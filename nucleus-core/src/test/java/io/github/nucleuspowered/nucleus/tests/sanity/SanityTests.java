@@ -9,6 +9,7 @@ import com.google.common.reflect.ClassPath;
 import io.github.nucleuspowered.nucleus.quickstart.NucleusConfigAdapter;
 import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,6 +49,39 @@ public class SanityTests {
         }
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testCommandKeysExistInMessagesFile() throws IOException {
+        Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
+                .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");
+        Set<Class<? extends ICommandExecutor<?>>> sc = ci.stream().map(ClassPath.ClassInfo::load).filter(ICommandExecutor.class::isAssignableFrom)
+                .map(x -> (Class<? extends ICommandExecutor<?>>)x).collect(Collectors.toSet());
+
+        // Get the resource
+        String bundle = "assets.nucleus.messages";
+
+        // Get the resource
+        ResourceBundle rb = ResourceBundle.getBundle(bundle, Locale.getDefault());
+        Enumeration<String> keys = rb.getKeys();
+        Set<String> s = new HashSet<>();
+
+        while (keys.hasMoreElements()) {
+            s.add(keys.nextElement());
+        }
+
+        List<Class<? extends ICommandExecutor<?>>> keyRoots = sc.stream()
+                .filter(x -> x.isAnnotationPresent(Command.class))
+                .filter(x -> !s.contains(x.getAnnotation(Command.class).commandDescriptionKey() + ".desc"))
+                .collect(Collectors.toList());
+
+        if (!keyRoots.isEmpty()) {
+            StringBuilder sb = new StringBuilder("Some command keys are not set: ");
+            keyRoots.forEach(x -> sb.append("Key: ").append(x.getAnnotation(Command.class).commandDescriptionKey())
+                    .append(".desc").append(" - ").append(x.getName())
+                    .append(System.lineSeparator()));
+            Assert.fail(sb.toString());
+        }
+    }
 
     @Test
     @SuppressWarnings("unchecked")
