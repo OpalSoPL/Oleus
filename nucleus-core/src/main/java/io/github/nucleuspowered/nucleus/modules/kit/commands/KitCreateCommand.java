@@ -31,33 +31,29 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 @Command(
-        aliases = { "create" },
+        aliases = { "create", "add" },
         basePermission = KitPermissions.BASE_KIT_CREATE,
         commandDescriptionKey = "kit.create",
         parentCommand = KitCommand.class
 )
 public class KitCreateCommand implements ICommandExecutor<CommandSource> {
 
+    private final String flag = "clone";
     private final String name = "name";
-
-    /*
-    @Override
-    protected boolean allowFallback(CommandSource source, CommandArgs args, CommandContext context) {
-        if (context.hasAny(this.name)) {
-            return false;
-        }
-        return super.allowFallback(source, args, context);
-    }
-*/
 
     @Override
     public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
-                GenericArguments.onlyOne(GenericArguments.string(Text.of(this.name)))
+                GenericArguments.flags().valueFlag(serviceCollection
+                                .commandElementSupplier()
+                                .createPermissionParameter(GenericArguments.markTrue(Text.of(this.flag)),
+                                        KitPermissions.BASE_KIT_EDIT), "c", "-clone")
+                    .buildWith(GenericArguments.onlyOne(GenericArguments.string(Text.of(this.name))))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override
+    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
         KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
         String kitName = context.requireOne(this.name, String.class);
 
@@ -65,20 +61,26 @@ public class KitCreateCommand implements ICommandExecutor<CommandSource> {
             return context.errorResult("command.kit.add.alreadyexists", kitName);
         }
 
-        if (context.is(Player.class)) {
-            final Player player = context.getIfPlayer();
-            Inventory inventory = Util.getKitInventoryBuilder()
-                    .property(InventoryTitle.PROPERTY_NAME,
-                            InventoryTitle.of(context.getMessage("command.kit.create.title", kitName)))
-                    .build(context.getServiceCollection().pluginContainer());
-            Container container = player.openInventory(inventory)
-                    .orElseThrow(() -> context.createException("command.kit.create.notcreated"));
-            Sponge.getEventManager().registerListeners(context.getServiceCollection().pluginContainer(), new TemporaryEventListener(
-                    service,
-                    context.getServiceCollection().messageProvider(),
-                    inventory,
-                    container,
-                    kitName));
+        if (context.is(Player.class) && context.testPermission(KitPermissions.BASE_KIT_EDIT)) {
+            // if we have a clone request, clone.
+            if (context.hasAny(this.flag)) {
+                service.saveKit(service.createKit(kitName).updateKitInventory(context.getCommandSourceAsPlayerUnchecked()));
+                context.sendMessage("command.kit.add.success", kitName);
+            } else {
+                final Player player = context.getIfPlayer();
+                Inventory inventory = Util.getKitInventoryBuilder()
+                        .property(InventoryTitle.PROPERTY_NAME,
+                                InventoryTitle.of(context.getMessage("command.kit.create.title", kitName)))
+                        .build(context.getServiceCollection().pluginContainer());
+                Container container = player.openInventory(inventory)
+                        .orElseThrow(() -> context.createException("command.kit.create.notcreated"));
+                Sponge.getEventManager().registerListeners(context.getServiceCollection().pluginContainer(), new TemporaryEventListener(
+                        service,
+                        context.getServiceCollection().messageProvider(),
+                        inventory,
+                        container,
+                        kitName));
+            }
         } else {
             try {
                 service.saveKit(service.createKit(kitName));
