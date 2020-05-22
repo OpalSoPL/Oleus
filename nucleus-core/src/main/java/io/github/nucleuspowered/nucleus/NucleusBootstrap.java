@@ -43,6 +43,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.util.ClientMessageReciever;
+import io.github.nucleuspowered.nucleus.util.PrettyPrinter;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.slf4j.Logger;
@@ -692,7 +693,9 @@ public class NucleusBootstrap {
         messages.add(Text.of(TextColors.RED, "-  INCORRECT SPONGE VERSION  -"));
         messages.add(Text.of(TextColors.RED, "------------------------------"));
         messages.add(Text.EMPTY);
-        messages.add(Text.of(TextColors.RED, "You are a mismatched version of Sponge on your server - this version of Nucleus will not run upon it."));
+        messages.add(Text.of(TextColors.RED, "You are running "
+                + "a mismatched version of Sponge on your server - this version of Nucleus will not run "
+                + "upon it."));
         messages.add(Text.of(TextColors.RED, "Nucleus has not started. Update Sponge to the latest version and try again."));
         if (this.isServer) {
             messages.add(Text.of(TextColors.RED,
@@ -741,15 +744,40 @@ public class NucleusBootstrap {
     }
 
     private List<Text> getErrorMessage() {
+        boolean isConfigError =
+                this.isErrored != null &&
+                this.isErrored instanceof IOException &&
+                this.isErrored.getCause() != null &&
+                this.isErrored.getCause().getClass().getName().contains(ConfigException.class.getSimpleName());
         List<Text> messages = Lists.newArrayList();
         messages.add(Text.of(TextColors.RED, "----------------------------"));
         messages.add(Text.of(TextColors.RED, "-  NUCLEUS FAILED TO LOAD  -"));
         messages.add(Text.of(TextColors.RED, "----------------------------"));
+
+        if (isConfigError) {
+            messages.add(Text.of(TextColors.RED, "-  ERROR IN CONFIGURATION  -"));
+            messages.add(Text.of(TextColors.RED, "----------------------------"));
+        }
+
         addX(messages, 5);
         messages.add(Text.of(TextColors.RED, "----------------------------"));
 
         messages.add(Text.EMPTY);
-        messages.add(Text.of(TextColors.RED, "Nucleus encountered an error during server start up and did not enable successfully. No commands, listeners or tasks are registered."));
+        if (isConfigError) {
+            messages.add(Text.of(TextColors.RED, "One of your configuration files is broken and could not be read."));
+            messages.add(Text.EMPTY);
+            messages.add(Text.of(TextColors.RED, this.isErrored.getCause().getMessage()));
+            messages.add(Text.EMPTY);
+            messages.add(Text.of(TextColors.RED, "This is usually because you've added an ID but forgotten to surround the ID with double quotes "
+                    + "(\")."));
+            messages.add(Text.of(TextColors.RED, "For example, to add minecraft:stone to the config, it should be added as \"minecraft:stone\""));
+            messages.add(Text.EMPTY);
+            messages.add(Text.of(TextColors.RED, "You will need to fix the configuration file and restart your server."));
+        } else {
+            messages.add(Text.of(TextColors.RED, "Nucleus encountered an error during server start up and did not enable successfully."));
+        }
+        messages.add(Text.EMPTY);
+        messages.add(Text.of(TextColors.RED, "No commands, listeners or tasks are registered."));
         if (this.isServer) {
             messages.add(Text.of(TextColors.RED,
                     "The server has been automatically whitelisted - this is to protect your server and players if you rely on some of Nucleus' functionality (such as fly states, etc.)"));
@@ -760,39 +788,24 @@ public class NucleusBootstrap {
         if (this.isErrored == null) {
             messages.add(Text.of(TextColors.YELLOW, "No exception was saved."));
         } else {
-            Throwable exception = this.isErrored;
-            if (exception.getCause() != null &&
-                    (exception instanceof QuickStartModuleLoaderException || exception instanceof QuickStartModuleDiscoveryException)) {
-                exception = exception.getCause();
-            }
-
-            // Blegh, relocations
-            if (exception instanceof IOException &&
-                    exception.getCause() != null &&
-                    exception.getCause().getClass().getName().contains(ConfigException.class.getSimpleName())) {
-                exception = exception.getCause();
-                messages.add(Text.of(TextColors.RED, "It appears that there is an error in your configuration file! The error is: "));
-                messages.add(Text.of(TextColors.RED, exception.getMessage()));
-                messages.add(Text.of(TextColors.RED, "Please correct this and restart your server."));
-                messages.add(Text.of(TextColors.YELLOW, "----------------------------"));
-                messages.add(Text.of(TextColors.YELLOW, "(The error that was thrown is shown below)"));
-            }
-
             try (StringWriter sw = new StringWriter(); PrintWriter pw = new PrintWriter(sw)) {
-                exception.printStackTrace(pw);
+                this.isErrored.printStackTrace(pw);
                 pw.flush();
                 String[] stackTrace = sw.toString().split("(\r)?\n");
                 for (String s : stackTrace) {
                     messages.add(Text.of(TextColors.YELLOW, s));
                 }
             } catch (IOException e) {
-                exception.printStackTrace();
+                this.isErrored.printStackTrace();
             }
         }
 
         messages.add(Text.of(TextColors.YELLOW, "----------------------------"));
         messages.add(Text.of(TextColors.RED, "If this error persists, check your configuration files and ensure that you have the latest version of Nucleus which matches the current version of the Sponge API."));
-        messages.add(Text.of(TextColors.RED, "If you do, please report this error to the Nucleus team at https://github.com/NucleusPowered/Nucleus/issues"));
+        if (!isConfigError) {
+            messages.add(Text.of(TextColors.RED,
+                    "If you continue to have this error, please report this error to the Nucleus team at https://github.com/NucleusPowered/Nucleus/issues"));
+        }
         messages.add(Text.of(TextColors.YELLOW, "----------------------------"));
         messages.add(Text.of(TextColors.YELLOW, "Server Information"));
         messages.add(Text.of(TextColors.YELLOW, "----------------------------"));
