@@ -171,7 +171,8 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         return GenericArguments.optionalWeak(
                 new NucleusRequirePermissionArgument(NucleusParameters.ONE_USER.get(this.serviceCollection),
                 this,
-                permission));
+                permission,
+                false));
     }
 
     @Override public OptionalDouble getDoubleOptionFromSubject(Subject player, String... options) {
