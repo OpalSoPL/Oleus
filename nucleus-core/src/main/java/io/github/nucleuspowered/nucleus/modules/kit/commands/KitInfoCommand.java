@@ -56,7 +56,7 @@ public class KitInfoCommand implements ICommandExecutor<CommandSource> {
                         context.getMessage("command.kit.info.onetime", yesno(context, kit.isOneTime())),
                         context.getMessage("command.kit.info.autoredeem", yesno(context, kit.isAutoRedeem())),
                         context.getMessage("command.kit.info.hidden", yesno(context, kit.isHiddenFromList())),
-                        context.getMessage("command.kit.info.displayredeem", yesno(context, kit.isAutoRedeem())),
+                        context.getMessage("command.kit.info.displayredeem", yesno(context, kit.isDisplayMessageOnRedeem())),
                         context.getMessage("command.kit.info.ignoresperm", yesno(context, kit.ignoresPermission()))
                 ).sendTo(context.getCommandSource());
         return context.successResult();
