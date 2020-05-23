@@ -1,12 +1,13 @@
-Nucleus
+Nucleus v2
 ====
+
+For version 1, see the sponge-api/7 branch.
 
 * [Source]
 * [Issues]
 * [Website]
 * [Downloads]
 * [Documentation]
-* [TeamCity]
 * [Discord]
 
 Licence: [MIT](LICENSE.md) (except for the Nucleus logo, which is all rights reserved)
@@ -17,10 +18,6 @@ plugins to disable modules that they replace the functionality of), and providin
 elite plugin for providing simple server tasks, and an essential addition to your server!
 
 Nucleus is being actively developed for Sponge API 7. 
-
-The current active branches are:
-
-* sponge-api/7 (this branch - 1.12.2+)
 
 ## Contributions
 
@@ -45,7 +42,8 @@ To build Nucleus, navigate to the source directory and run either:
 * `./gradlew build` on UNIX and UNIX like systems (including macOS and Linux)
 * `gradlew build` on Windows systems
 
-You will find the compiled JAR which will be named like `Nucleus-[version]-plugin.jar` in `output/`.
+You will find the compiled JAR which will be named like `Nucleus-[version]-plugin.jar` in `output/`. A corresponding API and
+javadocs jar will also exist.
 
 ## Building against the Nucleus API
 
@@ -55,7 +53,7 @@ Nucleus is available via a Maven repository.
 * Group ID: `io.github.nucleuspowered`
 * Artifact Name: `nucleus-api`
 
-The versioning follows `version[-SNAPSHOT]-S(sponge-api)`. Add the `-SNAPSHOT` section for the latest snapshot.
+The versioning follows `version[-SNAPSHOT|-ALPHAn|-BETAn|-RCn]`, where `n` is an integer. Add the `-SNAPSHOT` section for the latest snapshot.
 
 You can also get Nucleus as a whole this way, but internals may break at any time. The API is guaranteed to be more stable.
 
@@ -72,8 +70,7 @@ See [THIRDPARTY.md](THIRDPARTY.md) for more details.
 [Source]: https://github.com/NucleusPowered/Nucleus
 [Issues]: https://github.com/NucleusPowered/Nucleus/issues
 [Downloads]: https://github.com/NucleusPowered/Nucleus/releases
-[Website]: http://nucleuspowered.org/
-[Documentation]: http://nucleuspowered.org/docs
+[Website]: http://v2-beta.nucleuspowered.org/
+[Documentation]: http://v2-beta.nucleuspowered.org/docs
 [guidelines]: Contributing.md
-[TeamCity]: https://teamcity.drnaylor.co.uk/project.html?projectId=QuickStart&tab=projectOverview
-[Discord]: https://discord.gg/MC2mAuS
+[Discord]: https://discord.gg/A9QHG5H
