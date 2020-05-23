@@ -8,6 +8,7 @@ import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -85,8 +86,10 @@ public interface ICommandContext<C extends CommandSource> {
 
     <T> Collection<T> getAll(String name, TypeToken<T> clazz);
 
+    @NonNull
     <T> T requireOne(String name, Class<T> clazz);
 
+    @NonNull
     <T> T requireOne(String name, TypeToken<T> clazz);
 
     INucleusServiceCollection getServiceCollection();
@@ -105,10 +108,12 @@ public interface ICommandContext<C extends CommandSource> {
 
     CommandException createException(String key, Object... args);
 
+    @NonNull
     default Player getIfPlayer() throws CommandException {
         return getIfPlayer("command.playeronly");
     }
 
+    @NonNull
     Player getIfPlayer(String errorKey) throws CommandException;
 
     Map<CommandModifier, ICommandModifier> modifiers();

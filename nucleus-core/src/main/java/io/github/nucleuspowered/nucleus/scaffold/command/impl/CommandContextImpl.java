@@ -14,6 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.storage.util.ThrownSupplier;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -110,12 +111,12 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         return this.context.getAll(name);
     }
 
-    @Override public <T> T requireOne(String name, TypeToken<T> clazz) {
+    @Override public <T> @NonNull T requireOne(String name, TypeToken<T> clazz) {
         return this.context.requireOne(name);
     }
 
     @Override
-    public <T> T requireOne(String name, Class<T> clazz) {
+    public <T> @NonNull T requireOne(String name, Class<T> clazz) {
         return this.context.requireOne(name);
     }
 
@@ -384,7 +385,7 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         }
 
         @Override
-        public Player getIfPlayer(String errorKey) throws CommandException {
+        public @NonNull Player getIfPlayer(String errorKey) throws CommandException {
             if (getCommandSource() instanceof Player) {
                 return (Player) getCommandSource();
             }
@@ -434,7 +435,7 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         }
 
         @Override
-        public Player getIfPlayer(String errorKey) throws CommandException {
+        public @NonNull Player getIfPlayer(String errorKey) throws CommandException {
             throw new CommandException(
                     this.getServiceCollection().messageProvider().getMessageFor(getCommandSource(), errorKey)
             );
@@ -502,7 +503,7 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         }
 
         @Override
-        public Player getIfPlayer(String errorKey) throws CommandException {
+        public @NonNull Player getIfPlayer(String errorKey) throws CommandException {
             return getCommandSource();
         }
     }

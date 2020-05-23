@@ -146,23 +146,24 @@ public class TeleportCommand implements ICommandExecutor<CommandSource>, IReload
         boolean beQuiet = context.getOne(this.quietKey, Boolean.class).orElse(this.isDefaultQuiet);
         Optional<Player> oTo = context.getOne(this.playerToKey, Player.class);
         User to;
+        User fromUser;
         Player from;
         if (oTo.isPresent()) { // Two player argument.
-            from = context.getOne(NucleusParameters.Keys.PLAYER, Player.class)
-                    .flatMap(User::getPlayer)
-                    .orElseThrow(() -> context.createException("command.playeronly"));
+            fromUser = context.requireOne(NucleusParameters.Keys.PLAYER, User.class);
+            from = fromUser.getPlayer().orElse(null);
             to = oTo.get();
             if (context.is(to)) {
                 return context.errorResult("command.teleport.player.noself");
             }
         } else if (context.is(Player.class)) {
             from = context.getIfPlayer();
+            fromUser = from;
             to = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
         } else {
             return context.errorResult("command.playeronly");
         }
 
-        if (to.getPlayer().isPresent()) {
+        if (from != null && to.getPlayer().isPresent()) {
             try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 frame.pushCause(context.getIfPlayer());
                 TeleportResult result =
@@ -187,30 +188,38 @@ public class TeleportCommand implements ICommandExecutor<CommandSource>, IReload
 
         // Can we get a location?
         Supplier<CommandException> r = () -> context.createException("command.teleport.nolastknown", to.getName());
-        World w = to.getWorldUniqueId().flatMap(x -> Sponge.getServer().getWorld(x)).orElseThrow(r);
-        Location<World> l = new Location<>(
-                w,
-                to.getPosition()
-        );
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getIfPlayer());
-            boolean result = context.getServiceCollection()
-                    .teleportService()
-                    .teleportPlayerSmart(
-                            from,
-                            l,
-                            false,
-                            true,
-                            TeleportScanners.NO_SCAN.get()
-                    ).isSuccessful();
-            if (result) {
-                if (!context.is(from)) {
-                    context.sendMessage("command.teleport.offline.other", from.getName(), to.getName());
-                }
-
-                context.sendMessage("command.teleport.offline.self", to.getName());
+        if (from == null) {
+            if (fromUser.setLocation(to.getPosition(), to.getUniqueId())) {
+                context.sendMessage("command.teleport.offline.other", fromUser.getName(), to.getName());
                 return context.successResult();
+            }
+        } else {
+            World w = to.getWorldUniqueId().flatMap(x -> Sponge.getServer().getWorld(x)).orElseThrow(r);
+            Location<World> l = new Location<>(
+                    w,
+                    to.getPosition()
+            );
+
+            try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+                frame.pushCause(context.getIfPlayer());
+                boolean result = context.getServiceCollection()
+                        .teleportService()
+                        .teleportPlayerSmart(
+                                from,
+                                l,
+                                false,
+                                true,
+                                TeleportScanners.NO_SCAN.get()
+                        ).isSuccessful();
+                if (result) {
+                    if (!context.is(from)) {
+                        context.sendMessage("command.teleport.offline.other", from.getName(), to.getName());
+                    }
+
+                    context.sendMessage("command.teleport.offline.self", to.getName());
+                    return context.successResult();
+                }
             }
         }
 
