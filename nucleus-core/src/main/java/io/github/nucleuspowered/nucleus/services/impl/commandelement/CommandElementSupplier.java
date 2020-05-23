@@ -44,7 +44,8 @@ public class CommandElementSupplier implements ICommandElementSupplier {
                 new NucleusRequirePermissionArgument(
                         NucleusParameters.ONE_USER.get(this.serviceCollection),
                         this.permissionService,
-                        permission
+                        permission,
+                        false
                 )
         );
     }
@@ -54,7 +55,8 @@ public class CommandElementSupplier implements ICommandElementSupplier {
                 new NucleusRequirePermissionArgument(
                         isPlayer ? NucleusParameters.ONE_PLAYER.get(this.serviceCollection) : NucleusParameters.ONE_USER.get(this.serviceCollection),
                         this.permissionService,
-                        permission
+                        permission,
+                        false
                 )
         );
     }
@@ -64,13 +66,14 @@ public class CommandElementSupplier implements ICommandElementSupplier {
                 new NucleusRequirePermissionArgument(
                     isPlayer ? NucleusParameters.ONE_PLAYER.get(this.serviceCollection) : NucleusParameters.ONE_USER.get(this.serviceCollection),
                     this.permissionService,
-                    permission
+                    permission,
+                        false
                 )
         );
     }
 
-    @Override public NucleusRequirePermissionArgument createPermissionParameter(CommandElement wrapped, String permission) {
-        return new NucleusRequirePermissionArgument(wrapped, this.permissionService, permission);
+    @Override public NucleusRequirePermissionArgument createPermissionParameter(CommandElement wrapped, String permission, boolean isOptional) {
+        return new NucleusRequirePermissionArgument(wrapped, this.permissionService, permission, isOptional);
     }
 
     @Override public User getUserFromParametersElseSelf(ICommandContext<? extends CommandSource> context) throws CommandException {

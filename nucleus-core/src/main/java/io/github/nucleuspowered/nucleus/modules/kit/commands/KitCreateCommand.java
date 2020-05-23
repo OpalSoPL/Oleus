@@ -47,7 +47,7 @@ public class KitCreateCommand implements ICommandExecutor<CommandSource> {
                 GenericArguments.flags().valueFlag(serviceCollection
                                 .commandElementSupplier()
                                 .createPermissionParameter(GenericArguments.markTrue(Text.of(this.flag)),
-                                        KitPermissions.BASE_KIT_EDIT), "c", "-clone")
+                                        KitPermissions.BASE_KIT_EDIT, false), "c", "-clone")
                     .buildWith(GenericArguments.onlyOne(GenericArguments.string(Text.of(this.name))))
         };
     }

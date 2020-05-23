@@ -56,7 +56,7 @@ public class LightningCommand implements ICommandExecutor<CommandSource> {
                 GenericArguments.optional(
                     serviceCollection.commandElementSupplier().createPermissionParameter(
                             NucleusParameters.MANY_LIVING.get(serviceCollection),
-                            FunPermissions.OTHERS_LIGHTNING))
+                            FunPermissions.OTHERS_LIGHTNING, false))
         };
     }
 

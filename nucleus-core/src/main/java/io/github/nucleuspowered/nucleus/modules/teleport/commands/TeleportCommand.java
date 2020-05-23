@@ -82,7 +82,7 @@ public class TeleportCommand implements ICommandExecutor<CommandSource>, IReload
                     .valueFlag(
                             serviceCollection.commandElementSupplier()
                                 .createPermissionParameter(
-                                        GenericArguments.bool(Text.of(this.quietKey)), TeleportPermissions.TELEPORT_QUIET), "q")
+                                        GenericArguments.bool(Text.of(this.quietKey)), TeleportPermissions.TELEPORT_QUIET, false), "q")
                     .buildWith(GenericArguments.none()),
 
                     new AlternativeUsageArgument(

@@ -25,7 +25,7 @@ public interface ICommandElementSupplier {
 
     CommandElement createOnlyOtherUserPermissionElement(boolean isPlayer, String permission);
 
-    NucleusRequirePermissionArgument createPermissionParameter(CommandElement wrapped, String permission);
+    NucleusRequirePermissionArgument createPermissionParameter(CommandElement wrapped, String permission, boolean isOptional);
 
     User getUserFromParametersElseSelf(ICommandContext<? extends CommandSource> context) throws CommandException;
 }

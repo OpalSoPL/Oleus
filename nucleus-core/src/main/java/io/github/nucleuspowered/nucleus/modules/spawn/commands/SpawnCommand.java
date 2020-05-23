@@ -62,7 +62,7 @@ public class SpawnCommand implements ICommandExecutor<Player>, IReloadableServic
                             serviceCollection.commandElementSupplier()
                                 .createPermissionParameter(
                                         NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection),
-                                        SpawnPermissions.SPAWN_OTHERWORLDS))
+                                        SpawnPermissions.SPAWN_OTHERWORLDS, true))
         };
     }
 

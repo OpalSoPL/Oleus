@@ -74,10 +74,10 @@ public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadable
                                 .flag("f", "-force")
                                 .setAnchorFlags(false)
                                 .buildWith(GenericArguments.none()))),
-                serviceCollection.commandElementSupplier()
+                GenericArguments.optionalWeak(serviceCollection.commandElementSupplier()
                         .createPermissionParameter(
                                 NucleusParameters.OPTIONAL_ONE_PLAYER.get(serviceCollection),
-                                WarpPermissions.OTHERS_WARP),
+                                WarpPermissions.OTHERS_WARP, false)),
 
                 GenericArguments.onlyOne(serviceCollection.getServiceUnchecked(WarpService.class)
                         .warpElement(true))

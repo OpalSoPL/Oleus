@@ -38,7 +38,8 @@ public class ClearInventoryCommand implements ICommandExecutor<CommandSource> {
                 GenericArguments.optional(
                         serviceCollection.commandElementSupplier().createPermissionParameter(
                                 NucleusParameters.ONE_USER.get(serviceCollection),
-                                InventoryPermissions.OTHERS_CLEAR
+                                InventoryPermissions.OTHERS_CLEAR,
+                                false
                         ))
             )
         };

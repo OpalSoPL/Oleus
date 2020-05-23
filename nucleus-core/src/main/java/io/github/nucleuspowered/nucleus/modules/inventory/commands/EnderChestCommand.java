@@ -50,8 +50,7 @@ public class EnderChestCommand implements ICommandExecutor<Player> {
                                     NucleusParameters.ONE_USER_PLAYER_KEY.get(serviceCollection), // user if permission
                                     NucleusParameters.ONE_PLAYER.get(serviceCollection) // player if not
                             ),
-                            InventoryPermissions.OTHERS_ENDERCHEST
-                    ))
+                            InventoryPermissions.OTHERS_ENDERCHEST, false))
         };
     }
 

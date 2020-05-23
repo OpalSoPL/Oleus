@@ -66,7 +66,7 @@ public class KittyCannonCommand implements ICommandExecutor<CommandSource> {
                 .buildWith(
                     GenericArguments.optional(
                         serviceCollection.commandElementSupplier().createPermissionParameter(
-                                NucleusParameters.MANY_PLAYER.get(serviceCollection), FunPermissions.OTHERS_KITTYCANNON
+                                NucleusParameters.MANY_PLAYER.get(serviceCollection), FunPermissions.OTHERS_KITTYCANNON, false
                         )))
         };
     }

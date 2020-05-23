@@ -24,11 +24,13 @@ public class NucleusRequirePermissionArgument extends WrappedElement {
 
     private final String permission;
     private final IPermissionService permissionService;
+    private final boolean isOptional;
 
-    public NucleusRequirePermissionArgument(CommandElement wrapped, IPermissionService permissionService, String permission) {
+    public NucleusRequirePermissionArgument(CommandElement wrapped, IPermissionService permissionService, String permission, boolean isOptional) {
         super(wrapped);
         this.permissionService = permissionService;
         this.permission = permission;
+        this.isOptional = isOptional;
     }
 
     @Nullable
@@ -40,6 +42,9 @@ public class NucleusRequirePermissionArgument extends WrappedElement {
     @Override
     public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
         if (!this.permissionService.hasPermission(source, this.permission)) {
+            if (this.isOptional) {
+                return;
+            }
             Text key = getKey();
             throw args.createError(t("You do not have permission to use the %s argument", key != null ? key : t("unknown")));
         }
