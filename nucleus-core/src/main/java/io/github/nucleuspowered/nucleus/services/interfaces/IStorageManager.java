@@ -28,9 +28,9 @@ public interface IStorageManager {
 
     IStorageService.SingleCached<IKitDataObject> getKitsService();
 
-    IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> getUserService();
+    IStorageService.Keyed.KeyedData<UUID, IUserQueryObject, IUserDataObject> getUserService();
 
-    IStorageService.Keyed<UUID, IWorldQueryObject, IWorldDataObject> getWorldService();
+    IStorageService.Keyed.KeyedData<UUID, IWorldQueryObject, IWorldDataObject> getWorldService();
 
     IDataTranslator<IUserDataObject, JsonObject> getUserDataAccess();
 

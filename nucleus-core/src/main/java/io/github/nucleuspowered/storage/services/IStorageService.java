@@ -4,15 +4,14 @@
  */
 package io.github.nucleuspowered.storage.services;
 
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
 import io.github.nucleuspowered.storage.dataobjects.IDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
+import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 import io.github.nucleuspowered.storage.util.KeyedObject;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nonnull;
@@ -136,7 +135,7 @@ public interface IStorageService<D extends IDataObject> {
      *
      * @param <K> The primary key type
      * @param <Q> The {@link IQueryObject} that can contain query parameters
-     * @param <D> The {@link AbstractConfigurateBackedDataObject} that this service deals with.
+     * @param <D> The {@link IDataObject} that this service deals with.
      */
     interface Keyed<K, Q extends IQueryObject<K, Q>, D extends IDataObject> extends IStorageService<D> {
 
@@ -248,8 +247,6 @@ public interface IStorageService<D extends IDataObject> {
          */
         CompletableFuture<Integer> count(@Nonnull Q query);
 
-        <T2> CompletableFuture<Void> setAndSave(@Nonnull UUID key, DataKey<T2, ? extends D> dataKey, T2 data);
-
         /**
          * Saves an object of type {@link D} against the primary key of type {@link K}.
          *
@@ -266,6 +263,28 @@ public interface IStorageService<D extends IDataObject> {
          * @return A {@link CompletableFuture} that will contain an exception if there was a failure
          */
         CompletableFuture<Void> delete(@Nonnull K key);
+
+        /**
+         * Indicates the data is also keyed.
+         *
+         * @param <K> The primary key type
+         * @param <Q> The {@link IQueryObject} that can contain query parameters
+         * @param <D> The {@link IDataObject} that this service deals with.
+         */
+        interface KeyedData<K, Q extends IQueryObject<K, Q>, D extends IKeyedDataObject<D>> extends Keyed<K, Q, D> {
+
+            /**
+             * Performs a {@link #getOrNew(Object)}, then a {@link IKeyedDataObject#set(DataKey, Object)}, followed by a
+             * {@link #save(Object, IDataObject)}
+             *
+             * @param key The key to save against
+             * @param dataKey The data key to save against
+             * @param data The data to save
+             * @param <T2> The type of data to save
+             * @return A {@link CompletableFuture} that will contain an exception if there was a failure
+             */
+            <T2> CompletableFuture<Void> setAndSave(@Nonnull K key, DataKey<T2, ? extends D> dataKey, T2 data);
+        }
     }
 
 }

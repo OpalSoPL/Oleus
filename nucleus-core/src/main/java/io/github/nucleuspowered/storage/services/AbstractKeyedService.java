@@ -34,7 +34,7 @@ import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 
 public abstract class AbstractKeyedService<Q extends IQueryObject<UUID, Q>, D extends IKeyedDataObject<D>>
-        implements IStorageService.Keyed<UUID, Q, D> {
+        implements IStorageService.Keyed.KeyedData<UUID, Q, D> {
 
     private final LoadingCache<UUID, ReentrantReadWriteLock> dataLocks =
             Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(new CacheLoader<UUID, ReentrantReadWriteLock>() {
