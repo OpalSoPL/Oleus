@@ -133,7 +133,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
 
         IUserDataObject udo = this.serviceCollection.storageManager().getOrCreateUserOnThread(home.getOwnersUniqueId());
         Map<String, LocationNode> m = udo.get(HomeKeys.HOMES).orElseGet(ImmutableMap::of);
-        if (!setHome(m, home.getName(), location, rotation, false, udo)) {
+        if (!setHome(m, home.getName(), location, rotation, true, udo)) {
             throw new HomeException(
                     this.serviceCollection.messageProvider().getMessageFor(
                             Util.getSourceFromCause(cause),
