@@ -25,7 +25,7 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 @EssentialsEquivalent({"delwarp", "remwarp", "rmwarp"})
 @NonnullByDefault
 @Command(
-        aliases = {"delete", "del"},
+        aliases = {"delete", "del", "#delwarp", "#remwarp", "#rmwarp"},
         basePermission = WarpPermissions.BASE_WARP_LIST,
         commandDescriptionKey = "warp.list",
         async = true,
