@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kit.listeners;
 
+import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
-import io.github.nucleuspowered.nucleus.api.module.kit.exception.KitRedeemException;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
 import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
@@ -53,13 +53,11 @@ public class KitAutoRedeemListener implements ListenerBase.Conditional, IReloada
             }
 
             // Redeem kit in the normal way.
-            try {
-                this.kitService.redeemKit(kit, player, true, true, this.mustGetAll, false);
-                log(name  + kitName + " - kit redeemed.");
-            } catch (KitRedeemException e) {
-                if (this.logAutoRedeem) {
-                    this.logger.error(name + kitName + " - kit could not be redeemed.", e);
-                }
+            KitRedeemResult redeemResult = this.kitService.redeemKit(kit, player, true, true, this.mustGetAll, false);
+            if (redeemResult.isSuccess()) {
+                log(name + kitName + " - kit redeemed.");
+            } else if (this.logAutoRedeem) {
+                this.logger.error(name + kitName + " - kit could not be redeemed.", redeemResult.getStatus().name());
             }
         }
     }

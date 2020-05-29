@@ -6,11 +6,13 @@ package io.github.nucleuspowered.storage.services;
 
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
 import io.github.nucleuspowered.storage.dataobjects.IDataObject;
+import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 import io.github.nucleuspowered.storage.util.KeyedObject;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nonnull;
@@ -245,6 +247,8 @@ public interface IStorageService<D extends IDataObject> {
          * @return The {@link CompletableFuture} containing the count
          */
         CompletableFuture<Integer> count(@Nonnull Q query);
+
+        <T2> CompletableFuture<Void> setAndSave(@Nonnull UUID key, DataKey<T2, ? extends D> dataKey, T2 data);
 
         /**
          * Saves an object of type {@link D} against the primary key of type {@link K}.

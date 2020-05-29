@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.kit.events;
 
 import com.google.common.collect.ImmutableList;
+import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.api.module.kit.event.NucleusKitEvent;
-import io.github.nucleuspowered.nucleus.api.module.kit.exception.KitRedeemException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
@@ -150,11 +150,11 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
 
         @Nullable private final Collection<ItemStackSnapshot> redeemed;
         @Nullable private final Collection<String> commands;
-        private final KitRedeemException.Reason ex;
+        private final KitRedeemResult.Status ex;
 
         public FailedRedeem(Cause cause, @Nullable Instant lastTime, Kit kit, Player targetPlayer, Collection<ItemStackSnapshot> original,
                 @Nullable Collection<ItemStackSnapshot> redeemed, Collection<String> originalCommands, @Nullable Collection<String> commands,
-                KitRedeemException.Reason ex) {
+                KitRedeemResult.Status ex) {
             super(cause, lastTime, kit, targetPlayer, original, originalCommands);
             this.redeemed = redeemed;
             this.commands = commands;
@@ -169,7 +169,7 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
             return Optional.ofNullable(this.commands);
         }
 
-        @Override public KitRedeemException.Reason getReason() {
+        @Override public KitRedeemResult.Status getReason() {
             return this.ex;
         }
     }

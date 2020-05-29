@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.api.module.kit.data;
 
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.NucleusKitService;
-import io.github.nucleuspowered.nucleus.api.module.kit.exception.KitRedeemException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -192,9 +192,8 @@ public interface Kit {
      *
      * @param player The player to redeem the kit for
      * @return The result
-     * @throws KitRedeemException If the kit was not redeemed.
      */
-    default NucleusKitService.RedeemResult redeem(Player player) throws KitRedeemException {
+    default KitRedeemResult redeem(Player player) {
         save();
         NucleusKitService kitService = NucleusAPI.getKitService().orElseThrow(() -> new IllegalStateException("No Kit module"));
         return kitService.redeemKit(this, player, true);

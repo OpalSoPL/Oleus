@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.kit.event;
 
+import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
-import io.github.nucleuspowered.nucleus.api.module.kit.exception.KitRedeemException;
 import io.github.nucleuspowered.nucleus.api.util.CancelMessageEvent;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.event.Event;
@@ -157,11 +157,11 @@ public interface NucleusKitEvent extends Event {
         interface Failed extends Redeem {
 
             /**
-             * Gets the {@link KitRedeemException.Reason} that will be thrown by the routine.
+             * Gets the {@link KitRedeemResult.Status} that will be thrown by the routine.
              *
              * @return The reason.
              */
-            KitRedeemException.Reason getReason();
+            KitRedeemResult.Status getReason();
         }
     }
 }

@@ -166,7 +166,6 @@ public class CommandControl implements CommandCallable {
         // do we have a subcommand?
         CommandArgs args = new CommandArgs(arguments, tokeniser.tokenize(arguments, false));
         ICommandResult commandResult = process(Sponge.getCauseStackManager().getCurrentCause(), source, arguments, args);
-        commandResult.getErrorMessage(source).ifPresent(source::sendMessage);
         return commandResult.isSuccess() ? CommandResult.success() : CommandResult.empty();
     }
 

@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.kit.listeners;
 
 import io.github.nucleuspowered.nucleus.api.core.event.NucleusFirstJoinEvent;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
-import io.github.nucleuspowered.nucleus.api.module.kit.exception.KitRedeemException;
 import io.github.nucleuspowered.nucleus.modules.core.events.UserDataLoadedEvent;
 import io.github.nucleuspowered.nucleus.modules.kit.KitKeys;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
@@ -61,11 +60,7 @@ public class KitListener implements ListenerBase {
     @Listener
     public void onPlayerFirstJoin(NucleusFirstJoinEvent event, @Getter("getTargetEntity") Player player) {
         for (Kit kit : this.handler.getFirstJoinKits()) {
-            try {
-                handler.redeemKit(kit, player, true, true);
-            } catch (KitRedeemException e) {
-                // ignored
-            }
+            this.handler.redeemKit(kit, player, true, true);
         }
     }
 
@@ -73,7 +68,7 @@ public class KitListener implements ListenerBase {
     @Exclude({InteractInventoryEvent.Open.class})
     public void onPlayerInteractInventory(final InteractInventoryEvent event, @Root final Player player,
             @Getter("getTargetInventory") final Container inventory) {
-        handler.getCurrentlyOpenInventoryKit(inventory).ifPresent(x -> {
+        this.handler.getCurrentlyOpenInventoryKit(inventory).ifPresent(x -> {
             try {
                 x.getFirst().updateKitInventory(x.getSecond());
                 this.handler.saveKit(x.getFirst(), false);

@@ -5,9 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.kit.commands;
 
 import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.api.module.kit.NucleusKitService;
+import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
-import io.github.nucleuspowered.nucleus.api.module.kit.exception.KitRedeemException;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
 import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
 import io.github.nucleuspowered.nucleus.modules.kit.parameters.KitParameter;
@@ -26,6 +25,8 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.time.Duration;
 
 /**
  * Gives a kit to a subject.
@@ -65,13 +66,13 @@ public class KitGiveCommand implements ICommandExecutor<CommandSource>, IReloada
 
         Text playerName = context.getDisplayName(player.getUniqueId());
         Text kitName = Text.of(kit.getName());
-        try {
-            NucleusKitService.RedeemResult redeemResult = service.redeemKit(kit, player, !skip, this.mustGetAll);
-            if (!redeemResult.rejected().isEmpty()) {
+        KitRedeemResult redeemResult = service.redeemKit(kit, player, !skip, this.mustGetAll);
+        if (redeemResult.isSuccess()) {
+            if (!redeemResult.rejectedItems().isEmpty()) {
                 // If we drop them, tell the user
                 if (this.isDrop) {
                     context.sendMessage("command.kit.give.itemsdropped", playerName);
-                    redeemResult.rejected().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.getLocation()));
+                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.getLocation()));
                 } else {
                     context.sendMessage("command.kit.give.fullinventory", playerName);
                 }
@@ -83,19 +84,18 @@ public class KitGiveCommand implements ICommandExecutor<CommandSource>, IReloada
             }
 
             return context.successResult();
-        } catch (KitRedeemException ex) {
-            switch (ex.getReason()) {
-                case ALREADY_REDEEMED:
+        } else {
+            switch (redeemResult.getStatus()) {
+                case ALREADY_REDEEMED_ONE_TIME:
                     return context.errorResult("command.kit.give.onetime.alreadyredeemed", kitName, playerName);
                 case COOLDOWN_NOT_EXPIRED:
-                    KitRedeemException.Cooldown kre = (KitRedeemException.Cooldown) ex;
                     return context.errorResult("command.kit.give.cooldown",
                             playerName,
-                            context.getTimeString(kre.getTimeLeft()),
+                            context.getTimeString(redeemResult.getCooldownDuration().orElse(Duration.ZERO)),
                             kitName);
                 case PRE_EVENT_CANCELLED:
-                    KitRedeemException.PreCancelled krepe = (KitRedeemException.PreCancelled) ex;
-                    return krepe.getCancelMessage()
+                    return redeemResult
+                            .getMessage()
                             .map(context::errorResultLiteral)
                             .orElseGet(() -> context.errorResult("command.kit.cancelledpre", kit.getName()));
                 case NO_SPACE:
