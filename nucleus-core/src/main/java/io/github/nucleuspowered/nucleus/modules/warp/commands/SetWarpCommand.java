@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 @NonnullByDefault
 @Command(
         aliases = {"set", "#setwarp", "#warpset"},
+        parentCommand = WarpCommand.class,
         basePermission = WarpPermissions.BASE_WARP_SET,
         commandDescriptionKey = "warp.set",
         modifiers = {
