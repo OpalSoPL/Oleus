@@ -110,7 +110,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
         CreateHomeEvent event = new CreateHomeEvent(name, user, cause, location);
         postEvent(event);
 
-        if (!setHome(m, name, location, rotation, false, udo)) {
+        if (!setHome(user.getUniqueId(), m, name, location, rotation, false)) {
             throw new HomeException(
                     this.serviceCollection.messageProvider().getMessageFor(
                         Util.getSourceFromCause(cause),
@@ -133,7 +133,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
 
         IUserDataObject udo = this.serviceCollection.storageManager().getOrCreateUserOnThread(home.getOwnersUniqueId());
         Map<String, LocationNode> m = udo.get(HomeKeys.HOMES).orElseGet(ImmutableMap::of);
-        if (!setHome(m, home.getName(), location, rotation, true, udo)) {
+        if (!setHome(home.getOwnersUniqueId(), m, home.getName(), location, rotation, true)) {
             throw new HomeException(
                     this.serviceCollection.messageProvider().getMessageFor(
                             Util.getSourceFromCause(cause),
@@ -156,7 +156,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
 
         IUserDataObject udo = this.serviceCollection.storageManager().getOrCreateUserOnThread(home.getOwnersUniqueId());
         Map<String, LocationNode> m = udo.get(HomeKeys.HOMES).orElseGet(ImmutableMap::of);
-        if (!deleteHome(m, home.getName(), udo)) {
+        if (!deleteHome(home.getOwnersUniqueId(), m, home.getName())) {
                 throw new HomeException(
                         this.serviceCollection.messageProvider().getMessageFor(
                                 Util.getSourceFromCause(cause),
@@ -251,8 +251,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
         return Util.getValueIgnoreCase(homeData, home).map(x -> getHomeFrom(home, uuid, x));
     }
 
-    private boolean setHome(Map<String, LocationNode> m, String home, Location<World> location, Vector3d rotation, boolean overwrite,
-            IUserDataObject udo) {
+    private boolean setHome(UUID uuid, Map<String, LocationNode> m, String home, Location<World> location, Vector3d rotation, boolean overwrite) {
         final Pattern warpName = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]{1,15}$");
 
         if (m == null) {
@@ -269,7 +268,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
         }
 
         m.put(home, new LocationNode(location, rotation));
-        udo.set(HomeKeys.HOMES, m);
+        setAndSave(uuid, m);
         return true;
     }
 
@@ -287,7 +286,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
         return false;
     }
 
-    private boolean deleteHome(Map<String, LocationNode> m, String home, IUserDataObject udo) {
+    private boolean deleteHome(UUID uuid, Map<String, LocationNode> m, String home) {
         if (m == null || m.isEmpty()) {
             return false;
         }
@@ -296,11 +295,14 @@ public class HomeService implements NucleusHomeService, ServiceBase {
         if (os.isPresent()) {
             m = Maps.newHashMap(m);
             m.remove(os.get());
-            udo.set(HomeKeys.HOMES, m);
+            setAndSave(uuid, m);
             return true;
         }
 
         return false;
     }
 
+    private void setAndSave(UUID uuid, Map<String, LocationNode> map) {
+        this.serviceCollection.storageManager().getUserService().setAndSave(uuid, HomeKeys.HOMES, map);
+    }
 }
