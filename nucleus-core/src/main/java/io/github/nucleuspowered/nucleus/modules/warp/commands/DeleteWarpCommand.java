@@ -19,7 +19,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @EssentialsEquivalent({"delwarp", "remwarp", "rmwarp"})
@@ -40,27 +40,32 @@ public class DeleteWarpCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override
+    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
         Warp warp = context.requireOne(WarpService.WARP_KEY, Warp.class);
         NucleusWarpService qs = Sponge.getServiceManager().provideUnchecked(NucleusWarpService.class);
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
-            DeleteWarpEvent event = new DeleteWarpEvent(frame.getCurrentCause(), warp);
-            if (Sponge.getEventManager().post(event)) {
-                return event.getCancelMessage().map(context::errorResultLiteral)
-                        .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
-            }
-
-            if (qs.removeWarp(warp.getName())) {
-                // Worked. Tell them.
-                context.sendMessage("command.warps.del", warp.getName());
-                return context.successResult();
-            }
-
-            // Didn't work. Tell them.
-            return context.errorResult("command.warps.delerror");
+        final Cause cause;
+        if (context.getCause().root() == context.getCommandSource()) {
+            cause = context.getCause();
+        } else {
+            cause = context.getCause().with(context.getCommandSource());
         }
+
+        DeleteWarpEvent event = new DeleteWarpEvent(cause, warp);
+        if (Sponge.getEventManager().post(event)) {
+            return event.getCancelMessage().map(context::errorResultLiteral)
+                    .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
+        }
+
+        if (qs.removeWarp(warp.getName())) {
+            // Worked. Tell them.
+            context.sendMessage("command.warps.del", warp.getName());
+            return context.successResult();
+        }
+
+        // Didn't work. Tell them.
+        return context.errorResult("command.warps.delerror");
     }
 
 }
