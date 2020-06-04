@@ -108,20 +108,13 @@ val gitCommitMessage by tasks.registering(StdOutExec::class) {
     commandLine("git", "log", "-1", "--format=%B")
 }
 
-val cleanJars by tasks.registering {
-    doLast {
-        val output = project.file("output").listFiles()
-        if (output != null) {
-            for (x in output) {
-                if (x.name.endsWith("jar")
-                        || x.name.endsWith("md")
-                        || x.name.endsWith("json")
-                        || x.name.endsWith("yml")) {
-                    x.delete()
-                }
-            }
-        }
-    }
+val cleanOutput by tasks.registering(Delete::class) {
+    delete(fileTree("output").matching {
+        include("*.jar")
+        include("*.md")
+        include("*.json")
+        include("*.yml")
+    })
 }
 
 val copyJars by tasks.registering(Copy::class) {
@@ -246,7 +239,7 @@ tasks {
     }
 
     clean {
-        dependsOn(cleanJars)
+        dependsOn(cleanOutput)
     }
 
     compileJava {
