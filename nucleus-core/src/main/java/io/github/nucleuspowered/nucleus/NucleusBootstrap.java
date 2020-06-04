@@ -104,6 +104,8 @@ import javax.annotation.Nullable;
 @Plugin(id = NucleusPluginInfo.ID, name = NucleusPluginInfo.NAME, version = NucleusPluginInfo.VERSION, description = NucleusPluginInfo.DESCRIPTION, dependencies = @Dependency(id = "spongeapi", version = NucleusPluginInfo.SPONGE_API_VERSION))
 public class NucleusBootstrap {
 
+    private static final String DOCGEN_PROPERTY = "nucleus.docgen";
+
     private static final String divider = "+------------------------------------------------------------+";
     private static final int length = divider.length() - 2;
 
@@ -122,6 +124,7 @@ public class NucleusBootstrap {
     @Nullable private Path dataFileLocation = null;
     private boolean isServer = false;
     @Nullable private String versionFail;
+    private final boolean docgenOnly;
 
     private static boolean versionCheck(IMessageProviderService provider) throws IllegalStateException {
         Pattern matching = Pattern.compile("^(?<major>\\d+)\\.(?<minor>\\d+)");
@@ -195,7 +198,7 @@ public class NucleusBootstrap {
                 logger,
                 this.dataDir,
                 this.configDir);
-
+        this.docgenOnly = System.getProperty(DOCGEN_PROPERTY) != null;
     }
 
     private INucleusServiceCollection getServiceCollection() {
@@ -456,6 +459,31 @@ public class NucleusBootstrap {
         this.serviceCollection.permissionService().registerDescriptions();
         Sponge.getEventManager().post(new BaseModuleEvent.Complete(this));
         this.logger.info(messageProvider.getMessageString("startup.completeinit", NucleusPluginInfo.NAME));
+        if (this.docgenOnly) {
+            final Path finalPath;
+            try {
+                final String docgenPath = System.getProperty(DOCGEN_PROPERTY);
+                if (docgenPath.isEmpty()) {
+                    finalPath = this.dataDir.get();
+                } else {
+                    final Path path = Sponge.getGame().getGameDirectory().resolve(docgenPath);
+                    boolean isOk = path.toAbsolutePath().startsWith(Sponge.getGame().getGameDirectory().toAbsolutePath());
+                    isOk &= Files.notExists(path) || Files.isDirectory(path);
+                    if (isOk) {
+                        Files.createDirectories(path);
+                        finalPath = path;
+                    } else {
+                        finalPath = this.dataDir.get();
+                    }
+                }
+                this.logger.info("Starting generation of documentation, saving files to: {}", finalPath.toString());
+                this.serviceCollection.documentationGenerationService().generate(finalPath);
+                this.logger.info("Generation is complete. Server will shut down.");
+            } catch (Exception ex) {
+                this.logger.error("Could not generate. Server will shut down.");
+                ex.printStackTrace();
+            }
+        }
     }
 
     @Listener
@@ -468,6 +496,9 @@ public class NucleusBootstrap {
 
     @Listener(order = Order.EARLY)
     public void onGameStartingEarly(GameStartingServerEvent event) {
+        if (this.docgenOnly) {
+            return;
+        }
         IMessageProviderService messageProvider = this.serviceCollection.messageProvider();
         if (!this.isServer) {
             try {
@@ -491,6 +522,9 @@ public class NucleusBootstrap {
 
     @Listener
     public void onGameStarting(GameStartingServerEvent event) {
+        if (this.docgenOnly) {
+            return;
+        }
         IMessageProviderService messageProvider = this.serviceCollection.messageProvider();
         if (this.isErrored == null) {
             this.logger.info(messageProvider.getMessageString("startup.gamestart", NucleusPluginInfo.NAME));
@@ -514,6 +548,10 @@ public class NucleusBootstrap {
 
     @Listener(order = Order.PRE)
     public void onGameStarted(GameStartedServerEvent event) {
+        if (this.docgenOnly) {
+            Sponge.getServer().shutdown();
+            return;
+        }
         IMessageProviderService messageProvider = this.serviceCollection.messageProvider();
         if (this.isErrored == null) {
             try {
@@ -580,6 +618,9 @@ public class NucleusBootstrap {
 
     @Listener
     public void onServerStop(GameStoppedServerEvent event) {
+        if (this.docgenOnly) {
+            return;
+        }
         IMessageProviderService messageProvider = this.serviceCollection.messageProvider();
         if (this.hasStarted && this.isErrored == null) {
             this.serviceCollection.platformService().unsetGameStartedTime();
@@ -613,10 +654,6 @@ public class NucleusBootstrap {
                 e.printStackTrace();
             }
         }
-    }
-
-    public Path getConfigDirPath() {
-        return this.configDir;
     }
 
     private void resetDataPath() throws IOException {

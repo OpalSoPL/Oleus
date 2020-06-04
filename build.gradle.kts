@@ -179,6 +179,35 @@ compileTestKotlin.kotlinOptions {
     jvmTarget = "1.8"
 }
 
+val setupDocGen by tasks.registering(io.github.nucleuspowered.gradle.task.SetupServer::class) {
+    dependsOn(shadowJar)
+    acceptEula = true
+    fileProvider = shadowJar.archiveFile
+}
+
+val runDocGen by tasks.registering(JavaExec::class) {
+    dependsOn(setupDocGen)
+    workingDir = File("run")
+    classpath = files(File("run/sv.jar"))
+    systemProperty("nucleus.docgen", "docs")
+}
+
+val copyDocGen by tasks.registering(Copy::class) {
+    dependsOn(runDocGen)
+    from("run/docs")
+    into(project.file("output"))
+}
+
+val docGen by tasks.registering {
+    dependsOn(copyDocGen)
+    dependsOn(runDocGen)
+    dependsOn(setupDocGen)
+}
+
+val deleteDocGenServer by tasks.registering(Delete::class) {
+    delete("run")
+}
+
 tasks {
     shadowJar {
         dependsOn(":nucleus-api:build")

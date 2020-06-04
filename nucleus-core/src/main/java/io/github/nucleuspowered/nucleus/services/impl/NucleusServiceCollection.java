@@ -14,6 +14,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.ICommandMetadataServ
 import io.github.nucleuspowered.nucleus.services.interfaces.ICompatibilityService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICooldownService;
+import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenerationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
@@ -76,6 +77,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     private final Provider<ICompatibilityService> compatibilityServiceProvider;
     private final Provider<IChatMessageFormatterService> chatMessageFormatterProvider;
     private final Provider<IPlaceholderService> placeholderServiceProvider;
+    private final Provider<IDocumentationGenerationService> documentationGenerationServiceProvider;
     private final Injector injector;
     private final PluginContainer pluginContainer;
     private final Logger logger;
@@ -114,6 +116,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         this.compatibilityServiceProvider = new LazyLoad<>(this, injector, ICompatibilityService.class);
         this.chatMessageFormatterProvider = new LazyLoad<>(this, injector, IChatMessageFormatterService.class);
         this.placeholderServiceProvider = new LazyLoad<>(this, injector, IPlaceholderService.class);
+        this.documentationGenerationServiceProvider = new LazyLoad<>(this, injector, IDocumentationGenerationService.class);
         this.injector = injector;
         this.pluginContainer = pluginContainer;
         this.logger = logger;
@@ -222,6 +225,10 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
 
     @Override public IChatMessageFormatterService chatMessageFormatter() {
         return this.chatMessageFormatterProvider.get();
+    }
+
+    @Override public IDocumentationGenerationService documentationGenerationService() {
+        return this.documentationGenerationServiceProvider.get();
     }
 
     @Override
