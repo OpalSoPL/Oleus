@@ -34,3 +34,28 @@ jobs:
         KEY: ${{ secrets.GITHUB_TOKEN }}
         REPO: "NucleusPowered/Nucleus"
 
+    - name: Upload Plugin
+      uses: actions/upload-artifact@v2
+      with:
+        name: plugin
+        path: output/*-plugin.jar
+    - name: Upload API
+      uses: actions/upload-artifact@v2
+      with:
+        name: API
+        path: output/*-API.jar
+    - name: Upload Javadocs
+      uses: actions/upload-artifact@v2
+      with:
+        name: Javadocs
+        path: output/*-javadocs.jar
+    - name: Upload YAML
+      uses: actions/upload-artifact@v2
+      with:
+        name: YML
+        path: output/*.yml
+    - name: Upload Release Notes
+      uses: actions/upload-artifact@v2
+      with:
+        name: Release Notes
+        path: output/*.md
