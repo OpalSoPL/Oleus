@@ -34,7 +34,7 @@ try {
         doc.prerelease.push(newVer)
     }
 
-
+    core.setOutput('outputyml', yaml.safeDump(doc))
 } catch (e) {
     core.setFailed(e.message);
 }

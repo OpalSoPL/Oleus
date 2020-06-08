@@ -64,3 +64,5 @@ jobs:
       with:
         name: Release Notes
         path: output/*.md
+  docs:
+    runs-on: ubuntu-latest
