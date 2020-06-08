@@ -91,6 +91,31 @@ jobs:
           path: '_data/versions.yml'
           contents: ${{ steps.latestrel.outputs.outputyml }}
           write-mode: overwrite
+      - name: Delete old docgen files
+        run: |
+          rm _data/commands.yml
+          rm _data/ess.yml
+          rm _data/permissions.yml
+          rm _data/conf.yml
+          rm _data/tokens.yml
+      - name: Add new docgen files
+        uses: actions/download-artifact@v2
+        with:
+          name: YML files from DocGen
+          path: _data
+      - name: Create temp directory
+        run: |
+          mkdir -p tmp
+      - name: Get Javadocs
+        uses: actions/download-artifact@v2
+        with:
+          name: Nucleus Javadocs
+          path: tmp
+      - name: Unzip Javadocs
+        run: |
+          mkdir -p javadocs/${{ env.nucleus.version }}
+          find tmp -name "*.jar" -exec unzip {} -d javadocs/${{ env.nucleus.version }} \;
+          rm tmp/*.jar
       - name: Commit updates
         run: |
           git config --global user.name 'Github Actions Bot'
