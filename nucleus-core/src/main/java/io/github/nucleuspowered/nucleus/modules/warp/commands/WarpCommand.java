@@ -32,6 +32,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
 import java.util.Optional;
@@ -129,10 +130,13 @@ public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadable
 
         // Permission checks are done by the parser.
         Warp wd = context.requireOne(WarpService.WARP_KEY, Warp.class);
+        WorldProperties worldProperties = wd.getWorldProperties().orElseThrow(() -> context.createException(
+                "command.warp.worlddoesnotexist"
+        ));
 
         // Load the world in question
         if (!wd.getTransform().isPresent()) {
-            Sponge.getServer().loadWorld(wd.getWorldProperties().get().getUniqueId())
+            Sponge.getServer().loadWorld(worldProperties.getUniqueId())
                 .orElseThrow(() -> context.createException("command.warp.worldnotloaded"));
         }
 
