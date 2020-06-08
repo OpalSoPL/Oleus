@@ -5,12 +5,11 @@ name: Gradle Package
 
 on:
   push:
-    branches:
-      - v2/S7
+    tags:
+      - '[2-9]*'
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -22,8 +21,14 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
+    - name: Set Github Actions Environment Variable (Version)
+      run: ./gradlew setGithubActionsVersion
+
     - name: Build with Gradle
-      run: ./gradlew build docGen
+      run: ./gradlew build
+
+    - name: Run Doc Gen
+      run: ./gradlew docGen
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
     # the publishing section of your build.gradle

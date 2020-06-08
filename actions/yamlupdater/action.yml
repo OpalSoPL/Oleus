@@ -1,0 +1,16 @@
+name: 'Nucleus YML Updater'
+description: 'Updates the version in the docs YAML'
+inputs:
+  version:
+    description: 'Version'
+    required: true
+  inputyml:
+    description: 'String input'
+    required: true
+    default: ''
+outputs:
+  outputyml: # id of output
+    description: 'The output yml'
+runs:
+  using: 'node12'
+  main: 'index.js'

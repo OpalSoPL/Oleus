@@ -97,6 +97,16 @@ dependencies {
     }
 }
 
+/**
+ * For use with Github Actions, as you probably suspected by the name of the task
+ */
+val setGithubActionsVersion by tasks.registering(Exec::class) {
+    commandLine("echo", "::set-env name=NUCLEUS_VERSION::$version")
+    if (!level.isSnapshot) {
+        commandLine("echo", "::set-env name=NUCLEUS_NOT_SNAPSHOT::true")
+    }
+}
+
 val gitHash by tasks.registering(StdOutExec::class)  {
     commandLine("git", "rev-parse", "--short", "HEAD")
     doLast {
