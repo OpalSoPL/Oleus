@@ -19,7 +19,7 @@ try {
     let doc = yaml.safeLoad(core.getInput("inputyml"));
     const version = core.getInput("version");
     const semver = version.split("-", 2)[0];
-    const versplit = version.split(".");
+    const versplit = semver.split(".");
     let isPreRelease = version.includes("BETA") || version.includes("ALPHA") || version.includes("RC") || version.includes("SNAPSHOT");
     let newVer = {
         version: version,

@@ -66,3 +66,34 @@ jobs:
         path: output/*.md
   docs:
     runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        name: Checkout Docs
+        with:
+          repository: 'NucleusPowered/v2-site'
+          ref: 'gh-pages'
+          token: '${{ secrets.DOCS_PAT }}'
+      - uses: pCYSl5EDgo/cat@master
+        name: Read Current YAML Data
+        id: inputdata
+        with:
+          path: '_data/versions.yml'
+      - name: Add latest release
+        uses: './actions/yamlupdater' # Uses an action in the root directory
+        id: latestrel
+        with:
+          inputyaml: ${{ steps.inputdata.outputs.text }}
+          version: ${{ env.nucleus.version }}
+      - name: Save updated file
+        uses: DamianReeves/write-file-action
+        with:
+          path: '_data/versions.yml'
+          contents: ${{ steps.latestrel.outputs.outputyml }}
+          write-mode: overwrite
+      - name: Commit updates
+        run: |
+          git config --global user.name 'Github Actions Bot'
+          git config --global user.email 'dualspiral@users.noreply.github.com'
+          git commit -am "Update for ${{ env.nucleus.version }}"
+          git push
