@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Nucleus Documentation
+    url: https://nucleuspowered.org/docs
+    about: If you're asking how to do something, do not create an issues - read our docs first!
   - name: Nucleus Support Discord
     url: https://discord.gg/A9QHG5H
-    about: If you require support, please visit our Discord server and ask there. Do not create support issues.
+    about: If the docs do not answer your question, come ask in our support Discord server.
