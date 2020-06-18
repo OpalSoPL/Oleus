@@ -152,7 +152,9 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     commandDoc.setDefaultLevel(level.getRole());
                     commandDoc.setOneLineDescription(control.getShortDescription(Sponge.getServer().getConsole())
                             .map(Text::toPlain).orElse("No description provided"));
-                    commandDoc.setExtendedDescription(control.getHelp(Sponge.getServer().getConsole()).map(Text::toPlain).orElse(null));
+                    commandDoc.setExtendedDescription(control.getExtendedDescription(Sponge.getServer().getConsole())
+                            .map(Text::toPlain)
+                            .orElse(null));
                     commandDoc.setUsageString(control.getUsage(Sponge.getServer().getConsole()).toPlain());
                     commandDoc.setPermissions(new ArrayList<>(permissionDocs));
                     commandDoc.setSimpleUsage(control.getUsageText(Sponge.getServer().getConsole()).toPlain());
