@@ -156,13 +156,23 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                 .sorted(Comparator.comparing(PermissionDoc::getPermission))
                 .collect(Collectors.toList());
 
-        List<TokenDoc> tokenDocs = serviceCollection
+        List<TokenDoc> tokenDocs = this.serviceCollection
                 .placeholderService()
                 .getNucleusParsers()
+                .values()
                 .stream()
-                .map(PlaceholderMetadata::getToken)
-                .filter(x -> messageProviderService.hasKey("nucleus.token." + x.toLowerCase()))
-                .map(x -> new TokenDoc().setName(x).setDescription(messageProviderService.getMessageString("nucleus.token." + x.toLowerCase())))
+                .filter(PlaceholderMetadata::isDocument)
+                .filter(x -> {
+                    if (!messageProviderService.hasKey("nucleus.token." + x.getToken().toLowerCase())) {
+                        this.serviceCollection.logger().warn("Could not find message key for nucleus.token.{}", x.getToken().toLowerCase());
+                        return false;
+                    }
+                    return true;
+                })
+                .map(x -> new TokenDoc()
+                        .setId(x.getParser().getId())
+                        .setName(x.getToken())
+                        .setDescription(messageProviderService.getMessageString("nucleus.token." + x.getToken().toLowerCase())))
                 .collect(Collectors.toList());
 
         // Now do all the saving
