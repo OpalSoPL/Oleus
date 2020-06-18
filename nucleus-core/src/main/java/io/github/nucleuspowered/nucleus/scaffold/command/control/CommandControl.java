@@ -552,10 +552,10 @@ public class CommandControl implements CommandCallable {
     @Override
     @NonNull
     public Optional<Text> getHelp(@NonNull CommandSource source) {
-        Optional<Text> extended = getExtendedDescription(source);
+        final Optional<Text> extended = getExtendedDescription(source);
         if (extended.isPresent()) {
             return getShortDescription(source)
-                    .map(text -> Optional.of(Text.of(text, Text.NEW_LINE, Util.SPACE, Text.NEW_LINE, extended)))
+                    .map(text -> Optional.of(Text.of(text, Text.NEW_LINE, Util.SPACE, Text.NEW_LINE, extended.get())))
                     .orElse(extended);
         } else {
             return getShortDescription(source);
