@@ -39,7 +39,7 @@ public @interface CommandModifier {
     boolean generateConfig() default true;
 
     /**
-     * If true, runs the {@link ICommandModifier#preExecute(ICommandContext, CommandControl, INucleusServiceCollection, CommandModifier)}
+     * If true, runs the {@link ICommandModifier#preExecute(ICommandContext.Mutable, CommandControl, INucleusServiceCollection, CommandModifier)}
      * before the command executes.
      *
      * @return true by default
@@ -53,58 +53,5 @@ public @interface CommandModifier {
      * @return true by default
      */
     boolean onCompletion() default true;
-
-    /**
-     * Used for attaching additional information to the modifier, where appropriate
-     * @return The keys, if any
-     */
-    StringKey[] additionalStringKeys() default {};
-
-    /**
-     * Used for attaching additional information to the modifier, where appropriate
-     * @return The keys, if any
-     */
-    ClassKey[] additionalClassKeys() default {};
-
-    /**
-     * An annotation for providing string keys
-     */
-    @interface StringKey {
-
-        /**
-         * Key name
-         *
-         * @return The name
-         */
-        String name();
-
-        /**
-         * Value
-         *
-         * @return The value
-         */
-        String stringValue();
-    }
-
-    /**
-     * An annotation for providing class keys
-     */
-    @interface ClassKey {
-
-        /**
-         * Key name
-         *
-         * @return The name of the key
-         */
-        String name();
-
-        /**
-         * Value
-         *
-         * @return The name of the value
-         */
-        Class<?> classValue();
-
-    }
 
 }

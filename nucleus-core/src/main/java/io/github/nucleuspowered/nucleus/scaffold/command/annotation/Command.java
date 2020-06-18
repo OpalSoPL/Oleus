@@ -86,4 +86,10 @@ public @interface Command {
      */
     boolean async() default false;
 
+    /**
+     * For documentation purposes: documents other permissions that might be
+     * associated with this command.
+     */
+    String[] associatedPermissions() default {};
+
 }

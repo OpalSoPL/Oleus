@@ -7,6 +7,8 @@ package io.github.nucleuspowered.nucleus.modules.core.docgen;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
+import java.util.Objects;
+
 @ConfigSerializable
 public class PermissionDoc {
 
@@ -65,6 +67,23 @@ public class PermissionDoc {
     public PermissionDoc setDefaultLevel(String defaultLevel) {
         this.defaultLevel = defaultLevel;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PermissionDoc that = (PermissionDoc) o;
+        return Objects.equals(this.permission, that.permission);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.permission);
     }
 
 }

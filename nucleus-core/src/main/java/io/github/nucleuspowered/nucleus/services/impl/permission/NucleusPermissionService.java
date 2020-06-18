@@ -306,8 +306,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     @Override
     public Optional<IPermissionService.Metadata> getMetadataFor(String permission) {
-        this.metadataMap.get(permission);
-        return Optional.empty();
+        return Optional.ofNullable(this.metadataMap.get(permission));
     }
 
     @Override

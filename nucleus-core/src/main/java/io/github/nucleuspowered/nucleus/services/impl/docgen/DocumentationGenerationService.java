@@ -16,6 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandMetadata;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.services.impl.placeholder.PlaceholderMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICommandMetadataService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenerationService;
@@ -89,14 +90,15 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     CommandDoc commandDoc = new CommandDoc();
                     String cmdPath = metadata.getCommandKey().replaceAll("\\.", " ");
                     commandDoc.setCommandName(cmdPath);
+                    commandDoc.setModule(metadata.getModuleid());
 
                     if (metadata.isRoot()) {
-                        commandDoc.setAliases(String.join(", ", commandDoc.getAliases()));
+                        commandDoc.setAliases(String.join(", ", metadata.getAliases()));
                     } else {
                         String key = metadata.getCommandKey().replaceAll("\\.[a-z]+$", "").replaceAll("\\.", " ");
-                        commandDoc.setAliases(key + String.join(", " + key, commandDoc.getAliases()));
+                        commandDoc.setAliases(key + String.join(", " + key, metadata.getAliases()));
                         if (!metadata.getRootAliases().isEmpty()) {
-                            commandDoc.setRootAliases(String.join(", ", commandDoc.getRootAliases()));
+                            commandDoc.setRootAliases(String.join(", ", metadata.getRootAliases()));
                         }
                     }
 
@@ -105,14 +107,16 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     for (CommandModifier modifier : annotation.modifiers()) {
                         if (modifier.value().equals(CommandModifiers.HAS_COOLDOWN)) {
                             commandDoc.setCooldown(true);
-                            getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
                         } else if (modifier.value().equals(CommandModifiers.HAS_COST)) {
                             commandDoc.setCost(true);
-                            getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
                         } else if (modifier.value().equals(CommandModifiers.HAS_WARMUP)) {
                             commandDoc.setWarmup(true);
-                            getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
                         }
+                        getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
+                    }
+
+                    for (String perm : metadata.getCommandAnnotation().associatedPermissions()) {
+                        getPermissionDoc(perm).ifPresent(permissionDocs::add);
                     }
 
                     EssentialsEquivalent essentialsEquivalent = metadata.getEssentialsEquivalent();
@@ -131,13 +135,21 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     }
 
                     String[] base = metadata.getCommandAnnotation().basePermission();
+                    SuggestedLevel level = SuggestedLevel.USER;
                     if (base.length > 0) {
                         commandDoc.setPermissionbase(base[0]);
                         for (String permission : base) {
-                            getPermissionDoc(permission).ifPresent(permissionDocs::add);
+                            Optional<IPermissionService.Metadata> pm = this.serviceCollection.permissionService().getMetadataFor(permission);
+                            if (pm.isPresent()) {
+                                if (pm.get().getSuggestedLevel().compareTo(level) > 0) {
+                                    level = pm.get().getSuggestedLevel();
+                                }
+                                permissionDocs.add(getFor(pm.get()));
+                            }
                         }
                     }
 
+                    commandDoc.setDefaultLevel(level.getRole());
                     commandDoc.setOneLineDescription(control.getShortDescription(Sponge.getServer().getConsole())
                             .map(Text::toPlain).orElse("No description provided"));
                     commandDoc.setExtendedDescription(control.getHelp(Sponge.getServer().getConsole()).map(Text::toPlain).orElse(null));

@@ -66,10 +66,6 @@ public class CommandDoc {
 
     @Setting private String context;
 
-    public String getCommandName() {
-        return this.commandName;
-    }
-
     public void setCommandName(String commandName) {
         this.commandName = commandName;
     }
@@ -82,32 +78,16 @@ public class CommandDoc {
         this.aliases = aliases;
     }
 
-    public String getDefaultLevel() {
-        return this.defaultLevel;
-    }
-
     public void setDefaultLevel(String defaultLevel) {
         this.defaultLevel = defaultLevel;
-    }
-
-    public String getUsageString() {
-        return this.usageString;
     }
 
     public void setUsageString(String usageString) {
         this.usageString = usageString;
     }
 
-    public String getOneLineDescription() {
-        return this.oneLineDescription;
-    }
-
     public void setOneLineDescription(String oneLineDescription) {
         this.oneLineDescription = oneLineDescription;
-    }
-
-    public String getExtendedDescription() {
-        return this.extendedDescription;
     }
 
     public void setExtendedDescription(String extendedDescription) {
@@ -120,10 +100,6 @@ public class CommandDoc {
 
     public void setModule(String module) {
         this.module = module;
-    }
-
-    public String getPermissionbase() {
-        return this.permissionbase;
     }
 
     public void setPermissionbase(String permissionbase) {
@@ -162,10 +138,6 @@ public class CommandDoc {
         this.permissions = permissions;
     }
 
-    public String getRootAliases() {
-        return this.rootAliases;
-    }
-
     public void setRootAliases(String rootAliases) {
         this.rootAliases = rootAliases;
     }
@@ -178,24 +150,12 @@ public class CommandDoc {
         this.subcommands = subcommands;
     }
 
-    public List<String> getEssentialsEquivalents() {
-        return this.essentialsEquivalents;
-    }
-
     public void setEssentialsEquivalents(List<String> essentialsEquivalents) {
         this.essentialsEquivalents = essentialsEquivalents;
     }
 
-    public Boolean getExactEssEquiv() {
-        return this.isExactEssEquiv;
-    }
-
     public void setExactEssEquiv(Boolean exactEssEquiv) {
         this.isExactEssEquiv = exactEssEquiv;
-    }
-
-    public String getEssNotes() {
-        return this.essNotes;
     }
 
     public void setEssNotes(String essNotes) {
