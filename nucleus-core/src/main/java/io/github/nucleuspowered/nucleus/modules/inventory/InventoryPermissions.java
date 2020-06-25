@@ -47,7 +47,7 @@ public class InventoryPermissions {
     @PermissionMetadata(descriptionKey = "permission.others", replacements = { "enderchest" }, level = SuggestedLevel.ADMIN)
     public static final String OTHERS_ENDERCHEST = "nucleus.enderchest.others";
 
-    @PermissionMetadata(descriptionKey = "permission.inventory.keep", level = SuggestedLevel.ADMIN)
+    @PermissionMetadata(descriptionKey = "permission.inventory.keep", level = SuggestedLevel.NONE)
     public static final String INVENTORY_KEEP = "nucleus.inventory.keepondeath";
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "invsee" }, level = SuggestedLevel.ADMIN)
