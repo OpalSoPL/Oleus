@@ -55,7 +55,8 @@ public class EnchantCommand implements ICommandExecutor<Player> {
             new ImprovedCatalogTypeArgument(Text.of(this.enchantmentKey), EnchantmentType.class, serviceCollection),
             new BoundedIntegerArgument(Text.of(this.levelKey), 0, Short.MAX_VALUE, serviceCollection),
             GenericArguments.flags()
-                    .permissionFlag(ItemPermissions.ENCHANT_UNSAFE, "u", "-unsafe")
+                    .valueFlag(serviceCollection.commandElementSupplier()
+                            .createPermissionParameter(GenericArguments.none(), ItemPermissions.ENCHANT_UNSAFE, false), "u", "-unsafe")
                     .flag("o", "-overwrite")
                     .buildWith(GenericArguments.none())
         };
