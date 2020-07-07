@@ -86,7 +86,7 @@ jobs:
           inputyaml: ${{ steps.inputdata.outputs.text }}
           version: ${{ env.nucleus.version }}
       - name: Save updated file
-        uses: DamianReeves/write-file-action
+        uses: DamianReeves/write-file-action@v1.0
         with:
           path: '_data/versions.yml'
           contents: ${{ steps.latestrel.outputs.outputyml }}
