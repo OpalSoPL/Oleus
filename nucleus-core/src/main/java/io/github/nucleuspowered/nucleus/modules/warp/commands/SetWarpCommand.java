@@ -4,8 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.commands;
 
+import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.modules.warp.WarpPermissions;
 import io.github.nucleuspowered.nucleus.modules.warp.event.CreateWarpEvent;
+import io.github.nucleuspowered.nucleus.modules.warp.event.DeleteWarpEvent;
 import io.github.nucleuspowered.nucleus.modules.warp.services.WarpService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -24,6 +26,7 @@ import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @EssentialsEquivalent({"setwarp", "createwarp"})
@@ -52,15 +55,24 @@ public class SetWarpCommand implements ICommandExecutor<Player> {
 
 //    private final WarpService qs = getServiceUnchecked(WarpService.class);
     private final Pattern warpRegex = Pattern.compile("^[A-Za-z][A-Za-z0-9]{0,25}$");
+    private final String overwriteKey = "overwrite";
 
     @Override
     public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
-                GenericArguments.onlyOne(GenericArguments.string(Text.of(WarpService.WARP_KEY)))
+                GenericArguments.flags().valueFlag(
+                        serviceCollection.commandElementSupplier().createPermissionParameter(
+                                GenericArguments.markTrue(Text.of(this.overwriteKey)),
+                                WarpPermissions.BASE_WARP_DELETE,
+                                false
+                        ), "o")
+                        .buildWith(GenericArguments.onlyOne(GenericArguments.string(Text.of(WarpService.WARP_KEY)))
+                )
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override
+    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
         String warp = context.requireOne(WarpService.WARP_KEY, String.class);
 
         // Needs to match the name...
@@ -71,12 +83,30 @@ public class SetWarpCommand implements ICommandExecutor<Player> {
         WarpService warpService = context.getServiceCollection().getServiceUnchecked(WarpService.class);
 
         // Get the service, does the warp exist?
-        if (warpService.getWarp(warp).isPresent()) {
-            // You have to delete to set the same name
-            return context.errorResult("command.warps.nooverwrite");
+        final Optional<Warp> exists = warpService.getWarp(warp);
+        if (exists.isPresent()) {
+            if (!context.hasAny(this.overwriteKey)) {
+                // You have to delete to set the same name
+                return context.errorResult("command.warps.nooverwrite");
+            }
+
+            final DeleteWarpEvent event = new DeleteWarpEvent(context.getCause(), exists.get());
+            if (Sponge.getEventManager().post(event)) {
+                return event.getCancelMessage().map(context::errorResultLiteral)
+                        .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
+            }
+
+            final String toRemove = exists.get().getName();
+            if (warpService.removeWarp(toRemove)) {
+                // Worked. Tell them.
+                context.sendMessage("command.warps.del", toRemove);
+            } else {
+                // Didn't work. Tell them.
+                return context.errorResult("command.warps.delerror");
+            }
         }
 
-        Player src = context.getIfPlayer();
+        final Player src = context.getIfPlayer();
         try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(src);
             CreateWarpEvent event = new CreateWarpEvent(frame.getCurrentCause(), warp, src.getLocation());
