@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.message.commands;
 
 import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
+import io.github.nucleuspowered.nucleus.modules.message.config.MessageConfig;
 import io.github.nucleuspowered.nucleus.modules.message.parameter.MessageTargetArgument;
 import io.github.nucleuspowered.nucleus.modules.message.services.MessageHandler;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -19,6 +20,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.DisplayNameArgument;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.SelectorArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
@@ -40,8 +42,9 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = MessagePermissions.EXEMPT_COST_MESSAGE)
         }
 )
-public class MessageCommand implements ICommandExecutor<CommandSource> {
+public class MessageCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
     final static String TO = "to";
+    boolean canMessageSelf = false;
 
     @Override
     public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
@@ -55,7 +58,11 @@ public class MessageCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override
+    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+        if (context.is(context.requireOne(TO, CommandSource.class))) {
+            return context.errorResult("command.message.self");
+        }
         boolean b = context.getServiceCollection()
                 .getServiceUnchecked(MessageHandler.class)
                 .sendMessage(context.getCommandSource(),
@@ -63,4 +70,10 @@ public class MessageCommand implements ICommandExecutor<CommandSource> {
                         context.requireOne(NucleusParameters.Keys.MESSAGE, String.class));
         return b ? context.successResult() : context.failResult();
     }
+
+    @Override
+    public void onReload(INucleusServiceCollection serviceCollection) {
+        this.canMessageSelf = serviceCollection.moduleDataProvider().getModuleConfig(MessageConfig.class).isCanMessageSelf();
+    }
+
 }

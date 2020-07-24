@@ -18,6 +18,9 @@ public class MessageConfig {
     private static final String MESSAGE_SOCIAL_SPY_DEFAULT = "&7[SocialSpy] [{{fromDisplay}}&7 -> {{toDisplay}}&7]: &r";
     private static final String HELP_OP_DEFAULT = "&7HelpOp: {{name}} &7> &r";
 
+    @Setting(value = "can-message-self", comment = "config.message.canmessageself")
+    private boolean canMessageSelf = false;
+
     @Setting(value = "helpop-prefix", comment = "config.message.helpop.prefix")
     @Default(value = HELP_OP_DEFAULT, saveDefaultIfNull = true)
     private NucleusTextTemplateImpl helpOpPrefix;
@@ -32,6 +35,10 @@ public class MessageConfig {
 
     @Setting(value = "socialspy")
     private SocialSpy socialSpy = new SocialSpy();
+
+    public boolean isCanMessageSelf() {
+        return this.canMessageSelf;
+    }
 
     public NucleusTextTemplateImpl getHelpOpPrefix(INucleusTextTemplateFactory textTemplateFactory) {
         if (this.helpOpPrefix == null) {
