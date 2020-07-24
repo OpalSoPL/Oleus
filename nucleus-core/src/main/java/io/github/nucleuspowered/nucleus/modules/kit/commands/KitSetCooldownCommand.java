@@ -23,7 +23,7 @@ import java.time.Duration;
 
 @NonnullByDefault
 @Command(
-        aliases = { "setcooldown", "setinterval" },
+        aliases = { "cooldown", "setcooldown", "setinterval" },
         basePermission = KitPermissions.BASE_KIT_SETCOOLDOWN,
         commandDescriptionKey = "kit.setcooldown",
         parentCommand = KitCommand.class,

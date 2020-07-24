@@ -24,7 +24,7 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
  */
 @NonnullByDefault
 @Command(
-        aliases = { "onetime" },
+        aliases = { "onetime", "setonetime" },
         async = true,
         basePermission = KitPermissions.BASE_KIT_ONETIME,
         commandDescriptionKey = "kit.onetime",
