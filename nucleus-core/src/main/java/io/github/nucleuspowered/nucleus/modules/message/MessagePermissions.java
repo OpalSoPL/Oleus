@@ -5,11 +5,13 @@
 package io.github.nucleuspowered.nucleus.modules.message;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOptionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class MessagePermissions {
+
     private MessagePermissions() {
         throw new AssertionError("Nope");
     }
@@ -31,9 +33,6 @@ public class MessagePermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "reply" }, level = SuggestedLevel.USER)
     public static final String BASE_MESSAGE = "nucleus.message.base";
-
-    @PermissionMetadata(descriptionKey = "permission.message.color", level = SuggestedLevel.ADMIN)
-    public static final String MESSAGE_COLOR = "nucleus.message.color";
 
     @PermissionMetadata(descriptionKey = "permission.message.colour", level = SuggestedLevel.ADMIN)
     public static final String MESSAGE_COLOUR = "nucleus.message.colour";
@@ -67,5 +66,8 @@ public class MessagePermissions {
 
     @PermissionMetadata(descriptionKey = "permission.socialspy.force", level = SuggestedLevel.NONE)
     public static final String SOCIALSPY_FORCE = "nucleus.socialspy.force";
+
+    @LevelOptionMetadata("optionkey.socialspy")
+    public static final String SOCIALSPY_LEVEL_KEY = "nucleus.socialspy.level";
 
 }

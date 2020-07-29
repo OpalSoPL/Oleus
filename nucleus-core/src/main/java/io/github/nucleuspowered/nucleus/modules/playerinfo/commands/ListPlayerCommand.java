@@ -53,7 +53,8 @@ import java.util.stream.Collectors;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = PlayerInfoPermissions.EXEMPT_COOLDOWN_LIST),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = PlayerInfoPermissions.EXEMPT_WARMUP_LIST),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = PlayerInfoPermissions.EXEMPT_COST_LIST)
-        }
+        },
+        associatedPermissions = PlayerInfoPermissions.LIST_SEEVANISHED
 )
 public class ListPlayerCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
 

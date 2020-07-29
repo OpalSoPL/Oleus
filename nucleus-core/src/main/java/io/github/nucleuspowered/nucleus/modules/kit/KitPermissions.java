@@ -5,17 +5,14 @@
 package io.github.nucleuspowered.nucleus.modules.kit;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class KitPermissions {
     private KitPermissions() {
         throw new AssertionError("Nope");
     }
-
-    @PermissionMetadata(descriptionKey = "permission.base", replacements = { "kit add" }, level = SuggestedLevel.ADMIN)
-    public static final String BASE_KIT_ADD = "nucleus.kit.add.base";
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "kit autoredeem" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_KIT_AUTOREDEEM = "nucleus.kit.autoredeem.base";

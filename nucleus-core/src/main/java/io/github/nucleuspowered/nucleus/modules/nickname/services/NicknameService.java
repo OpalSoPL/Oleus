@@ -328,7 +328,6 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
     private void stripPermissionless(Subject source, Text message) throws NicknameException {
         Collection<String> strings = this.textStyleService.wouldStrip(
                 NicknamePermissions.NICKNAME_COLOUR,
-                NicknamePermissions.NICKNAME_COLOR, // inferior
                 NicknamePermissions.NICKNAME_STYLE,
                 source,
                 TextSerializers.FORMATTING_CODE.serialize(message));

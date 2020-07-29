@@ -40,7 +40,9 @@ import java.util.Optional;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = HomePermissions.EXEMPT_COOLDOWN_HOME_SET),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = HomePermissions.EXEMPT_WARMUP_HOME_SET),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = HomePermissions.EXEMPT_COST_HOME_SET)
-        }
+        },
+        associatedPermissions = HomePermissions.HOMES_UNLIMITED,
+        associatedOptions = HomePermissions.OPTION_HOME_COUNT
 )
 public class SetHomeCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
 

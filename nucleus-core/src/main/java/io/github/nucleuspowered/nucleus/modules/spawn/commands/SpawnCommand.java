@@ -44,6 +44,11 @@ import java.util.Optional;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = SpawnPermissions.EXEMPT_COOLDOWN_SPAWN),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = SpawnPermissions.EXEMPT_WARMUP_SPAWN),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = SpawnPermissions.EXEMPT_COST_SPAWN)
+        },
+        associatedPermissions = {
+                SpawnPermissions.SPAWN_FORCE,
+                SpawnPermissions.SPAWN_OTHERWORLDS,
+                SpawnPermissions.SPAWN_WORLDS
         }
 )
 public class SpawnCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {

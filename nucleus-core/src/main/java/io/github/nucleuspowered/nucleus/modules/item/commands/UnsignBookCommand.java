@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.item.commands;
 
+import io.github.nucleuspowered.nucleus.modules.inventory.InventoryPermissions;
 import io.github.nucleuspowered.nucleus.modules.item.ItemPermissions;
 import io.github.nucleuspowered.nucleus.quickstart.annotation.RequireExistenceOf;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -40,7 +41,8 @@ import java.util.Optional;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = ItemPermissions.EXEMPT_COOLDOWN_UNSIGNBOOK),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = ItemPermissions.EXEMPT_WARMUP_UNSIGNBOOK),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_UNSIGNBOOK)
-        }
+        },
+        associatedPermissions = ItemPermissions.OTHERS_UNSIGNBOOK
 )
 public class UnsignBookCommand implements ICommandExecutor<CommandSource> {
 

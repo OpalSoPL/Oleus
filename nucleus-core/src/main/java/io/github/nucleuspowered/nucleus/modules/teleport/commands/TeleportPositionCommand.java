@@ -35,7 +35,11 @@ import org.spongepowered.api.world.storage.WorldProperties;
 @Command(
         aliases = "tppos",
         basePermission = TeleportPermissions.BASE_TPPOS,
-        commandDescriptionKey = "tppos"
+        commandDescriptionKey = "tppos",
+        associatedPermissions = {
+                TeleportPermissions.TPPOS_BORDER,
+                TeleportPermissions.OTHERS_TPPOS
+        }
 )
 public class TeleportPositionCommand implements ICommandExecutor<CommandSource> {
 

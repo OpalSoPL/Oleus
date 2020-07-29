@@ -37,11 +37,15 @@ import java.util.Optional;
 
 @NonnullByDefault
 @EssentialsEquivalent(value = {"itemdb", "itemno", "durability", "dura"}, isExact = false, notes = "Nucleus tries to provide much more info!")
-@Command(aliases = { "iteminfo", "itemdb" }, basePermission = MiscPermissions.BASE_ITEMINFO, commandDescriptionKey = "iteminfo")
+@Command(
+        aliases = { "iteminfo", "itemdb" },
+        basePermission = MiscPermissions.BASE_ITEMINFO,
+        commandDescriptionKey = "iteminfo",
+        associatedPermissions = MiscPermissions.ITEMINFO_EXTENDED
+)
 public class ItemInfoCommand implements ICommandExecutor<CommandSource> {
 
     private final String key = "key";
-    private final Text comma = Text.of(TextColors.GREEN, ", ");
 
     @Override
     public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {

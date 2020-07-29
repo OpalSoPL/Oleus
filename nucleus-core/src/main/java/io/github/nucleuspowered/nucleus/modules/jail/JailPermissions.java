@@ -5,11 +5,13 @@
 package io.github.nucleuspowered.nucleus.modules.jail;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOptionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class JailPermissions {
+
     private JailPermissions() {
         throw new AssertionError("Nope");
     }
@@ -52,5 +54,8 @@ public class JailPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.jail.unjail", level = SuggestedLevel.MOD)
     public static final String JAIL_UNJAIL = "nucleus.jail.unjail";
+
+    @LevelOptionMetadata("optionlevel.jail")
+    public static final String JAIL_LEVEL_KEY = "nucleus.jail.key";
 
 }

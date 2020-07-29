@@ -44,7 +44,8 @@ import javax.annotation.Nullable;
         basePermission = WarpPermissions.BASE_WARP_LIST,
         commandDescriptionKey = "warp.list",
         async = true,
-        parentCommand = WarpCommand.class
+        parentCommand = WarpCommand.class,
+        associatedPermissions = WarpPermissions.PERMISSIONS_WARPS
 )
 public class ListWarpCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
 

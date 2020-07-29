@@ -52,6 +52,10 @@ import java.util.function.Consumer;
                         value = CommandModifiers.HAS_COST,
                         exemptPermission = TeleportPermissions.EXEMPT_COST_TPAHERE
                 )
+        },
+        associatedPermissions = {
+                TeleportPermissions.TPTOGGLE_EXEMPT,
+                TeleportPermissions.TELEPORT_HERE_FORCE
         }
 )
 public class TeleportAskHereCommand implements ICommandExecutor<Player> {

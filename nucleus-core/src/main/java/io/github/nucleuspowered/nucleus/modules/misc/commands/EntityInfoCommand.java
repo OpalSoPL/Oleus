@@ -39,7 +39,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @NonnullByDefault
-@Command(aliases = "entityinfo", basePermission = MiscPermissions.BASE_ENTITYINFO, commandDescriptionKey = "entityinfo")
+@Command(
+        aliases = "entityinfo",
+        basePermission = MiscPermissions.BASE_ENTITYINFO,
+        commandDescriptionKey = "entityinfo",
+        associatedPermissions = MiscPermissions.ENTITYINFO_EXTENDED
+)
 public class EntityInfoCommand implements ICommandExecutor<Player> {
 
     @Override

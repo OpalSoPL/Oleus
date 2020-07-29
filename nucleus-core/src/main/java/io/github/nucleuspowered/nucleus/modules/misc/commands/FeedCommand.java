@@ -29,7 +29,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = MiscPermissions.EXEMPT_COOLDOWN_FEED),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = MiscPermissions.EXEMPT_WARMUP_FEED),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = MiscPermissions.EXEMPT_COST_FEED)
-        }
+        },
+        associatedPermissions = MiscPermissions.OTHERS_FEED
 )
 @EssentialsEquivalent({"feed", "eat"})
 @NonnullByDefault

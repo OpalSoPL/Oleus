@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.misc;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class MiscPermissions {
@@ -17,29 +17,11 @@ public class MiscPermissions {
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "blockinfo" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_BLOCKINFO = "nucleus.blockinfo.base";
 
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "blockinfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_BLOCKINFO = "nucleus.blockinfo.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "blockinfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_BLOCKINFO = "nucleus.blockinfo.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "blockinfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_BLOCKINFO = "nucleus.blockinfo.exempt.warmup";
-
     @PermissionMetadata(descriptionKey = "permission.blockinfo.extended", level = SuggestedLevel.ADMIN)
     public static final String BLOCKINFO_EXTENDED = "nucleus.blockinfo.extended";
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "entityinfo" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_ENTITYINFO = "nucleus.entityinfo.base";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "entityinfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_ENTITYINFO = "nucleus.entityinfo.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "entityinfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_ENTITYINFO = "nucleus.entityinfo.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "entityinfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_ENTITYINFO = "nucleus.entityinfo.exempt.warmup";
 
     @PermissionMetadata(descriptionKey = "permission.entityinfo.extended", level = SuggestedLevel.ADMIN)
     public static final String ENTITYINFO_EXTENDED = "nucleus.entityinfo.extended";
@@ -92,15 +74,6 @@ public class MiscPermissions {
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "iteminfo" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_ITEMINFO = "nucleus.iteminfo.base";
 
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "iteminfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_ITEMINFO = "nucleus.iteminfo.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "iteminfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_ITEMINFO = "nucleus.iteminfo.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "iteminfo" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_ITEMINFO = "nucleus.iteminfo.exempt.warmup";
-
     @PermissionMetadata(descriptionKey = "permission.iteminfo.extended", level = SuggestedLevel.ADMIN)
     public static final String ITEMINFO_EXTENDED = "nucleus.iteminfo.extended";
 
@@ -136,14 +109,5 @@ public class MiscPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "suicide" }, level = SuggestedLevel.USER)
     public static final String BASE_SUICIDE = "nucleus.suicide.base";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "suicide" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_SUICIDE = "nucleus.suicide.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "suicide" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_SUICIDE = "nucleus.suicide.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "suicide" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_SUICIDE = "nucleus.suicide.exempt.warmup";
 
 }

@@ -29,7 +29,13 @@ import java.util.Optional;
 @Command(
         aliases = {"invsee"},
         basePermission = InventoryPermissions.BASE_INVSEE,
-        commandDescriptionKey = "invsee"
+        commandDescriptionKey = "invsee",
+        associatedPermissions = {
+                InventoryPermissions.INVSEE_EXEMPT_INSPECT,
+                InventoryPermissions.INVSEE_EXEMPT_INTERACT,
+                InventoryPermissions.INVSEE_MODIFY,
+                InventoryPermissions.INVSEE_OFFLINE
+        }
 )
 @NonnullByDefault
 public class InvSeeCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {

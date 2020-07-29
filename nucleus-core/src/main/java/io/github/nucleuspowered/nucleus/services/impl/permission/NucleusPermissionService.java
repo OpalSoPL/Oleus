@@ -15,6 +15,8 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
 import io.github.nucleuspowered.nucleus.util.PrettyPrinter;
 import io.github.nucleuspowered.nucleus.util.ThrownFunction;

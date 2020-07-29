@@ -34,6 +34,11 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = NicknamePermissions.EXEMPT_COOLDOWN_NICK),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = NicknamePermissions.EXEMPT_WARMUP_NICK),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = NicknamePermissions.EXEMPT_COST_NICK)
+        },
+        associatedPermissions = {
+                NicknamePermissions.OTHERS_NICK,
+                NicknamePermissions.NICKNAME_COLOUR,
+                NicknamePermissions.NICKNAME_STYLE
         }
 )
 @EssentialsEquivalent(value = {"nick", "nickname"}, isExact = false,

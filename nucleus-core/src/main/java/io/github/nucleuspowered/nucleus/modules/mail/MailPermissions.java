@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.mail;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class MailPermissions {
@@ -23,13 +23,7 @@ public class MailPermissions {
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "mail send" }, level = SuggestedLevel.USER)
     public static final String BASE_MAIL_SEND = "nucleus.mail.send.base";
 
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "mail send" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_MAIL_SEND = "nucleus.mail.send.exempt.cooldown";
-
     @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "mail send" }, level = SuggestedLevel.ADMIN)
     public static final String EXEMPT_COST_MAIL_SEND = "nucleus.mail.send.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "mail send" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_MAIL_SEND = "nucleus.mail.send.exempt.warmup";
 
 }

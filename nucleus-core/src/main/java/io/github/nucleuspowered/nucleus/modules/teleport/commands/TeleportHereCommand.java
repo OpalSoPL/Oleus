@@ -35,7 +35,11 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 @Command(
         aliases = {"tphere", "tph"},
         basePermission = TeleportPermissions.BASE_TPHERE,
-        commandDescriptionKey = "tphere"
+        commandDescriptionKey = "tphere",
+        associatedPermissions = {
+                TeleportPermissions.TPHERE_OFFLINE,
+                TeleportPermissions.TPTOGGLE_EXEMPT
+        }
 )
 public class TeleportHereCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
 

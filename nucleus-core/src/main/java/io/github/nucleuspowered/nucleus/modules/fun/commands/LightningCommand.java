@@ -46,7 +46,8 @@ import javax.annotation.Nullable;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = FunPermissions.EXEMPT_COOLDOWN_LIGHTNING),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = FunPermissions.EXEMPT_WARMUP_LIGHTNING),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = FunPermissions.EXEMPT_COST_LIGHTNING)
-        }
+        },
+        associatedPermissions = FunPermissions.OTHERS_LIGHTNING
 )
 public class LightningCommand implements ICommandExecutor<CommandSource> {
 

@@ -26,7 +26,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 @Command(
         aliases = {"clear", "clearinv", "clearinventory", "ci", "clearinvent"},
         basePermission = InventoryPermissions.BASE_CLEAR,
-        commandDescriptionKey = "clear"
+        commandDescriptionKey = "clear",
+        associatedPermissions = InventoryPermissions.OTHERS_CLEAR
 )
 @EssentialsEquivalent({"clearinventory", "ci", "clean", "clearinvent"})
 public class ClearInventoryCommand implements ICommandExecutor<CommandSource> {

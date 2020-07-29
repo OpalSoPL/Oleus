@@ -5,11 +5,13 @@
 package io.github.nucleuspowered.nucleus.modules.kick;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOptionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class KickPermissions {
+
     private KickPermissions() {
         throw new AssertionError("Nope");
     }
@@ -28,5 +30,8 @@ public class KickPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.kickall.whitelist", level = SuggestedLevel.ADMIN)
     public static final String KICKALL_WHITELIST = "nucleus.kickall.whitelist";
+
+    @LevelOptionMetadata("optionlevel.kick")
+    public static final String LEVEL_KEY = "nucleus.kick.level";
 
 }

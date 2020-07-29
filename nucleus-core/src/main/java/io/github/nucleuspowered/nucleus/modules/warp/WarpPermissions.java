@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.warp;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class WarpPermissions {
@@ -26,15 +26,6 @@ public class WarpPermissions {
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "category displayname" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_CATEGORY_DISPLAYNAME = "nucleus.warp.category.displayname.base";
 
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "warp category" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_WARP_CATEGORY = "nucleus.warp.category.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "warp category" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_WARP_CATEGORY = "nucleus.warp.category.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "warp category" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_WARP_CATEGORY = "nucleus.warp.category.exempt.warmup";
-
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "category list" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_CATEGORY_LIST = "nucleus.warp.category.list.base";
 
@@ -43,15 +34,6 @@ public class WarpPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "warp delete" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_WARP_DELETE = "nucleus.warp.delete.base";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "warp delete" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_WARP_DELETE = "nucleus.warp.delete.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "warp delete" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_WARP_DELETE = "nucleus.warp.delete.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "warp delete" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_WARP_DELETE = "nucleus.warp.delete.exempt.warmup";
 
     @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "warp" }, level = SuggestedLevel.ADMIN)
     public static final String EXEMPT_COOLDOWN_WARP = "nucleus.warp.exempt.cooldown";
@@ -64,15 +46,6 @@ public class WarpPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "warp list" }, level = SuggestedLevel.USER)
     public static final String BASE_WARP_LIST = "nucleus.warp.list.base";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "warp list" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_WARP_LIST = "nucleus.warp.list.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "warp list" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_WARP_LIST = "nucleus.warp.list.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "warp list" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_WARP_LIST = "nucleus.warp.list.exempt.warmup";
 
     @PermissionMetadata(descriptionKey = "permission.others", replacements = { "warp" }, level = SuggestedLevel.ADMIN)
     public static final String OTHERS_WARP = "nucleus.warp.others";

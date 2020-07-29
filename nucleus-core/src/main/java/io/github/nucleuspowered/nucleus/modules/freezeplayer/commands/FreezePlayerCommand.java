@@ -31,7 +31,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = FreezePlayerPermissions.EXEMPT_COOLDOWN_FREEZEPLAYER),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission =  FreezePlayerPermissions.EXEMPT_WARMUP_FREEZEPLAYER),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = FreezePlayerPermissions.EXEMPT_COST_FREEZEPLAYER)
-        }
+        },
+        associatedPermissions = FreezePlayerPermissions.OTHERS_FREEZEPLAYER
 )
 public class FreezePlayerCommand implements ICommandExecutor<CommandSource> {
 

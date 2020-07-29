@@ -31,7 +31,8 @@ import java.util.Optional;
 @Command(
         aliases = {"hat", "head"},
         basePermission = FunPermissions.BASE_HAT,
-        commandDescriptionKey = "hat"
+        commandDescriptionKey = "hat",
+        associatedPermissions = FunPermissions.OTHERS_HAT
 )
 public class HatCommand implements ICommandExecutor<CommandSource> {
 

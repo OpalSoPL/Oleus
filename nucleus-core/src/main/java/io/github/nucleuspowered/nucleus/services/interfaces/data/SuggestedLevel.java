@@ -2,7 +2,7 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.services.impl.permission;
+package io.github.nucleuspowered.nucleus.services.interfaces.data;
 
 import org.spongepowered.api.service.permission.PermissionDescription;
 

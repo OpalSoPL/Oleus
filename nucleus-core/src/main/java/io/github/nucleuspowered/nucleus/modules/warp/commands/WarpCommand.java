@@ -52,6 +52,10 @@ import java.util.Optional;
                         value = CommandModifiers.HAS_COOLDOWN,
                         exemptPermission = WarpPermissions.EXEMPT_COOLDOWN_WARP
                 )
+        },
+        associatedPermissions = {
+                WarpPermissions.PERMISSIONS_WARPS,
+                WarpPermissions.OTHERS_WARP
         }
 )
 public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {

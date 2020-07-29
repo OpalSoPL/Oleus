@@ -30,7 +30,11 @@ import java.util.UUID;
         aliases = {"note", "addnote"},
         basePermission = NotePermissions.NOTE_NOTIFY,
         commandDescriptionKey = "note",
-        async = true
+        async = true,
+        associatedPermissions = {
+                NotePermissions.NOTE_NOTIFY,
+                NotePermissions.NOTE_SHOWONLOGIN
+        }
 )
 public class NoteCommand implements ICommandExecutor<CommandSource> {
 

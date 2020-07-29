@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
 @Command(
         aliases = "kickall",
         basePermission = KickPermissions.BASE_KICKALL,
-        commandDescriptionKey = "kickall"
+        commandDescriptionKey = "kickall",
+        associatedPermissionLevelKeys = KickPermissions.KICKALL_WHITELIST
 )
 public class KickAllCommand implements ICommandExecutor<CommandSource> {
 

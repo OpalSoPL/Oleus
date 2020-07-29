@@ -21,6 +21,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.args.CommandElement;
@@ -43,12 +44,13 @@ import javax.inject.Inject;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = MessagePermissions.EXEMPT_COOLDOWN_HELPOP),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = MessagePermissions.EXEMPT_WARMUP_HELPOP),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = MessagePermissions.EXEMPT_COST_HELPOP)
-        }
+        },
+        associatedPermissions = MessagePermissions.HELPOP_RECEIVE
 )
 public class HelpOpCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
 
     private final IChatMessageFormatterService chatMessageFormatterService;
-    private HelpOpMessageChannel channel;
+    @Nullable private HelpOpMessageChannel channel;
 
     @Inject
     public HelpOpCommand(INucleusServiceCollection serviceCollection) {

@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.mute.commands;
 
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
-import io.github.nucleuspowered.nucleus.modules.mute.MuteModule;
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
 import io.github.nucleuspowered.nucleus.modules.mute.services.MuteHandler;
@@ -23,7 +22,12 @@ import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
 
-@Command(aliases = { "mute" }, basePermission = MutePermissions.BASE_UNMUTE, commandDescriptionKey = "unmute")
+@Command(
+        aliases = { "mute" },
+        basePermission = MutePermissions.BASE_UNMUTE,
+        commandDescriptionKey = "unmute",
+        associatedPermissionLevelKeys = MutePermissions.MUTE_LEVEL_KEY
+)
 public class UnmuteCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
 
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
@@ -41,7 +45,7 @@ public class UnmuteCommand implements ICommandExecutor<CommandSource>, IReloadab
         MuteHandler handler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
-                        MuteModule.LEVEL_KEY,
+                        MutePermissions.MUTE_LEVEL_KEY,
                         MutePermissions.BASE_MUTE,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.

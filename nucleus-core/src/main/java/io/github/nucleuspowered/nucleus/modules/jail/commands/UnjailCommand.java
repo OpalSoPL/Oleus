@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.jail.commands;
 
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
-import io.github.nucleuspowered.nucleus.modules.jail.JailModule;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
@@ -31,7 +30,8 @@ import javax.inject.Inject;
 @Command(
         aliases = {"unjail"},
         basePermission = JailPermissions.JAIL_UNJAIL,
-        commandDescriptionKey = "unjail"
+        commandDescriptionKey = "unjail",
+        associatedPermissionLevelKeys = JailPermissions.JAIL_LEVEL_KEY
 )
 @EssentialsEquivalent(value = "unjail", isExact = false, notes = "Not a toggle.")
 public class UnjailCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
@@ -56,7 +56,7 @@ public class UnjailCommand implements ICommandExecutor<CommandSource>, IReloadab
         User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
-                        JailModule.LEVEL_KEY,
+                        JailPermissions.JAIL_LEVEL_KEY,
                         JailPermissions.BASE_JAIL,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.

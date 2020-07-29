@@ -42,7 +42,8 @@ import javax.inject.Inject;
         aliases = {"info", "einfo"},
         async = true,
         basePermission = InfoPermissions.BASE_INFO,
-        commandDescriptionKey = "info"
+        commandDescriptionKey = "info",
+        associatedPermissions = InfoPermissions.INFO_LIST
 )
 @EssentialsEquivalent({"info", "ifo", "news", "about", "inform"})
 public class InfoCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
@@ -65,7 +66,11 @@ public class InfoCommand implements ICommandExecutor<CommandSource>, IReloadable
     public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
-                    .permissionFlag(InfoPermissions.INFO_LIST, "l", "-list")
+                    .valueFlag(serviceCollection.commandElementSupplier().createPermissionParameter(
+                            GenericArguments.markTrue(Text.of("list")),
+                            InfoPermissions.INFO_LIST,
+                            false
+                    ), "l", "-list")
                     .buildWith(
                         GenericArguments.optional(new InfoArgument(Text.of(this.key), this.infoService, serviceCollection)))
         };

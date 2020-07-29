@@ -29,7 +29,8 @@ import org.spongepowered.api.world.storage.WorldProperties;
         aliases = { "gen", "genchunks", "generatechunks", "chunkgen" },
         basePermission = WorldPermissions.BASE_BORDER_GEN,
         commandDescriptionKey = "world.border.gen",
-        parentCommand = BorderCommand.class
+        parentCommand = BorderCommand.class,
+        associatedPermissions = WorldPermissions.WORLD_BORDER_GEN_NOTIFY
 )
 public class GenerateChunksCommand implements ICommandExecutor<CommandSource> {
 

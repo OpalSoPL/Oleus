@@ -36,7 +36,10 @@ import org.spongepowered.api.world.storage.WorldProperties;
         aliases = "other",
         basePermission = SpawnPermissions.BASE_SPAWN_OTHER,
         commandDescriptionKey = "spawn.other",
-        parentCommand = SpawnCommand.class
+        parentCommand = SpawnCommand.class,
+        associatedPermissions = {
+                SpawnPermissions.SPAWNOTHER_OFFLINE
+        }
 )
 public class SpawnOtherCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
 

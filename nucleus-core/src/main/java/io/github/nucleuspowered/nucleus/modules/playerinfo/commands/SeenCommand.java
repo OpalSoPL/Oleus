@@ -59,7 +59,19 @@ import javax.annotation.Nullable;
         aliases = {"seen", "seenplayer", "lookup"},
         basePermission = PlayerInfoPermissions.BASE_SEEN,
         commandDescriptionKey = "seen",
-        async = true
+        async = true,
+        associatedPermissions = {
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_UUID,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_IP,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_FIRSTPLAYED,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_LASTPLAYED,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_SPEED_WALKING,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_SPEED_FLYING,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_LOCATION,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_CAN_FLY,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_IS_FLYING,
+            PlayerInfoPermissions.SEEN_EXTENDEDPERMS_GAMEMODE
+        }
 )
 public class SeenCommand implements ICommandExecutor<CommandSource> {
 

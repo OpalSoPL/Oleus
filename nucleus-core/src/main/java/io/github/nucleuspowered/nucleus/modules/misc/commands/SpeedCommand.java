@@ -42,6 +42,10 @@ import java.util.Map;
             @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = MiscPermissions.EXEMPT_WARMUP_SPEED),
             @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = MiscPermissions.EXEMPT_COOLDOWN_SPEED),
             @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = MiscPermissions.EXEMPT_COST_SPEED)
+        },
+        associatedPermissions = {
+                MiscPermissions.SPEED_EXEMPT_MAX,
+                MiscPermissions.OTHERS_SPEED
         }
 )
 public class SpeedCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable { //extends AbstractCommand.SimpleTargetOtherPlayer

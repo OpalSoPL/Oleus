@@ -28,7 +28,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = MiscPermissions.EXEMPT_COOLDOWN_EXTINGUISH),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = MiscPermissions.EXEMPT_WARMUP_EXTINGUISH),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = MiscPermissions.EXEMPT_COST_EXTINGUISH)
-        }
+        },
+        associatedPermissions = MiscPermissions.OTHERS_EXTINGUISH
 )
 public class ExtinguishCommand implements ICommandExecutor<CommandSource> {
 

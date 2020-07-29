@@ -34,6 +34,13 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = InventoryPermissions.EXEMPT_COOLDOWN_ENDERCHEST),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = InventoryPermissions.EXEMPT_WARMUP_ENDERCHEST),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = InventoryPermissions.EXEMPT_COST_ENDERCHEST)
+        },
+        associatedPermissions = {
+                InventoryPermissions.OTHERS_ENDERCHEST,
+                InventoryPermissions.ENDERCHEST_EXEMPT_INSPECT,
+                InventoryPermissions.ENDERCHEST_EXEMPT_MODIFY,
+                InventoryPermissions.ENDERCHEST_MODIFY,
+                InventoryPermissions.ENDERCHEST_OFFLINE
         }
 )
 @EssentialsEquivalent({"enderchest", "echest", "endersee", "ec"})

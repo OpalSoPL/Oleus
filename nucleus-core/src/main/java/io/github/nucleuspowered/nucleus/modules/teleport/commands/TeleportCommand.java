@@ -45,7 +45,7 @@ import java.util.function.Supplier;
         notes = "If you have permission, this will override '/tptoggle' automatically.")
 @NonnullByDefault
 @Command(
-        aliases = {"teleport", "$tp"},
+        aliases = {"teleport", "tele", "$tp"},
         basePermission = TeleportPermissions.BASE_TELEPORT,
         commandDescriptionKey = "teleport",
         modifiers = {
@@ -61,6 +61,12 @@ import java.util.function.Supplier;
                         value = CommandModifiers.HAS_COST,
                         exemptPermission = TeleportPermissions.EXEMPT_COST_TELEPORT
                 )
+        },
+        associatedPermissions = {
+                TeleportPermissions.TELEPORT_OFFLINE,
+                TeleportPermissions.TELEPORT_QUIET,
+                TeleportPermissions.OTHERS_TELEPORT,
+                TeleportPermissions.TPTOGGLE_EXEMPT
         }
 )
 public class TeleportCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {

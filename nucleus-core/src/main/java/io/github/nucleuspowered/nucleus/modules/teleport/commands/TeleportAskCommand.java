@@ -52,6 +52,10 @@ import java.util.function.Consumer;
                         value = CommandModifiers.HAS_COST,
                         exemptPermission = TeleportPermissions.EXEMPT_COST_TPA
                 )
+        },
+        associatedPermissions = {
+                TeleportPermissions.TPTOGGLE_EXEMPT,
+                TeleportPermissions.TELEPORT_ASK_FORCE
         }
 )
 @EssentialsEquivalent({"tpa", "call", "tpask"})

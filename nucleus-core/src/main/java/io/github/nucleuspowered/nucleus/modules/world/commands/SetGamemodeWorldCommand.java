@@ -27,7 +27,8 @@ import org.spongepowered.api.world.storage.WorldProperties;
         aliases = {"setgamemode", "setgm", "gamemode", "gm"},
         basePermission = WorldPermissions.BASE_WORLD_SETGAMEMODE,
         commandDescriptionKey = "world.setgamemode",
-        parentCommand = WorldCommand.class
+        parentCommand = WorldCommand.class,
+        associatedPermissions = WorldPermissions.WORLD_FORCE_GAMEMODE_OVERRIDE
 )
 public class SetGamemodeWorldCommand implements ICommandExecutor<CommandSource> {
 

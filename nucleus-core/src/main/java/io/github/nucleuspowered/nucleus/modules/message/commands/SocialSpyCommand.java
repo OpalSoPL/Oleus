@@ -23,7 +23,9 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 @Command(
         aliases = {"socialspy"},
         basePermission = MessagePermissions.BASE_SOCIALSPY,
-        commandDescriptionKey = "socialspy"
+        commandDescriptionKey = "socialspy",
+        associatedPermissionLevelKeys = MessagePermissions.SOCIALSPY_LEVEL_KEY,
+        associatedPermissions = MessagePermissions.SOCIALSPY_FORCE
 )
 public class SocialSpyCommand implements ICommandExecutor<Player> {
 

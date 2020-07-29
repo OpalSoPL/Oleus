@@ -60,8 +60,6 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
     private final Map<UUID, CustomMessageTarget<? extends CommandSource>> targets = Maps.newHashMap();
     private final Map<String, UUID> targetNames = Maps.newHashMap();
 
-    public static final String socialSpyOption = "nucleus.socialspy.level";
-
     @Inject
     public MessageHandler(INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
@@ -103,7 +101,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
     }
 
     @Override public int getSocialSpyLevel(User user) {
-        return this.useLevels ? this.serviceCollection.permissionService().getPositiveIntOptionFromSubject(user, socialSpyOption).orElse(0) : 0;
+        return this.useLevels ? this.serviceCollection.permissionService().getPositiveIntOptionFromSubject(user, MessagePermissions.SOCIALSPY_LEVEL_KEY).orElse(0) : 0;
     }
 
     @Override public Tristate forcedSocialSpyState(User user) {

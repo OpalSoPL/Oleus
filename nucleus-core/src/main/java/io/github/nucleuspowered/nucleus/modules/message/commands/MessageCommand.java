@@ -40,6 +40,11 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = MessagePermissions.EXEMPT_COOLDOWN_MESSAGE),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = MessagePermissions.EXEMPT_WARMUP_MESSAGE),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = MessagePermissions.EXEMPT_COST_MESSAGE)
+        },
+        associatedPermissions = {
+                MessagePermissions.MESSAGE_COLOUR,
+                MessagePermissions.MESSAGE_STYLE,
+                MessagePermissions.MESSAGE_URLS
         }
 )
 public class MessageCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {

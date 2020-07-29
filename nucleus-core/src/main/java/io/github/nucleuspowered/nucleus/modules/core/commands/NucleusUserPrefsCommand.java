@@ -36,7 +36,8 @@ import javax.annotation.Nullable;
         basePermission = CorePermissions.BASE_NUSERPREFS,
         commandDescriptionKey = "nuserprefs",
         prefixAliasesWithN = false,
-        async = true
+        async = true,
+        associatedPermissions = CorePermissions.OTHERS_NUSERPREFS
 )
 @NonnullByDefault
 public class NucleusUserPrefsCommand implements ICommandExecutor<CommandSource> {

@@ -10,7 +10,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
-@Command(aliases = "basicactionbar", basePermission = NotificationPermissions.BASE_BASICACTIONBAR, commandDescriptionKey = "basicactionbar")
+@Command(
+        aliases = "basicactionbar",
+        basePermission = NotificationPermissions.BASE_BASICACTIONBAR,
+        commandDescriptionKey = "basicactionbar"
+)
 public class BasicActionbarCommand extends TitleBase {
 
     @Inject

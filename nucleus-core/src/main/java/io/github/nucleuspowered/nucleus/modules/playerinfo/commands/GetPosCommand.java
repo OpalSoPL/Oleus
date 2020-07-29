@@ -32,7 +32,8 @@ import org.spongepowered.api.world.World;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = PlayerInfoPermissions.EXEMPT_COOLDOWN_GETPOS),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = PlayerInfoPermissions.EXEMPT_WARMUP_GETPOS),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = PlayerInfoPermissions.EXEMPT_COST_GETPOS)
-        }
+        },
+        associatedPermissions = PlayerInfoPermissions.GETPOS_OTHERS
 )
 public class GetPosCommand implements ICommandExecutor<CommandSource> {
 

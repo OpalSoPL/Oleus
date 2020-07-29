@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.ban.commands;
 
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
-import io.github.nucleuspowered.nucleus.modules.ban.BanModule;
 import io.github.nucleuspowered.nucleus.modules.ban.BanPermissions;
 import io.github.nucleuspowered.nucleus.modules.ban.config.BanConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -36,7 +35,8 @@ import java.util.Optional;
 @Command(
         aliases = {"unban", "pardon"},
         basePermission = BanPermissions.BASE_TEMPBAN,
-        commandDescriptionKey = "unban"
+        commandDescriptionKey = "unban",
+        associatedPermissionLevelKeys = BanPermissions.BAN_LEVEL_KEY
 )
 @EssentialsEquivalent({"unban", "pardon"})
 @NonnullByDefault
@@ -74,7 +74,7 @@ public class UnbanCommand implements ICommandExecutor<CommandSource>, IReloadabl
         User user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gp);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
-                        BanModule.BAN_LEVEL_KEY,
+                        BanPermissions.BAN_LEVEL_KEY,
                         BanPermissions.BASE_UNBAN,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.

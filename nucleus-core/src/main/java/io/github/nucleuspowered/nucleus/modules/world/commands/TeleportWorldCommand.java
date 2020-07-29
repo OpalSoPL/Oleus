@@ -36,6 +36,10 @@ import org.spongepowered.api.world.storage.WorldProperties;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = WorldPermissions.EXEMPT_COOLDOWN_WORLD_TELEPORT),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = WorldPermissions.EXEMPT_WARMUP_WORLD_TELEPORT),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = WorldPermissions.EXEMPT_COST_WORLD_TELEPORT)
+        },
+        associatedPermissions = {
+                WorldPermissions.WORLD_TELEPORT_OTHER,
+                WorldPermissions.WORLDS_ACCESS_PERMISSION_PREFIX
         }
 )
 public class TeleportWorldCommand implements ICommandExecutor<CommandSource> {

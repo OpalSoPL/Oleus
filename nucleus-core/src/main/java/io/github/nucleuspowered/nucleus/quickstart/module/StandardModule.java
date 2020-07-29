@@ -20,7 +20,7 @@ import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICommandMetadataService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;

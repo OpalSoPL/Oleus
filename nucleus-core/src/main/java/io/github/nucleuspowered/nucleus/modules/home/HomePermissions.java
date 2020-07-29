@@ -5,8 +5,10 @@
 package io.github.nucleuspowered.nucleus.modules.home;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.api.module.home.NucleusHomeService;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.OptionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class HomePermissions {
@@ -73,5 +75,8 @@ public class HomePermissions {
 
     @PermissionMetadata(descriptionKey = "permission.homes.unlimited", level = SuggestedLevel.ADMIN)
     public static final String HOMES_UNLIMITED = "nucleus.home.set.unlimited";
+
+    @OptionMetadata("option.homes.homecount")
+    public static final String OPTION_HOME_COUNT = NucleusHomeService.HOME_COUNT_OPTION;
 
 }

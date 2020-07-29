@@ -44,6 +44,10 @@ import java.util.Optional;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = MobPermissions.EXEMPT_COOLDOWN_SPAWNMOB),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = MobPermissions.EXEMPT_WARMUP_SPAWNMOB),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = MobPermissions.EXEMPT_COST_SPAWNMOB)
+        },
+        associatedPermissions = {
+                MobPermissions.OTHERS_SPAWNMOB,
+                MobPermissions.SPAWNMOB_MOB
         }
 )
 public class SpawnMobCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable { //extends AbstractCommand.SimpleTargetOtherPlayer implements

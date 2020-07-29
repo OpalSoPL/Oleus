@@ -43,7 +43,7 @@ public class MessageInfoProvider implements NucleusProvider {
                     mp.getMessageFor(source,
                             "seen.socialspylevel",
                             serviceCollection.permissionService()
-                                    .getPositiveIntOptionFromSubject(user, MessageHandler.socialSpyOption).orElse(0))
+                                    .getPositiveIntOptionFromSubject(user, MessagePermissions.SOCIALSPY_LEVEL_KEY).orElse(0))
             );
 
             lt.add(mp.getMessageFor(source, "seen.msgtoggle",

@@ -38,7 +38,8 @@ import java.util.concurrent.TimeUnit;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = FunPermissions.EXEMPT_COOLDOWN_ROCKET),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = FunPermissions.EXEMPT_WARMUP_ROCKET),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = FunPermissions.EXEMPT_COST_ROCKET)
-        }
+        },
+        associatedPermissions = FunPermissions.OTHERS_ROCKET
 )
 public class RocketCommand implements ICommandExecutor<CommandSource> {
 

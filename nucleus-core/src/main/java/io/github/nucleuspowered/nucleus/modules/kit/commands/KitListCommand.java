@@ -39,7 +39,8 @@ import javax.annotation.Nullable;
         async = true,
         basePermission = KitPermissions.BASE_KIT_LIST,
         commandDescriptionKey = "kit.list",
-        parentCommand = KitCommand.class
+        parentCommand = KitCommand.class,
+        associatedPermissions = KitPermissions.KIT_SHOWHIDDEN
 )
 @NonnullByDefault
 public class KitListCommand implements ICommandExecutor<CommandSource> {

@@ -42,7 +42,8 @@ import java.util.stream.Collectors;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = ItemPermissions.EXEMPT_COOLDOWN_ENCHANT),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = ItemPermissions.EXEMPT_WARMUP_ENCHANT),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_ENCHANT)
-        }
+        },
+        associatedPermissions = ItemPermissions.ENCHANT_UNSAFE
 )
 public class EnchantCommand implements ICommandExecutor<Player> {
 

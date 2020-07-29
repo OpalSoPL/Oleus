@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.mute.commands;
 
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
-import io.github.nucleuspowered.nucleus.modules.mute.MuteModule;
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
 import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
@@ -36,7 +35,18 @@ import java.util.UUID;
 
 @NonnullByDefault
 @EssentialsEquivalent(value = {"mute", "silence"}, isExact = false, notes = "Unmuting a player should be done via the /unmute command.")
-@Command(aliases = { "mute" }, basePermission = MutePermissions.BASE_MUTE, commandDescriptionKey = "mute")
+@Command(
+        aliases = { "mute" },
+        basePermission = MutePermissions.BASE_MUTE,
+        commandDescriptionKey = "mute",
+        associatedPermissionLevelKeys = MutePermissions.MUTE_LEVEL_KEY,
+        associatedPermissions = {
+                MutePermissions.MUTE_EXEMPT_LENGTH,
+                MutePermissions.MUTE_EXEMPT_TARGET,
+                MutePermissions.MUTE_NOTIFY,
+                MutePermissions.MUTE_SEEMUTEDCHAT
+        }
+)
 public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
 
     private long maxMute = Long.MAX_VALUE;
@@ -69,7 +79,7 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
 
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
-                        MuteModule.LEVEL_KEY,
+                        MutePermissions.MUTE_LEVEL_KEY,
                         MutePermissions.BASE_MUTE,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.

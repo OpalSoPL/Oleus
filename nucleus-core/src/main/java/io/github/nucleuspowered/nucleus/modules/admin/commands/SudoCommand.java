@@ -28,7 +28,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @Command(aliases = {"sudo"},
         basePermission = AdminPermissions.BASE_SUDO,
-        commandDescriptionKey = "sudo")
+        commandDescriptionKey = "sudo",
+        associatedPermissionLevelKeys = AdminModule.SUDO_LEVEL_KEY)
 @EssentialsEquivalent("sudo")
 @NonnullByDefault
 public class SudoCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {

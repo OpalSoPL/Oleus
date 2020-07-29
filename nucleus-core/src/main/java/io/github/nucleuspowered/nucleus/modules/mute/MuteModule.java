@@ -25,7 +25,6 @@ import javax.inject.Inject;
 @ModuleData(id = MuteModule.ID, name = "Mute")
 public class MuteModule extends ConfigurableModule<MuteConfig, MuteConfigAdapter> {
 
-    public static final String LEVEL_KEY = "nucleus.mute.level";
     public static final String ID = "mute";
 
     @Inject

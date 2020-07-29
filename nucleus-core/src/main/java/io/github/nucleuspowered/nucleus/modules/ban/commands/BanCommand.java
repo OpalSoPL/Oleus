@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.ban.commands;
 
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
-import io.github.nucleuspowered.nucleus.modules.ban.BanModule;
 import io.github.nucleuspowered.nucleus.modules.ban.BanPermissions;
 import io.github.nucleuspowered.nucleus.modules.ban.config.BanConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -38,7 +37,15 @@ import java.util.Optional;
 @Command(
         aliases = "ban",
         basePermission = BanPermissions.BASE_BAN,
-        commandDescriptionKey = "ban"
+        commandDescriptionKey = "ban",
+        associatedPermissions = {
+                BanPermissions.BAN_OFFLINE,
+                BanPermissions.BAN_EXEMPT_TARGET,
+                BanPermissions.BAN_NOTIFY
+        },
+        associatedPermissionLevelKeys = {
+                BanPermissions.BAN_LEVEL_KEY
+        }
 )
 @EssentialsEquivalent("ban")
 @NonnullByDefault
@@ -135,7 +142,7 @@ public class BanCommand implements ICommandExecutor<CommandSource>, IReloadableS
 
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
-                        BanModule.BAN_LEVEL_KEY,
+                        BanPermissions.BAN_LEVEL_KEY,
                         BanPermissions.BASE_BAN,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.

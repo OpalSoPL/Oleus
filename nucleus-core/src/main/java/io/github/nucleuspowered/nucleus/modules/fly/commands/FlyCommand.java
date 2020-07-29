@@ -32,7 +32,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = FlyPermissions.EXEMPT_COOLDOWN_FLY),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = FlyPermissions.EXEMPT_WARMUP_FLY),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = FlyPermissions.EXEMPT_COST_FLY)
-        }
+        },
+        associatedPermissions = FlyPermissions.OTHERS_FLY
 )
 public class FlyCommand implements ICommandExecutor<CommandSource> { // extends AbstractCommand.SimpleTargetOtherPlayer {
 

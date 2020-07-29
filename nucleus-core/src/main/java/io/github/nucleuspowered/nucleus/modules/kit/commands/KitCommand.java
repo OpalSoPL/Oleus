@@ -40,6 +40,12 @@ import java.time.Duration;
         modifiers = {
                 // Cooldowns and cost are determined by the kit itself.
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = KitPermissions.EXEMPT_WARMUP_KIT)
+        },
+        associatedPermissions = {
+                KitPermissions.KITS,
+                KitPermissions.KIT_EXEMPT_ONETIME,
+                KitPermissions.KIT_EXEMPT_COOLDOWN,
+                KitPermissions.KIT_EXEMPT_COST
         }
 )
 @EssentialsEquivalent(value = "kit, kits", isExact = false, notes = "'/kit' redeems, '/kits' lists.")

@@ -49,7 +49,8 @@ import java.util.function.Consumer;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = FunPermissions.EXEMPT_COOLDOWN_KITTYCANNON),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = FunPermissions.EXEMPT_WARMUP_KITTYCANNON),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = FunPermissions.EXEMPT_COST_KITTYCANNON)
-        }
+        },
+        associatedPermissions = FunPermissions.OTHERS_KITTYCANNON
 )
 public class KittyCannonCommand implements ICommandExecutor<CommandSource> {
 

@@ -26,7 +26,6 @@ import javax.inject.Inject;
 @ModuleData(id = JailModule.ID, name = "Jail")
 public class JailModule extends ConfigurableModule<JailConfig, JailConfigAdapter> {
 
-    public static final String LEVEL_KEY = "nucleus.jail.key";
     public static final String ID = "jail";
 
     @Inject

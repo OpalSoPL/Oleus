@@ -39,7 +39,12 @@ import java.util.List;
 import java.util.Optional;
 
 @NonnullByDefault
-@Command(aliases = "blockinfo", basePermission = MiscPermissions.BASE_BLOCKINFO, commandDescriptionKey = "blockinfo")
+@Command(
+        aliases = "blockinfo",
+        basePermission = MiscPermissions.BASE_BLOCKINFO,
+        commandDescriptionKey = "blockinfo",
+        associatedPermissions = MiscPermissions.BLOCKINFO_EXTENDED
+)
 public class BlockInfoCommand implements ICommandExecutor<CommandSource> {
 
     @Override
@@ -52,7 +57,8 @@ public class BlockInfoCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override
+    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
         Location<World> loc = null;
         if (context.hasAny(NucleusParameters.Keys.LOCATION)) {
             // get the location

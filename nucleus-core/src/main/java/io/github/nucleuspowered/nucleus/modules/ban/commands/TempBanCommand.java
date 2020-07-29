@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.ban.commands;
 
-import io.github.nucleuspowered.nucleus.modules.ban.BanModule;
 import io.github.nucleuspowered.nucleus.modules.ban.BanPermissions;
 import io.github.nucleuspowered.nucleus.modules.ban.config.BanConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -34,7 +33,13 @@ import java.time.temporal.ChronoUnit;
 @Command(
         aliases = "tempban",
         basePermission = BanPermissions.BASE_TEMPBAN,
-        commandDescriptionKey = "tempban"
+        commandDescriptionKey = "tempban",
+        associatedPermissions = {
+                BanPermissions.TEMPBAN_EXEMPT_LENGTH,
+                BanPermissions.TEMPBAN_EXEMPT_TARGET,
+                BanPermissions.TEMPBAN_OFFLINE,
+        },
+        associatedPermissionLevelKeys = BanPermissions.BAN_LEVEL_KEY
 )
 @EssentialsEquivalent("tempban")
 @NonnullByDefault
@@ -84,7 +89,7 @@ public class TempBanCommand implements ICommandExecutor<CommandSource>, IReloada
 
         if (this.banConfig.getLevelConfig().isUseLevels() &&
                 !context.isPermissionLevelOkay(u,
-                        BanModule.BAN_LEVEL_KEY,
+                        BanPermissions.BAN_LEVEL_KEY,
                         BanPermissions.BASE_TEMPBAN,
                         this.banConfig.getLevelConfig().isCanAffectSameLevel())) {
             // Failure.

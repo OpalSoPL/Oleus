@@ -50,7 +50,8 @@ import java.util.List;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = ItemPermissions.EXEMPT_COOLDOWN_SKULL),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = ItemPermissions.EXEMPT_WARMUP_SKULL),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_SKULL)
-        }
+        },
+        associatedPermissions = ItemPermissions.OTHERS_SKULL
 )
 public class SkullCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
 

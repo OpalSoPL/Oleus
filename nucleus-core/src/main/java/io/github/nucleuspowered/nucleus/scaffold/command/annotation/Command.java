@@ -92,4 +92,11 @@ public @interface Command {
      */
     String[] associatedPermissions() default {};
 
+    String[] associatedOptions() default {};
+
+    /**
+     * For documentation purposes: documents permission levels that might be used.
+     */
+    String[] associatedPermissionLevelKeys() default {};
+
 }

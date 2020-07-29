@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.vanish;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class VanishPermissions {
@@ -28,8 +28,5 @@ public class VanishPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.vanish.see", level = SuggestedLevel.ADMIN)
     public static final String VANISH_SEE = "nucleus.vanish.see";
-
-    @PermissionMetadata(descriptionKey = "permission.base", replacements = { "vanishonlogin" }, level = SuggestedLevel.ADMIN)
-    public static final String BASE_VANISHONLOGIN = "nucleus.vanishonlogin.base";
 
 }

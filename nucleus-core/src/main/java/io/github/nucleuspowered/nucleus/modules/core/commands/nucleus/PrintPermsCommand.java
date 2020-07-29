@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;

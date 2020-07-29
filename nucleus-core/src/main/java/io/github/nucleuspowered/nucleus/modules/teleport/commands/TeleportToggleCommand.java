@@ -25,7 +25,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
         aliases = "tptoggle",
         basePermission = TeleportPermissions.BASE_TPTOGGLE,
         commandDescriptionKey = "tptoggle",
-        async = true
+        async = true,
+        associatedPermissions = TeleportPermissions.TPTOGGLE_EXEMPT
 )
 public class TeleportToggleCommand implements ICommandExecutor<Player> {
 

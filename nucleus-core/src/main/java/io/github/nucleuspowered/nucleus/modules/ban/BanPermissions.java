@@ -5,11 +5,13 @@
 package io.github.nucleuspowered.nucleus.modules.ban;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOptionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class BanPermissions {
+
     private BanPermissions() {
         throw new AssertionError("Nope");
     }
@@ -43,5 +45,8 @@ public class BanPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "unban" }, level = SuggestedLevel.MOD)
     public static final String BASE_UNBAN = "nucleus.unban.base";
+
+    @LevelOptionMetadata("optionlevel.ban")
+    public static final String BAN_LEVEL_KEY = "nucleus.ban.level";
 
 }

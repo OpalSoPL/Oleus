@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
         aliases = {"ignorelist", "listignore", "ignored"},
         basePermission = IgnorePermissions.BASE_IGNORELIST,
         commandDescriptionKey = "ignorelist",
-        async = true
+        async = true,
+        associatedPermissions = IgnorePermissions.OTHERS_IGNORELIST
 )
 public class IgnoreListCommand implements ICommandExecutor<CommandSource> {
 

@@ -34,7 +34,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = FunPermissions.EXEMPT_COOLDOWN_IGNITE),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = FunPermissions.EXEMPT_WARMUP_IGNITE),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = FunPermissions.EXEMPT_COST_IGNITE)
-        }
+        },
+        associatedPermissions = FunPermissions.OTHERS_IGNITE
 )
 public class IgniteCommand implements ICommandExecutor<CommandSource> {
 

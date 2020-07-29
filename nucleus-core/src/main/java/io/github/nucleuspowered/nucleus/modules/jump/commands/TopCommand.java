@@ -36,7 +36,8 @@ import org.spongepowered.api.world.teleport.TeleportHelperFilters;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = JumpPermissions.EXEMPT_COOLDOWN_TOP),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = JumpPermissions.EXEMPT_WARMUP_TOP),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = JumpPermissions.EXEMPT_COST_TOP)
-        }
+        },
+        associatedPermissions = JumpPermissions.OTHERS_TOP
 )
 public class TopCommand implements ICommandExecutor<CommandSource> {
 

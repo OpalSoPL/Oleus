@@ -25,7 +25,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
         aliases = { "ignore" },
         basePermission = IgnorePermissions.BASE_IGNORE,
         commandDescriptionKey = "ignore",
-        async = true
+        async = true,
+        associatedPermissions = IgnorePermissions.IGNORE_CHAT
 )
 public class IgnoreCommand implements ICommandExecutor<Player> {
 

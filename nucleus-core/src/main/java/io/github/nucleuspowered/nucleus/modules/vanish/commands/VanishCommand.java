@@ -30,7 +30,11 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 @Command(
         aliases = {"vanish", "v"},
         basePermission = VanishPermissions.BASE_VANISH,
-        commandDescriptionKey = "vanish"
+        commandDescriptionKey = "vanish",
+        associatedPermissions = {
+                VanishPermissions.VANISH_SEE,
+                VanishPermissions.VANISH_PERSIST
+        }
 )
 public class VanishCommand implements ICommandExecutor<CommandSource> {
 

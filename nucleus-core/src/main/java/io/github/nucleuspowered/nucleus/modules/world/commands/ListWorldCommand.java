@@ -29,7 +29,10 @@ import java.util.List;
         aliases = {"list", "ls", "#worlds"},
         basePermission = WorldPermissions.BASE_WORLD_INFO,
         commandDescriptionKey = "world.list",
-        parentCommand = WorldCommand.class
+        parentCommand = WorldCommand.class,
+        associatedPermissions = {
+                WorldPermissions.WORLD_SEED
+        }
 )
 public class ListWorldCommand implements ICommandExecutor<CommandSource> {
 

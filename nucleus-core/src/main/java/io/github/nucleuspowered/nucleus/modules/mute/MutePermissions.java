@@ -5,11 +5,13 @@
 package io.github.nucleuspowered.nucleus.modules.mute;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOptionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class MutePermissions {
+
     private MutePermissions() {
         throw new AssertionError("Nope");
     }
@@ -49,5 +51,8 @@ public class MutePermissions {
 
     @PermissionMetadata(descriptionKey = "permission.mute.unmute", level = SuggestedLevel.MOD)
     public static final String BASE_UNMUTE = "nucleus.mute.unmute";
+
+    @LevelOptionMetadata("optionlevel.mute")
+    public static final String MUTE_LEVEL_KEY = "nucleus.mute.level";
 
 }

@@ -28,7 +28,8 @@ import javax.inject.Inject;
         aliases = { "setnucleuslanguage", "setnuclang" },
         basePermission = CorePermissions.BASE_NUSERPREFS,
         commandDescriptionKey = "setnucleuslanguage",
-        async = true
+        async = true,
+        associatedPermissions = CorePermissions.OTHERS_SETNUCLEUSLANGUAGE
 )
 public class SetNucleusLanguageCommand implements ICommandExecutor<CommandSource> {
 

@@ -50,7 +50,8 @@ import java.util.List;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = ItemPermissions.EXEMPT_COOLDOWN_REPAIR),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = ItemPermissions.EXEMPT_WARMUP_REPAIR),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_REPAIR)
-        }
+        },
+        associatedPermissions = ItemPermissions.OTHERS_REPAIR
 )
 public class RepairCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
 

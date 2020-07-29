@@ -42,7 +42,8 @@ import java.util.Optional;
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = EnvironmentPermissions.EXEMPT_COOLDOWN_WEATHER),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission =  EnvironmentPermissions.EXEMPT_WARMUP_WEATHER),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = EnvironmentPermissions.EXEMPT_COST_WEATHER)
-        }
+        },
+        associatedPermissions = EnvironmentPermissions.WEATHER_EXEMPT_LENGTH
 )
 public class WeatherCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
 

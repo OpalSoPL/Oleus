@@ -35,7 +35,8 @@ import java.time.Duration;
         aliases = { "give" },
         basePermission = KitPermissions.BASE_KIT_GIVE,
         commandDescriptionKey = "kit.give",
-        parentCommand = KitCommand.class
+        parentCommand = KitCommand.class,
+        associatedPermissions = KitPermissions.KIT_GIVE_OVERRIDE
 )
 @NonnullByDefault
 public class KitGiveCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {

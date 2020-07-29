@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.nickname;
 
 import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
-import io.github.nucleuspowered.nucleus.services.impl.permission.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.impl.permission.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 @RegisterPermissions
 public class NicknamePermissions {
@@ -35,19 +35,7 @@ public class NicknamePermissions {
     @PermissionMetadata(descriptionKey = "permission.nick.colour", level = SuggestedLevel.ADMIN)
     public static final String NICKNAME_COLOUR = "nucleus.nick.colour";
 
-    @PermissionMetadata(descriptionKey = "permission.nick.color", level = SuggestedLevel.ADMIN)
-    public static final String NICKNAME_COLOR = "nucleus.nick.color";
-
     @PermissionMetadata(descriptionKey = "permission.nick.style", level = SuggestedLevel.ADMIN)
     public static final String NICKNAME_STYLE = "nucleus.nick.style";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "realname" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_REALNAME = "nucleus.realname.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "realname" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_REALNAME = "nucleus.realname.exempt.cost";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "realname" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_REALNAME = "nucleus.realname.exempt.warmup";
 
 }

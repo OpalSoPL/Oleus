@@ -38,7 +38,8 @@ import java.util.Optional;
             @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = BackPermissions.EXEMPT_WARMUP_BACK),
             @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = BackPermissions.EXEMPT_COOLDOWN_BACK),
             @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = BackPermissions.EXEMPT_COST_BACK)
-        })
+        },
+        associatedPermissions = { BackPermissions.TPPOS_BORDER, BackPermissions.BACK_EXEMPT_SAMEDIMENSION })
 @NonnullByDefault
 public class BackCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
 

@@ -24,7 +24,10 @@ import java.util.UUID;
 @Command(
         aliases = {"msgtoggle", "messagetoggle", "mtoggle"},
         basePermission = MessagePermissions.BASE_MSGTOGGLE,
-        commandDescriptionKey = "msgtoggle"
+        commandDescriptionKey = "msgtoggle",
+        associatedPermissions = {
+                MessagePermissions.MSGTOGGLE_BYPASS
+        }
 )
 public class MsgToggleCommand implements ICommandExecutor<Player> {
 

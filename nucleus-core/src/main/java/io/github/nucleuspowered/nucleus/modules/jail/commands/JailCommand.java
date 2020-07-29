@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.modules.jail.commands;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
 import io.github.nucleuspowered.nucleus.datatypes.LocationData;
-import io.github.nucleuspowered.nucleus.modules.jail.JailModule;
 import io.github.nucleuspowered.nucleus.modules.jail.JailParameters;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
@@ -43,7 +42,15 @@ import javax.inject.Inject;
 @Command(
         aliases = {"jail"},
         basePermission = JailPermissions.BASE_JAIL,
-        commandDescriptionKey = "jail"
+        commandDescriptionKey = "jail",
+        associatedPermissions = {
+                JailPermissions.JAIL_NOTIFY,
+                JailPermissions.JAIL_OFFLINE,
+                JailPermissions.JAIL_EXEMPT_TARGET,
+                JailPermissions.JAIL_TELEPORTJAILED,
+                JailPermissions.JAIL_TELEPORTTOJAILED
+        },
+        associatedPermissionLevelKeys = JailPermissions.JAIL_LEVEL_KEY
 )
 @EssentialsEquivalent(value = {"togglejail", "tjail", "jail"}, isExact = false, notes = "This command is not a toggle.")
 public class JailCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
@@ -75,7 +82,7 @@ public class JailCommand implements ICommandExecutor<CommandSource>, IReloadable
 
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(pl,
-                        JailModule.LEVEL_KEY,
+                        JailPermissions.JAIL_LEVEL_KEY,
                         JailPermissions.BASE_JAIL,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.

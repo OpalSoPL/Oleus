@@ -18,8 +18,13 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
-@Command(aliases = { "ping" }, basePermission = MiscPermissions.BASE_PING, commandDescriptionKey = "ping")
 @EssentialsEquivalent(value = { "ping", "pong", "echo" }, isExact = false, notes = "Returns your latency, not your message.")
+@Command(
+        aliases = { "ping" },
+        basePermission = MiscPermissions.BASE_PING,
+        commandDescriptionKey = "ping",
+        associatedPermissions = MiscPermissions.OTHERS_PING
+)
 public class PingCommand implements ICommandExecutor<CommandSource> { // extends AbstractCommand.SimpleTargetOtherPlayer {
 
     @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {

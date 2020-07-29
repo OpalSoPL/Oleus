@@ -60,6 +60,10 @@ import javax.inject.Inject;
                 ),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = RTPPermissions.EXEMPT_WARMUP_RTP),
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = RTPPermissions.EXEMPT_COST_RTP)
+        },
+        associatedPermissions = {
+                RTPPermissions.OTHERS_RTP,
+                RTPPermissions.RTP_WORLDS
         }
 )
 public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {

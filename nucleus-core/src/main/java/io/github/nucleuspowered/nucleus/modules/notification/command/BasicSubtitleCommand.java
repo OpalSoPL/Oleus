@@ -10,7 +10,12 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
-@Command(aliases = "basicsubtitle", basePermission = NotificationPermissions.BASE_BASICSUBTITLE, commandDescriptionKey = "basicsubtitle")
+@Command(
+        aliases = "basicsubtitle",
+        basePermission = NotificationPermissions.BASE_BASICSUBTITLE,
+        commandDescriptionKey = "basicsubtitle",
+        associatedPermissions = NotificationPermissions.BASICSUBTITLE_MULTI
+)
 public class BasicSubtitleCommand extends TitleBase {
 
     @Inject
