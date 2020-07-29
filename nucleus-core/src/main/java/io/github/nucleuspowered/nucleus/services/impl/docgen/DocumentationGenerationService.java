@@ -95,8 +95,13 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     if (metadata.isRoot()) {
                         commandDoc.setAliases(String.join(", ", metadata.getAliases()));
                     } else {
-                        String key = metadata.getCommandKey().replaceAll("\\.[a-z]+$", "").replaceAll("\\.", " ");
-                        commandDoc.setAliases(key + String.join(", " + key, metadata.getAliases()));
+                        String key = metadata.getCommandKey()
+                                .replaceAll("\\.[a-z]+$", " ")
+                                .replaceAll("\\.", " ");
+                        commandDoc.setAliases(key + Arrays.stream(metadata.getAliases())
+                                .filter(x -> !x.startsWith("#"))
+                                .map(x -> x.replace("^$", ""))
+                                .collect(Collectors.joining(", " + key)));
                         if (!metadata.getRootAliases().isEmpty()) {
                             commandDoc.setRootAliases(String.join(", ", metadata.getRootAliases()));
                         }
@@ -105,12 +110,16 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     Set<PermissionDoc> permissionDocs = new HashSet<>();
                     Command annotation = metadata.getCommandAnnotation();
                     for (CommandModifier modifier : annotation.modifiers()) {
-                        if (modifier.value().equals(CommandModifiers.HAS_COOLDOWN)) {
-                            commandDoc.setCooldown(true);
-                        } else if (modifier.value().equals(CommandModifiers.HAS_COST)) {
-                            commandDoc.setCost(true);
-                        } else if (modifier.value().equals(CommandModifiers.HAS_WARMUP)) {
-                            commandDoc.setWarmup(true);
+                        switch (modifier.value()) {
+                            case CommandModifiers.HAS_COOLDOWN:
+                                commandDoc.setCooldown(true);
+                                break;
+                            case CommandModifiers.HAS_COST:
+                                commandDoc.setCost(true);
+                                break;
+                            case CommandModifiers.HAS_WARMUP:
+                                commandDoc.setWarmup(true);
+                                break;
                         }
                         getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
                     }
