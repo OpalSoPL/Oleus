@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.nickname.services;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.api.module.nickname.NucleusNicknameService;
 import io.github.nucleuspowered.nucleus.api.module.nickname.exception.NicknameException;
@@ -67,6 +68,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
     private Pattern pattern;
     private int min = 3;
     private int max = 16;
+    private final List<UUID> cached = Lists.newArrayList();
     private final BiMap<UUID, String> cache = HashBiMap.create();
     private final BiMap<UUID, Text> textCache = HashBiMap.create();
     private final TreeMap<String, UUID> reverseLowerCaseCache = new TreeMap<>();
@@ -84,6 +86,10 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
                     }
                 }
         );
+    }
+
+    public void markRead(UUID player) {
+        this.cached.add(player);
     }
 
     public void updateCache(UUID player, Text text) {
@@ -155,6 +161,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
     public void removeFromCache(UUID player) {
         this.cache.remove(player);
         this.textCache.remove(player);
+        this.cached.remove(player);
     }
 
     @Override
@@ -174,7 +181,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
 
     @Override
     public Optional<Text> getNickname(UUID user) {
-        if (Sponge.getServer().getPlayer(user).isPresent()) {
+        if (this.cached.contains(user)) {
             return Optional.ofNullable(this.textCache.get(user));
         }
         return this.storageManager.getUserService()
