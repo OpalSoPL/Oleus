@@ -139,11 +139,10 @@ val copyJars by tasks.registering(Copy::class) {
 val relNotes by tasks.registering(RelNotesTask::class) {
     dependsOn(gitHash)
     dependsOn(gitCommitMessage)
-    versionString { -> versionString }
-    spongeVersion { -> spongeVersion }
-    gitHash { -> gitHash.get().result!! }
-    gitCommit { -> gitCommitMessage.get().result!! }
-    level { -> level }
+    versionString { versionString }
+    gitHash { gitHash.get().result!! }
+    gitCommit { gitCommitMessage.get().result!! }
+    level { level }
 }
 
 val writeRelNotes by tasks.registering {
