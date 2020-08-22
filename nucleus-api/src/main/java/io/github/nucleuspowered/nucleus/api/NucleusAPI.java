@@ -8,7 +8,6 @@ import io.github.nucleuspowered.nucleus.api.core.NucleusAPIMetaService;
 import io.github.nucleuspowered.nucleus.api.core.NucleusPlayerMetadataService;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.api.core.NucleusWarmupManagerService;
-import io.github.nucleuspowered.nucleus.api.core.NucleusWorldUUIDChangeService;
 import io.github.nucleuspowered.nucleus.api.module.afk.NucleusAFKService;
 import io.github.nucleuspowered.nucleus.api.module.back.NucleusBackService;
 import io.github.nucleuspowered.nucleus.api.module.freezeplayer.NucleusFreezePlayerService;
@@ -25,20 +24,19 @@ import io.github.nucleuspowered.nucleus.api.module.note.NucleusNoteService;
 import io.github.nucleuspowered.nucleus.api.module.playerinfo.NucleusSeenService;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import io.github.nucleuspowered.nucleus.api.module.staffchat.NucleusStaffChatService;
-import io.github.nucleuspowered.nucleus.api.module.warning.NucleusWarningService;
 import io.github.nucleuspowered.nucleus.api.module.warp.NucleusWarpService;
 import io.github.nucleuspowered.nucleus.api.placeholder.NucleusPlaceholderService;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplateFactory;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.registry.UnknownTypeException;
 
 import java.util.Optional;
 
 /**
  * Contains static methods as an alternative way from using the Sponge Service manager.
  */
-public class NucleusAPI {
+public final class NucleusAPI {
 
     private NucleusAPI() {}
 
@@ -87,21 +85,6 @@ public class NucleusAPI {
     public static NucleusTextTemplateFactory getTextTemplateFactory() {
         return getService(NucleusTextTemplateFactory.class)
                 .orElseThrow(() -> new IllegalStateException("Nucleus Text Template Factory has not been registered"));
-    }
-
-    /**
-     * Gets the {@link NucleusWorldUUIDChangeService} service, which allows plugins to check if the admin has created a world UUID mapping.
-     *
-     * <p>
-     *     For proper verification, this will not contain any mappings until after the {@link GameStartingServerEvent} on default ordering
-     * </p>
-     *
-     * @return The {@link NucleusWorldUUIDChangeService}
-     * @throws IllegalStateException if Nucleus hasn't completed postinit.
-     */
-    public static NucleusWorldUUIDChangeService getWorldUUIDChangeService() {
-        return getService(NucleusWorldUUIDChangeService.class).orElseThrow(() -> new IllegalStateException("World UUID mappings have not yet been "
-                + "loaded"));
     }
 
     /**
@@ -325,19 +308,6 @@ public class NucleusAPI {
     }
 
     /**
-     * Gets the {@link NucleusWarningService}, if it exists.
-     *
-     * <p>
-     *     Requires the "warning" module.
-     * </p>
-     *
-     * @return The {@link NucleusWarningService}
-     */
-    public static Optional<NucleusWarningService> getWarningService() {
-        return getService(NucleusWarningService.class);
-    }
-
-    /**
      * Gets the {@link NucleusWarpService}, if it exists.
      *
      * <p>
@@ -351,8 +321,12 @@ public class NucleusAPI {
     }
 
     // A single point of failure means a single point to fix!
-    private static <T> Optional<T> getService(Class<T> clazz) {
-        return Sponge.getServiceManager().provide(clazz);
+    private static <T> Optional<T> getService(final Class<T> clazz) {
+        try {
+            return Optional.of(Sponge.getRegistry().getFactoryRegistry().provideFactory(clazz));
+        } catch (final UnknownTypeException exception) {
+            return Optional.empty();
+        }
     }
 
 }

@@ -25,7 +25,7 @@ public class SelectorArgument extends CommandElement {
     private final CommandElement wrapped;
     private final IMessageProviderService messageProvider;
 
-    public SelectorArgument(CommandElement wrapped, Class<? extends Entity> selectorFilter, INucleusServiceCollection serviceCollection) {
+    public SelectorArgument(final CommandElement wrapped, final Class<? extends Entity> selectorFilter, final INucleusServiceCollection serviceCollection) {
         super(wrapped.getKey());
         this.wrapped = wrapped;
         this.selectorFilter = selectorFilter;
@@ -34,19 +34,19 @@ public class SelectorArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         return null;
     }
 
     @Override
-    public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
-        String a = args.peek();
+    public void parse(final CommandSource source, final CommandArgs args, final CommandContext context) throws ArgumentParseException {
+        final String a = args.peek();
         if (a.startsWith("@")) {
             try {
                 // Time to try to eek it all out.
                 Selector.parse(a).resolve(source).stream().filter(this.selectorFilter::isInstance)
                         .forEach(x -> context.putArg(getKey(), x));
-            } catch (IllegalArgumentException e) {
+            } catch (final IllegalArgumentException e) {
                 throw args.createError(Text.of(e.getMessage()));
             }
 
@@ -62,12 +62,12 @@ public class SelectorArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return this.wrapped.complete(src, args, context);
     }
 
     @Override
-    public Text getUsage(CommandSource src) {
+    public Text getUsage(final CommandSource src) {
         return this.wrapped.getUsage(src);
     }
 

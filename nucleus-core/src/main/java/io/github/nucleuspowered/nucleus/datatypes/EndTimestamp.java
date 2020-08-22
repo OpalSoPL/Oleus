@@ -41,12 +41,12 @@ public abstract class EndTimestamp implements TimedEntry {
         return Optional.of(Duration.of(this.timeFromNextLogin, ChronoUnit.SECONDS));
     }
 
-    public void setEndtimestamp(Instant time) {
+    public void setEndtimestamp(final Instant time) {
         this.endtimestamp = time.getEpochSecond();
         this.timeFromNextLogin = null;
     }
 
-    public void setTimeFromNextLogin(Duration duration) {
+    public void setTimeFromNextLogin(final Duration duration) {
         this.timeFromNextLogin = duration.getSeconds();
         this.endtimestamp = null;
     }
@@ -64,7 +64,7 @@ public abstract class EndTimestamp implements TimedEntry {
             return Optional.empty();
         }
 
-        Duration duration;
+        final Duration duration;
         if (this.endtimestamp != null) {
             duration = Duration.between(Instant.now(), Instant.ofEpochSecond(this.endtimestamp));
         } else {
@@ -80,7 +80,7 @@ public abstract class EndTimestamp implements TimedEntry {
 
     @Override
     public boolean expired() {
-        return getRemainingTime().map(Duration::isZero).orElse(false);
+        return this.getRemainingTime().map(Duration::isZero).orElse(false);
     }
 
     @Override

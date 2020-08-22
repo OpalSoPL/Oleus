@@ -9,9 +9,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.CostModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.RequiresEconomyModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.WarmupModifier;
 import io.github.nucleuspowered.nucleus.scaffold.registry.NucleusRegistryModule;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public class CommandModiferRegistry extends NucleusRegistryModule<CommandModifierFactory> {
 
     @Override public Class<CommandModifierFactory> catalogClass() {
@@ -19,9 +16,9 @@ public class CommandModiferRegistry extends NucleusRegistryModule<CommandModifie
     }
 
     @Override public void registerModuleDefaults() {
-        registerAdditionalCatalog(new CommandModifierFactory.Simple(new CooldownModifier()));
-        registerAdditionalCatalog(new CommandModifierFactory.Simple(new CostModifier()));
-        registerAdditionalCatalog(new CommandModifierFactory.Simple(new WarmupModifier()));
-        registerAdditionalCatalog(new CommandModifierFactory.Simple(new RequiresEconomyModifier()));
+        this.registerAdditionalCatalog(new CommandModifierFactory.Simple(new CooldownModifier()));
+        this.registerAdditionalCatalog(new CommandModifierFactory.Simple(new CostModifier()));
+        this.registerAdditionalCatalog(new CommandModifierFactory.Simple(new WarmupModifier()));
+        this.registerAdditionalCatalog(new CommandModifierFactory.Simple(new RequiresEconomyModifier()));
     }
 }

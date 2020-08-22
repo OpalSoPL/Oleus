@@ -35,11 +35,11 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
     private CommentedConfigurationNode node = SimpleCommentedConfigurationNode.root();
 
     public ConfigFileMessagesRepository(
-            ITextStyleService textStyleService,
-            IPlayerDisplayNameService playerDisplayNameService,
-            Logger logger,
-            Path file,
-            Supplier<PropertiesMessageRepository> messageRepositorySupplier) {
+            final ITextStyleService textStyleService,
+            final IPlayerDisplayNameService playerDisplayNameService,
+            final Logger logger,
+            final Path file,
+            final Supplier<PropertiesMessageRepository> messageRepositorySupplier) {
         super(textStyleService, playerDisplayNameService);
         this.file = file;
         this.messageRepositorySupplier = messageRepositorySupplier;
@@ -52,26 +52,26 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
 
     @Override
     public void invalidateIfNecessary() {
-        invalidateIfNecessary(false);
+        this.invalidateIfNecessary(false);
     }
 
-    public void invalidateIfNecessary(boolean firstLoad) {
+    public void invalidateIfNecessary(final boolean firstLoad) {
         this.cachedMessages.clear();
         this.cachedStringMessages.clear();
         this.load(firstLoad);
     }
 
-    @Override public boolean hasEntry(String key) {
+    @Override public boolean hasEntry(final String key) {
         return false;
     }
 
-    @Override String getEntry(String key) {
+    @Override String getEntry(final String key) {
         return null;
     }
 
     protected CommentedConfigurationNode getDefaults() {
-        CommentedConfigurationNode ccn = SimpleCommentedConfigurationNode.root();
-        PropertiesMessageRepository repository = this.messageRepositorySupplier.get();
+        final CommentedConfigurationNode ccn = SimpleCommentedConfigurationNode.root();
+        final PropertiesMessageRepository repository = this.messageRepositorySupplier.get();
 
         repository.getKeys()
                 .forEach(x ->
@@ -80,24 +80,24 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
         return ccn;
     }
 
-    protected HoconConfigurationLoader getLoader(Path file) {
+    protected HoconConfigurationLoader getLoader(final Path file) {
         return HoconConfigurationLoader.builder().setPath(file).build();
     }
 
-    public Optional<String> getKey(@Nonnull String key) {
+    public Optional<String> getKey(@Nonnull final String key) {
         Preconditions.checkNotNull(key);
-        Object[] obj = key.split("\\.");
+        final Object[] obj = key.split("\\.");
         return Optional.ofNullable(this.node.getNode(obj).getString());
     }
 
     public List<String> walkThroughForMismatched() {
-        Matcher keyMatcher = KEYS.matcher("");
+        final Matcher keyMatcher = KEYS.matcher("");
         final List<String> keysToFix = Lists.newArrayList();
-        PropertiesMessageRepository propertiesMessageRepository = this.messageRepositorySupplier.get();
+        final PropertiesMessageRepository propertiesMessageRepository = this.messageRepositorySupplier.get();
         propertiesMessageRepository.getKeys().forEach(x -> {
-            String resKey = propertiesMessageRepository.getEntry(x);
-            Optional<String> msgKey = getKey(x);
-            if (msgKey.isPresent() && getTokens(resKey, keyMatcher) != getTokens(msgKey.get(), keyMatcher)) {
+            final String resKey = propertiesMessageRepository.getEntry(x);
+            final Optional<String> msgKey = this.getKey(x);
+            if (msgKey.isPresent() && this.getTokens(resKey, keyMatcher) != this.getTokens(msgKey.get(), keyMatcher)) {
                 keysToFix.add(x);
             }
         });
@@ -105,22 +105,22 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
         return keysToFix;
     }
 
-    public void fixMismatched(List<String> toFix) {
+    public void fixMismatched(final List<String> toFix) {
         Preconditions.checkNotNull(toFix);
         final PropertiesMessageRepository propertiesMessageRepository = this.messageRepositorySupplier.get();
         toFix.forEach(x -> {
-            String resKey = propertiesMessageRepository.getEntry(x);
-            Optional<String> msgKey = getKey(x);
+            final String resKey = propertiesMessageRepository.getEntry(x);
+            final Optional<String> msgKey = this.getKey(x);
 
-            Object[] nodeKey = x.split("\\.");
-            CommentedConfigurationNode cn = this.node.getNode(nodeKey).setValue(resKey);
+            final Object[] nodeKey = x.split("\\.");
+            final CommentedConfigurationNode cn = this.node.getNode(nodeKey).setValue(resKey);
             msgKey.ifPresent(cn::setComment);
         });
 
-        save();
+        this.save();
     }
 
-    private int getTokens(String message, Matcher matcher) {
+    private int getTokens(final String message, final Matcher matcher) {
         int result = -1;
 
         matcher.reset(message);
@@ -131,16 +131,16 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
         return result;
     }
 
-    private void load(boolean firstLoad) {
+    private void load(final boolean firstLoad) {
         try {
-            this.node = getLoader(this.file).load();
+            this.node = this.getLoader(this.file).load();
             this.isFailed = false;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             this.isFailed = true;
             // On error, fallback.
             // Blegh, relocations
             if (e.getCause().getClass().getName().contains(ConfigException.class.getSimpleName())) {
-                Throwable exception = e.getCause();
+                final Throwable exception = e.getCause();
                 this.logger.error("It appears that there is an error in your messages file! The error is: ");
                 this.logger.error(exception.getMessage());
                 this.logger.error("Please correct this then run /nucleus reload");
@@ -154,16 +154,16 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
 
         if (firstLoad) {
             // get defaults and merge in
-            this.node.mergeValuesFrom(getDefaults());
-            fixMismatched(walkThroughForMismatched());
-            save();
+            this.node.mergeValuesFrom(this.getDefaults());
+            this.fixMismatched(this.walkThroughForMismatched());
+            this.save();
         }
     }
 
     private void save() {
         try {
-            getLoader(this.file).save(this.node);
-        } catch (IOException e) {
+            this.getLoader(this.file).save(this.node);
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }

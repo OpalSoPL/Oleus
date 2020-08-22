@@ -34,38 +34,38 @@ public class CooldownModifier implements ICommandModifier {
         return "Cooldown Modifier";
     }
 
-    @Override public void getDefaultNode(ConfigurationNode node, IMessageProviderService messageProviderService) {
-        ConfigurationNode n = node.getNode(COOLDOWN);
+    @Override public void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) {
+        final ConfigurationNode n = node.getNode(COOLDOWN);
         if (n instanceof CommentedConfigurationNode) {
             ((CommentedConfigurationNode) n).setComment(messageProviderService.getMessageString("config.cooldown"));
         }
         n.setValue(0);
     }
 
-    @Override public void setDataFromNode(CommandModifiersConfig config, ConfigurationNode node) {
+    @Override public void setDataFromNode(final CommandModifiersConfig config, final ConfigurationNode node) {
         config.setCooldown(node.getNode(COOLDOWN).getInt(0));
     }
 
-    @Override public void setValueFromOther(CommandModifiersConfig from, CommandModifiersConfig to) {
+    @Override public void setValueFromOther(final CommandModifiersConfig from, final CommandModifiersConfig to) {
         to.setCooldown(from.getCooldown());
     }
 
-    @Override public boolean canExecuteModifier(INucleusServiceCollection serviceCollection, CommandSource source) throws CommandException {
+    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandSource source) throws CommandException {
         return source instanceof Player;
     }
 
-    @Override public Optional<Text> testRequirement(ICommandContext.Mutable<? extends CommandSource> source,
-            CommandControl control,
-            INucleusServiceCollection serviceCollection, CommandModifier modifier) throws CommandException {
-        CommandSource c = source.getCommandSource();
+    @Override public Optional<Text> testRequirement(final ICommandContext.Mutable<? extends CommandSource> source,
+            final CommandControl control,
+            final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
+        final CommandSource c = source.getCommandSource();
         return serviceCollection.cooldownService().getCooldown(control.getModifierKey(), source.getIfPlayer())
                 .map(duration -> serviceCollection.messageProvider().getMessageFor(c, "cooldown.message",
                         source.getTimeString(duration.getSeconds())));
     }
 
-    @Override public void onCompletion(ICommandContext<? extends CommandSource> source,
-            CommandControl control,
-            INucleusServiceCollection serviceCollection, CommandModifier modifier) throws CommandException {
+    @Override public void onCompletion(final ICommandContext<? extends CommandSource> source,
+            final CommandControl control,
+            final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
         serviceCollection.cooldownService().setCooldown(control.getModifierKey(), source.getIfPlayer(), Duration.ofSeconds(source.getCooldown()));
     }
 

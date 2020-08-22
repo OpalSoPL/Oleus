@@ -5,13 +5,11 @@
 package io.github.nucleuspowered.nucleus.api.module.mute.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
-import org.spongepowered.api.event.user.TargetUserEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import net.kyori.adventure.text.Component;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Events that occur whilst muted.
@@ -20,8 +18,14 @@ import java.util.Optional;
  *     These events might occur async!
  * </p>
  */
-@NonnullByDefault
-public interface NucleusMuteEvent extends TargetUserEvent {
+public interface NucleusMuteEvent {
+
+    /**
+     * The {@link UUID} of the muted user.
+     *
+     * @return The UUID
+     */
+    UUID getMutedUser();
 
     /**
      * Fired when a player is muted.
@@ -41,15 +45,11 @@ public interface NucleusMuteEvent extends TargetUserEvent {
          *
          * @return The reason.
          */
-        Text getReason();
+        Component getReason();
     }
 
     /**
      * Fired when a player is unmuted.
-     *
-     * <p>
-     *     Note that the {@link #getCause()} of the event will be the {@link PluginContainer} for the plugin if the event lapsed naturally.
-     * </p>
      */
     @MightOccurAsync
     interface Unmuted extends NucleusMuteEvent {

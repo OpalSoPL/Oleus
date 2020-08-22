@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.tests.test;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import io.github.nucleuspowered.nucleus.modules.rtp.kernels.KernelHelper;
 import org.junit.Assert;

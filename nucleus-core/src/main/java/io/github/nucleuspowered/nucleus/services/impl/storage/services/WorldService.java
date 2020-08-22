@@ -12,7 +12,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 public class WorldService extends AbstractKeyedService<IWorldQueryObject, IWorldDataObject> {
 
-    public WorldService(IStorageManager repository, PluginContainer pluginContainer) {
+    public WorldService(final IStorageManager repository, final PluginContainer pluginContainer) {
         super(repository::getWorldDataAccess, repository::getWorldRepository, pluginContainer);
     }
 

@@ -4,11 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.util.PaginationBuilderWrapper;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -73,7 +74,7 @@ public class Util {
     public static final DateTimeFormatter FULL_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)
             .withZone(ZoneId.systemDefault());
 
-    public static final Text SPACE = Text.of(" ");
+    public static final Component SPACE = TextComponent.space();
 
     private static final TextTemplate CHAT_TEMPLATE = TextTemplate.of(TextTemplate.arg(MessageEvent.PARAM_MESSAGE_HEADER).build(),
             TextTemplate.arg(MessageEvent.PARAM_MESSAGE_BODY).build(), TextTemplate.arg(MessageEvent.PARAM_MESSAGE_FOOTER).build());
@@ -83,15 +84,15 @@ public class Util {
 
     public static final UUID CONSOLE_FAKE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
-    public static CommandSource getSourceFromCause(Cause cause) {
+    public static CommandSource getSourceFromCause(final Cause cause) {
         return cause.first(CommandSource.class).orElseGet(Sponge.getServer()::getConsole);
     }
 
-    public static Text applyChatTemplate(MessageEvent.MessageFormatter formatter) {
+    public static Text applyChatTemplate(final MessageEvent.MessageFormatter formatter) {
         return applyChatTemplate(formatter.getHeader(), formatter.getBody(), formatter.getFooter());
     }
 
-    public static Text applyChatTemplate(TextRepresentable header, TextRepresentable body, TextRepresentable footer) {
+    public static Text applyChatTemplate(final TextRepresentable header, final TextRepresentable body, final TextRepresentable footer) {
         return CHAT_TEMPLATE.apply(
                 ImmutableMap.of(
                 MessageEvent.PARAM_MESSAGE_HEADER, header,
@@ -99,7 +100,7 @@ public class Util {
                 MessageEvent.PARAM_MESSAGE_FOOTER, footer)).build();
     }
 
-    public static UUID getUUID(CommandSource src) {
+    public static UUID getUUID(final CommandSource src) {
         if (src instanceof Identifiable) {
             return ((Identifiable) src).getUniqueId();
         }
@@ -107,42 +108,42 @@ public class Util {
         return CONSOLE_FAKE_UUID;
     }
 
-    public static Optional<User> getUserFromUUID(UUID uuid) {
+    public static Optional<User> getUserFromUUID(final UUID uuid) {
         return Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
                 .get(uuid).map(x -> x.isOnline() ? ((User)x.getPlayer().get()) : x);
     }
 
-    public static Object getObjectFromUUID(UUID uuid) {
-        Optional<Object> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
+    public static Object getObjectFromUUID(final UUID uuid) {
+        final Optional<Object> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
                 .get(uuid).map(x -> x.isOnline() ? x.getPlayer().get() : x);
         return user.orElseGet(() -> Sponge.getServer().getConsole());
 
     }
 
 
-    public static String getNameOrUnkown(ICommandContext<? extends CommandSource> context, GameProfile profile) {
+    public static String getNameOrUnkown(final ICommandContext<? extends CommandSource> context, final GameProfile profile) {
         return profile.getName().orElse(
                 context.getServiceCollection().messageProvider().getMessageString(context.getCommandKey(), "standard.unknown"));
     }
 
-    public static String getTimeFromTicks(IMessageProviderService messageProviderService, long ticks) {
+    public static String getTimeFromTicks(final IMessageProviderService messageProviderService, long ticks) {
         if (ticks < 0 || ticks > 23999) {
             // Normalise
             ticks = ticks % 24000;
         }
 
-        int mins = (int) ((ticks % 1000) / (100. / 6.));
+        final int mins = (int) ((ticks % 1000) / (100. / 6.));
         long hours = (ticks / 1000 + 6) % 24;
 
-        NumberFormat m = NumberFormat.getIntegerInstance();
+        final NumberFormat m = NumberFormat.getIntegerInstance();
         m.setMinimumIntegerDigits(2);
 
         if (hours < 12) {
-            long ahours = hours == 0 ? 12 : hours;
+            final long ahours = hours == 0 ? 12 : hours;
             return messageProviderService.getMessageString("standard.time.am", ahours, hours, m.format(mins));
         } else {
             hours -= 12;
-            long ahours = hours == 0 ? 12 : hours;
+            final long ahours = hours == 0 ? 12 : hours;
             return messageProviderService.getMessageString("standard.time.pm", ahours, hours, m.format(mins));
         }
     }
@@ -155,14 +156,14 @@ public class Util {
      * @param <T> The {@link CatalogType} that is also a {@link Translatable}
      * @return A {@link String} that represents the item.
      */
-    public static <T extends Translatable & CatalogType> String getTranslatableIfPresent(T translatable) {
+    public static <T extends Translatable & CatalogType> String getTranslatableIfPresent(final T translatable) {
         try {
-            String result = translatable.getTranslation().get();
+            final String result = translatable.getTranslation().get();
 
             if (!result.isEmpty()) {
                 return result;
             }
-        } catch (AbstractMethodError e) {
+        } catch (final AbstractMethodError e) {
             //
         }
 
@@ -176,7 +177,7 @@ public class Util {
      * @param key The {@link String} key.
      * @return An {@link Optional}, which contains the key if it exists.
      */
-    public static Optional<String> getKeyIgnoreCase(Map<String, ?> map, String key) {
+    public static Optional<String> getKeyIgnoreCase(final Map<String, ?> map, final String key) {
         return getKeyIgnoreCase(map.keySet(), key);
     }
 
@@ -187,7 +188,7 @@ public class Util {
      * @param key The {@link String} key.
      * @return An {@link Optional}, which contains the key if it exists.
      */
-    public static Optional<String> getKeyIgnoreCase(Collection<String> collection, String key) {
+    public static Optional<String> getKeyIgnoreCase(final Collection<String> collection, final String key) {
         return collection.stream().filter(x -> x.equalsIgnoreCase(key)).findFirst();
     }
 
@@ -199,7 +200,7 @@ public class Util {
      * @param <T> The type of values in the map.
      * @return An {@link Optional}, which contains a value if the key exists in some case form.
      */
-    public static <T> Optional<T> getValueIgnoreCase(Map<String, T> map, String key) {
+    public static <T> Optional<T> getValueIgnoreCase(final Map<String, T> map, final String key) {
         return map.entrySet().stream().filter(x -> x.getKey().equalsIgnoreCase(key))
                 .map(Map.Entry::getValue).findFirst();
     }
@@ -210,29 +211,29 @@ public class Util {
      * @param location The {@link Location} to test.
      * @return <code>true</code> if the location is within the border.
      */
-    public static boolean isLocationInWorldBorder(Location<World> location) {
+    public static boolean isLocationInWorldBorder(final Location<World> location) {
         return isLocationInWorldBorder(location.getPosition(), location.getExtent());
     }
 
-    public static boolean isLocationInWorldBorder(Vector3d location, World world) {
+    public static boolean isLocationInWorldBorder(final Vector3d location, final World world) {
 
         // Diameter, not radius - we'll want the radius later. We use long, we want the floor!
-        long radius = (long)Math.floor(world.getWorldBorder().getDiameter() / 2.0);
+        final long radius = (long)Math.floor(world.getWorldBorder().getDiameter() / 2.0);
 
         // We get the current position and subtract the border centre. This gives us an effective distance from the
         // centre in all three dimensions. We just care about the magnitude in the x and z directions, so we get the
         // positive amount.
-        Vector3d displacement = location.sub(world.getWorldBorder().getCenter()).abs();
+        final Vector3d displacement = location.sub(world.getWorldBorder().getCenter()).abs();
 
         // Check that we're not too far out.
         return !(displacement.getX() > radius || displacement.getZ() > radius);
     }
 
-    public static void compressAndDeleteFile(Path from) throws IOException {
+    public static void compressAndDeleteFile(final Path from) throws IOException {
         // Get the file.
         if (Files.exists(from)) {
-            Path to = Paths.get(from.toString() + ".gz");
-            try (OutputStream os = new GZIPOutputStream(new FileOutputStream(to.toFile()))) {
+            final Path to = Paths.get(from.toString() + ".gz");
+            try (final OutputStream os = new GZIPOutputStream(new FileOutputStream(to.toFile()))) {
                 Files.copy(from, os);
                 os.flush();
                 Files.delete(from);
@@ -242,24 +243,24 @@ public class Util {
 
     }
 
-    public static PaginationList.Builder getPaginationBuilder(CommandSource source) {
+    public static PaginationList.Builder getPaginationBuilder(final CommandSource source) {
         return getPaginationBuilder(source instanceof Player);
     }
 
-    public static PaginationList.Builder getPaginationBuilder(boolean isPlayer) {
-        PaginationList.Builder plb = Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder();
+    public static PaginationList.Builder getPaginationBuilder(final boolean isPlayer) {
+        final PaginationList.Builder plb = Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder();
         if (!isPlayer) {
             plb.linesPerPage(-1);
         }
 
-        return new PaginationBuilderWrapper(plb);
+        return plb;
     }
 
     public static Inventory.Builder getKitInventoryBuilder() {
         return Inventory.builder().of(InventoryArchetypes.CHEST).property(InventoryDimension.PROPERTY_NAME, new InventoryDimension(9, 4));
     }
 
-    public static Optional<CatalogType> getTypeFromItemInHand(Player src) {
+    public static Optional<CatalogType> getTypeFromItemInHand(final Player src) {
         // If subject, get the item in hand, otherwise, we can't continue.
         if (src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
             return Optional.of(getTypeFromItem(src.getItemInHand(HandTypes.MAIN_HAND).get()));
@@ -268,40 +269,40 @@ public class Util {
         }
     }
 
-    public static CatalogType getTypeFromItem(ItemStack is) {
+    public static CatalogType getTypeFromItem(final ItemStack is) {
         try {
-            Optional<BlockState> blockState = is.get(Keys.ITEM_BLOCKSTATE);
+            final Optional<BlockState> blockState = is.get(Keys.ITEM_BLOCKSTATE);
             if (blockState.isPresent()) {
                 return blockState.get();
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
 
         return is.getType();
     }
 
-    public static ItemStack dropItemOnFloorAtLocation(ItemStackSnapshot itemStackSnapshotToDrop, Location<World> location) {
+    public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final Location<World> location) {
         return dropItemOnFloorAtLocation(itemStackSnapshotToDrop, location.getExtent(), location.getPosition());
     }
 
-    public static ItemStack dropItemOnFloorAtLocation(ItemStackSnapshot itemStackSnapshotToDrop, World world, Vector3d position) {
-        Entity entityToDrop = world.createEntity(EntityTypes.ITEM, position);
+    public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final World world, final Vector3d position) {
+        final Entity entityToDrop = world.createEntity(EntityTypes.ITEM, position);
         entityToDrop.offer(Keys.REPRESENTED_ITEM, itemStackSnapshotToDrop);
         world.spawnEntity(entityToDrop);
         return itemStackSnapshotToDrop.createStack();
     }
 
-    public static Inventory getStandardInventory(Carrier player) {
+    public static Inventory getStandardInventory(final Carrier player) {
         return player.getInventory()
                 .query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class))
                 .transform(InventoryTransformations.PLAYER_MAIN_HOTBAR_FIRST);
     }
 
-    public static <T extends Event> void onPlayerSimulatedOrPlayer(T event, BiConsumer<T, Player> eventConsumer) {
+    public static <T extends Event> void onPlayerSimulatedOrPlayer(final T event, final BiConsumer<T, Player> eventConsumer) {
         // If we're simulating a player, we should use them instead.
-        @Nullable Player cs = checkSimulated(event).orElseGet(() -> {
-            Object root = event.getCause().root();
+        @Nullable final Player cs = checkSimulated(event).orElseGet(() -> {
+            final Object root = event.getCause().root();
             if (root instanceof Player) {
                 return (Player) root;
             }
@@ -315,16 +316,16 @@ public class Util {
 
     }
 
-    public static <T extends Event> void onSourceSimulatedOr(T event, Function<T, Optional<CommandSource>> orElse,
-            BiConsumer<T, CommandSource> eventConsumer) {
+    public static <T extends Event> void onSourceSimulatedOr(final T event, final Function<T, Optional<CommandSource>> orElse,
+            final BiConsumer<T, CommandSource> eventConsumer) {
         // If we're simulating a player, we should use them instead.
-        @Nullable CommandSource cs = checkSimulated(event).map(x -> (CommandSource) x).orElseGet(() -> orElse.apply(event).orElse(null));
+        @Nullable final CommandSource cs = checkSimulated(event).map(x -> (CommandSource) x).orElseGet(() -> orElse.apply(event).orElse(null));
         if (cs != null) {
             eventConsumer.accept(event, cs);
         }
     }
 
-    private static Optional<Player> checkSimulated(Event event) {
+    private static Optional<Player> checkSimulated(final Event event) {
         return event.getContext().get(EventContextKeys.PLAYER_SIMULATED).map(x -> Sponge.getServer().getPlayer(x.getUniqueId()).orElse(null));
     }
 }

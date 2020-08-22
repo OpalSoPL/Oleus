@@ -19,25 +19,25 @@ import javax.annotation.Nullable;
  */
 public interface DataKey<R, O extends IKeyedDataObject<?>> {
 
-    static <T, O extends IKeyedDataObject<?>> DataKey<T, O> of(TypeToken<T> type, Class<O> target, String... key) {
+    static <T, O extends IKeyedDataObject<?>> DataKey<T, O> of(final TypeToken<T> type, final Class<O> target, final String... key) {
         return new DataKeyImpl<>(key, type, target,  null);
     }
 
-    static <T, O extends IKeyedDataObject<?>> DataKey<T, O> of(T def, TypeToken<T> type, Class<O> target, String... key) {
+    static <T, O extends IKeyedDataObject<?>> DataKey<T, O> of(final T def, final TypeToken<T> type, final Class<O> target, final String... key) {
         return new DataKeyImpl<>(key, type, target, def);
     }
 
-    static <T, O extends IKeyedDataObject<?>> DataKey.ListKey<T, O> ofList(TypeToken<T> type, Class<O> target, String... key) {
+    static <T, O extends IKeyedDataObject<?>> DataKey.ListKey<T, O> ofList(final TypeToken<T> type, final Class<O> target, final String... key) {
         return new ListDataKey<>(key, type, target);
     }
 
     static <K, V, O extends IKeyedDataObject<?>> DataKey.MapKey<K, V, O> ofMap(
-            TypeToken<K> keyType, TypeToken<V> value, Class<O> target, String... key) {
+            final TypeToken<K> keyType, final TypeToken<V> value, final Class<O> target, final String... key) {
         return new MappedDataKey<>(key, keyType, value, target);
     }
 
     static <K, V, O extends IKeyedDataObject<?>> DataKey.MapListKey<K, V, O> ofMapList(
-            TypeToken<K> keyType, TypeToken<V> listValueType, Class<O> target, String... key) {
+            final TypeToken<K> keyType, final TypeToken<V> listValueType, final Class<O> target, final String... key) {
         return new MappedListDataKey<>(key, keyType, listValueType, target);
     }
 

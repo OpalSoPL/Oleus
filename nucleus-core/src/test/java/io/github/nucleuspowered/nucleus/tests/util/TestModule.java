@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.tests.util;
 
 import com.google.inject.AbstractModule;
-import io.github.nucleuspowered.nucleus.NucleusBootstrap;
+import io.github.nucleuspowered.nucleus.NucleusCore;
 import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfigAdapter;
 import org.mockito.Mockito;
@@ -44,14 +44,14 @@ public class TestModule extends AbstractModule {
         this.bind(CoreConfigAdapter.class).toInstance(mock);
 
         try {
-            NucleusBootstrap plugin = getMockPlugin();
-            this.bind(NucleusBootstrap.class).toInstance(plugin);
+            NucleusCore plugin = getMockPlugin();
+            this.bind(NucleusCore.class).toInstance(plugin);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private NucleusBootstrap getMockPlugin() {
-        return Mockito.mock(NucleusBootstrap.class);
+    private NucleusCore getMockPlugin() {
+        return Mockito.mock(NucleusCore.class);
     }
 }

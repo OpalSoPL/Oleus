@@ -20,11 +20,11 @@ public class ListDataKey<R, O extends IKeyedDataObject<?>> extends DataKeyImpl<L
 
     private final TypeToken<R> innerType;
 
-    private static <S> TypeToken<List<S>> createListToken(TypeToken<S> innerToken) {
+    private static <S> TypeToken<List<S>> createListToken(final TypeToken<S> innerToken) {
         return new TypeToken<List<S>>() {}.where(new TypeParameter<S>() {}, innerToken);
     }
 
-    public ListDataKey(String[] key, TypeToken<R> type, Class<O> target) {
+    public ListDataKey(final String[] key, final TypeToken<R> type, final Class<O> target) {
         super(key, createListToken(type), target, null);
         this.innerType = type;
     }

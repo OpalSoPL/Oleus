@@ -4,22 +4,22 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.home.exception;
 
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.util.TextMessageException;
 
 /**
  * Thrown when a home related action fails.
  */
-public class HomeException extends CommandException {
+public final class HomeException extends TextMessageException {
 
     private final Reasons reason;
 
-    public HomeException(Text message, Reasons reasons) {
+    public HomeException(final Component message, final Reasons reasons) {
         super(message);
         this.reason = reasons;
     }
 
-    public HomeException(Text message, Throwable cause, Reasons reasons) {
+    public HomeException(final Component message, final Throwable cause, final Reasons reasons) {
         super(message, cause);
         this.reason = reasons;
     }

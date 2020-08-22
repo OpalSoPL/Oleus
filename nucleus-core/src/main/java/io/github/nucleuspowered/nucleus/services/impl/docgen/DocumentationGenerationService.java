@@ -63,22 +63,22 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
-    public DocumentationGenerationService(INucleusServiceCollection serviceCollection) {
+    public DocumentationGenerationService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
     @Override
-    public void generate(Path directory) throws IOException, ObjectMappingException {
-        ICommandMetadataService commandMetadataService = this.serviceCollection.commandMetadataService();
-        IPermissionService permissionService = this.serviceCollection.permissionService();
-        IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
-        Collection<CommandControl> commands = commandMetadataService.getCommands();
+    public void generate(final Path directory) throws IOException, ObjectMappingException {
+        final ICommandMetadataService commandMetadataService = this.serviceCollection.commandMetadataService();
+        final IPermissionService permissionService = this.serviceCollection.permissionService();
+        final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
+        final Collection<CommandControl> commands = commandMetadataService.getCommands();
 
         final List<EssentialsDoc> essentialsDocs = new ArrayList<>();
-        List<CommandDoc> lcd = getAndSort(
+        final List<CommandDoc> lcd = this.getAndSort(
                 commands,
                 (CommandControl first, CommandControl second) -> {
-                    int m = first.getMetadata().getModuleid().compareToIgnoreCase(second.getMetadata().getModuleid());
+                    final int m = first.getMetadata().getModuleid().compareToIgnoreCase(second.getMetadata().getModuleid());
                     if (m == 0) {
                         return first.getCommandKey().compareToIgnoreCase(second.getCommandKey());
                     }
@@ -86,16 +86,16 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     return m;
                 },
                 control -> {
-                    CommandMetadata metadata = control.getMetadata();
-                    CommandDoc commandDoc = new CommandDoc();
-                    String cmdPath = metadata.getCommandKey().replaceAll("\\.", " ");
+                    final CommandMetadata metadata = control.getMetadata();
+                    final CommandDoc commandDoc = new CommandDoc();
+                    final String cmdPath = metadata.getCommandKey().replaceAll("\\.", " ");
                     commandDoc.setCommandName(cmdPath);
                     commandDoc.setModule(metadata.getModuleid());
 
                     if (metadata.isRoot()) {
                         commandDoc.setAliases(String.join(", ", metadata.getAliases()));
                     } else {
-                        String key = metadata.getCommandKey()
+                        final String key = metadata.getCommandKey()
                                 .replaceAll("\\.[a-z]+$", " ")
                                 .replaceAll("\\.", " ");
                         commandDoc.setAliases(key + Arrays.stream(metadata.getAliases())
@@ -107,9 +107,9 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                         }
                     }
 
-                    Set<PermissionDoc> permissionDocs = new HashSet<>();
-                    Command annotation = metadata.getCommandAnnotation();
-                    for (CommandModifier modifier : annotation.modifiers()) {
+                    final Set<PermissionDoc> permissionDocs = new HashSet<>();
+                    final Command annotation = metadata.getCommandAnnotation();
+                    for (final CommandModifier modifier : annotation.modifiers()) {
                         switch (modifier.value()) {
                             case CommandModifiers.HAS_COOLDOWN:
                                 commandDoc.setCooldown(true);
@@ -121,16 +121,16 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                                 commandDoc.setWarmup(true);
                                 break;
                         }
-                        getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
+                        this.getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
                     }
 
-                    for (String perm : metadata.getCommandAnnotation().associatedPermissions()) {
-                        getPermissionDoc(perm).ifPresent(permissionDocs::add);
+                    for (final String perm : metadata.getCommandAnnotation().associatedPermissions()) {
+                        this.getPermissionDoc(perm).ifPresent(permissionDocs::add);
                     }
 
-                    EssentialsEquivalent essentialsEquivalent = metadata.getEssentialsEquivalent();
+                    final EssentialsEquivalent essentialsEquivalent = metadata.getEssentialsEquivalent();
                     if (essentialsEquivalent != null) {
-                        List<String> eqiv = Arrays.asList(essentialsEquivalent.value());
+                        final List<String> eqiv = Arrays.asList(essentialsEquivalent.value());
                         commandDoc.setEssentialsEquivalents(eqiv);
                         commandDoc.setEssNotes(essentialsEquivalent.notes());
                         commandDoc.setExactEssEquiv(essentialsEquivalent.isExact());
@@ -143,17 +143,17 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                         );
                     }
 
-                    String[] base = metadata.getCommandAnnotation().basePermission();
+                    final String[] base = metadata.getCommandAnnotation().basePermission();
                     SuggestedLevel level = SuggestedLevel.USER;
                     if (base.length > 0) {
                         commandDoc.setPermissionbase(base[0]);
-                        for (String permission : base) {
-                            Optional<IPermissionService.Metadata> pm = this.serviceCollection.permissionService().getMetadataFor(permission);
+                        for (final String permission : base) {
+                            final Optional<IPermissionService.Metadata> pm = this.serviceCollection.permissionService().getMetadataFor(permission);
                             if (pm.isPresent()) {
                                 if (pm.get().getSuggestedLevel().compareTo(level) > 0) {
                                     level = pm.get().getSuggestedLevel();
                                 }
-                                permissionDocs.add(getFor(pm.get()));
+                                permissionDocs.add(this.getFor(pm.get()));
                             }
                         }
                     }
@@ -172,14 +172,14 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     return commandDoc;
                 });
 
-        List<PermissionDoc> permdocs = permissionService.getAllMetadata()
+        final List<PermissionDoc> permdocs = permissionService.getAllMetadata()
                 .stream()
                 .map(this::getFor)
                 .filter(x -> x.getPermission() != null)
                 .sorted(Comparator.comparing(PermissionDoc::getPermission))
                 .collect(Collectors.toList());
 
-        List<TokenDoc> tokenDocs = this.serviceCollection
+        final List<TokenDoc> tokenDocs = this.serviceCollection
                 .placeholderService()
                 .getNucleusParsers()
                 .values()
@@ -200,62 +200,62 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
 
         // Now do all the saving
         // Config files
-        Map<String, Class<?>> configs = this.serviceCollection
+        final Map<String, Class<?>> configs = this.serviceCollection
                 .moduleDataProvider()
                 .getModuleToConfigType();
-        ConfigurationNode configNode = SimpleConfigurationNode.root();
-        for (Map.Entry<String, Class<?>> entry : configs.entrySet()) {
+        final ConfigurationNode configNode = SimpleConfigurationNode.root();
+        for (final Map.Entry<String, Class<?>> entry : configs.entrySet()) {
             try {
-                configNode.getNode(entry.getKey()).setValue(createConfigString(entry.getValue().newInstance()));
-            } catch (InstantiationException | IllegalAccessException e) {
+                configNode.getNode(entry.getKey()).setValue(this.createConfigString(entry.getValue().newInstance()));
+            } catch (final InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
 
         // Generate command file.
-        YAMLConfigurationLoader configurationLoader = YAMLConfigurationLoader.builder()
+        final YAMLConfigurationLoader configurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("commands.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-        ConfigurationNode commandConfigurationNode = SimpleConfigurationNode.root().setValue(COMMAND_DOC_LIST_TYPE_TOKEN, lcd);
+        final ConfigurationNode commandConfigurationNode = SimpleConfigurationNode.root().setValue(COMMAND_DOC_LIST_TYPE_TOKEN, lcd);
         configurationLoader.save(commandConfigurationNode);
 
-        YAMLConfigurationLoader permissionsConfigurationLoader = YAMLConfigurationLoader.builder()
+        final YAMLConfigurationLoader permissionsConfigurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("permissions.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-        ConfigurationNode permissionConfiguationNode = SimpleConfigurationNode.root().setValue(PERMISSION_DOC_LIST_TYPE_TOKEN, permdocs);
+        final ConfigurationNode permissionConfiguationNode = SimpleConfigurationNode.root().setValue(PERMISSION_DOC_LIST_TYPE_TOKEN, permdocs);
         permissionsConfigurationLoader.save(permissionConfiguationNode);
 
-        YAMLConfigurationLoader essentialsConfigurationLoader = YAMLConfigurationLoader.builder()
+        final YAMLConfigurationLoader essentialsConfigurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("essentials.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-        ConfigurationNode essentialsConfigurationNode = SimpleConfigurationNode.root().setValue(ESSENTIALS_DOC_LIST_TYPE_TOKEN, essentialsDocs);
+        final ConfigurationNode essentialsConfigurationNode = SimpleConfigurationNode.root().setValue(ESSENTIALS_DOC_LIST_TYPE_TOKEN, essentialsDocs);
         essentialsConfigurationLoader.save(essentialsConfigurationNode);
 
-        YAMLConfigurationLoader configurationConfigurationLoader = YAMLConfigurationLoader.builder()
+        final YAMLConfigurationLoader configurationConfigurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("conf.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
         configurationConfigurationLoader.save(configNode);
 
-        YAMLConfigurationLoader tokensConfigurationLoader = YAMLConfigurationLoader.builder()
+        final YAMLConfigurationLoader tokensConfigurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("tokens.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-        ConfigurationNode tokensConfigNode = SimpleConfigurationNode.root().setValue(TOKEN_DOC_LIST_TYPE_TOKEN, tokenDocs);
+        final ConfigurationNode tokensConfigNode = SimpleConfigurationNode.root().setValue(TOKEN_DOC_LIST_TYPE_TOKEN, tokenDocs);
         tokensConfigurationLoader.save(tokensConfigNode);
 
     }
 
     private <T, R> List<R> getAndSort(
-            Collection<T> list,
-            Comparator<T> comparator,
-            Function<T, R> mapper) {
+            final Collection<T> list,
+            final Comparator<T> comparator,
+            final Function<T, R> mapper) {
         return list.stream().sorted(comparator).map(mapper).collect(Collectors.toList());
     }
 
-    private Optional<PermissionDoc> getPermissionDoc(String permission) {
+    private Optional<PermissionDoc> getPermissionDoc(final String permission) {
         return this.serviceCollection.permissionService().getMetadataFor(permission).map(this::getFor);
     }
 
-    private PermissionDoc getFor(IPermissionService.Metadata metadata) {
+    private PermissionDoc getFor(final IPermissionService.Metadata metadata) {
         return new PermissionDoc()
                 .setDefaultLevel(metadata.getSuggestedLevel().getRole())
                 .setDescription(metadata.getDescription(this.serviceCollection.messageProvider()))
@@ -263,23 +263,23 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                 .setModule(metadata.getModuleId());
     }
 
-    private String createConfigString(Object obj) throws IOException {
-        try (StringWriter sw = new StringWriter(); BufferedWriter writer = new BufferedWriter(sw)) {
-            HoconConfigurationLoader hcl = HoconConfigurationLoader.builder()
+    private String createConfigString(final Object obj) throws IOException {
+        try (final StringWriter sw = new StringWriter(); final BufferedWriter writer = new BufferedWriter(sw)) {
+            final HoconConfigurationLoader hcl = HoconConfigurationLoader.builder()
                     .setDefaultOptions(this.serviceCollection.configurateHelper().setOptions(ConfigurationOptions.defaults()))
                     .setSink(() -> writer)
                     .build();
-            CommentedConfigurationNode cn = hcl.createEmptyNode(this.serviceCollection.configurateHelper().setOptions(hcl.getDefaultOptions()));
-            applyToNode(obj.getClass(), obj, cn);
+            final CommentedConfigurationNode cn = hcl.createEmptyNode(this.serviceCollection.configurateHelper().setOptions(hcl.getDefaultOptions()));
+            this.applyToNode(obj.getClass(), obj, cn);
             hcl.save(cn);
             return sw.toString();
         }
     }
 
-    private <T> void applyToNode(Class<T> c, Object object, ConfigurationNode node) {
+    private <T> void applyToNode(final Class<T> c, final Object object, final ConfigurationNode node) {
         try {
             node.setValue(TypeToken.of(c), c.cast(object));
-        } catch (ObjectMappingException e) {
+        } catch (final ObjectMappingException e) {
             e.printStackTrace();
         }
     }

@@ -4,15 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.core.config;
 
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.neutrino.annotations.DoNotGenerate;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import uk.co.drnaylor.quickstart.config.NoMergeIfPresent;
-
-import java.util.Map;
-import java.util.UUID;
 
 @ConfigSerializable
 public class CoreConfig {
@@ -44,10 +39,6 @@ public class CoreConfig {
 
     @Setting(value = "console-overrides-exemptions", comment = "config.core.consoleoverrides")
     private boolean consoleOverride = true;
-
-    @NoMergeIfPresent
-    @Setting(value = "world-uuid-migration", comment = "config.core.worlduuidmigration")
-    private Map<UUID, String> uuidMigration = Maps.newHashMap();
 
     @Setting(value = "check-for-wildcard", comment = "config.core.wildcard")
     private boolean checkForWildcard = true;
@@ -117,10 +108,6 @@ public class CoreConfig {
 
     public boolean isConsoleOverride() {
         return this.consoleOverride;
-    }
-
-    public Map<UUID, String> getUuidMigration() {
-        return this.uuidMigration;
     }
 
     public boolean isCheckForWildcard() {

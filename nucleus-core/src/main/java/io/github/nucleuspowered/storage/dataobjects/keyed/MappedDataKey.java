@@ -22,13 +22,13 @@ public class MappedDataKey<K, V, O extends IKeyedDataObject<?>> extends DataKeyI
     private final TypeToken<K> keyType;
     private final TypeToken<V> valueType;
 
-    private static <Key, Value> TypeToken<Map<Key, Value>> createMapToken(TypeToken<Key> keyToken, TypeToken<Value> valueToken) {
+    private static <Key, Value> TypeToken<Map<Key, Value>> createMapToken(final TypeToken<Key> keyToken, final TypeToken<Value> valueToken) {
         return new TypeToken<Map<Key, Value>>() {}
                 .where(new TypeParameter<Key>() {}, keyToken)
                 .where(new TypeParameter<Value>() {}, valueToken);
     }
 
-    public MappedDataKey(String[] key, TypeToken<K> keyType, TypeToken<V> valueType, Class<O> target) {
+    public MappedDataKey(final String[] key, final TypeToken<K> keyType, final TypeToken<V> valueType, final Class<O> target) {
         super(key, createMapToken(keyType, valueType), target, null);
         this.keyType = keyType;
         this.valueType = valueType;

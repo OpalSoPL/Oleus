@@ -16,8 +16,8 @@ import java.util.stream.Collectors;
  */
 public class LowercaseMapKeySettingProcessor implements SettingProcessor {
 
-    @Override public void onGet(ConfigurationNode input) {
-        Map<Object, ? extends ConfigurationNode> nodes = input.getChildrenMap().entrySet()
+    @Override public void onGet(final ConfigurationNode input) {
+        final Map<Object, ? extends ConfigurationNode> nodes = input.getChildrenMap().entrySet()
                 .stream()
                 .map(x -> new Tuple<Object, ConfigurationNode>(x.getKey().toString().toLowerCase(), x.getValue()))
                 .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
@@ -25,5 +25,5 @@ public class LowercaseMapKeySettingProcessor implements SettingProcessor {
     }
 
     @Override
-    public void process(ConfigurationNode configurationNode) {}
+    public void process(final ConfigurationNode configurationNode) {}
 }

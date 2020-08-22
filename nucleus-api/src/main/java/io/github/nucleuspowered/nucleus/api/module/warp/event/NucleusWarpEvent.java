@@ -9,11 +9,10 @@ import io.github.nucleuspowered.nucleus.api.util.CancelMessageEvent;
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.user.TargetUserEvent;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.Optional;
 
@@ -40,7 +39,7 @@ public interface NucleusWarpEvent extends Cancellable, CancelMessageEvent, Event
          *
          * @return The location.
          */
-        Location<World> getLocation();
+        ServerLocation getLocation();
     }
 
     /**
@@ -61,7 +60,7 @@ public interface NucleusWarpEvent extends Cancellable, CancelMessageEvent, Event
          *
          * @return The location. It might not exist if the world does not exist any more.
          */
-        Optional<Location<World>> getLocation();
+        Optional<ServerLocation> getLocation();
     }
 
     /**
@@ -73,7 +72,14 @@ public interface NucleusWarpEvent extends Cancellable, CancelMessageEvent, Event
      *     Note that the user does not necessarily need to be online.
      * </p>
      */
-    interface Use extends TargetUserEvent, NucleusWarpEvent {
+    interface Use extends NucleusWarpEvent {
+
+        /**
+         * The User being warped.
+         *
+         * @return The {@link User}
+         */
+        User getTargetUser();
 
         /**
          * Gets the {@link Warp}
@@ -87,6 +93,6 @@ public interface NucleusWarpEvent extends Cancellable, CancelMessageEvent, Event
          *
          * @return The location.
          */
-        Location<World> getLocation();
+        ServerLocation getLocation();
     }
 }

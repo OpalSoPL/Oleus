@@ -22,12 +22,9 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.time.Duration;
 import java.util.Optional;
 
-@NonnullByDefault
 public class WarmupModifier implements ICommandModifier, IReloadableService.Reloadable {
 
     private static final String WARMUP = "warmup";
@@ -42,33 +39,33 @@ public class WarmupModifier implements ICommandModifier, IReloadableService.Relo
         return "Warmup Modifier";
     }
 
-    @Override public void getDefaultNode(ConfigurationNode node, IMessageProviderService messageProviderService) {
-        ConfigurationNode n = node.getNode(WARMUP);
+    @Override public void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) {
+        final ConfigurationNode n = node.getNode(WARMUP);
         if (n instanceof CommentedConfigurationNode) {
             ((CommentedConfigurationNode) n).setComment(messageProviderService.getMessageString("config.warmup"));
         }
         n.setValue(0);
     }
 
-    @Override public void setDataFromNode(CommandModifiersConfig config, ConfigurationNode node) {
+    @Override public void setDataFromNode(final CommandModifiersConfig config, final ConfigurationNode node) {
         config.setWarmup(node.getNode(WARMUP).getInt(0));
     }
 
-    @Override public void setValueFromOther(CommandModifiersConfig from, CommandModifiersConfig to) {
+    @Override public void setValueFromOther(final CommandModifiersConfig from, final CommandModifiersConfig to) {
         to.setWarmup(from.getWarmup());
     }
 
-    @Override public boolean canExecuteModifier(INucleusServiceCollection serviceCollection, CommandSource source) throws
+    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandSource source) throws
             CommandException {
         return source instanceof Player;
     }
 
-    @Override public Optional<ICommandResult> preExecute(ICommandContext.Mutable<? extends CommandSource> source, CommandControl control,
-            INucleusServiceCollection serviceCollection, CommandModifier modifier) {
+    @Override public Optional<ICommandResult> preExecute(final ICommandContext.Mutable<? extends CommandSource> source, final CommandControl control,
+            final INucleusServiceCollection serviceCollection, final CommandModifier modifier) {
         if (source.getWarmup() > 0) {
             // If the player had an exemption earlier, this would not be in the list. Therefore, we have a warmup.
             // We also know we have a player.
-            Player player = source.getCommandSourceAsPlayerUnchecked();
+            final Player player = source.getCommandSourceAsPlayerUnchecked();
             serviceCollection.warmupService().cancel(player);
 
             // Send a message.
@@ -99,7 +96,7 @@ public class WarmupModifier implements ICommandModifier, IReloadableService.Relo
     }
 
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.warmupConfig = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class).getWarmupConfig();
     }
 }

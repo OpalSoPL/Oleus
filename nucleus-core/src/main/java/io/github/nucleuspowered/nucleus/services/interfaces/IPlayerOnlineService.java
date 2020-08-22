@@ -21,7 +21,7 @@ public interface IPlayerOnlineService {
 
     boolean isOnline(CommandSource src, User player);
 
-    default Optional<Instant> lastSeen(CommandSource src, User player) {
+    default Optional<Instant> lastSeen(final CommandSource src, final User player) {
         return player.get(Keys.LAST_DATE_PLAYED);
     }
 

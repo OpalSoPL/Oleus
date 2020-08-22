@@ -21,7 +21,7 @@ class LogFile implements Closeable {
     private final BufferedWriter outputStream;
     private boolean isClosed = false;
 
-    LogFile(final Path location, Function<String, String> stringFormatter) throws IOException {
+    LogFile(final Path location, final Function<String, String> stringFormatter) throws IOException {
         Preconditions.checkNotNull(location);
         Preconditions.checkNotNull(stringFormatter);
 
@@ -30,12 +30,12 @@ class LogFile implements Closeable {
         this.formatter = stringFormatter;
     }
 
-    void writeLine(String line) throws IOException {
+    void writeLine(final String line) throws IOException {
         try {
             this.outputStream.write(this.formatter.apply(line));
             this.outputStream.newLine();
-        } catch (IOException e) {
-            close();
+        } catch (final IOException e) {
+            this.close();
             throw e;
         }
     }

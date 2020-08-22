@@ -5,10 +5,6 @@
 package io.github.nucleuspowered.nucleus.api.module.note.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.user.TargetUserEvent;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,8 +13,7 @@ import java.util.UUID;
  * Events for when notes are added to users.
  */
 @MightOccurAsync
-@NonnullByDefault
-public interface NucleusNoteEvent extends TargetUserEvent {
+public interface NucleusNoteEvent {
 
     /**
      * Gets the {@link UUID} of the player who added the note,
@@ -45,9 +40,9 @@ public interface NucleusNoteEvent extends TargetUserEvent {
     /**
      * The subject of the note.
      *
-     * @return The {@link User}
+     * @return The {@link UUID} of the user
      */
-    User getTargetUser();
+    UUID getTargetUser();
 
     /**
      * Event that is fired when a note is created.

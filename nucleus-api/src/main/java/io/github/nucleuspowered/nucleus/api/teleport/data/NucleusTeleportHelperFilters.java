@@ -4,26 +4,24 @@
  */
 package io.github.nucleuspowered.nucleus.api.teleport.data;
 
-import io.github.nucleuspowered.nucleus.api.util.RegistrySupplier;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
 import java.util.function.Supplier;
 
-/**
- * Do not access before Pre-Init
- */
 public final class NucleusTeleportHelperFilters {
 
     /**
      * Returns the location that is passed into the filter.
      */
     public final static Supplier<TeleportHelperFilter> NO_CHECK =
-            RegistrySupplier.supply(TeleportHelperFilter.class, "NO_CHECK");
+            () -> Sponge.getRegistry().getCatalogRegistry().get(TeleportHelperFilter.class, ResourceKey.of("nucleus", "no_check")).get();
 
     /**
      * Returns a location that is not a wall.
      */
     public final static Supplier<TeleportHelperFilter> WALL_CHECK =
-            RegistrySupplier.supply(TeleportHelperFilter.class, "WALL_CHECK");
+            () -> Sponge.getRegistry().getCatalogRegistry().get(TeleportHelperFilter.class, ResourceKey.of("nucleus", "wall_check")).get();
 
 }

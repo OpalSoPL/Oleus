@@ -4,18 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.home;
 
-import com.flowpowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.core.exception.NoSuchPlayerException;
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
 import io.github.nucleuspowered.nucleus.api.module.home.exception.HomeException;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,17 +33,6 @@ public interface NucleusHomeService {
     String HOME_COUNT_OPTION = "home-count";
 
     /**
-     * An alternative name that can be used instead of {@link #HOME_COUNT_OPTION}.
-     * Should only be used for reading, as an option named {@link #HOME_COUNT_OPTION}
-     * will supersede this.
-     *
-     * @deprecated Use {@link #HOME_COUNT_OPTION} as the permission option to set
-     * home counts, as that will override this one.
-     */
-    @Deprecated
-    String ALTERNATIVE_HOME_COUNT_OPTION = "homes";
-
-    /**
      * The pattern that all home names must follow.
      */
     Pattern HOME_NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]{1,15}$");
@@ -60,18 +43,8 @@ public interface NucleusHomeService {
      * @param user The {@link UUID} of the player
      * @return The number of homes.
      */
-    default int getHomeCount(UUID user) {
-        return getHomes(user).size();
-    }
-
-    /**
-     * Gets the number of homes the player currently has.
-     *
-     * @param user The {@link User}
-     * @return The number of homes.
-     */
-    default int getHomeCount(User user) {
-        return getHomeCount(user.getUniqueId());
+    default int getHomeCount(final UUID user) {
+        return this.getHomes(user).size();
     }
 
     /**
@@ -88,8 +61,8 @@ public interface NucleusHomeService {
      * @param user The {@link UUID}
      * @return The homes.
      */
-    default List<Home> getHomes(User user) {
-        return getHomes(user.getUniqueId());
+    default List<Home> getHomes(final User user) {
+        return this.getHomes(user.getUniqueId());
     }
 
     /**
@@ -101,8 +74,8 @@ public interface NucleusHomeService {
      */
     Optional<Home> getHome(UUID user, String name);
 
-    default Optional<Home> getHome(User user, String name) {
-        return getHome(user.getUniqueId(), name);
+    default Optional<Home> getHome(final User user, final String name) {
+        return this.getHome(user.getUniqueId(), name);
     }
 
     /**
@@ -112,25 +85,6 @@ public interface NucleusHomeService {
      *     Home names must follow the regex defined by {@link #HOME_NAME_PATTERN}.
      * </p>
      *
-     * @param cause The {@link Cause} of the change. The {@link PluginContainer} must be the root cause.
-     * @param user The {@link UUID} of the user to create the home for.
-     * @param name The name of the home to create.
-     * @param location The location of the home.
-     * @param rotation The rotation of the player when they return to this home.
-     * @throws HomeException if the home could not be created as the name is incorrect,
-     *                       could not be created due to home limits, or if a plugin
-     *                       cancelled the creation event.
-     */
-    void createHome(Cause cause, User user, String name, Location<World> location, Vector3d rotation) throws HomeException;
-
-    /**
-     * Creates a home. This is subject to Nucleus' standard checks.
-     *
-     * <p>
-     *     Home names must follow the regex defined by {@link #HOME_NAME_PATTERN}.
-     * </p>
-     *
-     * @param cause The {@link Cause} of the change. The {@link PluginContainer} must be the root cause.
      * @param user The {@link UUID} of the user to create the home for.
      * @param name The name of the home to create.
      * @param location The location of the home.
@@ -140,14 +94,11 @@ public interface NucleusHomeService {
      *                       cancelled the creation event.
      * @throws NoSuchPlayerException if the {@link UUID} does not map onto a player.
      */
-    default void createHome(Cause cause, UUID user, String name, Location<World> location, Vector3d rotation) throws HomeException, NoSuchPlayerException {
-        createHome(cause, Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(user).orElseThrow(NoSuchPlayerException::new), name, location, rotation);
-    }
+    void createHome(final UUID user, final String name, final ServerLocation location, final Vector3d rotation) throws HomeException, NoSuchPlayerException;
 
     /**
      * Modifies a home's location.
      *
-     * @param cause The {@link Cause} of the change. The {@link PluginContainer} must be the root cause.
      * @param user The {@link UUID} of the user to modify the home for.
      * @param name The name of the home to modify.
      * @param location The location of the home.
@@ -155,84 +106,43 @@ public interface NucleusHomeService {
      * @throws HomeException if the home could not be found or if a plugin cancelled
      *                      the event.
      */
-    default void modifyHome(Cause cause, UUID user, String name, Location<World> location, Vector3d rotation)
-            throws HomeException {
-        modifyHome(cause,
-            getHome(user, name).orElseThrow(() -> new HomeException(Text.of("Home does not exist"), HomeException.Reasons.DOES_NOT_EXIST)),
-            location,
-            rotation);
-    }
+    void modifyHome(final UUID user, final String name, final ServerLocation location, final Vector3d rotation) throws HomeException, NoSuchPlayerException;
 
     /**
      * Modifies a home's location.
      *
-     * @param cause The {@link Cause} of the change. The {@link PluginContainer} must be the root cause.
      * @param home The {@link Home} to modify.
      * @param location The location of the home.
      * @param rotation The rotation of the player when they return to this home.
      * @throws HomeException if the home could not be found, or a plugin cancelled the event.
      */
-    void modifyHome(Cause cause, Home home, Location<World> location, Vector3d rotation) throws HomeException;
-
-    default void modifyHome(Cause cause, User user, String name, Location<World> location, Vector3d rotation) throws HomeException {
-        modifyHome(cause, user.getUniqueId(), name, location, rotation);
-    }
+    void modifyHome(Home home, ServerLocation location, Vector3d rotation) throws HomeException;
 
     /**
      * Modifies a home's location, if it exists, otherwise creates a home. This is subject to Nucleus' standard checks.
      *
-     * @param cause The {@link Cause} of the change. The {@link PluginContainer} must be the root cause.
      * @param user The {@link UUID} of the user to modify the home for.
      * @param name The name of the home to modify or create.
      * @param location The location of the home.
      * @param rotation The rotation of the player when they return to this home.
      * @throws HomeException if the home could not be created, due to home limits, or a plugin cancelled the event.
      */
-    default void modifyOrCreateHome(Cause cause, User user, String name, Location<World> location, Vector3d rotation) throws HomeException {
-        if (getHome(user, name).isPresent()) {
-            modifyHome(cause, user, name, location, rotation);
+    default void modifyOrCreateHome(final UUID user, final String name, final ServerLocation location, final Vector3d rotation) throws HomeException, NoSuchPlayerException {
+        if (this.getHome(user, name).isPresent()) {
+            this.modifyHome(user, name, location, rotation);
         } else {
-            createHome(cause, user, name, location, rotation);
+            this.createHome(user, name, location, rotation);
         }
     }
 
     /**
-     * Modifies a home's location, if it exists, otherwise creates a home. This is subject to Nucleus' standard checks.
-     *
-     * @param cause The {@link Cause} of the change. The {@link PluginContainer} must be the root cause.
-     * @param user The {@link UUID} of the user to modify the home for.
-     * @param name The name of the home to modify or create.
-     * @param location The location of the home.
-     * @param rotation The rotation of the player when they return to this home.
-     * @throws HomeException if the home could not be created, due to home limits, or a plugin cancelled the event.
-     * @throws NoSuchPlayerException if the supplied UUID does not map to a known user
-     */
-    default void modifyOrCreateHome(Cause cause, UUID user, String name, Location<World> location, Vector3d rotation) throws HomeException, NoSuchPlayerException {
-        modifyOrCreateHome(cause, Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(user).orElseThrow(NoSuchPlayerException::new), name, location, rotation);
-    }
-
-    /**
      * Removes a home.
      *
-     * @param cause The {@link Cause} of the change. The {@link PluginContainer} must be the root cause.
      * @param user The {@link UUID} of the user to remove the home of.
      * @param name The name of the home to remove.
      * @throws HomeException if the home could not be found, or a plugin cancelled the event.
      */
-    default void removeHome(Cause cause, UUID user, String name) throws HomeException {
-        removeHome(cause, getHome(user, name).orElseThrow(() -> new HomeException(
-                Text.of("Home does not exist"),
-                HomeException.Reasons.DOES_NOT_EXIST)));
-    }
-
-    /**
-     * Removes a home.
-     *
-     * @param cause The {@link Cause} of the change. The {@link PluginContainer} must be the root cause.
-     * @param home The {@link Home} to remove.
-     * @throws HomeException if the home could not be found, or a plugin cancelled the event.
-     */
-    void removeHome(Cause cause, Home home) throws HomeException;
+    void removeHome(final UUID user, final String name) throws HomeException;
 
     /**
      * Returns the maximum number of homes the player can have.

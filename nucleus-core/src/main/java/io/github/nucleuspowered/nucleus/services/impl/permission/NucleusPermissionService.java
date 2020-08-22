@@ -71,8 +71,8 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     @Inject
     public NucleusPermissionService(
-            INucleusServiceCollection serviceCollection,
-            IReloadableService service) {
+            final INucleusServiceCollection serviceCollection,
+            final IReloadableService service) {
         this.messageProviderService = serviceCollection.messageProvider();
         this.serviceCollection = serviceCollection;
 
@@ -83,17 +83,17 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     @Override
     public void assignUserRoleToDefault() {
-        assignRoleToGroup(SuggestedLevel.USER, Sponge.getServiceManager().provideUnchecked(PermissionService.class).getDefaults());
+        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.getServiceManager().provideUnchecked(PermissionService.class).getDefaults());
     }
 
     @Override
-    public void assignRoleToGroup(SuggestedLevel role, Subject subject) {
-        for (Map.Entry<String, IPermissionService.Metadata> permission : this.metadataMap.entrySet()) {
+    public void assignRoleToGroup(final SuggestedLevel role, final Subject subject) {
+        for (final Map.Entry<String, IPermissionService.Metadata> permission : this.metadataMap.entrySet()) {
             if (permission.getValue().getSuggestedLevel() == role) {
                 subject.getTransientSubjectData().setPermission(ImmutableSet.of(), permission.getValue().getPermission(), Tristate.TRUE);
             }
         }
-        for (Map.Entry<String, IPermissionService.Metadata> permission : this.prefixMetadataMap.entrySet()) {
+        for (final Map.Entry<String, IPermissionService.Metadata> permission : this.prefixMetadataMap.entrySet()) {
             if (permission.getValue().getSuggestedLevel() == role) {
                 subject.getTransientSubjectData().setPermission(ImmutableSet.of(), permission.getValue().getPermission(), Tristate.TRUE);
             }
@@ -104,12 +104,12 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         return this.isOpOnly;
     }
 
-    @Override public void registerContextCalculator(ContextCalculator<Subject> calculator) {
+    @Override public void registerContextCalculator(final ContextCalculator<Subject> calculator) {
         this.contextCalculators.add(calculator);
         Sponge.getServiceManager().provide(PermissionService.class).ifPresent(x -> x.registerContextCalculator(calculator));
     }
 
-    @Override public void checkServiceChange(ProviderRegistration<PermissionService> service) {
+    @Override public void checkServiceChange(final ProviderRegistration<PermissionService> service) {
         this.contextCalculators.forEach(x -> service.getProvider().registerContextCalculator(x));
         service.getProvider().registerContextCalculator(this);
 
@@ -117,28 +117,28 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         this.isOpOnly = service.getPlugin().getId().equals("sponge");
     }
 
-    @Override public boolean hasPermission(Subject permissionSubject, String permission) {
-        return hasPermission(permissionSubject, permission, this.useRole);
+    @Override public boolean hasPermission(final Subject permissionSubject, final String permission) {
+        return this.hasPermission(permissionSubject, permission, this.useRole);
     }
 
-    @Override public Tristate hasPermissionTristate(Subject subject, String permission) {
-        return hasPermissionTristate(subject, permission, this.useRole);
+    @Override public Tristate hasPermissionTristate(final Subject subject, final String permission) {
+        return this.hasPermissionTristate(subject, permission, this.useRole);
     }
 
-    @Override public boolean hasPermissionWithConsoleOverride(Subject subject, String permission, boolean permissionIfConsoleAndOverridden) {
+    @Override public boolean hasPermissionWithConsoleOverride(final Subject subject, final String permission, final boolean permissionIfConsoleAndOverridden) {
         if (this.consoleOverride && subject instanceof ConsoleSource) {
             return permissionIfConsoleAndOverridden;
         }
 
-        return hasPermission(subject, permission);
+        return this.hasPermission(subject, permission);
     }
 
-    @Override public boolean isConsoleOverride(Subject subject) {
+    @Override public boolean isConsoleOverride(final Subject subject) {
         return this.consoleOverride && subject instanceof ConsoleSource;
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        CoreConfig coreConfig = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final CoreConfig coreConfig = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
         this.useRole = coreConfig.isUseParentPerms();
         this.consoleOverride = coreConfig.isConsoleOverride();
     }
@@ -146,11 +146,11 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override public void registerDescriptions() {
         Preconditions.checkState(!this.init);
         this.init = true;
-        PermissionService ps = Sponge.getServiceManager().provide(PermissionService.class).orElse(null);
-        boolean isPresent = ps != null;
+        final PermissionService ps = Sponge.getServiceManager().provide(PermissionService.class).orElse(null);
+        final boolean isPresent = ps != null;
 
-        for (Map.Entry<String, IPermissionService.Metadata> entry : this.metadataMap.entrySet()) {
-            SuggestedLevel level = entry.getValue().getSuggestedLevel();
+        for (final Map.Entry<String, IPermissionService.Metadata> entry : this.metadataMap.entrySet()) {
+            final SuggestedLevel level = entry.getValue().getSuggestedLevel();
             if (isPresent && level.getRole() != null) {
                 ps.newDescriptionBuilder(this.serviceCollection.pluginContainer())
                         .assign(level.getRole(), true)
@@ -160,8 +160,8 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         }
     }
 
-    @Override public void register(String permission, PermissionMetadata metadata, String moduleid) {
-        NucleusPermissionService.Metadata m = new NucleusPermissionService.Metadata(permission, metadata, moduleid);
+    @Override public void register(final String permission, final PermissionMetadata metadata, final String moduleid) {
+        final NucleusPermissionService.Metadata m = new NucleusPermissionService.Metadata(permission, metadata, moduleid);
         if (metadata.isPrefix()) {
             this.prefixMetadataMap.put(permission.toLowerCase(), m);
         } else {
@@ -169,7 +169,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         }
     }
 
-    @Override public CommandElement createOtherUserPermissionElement(String permission) {
+    @Override public CommandElement createOtherUserPermissionElement(final String permission) {
         return GenericArguments.optionalWeak(
                 new NucleusRequirePermissionArgument(NucleusParameters.ONE_USER.get(this.serviceCollection),
                 this,
@@ -177,54 +177,54 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
                 false));
     }
 
-    @Override public OptionalDouble getDoubleOptionFromSubject(Subject player, String... options) {
-        return getTypedObjectFromSubject(
+    @Override public OptionalDouble getDoubleOptionFromSubject(final Subject player, final String... options) {
+        return this.getTypedObjectFromSubject(
                 string -> OptionalDouble.of(Double.parseDouble(string)),
                 OptionalDouble.empty(),
                 player,
                 options);
     }
 
-    @Override public OptionalLong getPositiveLongOptionFromSubject(Subject player, String... options) {
-        return getTypedObjectFromSubject(
+    @Override public OptionalLong getPositiveLongOptionFromSubject(final Subject player, final String... options) {
+        return this.getTypedObjectFromSubject(
                 string -> OptionalLong.of(Long.parseLong(string)),
                 OptionalLong.empty(),
                 player,
                 options);
     }
 
-    @Override public OptionalInt getPositiveIntOptionFromSubject(Subject player, String... options) {
-        return getTypedObjectFromSubject(
+    @Override public OptionalInt getPositiveIntOptionFromSubject(final Subject player, final String... options) {
+        return this.getTypedObjectFromSubject(
                 string -> OptionalInt.of(Integer.parseUnsignedInt(string)),
                 OptionalInt.empty(),
                 player,
                 options);
     }
 
-    @Override public OptionalInt getIntOptionFromSubject(Subject player, String... options) {
-        return getTypedObjectFromSubject(
+    @Override public OptionalInt getIntOptionFromSubject(final Subject player, final String... options) {
+        return this.getTypedObjectFromSubject(
                 string -> OptionalInt.of(Integer.parseInt(string)),
                 OptionalInt.empty(),
                 player,
                 options);
     }
 
-    private <T> T getTypedObjectFromSubject(ThrownFunction<String, T, Exception> conversion, T empty, Subject player, String... options) {
+    private <T> T getTypedObjectFromSubject(final ThrownFunction<String, T, Exception> conversion, final T empty, final Subject player, final String... options) {
         try {
-            Optional<String> optional = getOptionFromSubject(player, options);
+            final Optional<String> optional = this.getOptionFromSubject(player, options);
             if (optional.isPresent()) {
                 return conversion.apply(optional.get());
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // ignored
         }
 
         return empty;
     }
 
-    @Override public Optional<String> getOptionFromSubject(Subject player, String... options) {
-        for (String option : options) {
-            String o = option.toLowerCase();
+    @Override public Optional<String> getOptionFromSubject(final Subject player, final String... options) {
+        for (final String option : options) {
+            final String o = option.toLowerCase();
 
             // Option for context.
             Optional<String> os = player.getOption(player.getActiveContexts(), o);
@@ -242,7 +242,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         return Optional.empty();
     }
 
-    @Override public PermissionMessageChannel permissionMessageChannel(String permission) {
+    @Override public PermissionMessageChannel permissionMessageChannel(final String permission) {
         return new PermissionMessageChannel(this, permission);
     }
 
@@ -250,8 +250,8 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         return ImmutableList.copyOf(this.metadataMap.values());
     }
 
-    private boolean hasPermission(Subject subject, String permission, boolean checkRole) {
-        Tristate tristate = hasPermissionTristate(subject, permission, checkRole);
+    private boolean hasPermission(final Subject subject, final String permission, final boolean checkRole) {
+        final Tristate tristate = this.hasPermissionTristate(subject, permission, checkRole);
         if (tristate == Tristate.UNDEFINED) {
             return subject.hasPermission(permission); // guarantees the correct response.
         }
@@ -259,13 +259,13 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         return tristate.asBoolean();
     }
 
-    private Tristate hasPermissionTristate(Subject subject, String permission, boolean checkRole) {
+    private Tristate hasPermissionTristate(final Subject subject, final String permission, final boolean checkRole) {
         if (checkRole && permission.startsWith("nucleus.")) {
-            Tristate tristate = subject.getPermissionValue(subject.getActiveContexts(), permission);
+            final Tristate tristate = subject.getPermissionValue(subject.getActiveContexts(), permission);
             if (tristate == Tristate.UNDEFINED) {
-                @Nullable IPermissionService.Metadata result = this.metadataMap.get(permission);
+                @Nullable final IPermissionService.Metadata result = this.metadataMap.get(permission);
                 if (result != null) { // check the "parent" perm
-                    String perm = result.getSuggestedLevel().getPermission();
+                    final String perm = result.getSuggestedLevel().getPermission();
                     if (perm == null) {
                         return subject.getPermissionValue(subject.getActiveContexts(), permission);
                     } else {
@@ -273,9 +273,9 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
                     }
                 }
 
-                for (Map.Entry<String, IPermissionService.Metadata> entry : this.prefixMetadataMap.entrySet()) {
+                for (final Map.Entry<String, IPermissionService.Metadata> entry : this.prefixMetadataMap.entrySet()) {
                     if (permission.startsWith(entry.getKey())) {
-                        String perm = entry.getValue().getSuggestedLevel().getPermission();
+                        final String perm = entry.getValue().getSuggestedLevel().getPermission();
                         if (perm == null) {
                             return subject.getPermissionValue(subject.getActiveContexts(), permission);
                         } else {
@@ -287,7 +287,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
                 // if we get here, no registered permissions were found
                 // therefore, warn
                 if (this.failedChecks.add(permission)) {
-                    PrettyPrinter printer = new PrettyPrinter(80);
+                    final PrettyPrinter printer = new PrettyPrinter(80);
                     printer.add("Nucleus Permission Not Registered").centre().hr();
                     printer.add("Nucleus has not registered a permission properly. This is an error in Nucleus - please report to the Nucleus "
                             + "github.");
@@ -307,14 +307,16 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     @Override
-    public Optional<IPermissionService.Metadata> getMetadataFor(String permission) {
+    public Optional<IPermissionService.Metadata> getMetadataFor(final String permission) {
         return Optional.ofNullable(this.metadataMap.get(permission));
     }
 
     @Override
-    public boolean isPermissionLevelOkay(Subject actor, Subject actee, String key, String permission, boolean isSameOkay) {
-        int actorLevel = getDeclaredLevel(actor, key).orElseGet(() -> hasPermission(actor, permission) ? getDefaultLevel(actor) : 0);
-        int acteeLevel = getDeclaredLevel(actee, key).orElseGet(() -> hasPermission(actee, permission) ? getDefaultLevel(actee) : 0);
+    public boolean isPermissionLevelOkay(final Subject actor, final Subject actee, final String key, final String permission, final boolean isSameOkay) {
+        final int actorLevel =
+                this.getDeclaredLevel(actor, key).orElseGet(() -> this.hasPermission(actor, permission) ? this.getDefaultLevel(actor) : 0);
+        final int acteeLevel =
+                this.getDeclaredLevel(actee, key).orElseGet(() -> this.hasPermission(actee, permission) ? this.getDefaultLevel(actee) : 0);
         if (isSameOkay) {
             return actorLevel >= acteeLevel;
         } else {
@@ -323,25 +325,25 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     @Override
-    public void setContext(Subject subject, Context context) {
+    public void setContext(final Subject subject, final Context context) {
         if (subject instanceof Identifiable) {
-            setContext(((Identifiable) subject).getUniqueId(), context);
+            this.setContext(((Identifiable) subject).getUniqueId(), context);
         }
     }
 
-    private void setContext(UUID uuid, Context context) {
+    private void setContext(final UUID uuid, final Context context) {
         this.standardContexts.computeIfAbsent(uuid, k -> new HashMap<>()).put(context.getKey().toLowerCase(), context);
     }
 
     @Override
-    public NoExceptionAutoClosable setContextTemporarily(Subject subject, Context context) {
+    public NoExceptionAutoClosable setContextTemporarily(final Subject subject, final Context context) {
         if (subject instanceof Identifiable) {
-            UUID uuid = ((Identifiable) subject).getUniqueId();
-            Context old = this.standardContexts.computeIfAbsent(uuid, k -> new HashMap<>()).put(context.getKey().toLowerCase(), context);
+            final UUID uuid = ((Identifiable) subject).getUniqueId();
+            final Context old = this.standardContexts.computeIfAbsent(uuid, k -> new HashMap<>()).put(context.getKey().toLowerCase(), context);
             return () -> {
-                removeContext(uuid, context.getKey().toLowerCase());
+                this.removeContext(uuid, context.getKey().toLowerCase());
                 if (old != null) {
-                    setContext(uuid, context);
+                    this.setContext(uuid, context);
                 }
             };
         }
@@ -349,22 +351,22 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     @Override
-    public void removeContext(UUID subject, String key) {
-        Map<String, Context> contexts = this.standardContexts.get(subject);
+    public void removeContext(final UUID subject, final String key) {
+        final Map<String, Context> contexts = this.standardContexts.get(subject);
         if (contexts != null && !contexts.isEmpty()) {
             contexts.remove(key.toLowerCase());
         }
     }
 
     @Override
-    public void removePlayerContexts(UUID uuid) {
+    public void removePlayerContexts(final UUID uuid) {
         this.standardContexts.remove(uuid);
     }
 
     @Override
-    public void accumulateContexts(Subject target, Set<Context> accumulator) {
+    public void accumulateContexts(final Subject target, final Set<Context> accumulator) {
         if (target instanceof Identifiable) {
-            Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).getUniqueId());
+            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).getUniqueId());
             if (ctxs != null && !ctxs.isEmpty()) {
                 accumulator.addAll(ctxs.values());
             }
@@ -374,16 +376,16 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override
     public boolean matches(final Context context, final Subject target) {
         if (target instanceof Identifiable) {
-            Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).getUniqueId());
+            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).getUniqueId());
             if (ctxs != null && !ctxs.isEmpty()) {
-                Context ctx = ctxs.get(context.getKey());
+                final Context ctx = ctxs.get(context.getKey());
                 return ctx.equals(context);
             }
         }
         return false;
     }
 
-    private int getDefaultLevel(Subject subject) {
+    private int getDefaultLevel(final Subject subject) {
         if (subject instanceof ConsoleSource || subject instanceof CommandBlockSource) {
             return Integer.MAX_VALUE;
         }
@@ -400,7 +402,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         private final String[] replacements;
         private final String moduleid;
 
-        Metadata(String permission, PermissionMetadata metadata, String moduleid) {
+        Metadata(final String permission, final PermissionMetadata metadata, final String moduleid) {
             this(
                     metadata.descriptionKey(),
                     metadata.replacements(),
@@ -411,12 +413,12 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
             );
         }
 
-        Metadata(String description,
-                String[] replacements,
-                String permission,
-                SuggestedLevel suggestedLevel,
-                boolean isPrefix,
-                String moduleid) {
+        Metadata(final String description,
+                final String[] replacements,
+                final String permission,
+                final SuggestedLevel suggestedLevel,
+                final boolean isPrefix,
+                final String moduleid) {
             this.description = description;
             this.replacements = replacements;
             this.permission = permission.toLowerCase();
@@ -433,7 +435,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
             return this.suggestedLevel;
         }
 
-        @Override public String getDescription(IMessageProviderService service) {
+        @Override public String getDescription(final IMessageProviderService service) {
             return service.getMessageString(this.description, (Object[]) this.replacements);
         }
 

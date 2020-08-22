@@ -13,12 +13,12 @@ public class LazyLoadFunction<I, T> implements Function<I, T> {
     @Nullable private T entry;
     private final Function<I, T> creator;
 
-    public LazyLoadFunction(Function<I, T> t) {
+    public LazyLoadFunction(final Function<I, T> t) {
         this.creator = t;
     }
 
     @Override
-    public final T apply(I i) {
+    public final T apply(final I i) {
         if (this.entry == null) {
             this.entry = this.creator.apply(i);
         }

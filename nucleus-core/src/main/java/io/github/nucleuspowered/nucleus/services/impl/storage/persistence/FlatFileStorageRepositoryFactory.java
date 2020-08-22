@@ -33,26 +33,26 @@ public final class FlatFileStorageRepositoryFactory implements IStorageRepositor
     private final Logger logger;
 
     @Inject
-    public FlatFileStorageRepositoryFactory(@DataDirectory Supplier<Path> path, Logger logger) {
+    public FlatFileStorageRepositoryFactory(@DataDirectory final Supplier<Path> path, final Logger logger) {
         this.dataPath = path;
         this.logger = logger;
     }
 
     @Override
     public IStorageRepository.Keyed<UUID, IUserQueryObject, JsonObject> userRepository() {
-        return repository(USER_DATA_DIRECTORY);
+        return this.repository(USER_DATA_DIRECTORY);
     }
 
     @Override
     public IStorageRepository.Keyed<UUID, IWorldQueryObject, JsonObject> worldRepository() {
-        return repository(WORLD_DATA_DIRECTORY);
+        return this.repository(WORLD_DATA_DIRECTORY);
     }
 
     private <R extends IQueryObject<UUID, R>> IStorageRepository.Keyed<UUID, R, JsonObject> repository(final String p) {
         return new FlatFileStorageRepository.UUIDKeyed<>(this.logger, query -> {
             if (query.keys().size() == 1) {
-                Collection<UUID> uuids = query.keys();
-                String uuid = uuids.iterator().next().toString();
+                final Collection<UUID> uuids = query.keys();
+                final String uuid = uuids.iterator().next().toString();
                 return this.dataPath.get().resolve(p).resolve(uuid.substring(0, 2)).resolve(uuid  + ".json");
             }
 

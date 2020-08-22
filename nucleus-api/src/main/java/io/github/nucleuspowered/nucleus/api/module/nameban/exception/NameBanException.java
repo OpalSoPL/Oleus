@@ -4,14 +4,14 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.nameban.exception;
 
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.util.TextMessageException;
 
-public class NameBanException extends CommandException {
+public class NameBanException extends TextMessageException {
 
     private final Reason reason;
 
-    public NameBanException(Text message, Reason reason) {
+    public NameBanException(final Component message, final Reason reason) {
         super(message);
         this.reason = reason;
     }

@@ -11,9 +11,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 @Command(
         aliases = "debug",
         basePermission = CorePermissions.BASE_NUCLEUS_DEBUG,

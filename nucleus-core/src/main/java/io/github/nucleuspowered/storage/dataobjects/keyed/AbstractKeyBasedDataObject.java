@@ -15,27 +15,27 @@ import javax.annotation.Nullable;
 public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends AbstractConfigurateBackedDataObject implements IKeyedDataObject<T> {
 
     @Override
-    public boolean has(DataKey<?, ? extends T> dataKey) {
-        return !getNode(dataKey.getKey()).isVirtual();
+    public boolean has(final DataKey<?, ? extends T> dataKey) {
+        return !this.getNode(dataKey.getKey()).isVirtual();
     }
 
-    public <V> Value<V> getAndSet(DataKey<V, ? extends T> dataKey) {
-        return new ValueImpl<>(getNullable(dataKey), dataKey);
+    public <V> Value<V> getAndSet(final DataKey<V, ? extends T> dataKey) {
+        return new ValueImpl<>(this.getNullable(dataKey), dataKey);
     }
 
     @Nullable
-    public <V> V getNullable(DataKey<V, ? extends T> dataKey) {
+    public <V> V getNullable(final DataKey<V, ? extends T> dataKey) {
         try {
-            return getNode(dataKey.getKey()).getValue(dataKey.getType());
-        } catch (ObjectMappingException e) {
+            return this.getNode(dataKey.getKey()).getValue(dataKey.getType());
+        } catch (final ObjectMappingException e) {
             e.printStackTrace();
             return null;
         }
     }
 
     @Nullable
-    public <V> V getOrDefault(DataKey<V, ? extends T> dataKey) {
-        V t = getNullable(dataKey);
+    public <V> V getOrDefault(final DataKey<V, ? extends T> dataKey) {
+        final V t = this.getNullable(dataKey);
         if (t == null) {
             return dataKey.getDefault();
         }
@@ -43,27 +43,27 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
         return t;
     }
 
-    public <V> Optional<V> get(DataKey<V, ? extends T> dataKey) {
-        return Optional.ofNullable(getNullable(dataKey));
+    public <V> Optional<V> get(final DataKey<V, ? extends T> dataKey) {
+        return Optional.ofNullable(this.getNullable(dataKey));
     }
 
-    public <V> boolean set(DataKey<V, ? extends T> dataKey, V data) {
+    public <V> boolean set(final DataKey<V, ? extends T> dataKey, final V data) {
         try {
-            getNode(dataKey.getKey()).setValue(dataKey.getType(), data);
+            this.getNode(dataKey.getKey()).setValue(dataKey.getType(), data);
             return true;
-        } catch (ObjectMappingException e) {
+        } catch (final ObjectMappingException e) {
             e.printStackTrace();
             return false;
         }
     }
 
-    public void remove(DataKey<?, ? extends T> dataKey) {
-        getNode(dataKey.getKey()).setValue(null);
+    public void remove(final DataKey<?, ? extends T> dataKey) {
+        this.getNode(dataKey.getKey()).setValue(null);
     }
 
-    private ConfigurationNode getNode(String[] key) {
+    private ConfigurationNode getNode(final String[] key) {
         ConfigurationNode r = this.backingNode;
-        for (String k : key) {
+        for (final String k : key) {
             r = r.getNode(k);
         }
 
@@ -75,7 +75,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
         @Nullable private V value;
         private DataKey<V, B> dataKey;
 
-        private ValueImpl(@Nullable V value, DataKey<V, B> dataKey) {
+        private ValueImpl(@Nullable final V value, final DataKey<V, B> dataKey) {
             this.value = value;
             this.dataKey = dataKey;
         }
@@ -84,7 +84,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
             return Optional.ofNullable(this.value);
         }
 
-        public void setValue(@Nullable V value) {
+        public void setValue(@Nullable final V value) {
             this.value = value;
         }
 

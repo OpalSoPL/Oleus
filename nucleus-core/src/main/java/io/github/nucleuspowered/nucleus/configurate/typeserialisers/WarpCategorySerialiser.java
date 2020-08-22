@@ -21,9 +21,9 @@ public class WarpCategorySerialiser implements TypeSerializer<WarpCategory>  {
 
     @Nullable
     @Override
-    public WarpCategory deserialize(@NonNull TypeToken<?> type, @NonNull ConfigurationNode value) {
-        String description = value.getNode(DESCRIPTION_ID).getString();
-        String displayName = value.getNode(DISPLAY_NAME_ID).getString();
+    public WarpCategory deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) {
+        final String description = value.getNode(DESCRIPTION_ID).getString();
+        final String displayName = value.getNode(DISPLAY_NAME_ID).getString();
         return new WarpCategoryData(
                 String.valueOf(value.getKey()),
                 displayName == null ? Text.of(value.getKey()) : TextSerializers.JSON.deserialize(displayName),
@@ -32,7 +32,7 @@ public class WarpCategorySerialiser implements TypeSerializer<WarpCategory>  {
     }
 
     @Override
-    public void serialize(@NonNull TypeToken<?> type, @Nullable WarpCategory obj, @NonNull ConfigurationNode value) {
+    public void serialize(@NonNull final TypeToken<?> type, @Nullable final WarpCategory obj, @NonNull final ConfigurationNode value) {
         if (obj == null) {
             return;
         }

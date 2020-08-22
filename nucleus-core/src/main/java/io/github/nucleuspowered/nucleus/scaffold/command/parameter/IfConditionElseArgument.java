@@ -23,18 +23,18 @@ public class IfConditionElseArgument extends CommandElement {
     private final IPermissionService permissionService;
 
     public static IfConditionElseArgument permission(
-            IPermissionService permissionService,
-            String permission,
-            CommandElement ifSo,
-            CommandElement ifNot) {
+            final IPermissionService permissionService,
+            final String permission,
+            final CommandElement ifSo,
+            final CommandElement ifNot) {
         return new IfConditionElseArgument(permissionService, ifSo, ifNot, (p, s, c) -> p.hasPermission(s, permission));
     }
 
     public IfConditionElseArgument(
-            IPermissionService permissionService,
-            CommandElement trueElement,
-            CommandElement falseElement,
-            Condition predicate) {
+            final IPermissionService permissionService,
+            final CommandElement trueElement,
+            final CommandElement falseElement,
+            final Condition predicate) {
         super(trueElement.getKey());
         this.permissionService = permissionService;
         this.trueElement = trueElement;
@@ -42,11 +42,11 @@ public class IfConditionElseArgument extends CommandElement {
         this.predicate = predicate;
     }
 
-    @Nullable @Override protected Object parseValue(CommandSource source, CommandArgs args) {
+    @Nullable @Override protected Object parseValue(final CommandSource source, final CommandArgs args) {
         return null;
     }
 
-    @Override public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
+    @Override public void parse(final CommandSource source, final CommandArgs args, final CommandContext context) throws ArgumentParseException {
         if (this.predicate.test(this.permissionService, source, context)) {
             this.trueElement.parse(source, args, context);
         } else {
@@ -54,7 +54,7 @@ public class IfConditionElseArgument extends CommandElement {
         }
     }
 
-    @Override public List<String> complete(CommandSource source, CommandArgs args, CommandContext context) {
+    @Override public List<String> complete(final CommandSource source, final CommandArgs args, final CommandContext context) {
         if (this.predicate.test(this.permissionService, source, context)) {
             return this.trueElement.complete(source, args, context);
         } else {

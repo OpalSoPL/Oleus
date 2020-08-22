@@ -22,13 +22,13 @@ public class KitDataObject extends AbstractConfigurateBackedDataObject implement
     public ImmutableMap<String, Kit> getKitMap() {
         if (this.cached == null) {
             try {
-                Map<String, Kit> map = SingleKitTypeSerilaiser.INSTANCE.deserialize(this.backingNode);
+                final Map<String, Kit> map = SingleKitTypeSerilaiser.INSTANCE.deserialize(this.backingNode);
                 if (map == null) {
                     this.cached = ImmutableMap.of();
                 } else {
                     this.cached = ImmutableMap.copyOf(map);
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
                 return ImmutableMap.of();
             }
@@ -37,38 +37,38 @@ public class KitDataObject extends AbstractConfigurateBackedDataObject implement
     }
 
     @Override
-    public void setKitMap(Map<String, Kit> map) throws Exception {
+    public void setKitMap(final Map<String, Kit> map) throws Exception {
         SingleKitTypeSerilaiser.INSTANCE.serialize(map, this.backingNode);
         this.cached = ImmutableMap.copyOf(map);
     }
 
     @Override
-    public boolean hasKit(String name) {
+    public boolean hasKit(final String name) {
         return this.getKitMap().containsKey(name.toLowerCase());
     }
 
     @Override
-    public Optional<Kit> getKit(String name) {
+    public Optional<Kit> getKit(final String name) {
         return Optional.ofNullable(this.getKitMap().get(name.toLowerCase()));
     }
 
     @Override
-    public void setKit(Kit kit) throws Exception {
-        Map<String, Kit> m = new HashMap<>(getKitMap());
+    public void setKit(final Kit kit) throws Exception {
+        final Map<String, Kit> m = new HashMap<>(this.getKitMap());
         m.put(kit.getName().toLowerCase(), kit);
-        setKitMap(m);
+        this.setKitMap(m);
     }
 
     @Override
-    public boolean removeKit(String name) throws Exception {
-        Map<String, Kit> m = new HashMap<>(getKitMap());
-        boolean b = m.remove(name.toLowerCase()) != null;
-        setKitMap(m);
+    public boolean removeKit(final String name) throws Exception {
+        final Map<String, Kit> m = new HashMap<>(this.getKitMap());
+        final boolean b = m.remove(name.toLowerCase()) != null;
+        this.setKitMap(m);
         return b;
     }
 
     @Override
-    public void setBackingNode(ConfigurationNode node) {
+    public void setBackingNode(final ConfigurationNode node) {
         super.setBackingNode(node);
         this.cached = null;
     }

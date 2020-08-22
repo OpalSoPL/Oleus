@@ -22,18 +22,18 @@ public class UTF8Control extends ResourceBundle.Control {
 
     private UTF8Control() {}
 
-    public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
+    public ResourceBundle newBundle(final String baseName, final Locale locale, final String format, final ClassLoader loader, final boolean reload)
             throws IOException {
 
         // The below is a copy of the default implementation.
-        String bundleName = toBundleName(baseName, locale);
-        String resourceName = toResourceName(bundleName, "properties");
+        final String bundleName = this.toBundleName(baseName, locale);
+        final String resourceName = this.toResourceName(bundleName, "properties");
         ResourceBundle bundle = null;
         InputStream stream = null;
         if (reload) {
-            URL url = loader.getResource(resourceName);
+            final URL url = loader.getResource(resourceName);
             if (url != null) {
-                URLConnection connection = url.openConnection();
+                final URLConnection connection = url.openConnection();
                 if (connection != null) {
                     connection.setUseCaches(false);
                     stream = connection.getInputStream();

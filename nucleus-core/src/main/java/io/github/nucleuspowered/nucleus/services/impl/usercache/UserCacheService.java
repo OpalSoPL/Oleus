@@ -47,19 +47,19 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
     private UserCacheVersionNode data;
 
     @Inject
-    public UserCacheService(INucleusServiceCollection serviceCollection) {
+    public UserCacheService(final INucleusServiceCollection serviceCollection) {
         this.dataDirectory = serviceCollection.dataDir();
         this.storageManager = serviceCollection.storageManager();
         serviceCollection.reloadableService().registerDataFileReloadable(this);
-        load();
+        this.load();
     }
 
     @Override public void load() {
         try {
-            this.data = configurationLoader()
+            this.data = this.configurationLoader()
                     .load()
                     .getValue(TypeToken.of(UserCacheVersionNode.class), (Supplier<UserCacheVersionNode>) UserCacheVersionNode::new);
-        } catch (IOException | ObjectMappingException e) {
+        } catch (final IOException | ObjectMappingException e) {
             e.printStackTrace();
             this.data = new UserCacheVersionNode();
         }
@@ -67,61 +67,61 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
 
     @Override public void save() {
         try {
-            GsonConfigurationLoader gsonConfigurationLoader = configurationLoader();
-            ConfigurationNode node = gsonConfigurationLoader.createEmptyNode();
+            final GsonConfigurationLoader gsonConfigurationLoader = this.configurationLoader();
+            final ConfigurationNode node = gsonConfigurationLoader.createEmptyNode();
             node.setValue(TypeToken.of(UserCacheVersionNode.class), this.data);
             gsonConfigurationLoader.save(node);
-        } catch (ObjectMappingException | IOException e) {
+        } catch (final ObjectMappingException | IOException e) {
             e.printStackTrace();
         }
 
     }
 
-    @Override public List<UUID> getForIp(String ip) {
-        updateCacheForOnlinePlayers();
-        String ipToCheck = ip.replace("/", "");
+    @Override public List<UUID> getForIp(final String ip) {
+        this.updateCacheForOnlinePlayers();
+        final String ipToCheck = ip.replace("/", "");
         return this.data.getNode().entrySet().stream().filter(x -> x.getValue()
                 .getIpAddress().map(y -> y.equals(ipToCheck)).orElse(false))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     @Override public List<UUID> getJailed() {
-        updateCacheForOnlinePlayers();
+        this.updateCacheForOnlinePlayers();
         return this.data.getNode().entrySet().stream().filter(x -> x.getValue().isJailed())
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    @Override public List<UUID> getJailedIn(String name) {
-        updateCacheForOnlinePlayers();
+    @Override public List<UUID> getJailedIn(final String name) {
+        this.updateCacheForOnlinePlayers();
         return this.data.getNode().entrySet().stream()
                 .filter(x -> x.getValue().getJailName().map(y -> y.equalsIgnoreCase(name)).orElse(false))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     @Override public List<UUID> getMuted() {
-        updateCacheForOnlinePlayers();
+        this.updateCacheForOnlinePlayers();
         return this.data.getNode().entrySet().stream().filter(x -> x.getValue().isMuted())
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
     @Override public void updateCacheForOnlinePlayers() {
-        IUserQueryObject iuq = new UserQueryObject();
+        final IUserQueryObject iuq = new UserQueryObject();
         iuq.addAllKeys(Sponge.getServer().getOnlinePlayers().stream().map(Identifiable::getUniqueId).collect(Collectors.toList()));
         this.storageManager.getUserService().getAll(iuq).thenAccept(result ->
                 result.forEach((uuid, obj) -> this.data.getNode().computeIfAbsent(uuid, x -> new UserCacheDataNode()).set(obj)));
     }
 
-    @Override public void updateCacheForPlayer(UUID uuid, IUserDataObject u) {
+    @Override public void updateCacheForPlayer(final UUID uuid, final IUserDataObject u) {
         this.data.getNode().computeIfAbsent(uuid, x -> new UserCacheDataNode()).set(u);
     }
 
-    @Override public void updateCacheForPlayer(UUID uuid) {
-        this.storageManager.getUser(uuid).thenAccept(x -> x.ifPresent(u -> updateCacheForPlayer(uuid, u)));
+    @Override public void updateCacheForPlayer(final UUID uuid) {
+        this.storageManager.getUser(uuid).thenAccept(x -> x.ifPresent(u -> this.updateCacheForPlayer(uuid, u)));
     }
 
     @Override public void startFilewalkIfNeeded() {
-        if (!this.isWalking && (!isCorrectVersion() || this.data.getNode().isEmpty())) {
-            fileWalk();
+        if (!this.isWalking && (!this.isCorrectVersion() || this.data.getNode().isEmpty())) {
+            this.fileWalk();
         }
     }
 
@@ -139,13 +139,13 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         }
 
         try {
-            Map<UUID, UserCacheDataNode> data = Maps.newHashMap();
-            List<UUID> knownUsers = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll().stream()
+            final Map<UUID, UserCacheDataNode> data = Maps.newHashMap();
+            final List<UUID> knownUsers = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll().stream()
                     .map(Identifiable::getUniqueId).collect(Collectors.toList());
 
             int count = 0;
-            IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> manager = this.storageManager.getUserService();
-            for (UUID user : knownUsers) {
+            final IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> manager = this.storageManager.getUserService();
+            for (final UUID user : knownUsers) {
                 if (manager.exists(user).join()) {
                     manager.get(user).join().ifPresent(x -> data.put(user, new UserCacheDataNode(x)));
                     if (++count >= 10) {
@@ -157,7 +157,7 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
 
             this.data = new UserCacheVersionNode();
             this.data.getNode().putAll(data);
-            save();
+            this.save();
         } finally {
             this.isWalking = false;
         }
@@ -172,7 +172,7 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
     }
 
     @Override
-    public void onDataFileLocationChange(INucleusServiceCollection serviceCollection) {
-        load();
+    public void onDataFileLocationChange(final INucleusServiceCollection serviceCollection) {
+        this.load();
     }
 }

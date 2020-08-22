@@ -79,8 +79,8 @@ public class MessageProviderService implements IMessageProviderService, IReloada
             .build(new CacheLoader<UUID, Locale>() {
                 @CheckForNull
                 @Override
-                public Locale load(@Nonnull UUID key) {
-                    NucleusUserPreferenceService.PreferenceKey<Locale> l =
+                public Locale load(@Nonnull final UUID key) {
+                    final NucleusUserPreferenceService.PreferenceKey<Locale> l =
                             userPreferenceService.keys().playerLocale().get();
                     return userPreferenceService.get(key, l).orElse(new Locale(""));
                 }
@@ -88,7 +88,7 @@ public class MessageProviderService implements IMessageProviderService, IReloada
 
     @Inject
     public MessageProviderService(
-            INucleusServiceCollection serviceCollection, @ConfigDirectory Path configPath) {
+            final INucleusServiceCollection serviceCollection, @ConfigDirectory final Path configPath) {
         this.serviceCollection = serviceCollection;
         serviceCollection.reloadableService().registerReloadable(this);
         this.defaultMessagesResource = new PropertiesMessageRepository(
@@ -100,14 +100,14 @@ public class MessageProviderService implements IMessageProviderService, IReloada
                 serviceCollection.playerDisplayNameService(),
                 serviceCollection.logger(),
                 configPath.resolve("messages.conf"),
-                () -> getPropertiesMessagesRepository(this.defaultLocale)
+                () -> this.getPropertiesMessagesRepository(this.defaultLocale)
         );
         this.userPreferenceService = serviceCollection.userPreferenceService();
     }
 
     @Override
-    public boolean hasKey(String key) {
-        return getMessagesRepository(this.defaultLocale).hasEntry(key);
+    public boolean hasKey(final String key) {
+        return this.getMessagesRepository(this.defaultLocale).hasEntry(key);
     }
 
     @Override
@@ -116,14 +116,14 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     }
 
     @Override
-    public Optional<Locale> getLocaleFromName(String l) {
+    public Optional<Locale> getLocaleFromName(final String l) {
         if (LOCALES.isEmpty()) {
             // for each locale, get the language name
             for (final Locale locale : KNOWN_LOCALES) {
                 for (final Locale innerLocale : KNOWN_LOCALES) {
-                    String key = LANGUAGE_KEY_PREFIX + innerLocale.toString().toLowerCase(Locale.ENGLISH);
-                    String name =
-                            getPropertiesMessagesRepository(locale)
+                    final String key = LANGUAGE_KEY_PREFIX + innerLocale.toString().toLowerCase(Locale.ENGLISH);
+                    final String name =
+                            this.getPropertiesMessagesRepository(locale)
                                     .getString(key)
                                     .toLowerCase(Locale.ENGLISH);
                     if (!LOCALES.containsKey(name)) {
@@ -138,14 +138,14 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     }
 
     @Override
-    public void invalidateLocaleCacheFor(UUID uuid) {
+    public void invalidateLocaleCacheFor(final UUID uuid) {
         this.localeCache.invalidate(uuid);
     }
 
     @Override
-    public Locale getLocaleFor(CommandSource commandSource) {
+    public Locale getLocaleFor(final CommandSource commandSource) {
         if (commandSource instanceof User) {
-            Locale l = this.localeCache.get(((User) commandSource).getUniqueId());
+            final Locale l = this.localeCache.get(((User) commandSource).getUniqueId());
             if (l != null && !l.toString().isEmpty()) {
                 return l;
             }
@@ -161,29 +161,29 @@ public class MessageProviderService implements IMessageProviderService, IReloada
         return toUse;
     }
 
-    @Override public Text getMessageFor(Locale locale, String key) {
-        return getMessagesRepository(locale).getText(key);
+    @Override public Text getMessageFor(final Locale locale, final String key) {
+        return this.getMessagesRepository(locale).getText(key);
     }
 
     @Override
-    public Text getMessageFor(Locale locale, String key, Text... args) {
-        return getMessagesRepository(locale).getText(key, args);
+    public Text getMessageFor(final Locale locale, final String key, final Text... args) {
+        return this.getMessagesRepository(locale).getText(key, args);
     }
 
-    @Override public Text getMessageFor(Locale locale, String key, Object... replacements) {
-        return getMessagesRepository(locale).getText(key, replacements);
+    @Override public Text getMessageFor(final Locale locale, final String key, final Object... replacements) {
+        return this.getMessagesRepository(locale).getText(key, replacements);
     }
 
-    @Override public Text getMessageFor(Locale locale, String key, String... replacements) {
-        return getMessagesRepository(locale).getText(key, replacements);
+    @Override public Text getMessageFor(final Locale locale, final String key, final String... replacements) {
+        return this.getMessagesRepository(locale).getText(key, replacements);
     }
 
-    @Override public String getMessageString(Locale locale, String key, String... replacements) {
-        return getMessagesRepository(locale).getString(key, replacements);
+    @Override public String getMessageString(final Locale locale, final String key, final String... replacements) {
+        return this.getMessagesRepository(locale).getString(key, replacements);
     }
 
-    @Override public String getMessageString(Locale locale, String key, Object... replacements) {
-        return  getMessagesRepository(locale).getString(key, replacements);
+    @Override public String getMessageString(final Locale locale, final String key, final Object... replacements) {
+        return this.getMessagesRepository(locale).getString(key, replacements);
     }
 
     @Override public boolean reloadMessageFile() {
@@ -195,86 +195,86 @@ public class MessageProviderService implements IMessageProviderService, IReloada
         return false;
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        CoreConfig coreConfig = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final CoreConfig coreConfig = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
         this.useMessagesFile = coreConfig.isCustommessages();
         this.useClientLocalesWhenPossible = coreConfig.isClientLocaleWhenPossible();
         this.defaultLocale = Locale.forLanguageTag(coreConfig.getServerLocale().replace("_", "-"));
-        this.serviceCollection.logger().info(getMessageString("language.set", this.defaultLocale.toLanguageTag()));
-        reloadMessageFile();
+        this.serviceCollection.logger().info(this.getMessageString("language.set", this.defaultLocale.toLanguageTag()));
+        this.reloadMessageFile();
     }
 
-    @Override public IMessageRepository getMessagesRepository(Locale locale) {
+    @Override public IMessageRepository getMessagesRepository(final Locale locale) {
         if (this.useMessagesFile) {
             return this.configFileMessagesRepository;
         }
 
-        return getPropertiesMessagesRepository(locale);
+        return this.getPropertiesMessagesRepository(locale);
     }
 
     @Override public ConfigFileMessagesRepository getConfigFileMessageRepository() {
         return this.configFileMessagesRepository;
     }
 
-    @Override public String getTimeString(Locale locale, Duration duration) {
-        return getTimeString(locale, duration.getSeconds());
+    @Override public String getTimeString(final Locale locale, final Duration duration) {
+        return this.getTimeString(locale, duration.getSeconds());
     }
 
-    @Override public String getTimeString(Locale locale, long time) {
+    @Override public String getTimeString(final Locale locale, long time) {
         time = Math.abs(time);
-        long sec = time % 60;
-        long min = (time / 60) % 60;
-        long hour = (time / 3600) % 24;
-        long day = time / 86400;
+        final long sec = time % 60;
+        final long min = (time / 60) % 60;
+        final long hour = (time / 3600) % 24;
+        final long day = time / 86400;
 
         if (time == 0) {
-            return getMessageString(locale, "standard.inamoment");
+            return this.getMessageString(locale, "standard.inamoment");
         }
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         if (day > 0) {
             sb.append(day).append(" ");
             if (day > 1) {
-                sb.append(getMessageString(locale, "standard.days"));
+                sb.append(this.getMessageString(locale, "standard.days"));
             } else {
-                sb.append(getMessageString(locale, "standard.day"));
+                sb.append(this.getMessageString(locale, "standard.day"));
             }
         }
 
         if (hour > 0) {
-            appendComma(sb);
+            this.appendComma(sb);
             sb.append(hour).append(" ");
             if (hour > 1) {
-                sb.append(getMessageString(locale, "standard.hours"));
+                sb.append(this.getMessageString(locale, "standard.hours"));
             } else {
-                sb.append(getMessageString(locale, "standard.hour"));
+                sb.append(this.getMessageString(locale, "standard.hour"));
             }
         }
 
         if (min > 0) {
-            appendComma(sb);
+            this.appendComma(sb);
             sb.append(min).append(" ");
             if (min > 1) {
-                sb.append(getMessageString(locale, "standard.minutes"));
+                sb.append(this.getMessageString(locale, "standard.minutes"));
             } else {
-                sb.append(getMessageString(locale, "standard.minute"));
+                sb.append(this.getMessageString(locale, "standard.minute"));
             }
         }
 
         if (sec > 0) {
-            appendComma(sb);
+            this.appendComma(sb);
             sb.append(sec).append(" ");
             if (sec > 1) {
-                sb.append(getMessageString(locale, "standard.seconds"));
+                sb.append(this.getMessageString(locale, "standard.seconds"));
             } else {
-                sb.append(getMessageString(locale, "standard.second"));
+                sb.append(this.getMessageString(locale, "standard.second"));
             }
         }
 
         if (sb.length() > 0) {
             return sb.toString();
         } else {
-            return getMessageString(locale, "standard.unknown");
+            return this.getMessageString(locale, "standard.unknown");
         }
     }
 
@@ -283,13 +283,13 @@ public class MessageProviderService implements IMessageProviderService, IReloada
         return ImmutableList.copyOf(LOCALES.keySet());
     }
 
-    private void appendComma(StringBuilder stringBuilder) {
+    private void appendComma(final StringBuilder stringBuilder) {
         if (stringBuilder.length() > 0) {
             stringBuilder.append(", ");
         }
     }
 
-    private PropertiesMessageRepository getPropertiesMessagesRepository(Locale locale) {
+    private PropertiesMessageRepository getPropertiesMessagesRepository(final Locale locale) {
         return this.messagesMap.computeIfAbsent(locale, key -> {
             if (Sponge.getAssetManager().getAsset(
                     this.serviceCollection.pluginContainer(),

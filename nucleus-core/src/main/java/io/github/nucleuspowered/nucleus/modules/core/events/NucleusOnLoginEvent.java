@@ -11,7 +11,6 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.event.user.TargetUserEvent;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
@@ -21,7 +20,6 @@ import javax.annotation.Nullable;
 /**
  * Internal only.
  */
-@NonnullByDefault
 public class NucleusOnLoginEvent extends AbstractEvent implements TargetUserEvent {
 
     private final Cause cause;

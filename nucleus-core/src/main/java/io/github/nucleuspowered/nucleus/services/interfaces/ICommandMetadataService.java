@@ -29,9 +29,9 @@ public interface ICommandMetadataService {
 
     void completeRegistrationPhase(INucleusServiceCollection serviceCollection);
 
-    default void addMapping(Map<String, String> mappings) {
-        for (Map.Entry<String, String> entry : mappings.entrySet()) {
-            addMapping(entry.getKey(), entry.getValue());
+    default void addMapping(final Map<String, String> mappings) {
+        for (final Map.Entry<String, String> entry : mappings.entrySet()) {
+            this.addMapping(entry.getKey(), entry.getValue());
         }
     }
 

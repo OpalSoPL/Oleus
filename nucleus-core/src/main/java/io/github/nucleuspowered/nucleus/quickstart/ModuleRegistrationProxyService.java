@@ -25,7 +25,7 @@ public class ModuleRegistrationProxyService {
     private final ModuleHolder<?, ?> moduleHolder;
 
     @Inject
-    public ModuleRegistrationProxyService(INucleusServiceCollection serviceCollection, ModuleHolder<?, ?> holder) {
+    public ModuleRegistrationProxyService(final INucleusServiceCollection serviceCollection, final ModuleHolder<?, ?> holder) {
         this.serviceCollection = serviceCollection;
         this.moduleHolder = holder;
     }
@@ -34,31 +34,31 @@ public class ModuleRegistrationProxyService {
         return this.moduleHolder.getCurrentPhase() == ConstructionPhase.DISCOVERED;
     }
 
-    public void removeModule(String module, PluginContainer plugin) throws ModulesLoadedException, UnremovableModuleException, NoModuleException {
-        if (!canDisableModules()) {
+    public void removeModule(final String module, final PluginContainer plugin) throws ModulesLoadedException, UnremovableModuleException, NoModuleException {
+        if (!this.canDisableModules()) {
             throw new ModulesLoadedException();
         }
 
         // The plugin must actually be a plugin.
         Preconditions.checkNotNull(plugin);
-        Logger logger = this.serviceCollection.logger();
-        IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
+        final Logger logger = this.serviceCollection.logger();
+        final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         try {
             this.moduleHolder.disableModule(module);
             logger.info(messageProviderService.getMessageString("nucleus.module.disabled.modulerequest",
                     plugin.getName(), plugin.getId(), module));
-        } catch (IllegalStateException e) {
+        } catch (final IllegalStateException e) {
             throw new ModulesLoadedException();
-        } catch (UndisableableModuleException e) {
+        } catch (final UndisableableModuleException e) {
             logger.warn(messageProviderService.getMessageString("nucleus.module.disabled.forceload",
                     plugin.getName(),
                     plugin.getId(),
                     module));
             logger.warn(messageProviderService.getMessageString("nucleus.module.disabled.forceloadtwo", plugin.getName()));
             throw new UnremovableModuleException();
-        } catch (uk.co.drnaylor.quickstart.exceptions.NoModuleException e) {
+        } catch (final uk.co.drnaylor.quickstart.exceptions.NoModuleException e) {
             throw new NoModuleException();
-        } catch (QuickStartModuleLoaderException e) {
+        } catch (final QuickStartModuleLoaderException e) {
             e.printStackTrace();
         }
     }

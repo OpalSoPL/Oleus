@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.util;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;

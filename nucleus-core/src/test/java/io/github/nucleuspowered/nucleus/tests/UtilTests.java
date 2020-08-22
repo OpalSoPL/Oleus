@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.tests;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.Util;
 import org.junit.Assert;
 import org.junit.Test;

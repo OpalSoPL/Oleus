@@ -26,12 +26,12 @@ public class CommandNameCache {
 
     private CommandNameCache() {}
 
-    public Set<String> getFromCommandAndSource(String command, CommandSource source) {
-        Optional<? extends CommandMapping> oc = Sponge.getCommandManager().get(command, source);
+    public Set<String> getFromCommandAndSource(final String command, final CommandSource source) {
+        final Optional<? extends CommandMapping> oc = Sponge.getCommandManager().get(command, source);
         return oc.map(CommandNameCache.INSTANCE::getLowercase).orElseGet(HashSet::new);
     }
 
-    public Set<String> getLowercase(CommandMapping mapping) {
+    public Set<String> getLowercase(final CommandMapping mapping) {
         return new HashSet<>(this.mappingSetMap
                 .computeIfAbsent(mapping, x -> x.getAllAliases().stream().map(String::toLowerCase).collect(ImmutableSet.toImmutableSet())));
     }

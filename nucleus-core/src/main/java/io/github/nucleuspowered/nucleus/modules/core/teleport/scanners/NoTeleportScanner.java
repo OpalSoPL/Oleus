@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.core.teleport.scanners;
 
-import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
@@ -15,7 +15,6 @@ import org.spongepowered.plugin.meta.util.NonnullByDefault;
 
 import java.util.Optional;
 
-@NonnullByDefault
 public class NoTeleportScanner implements TeleportScanner {
 
     @Override

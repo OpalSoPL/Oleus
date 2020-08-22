@@ -4,39 +4,35 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.spawn.event;
 
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.user.TargetUserEvent;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 
 /**
  * Called when Nucleus has been requested to send a {@link User} to spawn, either now, or on their next login.
  */
-@NonnullByDefault
-public interface NucleusSendToSpawnEvent extends TargetUserEvent, Cancellable {
+public interface NucleusSendToSpawnEvent extends Cancellable {
 
     /**
-     * The {@link Transform} to send the {@link User} to.
+     * The {@link ServerLocation} to send the {@link User} to.
      *
-     * @return The {@link Transform}
+     * @return The {@link ServerLocation}
      */
-    Transform<World> getTransformTo();
+    ServerLocation getTargetLocation();
 
     /**
-     * The original {@link Transform} Nucleus was going to send the {@link User} to, in the event it's changed.
+     * The original {@link ServerLocation} Nucleus was going to send the user to.
      *
-     * @return The {@link Transform}
+     * @return The {@link ServerLocation}
      */
-    Transform<World> getOriginalTransformTo();
+    ServerLocation getOriginalTargetLocation();
 
     /**
-     * The {@link Transform} to redirect the {@link User} to.
+     * The {@link ServerLocation} to redirect the user to.
      *
-     * @param transform The {@link Transform}
+     * @param transform The {@link ServerLocation}
      */
-    void setTransformTo(Transform<World> transform);
+    void setTransformTo(ServerLocation transform);
 
     /**
      * If cancelled, the reason to return to the requestee.

@@ -26,7 +26,7 @@ public class NucleusCommandException extends CommandException {
     private final IMessageProviderService messageProvider;
     private Boolean overrideUsage = null;
 
-    public NucleusCommandException(List<Tuple<String, CommandException>> exception, boolean allowFallback, IMessageProviderService messageProviderService) {
+    public NucleusCommandException(final List<Tuple<String, CommandException>> exception, final boolean allowFallback, final IMessageProviderService messageProviderService) {
         super(Text.EMPTY);
         this.exceptions = exception;
         this.allowFallback = allowFallback;
@@ -50,37 +50,37 @@ public class NucleusCommandException extends CommandException {
         }
 
         if (this.exceptions.stream().allMatch(x -> {
-            CommandException e = x.getSecond();
+            final CommandException e = x.getSecond();
             return e instanceof NucleusArgumentParseException && ((NucleusArgumentParseException) e).isEnd();
         })) {
             if (this.exceptions.size() == 1) {
-                Tuple<String, CommandException> exceptionTuple = this.exceptions.get(0);
+                final Tuple<String, CommandException> exceptionTuple = this.exceptions.get(0);
                 return Text.of( this.messageProvider.getMessage("command.exception.fromcommand", exceptionTuple.getFirst()),
                         Text.NEW_LINE, TextColors.RED, exceptionTuple.getSecond().getText());
             } else {
-                return print(this.exceptions);
+                return this.print(this.exceptions);
             }
         }
 
-        List<Tuple<String, CommandException>> lce = this.exceptions.stream()
+        final List<Tuple<String, CommandException>> lce = this.exceptions.stream()
                 .filter(x -> {
-                    CommandException e = x.getSecond();
+                    final CommandException e = x.getSecond();
                     return !(e instanceof NucleusArgumentParseException) || !((NucleusArgumentParseException) e).isEnd();
                 })
                 .filter(x -> !CommandPermissionException.class.isInstance(x))
                 .collect(Collectors.toList());
         if (lce.size() == 1) {
-            Tuple<String, CommandException> exceptionTuple = this.exceptions.get(0);
+            final Tuple<String, CommandException> exceptionTuple = this.exceptions.get(0);
             return Text.of(this.messageProvider.getMessage("command.exception.fromcommand", exceptionTuple.getFirst()),
                     Text.NEW_LINE, TextColors.RED, exceptionTuple.getSecond().getText());
         }
 
-        return print(lce);
+        return this.print(lce);
     }
 
-    private Text print(List<Tuple<String, CommandException>> lce) {
-        Text sept = this.messageProvider.getMessage("command.exception.separator");
-        Text.Builder builder = this.messageProvider.getMessage("command.exception.multiple")
+    private Text print(final List<Tuple<String, CommandException>> lce) {
+        final Text sept = this.messageProvider.getMessage("command.exception.separator");
+        final Text.Builder builder = this.messageProvider.getMessage("command.exception.multiple")
                 .toBuilder();
         lce.forEach(x -> builder.append(Text.NEW_LINE).append(sept)
                 .append(Text.NEW_LINE)
@@ -93,7 +93,7 @@ public class NucleusCommandException extends CommandException {
         return builder.toText();
     }
 
-    public void setOverrideUsage(Boolean overrideUsage) {
+    public void setOverrideUsage(final Boolean overrideUsage) {
         this.overrideUsage = overrideUsage;
     }
 

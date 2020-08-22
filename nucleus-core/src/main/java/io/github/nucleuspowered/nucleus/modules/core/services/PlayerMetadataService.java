@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.core.services;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.core.NucleusPlayerMetadataService;
 import io.github.nucleuspowered.nucleus.modules.core.CoreKeys;
@@ -16,7 +16,6 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -28,7 +27,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 @APIService(NucleusPlayerMetadataService.class)
-@NonnullByDefault
 public class PlayerMetadataService implements NucleusPlayerMetadataService, ServiceBase {
 
     private final IStorageManager storageManager;

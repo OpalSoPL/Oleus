@@ -22,27 +22,27 @@ public class TextFileControllerCollection implements ITextFileControllerCollecti
     private final Map<String, TextFileController> textFileControllers = Maps.newHashMap();
 
     @Inject
-    public TextFileControllerCollection(INucleusServiceCollection serviceCollection) {
+    public TextFileControllerCollection(final INucleusServiceCollection serviceCollection) {
         serviceCollection.reloadableService().registerReloadable(this);
     }
 
-    @Override public Optional<TextFileController> get(String key) {
+    @Override public Optional<TextFileController> get(final String key) {
         return Optional.ofNullable(this.textFileControllers.get(key));
     }
 
-    @Override public void register(String key, TextFileController controller) {
+    @Override public void register(final String key, final TextFileController controller) {
         this.textFileControllers.put(key, controller);
     }
 
-    @Override public void remove(String key) {
+    @Override public void remove(final String key) {
         this.textFileControllers.remove(key);
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        for (TextFileController textFileController : this.textFileControllers.values()) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        for (final TextFileController textFileController : this.textFileControllers.values()) {
             try {
                 textFileController.load();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }

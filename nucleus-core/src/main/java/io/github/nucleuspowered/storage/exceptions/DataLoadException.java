@@ -6,7 +6,7 @@ package io.github.nucleuspowered.storage.exceptions;
 
 public class DataLoadException extends Exception {
 
-    public DataLoadException(String mesage, Exception innerException) {
+    public DataLoadException(final String mesage, final Exception innerException) {
         super(mesage, innerException);
     }
 }

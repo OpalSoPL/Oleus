@@ -16,11 +16,11 @@ public abstract class NucleusConfigAdapter<R> extends TypedAbstractConfigAdapter
         final TypeToken<R> typeToken;
         final Class<R> clazz;
 
-        public Standard(Class<R> clazz) {
+        public Standard(final Class<R> clazz) {
             this(TypeToken.of(clazz));
         }
 
-        public Standard(TypeToken<R> typeToken) {
+        public Standard(final TypeToken<R> typeToken) {
             this.typeToken = typeToken;
             this.clazz = (Class<R>) typeToken.getRawType();
         }
@@ -30,23 +30,23 @@ public abstract class NucleusConfigAdapter<R> extends TypedAbstractConfigAdapter
         }
 
         @Override
-        protected R convertFromConfigurateNode(ConfigurationNode node) throws ObjectMappingException {
-            return node.getValue(this.typeToken, getDefaultObject());
+        protected R convertFromConfigurateNode(final ConfigurationNode node) throws ObjectMappingException {
+            return node.getValue(this.typeToken, this.getDefaultObject());
         }
 
         @Override
-        protected ConfigurationNode insertIntoConfigurateNode(ConfigurationNode newNode, R data) throws ObjectMappingException {
+        protected ConfigurationNode insertIntoConfigurateNode(final ConfigurationNode newNode, final R data) throws ObjectMappingException {
             return newNode.setValue(this.typeToken, data);
         }
     }
 
     public abstract static class StandardWithSimpleDefault<R> extends NucleusConfigAdapter.Standard<R> {
 
-        public StandardWithSimpleDefault(Class<R> clazz) {
+        public StandardWithSimpleDefault(final Class<R> clazz) {
             super(clazz);
         }
 
-        public StandardWithSimpleDefault(TypeToken<R> typeToken) {
+        public StandardWithSimpleDefault(final TypeToken<R> typeToken) {
             super(typeToken);
         }
 
@@ -55,7 +55,7 @@ public abstract class NucleusConfigAdapter<R> extends TypedAbstractConfigAdapter
         public R getDefaultObject() {
             try {
                 return (R) this.typeToken.getRawType().newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (final InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }

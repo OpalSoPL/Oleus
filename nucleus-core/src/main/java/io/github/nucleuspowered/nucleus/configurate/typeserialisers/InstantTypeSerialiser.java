@@ -12,11 +12,11 @@ import java.time.Instant;
 
 public class InstantTypeSerialiser implements TypeSerializer<Instant> {
 
-    @Override public Instant deserialize(TypeToken<?> type, ConfigurationNode value) {
+    @Override public Instant deserialize(final TypeToken<?> type, final ConfigurationNode value) {
         return Instant.ofEpochMilli(value.getLong());
     }
 
-    @Override public void serialize(TypeToken<?> type, Instant obj, ConfigurationNode value) {
+    @Override public void serialize(final TypeToken<?> type, final Instant obj, final ConfigurationNode value) {
         value.setValue(obj.toEpochMilli());
     }
 }

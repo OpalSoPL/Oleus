@@ -28,12 +28,12 @@ public class RegexArgument extends CommandElement {
     private final TriFunction<CommandSource, CommandArgs, CommandContext, List<String>> function;
     private final IMessageProviderService messageProvider;
 
-    public RegexArgument(@Nullable Text key, String regex, String errorKey, INucleusServiceCollection serviceCollection) {
+    public RegexArgument(@Nullable final Text key, final String regex, final String errorKey, final INucleusServiceCollection serviceCollection) {
         this(key, regex, errorKey, null, serviceCollection);
     }
 
-    public RegexArgument(@Nullable Text key, String regex, String errorKey, @Nullable TriFunction<CommandSource, CommandArgs, CommandContext,
-            List<String>> tabComplete, INucleusServiceCollection serviceCollection) {
+    public RegexArgument(@Nullable final Text key, final String regex, final String errorKey, @Nullable final TriFunction<CommandSource, CommandArgs, CommandContext,
+            List<String>> tabComplete, final INucleusServiceCollection serviceCollection) {
         super(key);
 
         Preconditions.checkNotNull(regex);
@@ -45,8 +45,8 @@ public class RegexArgument extends CommandElement {
         this.messageProvider = serviceCollection.messageProvider();
     }
 
-    @Nullable @Override protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String arg = args.next();
+    @Nullable @Override protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String arg = args.next();
         if (this.regex.matcher(arg).matches()) {
             return arg;
         }
@@ -54,7 +54,7 @@ public class RegexArgument extends CommandElement {
         throw args.createError(this.messageProvider.getMessageFor(source, this.errorKey));
     }
 
-    @Override public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    @Override public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return this.function.accept(src, args, context);
     }
 }

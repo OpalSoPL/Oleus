@@ -12,20 +12,20 @@ public enum TextModifiers implements Function<Text, Text> {
 
     SPACE_AFTER("s") {
         @Override
-        public Text apply(Text text) {
+        public Text apply(final Text text) {
             return Text.of(text, " ");
         }
     },
     SPACE_BEFORE("p") {
         @Override
-        public Text apply(Text text) {
+        public Text apply(final Text text) {
             return Text.of(" ", text);
         }
     };
 
     private final String key;
 
-    TextModifiers(String p) {
+    TextModifiers(final String p) {
         this.key = p;
     }
 

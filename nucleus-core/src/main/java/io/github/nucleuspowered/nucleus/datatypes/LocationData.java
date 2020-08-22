@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.datatypes;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
@@ -26,7 +26,7 @@ public class LocationData implements NamedLocation {
     private final Vector3d position;
     private final Vector3d rotation;
 
-    public LocationData(String name, UUID world, Vector3d position, Vector3d rotation) {
+    public LocationData(final String name, final UUID world, final Vector3d position, final Vector3d rotation) {
         this.rotation = rotation;
         this.position = position;
         this.warpName = name;
@@ -56,12 +56,12 @@ public class LocationData implements NamedLocation {
     }
 
     @Override public Optional<Location<World>> getLocation() {
-        Optional<World> optional = Sponge.getServer().getWorld(this.worldUUID);
+        final Optional<World> optional = Sponge.getServer().getWorld(this.worldUUID);
         return optional.map(world -> new Location<>(world, this.position));
     }
 
     @Override public Optional<Transform<World>> getTransform() {
-        Optional<Location<World>> olw = getLocation();
+        final Optional<Location<World>> olw = this.getLocation();
         return olw.map(worldLocation -> new Transform<>(worldLocation.getExtent(), this.position, this.rotation));
     }
 

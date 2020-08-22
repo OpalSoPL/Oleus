@@ -23,7 +23,7 @@ public class IStorageRepositoryFactoryRegistryModule extends NucleusRegistryModu
         return INSTANCE;
     }
 
-    public IStorageRepositoryFactoryRegistryModule(FlatFileStorageRepositoryFactory factory) {
+    public IStorageRepositoryFactoryRegistryModule(final FlatFileStorageRepositoryFactory factory) {
         if (INSTANCE != null) {
             throw new IllegalStateException("Singleton already exists");
         }

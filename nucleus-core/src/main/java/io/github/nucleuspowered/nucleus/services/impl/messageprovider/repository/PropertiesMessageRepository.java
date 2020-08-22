@@ -14,9 +14,9 @@ public class PropertiesMessageRepository extends AbstractMessageRepository imple
 
     private final ResourceBundle resource;
 
-    public PropertiesMessageRepository(ITextStyleService textStyleService,
-            IPlayerDisplayNameService playerDisplayNameService,
-            ResourceBundle resource) {
+    public PropertiesMessageRepository(final ITextStyleService textStyleService,
+            final IPlayerDisplayNameService playerDisplayNameService,
+            final ResourceBundle resource) {
         super(textStyleService, playerDisplayNameService);
         this.resource = resource;
     }
@@ -26,12 +26,12 @@ public class PropertiesMessageRepository extends AbstractMessageRepository imple
     }
 
     @Override
-    public boolean hasEntry(String key) {
+    public boolean hasEntry(final String key) {
         return this.resource.containsKey(key);
     }
 
     @Override
-    String getEntry(String key) {
+    String getEntry(final String key) {
         if (this.resource.containsKey(key)) {
             return this.resource.getString(key);
         }

@@ -4,21 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.nickname.exception;
 
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.util.TextMessageException;
 
-public class NicknameException extends Exception {
+public class NicknameException extends TextMessageException {
 
     private final Type type;
-    private final Text textMessage;
 
-    public NicknameException(Text message, Type type) {
-        super(message.toPlain());
-        this.textMessage = message;
+    public NicknameException(final Component message, final Type type) {
+        super(message);
         this.type = type;
-    }
-
-    public Text getTextMessage() {
-        return this.textMessage;
     }
 
     public Type getType() {

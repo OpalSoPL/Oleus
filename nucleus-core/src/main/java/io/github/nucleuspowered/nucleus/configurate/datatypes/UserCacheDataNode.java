@@ -34,11 +34,11 @@ public class UserCacheDataNode {
         // ignored - for Configurate
     }
 
-    public UserCacheDataNode(IUserDataObject x) {
-        set(x);
+    public UserCacheDataNode(final IUserDataObject x) {
+        this.set(x);
     }
 
-    public void set(IUserDataObject x) {
+    public void set(final IUserDataObject x) {
         this.ipAddress = x.get(CoreKeys.IP_ADDRESS).map(y -> y.replace("/", "")).orElse(null);
         this.jail = x.get(JailKeys.JAIL_DATA).map(JailData::getJailName).orElse(null);
         this.isMuted = x.get(MuteKeys.MUTE_DATA).isPresent();
@@ -49,7 +49,7 @@ public class UserCacheDataNode {
     }
 
     public boolean isJailed() {
-        return getJailName().isPresent();
+        return this.getJailName().isPresent();
     }
 
     public Optional<String> getJailName() {

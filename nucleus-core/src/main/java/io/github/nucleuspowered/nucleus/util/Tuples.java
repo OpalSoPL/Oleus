@@ -15,25 +15,25 @@ public final class Tuples {
 
     private Tuples() {}
 
-    public static <A, B> Tuple<A, B> of(A a, B b) {
+    public static <A, B> Tuple<A, B> of(final A a, final B b) {
         return new Tuple<>(a, b);
     }
 
-    public static <A, B> NullableTuple<A, B> ofNullable(A a, B b) {
+    public static <A, B> NullableTuple<A, B> ofNullable(final A a, final B b) {
         return new NullableTuple<>(a, b);
     }
 
-    public static <A, B, C> Tri<A, B, C> of(A a, B b, C c) {
+    public static <A, B, C> Tri<A, B, C> of(final A a, final B b, final C c) {
         return new Tri<>(a, b, c);
     }
 
-    public static <A, B, C, D> Quad<A, B, C, D> of(A a, B b, C c, D d) {
+    public static <A, B, C, D> Quad<A, B, C, D> of(final A a, final B b, final C c, final D d) {
         return new Quad<>(a, b, c, d);
     }
 
     public static class NullableTuple<A, B> {
 
-        public NullableTuple(@Nullable A first, @Nullable B second) {
+        public NullableTuple(@Nullable final A first, @Nullable final B second) {
             this.first = first;
             this.second = second;
         }
@@ -57,9 +57,9 @@ public final class Tuples {
             return this.second;
         }
 
-        public void mapIfPresent(Consumer<A> firstConsumer, Consumer<B> secondConsumer) {
-            getFirst().ifPresent(firstConsumer);
-            getSecond().ifPresent(secondConsumer);
+        public void mapIfPresent(final Consumer<A> firstConsumer, final Consumer<B> secondConsumer) {
+            this.getFirst().ifPresent(firstConsumer);
+            this.getSecond().ifPresent(secondConsumer);
         }
     }
 
@@ -69,7 +69,7 @@ public final class Tuples {
         private final B second;
         private final C third;
 
-        private Tri(A first, B second, C third) {
+        private Tri(final A first, final B second, final C third) {
             this.first = first;
             this.second = second;
             this.third = third;
@@ -92,7 +92,7 @@ public final class Tuples {
 
         private final D fourth;
 
-        private Quad(A first, B second, C third, D fourth) {
+        private Quad(final A first, final B second, final C third, final D fourth) {
             super(first, second, third);
             this.fourth = fourth;
         }

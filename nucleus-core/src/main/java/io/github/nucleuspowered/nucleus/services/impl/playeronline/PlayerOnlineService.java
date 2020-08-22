@@ -28,21 +28,21 @@ public class PlayerOnlineService implements IPlayerOnlineService {
     private BiPredicate<CommandSource, User> online = STANDARD_ONLINE;
     private BiFunction<CommandSource, User, Optional<Instant>> lastPlayed = STANDARD_LAST_PLAYED;
 
-    @Override public boolean isOnline(CommandSource src, User player) {
+    @Override public boolean isOnline(final CommandSource src, final User player) {
         return this.online.test(src, player);
     }
 
-    @Override public Optional<Instant> lastSeen(CommandSource src, User player) {
+    @Override public Optional<Instant> lastSeen(final CommandSource src, final User player) {
         return this.lastPlayed.apply(src, player);
     }
 
-    @Override public void set(BiPredicate<CommandSource, User> isOnline, BiFunction<CommandSource, User, Optional<Instant>> lastSeen) {
+    @Override public void set(final BiPredicate<CommandSource, User> isOnline, final BiFunction<CommandSource, User, Optional<Instant>> lastSeen) {
         this.online = isOnline == null ? STANDARD_ONLINE : isOnline;
         this.lastPlayed = lastSeen == null ? STANDARD_LAST_PLAYED : lastSeen;
     }
 
     @Override public void reset() {
-        set(null, null);
+        this.set(null, null);
     }
 
 }

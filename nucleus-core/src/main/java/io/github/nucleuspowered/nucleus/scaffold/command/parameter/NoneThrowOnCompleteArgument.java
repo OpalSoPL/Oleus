@@ -24,12 +24,12 @@ public class NoneThrowOnCompleteArgument extends CommandElement {
         super(null);
     }
 
-    @Nullable @Override protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    @Nullable @Override protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         return null;
     }
 
     @Override
-    public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
+    public void parse(final CommandSource source, final CommandArgs args, final CommandContext context) throws ArgumentParseException {
         if (context.hasAny(CommandContext.TAB_COMPLETION)) {
             // no-one cares
             throw args.createError(Text.of("dummy error"));
@@ -37,12 +37,12 @@ public class NoneThrowOnCompleteArgument extends CommandElement {
         super.parse(source, args, context);
     }
 
-    @Override public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    @Override public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return ImmutableList.of();
     }
 
     @Override
-    public Text getUsage(CommandSource src) {
+    public Text getUsage(final CommandSource src) {
         return Text.of();
     }
 }

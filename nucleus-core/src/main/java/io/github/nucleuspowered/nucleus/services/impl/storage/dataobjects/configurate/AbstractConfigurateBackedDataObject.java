@@ -17,7 +17,7 @@ public abstract class AbstractConfigurateBackedDataObject implements IConfigurat
         return this.backingNode.copy();
     }
 
-    @Override public void setBackingNode(ConfigurationNode node) {
+    @Override public void setBackingNode(final ConfigurationNode node) {
         this.backingNode = node;
     }
 

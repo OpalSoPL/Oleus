@@ -17,7 +17,7 @@ public final class TypeHelper {
 
     private TypeHelper() {}
 
-    public static Tuple<DataQuery, List<?>> getList(DataQuery query, Object array) {
+    public static Tuple<DataQuery, List<?>> getList(final DataQuery query, final Object array) {
 
         if (array instanceof byte[]) {
             return Tuple.of(getNewName(query, "B"), Arrays.asList(ArrayUtils.toObject((byte[]) array)));
@@ -38,18 +38,18 @@ public final class TypeHelper {
         throw new RuntimeException();
     }
 
-    public static Tuple<DataQuery, Object> getArray(DataQuery query, DataView container) {
-        String a = query.asString(".");
-        DataQuery q = DataQuery.of('.', query.asString(".").replaceAll("\\$Array\\$[a-zA-Z]$", ""));
-        String objType = a.substring(a.length() - 1);
-        List<?> array = container.getList(query).orElse(Lists.newArrayList());
-        int size = array.size();
+    public static Tuple<DataQuery, Object> getArray(final DataQuery query, final DataView container) {
+        final String a = query.asString(".");
+        final DataQuery q = DataQuery.of('.', query.asString(".").replaceAll("\\$Array\\$[a-zA-Z]$", ""));
+        final String objType = a.substring(a.length() - 1);
+        final List<?> array = container.getList(query).orElse(Lists.newArrayList());
+        final int size = array.size();
 
         switch (objType) {
             case "B": {
-                byte[] b = new byte[size];
+                final byte[] b = new byte[size];
                 for (int i = 0; i < size; i++) {
-                    Object obj = array.get(i);
+                    final Object obj = array.get(i);
                     if (obj instanceof String) {
                         b[i] = Byte.parseByte((String) obj);
                     } else {
@@ -60,9 +60,9 @@ public final class TypeHelper {
                 return Tuple.of(q, b);
             }
             case "S": {
-                short[] b = new short[size];
+                final short[] b = new short[size];
                 for (int i = 0; i < size; i++) {
-                    Object obj = array.get(i);
+                    final Object obj = array.get(i);
                     if (obj instanceof String) {
                         b[i] = Short.parseShort((String) obj);
                     } else {
@@ -73,9 +73,9 @@ public final class TypeHelper {
                 return Tuple.of(q, b);
             }
             case "I": {
-                int[] b = new int[size];
+                final int[] b = new int[size];
                 for (int i = 0; i < size; i++) {
-                    Object obj = array.get(i);
+                    final Object obj = array.get(i);
                     if (obj instanceof String) {
                         b[i] = Integer.parseInt((String) obj);
                     } else {
@@ -86,9 +86,9 @@ public final class TypeHelper {
                 return Tuple.of(q, b);
             }
             case "J": {
-                long[] b = new long[size];
+                final long[] b = new long[size];
                 for (int i = 0; i < size; i++) {
-                    Object obj = array.get(i);
+                    final Object obj = array.get(i);
                     if (obj instanceof String) {
                         b[i] = Long.parseLong((String) obj);
                     } else {
@@ -99,9 +99,9 @@ public final class TypeHelper {
                 return Tuple.of(q, b);
             }
             case "F": {
-                float[] b = new float[size];
+                final float[] b = new float[size];
                 for (int i = 0; i < size; i++) {
-                    Object obj = array.get(i);
+                    final Object obj = array.get(i);
                     if (obj instanceof String) {
                         b[i] = Float.parseFloat((String) obj);
                     } else {
@@ -112,9 +112,9 @@ public final class TypeHelper {
                 return Tuple.of(q, b);
             }
             case "D": {
-                double[] b = new double[size];
+                final double[] b = new double[size];
                 for (int i = 0; i < size; i++) {
-                    Object obj = array.get(i);
+                    final Object obj = array.get(i);
                     if (obj instanceof String) {
                         b[i] = Double.parseDouble((String) obj);
                     } else {
@@ -125,9 +125,9 @@ public final class TypeHelper {
                 return Tuple.of(q, b);
             }
             case "Z": {
-                boolean[] b = new boolean[size];
+                final boolean[] b = new boolean[size];
                 for (int i = 0; i < size; i++) {
-                    Object obj = array.get(i);
+                    final Object obj = array.get(i);
                     if (obj instanceof String) {
                         b[i] = Boolean.parseBoolean((String) obj);
                     } else {
@@ -142,7 +142,7 @@ public final class TypeHelper {
         throw new RuntimeException();
     }
 
-    private static DataQuery getNewName(DataQuery dataQuery, String name) {
+    private static DataQuery getNewName(final DataQuery dataQuery, final String name) {
         return DataQuery.of('.', dataQuery.asString(".") + "$Array$" + name);
     }
 

@@ -20,7 +20,7 @@ public class QueryKey<T, Q extends IQueryObject<?, Q>> {
 
     private final String key;
 
-    protected QueryKey(String key) {
+    protected QueryKey(final String key) {
         this.key = key;
     }
 
@@ -33,9 +33,9 @@ public class QueryKey<T, Q extends IQueryObject<?, Q>> {
     }
 
     @SuppressWarnings("unchecked")
-    public final Collection<T> getValues(Collection<Object> objects) {
-        ImmutableList.Builder<T> builder = ImmutableList.builder();
-        for (Object o : objects) {
+    public final Collection<T> getValues(final Collection<Object> objects) {
+        final ImmutableList.Builder<T> builder = ImmutableList.builder();
+        for (final Object o : objects) {
             builder.add((T) o);
         }
 

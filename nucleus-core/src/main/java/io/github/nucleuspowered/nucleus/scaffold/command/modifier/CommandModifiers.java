@@ -4,9 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.scaffold.command.modifier;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public class CommandModifiers {
 
     private CommandModifiers() {}

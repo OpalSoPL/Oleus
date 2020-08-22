@@ -45,16 +45,16 @@ public class ImprovedGameModeArgument extends CommandElement {
 
     private final IMessageProviderService messageProviderService;
 
-    public ImprovedGameModeArgument(@Nullable Text key, INucleusServiceCollection serviceCollection) {
+    public ImprovedGameModeArgument(@Nullable final Text key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProviderService = serviceCollection.messageProvider();
     }
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String arg = args.next();
-        GameMode mode = GAMEMODE_MAP.get(arg.toLowerCase());
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String arg = args.next();
+        final GameMode mode = GAMEMODE_MAP.get(arg.toLowerCase());
 
         if (mode == null) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.gamemode.error", arg));
@@ -64,17 +64,17 @@ public class ImprovedGameModeArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         try {
-            String arg = args.peek();
+            final String arg = args.peek();
             return GAMEMODE_MAP.keySet().stream().filter(x -> x.startsWith(arg.toLowerCase())).collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return Lists.newArrayList(GAMEMODE_MAP.keySet());
         }
     }
 
     @Override
-    public Text getUsage(CommandSource src) {
+    public Text getUsage(final CommandSource src) {
         return Text.of("game mode");
     }
 }

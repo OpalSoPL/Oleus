@@ -55,10 +55,10 @@ public final class StorageManager implements IStorageManager, IReloadableService
     private final IStorageService.SingleCached<IKitDataObject> kitsService;
 
     @Inject
-    public StorageManager(@DataDirectory Supplier<Path> dataDirectory,
-            Logger logger,
-            IConfigurateHelper configurateHelper,
-            PluginContainer pluginContainer) {
+    public StorageManager(@DataDirectory final Supplier<Path> dataDirectory,
+            final Logger logger,
+            final IConfigurateHelper configurateHelper,
+            final PluginContainer pluginContainer) {
         this.flatFileStorageRepositoryFactory = new FlatFileStorageRepositoryFactory(dataDirectory, logger);
         new IStorageRepositoryFactoryRegistryModule(this.flatFileStorageRepositoryFactory);
         this.configurateHelper = configurateHelper;
@@ -92,7 +92,7 @@ public final class StorageManager implements IStorageManager, IReloadableService
         }
 
         @Override public IUserDataObject createNew() {
-            UserDataObject d = new UserDataObject();
+            final UserDataObject d = new UserDataObject();
             d.setBackingNode(configurateHelper.createNode());
             return d;
         }
@@ -103,7 +103,7 @@ public final class StorageManager implements IStorageManager, IReloadableService
         }
 
         @Override public IWorldDataObject createNew() {
-            WorldDataObject d = new WorldDataObject();
+            final WorldDataObject d = new WorldDataObject();
             d.setBackingNode(configurateHelper.createNode());
             return d;
         }
@@ -114,7 +114,7 @@ public final class StorageManager implements IStorageManager, IReloadableService
         }
 
         @Override public IGeneralDataObject createNew() {
-            GeneralDataObject d = new GeneralDataObject();
+            final GeneralDataObject d = new GeneralDataObject();
             d.setBackingNode(configurateHelper.createNode());
             return d;
         }
@@ -125,7 +125,7 @@ public final class StorageManager implements IStorageManager, IReloadableService
         }
 
         @Override public IKitDataObject createNew() {
-            KitDataObject d = new KitDataObject();
+            final KitDataObject d = new KitDataObject();
             d.setBackingNode(configurateHelper.createNode());
             return d;
         }
@@ -204,23 +204,23 @@ public final class StorageManager implements IStorageManager, IReloadableService
 
     @Override
     public CompletableFuture<Void> saveAndInvalidateAllCaches() {
-        CompletableFuture<Void> a = this.generalService.ensureSaved().whenComplete((cv, t) -> this.generalService.clearCache());
-        CompletableFuture<Void> b = this.userService.ensureSaved().whenComplete((cv, t) -> this.userService.clearCache());
-        CompletableFuture<Void> c = this.worldService.ensureSaved().whenComplete((cv, t) -> this.worldService.clearCache());
-        CompletableFuture<Void> d = this.kitsService.ensureSaved().whenComplete((cv, t) -> this.kitsService.clearCache());
+        final CompletableFuture<Void> a = this.generalService.ensureSaved().whenComplete((cv, t) -> this.generalService.clearCache());
+        final CompletableFuture<Void> b = this.userService.ensureSaved().whenComplete((cv, t) -> this.userService.clearCache());
+        final CompletableFuture<Void> c = this.worldService.ensureSaved().whenComplete((cv, t) -> this.worldService.clearCache());
+        final CompletableFuture<Void> d = this.kitsService.ensureSaved().whenComplete((cv, t) -> this.kitsService.clearCache());
         return CompletableFuture.allOf(a, b, c, d);
     }
 
     @Override public CompletableFuture<Void> saveAll() {
-        CompletableFuture<Void> a = this.generalService.ensureSaved();
-        CompletableFuture<Void> b = this.userService.ensureSaved();
-        CompletableFuture<Void> c = this.worldService.ensureSaved();
-        CompletableFuture<Void> d = this.kitsService.ensureSaved();
+        final CompletableFuture<Void> a = this.generalService.ensureSaved();
+        final CompletableFuture<Void> b = this.userService.ensureSaved();
+        final CompletableFuture<Void> c = this.worldService.ensureSaved();
+        final CompletableFuture<Void> d = this.kitsService.ensureSaved();
         return CompletableFuture.allOf(a, b, c, d);
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         // TODO: Data registry
         if (this.generalRepository != null) {
             this.generalRepository.shutdown();

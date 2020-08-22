@@ -16,7 +16,7 @@ public abstract class CostCancellableTask implements CancellableTask {
     private final double cost;
     private boolean hasRun = false;
 
-    public CostCancellableTask(INucleusServiceCollection serviceCollection, CommandSource target, double cost) {
+    public CostCancellableTask(final INucleusServiceCollection serviceCollection, final CommandSource target, final double cost) {
         this.serviceCollection = serviceCollection;
         this.target = target;
         this.cost = cost;

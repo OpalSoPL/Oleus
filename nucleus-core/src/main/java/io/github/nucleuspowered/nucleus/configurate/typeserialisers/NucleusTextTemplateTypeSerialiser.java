@@ -15,19 +15,19 @@ public class NucleusTextTemplateTypeSerialiser implements TypeSerializer<Nucleus
 
     private final INucleusTextTemplateFactory factory;
 
-    public NucleusTextTemplateTypeSerialiser(INucleusTextTemplateFactory factory) {
+    public NucleusTextTemplateTypeSerialiser(final INucleusTextTemplateFactory factory) {
         this.factory = factory;
     }
 
-    @Override public NucleusTextTemplateImpl deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+    @Override public NucleusTextTemplateImpl deserialize(final TypeToken<?> type, final ConfigurationNode value) throws ObjectMappingException {
         try {
             return this.factory.createFromString(value.getString());
-        } catch (Throwable throwable) {
+        } catch (final Throwable throwable) {
             throw new ObjectMappingException(throwable);
         }
     }
 
-    @Override public void serialize(TypeToken<?> type, NucleusTextTemplateImpl obj, ConfigurationNode value) {
+    @Override public void serialize(final TypeToken<?> type, final NucleusTextTemplateImpl obj, final ConfigurationNode value) {
         value.setValue(obj.getRepresentation());
     }
 }

@@ -11,8 +11,6 @@ import io.github.nucleuspowered.nucleus.annotationprocessor.Store;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
@@ -20,7 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 
 @Store(Constants.REGISTRY)
-@NonnullByDefault
 public abstract class NucleusRegistryModule<T extends CatalogType> implements AdditionalCatalogRegistryModule<T> {
 
     private boolean registered = false;
@@ -32,9 +29,9 @@ public abstract class NucleusRegistryModule<T extends CatalogType> implements Ad
 
     public final void registerDefaults() {
         if (!this.registered) {
-            registerModuleDefaults();
+            this.registerModuleDefaults();
             this.registered = true;
-            Sponge.getRegistry().registerModule(catalogClass(), this);
+            Sponge.getRegistry().registerModule(this.catalogClass(), this);
         }
     }
 
@@ -43,7 +40,7 @@ public abstract class NucleusRegistryModule<T extends CatalogType> implements Ad
     }
 
     @Override
-    public void registerAdditionalCatalog(T entry) {
+    public void registerAdditionalCatalog(final T entry) {
         Preconditions.checkNotNull(entry, "entry");
         if (this.entries.containsKey(entry.getId().toLowerCase(Locale.ENGLISH))) {
             throw new IllegalArgumentException("Cannot register that ID as it already has been registered");
@@ -55,7 +52,7 @@ public abstract class NucleusRegistryModule<T extends CatalogType> implements Ad
                     + "with the nucleus namespace");
         }
 
-        if (!this.registered || allowsAdditional()) {
+        if (!this.registered || this.allowsAdditional()) {
             this.entries.put(entry.getId().toLowerCase(Locale.ENGLISH), entry);
         } else {
             throw new IllegalArgumentException("Cannot register additional types for this catalog");
@@ -63,7 +60,7 @@ public abstract class NucleusRegistryModule<T extends CatalogType> implements Ad
     }
 
     @Override
-    public Optional<T> getById(String id) {
+    public Optional<T> getById(final String id) {
         final String lowerId = id.toLowerCase(Locale.ENGLISH);
         T instance = this.entries.get(lowerId);
         if (instance == null && !lowerId.contains(":")) {

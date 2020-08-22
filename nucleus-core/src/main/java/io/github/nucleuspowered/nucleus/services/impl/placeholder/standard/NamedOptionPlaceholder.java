@@ -18,14 +18,14 @@ public class NamedOptionPlaceholder implements PlaceholderParser {
     private final IPermissionService permissionService;
     private final String namedOption;
 
-    public NamedOptionPlaceholder(IPermissionService permissionService, String namedOption) {
+    public NamedOptionPlaceholder(final IPermissionService permissionService, final String namedOption) {
         this.permissionService = permissionService;
         this.namedOption = namedOption;
     }
 
     @Override
-    public Text parse(PlaceholderContext placeholderContext) {
-        Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject().filter(x -> x instanceof Subject).map(x -> (Subject) x);
+    public Text parse(final PlaceholderContext placeholderContext) {
+        final Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject().filter(x -> x instanceof Subject).map(x -> (Subject) x);
         return subjectOptional.flatMap(subject -> this.permissionService
                 .getOptionFromSubject(subject, this.namedOption)
                 .map(TextSerializers.FORMATTING_CODE::deserialize))

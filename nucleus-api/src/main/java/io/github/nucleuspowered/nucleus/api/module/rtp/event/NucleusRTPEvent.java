@@ -4,15 +4,21 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.rtp.event;
 
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.entity.living.humanoid.player.TargetPlayerEvent;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 
 /**
  * Events for RTP
  */
-public interface NucleusRTPEvent extends TargetPlayerEvent {
+public interface NucleusRTPEvent {
+
+    /**
+     * The {@link ServerPlayer} currently being teleported.
+     *
+     * @return The {@link ServerPlayer}
+     */
+    ServerPlayer getTargetPlayer();
 
     /**
      * Fired when the RTP system has selected a location
@@ -27,7 +33,7 @@ public interface NucleusRTPEvent extends TargetPlayerEvent {
          *
          * @return The location
          */
-        Location<World> getLocation();
+        ServerLocation getLocation();
 
     }
 }

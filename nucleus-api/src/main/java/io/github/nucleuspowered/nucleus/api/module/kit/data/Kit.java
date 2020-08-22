@@ -11,8 +11,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
@@ -23,7 +21,6 @@ import java.util.Optional;
  *
  * <p>Note that this kit requires explicit saving, see {@link #save()}</p>
  */
-@NonnullByDefault
 public interface Kit {
 
     /**

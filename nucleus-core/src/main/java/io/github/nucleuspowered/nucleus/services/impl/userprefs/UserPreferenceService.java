@@ -46,7 +46,7 @@ public class UserPreferenceService implements IUserPreferenceService {
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
-    public UserPreferenceService(INucleusServiceCollection serviceCollection) {
+    public UserPreferenceService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.element = new Element(serviceCollection);
         this.provider = new NucleusKeysProvider(serviceCollection);
@@ -54,14 +54,14 @@ public class UserPreferenceService implements IUserPreferenceService {
 
     @Override
     public void postInit() {
-        this.provider.getAll().forEach(x -> register((PreferenceKeyImpl<?>) x));
+        this.provider.getAll().forEach(x -> this.register((PreferenceKeyImpl<?>) x));
     }
 
     @Override public CommandElement getElement() {
         return this.element;
     }
 
-    @Override public void register(PreferenceKeyImpl<?> key) {
+    @Override public void register(final PreferenceKeyImpl<?> key) {
         if (this.registered.containsKey(key.getID())) {
             throw new IllegalArgumentException("ID already registered");
         }
@@ -72,19 +72,19 @@ public class UserPreferenceService implements IUserPreferenceService {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public <T> void set(UUID uuid, NucleusUserPreferenceService.PreferenceKey<T> key, @Nullable T value) {
-        PreferenceKeyImpl pki;
+    public <T> void set(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key, @Nullable final T value) {
+        final PreferenceKeyImpl pki;
         if (Objects.requireNonNull(key) instanceof PreferenceKeyImpl) {
             pki = (PreferenceKeyImpl) key;
         } else {
             throw new IllegalArgumentException("Cannot have custom preference keys");
         }
 
-        set(uuid, pki, value);
+        this.set(uuid, pki, value);
         ((PreferenceKeyImpl<T>) key).onSet(this.serviceCollection, uuid, value);
     }
 
-    @Override public <T> void set(UUID uuid, PreferenceKeyImpl<T> key, @Nullable T value) {
+    @Override public <T> void set(final UUID uuid, final PreferenceKeyImpl<T> key, @Nullable final T value) {
         this.serviceCollection
                 .storageManager()
                 .getUserService()
@@ -92,18 +92,18 @@ public class UserPreferenceService implements IUserPreferenceService {
                 .thenAccept(x -> x.set(key, value));
     }
 
-    @Override public Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> get(User user) {
-        Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> ret = new HashMap<>();
-        for (NucleusUserPreferenceService.PreferenceKey<?> key : this.registered.values()) {
+    @Override public Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> get(final User user) {
+        final Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> ret = new HashMap<>();
+        for (final NucleusUserPreferenceService.PreferenceKey<?> key : this.registered.values()) {
             if (((PreferenceKeyImpl) key).canAccess(this.serviceCollection, user)) {
-                ret.put(key, get(user.getUniqueId(), key).orElse(null));
+                ret.put(key, this.get(user.getUniqueId(), key).orElse(null));
             }
         }
 
         return ret;
     }
 
-    @Override public <T> Optional<T> get(UUID uuid, NucleusUserPreferenceService.PreferenceKey<T> key) {
+    @Override public <T> Optional<T> get(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key) {
         if (!this.registered.containsValue(key)) {
             throw new IllegalArgumentException("Key is not registered.");
         }
@@ -112,7 +112,7 @@ public class UserPreferenceService implements IUserPreferenceService {
             throw new IllegalArgumentException("Custom preference keys are not supported.");
         }
 
-        PreferenceKeyImpl<T> prefKey = (PreferenceKeyImpl<T>) key;
+        final PreferenceKeyImpl<T> prefKey = (PreferenceKeyImpl<T>) key;
         Optional<T> ot = Optional.empty();
         try {
             ot = this.serviceCollection
@@ -120,15 +120,15 @@ public class UserPreferenceService implements IUserPreferenceService {
                     .getUserService()
                     .getOnThread(uuid)
                     .map(x -> x.getOrDefault(prefKey));
-        } catch (ClassCastException e) {
+        } catch (final ClassCastException e) {
             e.printStackTrace();
         }
 
         return ot;
     }
 
-    @Override public <T> T getUnwrapped(UUID uuid, NucleusUserPreferenceService.PreferenceKey<T> key) {
-        return get(uuid, key).orElse(null);
+    @Override public <T> T getUnwrapped(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key) {
+        return this.get(uuid, key).orElse(null);
     }
 
     @Override
@@ -137,25 +137,25 @@ public class UserPreferenceService implements IUserPreferenceService {
     }
 
     @Override
-    public <T> Optional<T> getPreferenceFor(User user, NucleusUserPreferenceService.PreferenceKey<T> key) {
-        return get(user.getUniqueId(), key);
+    public <T> Optional<T> getPreferenceFor(final User user, final NucleusUserPreferenceService.PreferenceKey<T> key) {
+        return this.get(user.getUniqueId(), key);
     }
 
     @Override
-    public <T> void setPreferenceFor(User user, NucleusUserPreferenceService.PreferenceKey<T> key, T value) {
-        set(user.getUniqueId(), key, value);
+    public <T> void setPreferenceFor(final User user, final NucleusUserPreferenceService.PreferenceKey<T> key, final T value) {
+        this.set(user.getUniqueId(), key, value);
     }
 
     @Override
-    public void removePreferenceFor(User user, NucleusUserPreferenceService.PreferenceKey<?> key) {
-        set(user.getUniqueId(), key, null);
+    public void removePreferenceFor(final User user, final NucleusUserPreferenceService.PreferenceKey<?> key) {
+        this.set(user.getUniqueId(), key, null);
     }
 
-    @Override public boolean canAccess(User user, PreferenceKey<?> key) {
+    @Override public boolean canAccess(final User user, final PreferenceKey<?> key) {
         return ((PreferenceKeyImpl) key).canAccess(this.serviceCollection, user);
     }
 
-    @Override public String getDescription(PreferenceKey<?> key) {
+    @Override public String getDescription(final PreferenceKey<?> key) {
         return ((PreferenceKeyImpl) key).getDescription(this.serviceCollection.messageProvider());
     }
 
@@ -172,12 +172,12 @@ public class UserPreferenceService implements IUserPreferenceService {
 
             final LazyLoadFunction<INucleusServiceCollection, CommandElement> element;
 
-            Type(LazyLoadFunction<INucleusServiceCollection, CommandElement> element) {
+            Type(final LazyLoadFunction<INucleusServiceCollection, CommandElement> element) {
                 this.element = element;
             }
         }
 
-        Element(INucleusServiceCollection serviceCollection) {
+        Element(final INucleusServiceCollection serviceCollection) {
             super(null);
             this.serviceCollection = serviceCollection;
         }
@@ -189,20 +189,20 @@ public class UserPreferenceService implements IUserPreferenceService {
         }
 
         @Override
-        public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
-            String next = args.next().toLowerCase();
-            Type type = parseFirst(source, args, context, next);
+        public void parse(final CommandSource source, final CommandArgs args, final CommandContext context) throws ArgumentParseException {
+            final String next = args.next().toLowerCase();
+            final Type type = this.parseFirst(source, args, context, next);
 
             if (args.hasNext()) {
                 type.element.apply(this.serviceCollection).parse(source, args, context);
             }
         }
 
-        private Type parseFirst(CommandSource source, CommandArgs args, CommandContext context, String next) throws ArgumentParseException {
-            NucleusUserPreferenceService.PreferenceKey<?> key = this.keys.get(next);
+        private Type parseFirst(final CommandSource source, final CommandArgs args, final CommandContext context, final String next) throws ArgumentParseException {
+            final NucleusUserPreferenceService.PreferenceKey<?> key = this.keys.get(next);
             if (key != null) {
                 Type type = null;
-                Class<?> cls = key.getValueClass();
+                final Class<?> cls = key.getValueClass();
                 if (cls == boolean.class || cls == Boolean.class) {
                     type = Type.BOOLEAN;
                 } else if (cls == int.class || cls == Integer.class) {
@@ -216,7 +216,7 @@ public class UserPreferenceService implements IUserPreferenceService {
                 }
 
                 if (type != null) {
-                    checkAccess(key, getUser(source, args, context), args, source);
+                    this.checkAccess(key, this.getUser(source, args, context), args, source);
                     context.putArg(PREFERENCE_ARG, key);
                     return type;
                 }
@@ -225,7 +225,7 @@ public class UserPreferenceService implements IUserPreferenceService {
             throw args.createError(this.serviceCollection.messageProvider().getMessageFor(source, "args.userprefs.incorrect", next));
         }
 
-        private void checkAccess(NucleusUserPreferenceService.PreferenceKey<?> key, User user, CommandArgs args, CommandSource source)
+        private void checkAccess(final NucleusUserPreferenceService.PreferenceKey<?> key, final User user, final CommandArgs args, final CommandSource source)
                 throws ArgumentParseException {
             if (!((PreferenceKeyImpl) key).canAccess(this.serviceCollection, user)) {
                 if (source instanceof Player && ((Player) source).getUniqueId().equals(user.getUniqueId())) {
@@ -235,8 +235,8 @@ public class UserPreferenceService implements IUserPreferenceService {
             }
         }
 
-        private User getUser(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
-            Optional<User> o = context.getOne(NucleusParameters.Keys.USER);
+        private User getUser(final CommandSource source, final CommandArgs args, final CommandContext context) throws ArgumentParseException {
+            final Optional<User> o = context.getOne(NucleusParameters.Keys.USER);
             if (!o.isPresent()) {
                 if (source instanceof User) {
                     return (User) source;
@@ -250,15 +250,15 @@ public class UserPreferenceService implements IUserPreferenceService {
 
         @Nullable
         @Override
-        protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+        protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
             return null;
         }
 
         @Override
-        public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+        public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
             try {
-                final User user = getUser(src, args, context);
-                CommandArgs.Snapshot snapshot = args.getSnapshot();
+                final User user = this.getUser(src, args, context);
+                final CommandArgs.Snapshot snapshot = args.getSnapshot();
                 final String arg1 = args.next().toLowerCase();
 
                 if (!args.hasNext()) {
@@ -270,16 +270,16 @@ public class UserPreferenceService implements IUserPreferenceService {
                             .map(Map.Entry::getKey)
                             .collect(Collectors.toList());
                 } else {
-                    return parseFirst(src, args, context, arg1).element.apply(this.serviceCollection).complete(src, args, context);
+                    return this.parseFirst(src, args, context, arg1).element.apply(this.serviceCollection).complete(src, args, context);
                 }
-            } catch (ArgumentParseException e) {
+            } catch (final ArgumentParseException e) {
                 return ImmutableList.of();
             }
         }
 
         @Override
-        public Text getUsage(CommandSource src) {
-            return getKey();
+        public Text getUsage(final CommandSource src) {
+            return this.getKey();
         }
     }
 

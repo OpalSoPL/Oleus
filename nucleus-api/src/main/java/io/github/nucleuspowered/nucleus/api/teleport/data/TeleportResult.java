@@ -18,7 +18,7 @@ public enum TeleportResult {
         this(false);
     }
 
-    TeleportResult(boolean successState) {
+    TeleportResult(final boolean successState) {
         this.successState = successState;
     }
 

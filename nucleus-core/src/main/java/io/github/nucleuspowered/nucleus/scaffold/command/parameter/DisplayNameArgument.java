@@ -43,8 +43,8 @@ public class DisplayNameArgument extends CommandElement {
     private static boolean PARTIAL_MATCH = true;
     private final IPlayerOnlineService playerOnlineService;
 
-    public static void onReload(INucleusServiceCollection serviceCollection) {
-        CoreConfig cc = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
+    public static void onReload(final INucleusServiceCollection serviceCollection) {
+        final CoreConfig cc = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
         USER_LIMIT = Math.max(cc.getNicknameArgOfflineLimit(), 0);
         PARTIAL_MATCH = cc.isPartialMatch();
     }
@@ -54,7 +54,7 @@ public class DisplayNameArgument extends CommandElement {
     private final IMessageProviderService messageProviderService;
     // @Nullable private final NicknameService nicknameService;
 
-    public DisplayNameArgument(@Nullable Text key, Target target, INucleusServiceCollection serviceCollection) {
+    public DisplayNameArgument(@Nullable final Text key, final Target target, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.target = target;
         if (!init) {
@@ -76,28 +76,28 @@ public class DisplayNameArgument extends CommandElement {
 
     @Nullable
     @Override
-    public Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String toParse = args.next();
-        return parseValue(source, toParse, (key, entry) -> args.createError(
+    public Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String toParse = args.next();
+        return this.parseValue(source, toParse, (key, entry) -> args.createError(
                 this.messageProviderService.getMessageFor(source.getLocale(), key, entry)));
     }
 
-    public Set<?> parseValue(CommandSource source,
-        String toParse, BiFunction<String, String, ArgumentParseException> exceptionSupplier) throws ArgumentParseException {
+    public Set<?> parseValue(final CommandSource source,
+        String toParse, final BiFunction<String, String, ArgumentParseException> exceptionSupplier) throws ArgumentParseException {
 
         if (target == Target.PLAYER_CONSOLE && toParse.equalsIgnoreCase("-")) {
             return ImmutableSet.of(Sponge.getServer().getConsole());
         }
 
-        final Predicate<Player> shouldShow = determinePredicate(source);
+        final Predicate<Player> shouldShow = this.determinePredicate(source);
 
-        boolean playerOnly = toParse.startsWith("p:");
+        final boolean playerOnly = toParse.startsWith("p:");
         if (playerOnly) {
             toParse = toParse.substring(2);
         }
 
         // Does the player exist?
-        Optional<Player> player = Sponge.getServer().getPlayer(toParse);
+        final Optional<Player> player = Sponge.getServer().getPlayer(toParse);
         if (player.isPresent() && this.playerOnlineService.isOnline(source, player.get())) {
             return ImmutableSet.of(player.get()); // exact match.
         }
@@ -107,17 +107,17 @@ public class DisplayNameArgument extends CommandElement {
         }
 
         // offline users take precedence over nicknames
-        UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
         if (!toParse.isEmpty() && this.target == Target.USER) {
-            Optional<User> user = uss.get(toParse);
+            final Optional<User> user = uss.get(toParse);
             if (user.isPresent()) {
                 return ImmutableSet.of(user.get());
             }
         }
 
-        Optional<User> op = this.displayNameService.getUser(toParse.toLowerCase());
+        final Optional<User> op = this.displayNameService.getUser(toParse.toLowerCase());
         if (op.isPresent()) {
-            User u = op.get();
+            final User u = op.get();
             if (u.getPlayer().isPresent() && this.playerOnlineService.isOnline(source, u.getPlayer().get())) {
                 return ImmutableSet.of(u.getPlayer().get());
             }
@@ -132,7 +132,7 @@ public class DisplayNameArgument extends CommandElement {
             throw exceptionSupplier.apply("args.user.nouserfuzzy", toParse);
         }
 
-        Set<User> users = new HashSet<>();
+        final Set<User> users = new HashSet<>();
         final String parse = toParse.toLowerCase();
         // fuzzy matching time.
         // players that match
@@ -152,7 +152,7 @@ public class DisplayNameArgument extends CommandElement {
                 .limit(USER_LIMIT)
                 .forEach(users::add);
 
-        List<UUID> uuids = users.stream().map(Identifiable::getUniqueId).collect(Collectors.toList());
+        final List<UUID> uuids = users.stream().map(Identifiable::getUniqueId).collect(Collectors.toList());
         if (this.target == Target.USER) {
             if (PARTIAL_MATCH) {
                 // This may add vanished players, but that's OK because we're showing all users anyway,
@@ -176,8 +176,8 @@ public class DisplayNameArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource source, CommandArgs args, CommandContext context) {
-        List<String> names = new ArrayList<>();
+    public List<String> complete(final CommandSource source, final CommandArgs args, final CommandContext context) {
+        final List<String> names = new ArrayList<>();
         try {
             String toParse = args.peek();
             final boolean playerOnly = toParse.startsWith("p:");
@@ -185,11 +185,11 @@ public class DisplayNameArgument extends CommandElement {
                 toParse = toParse.substring(2);
             }
 
-            String parse = toParse.toLowerCase();
-            final Predicate<Player> shouldShow = determinePredicate(source);
+            final String parse = toParse.toLowerCase();
+            final Predicate<Player> shouldShow = this.determinePredicate(source);
             final Predicate<Player> partial = x -> x.getName().toLowerCase().startsWith(parse);
 
-            UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+            final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
             Sponge.getServer().getOnlinePlayers().stream()
                     .filter(partial.and(shouldShow))
                     .forEach(player -> {
@@ -224,12 +224,12 @@ public class DisplayNameArgument extends CommandElement {
             }
 
             return names;
-        } catch (ArgumentParseException ex) {
+        } catch (final ArgumentParseException ex) {
             return names;
         }
     }
 
-    private Predicate<Player> determinePredicate(CommandSource source) {
+    private Predicate<Player> determinePredicate(final CommandSource source) {
         return p -> this.playerOnlineService.isOnline(source, p);
     }
 

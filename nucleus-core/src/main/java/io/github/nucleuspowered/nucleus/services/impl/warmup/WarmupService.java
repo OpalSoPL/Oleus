@@ -33,25 +33,25 @@ public class WarmupService implements IWarmupService {
     private final BiMap<UUID, WarmupTask> uuidToWarmup = HashBiMap.create();
 
     @Inject
-    public WarmupService(PluginContainer pluginContainer) {
+    public WarmupService(final PluginContainer pluginContainer) {
         this.pluginContainer = pluginContainer;
     }
 
-    @Override public void executeAfter(Player target, Duration duration, WarmupTask runnable) {
-        execute(target, duration, runnable, false);
+    @Override public void executeAfter(final Player target, final Duration duration, final WarmupTask runnable) {
+        this.execute(target, duration, runnable, false);
     }
 
-    @Override public void executeAfterAsync(Player target, Duration duration, WarmupTask runnable) {
-        execute(target, duration, runnable, true);
+    @Override public void executeAfterAsync(final Player target, final Duration duration, final WarmupTask runnable) {
+        this.execute(target, duration, runnable, true);
     }
 
-    private void execute(Player target, Duration duration, WarmupTask runnable, boolean async) {
+    private void execute(final Player target, final Duration duration, final WarmupTask runnable, final boolean async) {
         synchronized (this.lockingObject) {
-            cancelInternal(target);
+            this.cancelInternal(target);
 
             // build the task
             final UUID playerTarget = target.getUniqueId();
-            Consumer<Task> taskToSubmit = task -> {
+            final Consumer<Task> taskToSubmit = task -> {
                 if (Sponge.getServer().getPlayer(playerTarget).isPresent()) {
                     // Only run if the player is still on the server.
                     runnable.run();
@@ -61,30 +61,30 @@ public class WarmupService implements IWarmupService {
                 this.uuidToWarmup.remove(task.getUniqueId());
             };
 
-            Task.Builder builder = Task.builder()
+            final Task.Builder builder = Task.builder()
                     .execute(taskToSubmit)
                     .delay(duration.toMillis(), TimeUnit.MILLISECONDS)
                     .name("Nucleus Warmup task: " + playerTarget.toString());
             if (async) {
                 builder.async();
             }
-            Task t = builder.submit(this.pluginContainer);
+            final Task t = builder.submit(this.pluginContainer);
             this.tasks.put(playerTarget, t.getUniqueId());
             this.uuidToWarmup.put(t.getUniqueId(), runnable);
         }
     }
 
-    @Override public boolean cancel(Player player) {
+    @Override public boolean cancel(final Player player) {
         synchronized (this.lockingObject) {
-            return cancelInternal(player);
+            return this.cancelInternal(player);
         }
     }
 
-    private boolean cancelInternal(Player player) {
-        UUID taskUUID = this.tasks.get(player.getUniqueId());
+    private boolean cancelInternal(final Player player) {
+        final UUID taskUUID = this.tasks.get(player.getUniqueId());
         if (taskUUID != null) {
             Sponge.getScheduler().getTaskById(taskUUID).ifPresent(Task::cancel);
-            WarmupTask task = this.uuidToWarmup.get(taskUUID);
+            final WarmupTask task = this.uuidToWarmup.get(taskUUID);
             if (task != null) {
                 // if we get here, it was never cancelled.
                 task.onCancel();
@@ -96,9 +96,9 @@ public class WarmupService implements IWarmupService {
         return taskUUID != null;
     }
 
-    @Override public boolean awaitingExecution(Player player) {
+    @Override public boolean awaitingExecution(final Player player) {
         synchronized (this.lockingObject) {
-            UUID taskUUID = this.tasks.get(player.getUniqueId());
+            final UUID taskUUID = this.tasks.get(player.getUniqueId());
             if (taskUUID != null) {
                 if (Sponge.getScheduler().getTaskById(taskUUID).isPresent()) {
                     // remove entries

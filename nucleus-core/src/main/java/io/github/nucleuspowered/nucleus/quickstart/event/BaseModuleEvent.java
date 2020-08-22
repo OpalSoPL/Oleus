@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.quickstart.event;
 
-import io.github.nucleuspowered.nucleus.NucleusBootstrap;
+import io.github.nucleuspowered.nucleus.NucleusCore;
 import io.github.nucleuspowered.nucleus.api.core.event.NucleusModuleEvent;
 import io.github.nucleuspowered.nucleus.api.core.exception.ModulesLoadedException;
 import io.github.nucleuspowered.nucleus.api.core.exception.NoModuleException;
@@ -14,23 +14,21 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import uk.co.drnaylor.quickstart.enums.LoadingStatus;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@NonnullByDefault
 public abstract class BaseModuleEvent extends AbstractEvent implements NucleusModuleEvent {
 
-    private final NucleusBootstrap plugin;
+    private final NucleusCore plugin;
     private final Cause cause;
     private final Map<String, ModuleEnableState> state;
 
-    private BaseModuleEvent(NucleusBootstrap plugin) {
+    private BaseModuleEvent(final NucleusCore plugin) {
         this.cause = Sponge.getCauseStackManager().getCurrentCause();
         this.plugin = plugin;
-        this.state = getState();
+        this.state = this.getState();
     }
 
     @Override
@@ -45,10 +43,10 @@ public abstract class BaseModuleEvent extends AbstractEvent implements NucleusMo
 
     Map<String, ModuleEnableState> getState() {
         return this.plugin.getModuleHolder().getModulesWithLoadingState()
-                .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, v -> getFromLoadingStatus(v.getValue())));
+                .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, v -> this.getFromLoadingStatus(v.getValue())));
     }
 
-    private ModuleEnableState getFromLoadingStatus(LoadingStatus status) {
+    private ModuleEnableState getFromLoadingStatus(final LoadingStatus status) {
         if (status == LoadingStatus.DISABLED) {
             return ModuleEnableState.DISABLED;
         } else if (status == LoadingStatus.ENABLED) {
@@ -59,20 +57,20 @@ public abstract class BaseModuleEvent extends AbstractEvent implements NucleusMo
     }
 
     public static class AboutToConstructEvent extends BaseModuleEvent implements NucleusModuleEvent.AboutToConstruct {
-        public AboutToConstructEvent(NucleusBootstrap plugin) {
+        public AboutToConstructEvent(final NucleusCore plugin) {
             super(plugin);
         }
 
         @Override
         public Map<String, ModuleEnableState> getModuleList() {
-            return getState();
+            return this.getState();
         }
 
         @Override
-        public void disableModule(String module, PluginContainer plugin) throws UnremovableModuleException, NoModuleException {
+        public void disableModule(final String module, final PluginContainer plugin) throws UnremovableModuleException, NoModuleException {
             try {
                 Sponge.getServiceManager().provideUnchecked(ModuleRegistrationProxyService.class).removeModule(module, plugin);
-            } catch (ModulesLoadedException e) {
+            } catch (final ModulesLoadedException e) {
                 // This shouldn't happen, as this gets called before the registration
                 // But, just in case...
                 e.printStackTrace();
@@ -82,28 +80,28 @@ public abstract class BaseModuleEvent extends AbstractEvent implements NucleusMo
 
     public static class AboutToEnable extends BaseModuleEvent implements NucleusModuleEvent.AboutToEnable {
 
-        public AboutToEnable(NucleusBootstrap plugin) {
+        public AboutToEnable(final NucleusCore plugin) {
             super(plugin);
         }
     }
 
     public static class Complete extends BaseModuleEvent implements NucleusModuleEvent.Complete {
 
-        public Complete(NucleusBootstrap plugin) {
+        public Complete(final NucleusCore plugin) {
             super(plugin);
         }
     }
 
     public static class PreEnable extends BaseModuleEvent implements NucleusModuleEvent.PreEnable {
 
-        public PreEnable(NucleusBootstrap plugin) {
+        public PreEnable(final NucleusCore plugin) {
             super(plugin);
         }
     }
 
     public static class Enabled extends BaseModuleEvent implements NucleusModuleEvent.Enabled {
 
-        public Enabled(NucleusBootstrap plugin) {
+        public Enabled(final NucleusCore plugin) {
             super(plugin);
         }
     }

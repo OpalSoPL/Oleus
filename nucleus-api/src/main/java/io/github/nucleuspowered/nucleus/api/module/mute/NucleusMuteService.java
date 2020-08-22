@@ -5,13 +5,13 @@
 package io.github.nucleuspowered.nucleus.api.module.mute;
 
 import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 
 import java.time.Duration;
 import java.util.Optional;
-
-import javax.annotation.Nullable;
+import java.util.UUID;
 
 /**
  * Provides methods for managing mutes within Nucleus
@@ -26,38 +26,37 @@ public interface NucleusMuteService {
     String MUTED_CONTEXT = "nucleus_muted";
 
     /**
-     * Gets whether a {@link User} is muted.
+     * Gets whether the player with a given {@link UUID} is muted.
      *
-     * @param user The {@link User} to check.
+     * @param uuid The {@link UUID} of a user to check.
      * @return <code>true</code> if so.
      */
-    boolean isMuted(User user);
+    boolean isMuted(UUID uuid);
 
     /**
      * Gets the {@link Mute} about a player.
      *
-     * @param user The {@link User} to check
+     * @param user The {@link UUID} of a user to check
      * @return The {@link Mute}, if applicable.
      */
-    Optional<Mute> getPlayerMuteInfo(User user);
+    Optional<Mute> getPlayerMuteInfo(UUID user);
 
     /**
-     * Mutes a player.
+     * Mutes a player. The {@link Cause} will be used to determine the
+     * source who muted the target.
      *
-     * @param user The {@link User} to mute.
+     * @param user The {@link UUID} of the player to mute.
      * @param reason The reason to mute them for.
      * @param duration The length of time to mute for, or <code>null</code> for indefinite.
-     * @param cause The {@link Cause} of the mute. The first {@link User} in the cause will be designated as the muter.
      * @return <code>true</code> if the user was muted, <code>false</code> if the user was already muted.
      */
-    boolean mutePlayer(User user, String reason, @Nullable Duration duration, Cause cause);
+    boolean mutePlayer(UUID user, String reason, @Nullable Duration duration);
 
     /**
      * Unmutes a player.
      *
-     * @param user The {@link User} to unmute.
-     * @param cause The {@link Cause}
+     * @param uuid The {@link UUID} of the user to unmute.
      * @return <code>true</code> if the player was unmuted.
      */
-    boolean unmutePlayer(User user, Cause cause);
+    boolean unmutePlayer(UUID uuid);
 }

@@ -13,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class ServicesUtil {
 
-    public static <R> CompletableFuture<R> run(ThrownSupplier<R, Exception> taskConsumer, PluginContainer pluginContainer) {
-        CompletableFuture<R> future = new CompletableFuture<>();
+    public static <R> CompletableFuture<R> run(final ThrownSupplier<R, Exception> taskConsumer, final PluginContainer pluginContainer) {
+        final CompletableFuture<R> future = new CompletableFuture<>();
 
         if (Sponge.getServer().isMainThread()) {
             Task.builder().async().execute(t -> runInternal(future, taskConsumer)).submit(pluginContainer);
@@ -25,10 +25,10 @@ public class ServicesUtil {
         return future;
     }
 
-    private static <R> void runInternal(CompletableFuture<R> future, ThrownSupplier<R, Exception> taskConsumer) {
+    private static <R> void runInternal(final CompletableFuture<R> future, final ThrownSupplier<R, Exception> taskConsumer) {
         try {
             future.complete(taskConsumer.get());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             future.completeExceptionally(e);
         }
     }

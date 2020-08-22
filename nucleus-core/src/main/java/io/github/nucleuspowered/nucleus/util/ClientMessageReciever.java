@@ -8,19 +8,16 @@ import org.slf4j.Logger;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public class ClientMessageReciever implements MessageReceiver {
 
     private final Logger logger;
 
-    public ClientMessageReciever(Logger logger) {
+    public ClientMessageReciever(final Logger logger) {
         this.logger = logger;
     }
 
     @Override
-    public void sendMessage(Text message) {
+    public void sendMessage(final Text message) {
         this.logger.info(message.toPlain());
     }
 
@@ -30,7 +27,7 @@ public class ClientMessageReciever implements MessageReceiver {
     }
 
     @Override
-    public void setMessageChannel(MessageChannel channel) {
+    public void setMessageChannel(final MessageChannel channel) {
         // noop
     }
 }

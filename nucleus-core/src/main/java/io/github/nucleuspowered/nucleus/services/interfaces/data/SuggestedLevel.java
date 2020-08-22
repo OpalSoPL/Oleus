@@ -19,7 +19,7 @@ public enum SuggestedLevel {
     @Nullable private final String permission;
     @Nullable private final String role;
 
-    SuggestedLevel(@Nullable SuggestedLevel level, @Nullable String permission, @Nullable String role) {
+    SuggestedLevel(@Nullable final SuggestedLevel level, @Nullable final String permission, @Nullable final String role) {
         this.level = level;
         this.permission = permission;
         this.role = role;

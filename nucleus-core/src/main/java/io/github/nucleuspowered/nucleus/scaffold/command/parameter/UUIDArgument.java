@@ -31,45 +31,45 @@ public class UUIDArgument<T> extends CommandElement {
     @Nullable private final Function<UUID, Optional<T>> validator;
     private final IMessageProviderService messageProvider;
 
-    public static UUIDArgument<GameProfile> gameProfile(Text key, INucleusServiceCollection serviceCollection) {
+    public static UUIDArgument<GameProfile> gameProfile(final Text key, final INucleusServiceCollection serviceCollection) {
         return new UUIDArgument<>(key, x -> Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll()
                 .stream().filter(y -> y.getUniqueId().equals(x)).findFirst(), serviceCollection);
     }
 
-    public static UUIDArgument<User> user(Text key, INucleusServiceCollection serviceCollection) {
+    public static UUIDArgument<User> user(final Text key, final INucleusServiceCollection serviceCollection) {
         return new UUIDArgument<>(key, x -> Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(x), serviceCollection);
     }
 
-    public static UUIDArgument<Player> player(Text key, INucleusServiceCollection serviceCollection) {
+    public static UUIDArgument<Player> player(final Text key, final INucleusServiceCollection serviceCollection) {
         return new UUIDArgument<>(key, x -> Sponge.getServer().getPlayer(x), serviceCollection);
     }
 
-    public UUIDArgument(@Nullable Text key, @Nullable Function<UUID, Optional<T>> validator, INucleusServiceCollection serviceCollection) {
+    public UUIDArgument(@Nullable final Text key, @Nullable final Function<UUID, Optional<T>> validator, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.validator = validator;
         this.messageProvider = serviceCollection.messageProvider();
     }
 
-    @Nullable @Override protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    @Nullable @Override protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         String a = args.next().toLowerCase();
         try {
             if (!a.contains("-") && a.matches("[0-9a-f]{32}")) {
                 a = String.format("%s-%s-%s-%s-%s", a.substring(0, 8), a.substring(8, 12), a.substring(12, 16), a.substring(16, 20), a.substring(20));
             }
 
-            UUID uuid = UUID.fromString(a);
+            final UUID uuid = UUID.fromString(a);
             if (this.validator != null) {
                 return this.validator.apply(uuid).orElseThrow(() ->
                     args.createError(this.messageProvider.getMessageFor(source, "args.uuid.notvalid.nomatch")));
             }
 
             return uuid;
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             throw args.createError(this.messageProvider.getMessageFor(source, "args.uuid.notvalid.malformed"));
         }
     }
 
-    @Override public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    @Override public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return Lists.newArrayList();
     }
 }

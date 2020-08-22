@@ -7,22 +7,18 @@ package io.github.nucleuspowered.nucleus.api.module.kit.event;
 import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.api.util.CancelMessageEvent;
-import org.spongepowered.api.command.source.ConsoleSource;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.entity.living.humanoid.player.TargetPlayerEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 /**
  * Events that are related about kits.
  */
-@NonnullByDefault
 public interface NucleusKitEvent extends Event {
 
     /**
@@ -30,16 +26,25 @@ public interface NucleusKitEvent extends Event {
      *
      * <ul>
      *     <li>
-     *         <code>Pre</code> is fired before the kit is redeemed, and the contents of the kit may be altered at this stage for this redemption
-     *         only.
+     *         <code>Pre</code> is fired before the kit is redeemed, and the
+     *         contents of the kit may be altered at this stage for this
+     *         redemption only.
      *     </li>
      *     <li>
-     *         <code>Post</code> is fired after a kit is redeemed successfully (defined as a kit would not be redeemable again if it was a one time
-     *         kit).
+     *         <code>Post</code> is fired after a kit is redeemed successfully
+     *         (defined as a kit would not be redeemable again if it was a one
+     *         time kit).
      *     </li>
      * </ul>
      */
-    interface Redeem extends NucleusKitEvent, TargetPlayerEvent {
+    interface Redeem extends NucleusKitEvent {
+
+        /**
+         * Gets the {@link ServerPlayer} that is redeeming a kit.
+         *
+         * @return The {@link ServerPlayer}
+         */
+        ServerPlayer getRedeemingPlayer();
 
         /**
          * Gets the last time the kit was redeemed, if any.
@@ -96,7 +101,8 @@ public interface NucleusKitEvent extends Event {
          * redeemed by the kit, see {@link #getCommandsToExecute()}</p>
          *
          * <p>If {@link #getCommandsToExecute()} ()} is <code>null</code>, this
-         * is what will be executed. Note that these are run by the {@link ConsoleSource}.</p>
+         * is what will be executed. Note that these are run by the
+         * {@link SystemSubject}.</p>
          *
          * <p>The token that represents the player in commands is <code>{{player}}</code></p>
          *
@@ -116,7 +122,7 @@ public interface NucleusKitEvent extends Event {
          *
          * <p>The token that represents the player in commands is <code>{{player}}</code></p>
          *
-         * <p>Note that these are run by the {@link ConsoleSource}.</p>
+         * <p>Note that these are run by the {@link SystemSubject}.</p>
          *
          * @return The commands to run.
          */
@@ -130,14 +136,14 @@ public interface NucleusKitEvent extends Event {
             /**
              * Override the content of the kit for this redemption only.
              *
-             * @param stacksToRedeem the {@link ItemStackSnapshot}s that should be
-             *                       redeemed. Set to null to return to original behaviour
+             * @param stacksToRedeem the {@link ItemStackSnapshot}s that should
+             *  be redeemed. Set to null to return to original behaviour
              */
             void setStacksToRedeem(@Nullable Collection<ItemStackSnapshot> stacksToRedeem);
 
             /**
-             * Override the commands run by this kit for this redemption only. Note that these
-             * are run by the {@link ConsoleSource}.
+             * Override the commands run by this kit for this redemption only.
+             * Note that these are run by the {@link SystemSubject}.
              *
              * @param commandsToExecute the commands that should be redeemed, using
              *                          <code>{{player}}</code> as the player key.
@@ -157,7 +163,8 @@ public interface NucleusKitEvent extends Event {
         interface Failed extends Redeem {
 
             /**
-             * Gets the {@link KitRedeemResult.Status} that will be thrown by the routine.
+             * Gets the {@link KitRedeemResult.Status} that will be thrown by
+             * the routine.
              *
              * @return The reason.
              */

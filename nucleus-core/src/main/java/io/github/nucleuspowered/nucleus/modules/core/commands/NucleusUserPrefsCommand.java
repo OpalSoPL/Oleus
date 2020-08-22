@@ -23,8 +23,6 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +37,6 @@ import javax.annotation.Nullable;
         async = true,
         associatedPermissions = CorePermissions.OTHERS_NUSERPREFS
 )
-@NonnullByDefault
 public class NucleusUserPrefsCommand implements ICommandExecutor<CommandSource> {
 
     private static final Text SEPARATOR = Text.of(": ");

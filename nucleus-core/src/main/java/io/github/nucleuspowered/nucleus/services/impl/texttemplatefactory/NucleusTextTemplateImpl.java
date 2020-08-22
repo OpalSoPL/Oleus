@@ -30,8 +30,6 @@ import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayDeque;
@@ -45,7 +43,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
     @Nullable private final Text prefix;
@@ -62,14 +59,14 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
                             + "(?<specialCmd>(\\[(?<sMsg>.+?)](?<optionsscmd>\\{[a-z]+})?\\((?<sCmd>/.+?)\\))))",
                     Pattern.CASE_INSENSITIVE);
 
-    public NucleusTextTemplateImpl(String representation,
-            @Nullable Text prefix,
-            @Nullable Text suffix,
-            INucleusServiceCollection serviceCollection
+    public NucleusTextTemplateImpl(final String representation,
+            @Nullable final Text prefix,
+            @Nullable final Text suffix,
+            final INucleusServiceCollection serviceCollection
     ) {
         this.serviceCollection = serviceCollection;
         this.representation = representation;
-        Tuple<TextTemplate, Map<String, Function<CommandSource, Text>>> t = parse(representation);
+        final Tuple<TextTemplate, Map<String, Function<CommandSource, Text>>> t = this.parse(representation);
         this.textTemplate = t.getFirst();
 
         this.tokenMap.putAll(t.getSecond());
@@ -77,7 +74,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
         this.suffix = suffix;
     }
 
-    public NucleusTextTemplateImpl(String representation, INucleusServiceCollection serviceCollection) {
+    public NucleusTextTemplateImpl(final String representation, final INucleusServiceCollection serviceCollection) {
         this(representation, null, null, serviceCollection);
     }
 
@@ -108,31 +105,31 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
     }
 
     @Override
-    public Text getForCommandSource(CommandSource source) {
-        return getForCommandSource(source, ImmutableMap.of());
+    public Text getForCommandSource(final CommandSource source) {
+        return this.getForCommandSource(source, ImmutableMap.of());
     }
 
     @Override
-    public Text getForCommandSource(CommandSource source, CommandSource sender) {
-        Optional<Text> s =
+    public Text getForSource(final CommandSource source, final CommandSource sender) {
+        final Optional<Text> s =
                 Optional.of(this.serviceCollection.placeholderService().parse(sender, "displayname").toText());
-        return getForCommandSource(source,
+        return this.getForCommandSource(source,
                 ImmutableMap.<String, Function<CommandSource, Optional<Text>>>builder()
                         .put("sender", se -> s)
                         .build());
     }
 
     @Override @SuppressWarnings("SameParameterValue")
-    public Text getForCommandSource(CommandSource source,
-            @Nullable Map<String, Function<CommandSource, Optional<Text>>> tokensArray) {
+    public Text getForCommandSource(final CommandSource source,
+            @Nullable final Map<String, Function<CommandSource, Optional<Text>>> tokensArray) {
 
-        Map<String, TextTemplate.Arg> tokens = this.textTemplate.getArguments();
-        Map<String, TextRepresentable> finalArgs = Maps.newHashMap();
+        final Map<String, TextTemplate.Arg> tokens = this.textTemplate.getArguments();
+        final Map<String, TextRepresentable> finalArgs = Maps.newHashMap();
 
         tokens.forEach((k, v) -> {
-            String key = k.toLowerCase();
+            final String key = k.toLowerCase();
 
-            TextRepresentable t;
+            final TextRepresentable t;
             if (this.tokenMap.containsKey(key)) {
                 t = this.tokenMap.get(key).apply(source);
             } else if (tokensArray != null && tokensArray.containsKey(key)) {
@@ -146,14 +143,14 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             }
         });
 
-        Text.Builder builder = Text.builder();
+        final Text.Builder builder = Text.builder();
         ITextStyleService.TextFormat st = null;
         if (this.prefix != null) {
             builder.append(this.prefix);
             st = this.serviceCollection.textStyleService().getLastColourAndStyle(this.prefix, null);
         }
 
-        Text finalText = this.textTemplate.apply(finalArgs).build();
+        final Text finalText = this.textTemplate.apply(finalArgs).build();
 
         // Don't append text if there is no text to append!
         if (!finalText.isEmpty()) {
@@ -175,25 +172,25 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
         return this.textTemplate.toText();
     }
 
-    Tuples.NullableTuple<List<TextRepresentable>, Map<String, Function<CommandSource, Text>>> createTextTemplateFragmentWithLinks(String message) {
+    Tuples.NullableTuple<List<TextRepresentable>, Map<String, Function<CommandSource, Text>>> createTextTemplateFragmentWithLinks(final String message) {
         Preconditions.checkNotNull(message, "message");
         if (message.isEmpty()) {
             return new Tuples.NullableTuple<>(Lists.newArrayList(Text.EMPTY), null);
         }
 
-        Matcher m = this.enhancedUrlParser.matcher(message);
-        ITextStyleService textStyleService = this.serviceCollection.textStyleService();
+        final Matcher m = this.enhancedUrlParser.matcher(message);
+        final ITextStyleService textStyleService = this.serviceCollection.textStyleService();
         if (!m.find()) {
             return new Tuples.NullableTuple<>(Lists.newArrayList(textStyleService.oldLegacy(message)), null);
         }
 
-        Map<String, Function<CommandSource, Text>> args = Maps.newHashMap();
-        List<TextRepresentable> texts = Lists.newArrayList();
+        final Map<String, Function<CommandSource, Text>> args = Maps.newHashMap();
+        final List<TextRepresentable> texts = Lists.newArrayList();
         String remaining = message;
         ITextStyleService.TextFormat st = ITextStyleService.EMPTY;
         do {
             // We found a URL. We split on the URL that we have.
-            String[] textArray = remaining.split(this.enhancedUrlParser.pattern(), 2);
+            final String[] textArray = remaining.split(this.enhancedUrlParser.pattern(), 2);
             TextRepresentable first = Text.builder().color(st.colour()).style(st.style())
                     .append(textStyleService.oldLegacy(textArray[0])).build();
 
@@ -208,7 +205,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             }
 
             // Get the last colour & styles
-            String colourMatch = m.group("colour");
+            final String colourMatch = m.group("colour");
             if (colourMatch != null && !colourMatch.isEmpty()) {
 
                 // If there is a reset, explicitly do it.
@@ -223,37 +220,37 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             st = textStyleService.getLastColourAndStyle(first, st);
 
             // Build the URL
-            String whiteSpace = m.group("first");
+            final String whiteSpace = m.group("first");
             if (m.group("url") != null) {
-                String url = m.group("url");
-                texts.add(getTextForUrl(url, url, whiteSpace, st, m.group("options")));
+                final String url = m.group("url");
+                texts.add(this.getTextForUrl(url, url, whiteSpace, st, m.group("options")));
             } else if (m.group("specialUrl") != null) {
-                String url = m.group("sUrl");
-                String msg = m.group("msg");
-                texts.add(getTextForUrl(url, msg, whiteSpace, st, m.group("optionssurl")));
+                final String url = m.group("sUrl");
+                final String msg = m.group("msg");
+                texts.add(this.getTextForUrl(url, msg, whiteSpace, st, m.group("optionssurl")));
             } else {
                 // Must be commands.
-                String cmd = m.group("sCmd");
-                String msg = m.group("sMsg");
-                String optionList = m.group("optionsscmd");
+                final String cmd = m.group("sCmd");
+                final String msg = m.group("sMsg");
+                final String optionList = m.group("optionsscmd");
 
                 if (cmd.contains("{{subject}}")) {
-                    String arg = UUID.randomUUID().toString();
+                    final String arg = UUID.randomUUID().toString();
                     args.put(arg, cs -> {
-                        String command = cmd.replace("{{subject}}", cs.getName());
-                        return getCmd(msg, command, optionList, whiteSpace);
+                        final String command = cmd.replace("{{subject}}", cs.getName());
+                        return this.getCmd(msg, command, optionList, whiteSpace);
                     });
 
                     texts.add(TextTemplate.arg(arg).color(st.colour()).style(st.style()).build());
                 } else {
-                    texts.add(Text.of(st.colour(), st.style(), getCmd(msg, cmd, optionList, whiteSpace)));
+                    texts.add(Text.of(st.colour(), st.style(), this.getCmd(msg, cmd, optionList, whiteSpace)));
                 }
             }
         } while (remaining != null && m.find());
 
         // Add the last bit.
         if (remaining != null) {
-            Text.Builder tb = Text.builder().color(st.colour()).style(st.style()).append(TextSerializers.FORMATTING_CODE.deserialize(remaining));
+            final Text.Builder tb = Text.builder().color(st.colour()).style(st.style()).append(TextSerializers.FORMATTING_CODE.deserialize(remaining));
             if (remaining.matches("^\\s+&r.*")) {
                 tb.style(TextStyles.RESET);
             }
@@ -265,10 +262,10 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
         return new Tuples.NullableTuple<>(texts, args);
     }
 
-    private Text getCmd(String msg, String cmd, @org.checkerframework.checker.nullness.qual.Nullable String optionList, String whiteSpace) {
-        Text.Builder textBuilder = Text.builder(msg)
+    private Text getCmd(final String msg, final String cmd, @org.checkerframework.checker.nullness.qual.Nullable final String optionList, final String whiteSpace) {
+        final Text.Builder textBuilder = Text.builder(msg)
                 .onClick(TextActions.runCommand(cmd))
-                .onHover(setupHoverOnCmd(cmd, optionList));
+                .onHover(this.setupHoverOnCmd(cmd, optionList));
         if (optionList != null && optionList.contains("s")) {
             textBuilder.onClick(TextActions.suggestCommand(cmd));
         }
@@ -282,7 +279,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
     }
 
     @Nullable
-    private HoverAction<?> setupHoverOnCmd(String cmd, @Nullable String optionList) {
+    private HoverAction<?> setupHoverOnCmd(final String cmd, @Nullable final String optionList) {
         if (optionList != null) {
             if (optionList.contains("h")) {
                 return null;
@@ -296,19 +293,20 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
         return TextActions.showText(this.serviceCollection.messageProvider().getMessage("chat.command.click", cmd));
     }
 
-    private Text getTextForUrl(String url, String msg, String whiteSpace, ITextStyleService.TextFormat st, @Nullable String optionString) {
-        String toParse = TextSerializers.FORMATTING_CODE.stripCodes(url);
-        IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
+    private Text getTextForUrl(
+            final String url, final String msg, final String whiteSpace, final ITextStyleService.TextFormat st, @Nullable final String optionString) {
+        final String toParse = TextSerializers.FORMATTING_CODE.stripCodes(url);
+        final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
 
         try {
-            URL urlObj;
+            final URL urlObj;
             if (!toParse.startsWith("http://") && !toParse.startsWith("https://")) {
                 urlObj = new URL("http://" + toParse);
             } else {
                 urlObj = new URL(toParse);
             }
 
-            Text.Builder textBuilder = Text.builder(msg).color(st.colour()).style(st.style()).onClick(TextActions.openUrl(urlObj));
+            final Text.Builder textBuilder = Text.builder(msg).color(st.colour()).style(st.style()).onClick(TextActions.openUrl(urlObj));
             if (optionString == null || !optionString.contains("h")) {
                 textBuilder.onHover(TextActions.showText(messageProviderService.getMessage("chat.url.click", url)));
             }
@@ -318,12 +316,12 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             }
 
             return textBuilder.build();
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             // URL parsing failed, just put the original text in here.
             this.serviceCollection.logger().warn(messageProviderService.getMessageString("chat.url.malformed", url));
             e.printStackTrace();
             
-            Text ret = Text.builder(url).color(st.colour()).style(st.style()).build();
+            final Text ret = Text.builder(url).color(st.colour()).style(st.style()).build();
             if (!whiteSpace.isEmpty()) {
                 return Text.builder(whiteSpace).append(ret).build();
             }
@@ -341,20 +339,20 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             Pattern.compile("(?<url>\\[[^\\[]+]\\(/[^)]*?)?(?<match>\\{\\{(?!subject)(?<name>[^\\s{}]+)}})"
                     + "(?<urltwo>[^(]*?\\))?");
 
-        Ampersand(String representation, INucleusServiceCollection serviceCollection) {
+        Ampersand(final String representation, final INucleusServiceCollection serviceCollection) {
             super(representation, serviceCollection);
         }
 
-        Ampersand(String representation, @Nullable Text prefix, @Nullable Text suffix, INucleusServiceCollection serviceCollection) {
+        Ampersand(final String representation, @Nullable final Text prefix, @Nullable final Text suffix, final INucleusServiceCollection serviceCollection) {
             super(representation, prefix, suffix, serviceCollection);
         }
 
         @Override Tuple<TextTemplate, Map<String, Function<CommandSource, Text>>> parse(final String string) {
             // regex!
-            Matcher mat = pattern.matcher(string);
-            List<String> map = Lists.newArrayList();
+            final Matcher mat = pattern.matcher(string);
+            final List<String> map = Lists.newArrayList();
 
-            List<String> s = Lists.newArrayList(pattern.split(string));
+            final List<String> s = Lists.newArrayList(pattern.split(string));
             int index = 0;
 
             while (mat.find()) {
@@ -391,17 +389,17 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             }
 
             // Generic hell.
-            ArrayDeque<TextRepresentable> texts = new ArrayDeque<>();
-            Map<String, Function<CommandSource, Text>> tokens = Maps.newHashMap();
+            final ArrayDeque<TextRepresentable> texts = new ArrayDeque<>();
+            final Map<String, Function<CommandSource, Text>> tokens = Maps.newHashMap();
 
             // This condition only occurs if you _just_ use the token. Otherwise, you get a part either side - so it's either 0 or 2.
             if (s.size() > 0) {
-                createTextTemplateFragmentWithLinks(s.get(0)).mapIfPresent(texts::addAll, tokens::putAll);
+                this.createTextTemplateFragmentWithLinks(s.get(0)).mapIfPresent(texts::addAll, tokens::putAll);
             }
 
             for (int i = 0; i < map.size(); i++) {
-                TextTemplate.Arg.Builder arg = TextTemplate.arg(map.get(i)).optional();
-                TextRepresentable r = texts.peekLast();
+                final TextTemplate.Arg.Builder arg = TextTemplate.arg(map.get(i)).optional();
+                final TextRepresentable r = texts.peekLast();
                 ITextStyleService.TextFormat style = null;
                 if (r != null) {
                     // Create the argument
@@ -411,13 +409,13 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
                 texts.add(arg.build());
                 if (s.size() > i + 1) {
-                    Tuples.NullableTuple<List<TextRepresentable>, Map<String, Function<CommandSource, Text>>> tt =
-                        createTextTemplateFragmentWithLinks(s.get(i + 1));
+                    final Tuples.NullableTuple<List<TextRepresentable>, Map<String, Function<CommandSource, Text>>> tt =
+                            this.createTextTemplateFragmentWithLinks(s.get(i + 1));
                     if (style != null && tt.getFirst().isPresent()) {
                         texts.push(style.textOf());
                     }
 
-                    createTextTemplateFragmentWithLinks(s.get(i + 1)).mapIfPresent(texts::addAll, tokens::putAll);
+                    this.createTextTemplateFragmentWithLinks(s.get(i + 1)).mapIfPresent(texts::addAll, tokens::putAll);
                 }
             }
 
@@ -437,20 +435,20 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             return textTemplateTypeSerializer;
         }
 
-        Json(String representation, @Nullable Text prefix, @Nullable Text suffix, INucleusServiceCollection serviceCollection) {
+        Json(final String representation, @Nullable final Text prefix, @Nullable final Text suffix, final INucleusServiceCollection serviceCollection) {
             super(representation, prefix, suffix, serviceCollection);
         }
 
-        Json(String representation, INucleusServiceCollection serviceCollection) {
+        Json(final String representation, final INucleusServiceCollection serviceCollection) {
             super(representation, serviceCollection);
         }
 
-        Json(TextTemplate textTemplate, INucleusServiceCollection serviceCollection) {
+        Json(final TextTemplate textTemplate, final INucleusServiceCollection serviceCollection) {
             super(JsonConfigurateStringHelper.getJsonStringFrom(textTemplate), serviceCollection);
         }
 
         @Override
-        Tuple<TextTemplate, Map<String, Function<CommandSource, Text>>> parse(String parser) {
+        Tuple<TextTemplate, Map<String, Function<CommandSource, Text>>> parse(final String parser) {
             try {
                 return Tuple.of(
                         getSerialiser().deserialize(
@@ -458,7 +456,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
                                 JsonConfigurateStringHelper.getNodeFromJson(parser)
                                         .orElseGet(() -> SimpleConfigurationNode.root().setValue(parser))),
                         Maps.newHashMap());
-            } catch (ObjectMappingException e) {
+            } catch (final ObjectMappingException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -468,12 +466,12 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
         public static NucleusTextTemplateImpl INSTANCE;
 
-        Empty(INucleusServiceCollection serviceCollection) {
+        Empty(final INucleusServiceCollection serviceCollection) {
             super("", serviceCollection);
             INSTANCE = this;
         }
 
-        @Override Tuple<TextTemplate, Map<String, Function<CommandSource, Text>>> parse(String parser) {
+        @Override Tuple<TextTemplate, Map<String, Function<CommandSource, Text>>> parse(final String parser) {
             return Tuple.of(TextTemplate.EMPTY, Maps.newHashMap());
         }
 

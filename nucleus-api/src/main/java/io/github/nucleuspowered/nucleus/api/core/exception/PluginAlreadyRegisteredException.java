@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.core.exception;
 
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 public class PluginAlreadyRegisteredException extends Exception {
 

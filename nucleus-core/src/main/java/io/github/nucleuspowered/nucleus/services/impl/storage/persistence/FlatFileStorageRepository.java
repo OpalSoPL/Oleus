@@ -48,23 +48,23 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
 
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    protected FlatFileStorageRepository(Logger logger) {
+    protected FlatFileStorageRepository(final Logger logger) {
         this.logger = logger;
     }
 
-    Optional<JsonObject> get(@Nullable Path path) throws DataLoadException {
+    Optional<JsonObject> get(@Nullable final Path path) throws DataLoadException {
         if (path != null) {
             try {
                 if (Files.size(path) == 0) {
                     return Optional.empty(); // nothing in the file, don't do anything with it.
                 }
                 // Read the file.
-                try (BufferedReader reader = Files.newBufferedReader(path)) {
+                try (final BufferedReader reader = Files.newBufferedReader(path)) {
                     return Optional.of(new JsonParser()
                             .parse(reader.lines().collect(Collectors.joining()))
                             .getAsJsonObject());
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 throw new DataLoadException("Could not load file at " + path.toAbsolutePath().toString(), e);
             }
         }
@@ -72,7 +72,7 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         return Optional.empty();
     }
 
-    void save(Path file, JsonObject object) throws DataSaveException {
+    void save(final Path file, final JsonObject object) throws DataSaveException {
         try {
             // Backup the file
             if (Files.exists(file)) {
@@ -81,10 +81,10 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
 
             // Write the new file
             Files.createDirectories(file.getParent());
-            try (BufferedWriter writer = Files.newBufferedWriter(file, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            try (final BufferedWriter writer = Files.newBufferedWriter(file, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
                 writer.write(gson.toJson(object));
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             this.logger.error("Could not save " + file.toString());
             ex.printStackTrace();
             throw new DataSaveException("Could not save " + file.toString(), ex);
@@ -108,7 +108,7 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
 
         private final Supplier<Path> FILENAME_RESOLVER;
 
-        Single(Logger logger, Supplier<Path> filename_resolver) {
+        Single(final Logger logger, final Supplier<Path> filename_resolver) {
             super(logger);
             this.FILENAME_RESOLVER = filename_resolver;
         }
@@ -116,15 +116,15 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         @Override
         public Optional<JsonObject> get() throws DataLoadException {
             if (Files.exists(FILENAME_RESOLVER.get())) {
-                return get(FILENAME_RESOLVER.get());
+                return this.get(FILENAME_RESOLVER.get());
             }
 
             return Optional.empty();
         }
 
         @Override
-        public void save(JsonObject object) throws DataSaveException {
-            save(FILENAME_RESOLVER.get(), object);
+        public void save(final JsonObject object) throws DataSaveException {
+            this.save(FILENAME_RESOLVER.get(), object);
         }
 
     }
@@ -138,10 +138,10 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         private final Function<UUID, Path> UUID_FILENAME_RESOLVER;
 
         UUIDKeyed(
-                Logger logger,
-                ThrownFunction<Q, Path, DataQueryException> filename_resolver,
-                Function<UUID, Path> uuid_filename_resolver,
-                Supplier<Path> basePath) {
+                final Logger logger,
+                final ThrownFunction<Q, Path, DataQueryException> filename_resolver,
+                final Function<UUID, Path> uuid_filename_resolver,
+                final Supplier<Path> basePath) {
             super(logger);
             this.FILENAME_RESOLVER = filename_resolver;
             this.UUID_FILENAME_RESOLVER = uuid_filename_resolver;
@@ -149,74 +149,74 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         }
 
         @Override
-        public boolean exists(Q query) {
+        public boolean exists(final Q query) {
             try {
-                return existsInternal(query) != null;
-            } catch (DataQueryException e) {
+                return this.existsInternal(query) != null;
+            } catch (final DataQueryException e) {
                 e.printStackTrace();
                 return false;
             }
         }
 
         @Override
-        public Optional<KeyedObject<UUID, JsonObject>> get(Q query) throws DataLoadException {
-            Path path;
+        public Optional<KeyedObject<UUID, JsonObject>> get(final Q query) throws DataLoadException {
+            final Path path;
             try {
-                path = existsInternal(query);
-            } catch (Exception e) {
+                path = this.existsInternal(query);
+            } catch (final Exception e) {
                 throw new DataLoadException("Query not valid", e);
             }
 
-            return get(path).map(x -> new KeyedObject<>(query.keys().iterator().next(), x));
+            return this.get(path).map(x -> new KeyedObject<>(query.keys().iterator().next(), x));
         }
 
         @Override
-        public boolean exists(UUID uuid) {
-            return existsInternal(uuid) != null;
+        public boolean exists(final UUID uuid) {
+            return this.existsInternal(uuid) != null;
         }
 
         @Override
-        public Optional<JsonObject> get(UUID uuid) throws DataLoadException {
-            return get(existsInternal(uuid));
+        public Optional<JsonObject> get(final UUID uuid) throws DataLoadException {
+            return this.get(this.existsInternal(uuid));
         }
 
         @Override
         public Collection<UUID> getAllKeys() throws DataLoadException {
-            return ImmutableSet.copyOf(getAllKeysInternal());
+            return ImmutableSet.copyOf(this.getAllKeysInternal());
         }
 
         @Override
-        public Map<UUID, JsonObject> getAll(Q query) throws DataLoadException, DataQueryException {
-            ImmutableMap.Builder<UUID, JsonObject> j = ImmutableMap.builder();
-            for (UUID key : getAllKeys(query)) {
-                j.put(key, get(key).get()); // should be there
+        public Map<UUID, JsonObject> getAll(final Q query) throws DataLoadException, DataQueryException {
+            final ImmutableMap.Builder<UUID, JsonObject> j = ImmutableMap.builder();
+            for (final UUID key : this.getAllKeys(query)) {
+                j.put(key, this.get(key).get()); // should be there
             }
 
             return j.build();
         }
 
         @Override
-        public Collection<UUID> getAllKeys(Q query) throws DataLoadException, DataQueryException {
+        public Collection<UUID> getAllKeys(final Q query) throws DataLoadException, DataQueryException {
             if (query.restrictedToKeys()) {
-                getAllKeysInternal().retainAll(query.keys());
+                this.getAllKeysInternal().retainAll(query.keys());
             }
 
             throw new DataQueryException("There must only a key", query);
         }
 
         private Set<UUID> getAllKeysInternal() throws DataLoadException {
-            UUIDFileWalker u = new UUIDFileWalker();
+            final UUIDFileWalker u = new UUIDFileWalker();
             try {
                 Files.walkFileTree(BASE_PATH.get(), u);
                 return u.uuidSet;
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new DataLoadException("Could not walk the file tree", e);
             }
         }
 
         @Nullable
-        private Path existsInternal(UUID uuid) {
-            Path path = UUID_FILENAME_RESOLVER.apply(uuid);
+        private Path existsInternal(final UUID uuid) {
+            final Path path = UUID_FILENAME_RESOLVER.apply(uuid);
             if (Files.exists(UUID_FILENAME_RESOLVER.apply(uuid))) {
                 return path;
             }
@@ -226,30 +226,30 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
 
 
         @Override
-        public int count(Q query) {
-            return exists(query) ? 1 : 0;
+        public int count(final Q query) {
+            return this.exists(query) ? 1 : 0;
         }
 
         @Override
-        public void save(UUID key, JsonObject object) throws DataSaveException {
-            Path file = UUID_FILENAME_RESOLVER.apply(key);
-            save(file, object);
+        public void save(final UUID key, final JsonObject object) throws DataSaveException {
+            final Path file = UUID_FILENAME_RESOLVER.apply(key);
+            this.save(file, object);
         }
 
         @Override
-        public void delete(UUID key) throws DataDeleteException {
-            Path filename = UUID_FILENAME_RESOLVER.apply(key);
+        public void delete(final UUID key) throws DataDeleteException {
+            final Path filename = UUID_FILENAME_RESOLVER.apply(key);
 
             try {
                 Files.delete(filename);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new DataDeleteException("Could not delete " + filename, e);
             }
         }
 
         @Nullable
-        private Path existsInternal(Q query) throws DataQueryException {
-            Path path = FILENAME_RESOLVER.apply(query);
+        private Path existsInternal(final Q query) throws DataQueryException {
+            final Path path = FILENAME_RESOLVER.apply(query);
             if (Files.exists(FILENAME_RESOLVER.apply(query))) {
                 return path;
             }
@@ -262,7 +262,7 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
             private final Set<UUID> uuidSet = new HashSet<>();
 
             @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
                 if (dir.getFileName().toString().length() == 2) {
                     return super.preVisitDirectory(dir, attrs);
                 }
@@ -273,14 +273,14 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
             // Print information about
             // each type of file.
             @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attr) {
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attr) {
                 if (attr.isRegularFile()) {
                     if (file.endsWith(".json")) {
-                        String f = file.getFileName().toString();
+                        final String f = file.getFileName().toString();
                         if (f.length() == 41 && f.startsWith(file.getParent().toString().toLowerCase())) {
                             try {
                                 this.uuidSet.add(UUID.fromString(f.substring(0, 36)));
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 // ignored
                             }
                         }

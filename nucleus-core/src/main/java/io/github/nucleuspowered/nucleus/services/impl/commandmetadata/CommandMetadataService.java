@@ -73,11 +73,11 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     private List<String> registeredAliases = new ArrayList<>();
 
     @Inject
-    public CommandMetadataService(@ConfigDirectory Path configDirectory,
-            IReloadableService reloadableService,
-            IMessageProviderService messageProviderService,
-            IConfigurateHelper helper,
-            PluginContainer pluginContainer) {
+    public CommandMetadataService(@ConfigDirectory final Path configDirectory,
+            final IReloadableService reloadableService,
+            final IMessageProviderService messageProviderService,
+            final IConfigurateHelper helper,
+            final PluginContainer pluginContainer) {
         reloadableService.registerReloadable(this);
         this.configurateHelper = helper;
         this.messageProviderService = messageProviderService;
@@ -85,25 +85,25 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         this.pluginContainer = pluginContainer;
     }
 
-    private String getKey(Command command) {
-        return getKey(new LinkedHashSet<>(), new StringBuilder(), command).toString().toLowerCase();
+    private String getKey(final Command command) {
+        return this.getKey(new LinkedHashSet<>(), new StringBuilder(), command).toString().toLowerCase();
     }
 
     private StringBuilder getKey(
-            LinkedHashSet<Class<? extends ICommandExecutor>> traversed,
-            StringBuilder stringBuilder,
-            Command command) {
+            final LinkedHashSet<Class<? extends ICommandExecutor>> traversed,
+            final StringBuilder stringBuilder,
+            final Command command) {
         if (command.parentCommand() != ICommandExecutor.class) {
             if (!traversed.add(command.parentCommand())) {
-                List<String> elements = new ArrayList<>();
-                for (Class<?> c : traversed) {
+                final List<String> elements = new ArrayList<>();
+                for (final Class<?> c : traversed) {
                     elements.add(c.getName());
                 }
                 throw new IllegalStateException("Circularity detected: " + System.lineSeparator() +
                         String.join(System.lineSeparator(), elements));
             }
 
-            getKey(traversed, stringBuilder, command.parentCommand().getAnnotation(Command.class)).append(".");
+            this.getKey(traversed, stringBuilder, command.parentCommand().getAnnotation(Command.class)).append(".");
         }
 
         return stringBuilder.append(command.aliases()[0]);
@@ -111,13 +111,13 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
     @Override
     public void registerCommand(
-            String id,
-            String name,
-            Command command,
-            Class<? extends ICommandExecutor<?>> associatedContext
+            final String id,
+            final String name,
+            final Command command,
+            final Class<? extends ICommandExecutor<?>> associatedContext
     ) {
         Preconditions.checkState(!this.registrationComplete, "Registration has completed.");
-        String key = getKey(command);
+        final String key = this.getKey(command);
         this.commandMetadataMap.put(key, new CommandMetadata(
                 id,
                 name,
@@ -142,31 +142,31 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     public void completeRegistrationPhase(final INucleusServiceCollection serviceCollection) {
         Preconditions.checkState(!this.registrationComplete, "Registration has completed.");
         this.registrationComplete = true;
-        load();
+        this.load();
 
-        Map<Class<? extends ICommandExecutor<?>>, String> metadataStringMap = this.commandMetadataMap.entrySet()
+        final Map<Class<? extends ICommandExecutor<?>>, String> metadataStringMap = this.commandMetadataMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         entry -> entry.getValue().getExecutor(),
                         Map.Entry::getKey
                 ));
 
-        Map<CommandMetadata, CommandControl> commands = new HashMap<>();
+        final Map<CommandMetadata, CommandControl> commands = new HashMap<>();
         // this.commandMetadataMap.values().forEach(metadata -> execToMeta.put(metadata.getExecutor(), metadata));
 
-        Map<Class<? extends ICommandExecutor>, Map<String, CommandMetadata>> toRegister = new HashMap<>();
+        final Map<Class<? extends ICommandExecutor>, Map<String, CommandMetadata>> toRegister = new HashMap<>();
         toRegister.put(ICommandExecutor.class, new HashMap<>());
 
         // We need aliases out
-        mergeAliases();
+        this.mergeAliases();
 
-        for (CommandMetadata metadata : this.commandMetadataMap.values()) {
+        for (final CommandMetadata metadata : this.commandMetadataMap.values()) {
             // Only do this if it's enabled.
-            CommentedConfigurationNode commandNode = this.commandsConfConfigNode.getNode(metadata.getCommandKey());
+            final CommentedConfigurationNode commandNode = this.commandsConfConfigNode.getNode(metadata.getCommandKey());
             if (commandNode.getNode(ENABLED).getBoolean(false)) {
                 // Get the aliases
                 try {
-                    Map<String, Boolean> m = commandNode
+                    final Map<String, Boolean> m = commandNode
                             .getNode(ROOT_ALIASES)
                             .getValue(MAP_TYPE_TOKEN);
                     if (m != null) {
@@ -178,14 +178,14 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
                                         metadata.getCommandAnnotation().parentCommand(), y -> new HashMap<>())
                                             .put(x, metadata));
                     }
-                } catch (ObjectMappingException e) {
+                } catch (final ObjectMappingException e) {
                     e.printStackTrace();
                 }
 
                 if (!metadata.isRoot()) {
-                    String prefix =
+                    final String prefix =
                             metadataStringMap.get(metadata.getCommandAnnotation().parentCommand()).replace(".", " ");
-                    for (String x : metadata.getAtLevelAliases()) {
+                    for (final String x : metadata.getAtLevelAliases()) {
                         toRegister.computeIfAbsent(
                                 metadata.getCommandAnnotation().parentCommand(),
                                 y -> new HashMap<>()).put(prefix + " " + x, metadata);
@@ -195,9 +195,9 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         }
 
         // Now for mappings
-        Set<String> toRemove = new HashSet<>();
-        for (Map.Entry<String, String> entry : this.commandremap.entrySet()) {
-            CommentedConfigurationNode node = this.commandsConfConfigNode.getNode(entry.getKey()).getNode("enabled");
+        final Set<String> toRemove = new HashSet<>();
+        for (final Map.Entry<String, String> entry : this.commandremap.entrySet()) {
+            final CommentedConfigurationNode node = this.commandsConfConfigNode.getNode(entry.getKey()).getNode("enabled");
             if (node.isVirtual()) {
                 node.setValue(true).setComment(serviceCollection.messageProvider().getMessageString("config.enabled"));
             } else if (!node.getBoolean(true)) {
@@ -210,38 +210,38 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         // save();
 
         // use aliases to register commands.
-        register(toRegister, commands, ICommandExecutor.class, null, serviceCollection);
+        this.register(toRegister, commands, ICommandExecutor.class, null, serviceCollection);
 
         // Okay, now we've created our commands, time to update command conf with the modifiers.
-        mergeModifierDefaults();
-        save();
+        this.mergeModifierDefaults();
+        this.save();
 
         // Now set the data.
-        setupData();
+        this.setupData();
     }
 
     private <T extends ICommandExecutor> void register(
-            Map<Class<? extends ICommandExecutor>, Map<String, CommandMetadata>> toStart,
-            Map<CommandMetadata, CommandControl> commands,
-            Class<T> keyToCheck,
-            @Nullable CommandControl parentControl,
-            INucleusServiceCollection collection) {
+            final Map<Class<? extends ICommandExecutor>, Map<String, CommandMetadata>> toStart,
+            final Map<CommandMetadata, CommandControl> commands,
+            final Class<T> keyToCheck,
+            @Nullable final CommandControl parentControl,
+            final INucleusServiceCollection collection) {
 
-        for (Map.Entry<String, CommandMetadata> entry : toStart.get(keyToCheck).entrySet()) {
-            CommandControl control = commands.computeIfAbsent(entry.getValue(), mm -> construct(parentControl, mm, collection));
+        for (final Map.Entry<String, CommandMetadata> entry : toStart.get(keyToCheck).entrySet()) {
+            final CommandControl control = commands.computeIfAbsent(entry.getValue(), mm -> this.construct(parentControl, mm, collection));
             this.controlToExecutorClass.putIfAbsent(entry.getValue().getExecutor(), control);
-            Class<? extends ICommandExecutor> currentKey = entry.getValue().getExecutor();
-            boolean hasKey = toStart.containsKey(currentKey);
+            final Class<? extends ICommandExecutor> currentKey = entry.getValue().getExecutor();
+            final boolean hasKey = toStart.containsKey(currentKey);
             if (hasKey) {
                 // register entries with this executor.
-                register(toStart, commands, entry.getValue().getExecutor(), control, collection);
+                this.register(toStart, commands, entry.getValue().getExecutor(), control, collection);
             }
 
             // actual parent
             if (parentControl == null || !entry.getKey().contains(" ")) {
                 this.controlToAliases.computeIfAbsent(control, c -> new ArrayList<>()).add(entry.getKey());
             } else {
-                String key = entry.getKey().substring(entry.getKey().lastIndexOf(" ") + 1);
+                final String key = entry.getKey().substring(entry.getKey().lastIndexOf(" ") + 1);
                 parentControl.attach(key, control);
             }
 
@@ -249,12 +249,12 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
         // Now we register all root commands as necessary.
         if (parentControl == null) {
-            for (Map.Entry<CommandControl, List<String>> aliases : this.controlToAliases.entrySet()) {
+            for (final Map.Entry<CommandControl, List<String>> aliases : this.controlToAliases.entrySet()) {
                 // Ensure that the first entry in the list is the one specified first
-                CommandControl control = aliases.getKey();
-                List<String> orderedAliases = new ArrayList<>();
-                List<String> aliasesToAdd = new ArrayList<>(aliases.getValue());
-                for (String a : control.getMetadata().getRootAliases()) {
+                final CommandControl control = aliases.getKey();
+                final List<String> orderedAliases = new ArrayList<>();
+                final List<String> aliasesToAdd = new ArrayList<>(aliases.getValue());
+                for (final String a : control.getMetadata().getRootAliases()) {
                     if (aliases.getValue().contains(a)) {
                         orderedAliases.add(a);
                         aliasesToAdd.remove(a);
@@ -273,16 +273,16 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     private void mergeAliases() {
-        CommentedConfigurationNode toMerge = this.configurateHelper.createNode();
+        final CommentedConfigurationNode toMerge = this.configurateHelper.createNode();
         this.commandMetadataMap.values().forEach(metadata -> {
-            CommentedConfigurationNode node = toMerge.getNode(metadata.getCommandKey());
-            String messageKey = metadata.getCommandAnnotation().commandDescriptionKey() + ".desc";
+            final CommentedConfigurationNode node = toMerge.getNode(metadata.getCommandKey());
+            final String messageKey = metadata.getCommandAnnotation().commandDescriptionKey() + ".desc";
             if (this.messageProviderService.hasKey(messageKey)) {
                 node.setComment(this.messageProviderService.getMessageString(messageKey));
             }
             node.getNode(ENABLED).setComment(this.messageProviderService.getMessageString("config.enabled")).setValue(true);
-            CommentedConfigurationNode al = node.getNode(ROOT_ALIASES);
-            for (String a : metadata.getRootAliases()) {
+            final CommentedConfigurationNode al = node.getNode(ROOT_ALIASES);
+            for (final String a : metadata.getRootAliases()) {
                 al.getNode(a).setValue(!metadata.getDisabledByDefaultRootAliases().contains(a));
             }
             if (!al.isVirtual()) {
@@ -294,11 +294,11 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     private void mergeModifierDefaults() {
-        CommentedConfigurationNode toMerge = this.configurateHelper.createNode();
+        final CommentedConfigurationNode toMerge = this.configurateHelper.createNode();
         this.controlToAliases.keySet().forEach(control -> {
-            CommentedConfigurationNode node = toMerge.getNode(control.getCommandKey());
+            final CommentedConfigurationNode node = toMerge.getNode(control.getCommandKey());
             if (!control.isModifierKeyRedirected()) { // if redirected, another command will deal with this.
-                for (Map.Entry<CommandModifier, ICommandModifier> modifier : control.getCommandModifiers().entrySet()) {
+                for (final Map.Entry<CommandModifier, ICommandModifier> modifier : control.getCommandModifiers().entrySet()) {
                     if (modifier.getKey().useFrom() == ICommandExecutor.class) {
                         modifier.getValue().getDefaultNode(node, this.messageProviderService);
                     }
@@ -310,15 +310,15 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     private void setupData() {
-        List<Action> postponeAction = new ArrayList<>();
+        final List<Action> postponeAction = new ArrayList<>();
         this.controlToAliases.keySet().forEach(control -> {
-            CommentedConfigurationNode node;
+            final CommentedConfigurationNode node;
             if (control.isModifierKeyRedirected()) {
                 node = this.commandsConfConfigNode.getNode(control.getMetadata().getCommandAnnotation().modifierOverride());
             } else {
                 node = this.commandsConfConfigNode.getNode(control.getCommandKey());
             }
-            for (Map.Entry<CommandModifier, ICommandModifier> modifier : control.getCommandModifiers().entrySet()) {
+            for (final Map.Entry<CommandModifier, ICommandModifier> modifier : control.getCommandModifiers().entrySet()) {
                 if (modifier.getKey().useFrom() != ICommandExecutor.class) {
                     final CommandControl useFromControl = this.controlToExecutorClass.get(modifier.getKey().useFrom());
                     postponeAction.add(() ->
@@ -331,8 +331,8 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         postponeAction.forEach(Action::action);
     }
 
-    private CommandControl construct(@Nullable CommandControl parent, CommandMetadata metadata, INucleusServiceCollection serviceCollection) {
-        ICommandExecutor<?> executor = serviceCollection.injector().getInstance(metadata.getExecutor());
+    private CommandControl construct(@Nullable final CommandControl parent, final CommandMetadata metadata, final INucleusServiceCollection serviceCollection) {
+        final ICommandExecutor<?> executor = serviceCollection.injector().getInstance(metadata.getExecutor());
         return new CommandControl(
                 executor,
                 parent,
@@ -341,7 +341,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         );
     }
 
-    @Override public void addMapping(String newCommand, String remapped) {
+    @Override public void addMapping(final String newCommand, final String remapped) {
         if (this.commandremap.containsKey(newCommand.toLowerCase())) {
             throw new IllegalArgumentException("command already in use");
         }
@@ -350,7 +350,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     @Override public void activate() {
-        for (Map.Entry<String, String> entry : this.commandremap.entrySet()) {
+        for (final Map.Entry<String, String> entry : this.commandremap.entrySet()) {
             if (!Sponge.getCommandManager().get(entry.getKey()).isPresent()) {
                 Sponge.getCommandManager().get(entry.getValue()).ifPresent(x ->
                         Sponge.getCommandManager().register(this.pluginContainer, x.getCallable(), entry.getKey()));
@@ -359,8 +359,8 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     @Override public void deactivate() {
-        for (Map.Entry<String, String> entry : this.commandremap.entrySet()) {
-            Optional<? extends CommandMapping> mappingOptional = Sponge.getCommandManager().get(entry.getKey());
+        for (final Map.Entry<String, String> entry : this.commandremap.entrySet()) {
+            final Optional<? extends CommandMapping> mappingOptional = Sponge.getCommandManager().get(entry.getKey());
             if (mappingOptional.isPresent() &&
                     Sponge.getCommandManager().getOwner(mappingOptional.get()).map(x -> x.getId().equals(NucleusPluginInfo.ID)).orElse(false)) {
                 Sponge.getCommandManager().removeMapping(mappingOptional.get());
@@ -368,11 +368,11 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         }
     }
 
-    @Override public boolean isNucleusCommand(String command) {
+    @Override public boolean isNucleusCommand(final String command) {
         return this.registrationComplete && this.registeredAliases.contains(command.toLowerCase());
     }
 
-    @Override public Optional<CommandControl> getControl(Class<? extends ICommandExecutor<? extends CommandSource>> executorClass) {
+    @Override public Optional<CommandControl> getControl(final Class<? extends ICommandExecutor<? extends CommandSource>> executorClass) {
         return Optional.ofNullable(this.controlToExecutorClass.get(executorClass));
     }
 
@@ -380,7 +380,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         return this.controlToAliases.keySet();
     }
 
-    @Override public void registerInterceptor(ICommandInterceptor impl) {
+    @Override public void registerInterceptor(final ICommandInterceptor impl) {
         this.interceptors.add(impl);
     }
 
@@ -388,10 +388,10 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         return ImmutableList.copyOf(this.interceptors);
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         // reload the file.
-        load();
-        setupData();
+        this.load();
+        this.setupData();
     }
 
     private void load() {
@@ -401,7 +401,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
                     .setPath(this.commandsFile)
                     .build()
                     .load();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
@@ -414,7 +414,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
                     .setPath(this.commandsFile)
                     .build()
                     .save(this.commandsConfConfigNode);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

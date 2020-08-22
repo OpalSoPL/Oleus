@@ -24,27 +24,27 @@ public class QuickStartModuleConstructor implements ModuleConstructor<StandardMo
     private final Map<String, Map<String, List<String>>> moduleList;
     private final INucleusServiceCollection serviceCollection;
 
-    public QuickStartModuleConstructor(Map<String, Map<String, List<String>>> m, INucleusServiceCollection serviceCollection) {
+    public QuickStartModuleConstructor(final Map<String, Map<String, List<String>>> m, final INucleusServiceCollection serviceCollection) {
          this.moduleList = m;
          this.serviceCollection = serviceCollection;
     }
 
     @Override
-    public StandardModule constructModule(Class<? extends StandardModule> moduleClass) throws QuickStartModuleLoaderException.Construction {
-        return constructInternal(moduleClass);
+    public StandardModule constructModule(final Class<? extends StandardModule> moduleClass) throws QuickStartModuleLoaderException.Construction {
+        return this.constructInternal(moduleClass);
     }
 
-    public <T extends StandardModule> T constructInternal(Class<T> moduleClass) throws QuickStartModuleLoaderException.Construction {
+    public <T extends StandardModule> T constructInternal(final Class<T> moduleClass) throws QuickStartModuleLoaderException.Construction {
         T m;
         try {
             try {
-                Constructor<T> s = moduleClass.getDeclaredConstructor(Supplier.class, INucleusServiceCollection.class);
+                final Constructor<T> s = moduleClass.getDeclaredConstructor(Supplier.class, INucleusServiceCollection.class);
                 m = s.newInstance(this.serviceCollection.injector().getInstance(this.holderKey), this.serviceCollection);
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 // then try injection
                 m = this.serviceCollection.injector().getInstance(moduleClass);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new QuickStartModuleLoaderException.Construction(moduleClass, "Could not instantiate module!", e);
         }
 

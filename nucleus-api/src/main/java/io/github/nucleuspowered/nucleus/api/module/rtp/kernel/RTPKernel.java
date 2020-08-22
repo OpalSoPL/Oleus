@@ -5,15 +5,13 @@
 package io.github.nucleuspowered.nucleus.api.module.rtp.kernel;
 
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.registry.util.PluginProvidedRegistryModule;
 import org.spongepowered.api.util.annotation.CatalogedBy;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 /**
  * An {@link RTPKernel} provides the instructions for how to select
@@ -25,7 +23,6 @@ import javax.annotation.Nullable;
  * are expected to handle cases where a {@code null} or invalid
  * location is supplied.</p>
  */
-@PluginProvidedRegistryModule
 @CatalogedBy(RTPKernels.class)
 public interface RTPKernel extends CatalogType {
 
@@ -40,8 +37,8 @@ public interface RTPKernel extends CatalogType {
      * @param options The options to consider when teleporting
      * @return The location to teleport to, if any.
      */
-    Optional<Location<World>> getLocation(
-            @Nullable Location<World> currentLocation,
-            World target,
+    Optional<ServerLocation> getLocation(
+            @Nullable ServerLocation currentLocation,
+            ServerWorld target,
             NucleusRTPService.RTPOptions options);
 }

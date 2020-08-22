@@ -27,7 +27,7 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
     private final IMessageProviderService messageProviderService;
 
     @Inject
-    public EconomyServiceProvider(IMessageProviderService messageProviderService) {
+    public EconomyServiceProvider(final IMessageProviderService messageProviderService) {
         this.messageProviderService = messageProviderService;
     }
 
@@ -36,19 +36,19 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
         return Sponge.getServiceManager().provide(EconomyService.class).isPresent();
     }
 
-    @Override public String getCurrencySymbol(double cost) {
-        Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
+    @Override public String getCurrencySymbol(final double cost) {
+        final Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
         return oes.map(economyService -> economyService.getDefaultCurrency().format(BigDecimal.valueOf(cost)).toPlain())
                 .orElseGet(() -> String.valueOf(cost));
 
     }
 
-    @Override public boolean hasBalance(Player src, double balance) {
-        Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
+    @Override public boolean hasBalance(final Player src, final double balance) {
+        final Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
         if (oes.isPresent()) {
             // Check balance.
-            EconomyService es = oes.get();
-            Optional<UniqueAccount> ua = es.getOrCreateAccount(src.getUniqueId());
+            final EconomyService es = oes.get();
+            final Optional<UniqueAccount> ua = es.getOrCreateAccount(src.getUniqueId());
             return ua.isPresent() && ua.get().getBalance(es.getDefaultCurrency()).doubleValue() >= balance;
         }
 
@@ -56,25 +56,25 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
         return true;
     }
 
-    @Override public boolean withdrawFromPlayer(Player src, double cost) {
-        return withdrawFromPlayer(src, cost, true);
+    @Override public boolean withdrawFromPlayer(final Player src, final double cost) {
+        return this.withdrawFromPlayer(src, cost, true);
     }
 
-    @Override public boolean withdrawFromPlayer(Player src, double cost, boolean message) {
-        Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
+    @Override public boolean withdrawFromPlayer(final Player src, final double cost, final boolean message) {
+        final Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
         if (oes.isPresent()) {
             // Check balance.
-            EconomyService es = oes.get();
-            Optional<UniqueAccount> a = es.getOrCreateAccount(src.getUniqueId());
+            final EconomyService es = oes.get();
+            final Optional<UniqueAccount> a = es.getOrCreateAccount(src.getUniqueId());
             if (!a.isPresent()) {
                 this.messageProviderService.sendMessageTo(src, "cost.noaccount");
                 return false;
             }
 
-            TransactionResult tr = a.get().withdraw(es.getDefaultCurrency(), BigDecimal.valueOf(cost), CauseStackHelper.createCause(src));
+            final TransactionResult tr = a.get().withdraw(es.getDefaultCurrency(), BigDecimal.valueOf(cost), CauseStackHelper.createCause(src));
             if (tr.getResult() == ResultType.ACCOUNT_NO_FUNDS) {
                 if (message) {
-                    this.messageProviderService.sendMessageTo(src, "cost.nofunds", getCurrencySymbol(cost));
+                    this.messageProviderService.sendMessageTo(src, "cost.nofunds", this.getCurrencySymbol(cost));
                 }
 
                 return false;
@@ -84,30 +84,30 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
             }
 
             if (message) {
-                this.messageProviderService.sendMessageTo(src, "cost.complete", getCurrencySymbol(cost));
+                this.messageProviderService.sendMessageTo(src, "cost.complete", this.getCurrencySymbol(cost));
             }
         }
 
         return true;
     }
 
-    @Override public boolean depositInPlayer(User src, double cost) {
-        return depositInPlayer(src, cost, true);
+    @Override public boolean depositInPlayer(final User src, final double cost) {
+        return this.depositInPlayer(src, cost, true);
     }
 
-    @Override public boolean depositInPlayer(User src, double cost, boolean message) {
-        Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
+    @Override public boolean depositInPlayer(final User src, final double cost, final boolean message) {
+        final Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
         if (oes.isPresent()) {
             // Check balance.
-            EconomyService es = oes.get();
-            Optional<UniqueAccount> a = es.getOrCreateAccount(src.getUniqueId());
+            final EconomyService es = oes.get();
+            final Optional<UniqueAccount> a = es.getOrCreateAccount(src.getUniqueId());
             if (!a.isPresent()) {
                 src.getPlayer().ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.noaccount"));
                 return false;
             }
 
-            TransactionResult tr = a.get().deposit(es.getDefaultCurrency(), BigDecimal.valueOf(cost), CauseStackHelper.createCause(src));
+            final TransactionResult tr = a.get().deposit(es.getDefaultCurrency(), BigDecimal.valueOf(cost), CauseStackHelper.createCause(src));
             if (tr.getResult() != ResultType.SUCCESS && src.isOnline()) {
                 src.getPlayer().ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.error"));
@@ -116,7 +116,7 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
 
             if (message && src.isOnline()) {
                 src.getPlayer().ifPresent(x ->
-                        this.messageProviderService.sendMessageTo(x, "cost.refund", getCurrencySymbol(cost)));
+                        this.messageProviderService.sendMessageTo(x, "cost.refund", this.getCurrencySymbol(cost)));
             }
         }
 

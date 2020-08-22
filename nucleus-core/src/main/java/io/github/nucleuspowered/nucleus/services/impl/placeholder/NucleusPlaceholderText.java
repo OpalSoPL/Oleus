@@ -18,7 +18,7 @@ public class NucleusPlaceholderText implements PlaceholderText {
     private final PlaceholderParser parser;
     private final Collection<Function<Text, Text>> modifiers;
 
-    public NucleusPlaceholderText(PlaceholderContext context, PlaceholderParser parser, Collection<Function<Text, Text>> modifiers) {
+    public NucleusPlaceholderText(final PlaceholderContext context, final PlaceholderParser parser, final Collection<Function<Text, Text>> modifiers) {
         this.context = context;
         this.parser = parser;
         this.modifiers = modifiers;
@@ -38,7 +38,7 @@ public class NucleusPlaceholderText implements PlaceholderText {
     public Text toText() {
         Text result = this.parser.parse(this.context);
         if (!result.isEmpty()) {
-            for (Function<Text, Text> modifier : this.modifiers) {
+            for (final Function<Text, Text> modifier : this.modifiers) {
                 result = modifier.apply(result);
             }
         }

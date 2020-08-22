@@ -13,37 +13,34 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class PositiveDoubleArgument extends CommandElement {
 
     private final IMessageProviderService messageProvider;
 
-    public PositiveDoubleArgument(@Nullable Text key, INucleusServiceCollection serviceCollection) {
+    public PositiveDoubleArgument(@Nullable final Text key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProvider = serviceCollection.messageProvider();
     }
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         try {
-            double d = Double.parseDouble(args.next());
+            final double d = Double.parseDouble(args.next());
             if (d >= 0) {
                 return d;
             }
-        } catch (NumberFormatException ignored) {}
+        } catch (final NumberFormatException ignored) {}
 
         throw args.createError(this.messageProvider.getMessageFor(source, "args.positiveint.negative"));
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return ImmutableList.of();
     }
 }

@@ -24,14 +24,14 @@ public class MappedListDataKey<K, V, O extends IKeyedDataObject<?>> extends Data
     private final TypeToken<V> valueType;
 
     private static <Key, Value> TypeToken<Map<Key, List<Value>>> createMapListToken(
-            TypeToken<Key> keyToken,
-            TypeToken<Value> valueToken) {
+            final TypeToken<Key> keyToken,
+            final TypeToken<Value> valueToken) {
         return new TypeToken<Map<Key, List<Value>>>() {}
                 .where(new TypeParameter<Key>() {}, keyToken)
                 .where(new TypeParameter<Value>() {}, valueToken);
     }
 
-    public MappedListDataKey(String[] key, TypeToken<K> keyType, TypeToken<V> valueType, Class<O> target) {
+    public MappedListDataKey(final String[] key, final TypeToken<K> keyType, final TypeToken<V> valueType, final Class<O> target) {
         super(key, createMapListToken(keyType, valueType), target, null);
         this.keyType = keyType;
         this.valueType = valueType;

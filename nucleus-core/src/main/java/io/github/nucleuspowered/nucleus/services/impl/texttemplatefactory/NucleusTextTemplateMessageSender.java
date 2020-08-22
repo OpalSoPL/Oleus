@@ -29,28 +29,28 @@ public class NucleusTextTemplateMessageSender {
     private final CommandSource sender;
 
     public NucleusTextTemplateMessageSender(
-            INucleusTextTemplateFactory textTemplateFactory,
-            NucleusTextTemplate textTemplate,
-            IPlaceholderService placeholderService,
-            CommandSource sender) {
+            final INucleusTextTemplateFactory textTemplateFactory,
+            final NucleusTextTemplate textTemplate,
+            final IPlaceholderService placeholderService,
+            final CommandSource sender) {
         this.textTemplateFactory = textTemplateFactory;
         this.textTemplate = textTemplate;
         this.placeholderService = placeholderService;
         this.sender = sender;
     }
 
-    public boolean send(Cause cause) {
-        List<CommandSource> members = Lists.newArrayList(Sponge.getServer().getConsole());
+    public boolean send(final Cause cause) {
+        final List<CommandSource> members = Lists.newArrayList(Sponge.getServer().getConsole());
         members.addAll(Sponge.getServer().getOnlinePlayers());
-        return send(members, true, cause);
+        return this.send(members, true, cause);
     }
 
-    public boolean send(Collection<CommandSource> source, Cause cause) {
-        return send(source, false, cause);
+    public boolean send(final Collection<CommandSource> source, final Cause cause) {
+        return this.send(source, false, cause);
     }
 
-    private boolean send(Collection<CommandSource> source, boolean isBroadcast, Cause cause) {
-        NucleusTextTemplateEvent event;
+    private boolean send(final Collection<CommandSource> source, final boolean isBroadcast, final Cause cause) {
+        final NucleusTextTemplateEvent event;
         if (isBroadcast) {
             event = new NucleusTextTemplateEventImpl.Broadcast(
                     this.textTemplate,
@@ -71,13 +71,13 @@ public class NucleusTextTemplateMessageSender {
             return false;
         }
 
-        NucleusTextTemplate template = event.getMessage();
+        final NucleusTextTemplate template = event.getMessage();
         if (!template.containsTokens()) {
-            Text text = this.textTemplate.getForCommandSource(Sponge.getServer().getConsole());
+            final Text text = this.textTemplate.getForSource(Sponge.getServer().getConsole());
             event.getRecipients().forEach(x -> x.sendMessage(text));
         } else {
-            Map<String, Function<CommandSource, Optional<Text>>> m = Maps.newHashMap();
-            Optional<Text> sender = Optional.of(this.placeholderService.parse(this.sender, "displayname").toText());
+            final Map<String, Function<CommandSource, Optional<Text>>> m = Maps.newHashMap();
+            final Optional<Text> sender = Optional.of(this.placeholderService.parse(this.sender, "displayname").toText());
             m.put("sender", cs -> sender);
             event.getRecipients().forEach(x -> x.sendMessage(this.textTemplate.getForCommandSource(x, m)));
         }

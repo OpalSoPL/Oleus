@@ -43,7 +43,7 @@ public interface ICompatibilityService {
 
         private final int index;
 
-        Severity(int index) {
+        Severity(final int index) {
             this.index = index;
         }
 

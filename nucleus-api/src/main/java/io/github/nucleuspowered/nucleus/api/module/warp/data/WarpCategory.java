@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.warp.data;
 
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -26,14 +26,14 @@ public interface WarpCategory {
      *
      * @return The display name.
      */
-    Text getDisplayName();
+    Component getDisplayName();
 
     /**
      * Gets the defined description of the category, if available.
      *
      * @return An {@link Optional} that might contain a description.
      */
-    Optional<Text> getDescription();
+    Optional<Component> getDescription();
 
     /**
      * Gets the warps associated with this category.

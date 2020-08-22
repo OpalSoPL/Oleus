@@ -28,18 +28,18 @@ public class CommandElementSupplier implements ICommandElementSupplier {
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
-    public CommandElementSupplier(INucleusServiceCollection serviceCollection) {
+    public CommandElementSupplier(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.permissionService = serviceCollection.permissionService();
     }
 
     @Override
-    public CommandElement createLocaleElement(Text key) {
+    public CommandElement createLocaleElement(final Text key) {
         return new LocaleElement(key, this.serviceCollection);
     }
 
     @Override
-    public CommandElement createOnlyOtherUserPermissionElement(String permission) {
+    public CommandElement createOnlyOtherUserPermissionElement(final String permission) {
         return GenericArguments.optional(
                 new NucleusRequirePermissionArgument(
                         NucleusParameters.ONE_USER.get(this.serviceCollection),
@@ -50,7 +50,7 @@ public class CommandElementSupplier implements ICommandElementSupplier {
         );
     }
 
-    @Override public CommandElement createOnlyOtherUserPermissionElement(boolean isPlayer, String permission) {
+    @Override public CommandElement createOnlyOtherUserPermissionElement(final boolean isPlayer, final String permission) {
         return GenericArguments.optional(
                 new NucleusRequirePermissionArgument(
                         isPlayer ? NucleusParameters.ONE_PLAYER.get(this.serviceCollection) : NucleusParameters.ONE_USER.get(this.serviceCollection),
@@ -61,7 +61,7 @@ public class CommandElementSupplier implements ICommandElementSupplier {
         );
     }
 
-    @Override public CommandElement createOtherUserPermissionElement(boolean isPlayer, String permission) {
+    @Override public CommandElement createOtherUserPermissionElement(final boolean isPlayer, final String permission) {
         return GenericArguments.optionalWeak(
                 new NucleusRequirePermissionArgument(
                     isPlayer ? NucleusParameters.ONE_PLAYER.get(this.serviceCollection) : NucleusParameters.ONE_USER.get(this.serviceCollection),
@@ -72,12 +72,12 @@ public class CommandElementSupplier implements ICommandElementSupplier {
         );
     }
 
-    @Override public NucleusRequirePermissionArgument createPermissionParameter(CommandElement wrapped, String permission, boolean isOptional) {
+    @Override public NucleusRequirePermissionArgument createPermissionParameter(final CommandElement wrapped, final String permission, final boolean isOptional) {
         return new NucleusRequirePermissionArgument(wrapped, this.permissionService, permission, isOptional);
     }
 
-    @Override public User getUserFromParametersElseSelf(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Optional<User> user = context.getOne(NucleusParameters.Keys.USER, User.class).filter(context::is);
+    @Override public User getUserFromParametersElseSelf(final ICommandContext<? extends CommandSource> context) throws CommandException {
+        final Optional<User> user = context.getOne(NucleusParameters.Keys.USER, User.class).filter(context::is);
         if (!user.isPresent()) {
             return context.getIfPlayer();
         }

@@ -24,35 +24,35 @@ public class UsageCommand {
 
     private final CommandControl attachedCommandControl;
 
-    UsageCommand(CommandControl attachedCommandControl) {
+    UsageCommand(final CommandControl attachedCommandControl) {
         this.attachedCommandControl = attachedCommandControl;
     }
 
-    void process(ICommandContext<? extends CommandSource> commandContext, String command, @Nullable String previous) throws CommandException {
+    void process(final ICommandContext<? extends CommandSource> commandContext, final String command, @Nullable final String previous) throws CommandException {
         if (!this.attachedCommandControl.testPermission(commandContext.getCommandSourceUnchecked())) {
             commandContext.sendMessage("command.usage.nopermission");
             return;
         }
 
         try {
-            List<Text> textMessages = usage(commandContext, command, previous);
+            final List<Text> textMessages = this.usage(commandContext, command, previous);
 
             // Header
             // String command = this.attachedCommandControl.getCommand();
-            Text header = commandContext.getMessage( "command.usage.header", command);
+            final Text header = commandContext.getMessage( "command.usage.header", command);
 
             Util.getPaginationBuilder(commandContext.getCommandSource()).title(header).contents(textMessages).sendTo(commandContext.getCommandSource());
-        } catch (CommandPermissionException e) {
+        } catch (final CommandPermissionException e) {
             commandContext.sendMessage("command.usage.nopermission");
         }
     }
 
-    public List<Text> usage(ICommandContext<? extends CommandSource> context, String command, @Nullable String previous) throws CommandPermissionException {
+    public List<Text> usage(final ICommandContext<? extends CommandSource> context, final String command, @Nullable final String previous) throws CommandPermissionException {
         if (!this.attachedCommandControl.testPermission(context.getCommandSourceUnchecked())) {
             throw new CommandPermissionException();
         }
 
-        List<Text> textMessages = Lists.newArrayList();
+        final List<Text> textMessages = Lists.newArrayList();
 
         if (previous != null) {
             textMessages.add(context.getMessage("command.usage.noexist", previous));
@@ -73,7 +73,7 @@ public class UsageCommand {
 
         // Aliases
         final String prefix = command.replaceAll("[\\S]+$","");
-        String result = "/" + this.attachedCommandControl.getAliases()
+        final String result = "/" + this.attachedCommandControl.getAliases()
                 .stream()
                 .map(x -> {
                     if (x.startsWith("#")) {
@@ -84,14 +84,14 @@ public class UsageCommand {
                 }).collect(Collectors.joining(", /"));
         textMessages.add(context.getMessage("command.usage.aliases", result));
 
-        Optional<Text> desc = this.attachedCommandControl.getShortDescription(context.getCommandSourceUnchecked());
+        final Optional<Text> desc = this.attachedCommandControl.getShortDescription(context.getCommandSourceUnchecked());
         if (desc.isPresent()) {
             textMessages.add(Util.SPACE);
             textMessages.add(context.getMessage("command.usage.summary"));
             textMessages.add(desc.get());
         }
 
-        Optional<Text> ext = this.attachedCommandControl.getExtendedDescription(context.getCommandSourceUnchecked());
+        final Optional<Text> ext = this.attachedCommandControl.getExtendedDescription(context.getCommandSourceUnchecked());
         if (ext.isPresent()) {
             textMessages.add(Util.SPACE);
             textMessages.add(context.getMessage("command.usage.description"));
@@ -104,7 +104,7 @@ public class UsageCommand {
             textMessages.add(Text.of(TextColors.WHITE, this.attachedCommandControl.getUsageText(context.getCommandSourceUnchecked())));
         }
 
-        Text subcommands = this.attachedCommandControl.getSubcommandTexts(context.getCommandSourceUnchecked());
+        final Text subcommands = this.attachedCommandControl.getSubcommandTexts(context.getCommandSourceUnchecked());
         if (!subcommands.isEmpty()) {
             textMessages.add(Util.SPACE);
             textMessages.add(Text.joinWith(Text.of(" "), context.getMessage("command.usage.subcommand"), subcommands));

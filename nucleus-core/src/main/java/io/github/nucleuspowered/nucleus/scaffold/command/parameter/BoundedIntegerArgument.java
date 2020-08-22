@@ -27,8 +27,8 @@ public class BoundedIntegerArgument extends CommandElement {
     private final int max;
     private final IMessageProviderService messageProviderService;
 
-    public BoundedIntegerArgument(@Nullable Text key, int min, int max,
-            INucleusServiceCollection serviceCollection) {
+    public BoundedIntegerArgument(@Nullable final Text key, final int min, final int max,
+            final INucleusServiceCollection serviceCollection) {
         super(key);
         this.min = Math.min(min, max);
         this.max = Math.max(min, max);
@@ -37,9 +37,9 @@ public class BoundedIntegerArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         try {
-            int value = Integer.parseInt(args.next());
+            final int value = Integer.parseInt(args.next());
             if (value > this.max || value < this.min) {
                 throw args.createError(this.messageProviderService.getMessageFor(source, "args.boundedinteger.outofbounds", String.valueOf(
 
@@ -48,18 +48,18 @@ public class BoundedIntegerArgument extends CommandElement {
             }
 
             return value;
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.boundedinteger.nonumber"));
         }
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return ImmutableList.of();
     }
 
     @Override
-    public Text getUsage(CommandSource src) {
+    public Text getUsage(final CommandSource src) {
         return Text.of(this.getKey(), String.format("(%s to %s)", this.min, this.max));
     }
 }

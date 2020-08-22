@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.api.core.event;
 import io.github.nucleuspowered.nucleus.api.core.exception.NoModuleException;
 import io.github.nucleuspowered.nucleus.api.core.exception.UnremovableModuleException;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.Map;
 

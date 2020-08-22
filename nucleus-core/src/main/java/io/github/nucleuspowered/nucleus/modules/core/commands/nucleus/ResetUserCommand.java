@@ -31,7 +31,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanTypes;
 
@@ -47,7 +46,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-@NonnullByDefault
 @Command(
         aliases = "resetuser",
         basePermission = CorePermissions.BASE_NUCLEUS_RESETUSER,

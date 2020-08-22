@@ -50,41 +50,41 @@ public interface IStorageManager {
 
     CompletableFuture<Void> saveAndInvalidateAllCaches();
 
-    default CompletableFuture<IUserDataObject> getOrCreateUser(UUID uuid) {
-        return getUserService().getOrNew(uuid);
+    default CompletableFuture<IUserDataObject> getOrCreateUser(final UUID uuid) {
+        return this.getUserService().getOrNew(uuid);
     }
 
-    default IUserDataObject getOrCreateUserOnThread(UUID uuid) {
-        return getUserService().getOrNewOnThread(uuid);
+    default IUserDataObject getOrCreateUserOnThread(final UUID uuid) {
+        return this.getUserService().getOrNewOnThread(uuid);
     }
 
-    default CompletableFuture<Optional<IUserDataObject>> getUser(UUID uuid) {
-        return getUserService().get(uuid);
+    default CompletableFuture<Optional<IUserDataObject>> getUser(final UUID uuid) {
+        return this.getUserService().get(uuid);
     }
 
-    default Optional<IUserDataObject> getUserOnThread(UUID uuid) {
-        return getUserService().getOnThread(uuid);
+    default Optional<IUserDataObject> getUserOnThread(final UUID uuid) {
+        return this.getUserService().getOnThread(uuid);
     }
 
-    default CompletableFuture<Void> saveUser(UUID uuid, IUserDataObject object) {
-        return getUserService().save(uuid, object);
+    default CompletableFuture<Void> saveUser(final UUID uuid, final IUserDataObject object) {
+        return this.getUserService().save(uuid, object);
     }
 
-    default Optional<IWorldDataObject> getWorldOnThread(UUID uuid) {
-        return getWorldService().getOnThread(uuid);
+    default Optional<IWorldDataObject> getWorldOnThread(final UUID uuid) {
+        return this.getWorldService().getOnThread(uuid);
     }
 
-    default IWorldDataObject getOrCreateWorldOnThread(UUID uuid) {
-        return getWorldService().getOrNewOnThread(uuid);
+    default IWorldDataObject getOrCreateWorldOnThread(final UUID uuid) {
+        return this.getWorldService().getOrNewOnThread(uuid);
     }
 
     default IGeneralDataObject getGeneral() {
-        IStorageService.SingleCached<IGeneralDataObject> gs = getGeneralService();
+        final IStorageService.SingleCached<IGeneralDataObject> gs = this.getGeneralService();
         return gs.getCached().orElseGet(() -> gs.getOrNew().join());
     }
 
     default IKitDataObject getKits() {
-        IStorageService.SingleCached<IKitDataObject> gs = getKitsService();
+        final IStorageService.SingleCached<IKitDataObject> gs = this.getKitsService();
         return gs.getCached().orElseGet(() -> gs.getOrNew().join());
     }
 

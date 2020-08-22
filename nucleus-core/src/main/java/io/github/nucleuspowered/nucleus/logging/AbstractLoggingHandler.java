@@ -4,13 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.logging;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.slf4j.Logger;
-import org.spongepowered.api.GameState;
-import org.spongepowered.api.Sponge;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -20,8 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Locale;
-
-import javax.inject.Inject;
 
 public abstract class AbstractLoggingHandler implements IReloadableService.Reloadable {
 
@@ -38,17 +34,17 @@ public abstract class AbstractLoggingHandler implements IReloadableService.Reloa
     private final Object locking = new Object();
 
     @Inject
-    public AbstractLoggingHandler(String directoryName,
-            String filePrefix,
-            IMessageProviderService messageProviderService,
-            Logger logger) {
+    public AbstractLoggingHandler(final String directoryName,
+            final String filePrefix,
+            final IMessageProviderService messageProviderService,
+            final Logger logger) {
         this.directoryName = directoryName;
         this.filePrefix = filePrefix;
         this.messageProviderService = messageProviderService;
         this.slogger = logger;
     }
 
-    public void queueEntry(String s) {
+    public void queueEntry(final String s) {
         if (this.logger != null) {
             synchronized (this.locking) {
                 this.queueEntry.add(s);
@@ -57,8 +53,7 @@ public abstract class AbstractLoggingHandler implements IReloadableService.Reloa
     }
 
     public void onServerShutdown() throws IOException {
-        Preconditions.checkState(Sponge.getGame().getState().equals(GameState.SERVER_STOPPED));
-        onShutdown();
+        this.onShutdown();
     }
 
     protected void onShutdown() throws IOException {
@@ -75,17 +70,17 @@ public abstract class AbstractLoggingHandler implements IReloadableService.Reloa
             return;
         }
 
-        List<String> l;
+        final List<String> l;
         synchronized (this.locking) {
             l = Lists.newArrayList(this.queueEntry);
             this.queueEntry.clear();
         }
 
         if (this.logger == null) {
-            if (enabledLog()) {
+            if (this.enabledLog()) {
                 try {
-                    createLogger();
-                } catch (IOException e) {
+                    this.createLogger();
+                } catch (final IOException e) {
                     this.slogger.warn(this.messageProviderService.getMessageString("commandlog.couldnotwrite"));
                     e.printStackTrace();
                     return;
@@ -96,8 +91,8 @@ public abstract class AbstractLoggingHandler implements IReloadableService.Reloa
         }
 
         try {
-            writeEntry(l);
-        } catch (IOException e) {
+            this.writeEntry(l);
+        } catch (final IOException e) {
             this.slogger.warn(this.messageProviderService.getMessageString("commandlog.couldnotwrite"));
             e.printStackTrace();
         }
@@ -109,7 +104,7 @@ public abstract class AbstractLoggingHandler implements IReloadableService.Reloa
             "] " + s);
     }
 
-    private void writeEntry(Iterable<String> entry) throws IOException {
+    private void writeEntry(final Iterable<String> entry) throws IOException {
         if (this.logger != null) {
             this.logger.logEntry(entry);
         }

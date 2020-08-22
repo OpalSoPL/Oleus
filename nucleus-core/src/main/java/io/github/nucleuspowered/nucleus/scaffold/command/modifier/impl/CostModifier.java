@@ -34,29 +34,29 @@ public class CostModifier implements ICommandModifier {
         return "Cost Modifier";
     }
 
-    @Override public void getDefaultNode(ConfigurationNode node, IMessageProviderService messageProviderService) {
-        ConfigurationNode n = node.getNode(COST);
+    @Override public void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) {
+        final ConfigurationNode n = node.getNode(COST);
         if (n instanceof CommentedConfigurationNode) {
             ((CommentedConfigurationNode) n).setComment(messageProviderService.getMessageString("config.cost"));
         }
         n.setValue(0.0);
     }
 
-    @Override public void setDataFromNode(CommandModifiersConfig config, ConfigurationNode node) {
+    @Override public void setDataFromNode(final CommandModifiersConfig config, final ConfigurationNode node) {
         config.setCost(node.getNode(COST).getInt(0));
     }
 
-    @Override public void setValueFromOther(CommandModifiersConfig from, CommandModifiersConfig to) {
+    @Override public void setValueFromOther(final CommandModifiersConfig from, final CommandModifiersConfig to) {
         to.setCost(from.getCost());
     }
 
-    @Override public boolean canExecuteModifier(INucleusServiceCollection serviceCollection, CommandSource source) throws
+    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandSource source) throws
             CommandException {
         return serviceCollection.economyServiceProvider().serviceExists() && source instanceof Player;
     }
 
-    @Override public Optional<Text> testRequirement(ICommandContext.Mutable<? extends CommandSource> source, CommandControl control,
-            INucleusServiceCollection serviceCollection, CommandModifier modifier) throws CommandException {
+    @Override public Optional<Text> testRequirement(final ICommandContext.Mutable<? extends CommandSource> source, final CommandControl control,
+            final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
         if (source.getCost() > 0) {
             final double cost = source.getCost();
             final IEconomyServiceProvider ies = serviceCollection.economyServiceProvider();
@@ -70,7 +70,7 @@ public class CostModifier implements ICommandModifier {
                 serviceCollection.economyServiceProvider();
                 try {
                     ies.depositInPlayer(s.getIfPlayer(), source.getCost(), false);
-                } catch (CommandException e) {
+                } catch (final CommandException e) {
                     serviceCollection.logger().error("Could not return {} to {}.", cost, source.getName());
                 }
             });
@@ -80,10 +80,10 @@ public class CostModifier implements ICommandModifier {
     }
 
     @Override
-    public void onFailure(ICommandContext<? extends CommandSource> source, CommandControl control, INucleusServiceCollection serviceCollection,
-            CommandModifier modifier) throws CommandException {
+    public void onFailure(final ICommandContext<? extends CommandSource> source, final CommandControl control, final INucleusServiceCollection serviceCollection,
+            final CommandModifier modifier) throws CommandException {
         if (source.getCost() > 0) {
-            IEconomyServiceProvider ies = serviceCollection.economyServiceProvider();
+            final IEconomyServiceProvider ies = serviceCollection.economyServiceProvider();
             ies.depositInPlayer((Player) source.getCommandSource(), source.getCost(), false);
         }
     }

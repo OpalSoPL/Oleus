@@ -16,8 +16,8 @@ public class LocaleSerialiser implements TypeSerializer<Locale> {
 
     @Nullable
     @Override
-    public Locale deserialize(@NonNull TypeToken<?> type, @NonNull ConfigurationNode value) {
-        Locale l = Locale.forLanguageTag(value.getString("und").replace("_", "-"));
+    public Locale deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) {
+        final Locale l = Locale.forLanguageTag(value.getString("und").replace("_", "-"));
         if (l.toString().isEmpty()) {
             return null;
         }
@@ -25,7 +25,7 @@ public class LocaleSerialiser implements TypeSerializer<Locale> {
     }
 
     @Override
-    public void serialize(@NonNull TypeToken<?> type, @Nullable Locale obj, @NonNull ConfigurationNode value) {
+    public void serialize(@NonNull final TypeToken<?> type, @Nullable final Locale obj, @NonNull final ConfigurationNode value) {
         if (obj != null && !obj.toString().isEmpty()) {
             value.setValue(obj.toString());
         }

@@ -31,7 +31,7 @@ public class DateRotatableFileLogger implements Closeable {
     private final Function<String, String> formatter;
     private boolean isClosed = false;
 
-    public DateRotatableFileLogger(String directory, String filenamePrefix, Function<String, String> formatter) throws IOException {
+    public DateRotatableFileLogger(final String directory, final String filenamePrefix, final Function<String, String> formatter) throws IOException {
         Preconditions.checkNotNull(directory);
         Preconditions.checkNotNull(filenamePrefix);
 
@@ -60,11 +60,11 @@ public class DateRotatableFileLogger implements Closeable {
         do {
             count++;
             fileName = this.directory.toString() + "/" + this.filenamePrefix + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd").format(Instant.now().atZone(ZoneId.systemDefault())) + "-" + count + ".log";
-            Path nextFile = Paths.get(fileName);
+            final Path nextFile = Paths.get(fileName);
             if (Files.exists(nextFile)) {
                 try {
                     Util.compressAndDeleteFile(nextFile);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     e.printStackTrace();
                 }
             } else if (!Files.exists(Paths.get(fileName + ".gz"))) {
@@ -76,38 +76,38 @@ public class DateRotatableFileLogger implements Closeable {
         this.currentDate = Instant.now().truncatedTo(ChronoUnit.DAYS);
     }
 
-    public void logEntry(String entry) throws IOException {
+    public void logEntry(final String entry) throws IOException {
         if (this.isClosed) {
             throw new IllegalStateException();
         }
 
-        logEntry(Lists.newArrayList(entry), true);
+        this.logEntry(Lists.newArrayList(entry), true);
     }
 
-    public void logEntry(Iterable<String> entry) throws IOException {
+    public void logEntry(final Iterable<String> entry) throws IOException {
         if (this.isClosed) {
             throw new IllegalStateException();
         }
 
-        logEntry(entry, true);
+        this.logEntry(entry, true);
     }
 
-    private void logEntry(Iterable<String> entry, boolean retryOnError) throws IOException {
+    private void logEntry(final Iterable<String> entry, final boolean retryOnError) throws IOException {
         if (this.file == null || this.file.isClosed() || Instant.now().truncatedTo(ChronoUnit.DAYS).isAfter(this.currentDate)) {
-            openFile();
+            this.openFile();
         }
 
         try {
-            Iterator<String> iterator = entry.iterator();
+            final Iterator<String> iterator = entry.iterator();
             while (iterator.hasNext()) {
                 this.file.writeLine(iterator.next());
                 iterator.remove();
             }
 
             this.file.flush();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             if (retryOnError) {
-                logEntry(entry, false);
+                this.logEntry(entry, false);
             } else {
                 throw e;
             }

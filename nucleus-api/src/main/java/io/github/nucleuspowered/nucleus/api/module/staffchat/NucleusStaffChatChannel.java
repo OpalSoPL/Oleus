@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.staffchat;
 
-import org.spongepowered.api.text.channel.MessageChannel;
+import net.kyori.adventure.audience.Audience;
 
 /**
  * Indicates that the chat event is a staff chat message.
@@ -12,4 +12,4 @@ import org.spongepowered.api.text.channel.MessageChannel;
  * <p>Note that this is only guaranteed to appear after
  * {@link org.spongepowered.api.event.Order#LATE}</p>
  */
-public interface NucleusStaffChatChannel extends MessageChannel { }
+public interface NucleusStaffChatChannel extends Audience { }

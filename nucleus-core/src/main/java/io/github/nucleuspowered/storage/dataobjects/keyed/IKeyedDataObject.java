@@ -12,8 +12,8 @@ import javax.annotation.Nullable;
 
 public interface IKeyedDataObject<T extends IKeyedDataObject<T>> extends IDataObject {
 
-    default boolean has(DataKey<?, ? extends T> dataKey) {
-        return get(dataKey).isPresent();
+    default boolean has(final DataKey<?, ? extends T> dataKey) {
+        return this.get(dataKey).isPresent();
     }
 
     <T2> Value<T2> getAndSet(DataKey<T2, ? extends T> dataKey);

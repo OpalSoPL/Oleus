@@ -4,11 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.api.util.data;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -51,14 +50,7 @@ public interface NamedLocation {
      *
      * @return The {@link Location} if the world is loaded.
      */
-    Optional<Location<World>> getLocation();
-
-    /**
-     * Gets the {@link Transform} if the world is loaded.
-     *
-     * @return The {@link Transform} if the world is loaded.
-     */
-    Optional<Transform<World>> getTransform();
+    Optional<ServerLocation> getLocation();
 
     /**
      * Gets the name of the location.

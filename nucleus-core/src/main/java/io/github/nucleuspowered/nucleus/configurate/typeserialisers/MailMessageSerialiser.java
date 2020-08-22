@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
-import io.github.nucleuspowered.nucleus.modules.mail.data.MailData;
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -22,7 +21,7 @@ public class MailMessageSerialiser implements TypeSerializer<MailMessage> {
 
     @Nullable
     @Override
-    public MailMessage deserialize(@NonNull TypeToken<?> type, @NonNull ConfigurationNode value) throws ObjectMappingException {
+    public MailMessage deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
         if (value.isVirtual()) {
             return null;
         }
@@ -33,13 +32,13 @@ public class MailMessageSerialiser implements TypeSerializer<MailMessage> {
                     Instant.ofEpochMilli(value.getNode("date").getLong()),
                     value.getNode("message").getString()
             );
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             throw new ObjectMappingException("Could not create a mail message.", e);
         }
     }
 
     @Override
-    public void serialize(@NonNull TypeToken<?> type, @Nullable MailMessage obj, @NonNull ConfigurationNode value) {
+    public void serialize(@NonNull final TypeToken<?> type, @Nullable final MailMessage obj, @NonNull final ConfigurationNode value) {
         if (obj != null) {
             value.getNode("uuid").setValue(obj.getSender().map(Identifiable::getUniqueId).orElse(Util.CONSOLE_FAKE_UUID));
             value.getNode("date").setValue(obj.getDate().toEpochMilli());

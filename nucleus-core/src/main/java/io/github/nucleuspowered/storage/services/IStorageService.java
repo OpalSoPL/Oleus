@@ -68,9 +68,9 @@ public interface IStorageService<D extends IDataObject> {
          * @return The {@link D}
          */
         default CompletableFuture<D> getOrNew() {
-            return get().thenApply(d -> d.orElseGet(() -> {
-                D result = createNew();
-                save(result);
+            return this.get().thenApply(d -> d.orElseGet(() -> {
+                final D result = this.createNew();
+                this.save(result);
                 return result;
             }));
         }
@@ -81,9 +81,9 @@ public interface IStorageService<D extends IDataObject> {
          * @return The data.
          */
         default D getOrNewOnThread() {
-            return getOnThread().orElseGet(() -> {
-                D result = createNew();
-                save(result);
+            return this.getOnThread().orElseGet(() -> {
+                final D result = this.createNew();
+                this.save(result);
                 return result;
             });
         }
@@ -171,10 +171,10 @@ public interface IStorageService<D extends IDataObject> {
          * @param key The key
          * @return The {@link D}
          */
-        default CompletableFuture<D> getOrNew(@Nonnull K key) {
-            return get(key).thenApply(d -> d.orElseGet(() -> {
-                D result = createNew();
-                save(key, result);
+        default CompletableFuture<D> getOrNew(@Nonnull final K key) {
+            return this.get(key).thenApply(d -> d.orElseGet(() -> {
+                final D result = this.createNew();
+                this.save(key, result);
                 return result;
             }));
         }
@@ -185,10 +185,10 @@ public interface IStorageService<D extends IDataObject> {
          * @param key The key
          * @return The object, if it exists
          */
-        default D getOrNewOnThread(@Nonnull K key) {
-            return getOnThread(key).orElseGet(() -> {
-                D result = createNew();
-                save(key, result);
+        default D getOrNewOnThread(@Nonnull final K key) {
+            return this.getOnThread(key).orElseGet(() -> {
+                final D result = this.createNew();
+                this.save(key, result);
                 return result;
             });
         }
@@ -232,8 +232,8 @@ public interface IStorageService<D extends IDataObject> {
          * @param query The query
          * @return The {@link CompletableFuture} containing the whether an object exists
          */
-        default CompletableFuture<Boolean> exists(@Nonnull Q query) {
-            return count(query).thenApply(x -> x > 0);
+        default CompletableFuture<Boolean> exists(@Nonnull final Q query) {
+            return this.count(query).thenApply(x -> x > 0);
         }
 
         /**

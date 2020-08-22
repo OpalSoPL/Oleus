@@ -15,8 +15,6 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-@NonnullByDefault
 @Command(
         aliases = "printperms",
         basePermission = CorePermissions.BASE_NUCLEUS_PRINTPERMS,

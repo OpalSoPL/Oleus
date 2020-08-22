@@ -54,13 +54,13 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
     private final Map<CommandModifier, ICommandModifier> modifiers;
     private final ArrayList<Consumer<ICommandContext<P>>> failActions = new ArrayList<>();
 
-    CommandContextImpl(Cause cause,
-            CommandContext context,
-            INucleusServiceCollection serviceCollection,
-            ThrownSupplier<P, CommandException> source,
-            P sourceDirect,
-            CommandControl control,
-            Map<CommandModifier, ICommandModifier> modifiers) {
+    CommandContextImpl(final Cause cause,
+            final CommandContext context,
+            final INucleusServiceCollection serviceCollection,
+            final ThrownSupplier<P, CommandException> source,
+            final P sourceDirect,
+            final CommandControl control,
+            final Map<CommandModifier, ICommandModifier> modifiers) {
         this.cause = cause;
         this.commandkey = control.getCommandKey();
         this.context = context;
@@ -89,44 +89,44 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
     }
 
     @Override
-    public <T> Optional<T> getOne(String name, Class<T> clazz) {
+    public <T> Optional<T> getOne(final String name, final Class<T> clazz) {
         return this.context.getOne(name);
     }
 
     @Override
-    public boolean hasAny(String name) {
+    public boolean hasAny(final String name) {
         return this.context.hasAny(name);
     }
 
     @Override
-    public <T> Collection<T> getAll(String name, Class<T> clazz) {
+    public <T> Collection<T> getAll(final String name, final Class<T> clazz) {
         return this.context.getAll(name);
     }
 
-    @Override public <T> Optional<T> getOne(String name, TypeToken<T> clazz) {
+    @Override public <T> Optional<T> getOne(final String name, final TypeToken<T> clazz) {
         return this.context.getOne(name);
     }
 
-    @Override public <T> Collection<T> getAll(String name, TypeToken<T> clazz) {
+    @Override public <T> Collection<T> getAll(final String name, final TypeToken<T> clazz) {
         return this.context.getAll(name);
     }
 
-    @Override public <T> @NonNull T requireOne(String name, TypeToken<T> clazz) {
+    @Override public <T> @NonNull T requireOne(final String name, final TypeToken<T> clazz) {
         return this.context.requireOne(name);
     }
 
     @Override
-    public <T> @NonNull T requireOne(String name, Class<T> clazz) {
+    public <T> @NonNull T requireOne(final String name, final Class<T> clazz) {
         return this.context.requireOne(name);
     }
 
     @Override
-    public Player getPlayerFromArgs(String key, String errorKey) throws CommandException {
-        Optional<Player> player = getOne(key, Player.class);
+    public Player getPlayerFromArgs(final String key, final String errorKey) throws CommandException {
+        final Optional<Player> player = this.getOne(key, Player.class);
         if (player.isPresent()) {
             return player.get();
         } else {
-            return getIfPlayer(errorKey);
+            return this.getIfPlayer(errorKey);
         }
     }
 
@@ -134,7 +134,7 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
     public P getCommandSourceUnchecked() {
         try {
             return this.source.get();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -143,18 +143,18 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
     public Player getCommandSourceAsPlayerUnchecked() {
         try {
             return (Player) this.source.get();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public User getUserFromArgs(String key, String errorKey) throws CommandException {
-        Optional<User> player = getOne(key, User.class);
+    public User getUserFromArgs(final String key, final String errorKey) throws CommandException {
+        final Optional<User> player = this.getOne(key, User.class);
         if (player.isPresent()) {
             return player.get();
         } else {
-            return getIfPlayer(errorKey);
+            return this.getIfPlayer(errorKey);
         }
     }
 
@@ -164,7 +164,7 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
     }
 
     @Override
-    public void setCooldown(int cooldown) {
+    public void setCooldown(final int cooldown) {
         this.cooldown = Math.max(cooldown, 0);
     }
 
@@ -174,18 +174,18 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
     }
 
     @Override
-    public void setCost(double cost) {
+    public void setCost(final double cost) {
         this.cost = Math.max(cost, 0);
     }
 
     @Override
-    public <T> void put(String name, Class<T> clazz, T obj) {
+    public <T> void put(final String name, final Class<T> clazz, final T obj) {
         this.context.putArg(name, obj);
     }
 
     @Override
-    public <T> void putAll(String name, Class<T> clazz, Collection<? extends T> obj) {
-        for (T o : obj) {
+    public <T> void putAll(final String name, final Class<T> clazz, final Collection<? extends T> obj) {
+        for (final T o : obj) {
             this.context.putArg(name, o);
         }
     }
@@ -200,26 +200,26 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         return CommandResultImpl.FAILURE;
     }
 
-    @Override public ICommandResult getResultFromBoolean(boolean success) {
+    @Override public ICommandResult getResultFromBoolean(final boolean success) {
         if (success) {
-            return successResult();
+            return this.successResult();
         }
-        return failResult();
+        return this.failResult();
     }
 
-    public ICommandResult errorResultLiteral(Text message) {
+    public ICommandResult errorResultLiteral(final Text message) {
         return new CommandResultImpl.Literal(message);
     }
 
     @Override
-    public ICommandResult errorResult(String key, Object... args) {
+    public ICommandResult errorResult(final String key, final Object... args) {
         return new CommandResultImpl(this.serviceCollection.messageProvider(), key, args);
     }
 
     @Override
-    public CommandException createException(Throwable th, String key, Object... args) {
-        Optional<? extends CommandSource> c = this.source.asOptional();
-        CommandSource source;
+    public CommandException createException(final Throwable th, final String key, final Object... args) {
+        final Optional<? extends CommandSource> c = this.source.asOptional();
+        final CommandSource source;
         if (c.isPresent()) {
             source = c.get();
         } else {
@@ -233,9 +233,9 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
     }
 
     @Override
-    public CommandException createException(String key, Object... args) {
-        Optional<? extends CommandSource> c = this.source.asOptional();
-        CommandSource source;
+    public CommandException createException(final String key, final Object... args) {
+        final Optional<? extends CommandSource> c = this.source.asOptional();
+        final CommandSource source;
         if (c.isPresent()) {
             source = c.get();
         } else {
@@ -256,12 +256,12 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         return ImmutableMap.copyOf(this.modifiers);
     }
 
-    @Override public void removeModifier(String modifierId) {
+    @Override public void removeModifier(final String modifierId) {
         this.modifiers.entrySet().removeIf(x -> x.getKey().value().equals(modifierId));
     }
 
     @Override
-    public void removeModifier(ICommandModifier modifier) {
+    public void removeModifier(final ICommandModifier modifier) {
         this.modifiers.entrySet().removeIf(x -> x.getValue() == modifier);
     }
 
@@ -269,7 +269,7 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         return ImmutableList.copyOf(this.failActions);
     }
 
-    @Override public void addFailAction(Consumer<ICommandContext<P>> action) {
+    @Override public void addFailAction(final Consumer<ICommandContext<P>> action) {
         this.failActions.add(action);
     }
 
@@ -277,55 +277,55 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         return this.warmup;
     }
 
-    @Override public void setWarmup(int warmup) {
+    @Override public void setWarmup(final int warmup) {
         this.warmup = warmup;
     }
 
-    @Override public boolean testPermission(String permission) {
-        return testPermissionFor(getCommandSourceUnchecked(), permission);
+    @Override public boolean testPermission(final String permission) {
+        return this.testPermissionFor(this.getCommandSourceUnchecked(), permission);
     }
 
-    @Override public boolean testPermissionFor(Subject subject, String permission) {
+    @Override public boolean testPermissionFor(final Subject subject, final String permission) {
         return this.serviceCollection.permissionService().hasPermission(subject, permission);
     }
 
-    @Override public String getMessageString(String key, Object... replacements) {
-        return getMessageStringFor(getCommandSourceUnchecked(), key, replacements);
+    @Override public String getMessageString(final String key, final Object... replacements) {
+        return getMessageStringFor(this.getCommandSourceUnchecked(), key, replacements);
     }
 
-    @Override public String getMessageStringFor(CommandSource to, String key, Object... replacements) {
+    @Override public String getMessageStringFor(final CommandSource to, final String key, final Object... replacements) {
         return this.serviceCollection.messageProvider().getMessageString(to.getLocale(), key, replacements);
     }
 
-    @Override public Text getMessageFor(CommandSource to, String key, Object... replacements) {
-        return this.serviceCollection.messageProvider().getMessageFor(getCommandSourceUnchecked(), key, replacements);
+    @Override public Text getMessageFor(final CommandSource to, final String key, final Object... replacements) {
+        return this.serviceCollection.messageProvider().getMessageFor(this.getCommandSourceUnchecked(), key, replacements);
     }
 
-    @Override public Text getMessage(String key, Object... replacements) {
-        return getMessageFor(getCommandSourceUnchecked(), key, replacements);
+    @Override public Text getMessage(final String key, final Object... replacements) {
+        return getMessageFor(this.getCommandSourceUnchecked(), key, replacements);
     }
 
-    @Override public String getTimeString(long seconds) {
-        return this.serviceCollection.messageProvider().getTimeString(getCommandSourceUnchecked().getLocale(), seconds);
+    @Override public String getTimeString(final long seconds) {
+        return this.serviceCollection.messageProvider().getTimeString(this.getCommandSourceUnchecked().getLocale(), seconds);
     }
 
-    @Override public void sendMessage(String key, Object... replacements) {
-        sendMessageTo(getCommandSourceUnchecked(), key, replacements);
+    @Override public void sendMessage(final String key, final Object... replacements) {
+        sendMessageTo(this.getCommandSourceUnchecked(), key, replacements);
     }
 
-    @Override public void sendMessageText(Text message) {
-        getCommandSourceUnchecked().sendMessage(message);
+    @Override public void sendMessageText(final Text message) {
+        this.getCommandSourceUnchecked().sendMessage(message);
     }
 
-    @Override public void sendMessageTo(MessageReceiver source, String key, Object... replacements) {
+    @Override public void sendMessageTo(final MessageReceiver source, final String key, final Object... replacements) {
         this.serviceCollection.messageProvider().sendMessageTo(source, key, replacements);
     }
 
-    @Override public boolean is(CommandSource other) {
+    @Override public boolean is(final CommandSource other) {
         return this.source.getUnchecked().equals(other);
     }
 
-    @Override public boolean is(Class<?> other) {
+    @Override public boolean is(final Class<?> other) {
         return other.isInstance(this.source.getUnchecked());
     }
 
@@ -333,14 +333,14 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         return false;
     }
 
-    @Override public boolean is(User x) {
+    @Override public boolean is(final User x) {
         return false;
     }
 
-    @Override public Optional<WorldProperties> getWorldPropertiesOrFromSelf(String worldKey) {
-        Optional<WorldProperties> optionalWorldProperties = this.context.getOne(worldKey);
+    @Override public Optional<WorldProperties> getWorldPropertiesOrFromSelf(final String worldKey) {
+        final Optional<WorldProperties> optionalWorldProperties = this.context.getOne(worldKey);
         if (!optionalWorldProperties.isPresent()) {
-            CommandSource source = getCommandSourceUnchecked();
+            final CommandSource source = this.getCommandSourceUnchecked();
             if (source instanceof Locatable) {
                 return Optional.of(((Locatable) source).getWorld().getProperties());
             }
@@ -350,10 +350,10 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
     }
 
     @Override public Text getDisplayName() {
-        return this.getServiceCollection().playerDisplayNameService().getDisplayName(getCommandSourceUnchecked());
+        return this.getServiceCollection().playerDisplayNameService().getDisplayName(this.getCommandSourceUnchecked());
     }
 
-    @Override public Text getDisplayName(UUID uuid) {
+    @Override public Text getDisplayName(final UUID uuid) {
         return this.getServiceCollection().playerDisplayNameService().getDisplayName(uuid);
     }
 
@@ -361,22 +361,22 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         return this.stringName;
     }
 
-    @Override public OptionalInt getLevelFor(Subject subject, String key) {
+    @Override public OptionalInt getLevelFor(final Subject subject, final String key) {
         return this.serviceCollection.permissionService().getIntOptionFromSubject(subject, key);
     }
 
-    @Override public boolean isPermissionLevelOkay(Subject actee, String key, String permissionIfNoLevel, boolean isSameLevel) {
-        return this.serviceCollection.permissionService().isPermissionLevelOkay(getCommandSourceUnchecked(), actee, key, permissionIfNoLevel, isSameLevel);
+    @Override public boolean isPermissionLevelOkay(final Subject actee, final String key, final String permissionIfNoLevel, final boolean isSameLevel) {
+        return this.serviceCollection.permissionService().isPermissionLevelOkay(this.getCommandSourceUnchecked(), actee, key, permissionIfNoLevel, isSameLevel);
     }
 
     public static class Any extends CommandContextImpl<CommandSource> {
 
-        public Any(Cause cause,
-                CommandContext context,
-                INucleusServiceCollection serviceCollection,
-                CommandSource target,
-                CommandControl control,
-                Map<CommandModifier, ICommandModifier> modifiers) throws CommandException {
+        public Any(final Cause cause,
+                final CommandContext context,
+                final INucleusServiceCollection serviceCollection,
+                final CommandSource target,
+                final CommandControl control,
+                final Map<CommandModifier, ICommandModifier> modifiers) throws CommandException {
             super(cause, context, serviceCollection, () -> target, target, control, modifiers);
         }
 
@@ -385,32 +385,32 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         }
 
         @Override
-        public @NonNull Player getIfPlayer(String errorKey) throws CommandException {
-            if (getCommandSource() instanceof Player) {
-                return (Player) getCommandSource();
+        public @NonNull Player getIfPlayer(final String errorKey) throws CommandException {
+            if (this.getCommandSource() instanceof Player) {
+                return (Player) this.getCommandSource();
             }
 
             throw new CommandException(
-                    this.getServiceCollection().messageProvider().getMessageFor(getCommandSource(), errorKey)
+                    this.getServiceCollection().messageProvider().getMessageFor(this.getCommandSource(), errorKey)
             );
         }
 
         @Override
-        public boolean is(User x) {
+        public boolean is(final User x) {
             try {
-                CommandSource source = getCommandSource();
+                final CommandSource source = this.getCommandSource();
                 if (source instanceof Player) {
                     return ((Player) source).getUniqueId().equals(x.getUniqueId());
                 }
 
                 return false;
-            } catch (CommandException e) {
+            } catch (final CommandException e) {
                 return false;
             }
         }
 
         @Override public boolean isUser() {
-            return getCommandSourceUnchecked() instanceof User;
+            return this.getCommandSourceUnchecked() instanceof User;
         }
     }
 
@@ -419,13 +419,13 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
 
         private final boolean isBypass;
 
-        public Console(Cause cause,
-                CommandContext context,
-                INucleusServiceCollection serviceCollection,
-                ConsoleSource target,
-                CommandControl control,
-                Map<CommandModifier, ICommandModifier> modifiers,
-                boolean isBypass) throws CommandException {
+        public Console(final Cause cause,
+                final CommandContext context,
+                final INucleusServiceCollection serviceCollection,
+                final ConsoleSource target,
+                final CommandControl control,
+                final Map<CommandModifier, ICommandModifier> modifiers,
+                final boolean isBypass) throws CommandException {
             super(cause, context, serviceCollection, () -> target, target, control, modifiers);
             this.isBypass = isBypass;
         }
@@ -435,13 +435,13 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         }
 
         @Override
-        public @NonNull Player getIfPlayer(String errorKey) throws CommandException {
+        public @NonNull Player getIfPlayer(final String errorKey) throws CommandException {
             throw new CommandException(
-                    this.getServiceCollection().messageProvider().getMessageFor(getCommandSource(), errorKey)
+                    this.getServiceCollection().messageProvider().getMessageFor(this.getCommandSource(), errorKey)
             );
         }
 
-        @Override public boolean is(Class<?> other) {
+        @Override public boolean is(final Class<?> other) {
             return ConsoleSource.class.isAssignableFrom(other);
         }
 
@@ -453,7 +453,7 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
             return this.isBypass;
         }
 
-        @Override public Optional<WorldProperties> getWorldPropertiesOrFromSelf(String worldKey) {
+        @Override public Optional<WorldProperties> getWorldPropertiesOrFromSelf(final String worldKey) {
             return this.context.getOne(worldKey);
         }
     }
@@ -462,24 +462,24 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
 
         private final UUID uuid;
 
-        public PlayerSource(Cause cause,
-                CommandContext context,
-                INucleusServiceCollection serviceCollection,
-                ThrownSupplier<Player, CommandException> source,
-                Player player,
-                CommandControl control,
-                Map<CommandModifier, ICommandModifier> modifiers) throws CommandException {
+        public PlayerSource(final Cause cause,
+                final CommandContext context,
+                final INucleusServiceCollection serviceCollection,
+                final ThrownSupplier<Player, CommandException> source,
+                final Player player,
+                final CommandControl control,
+                final Map<CommandModifier, ICommandModifier> modifiers) throws CommandException {
             super(cause, context, serviceCollection, source, player, control, modifiers);
             this.uuid = source.asOptional().map(Identifiable::getUniqueId).get();
         }
 
         @Override
-        public boolean is(Class<?> other) {
+        public boolean is(final Class<?> other) {
             return Player.class.isAssignableFrom(other);
         }
 
         @Override
-        public boolean is(User x) {
+        public boolean is(final User x) {
             return x.getUniqueId().equals(this.uuid);
         }
 
@@ -488,8 +488,8 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         }
 
         @Override
-        public Optional<WorldProperties> getWorldPropertiesOrFromSelf(String worldKey) {
-            Optional<WorldProperties> worldProperties = this.context.getOne(worldKey);
+        public Optional<WorldProperties> getWorldPropertiesOrFromSelf(final String worldKey) {
+            final Optional<WorldProperties> worldProperties = this.context.getOne(worldKey);
             if (!worldProperties.isPresent()) {
                 return Optional.of(this.getCommandSourceAsPlayerUnchecked().getWorld().getProperties());
             }
@@ -503,8 +503,8 @@ public abstract class CommandContextImpl<P extends CommandSource> implements ICo
         }
 
         @Override
-        public @NonNull Player getIfPlayer(String errorKey) throws CommandException {
-            return getCommandSource();
+        public @NonNull Player getIfPlayer(final String errorKey) throws CommandException {
+            return this.getCommandSource();
         }
     }
 

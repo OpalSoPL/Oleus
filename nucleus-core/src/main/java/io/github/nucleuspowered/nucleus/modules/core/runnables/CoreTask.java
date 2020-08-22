@@ -10,15 +10,12 @@ import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 /**
  * Core tasks. No module, must always run.
  */
-@NonnullByDefault
 public class CoreTask implements TaskBase, IReloadableService.Reloadable {
 
     private boolean printSave = false;

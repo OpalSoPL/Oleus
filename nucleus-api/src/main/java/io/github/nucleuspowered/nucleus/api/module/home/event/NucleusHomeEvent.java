@@ -10,11 +10,11 @@ import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.user.TargetUserEvent;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Events when a player's home changes.
@@ -29,18 +29,18 @@ public interface NucleusHomeEvent extends Cancellable, CancelMessageEvent, Event
     String getName();
 
     /**
-     * Gets the owner of the house
+     * Gets the {@link UUID} of the owner of the home
      *
      * @return The owner.
      */
-    User getUser();
+    UUID getUser();
 
     /**
-     * Gets the {@link Location} of the home.
+     * Gets the {@link ServerLocation} of the home.
      *
      * @return The location. It might not exist if the world does not exist any more.
      */
-    Optional<Location<World>> getLocation();
+    Optional<ServerLocation> getLocation();
 
     /**
      * Fired when a home is created.
@@ -67,7 +67,7 @@ public interface NucleusHomeEvent extends Cancellable, CancelMessageEvent, Event
          *
          * @return The location. It might not exist if the world does not exist any more.
          */
-        Optional<Location<World>> getOriginalLocation();
+        Optional<ServerLocation> getOriginalLocation();
     }
 
     /**
@@ -91,7 +91,14 @@ public interface NucleusHomeEvent extends Cancellable, CancelMessageEvent, Event
      *     Note that the user does not necessarily need to be online.
      * </p>
      */
-    interface Use extends NucleusHomeEvent, TargetUserEvent {
+    interface Use extends NucleusHomeEvent {
+
+        /**
+         * The {@link UUID} of the user that is being teleported.
+         *
+         * @return The {@link UUID} of the user being teleported.
+         */
+        UUID getTeleportingUser();
 
         /**
          * Gets the existing home.

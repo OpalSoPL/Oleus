@@ -35,9 +35,9 @@ public interface NucleusProvider extends IPlayerInformationService.Provider {
         Text getText(User user, CommandSource source, INucleusServiceCollection serviceCollection);
 
         @Override
-        default Optional<Text> get(User user, CommandSource source, INucleusServiceCollection serviceCollection) {
-            if (serviceCollection.permissionService().hasPermission(source, permission())) {
-                return Optional.ofNullable(getText(user, source, serviceCollection));
+        default Optional<Text> get(final User user, final CommandSource source, final INucleusServiceCollection serviceCollection) {
+            if (serviceCollection.permissionService().hasPermission(source, this.permission())) {
+                return Optional.ofNullable(this.getText(user, source, serviceCollection));
             }
 
             return Optional.empty();

@@ -5,13 +5,12 @@
 package io.github.nucleuspowered.nucleus.api.module.nickname;
 
 import io.github.nucleuspowered.nucleus.api.module.nickname.exception.NicknameException;
+import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 /**
  * Allows plugins to set and inspect a {@link User}'s current nickname.
@@ -23,33 +22,33 @@ public interface NucleusNicknameService {
      * including the prefix, if it exists.
      *
      * @param user The {@link UUID} of the user to inspect.
-     * @return The nickname in {@link Text} form, if it exists.
+     * @return The nickname in {@link Component} form, if it exists.
      */
-    Optional<Text> getNicknameWithPrefix(UUID user);
+    Optional<Component> getNicknameWithPrefix(UUID user);
 
     /**
      * Gets the current nickname for a user with prefix, if it exists.
      *
      * @param user The {@link User} to inspect.
-     * @return The nickname in {@link Text} form, if it exists.
+     * @return The nickname in {@link Component} form, if it exists.
      */
-    Optional<Text> getNicknameWithPrefix(User user);
+    Optional<Component> getNicknameWithPrefix(User user);
 
     /**
      * Gets the current nickname for a user, if it exists.
      *
      * @param user The {@link User} to inspect.
-     * @return The nickname in {@link Text} form, if it exists.
+     * @return The nickname in {@link Component} form, if it exists.
      */
-    Optional<Text> getNickname(User user);
+    Optional<Component> getNickname(User user);
 
     /**
      * Gets the current nickname for a user, if it exists.
      *
      * @param user The {@link UUID} of the user to inspect.
-     * @return The nickname in {@link Text} form, if it exists.
+     * @return The nickname in {@link Component} form, if it exists.
      */
-    Optional<Text> getNickname(UUID user);
+    Optional<Component> getNickname(UUID user);
 
     /**
      * Sets a user's nickname.
@@ -58,8 +57,8 @@ public interface NucleusNicknameService {
      * @param nickname The nickname, or {@code null} to remove it.
      * @throws NicknameException if the nickname could not be set.
      */
-    default void setNickname(User user, @Nullable Text nickname) throws NicknameException {
-        setNickname(user, nickname, false);
+    default void setNickname(final UUID user, @Nullable final Component nickname) throws NicknameException {
+        this.setNickname(user, nickname, false);
     }
 
     /**
@@ -70,7 +69,7 @@ public interface NucleusNicknameService {
      * @param bypassRestrictions Whether to bypass the configured restrictions.
      * @throws NicknameException if the nickname could not be set.
      */
-    void setNickname(User user, @Nullable Text nickname, boolean bypassRestrictions) throws NicknameException;
+    void setNickname(UUID user, @Nullable Component nickname, boolean bypassRestrictions) throws NicknameException;
 
     /**
      * Removes the nickname for the specified user.
@@ -78,8 +77,8 @@ public interface NucleusNicknameService {
      * @param user The nickname to set.
      * @throws NicknameException if the nickname could not be set.
      */
-    default void removeNickname(User user) throws NicknameException {
-        setNickname(user, null);
+    default void removeNickname(final UUID user) throws NicknameException {
+        this.setNickname(user, null);
     }
 
 }

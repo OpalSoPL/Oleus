@@ -14,7 +14,7 @@ public abstract class WrappedElement extends CommandElement {
 
     private final CommandElement wrappedElement;
 
-    public WrappedElement(CommandElement wrappedElement) {
+    public WrappedElement(final CommandElement wrappedElement) {
         super(wrappedElement.getKey());
         this.wrappedElement = wrappedElement;
     }
@@ -27,7 +27,7 @@ public abstract class WrappedElement extends CommandElement {
         return this.wrappedElement.getKey();
     }
 
-    @Override public Text getUsage(CommandSource src) {
-        return getWrappedElement().getUsage(src);
+    @Override public Text getUsage(final CommandSource src) {
+        return this.getWrappedElement().getUsage(src);
     }
 }

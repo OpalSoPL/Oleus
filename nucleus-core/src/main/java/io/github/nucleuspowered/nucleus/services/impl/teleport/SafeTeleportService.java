@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.teleport;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.teleport.data.NucleusTeleportHelperFilters;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
@@ -44,11 +44,11 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
     private SafeTeleportConfig config = new SafeTeleportConfig();
 
     @Inject
-    public SafeTeleportService(PluginContainer pluginContainer) {
+    public SafeTeleportService(final PluginContainer pluginContainer) {
         Sponge.getServiceManager().setProvider(pluginContainer, INucleusTeleportService.class, this);
     }
 
-    @Override public boolean setLocation(Player player, Location<World> location) {
+    @Override public boolean setLocation(final Player player, final Location<World> location) {
         if (player.setLocation(location)) {
             player.setSpectatorTarget(null);
             return true;
@@ -57,49 +57,49 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
         return false;
     }
 
-    @Override public TeleportResult teleportPlayerSmart(Player player,
-            Transform<World> transform,
-            boolean centreBlock,
-            boolean safe,
-            TeleportScanner scanner) {
-        return teleportPlayerSmart(player, transform.getLocation(), transform.getRotation(), centreBlock, safe, scanner);
+    @Override public TeleportResult teleportPlayerSmart(final Player player,
+            final Transform<World> transform,
+            final boolean centreBlock,
+            final boolean safe,
+            final TeleportScanner scanner) {
+        return this.teleportPlayerSmart(player, transform.getLocation(), transform.getRotation(), centreBlock, safe, scanner);
     }
 
-    @Override public TeleportResult teleportPlayerSmart(Player player,
-            Location<World> location,
-            boolean centreBlock,
-            boolean safe,
-            TeleportScanner scanner) {
-        return teleportPlayer(player,
+    @Override public TeleportResult teleportPlayerSmart(final Player player,
+            final Location<World> location,
+            final boolean centreBlock,
+            final boolean safe,
+            final TeleportScanner scanner) {
+        return this.teleportPlayer(player,
                 location,
                 player.getRotation(),
                 centreBlock,
                 scanner,
-                getAppropriateFilter(player, safe));
+                this.getAppropriateFilter(player, safe));
     }
 
-    @Override public TeleportResult teleportPlayerSmart(Player player,
-            Location<World> location,
-            Vector3d rotation,
-            boolean centreBlock,
-            boolean safe,
-            TeleportScanner scanner) {
-        return teleportPlayer(player,
+    @Override public TeleportResult teleportPlayerSmart(final Player player,
+            final Location<World> location,
+            final Vector3d rotation,
+            final boolean centreBlock,
+            final boolean safe,
+            final TeleportScanner scanner) {
+        return this.teleportPlayer(player,
                 location,
                 rotation,
                 centreBlock,
                 scanner,
-                getAppropriateFilter(player, safe));
+                this.getAppropriateFilter(player, safe));
     }
 
     @Override
-    public TeleportResult teleportPlayer(Player player,
-            Location<World> location,
-            boolean centreBlock,
-            TeleportScanner scanner,
-            TeleportHelperFilter filter,
-            TeleportHelperFilter... filters) {
-        return teleportPlayer(
+    public TeleportResult teleportPlayer(final Player player,
+            final Location<World> location,
+            final boolean centreBlock,
+            final TeleportScanner scanner,
+            final TeleportHelperFilter filter,
+            final TeleportHelperFilter... filters) {
+        return this.teleportPlayer(
                 player,
                 location,
                 player.getRotation(),
@@ -111,15 +111,15 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
     }
 
     @Override
-    public TeleportResult teleportPlayer(Player player,
-            Location<World> location,
-            Vector3d rotation,
-            boolean centreBlock,
-            TeleportScanner scanner,
-            TeleportHelperFilter filter,
-            TeleportHelperFilter... filters) {
+    public TeleportResult teleportPlayer(final Player player,
+            final Location<World> location,
+            final Vector3d rotation,
+            final boolean centreBlock,
+            final TeleportScanner scanner,
+            final TeleportHelperFilter filter,
+            final TeleportHelperFilter... filters) {
 
-        Optional<Transform<World>> optionalWorldTransform = getSafeTransform(
+        final Optional<Transform<World>> optionalWorldTransform = this.getSafeTransform(
                 location,
                 rotation,
                 scanner,
@@ -127,10 +127,10 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
                 filters
         );
 
-        Cause cause = Sponge.getCauseStackManager().getCurrentCause();
+        final Cause cause = Sponge.getCauseStackManager().getCurrentCause();
         if (optionalWorldTransform.isPresent()) {
             Transform<World> targetLocation = optionalWorldTransform.get();
-            AboutToTeleportEvent event = new AboutToTeleportEvent(
+            final AboutToTeleportEvent event = new AboutToTeleportEvent(
                     cause,
                     targetLocation,
                     player
@@ -138,7 +138,7 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
 
             if (Sponge.getEventManager().post(event)) {
                 event.getCancelMessage().ifPresent(x -> {
-                    Object o = cause.root();
+                    final Object o = cause.root();
                     if (o instanceof MessageReceiver) {
                         ((MessageReceiver) o).sendMessage(x);
                     }
@@ -146,9 +146,9 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
                 return TeleportResult.FAIL_CANCELLED;
             }
 
-            try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.BYPASS_JAILING_RESTRICTION, true);
-                Optional<Entity> oe = player.getVehicle();
+                final Optional<Entity> oe = player.getVehicle();
                 if (oe.isPresent()) {
                     player.setVehicle(null);
                 }
@@ -175,10 +175,10 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
 
     @Override
     public Optional<Location<World>> getSafeLocation(
-            Location<World> location,
-            TeleportScanner scanner,
-            TeleportHelperFilter filter,
-            TeleportHelperFilter... filters) {
+            final Location<World> location,
+            final TeleportScanner scanner,
+            final TeleportHelperFilter filter,
+            final TeleportHelperFilter... filters) {
         return scanner.scanFrom(
                 location.getExtent(),
                 location.getBlockPosition(),
@@ -192,16 +192,16 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
 
     @Override
     public Optional<Transform<World>> getSafeTransform(
-            Location<World> location,
-            Vector3d rotation,
-            TeleportScanner scanner,
-            TeleportHelperFilter filter,
-            TeleportHelperFilter... filters) {
-        return getSafeLocation(location, scanner, filter, filters)
+            final Location<World> location,
+            final Vector3d rotation,
+            final TeleportScanner scanner,
+            final TeleportHelperFilter filter,
+            final TeleportHelperFilter... filters) {
+        return this.getSafeLocation(location, scanner, filter, filters)
                 .map(x -> new Transform<>(location.getExtent(), location.getPosition(), rotation));
     }
 
-    @Override public TeleportHelperFilter getAppropriateFilter(Player src, boolean safeTeleport) {
+    @Override public TeleportHelperFilter getAppropriateFilter(final Player src, final boolean safeTeleport) {
         if (safeTeleport && !src.get(Keys.GAME_MODE).filter(x -> x == GameModes.SPECTATOR).isPresent()) {
             if (src.get(Keys.IS_FLYING).orElse(false)) {
                 return TeleportHelperFilters.FLYING;
@@ -214,14 +214,14 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.getServiceUnchecked(CoreConfigAdapter.class)
                 .getNodeOrDefault().getSafeTeleportConfig();
     }
 
-    @Override public BorderDisableSession temporarilyDisableBorder(boolean reset, World world) {
+    @Override public BorderDisableSession temporarilyDisableBorder(final boolean reset, final World world) {
         if (reset) {
-            WorldBorder border = world.getWorldBorder();
+            final WorldBorder border = world.getWorldBorder();
             return new WorldBorderReset(border);
         }
 
@@ -235,7 +235,7 @@ public class SafeTeleportService implements INucleusTeleportService, IReloadable
         private final double diameter;
         private final WorldBorder border;
 
-        WorldBorderReset(WorldBorder border) {
+        WorldBorderReset(final WorldBorder border) {
             this.border = border;
             this.x = border.getCenter().getX();
             this.z = border.getCenter().getZ();

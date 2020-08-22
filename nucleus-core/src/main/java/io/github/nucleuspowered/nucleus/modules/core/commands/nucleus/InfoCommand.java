@@ -21,8 +21,6 @@ import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
@@ -41,7 +39,6 @@ import java.util.Set;
         parentCommand = NucleusCommand.class,
         async = true
 )
-@NonnullByDefault
 public class InfoCommand implements ICommandExecutor<CommandSource> {
 
     @Override

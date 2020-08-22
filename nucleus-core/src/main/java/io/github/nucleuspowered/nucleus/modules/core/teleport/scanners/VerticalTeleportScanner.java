@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.core.teleport.scanners;
 
-import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
@@ -48,7 +48,6 @@ public abstract class VerticalTeleportScanner implements TeleportScanner {
         return Optional.empty();
     }
 
-    @NonnullByDefault
     public static class Ascending extends VerticalTeleportScanner {
 
         @Override
@@ -63,7 +62,6 @@ public abstract class VerticalTeleportScanner implements TeleportScanner {
 
     }
 
-    @NonnullByDefault
     public static class Descending extends VerticalTeleportScanner {
 
         @Override

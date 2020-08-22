@@ -12,16 +12,16 @@ public interface ThrownSupplier<I, X extends Throwable> {
 
     default I getUnchecked() {
         try {
-            return get();
-        } catch (Throwable x) {
+            return this.get();
+        } catch (final Throwable x) {
             throw new RuntimeException(x);
         }
     }
 
     default Optional<I> asOptional() {
         try {
-            return Optional.of(get());
-        } catch (Throwable x) {
+            return Optional.of(this.get());
+        } catch (final Throwable x) {
             return Optional.empty();
         }
     }

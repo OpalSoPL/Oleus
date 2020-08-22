@@ -6,8 +6,8 @@ package io.github.nucleuspowered.nucleus.api.module.kit;
 
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.api.module.kit.event.NucleusKitEvent;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.text.Text;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -25,7 +25,7 @@ public interface KitRedeemResult {
      * @return true if so
      */
     default boolean isSuccess() {
-        return getStatus() == Status.SUCCESS || getStatus() == Status.PARTIAL_SUCCESS;
+        return this.getStatus() == Status.SUCCESS || this.getStatus() == Status.PARTIAL_SUCCESS;
     }
 
     /**
@@ -58,7 +58,7 @@ public interface KitRedeemResult {
      * @return The {@link Duration}, if any.
      */
     default Optional<Duration> getCooldownDuration() {
-        return getCooldownExpiry().map(x -> {
+        return this.getCooldownExpiry().map(x -> {
             Instant now = Instant.now();
             if (x.isAfter(now)) {
                 return Duration.between(now, x);
@@ -72,7 +72,7 @@ public interface KitRedeemResult {
      *
      * @return The associated message, if any.
      */
-    Optional<Text> getMessage();
+    Optional<Component> getMessage();
 
     /**
      * The items that didn't make it into the inventory if the kit was otherwise

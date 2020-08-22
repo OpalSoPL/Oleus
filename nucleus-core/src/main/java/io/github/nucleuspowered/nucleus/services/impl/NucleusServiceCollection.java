@@ -87,11 +87,11 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
 
     @Inject
     public NucleusServiceCollection(
-            Injector injector,
-            PluginContainer pluginContainer,
-            Logger logger,
-            @DataDirectory Supplier<Path> dataPath,
-            @ConfigDirectory Path configPath) {
+            final Injector injector,
+            final PluginContainer pluginContainer,
+            final Logger logger,
+            @DataDirectory final Supplier<Path> dataPath,
+            @ConfigDirectory final Path configPath) {
         this.messageProviderService = new LazyLoad<>(this, injector, IMessageProviderService.class);
         this.economyServiceProvider = new LazyLoad<>(this, injector, IEconomyServiceProvider.class);
         this.warmupService = new LazyLoad<>(this, injector, IWarmupService.class);
@@ -247,7 +247,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     }
 
     @Override
-    public <I, C extends I> void registerService(Class<I> key, C service, boolean rereg) {
+    public <I, C extends I> void registerService(final Class<I> key, final C service, final boolean rereg) {
         if (!rereg && (this.instances.containsKey(key) || this.suppliers.containsKey(key))) {
             return;
         }
@@ -257,7 +257,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     }
 
     @Override @SuppressWarnings("unchecked")
-    public <I> Optional<I> getService(Class<I> key) {
+    public <I> Optional<I> getService(final Class<I> key) {
         if (this.instances.containsKey(key)) {
             return Optional.of((I) this.instances.get(key));
         } else if (this.suppliers.containsKey(key)) {
@@ -268,7 +268,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     }
 
     @Override @SuppressWarnings("unchecked")
-    public <I> I getServiceUnchecked(Class<I> key) {
+    public <I> I getServiceUnchecked(final Class<I> key) {
         if (this.instances.containsKey(key)) {
             return (I) this.instances.get(key);
         } else if (this.suppliers.containsKey(key)) {

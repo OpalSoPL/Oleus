@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.datatypes;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.World;
@@ -18,7 +18,7 @@ public class UUIDTransform {
     private final Vector3d position;
     private final Vector3d rotation;
 
-    public UUIDTransform(Transform<World> worldTransform) {
+    public UUIDTransform(final Transform<World> worldTransform) {
         this(
                 worldTransform.getExtent().getUniqueId(),
                 worldTransform.getPosition(),
@@ -26,7 +26,7 @@ public class UUIDTransform {
         );
     }
 
-    public UUIDTransform(UUID world, Vector3d position, Vector3d rotation) {
+    public UUIDTransform(final UUID world, final Vector3d position, final Vector3d rotation) {
         this.world = world;
         this.position = position;
         this.rotation = rotation;
@@ -53,11 +53,11 @@ public class UUIDTransform {
     }
 
     public Optional<Transform<World>> getTransform() {
-        return getWorld().map(x -> new Transform<>(x, this.position, this.rotation));
+        return this.getWorld().map(x -> new Transform<>(x, this.position, this.rotation));
     }
 
     public Optional<Transform<World>> loadTransform() {
-        return loadWorld().map(x -> new Transform<>(x, this.position, this.rotation));
+        return this.loadWorld().map(x -> new Transform<>(x, this.position, this.rotation));
     }
 
 }

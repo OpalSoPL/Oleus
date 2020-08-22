@@ -38,12 +38,12 @@ public interface IPlayerDisplayNameService {
 
     Text getDisplayName(UUID playerUUID);
 
-    default Text getDisplayName(Player player) {
-        return getDisplayName(player.getUniqueId());
+    default Text getDisplayName(final Player player) {
+        return this.getDisplayName(player.getUniqueId());
     }
 
-    default Text getDisplayName(User user) {
-        return getDisplayName(user.getUniqueId());
+    default Text getDisplayName(final User user) {
+        return this.getDisplayName(user.getUniqueId());
     }
 
     Text getDisplayName(CommandSource source);

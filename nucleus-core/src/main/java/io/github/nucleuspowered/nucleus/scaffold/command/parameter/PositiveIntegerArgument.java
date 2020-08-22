@@ -23,11 +23,11 @@ public class PositiveIntegerArgument extends CommandElement {
     private final boolean allowZero;
     private final IMessageProviderService messageProvider;
 
-    public PositiveIntegerArgument(@Nullable Text key, INucleusServiceCollection serviceCollection) {
+    public PositiveIntegerArgument(@Nullable final Text key, final INucleusServiceCollection serviceCollection) {
         this(key, true, serviceCollection);
     }
 
-    public PositiveIntegerArgument(@Nullable Text key, boolean allowZero, INucleusServiceCollection serviceCollection) {
+    public PositiveIntegerArgument(@Nullable final Text key, final boolean allowZero, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.allowZero = allowZero;
         this.messageProvider = serviceCollection.messageProvider();
@@ -35,21 +35,21 @@ public class PositiveIntegerArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         try {
-            int a = Integer.parseUnsignedInt(args.next());
+            final int a = Integer.parseUnsignedInt(args.next());
             if (this.allowZero || a != 0) {
                 return a;
             }
 
             throw args.createError(this.messageProvider.getMessageFor(source, "args.positiveint.zero"));
-        } catch (NumberFormatException e) {
+        } catch (final NumberFormatException e) {
             throw args.createError(this.messageProvider.getMessageFor(source, "args.positiveint.negative"));
         }
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return Lists.newArrayList();
     }
 }

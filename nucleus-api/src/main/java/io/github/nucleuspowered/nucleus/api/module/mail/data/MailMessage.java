@@ -4,10 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.mail.data;
 
-import org.spongepowered.api.entity.living.player.User;
-
 import java.time.Instant;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Represents a mail message.
@@ -29,9 +28,10 @@ public interface MailMessage {
     Instant getDate();
 
     /**
-     * The sender of the message, or {@link Optional#empty()} if it wasn't a player.
+     * The {@link UUID} of the sender of the message, or
+     * {@link Optional#empty()} if it wasn't a player.
      *
      * @return The sender.
      */
-    Optional<User> getSender();
+    Optional<UUID> getSender();
 }

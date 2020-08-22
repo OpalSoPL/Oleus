@@ -4,11 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.api.core;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.net.InetAddress;
 import java.time.Instant;
@@ -18,7 +17,6 @@ import java.util.UUID;
 /**
  * Retrieves Nucleus and general metadata about a {@link User}
  */
-@NonnullByDefault
 public interface NucleusPlayerMetadataService {
 
     /**

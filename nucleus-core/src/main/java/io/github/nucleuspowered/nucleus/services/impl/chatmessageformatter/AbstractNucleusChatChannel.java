@@ -24,13 +24,13 @@ public abstract class AbstractNucleusChatChannel<T extends Collection<MessageRec
     private final MessageChannel messageChannel;
     final T messageReceiverList;
 
-    public AbstractNucleusChatChannel(MessageChannel messageChannel, T receivers) {
+    public AbstractNucleusChatChannel(final MessageChannel messageChannel, final T receivers) {
         this.messageChannel = messageChannel;
         this.messageReceiverList = receivers;
     }
 
     @Override
-    public void send(@Nullable Object sender, Text original, ChatType type) {
+    public void send(@Nullable final Object sender, final Text original, final ChatType type) {
         this.messageChannel.send(sender, original, type);
     }
 
@@ -48,9 +48,9 @@ public abstract class AbstractNucleusChatChannel<T extends Collection<MessageRec
 
         private final Function<Immutable<I, M>, M> mutableFactory;
 
-        public Immutable(MessageChannel messageChannel,
-                Collection<MessageReceiver> messageReceivers,
-                Function<Immutable<I, M>, M> mutableFactory) {
+        public Immutable(final MessageChannel messageChannel,
+                final Collection<MessageReceiver> messageReceivers,
+                final Function<Immutable<I, M>, M> mutableFactory) {
             super(messageChannel, ImmutableList.copyOf(messageReceivers));
             this.mutableFactory = mutableFactory;
         }
@@ -65,21 +65,21 @@ public abstract class AbstractNucleusChatChannel<T extends Collection<MessageRec
             extends AbstractNucleusChatChannel<Set<MessageReceiver>>
             implements MutableMessageChannel {
 
-        public Mutable(Immutable<?, M> immutable) {
+        public Mutable(final Immutable<?, M> immutable) {
             super(immutable.getDelegated(), new HashSet<>(immutable.getMembers()));
         }
 
-        public Mutable(MessageChannel messageChannel, Collection<MessageReceiver> messageReceivers) {
+        public Mutable(final MessageChannel messageChannel, final Collection<MessageReceiver> messageReceivers) {
             super(messageChannel, new HashSet<>(messageReceivers));
         }
 
         @Override
-        public boolean addMember(MessageReceiver member) {
+        public boolean addMember(final MessageReceiver member) {
             return this.messageReceiverList.add(member);
         }
 
         @Override
-        public boolean removeMember(MessageReceiver member) {
+        public boolean removeMember(final MessageReceiver member) {
             return this.messageReceiverList.remove(member);
         }
 

@@ -4,21 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.api.placeholder;
 
+import net.kyori.adventure.text.ComponentLike;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import org.spongepowered.api.text.placeholder.PlaceholderText;
-
-import java.util.Optional;
 
 /**
  * Provides a way to determine how Nucleus uses placeholders.
  */
 public interface NucleusPlaceholderService {
 
-    TextRepresentable parse(@Nullable CommandSource commandSource, String input);
+    ComponentLike parse(@Nullable Object sender, String input);
 
     /**
      * Gets the parser associated with the provided token name, if any,

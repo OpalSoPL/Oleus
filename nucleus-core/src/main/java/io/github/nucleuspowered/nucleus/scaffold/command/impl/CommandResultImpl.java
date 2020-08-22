@@ -27,11 +27,11 @@ public class CommandResultImpl implements ICommandResult {
     private final boolean willContinue;
     private final IMessageProviderService messageProviderService;
 
-    private CommandResultImpl(boolean success, boolean willContinue) {
+    private CommandResultImpl(final boolean success, final boolean willContinue) {
         this(success, willContinue, null, null, null);
     }
 
-    public CommandResultImpl(IMessageProviderService messageProviderService, String key, Object[] args) {
+    public CommandResultImpl(final IMessageProviderService messageProviderService, final String key, final Object[] args) {
         this(
                 false,
                 false,
@@ -42,11 +42,11 @@ public class CommandResultImpl implements ICommandResult {
     }
 
     private CommandResultImpl(
-            boolean success,
-            boolean willContinue,
-            @Nullable IMessageProviderService messageProviderService,
-            @Nullable String key,
-            @Nullable Object[] args) {
+            final boolean success,
+            final boolean willContinue,
+            @Nullable final IMessageProviderService messageProviderService,
+            @Nullable final String key,
+            @Nullable final Object[] args) {
         this.key = key;
         this.args = args;
         this.messageProviderService = messageProviderService;
@@ -65,7 +65,7 @@ public class CommandResultImpl implements ICommandResult {
     }
 
     @Override
-    public Optional<Text> getErrorMessage(CommandSource source) {
+    public Optional<Text> getErrorMessage(final CommandSource source) {
         if (this.messageProviderService == null) {
             return Optional.empty();
         }
@@ -77,12 +77,12 @@ public class CommandResultImpl implements ICommandResult {
 
         private final Text literal;
 
-        public Literal(Text literal) {
+        public Literal(final Text literal) {
             super(false, false);
             this.literal = literal;
         }
 
-        @Override public Optional<Text> getErrorMessage(CommandSource source) {
+        @Override public Optional<Text> getErrorMessage(final CommandSource source) {
             return Optional.of(this.literal);
         }
     }

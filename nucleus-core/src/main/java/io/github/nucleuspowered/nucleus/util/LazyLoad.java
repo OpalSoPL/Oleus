@@ -17,7 +17,7 @@ public class LazyLoad<T> implements Provider<T> {
     private final Injector injector;
     private T instance;
 
-    public LazyLoad(NucleusServiceCollection nucleusServiceCollection, Injector injector, Class<T> clazz) {
+    public LazyLoad(final NucleusServiceCollection nucleusServiceCollection, final Injector injector, final Class<T> clazz) {
         this.nucleusServiceCollection = nucleusServiceCollection;
         this.injector = injector;
         this.clazz = clazz;

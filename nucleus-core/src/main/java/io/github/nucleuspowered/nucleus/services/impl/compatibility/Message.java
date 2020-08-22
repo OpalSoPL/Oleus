@@ -19,12 +19,12 @@ public class Message implements ICompatibilityService.CompatibilityMessages {
     private final String resolution;
     private final Collection<String> modules;
 
-    public Message(String modId,
-            ICompatibilityService.Severity severity,
-            String symptom,
-            String message,
-            String resolution,
-            @Nullable Collection<String> modules) {
+    public Message(final String modId,
+            final ICompatibilityService.Severity severity,
+            final String symptom,
+            final String message,
+            final String resolution,
+            @Nullable final Collection<String> modules) {
         this.modId = modId;
         this.severity = severity;
         this.symptom = symptom;

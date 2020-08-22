@@ -11,22 +11,22 @@ public class NucleusLoggerProxy implements LoggerProxy {
 
     private final Logger logger;
 
-    public NucleusLoggerProxy(Logger logger) {
+    public NucleusLoggerProxy(final Logger logger) {
         this.logger = logger;
     }
 
     @Override
-    public void info(String message) {
+    public void info(final String message) {
         this.logger.info(message);
     }
 
     @Override
-    public void warn(String message) {
+    public void warn(final String message) {
         this.logger.warn(message);
     }
 
     @Override
-    public void error(String message) {
+    public void error(final String message) {
         this.logger.error(message);
     }
 }

@@ -19,8 +19,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Collection;
 
 import javax.annotation.Nullable;
@@ -31,7 +29,6 @@ import javax.annotation.Nullable;
         commandDescriptionKey = "nucleus",
         prefixAliasesWithN = false
 )
-@NonnullByDefault
 public class NucleusCommand implements ICommandExecutor<CommandSource> {
 
     private final Text version = Text.of(TextColors.GREEN, NAME + " version " + VERSION + " (built from commit " + GIT_HASH + ")");

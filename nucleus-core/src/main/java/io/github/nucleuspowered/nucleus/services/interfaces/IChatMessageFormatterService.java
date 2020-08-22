@@ -33,7 +33,7 @@ public interface IChatMessageFormatterService {
             return false;
         }
 
-        default void formatMessageEvent(CommandSource source, MessageEvent.MessageFormatter formatters) {}
+        default void formatMessageEvent(final CommandSource source, final MessageEvent.MessageFormatter formatters) {}
 
         default Collection<MessageReceiver> receivers() {
             return MessageChannel.TO_ALL.getMembers();

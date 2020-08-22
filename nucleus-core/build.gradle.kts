@@ -10,9 +10,11 @@ group = "io.github.nucleuspowered"
 
 repositories {
     jcenter()
-    maven("https://repo.spongepowered.org/maven")
     maven("https://repo.drnaylor.co.uk/artifactory/list/minecraft")
     maven("https://repo.drnaylor.co.uk/artifactory/list/quickstart")
+    maven("https://repo-new.spongepowered.org/repository/maven-public")
+    maven("https://repo.spongepowered.org/maven")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
     // maven("https://jitpack.io")
 }
 
@@ -33,7 +35,7 @@ java {
 }
 
 dependencies {
-    annotationProcessor(project(":nucleus-ap"))
+   // annotationProcessor(project(":nucleus-ap"))
     implementation(project(":nucleus-ap"))
     implementation(project(":nucleus-api"))
 

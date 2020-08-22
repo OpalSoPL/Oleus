@@ -17,13 +17,13 @@ public class OptionPlaceholder implements PlaceholderParser {
 
     private final IPermissionService permissionService;
 
-    public OptionPlaceholder(IPermissionService permissionService) {
+    public OptionPlaceholder(final IPermissionService permissionService) {
         this.permissionService = permissionService;
     }
 
     @Override
-    public Text parse(PlaceholderContext placeholderContext) {
-        Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject().filter(x -> x instanceof Subject).map(x -> (Subject) x);
+    public Text parse(final PlaceholderContext placeholderContext) {
+        final Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject().filter(x -> x instanceof Subject).map(x -> (Subject) x);
         if (subjectOptional.isPresent() && placeholderContext.getArgumentString().isPresent()) {
             return this.permissionService
                     .getOptionFromSubject(subjectOptional.get(), placeholderContext.getArgumentString().get())

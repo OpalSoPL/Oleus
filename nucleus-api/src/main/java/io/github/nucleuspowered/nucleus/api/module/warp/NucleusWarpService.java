@@ -4,11 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.warp;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -23,7 +22,6 @@ import javax.annotation.Nullable;
 /**
  * Gets a service that allows users to warp about using defined warp.
  */
-@NonnullByDefault
 public interface NucleusWarpService {
 
     /**

@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.api.module.warp.data;
 
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
 
 import java.util.Optional;
 
@@ -31,7 +31,7 @@ public interface Warp extends NamedLocation {
     /**
      * Gets the description for the warp.
      *
-     * @return The {@link Text} description, if available.
+     * @return The {@link Component} description, if available.
      */
-    Optional<Text> getDescription();
+    Optional<Component> getDescription();
 }

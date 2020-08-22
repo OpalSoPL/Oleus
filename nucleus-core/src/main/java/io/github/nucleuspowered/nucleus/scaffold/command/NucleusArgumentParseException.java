@@ -19,10 +19,10 @@ public class NucleusArgumentParseException extends ArgumentParseException {
     private final boolean isEnd;
 
     public static NucleusArgumentParseException from(
-            IMessageProviderService messageProviderService,
-            ArgumentParseException exception,
-            @Nullable Text usage,
-            @Nullable Text subcommands) {
+            final IMessageProviderService messageProviderService,
+            final ArgumentParseException exception,
+            @Nullable final Text usage,
+            @Nullable final Text subcommands) {
         return new NucleusArgumentParseException(
                 messageProviderService,
                 Text.of(TextColors.RED, exception.getMessage()),
@@ -35,13 +35,13 @@ public class NucleusArgumentParseException extends ArgumentParseException {
     }
 
     public NucleusArgumentParseException(
-            IMessageProviderService messageProviderService,
-            Text message,
-            String source,
-            int position,
-            @Nullable Text usage,
-            @Nullable Text subcommands,
-            boolean isEnd) {
+            final IMessageProviderService messageProviderService,
+            final Text message,
+            final String source,
+            final int position,
+            @Nullable final Text usage,
+            @Nullable final Text subcommands,
+            final boolean isEnd) {
         super(message, source, position);
         this.messageProviderService = messageProviderService;
         this.usage = usage;
@@ -50,16 +50,16 @@ public class NucleusArgumentParseException extends ArgumentParseException {
     }
 
     @Override public Text getText() {
-        Text t = super.getText();
+        final Text t = super.getText();
         if (this.usage == null && this.subcommands == null) {
             return t;
         }
 
-        return Text.join(t, Text.NEW_LINE, getUsage());
+        return Text.join(t, Text.NEW_LINE, this.getUsage());
     }
 
     @Nullable public Text getUsage() {
-        Text.Builder builder = Text.builder();
+        final Text.Builder builder = Text.builder();
         if (this.usage != null) {
             builder.append(Text.NEW_LINE).append(this.messageProviderService.getMessage("command.exception.usage", this.usage));
         }

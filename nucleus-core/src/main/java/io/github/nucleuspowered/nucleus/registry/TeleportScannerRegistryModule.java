@@ -12,7 +12,6 @@ import io.github.nucleuspowered.nucleus.scaffold.registry.NucleusRegistryModule;
 import io.github.nucleuspowered.nucleus.scaffold.registry.Registry;
 import org.spongepowered.plugin.meta.util.NonnullByDefault;
 
-@NonnullByDefault
 @Registry(TeleportScanners.class)
 public class TeleportScannerRegistryModule extends NucleusRegistryModule<TeleportScanner> {
 
@@ -23,8 +22,8 @@ public class TeleportScannerRegistryModule extends NucleusRegistryModule<Telepor
 
     @Override
     public void registerModuleDefaults() {
-        registerAdditionalCatalog(new NoTeleportScanner());
-        registerAdditionalCatalog(new VerticalTeleportScanner.Ascending());
-        registerAdditionalCatalog(new VerticalTeleportScanner.Descending());
+        this.registerAdditionalCatalog(new NoTeleportScanner());
+        this.registerAdditionalCatalog(new VerticalTeleportScanner.Ascending());
+        this.registerAdditionalCatalog(new VerticalTeleportScanner.Descending());
     }
 }

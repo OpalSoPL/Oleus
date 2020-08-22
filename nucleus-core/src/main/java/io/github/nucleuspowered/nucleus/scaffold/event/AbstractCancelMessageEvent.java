@@ -8,20 +8,17 @@ import io.github.nucleuspowered.nucleus.api.util.CancelMessageEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public abstract class AbstractCancelMessageEvent extends AbstractEvent implements CancelMessageEvent {
 
     private final Cause cause;
     @Nullable private Text cancelMessage = null;
     private boolean cancelled = false;
 
-    protected AbstractCancelMessageEvent(Cause cause) {
+    protected AbstractCancelMessageEvent(final Cause cause) {
         this.cause = cause;
     }
 
@@ -29,7 +26,7 @@ public abstract class AbstractCancelMessageEvent extends AbstractEvent implement
         return Optional.ofNullable(this.cancelMessage);
     }
 
-    @Override public void setCancelMessage(@Nullable Text message) {
+    @Override public void setCancelMessage(@Nullable final Text message) {
         this.cancelMessage = message;
     }
 
@@ -37,7 +34,7 @@ public abstract class AbstractCancelMessageEvent extends AbstractEvent implement
         return this.cancelled;
     }
 
-    @Override public void setCancelled(boolean cancel) {
+    @Override public void setCancelled(final boolean cancel) {
         this.cancelled = cancel;
     }
 

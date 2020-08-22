@@ -14,7 +14,7 @@ public class KeyedObject<K, O> {
     private final K key;
     @Nullable private final O value;
 
-    public KeyedObject(K key, @Nullable O value) {
+    public KeyedObject(final K key, @Nullable final O value) {
         this.key = key;
         this.value = value;
     }
@@ -36,7 +36,7 @@ public class KeyedObject<K, O> {
      * @param <R> The type to transform to
      * @return The new {@link KeyedObject}s.
      */
-    public <R> KeyedObject<K, R> mapValue(Function<O, R> mapper) {
+    public <R> KeyedObject<K, R> mapValue(final Function<O, R> mapper) {
         return new KeyedObject<>(this.key, this.value != null ? mapper.apply(this.value) : null);
     }
 }

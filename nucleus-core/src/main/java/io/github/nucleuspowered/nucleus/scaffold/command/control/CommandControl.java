@@ -97,10 +97,10 @@ public class CommandControl implements CommandCallable {
     private boolean acceptingRegistration = true;
 
     public CommandControl(
-            @Nullable ICommandExecutor<? extends CommandSource> executor,
-            @Nullable CommandControl parent,
-            CommandMetadata meta,
-            INucleusServiceCollection serviceCollection) {
+            @Nullable final ICommandExecutor<? extends CommandSource> executor,
+            @Nullable final CommandControl parent,
+            final CommandMetadata meta,
+            final INucleusServiceCollection serviceCollection) {
         this.executor = meta.getCommandAnnotation().hasExecutor() ? executor : null;
         this.metadata = meta;
         this.commandKey = meta.getCommandKey();
@@ -108,7 +108,7 @@ public class CommandControl implements CommandCallable {
         this.basicPermission = ImmutableList.copyOf(meta.getCommandAnnotation().basePermission());
         this.serviceCollection = serviceCollection;
         this.hasHelpCommand = meta.getCommandAnnotation().hasHelpCommand();
-        CommandElement[] elements = executor == null ? new CommandElement[0] : executor.parameters(serviceCollection);
+        final CommandElement[] elements = executor == null ? new CommandElement[0] : executor.parameters(serviceCollection);
         if (elements.length == 0) {
             this.element = GenericArguments.none();
         } else if (elements.length == 1) {
@@ -120,7 +120,7 @@ public class CommandControl implements CommandCallable {
         this.aliases = ImmutableList.copyOf(meta.getAliases());
         Class<? extends CommandSource> c = CommandSource.class;
         if (this.executor != null) {
-            for (Type type : this.executor.getClass().getGenericInterfaces()) {
+            for (final Type type : this.executor.getClass().getGenericInterfaces()) {
                 if (type.getTypeName().startsWith(ICommandExecutor.class.getName()) && type instanceof ParameterizedType) {
                     //noinspection unchecked
                     c = (Class<? extends CommandSource>) (((ParameterizedType) type).getActualTypeArguments()[0]);
@@ -142,7 +142,7 @@ public class CommandControl implements CommandCallable {
         this.modifiers = validateModifiers(this, serviceCollection.logger(), meta.getCommandAnnotation());
     }
 
-    public void attach(String alias, CommandControl commandControl) {
+    public void attach(final String alias, final CommandControl commandControl) {
         Preconditions.checkState(this.acceptingRegistration, "Registration is complete.");
         this.subcommands.putIfAbsent(alias, commandControl);
         this.primarySubcommands.putIfAbsent(
@@ -150,11 +150,11 @@ public class CommandControl implements CommandCallable {
                 commandControl);
     }
 
-    public void completeRegistration(INucleusServiceCollection serviceCollection) {
+    public void completeRegistration(final INucleusServiceCollection serviceCollection) {
         Preconditions.checkState(this.acceptingRegistration, "Registration is complete.");
         this.acceptingRegistration = false;
         if (this.executor instanceof IReloadableService.Reloadable) {
-            IReloadableService.Reloadable reloadable = (IReloadableService.Reloadable) this.executor;
+            final IReloadableService.Reloadable reloadable = (IReloadableService.Reloadable) this.executor;
             serviceCollection.reloadableService().registerReloadable(reloadable);
             reloadable.onReload(serviceCollection);
         }
@@ -162,41 +162,41 @@ public class CommandControl implements CommandCallable {
 
     @Override
     @NonNull
-    public CommandResult process(@NonNull CommandSource source, @NonNull String arguments) throws CommandException {
+    public CommandResult process(@NonNull final CommandSource source, @NonNull final String arguments) throws CommandException {
         // do we have a subcommand?
-        CommandArgs args = new CommandArgs(arguments, tokeniser.tokenize(arguments, false));
-        ICommandResult commandResult = process(Sponge.getCauseStackManager().getCurrentCause(), source, arguments, args);
+        final CommandArgs args = new CommandArgs(arguments, tokeniser.tokenize(arguments, false));
+        final ICommandResult commandResult = this.process(Sponge.getCauseStackManager().getCurrentCause(), source, arguments, args);
         return commandResult.isSuccess() ? CommandResult.success() : CommandResult.empty();
     }
 
-    public ICommandResult process(@Nonnull Cause cause,
-            @NonNull CommandSource source,
-            @NonNull String arguments,
-            CommandArgs args) throws CommandException {
+    public ICommandResult process(@Nonnull final Cause cause,
+            @NonNull final CommandSource source,
+            @NonNull final String arguments,
+            final CommandArgs args) throws CommandException {
         // Phase one: child command processing. Keep track of all thrown arguments.
-        List<Tuple<String, CommandException>> thrown = Lists.newArrayList();
+        final List<Tuple<String, CommandException>> thrown = Lists.newArrayList();
         final CommandContext context = new CommandContext();
         final CommandArgs.Snapshot state = args.getSnapshot();
 
         if (args.hasNext()) {
-            String next = args.peek();
+            final String next = args.peek();
 
             // If this works, then we're A-OK.
-            CommandCallable callable = this.subcommands.get(next);
+            final CommandCallable callable = this.subcommands.get(next);
             if (callable != null) {
                 try {
                     if (callable instanceof CommandControl) {
                         args.next();
                         return ((CommandControl) callable).process(cause, source, getArgumentStringFromCurrentArgumentState(args), args);
                     } else {
-                        int successCount = callable.process(source, getArgumentStringFromCurrentArgumentState(args)).getSuccessCount().orElse(0);
+                        final int successCount = callable.process(source, getArgumentStringFromCurrentArgumentState(args)).getSuccessCount().orElse(0);
                         return successCount > 0 ? ICommandResult.success() : ICommandResult.fail();
                     }
-                } catch (ArgumentParseException e) {
+                } catch (final ArgumentParseException e) {
                     // We should only fallback if arguments couldn't parse.
                     // If the Exception is _not_ of right type, wrap it and add it. This shouldn't happen though.
                     if (callable instanceof CommandControl) {
-                        CommandControl control = (CommandControl) callable;
+                        final CommandControl control = (CommandControl) callable;
                         thrown.add(Tuple.of(command + " " + next, NucleusArgumentParseException.from(
                                 this.serviceCollection.messageProvider(),
                                 e,
@@ -230,27 +230,27 @@ public class CommandControl implements CommandCallable {
         }
 
         // Ensure we're the correct type.
-        checkSourceType(source);
+        this.checkSourceType(source);
 
         // Create the ICommandContext
         // TODO: Abstract this away
-        Map<CommandModifier, ICommandModifier> modifiers = selectAppropriateModifiers(source);
-        ICommandContext.Mutable<? extends CommandSource> contextSource = getContextFrom(source,
+        final Map<CommandModifier, ICommandModifier> modifiers = this.selectAppropriateModifiers(source);
+        final ICommandContext.Mutable<? extends CommandSource> contextSource = getContextFrom(source,
                 cause,
                 context,
                 modifiers,
                 this,
                 this.serviceCollection);
 
-        try (NoExceptionAutoClosable closable = this.serviceCollection.permissionService().setContextTemporarily(source, this.context)) {
+        try (final NoExceptionAutoClosable closable = this.serviceCollection.permissionService().setContextTemporarily(source, this.context)) {
             // Do we have permission?
-            if (!testPermission(source)) {
+            if (!this.testPermission(source)) {
                 throw new CommandPermissionException();
             }
 
             // Can we run this command? Exception will be thrown if not.
-            for (Map.Entry<CommandModifier, ICommandModifier> x : modifiers.entrySet()) {
-                Optional<Text> req = x.getValue().testRequirement(contextSource, this, this.serviceCollection, x.getKey());
+            for (final Map.Entry<CommandModifier, ICommandModifier> x : modifiers.entrySet()) {
+                final Optional<Text> req = x.getValue().testRequirement(contextSource, this, this.serviceCollection, x.getKey());
                 if (req.isPresent()) {
                     // Nope, we're out
                     throw new CommandException(req.get());
@@ -277,22 +277,22 @@ public class CommandControl implements CommandCallable {
                                 Text.of(TextColors.RED, "Too many arguments"),
                                 args.getRaw(),
                                 args.getRawPosition(),
-                                Text.of(getUsage(source)),
-                                getSubcommandTexts(source),
+                                Text.of(this.getUsage(source)),
+                                this.getSubcommandTexts(source),
                                 true)));
                         throw new NucleusCommandException(thrown, true, this.serviceCollection.messageProvider());
                     }
-                } catch (NucleusCommandException nce) {
+                } catch (final NucleusCommandException nce) {
                     throw nce;
-                } catch (ArgumentParseException ape) {
+                } catch (final ArgumentParseException ape) {
                     // get the command to get the usage/subs from.
                     thrown.add(Tuple.of(this.command, NucleusArgumentParseException.from(this.serviceCollection.messageProvider(),
                             ape,
-                            Text.of(getUsage(source)),
-                            getSubcommandTexts(source))));
+                            Text.of(this.getUsage(source)),
+                            this.getSubcommandTexts(source))));
                     throw new NucleusCommandException(thrown, true, this.serviceCollection.messageProvider());
-                } catch (Throwable throwable) {
-                    String m;
+                } catch (final Throwable throwable) {
+                    final String m;
                     if (throwable.getMessage() == null) {
                         m = "null";
                     } else {
@@ -312,36 +312,36 @@ public class CommandControl implements CommandCallable {
                 Optional<ICommandResult> result = this.executor.preExecute((ICommandContext.Mutable) contextSource);
                 if (result.isPresent()) {
                     // STOP.
-                    onResult(source, contextSource, result.get());
+                    this.onResult(source, contextSource, result.get());
                     return result.get();
                 }
 
                 // Modifiers might have something to say about it.
-                for (Map.Entry<CommandModifier, ICommandModifier> modifier : contextSource.modifiers().entrySet()) {
+                for (final Map.Entry<CommandModifier, ICommandModifier> modifier : contextSource.modifiers().entrySet()) {
                     if (modifier.getKey().onExecute()) {
                         result = modifier.getValue().preExecute(contextSource, this, this.serviceCollection, modifier.getKey());
                         if (result.isPresent()) {
                             // STOP.
-                            onResult(source, contextSource, result.get());
+                            this.onResult(source, contextSource, result.get());
                             return result.get();
                         }
                     }
                 }
 
-                return execute(source, contextSource);
-            } catch (Exception ex) {
+                return this.execute(source, contextSource);
+            } catch (final Exception ex) {
                 // Run any fail actions.
-                runFailActions(contextSource);
+                this.runFailActions(contextSource);
                 throw ex;
             }
         }
     }
 
     public Text getSubcommandTexts() {
-        return getSubcommandTexts(null);
+        return this.getSubcommandTexts(null);
     }
 
-    public Text getSubcommandTexts(@Nullable CommandSource source) {
+    public Text getSubcommandTexts(@Nullable final CommandSource source) {
         return Text.joinWith(Text.of(", "), this.primarySubcommands.entrySet()
                 .stream()
                 .filter(x -> source == null || x.getValue().testPermission(source))
@@ -349,36 +349,36 @@ public class CommandControl implements CommandCallable {
                 .collect(Collectors.toList()));
     }
 
-    private <T extends CommandSource> void runFailActions(ICommandContext<T> contextSource) {
+    private <T extends CommandSource> void runFailActions(final ICommandContext<T> contextSource) {
         contextSource.failActions().forEach(x -> x.accept(contextSource));
     }
 
     // Entry point for warmups.
-    public void startExecute(@NonNull ICommandContext<? extends CommandSource> contextSource) {
-        CommandSource source;
+    public void startExecute(@NonNull final ICommandContext<? extends CommandSource> contextSource) {
+        final CommandSource source;
         try {
             source = contextSource.getCommandSource();
-        } catch (CommandException ex) {
+        } catch (final CommandException ex) {
             this.serviceCollection.logger().warn("Could not get command source, cancelling command execution (did the player disconnect?)", ex);
             return;
         }
 
         try {
-            execute(source, contextSource);
-        } catch (CommandException ex) {
+            this.execute(source, contextSource);
+        } catch (final CommandException ex) {
             // If we are here, then we're handling the command ourselves.
-            Text message = ex.getText() == null ? Text.of(TextColors.RED, "Unknown error!") : ex.getText();
-            onFail(contextSource, message);
+            final Text message = ex.getText() == null ? Text.of(TextColors.RED, "Unknown error!") : ex.getText();
+            this.onFail(contextSource, message);
             this.serviceCollection.logger().warn("Error executing command {}", this.command, ex);
         }
     }
 
     @SuppressWarnings("unchecked")
     private ICommandResult execute(
-            CommandSource source,
-            @NonNull ICommandContext<? extends CommandSource> context) throws CommandException {
+            final CommandSource source,
+            @NonNull final ICommandContext<? extends CommandSource> context) throws CommandException {
         Preconditions.checkState(this.executor != null, "executor");
-        for (ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
+        for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
             commandInterceptor.onPreCommand(
                     (Class<ICommandExecutor<?>>) this.executor.getClass(),
                     this,
@@ -386,15 +386,15 @@ public class CommandControl implements CommandCallable {
             );
         }
 
-        ICommandResult result;
+        final ICommandResult result;
         if (this.isAsync) {
-            runAsync(source, context);
+            this.runAsync(source, context);
             result = context.successResult();
         } else {
             // Anything else to go here?
             result = this.executor.execute((ICommandContext) context);
-            onResult(source, context, result);
-            for (ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
+            this.onResult(source, context, result);
+            for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
                 commandInterceptor.onPostCommand(
                         (Class<ICommandExecutor<?>>) this.executor.getClass(),
                         this,
@@ -414,15 +414,15 @@ public class CommandControl implements CommandCallable {
             try {
                 //noinspection unchecked
                 result = this.executor.execute((ICommandContext) context);
-            } catch (CommandException e) {
+            } catch (final CommandException e) {
                 result = context.errorResultLiteral(e.getText());
             }
 
             final ICommandResult fResult = result;
             Task.builder().execute(t -> {
                 try {
-                    onResult(source, context, fResult);
-                    for (ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
+                    this.onResult(source, context, fResult);
+                    for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
                         commandInterceptor.onPostCommand(
                                 (Class<ICommandExecutor<?>>) this.executor.getClass(),
                                 this,
@@ -430,40 +430,40 @@ public class CommandControl implements CommandCallable {
                                 fResult
                         );
                     }
-                } catch (CommandException e) {
+                } catch (final CommandException e) {
                     e.printStackTrace();
                 }
             }).submit(this.serviceCollection.pluginContainer());
         }).async().submit(this.serviceCollection.pluginContainer());
     }
 
-    private void onResult(CommandSource source, ICommandContext<? extends CommandSource> contextSource, ICommandResult result) throws CommandException {
+    private void onResult(final CommandSource source, final ICommandContext<? extends CommandSource> contextSource, final ICommandResult result) throws CommandException {
         if (result.isSuccess()) {
-            onSuccess(contextSource);
+            this.onSuccess(contextSource);
         } else if (!result.isWillContinue()) {
-            onFail(contextSource, result.getErrorMessage(source).orElse(null));
+            this.onFail(contextSource, result.getErrorMessage(source).orElse(null));
         }
 
         // The command will continue later. Don't do anything.
     }
 
-    private void onSuccess(ICommandContext<? extends CommandSource> source) throws CommandException {
-        for (Map.Entry<CommandModifier, ICommandModifier> x : source.modifiers().entrySet()) {
+    private void onSuccess(final ICommandContext<? extends CommandSource> source) throws CommandException {
+        for (final Map.Entry<CommandModifier, ICommandModifier> x : source.modifiers().entrySet()) {
             if (x.getKey().onCompletion()) {
                 x.getValue().onCompletion(source, this, this.serviceCollection, x.getKey());
             }
         }
     }
 
-    public void onFail(ICommandContext<? extends CommandSource> source, @Nullable Text errorMessage) {
+    public void onFail(final ICommandContext<? extends CommandSource> source, @Nullable final Text errorMessage) {
         // Run any fail actions.
-        runFailActions(source);
+        this.runFailActions(source);
         if (errorMessage != null) {
             source.getCommandSourceUnchecked().sendMessage(errorMessage);
         }
     }
 
-    private Map<CommandModifier, ICommandModifier> selectAppropriateModifiers(CommandSource source) throws CommandException {
+    private Map<CommandModifier, ICommandModifier> selectAppropriateModifiers(final CommandSource source) throws CommandException {
         return this.modifiers
                 .entrySet()
                 .stream()
@@ -471,7 +471,7 @@ public class CommandControl implements CommandCallable {
                 .filter(x -> {
                     try {
                         return x.getValue().canExecuteModifier(this.serviceCollection, source);
-                    } catch (CommandException e) {
+                    } catch (final CommandException e) {
                         e.printStackTrace();
                         return false;
                     }
@@ -483,9 +483,9 @@ public class CommandControl implements CommandCallable {
 
     @Override
     @NonNull
-    public List<String> getSuggestions(@NonNull CommandSource source, @NonNull String arguments, @Nullable Location<World> targetPosition)
+    public List<String> getSuggestions(@NonNull final CommandSource source, @NonNull final String arguments, @Nullable final Location<World> targetPosition)
             throws CommandException {
-        List<SingleArg> singleArgs = Lists.newArrayList(tokeniser.tokenize(arguments, false));
+        final List<SingleArg> singleArgs = Lists.newArrayList(tokeniser.tokenize(arguments, false));
         // If we end with a space - then we add another argument.
         if (arguments.isEmpty() || arguments.endsWith(" ")) {
             singleArgs.add(new SingleArg("", arguments.length() - 1, arguments.length() - 1));
@@ -494,7 +494,7 @@ public class CommandControl implements CommandCallable {
         final CommandArgs args = new CommandArgs(arguments, singleArgs);
 
         final List<String> options = Lists.newArrayList();
-        CommandContext context = new CommandContext();
+        final CommandContext context = new CommandContext();
         context.putArg(CommandContext.TAB_COMPLETION, true); // We don't care for the value.
 
         // Subcommand
@@ -504,13 +504,13 @@ public class CommandControl implements CommandCallable {
                     .filter(x -> x.toLowerCase().startsWith(args.get(0).toLowerCase()))
                     .forEach(options::add);
         } else if (args.size() > 1) {
-            CommandCallable callable = this.subcommands.get(args.peek().toLowerCase());
+            final CommandCallable callable = this.subcommands.get(args.peek().toLowerCase());
 
             // If we have a subcommand, get the completions for that too.
             if (callable != null) {
-                CommandArgs.Snapshot state = args.getSnapshot();
-                String[] splitArgs = arguments.split(" ", 2);
-                String targetArg = splitArgs.length == 1 ? "" : splitArgs[1];
+                final CommandArgs.Snapshot state = args.getSnapshot();
+                final String[] splitArgs = arguments.split(" ", 2);
+                final String targetArg = splitArgs.length == 1 ? "" : splitArgs[1];
                 options.addAll(callable.getSuggestions(source, targetArg, targetPosition));
                 args.applySnapshot(state);
             }
@@ -525,48 +525,48 @@ public class CommandControl implements CommandCallable {
     }
 
     @Override
-    public boolean testPermission(@NonNull CommandSource source) {
+    public boolean testPermission(@NonNull final CommandSource source) {
         return this.basicPermission.stream().allMatch(x -> this.serviceCollection.permissionService().hasPermission(source, x));
     }
 
     @Override
     @NonNull
-    public Optional<Text> getShortDescription(@NonNull CommandSource source) {
+    public Optional<Text> getShortDescription(@NonNull final CommandSource source) {
         return Optional.of(this.serviceCollection
                 .messageProvider()
                 .getMessageFor(source, this.metadata.getCommandAnnotation().commandDescriptionKey() + ".desc"));
     }
 
-    public Optional<Text> getExtendedDescription(@NonNull CommandSource source) {
+    public Optional<Text> getExtendedDescription(@NonNull final CommandSource source) {
         try {
             return Optional.ofNullable(
                     this.serviceCollection
                             .messageProvider()
                             .getMessageFor(source, this.metadata.getCommandAnnotation().commandDescriptionKey() + ".extended")
             );
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return Optional.empty();
         }
     }
 
     @Override
     @NonNull
-    public Optional<Text> getHelp(@NonNull CommandSource source) {
-        final Optional<Text> extended = getExtendedDescription(source);
+    public Optional<Text> getHelp(@NonNull final CommandSource source) {
+        final Optional<Text> extended = this.getExtendedDescription(source);
         if (extended.isPresent()) {
-            return getShortDescription(source)
+            return this.getShortDescription(source)
                     .map(text -> Optional.of(Text.of(text, Text.NEW_LINE, Util.SPACE, Text.NEW_LINE, extended.get())))
                     .orElse(extended);
         } else {
-            return getShortDescription(source);
+            return this.getShortDescription(source);
         }
     }
 
     @Override
     @NonNull
     public Text getUsage(@NonNull final CommandSource source) {
-        Text.Builder builder = getUsageText(source).toBuilder();
-        Collection<Text> ct = getSubcommandText(source);
+        final Text.Builder builder = this.getUsageText(source).toBuilder();
+        final Collection<Text> ct = this.getSubcommandText(source);
         if (!ct.isEmpty()) {
             builder.append(Text.NEW_LINE)
                     .append(Text.joinWith(Text.NEW_LINE, ct));
@@ -574,8 +574,8 @@ public class CommandControl implements CommandCallable {
         return builder.build();
     }
 
-    public Collection<Text> getSubcommandText(@NonNull CommandSource source) {
-        List<Text> texts = new ArrayList<>();
+    public Collection<Text> getSubcommandText(@NonNull final CommandSource source) {
+        final List<Text> texts = new ArrayList<>();
         if (!this.primarySubcommands.isEmpty()) {
             this.primarySubcommands.values().stream()
                     .filter(commandControl -> commandControl instanceof CommandControl && commandControl.testPermission(source))
@@ -586,7 +586,7 @@ public class CommandControl implements CommandCallable {
         return texts;
     }
 
-    public Text getUsageText(@NonNull CommandSource source) {
+    public Text getUsageText(@NonNull final CommandSource source) {
         return this.serviceCollection.messageProvider().getMessageFor(source,
                 "command.usage.bl",
                 Text.of(this.command),
@@ -594,8 +594,8 @@ public class CommandControl implements CommandCallable {
     }
 
     @Nullable
-    private CommandCallable getSubcommand(String subcommand, @Nullable CommandSource source) {
-        CommandCallable control = this.subcommands.get(subcommand.toLowerCase());
+    private CommandCallable getSubcommand(final String subcommand, @Nullable final CommandSource source) {
+        final CommandCallable control = this.subcommands.get(subcommand.toLowerCase());
         if (source == null || control.testPermission(source)) {
             return control;
         }
@@ -636,21 +636,21 @@ public class CommandControl implements CommandCallable {
     }
 
 
-    private CommandException getExceptionFromKey(CommandSource source, String key, String... subs) {
+    private CommandException getExceptionFromKey(final CommandSource source, final String key, final String... subs) {
         return new CommandException(this.serviceCollection.messageProvider().getMessageFor(source, key, subs));
     }
 
-    private void checkSourceType(CommandSource source) throws CommandException {
+    private void checkSourceType(final CommandSource source) throws CommandException {
         if (!this.sourceType.isInstance(source)) {
             if (this.sourceType.equals(Player.class) && !(source instanceof Player)) {
-                throw getExceptionFromKey(source, "command.playeronly");
+                throw this.getExceptionFromKey(source, "command.playeronly");
             } else if (this.sourceType.equals(ConsoleSource.class) && !(source instanceof ConsoleSource)) {
-                throw getExceptionFromKey(source, "command.consoleonly");
+                throw this.getExceptionFromKey(source, "command.consoleonly");
             } else if (this.sourceType.equals(CommandBlockSource.class) && !(source instanceof CommandBlockSource)) {
-                throw getExceptionFromKey(source, "command.commandblockonly");
+                throw this.getExceptionFromKey(source, "command.commandblockonly");
             }
 
-            throw getExceptionFromKey(source, "command.unknownsource");
+            throw this.getExceptionFromKey(source, "command.unknownsource");
         }
     }
 
@@ -670,7 +670,7 @@ public class CommandControl implements CommandCallable {
         return this.commandModifiersConfig.getCooldown();
     }
 
-    public int getCooldown(Subject subject) {
+    public int getCooldown(final Subject subject) {
         return this.serviceCollection.permissionService()
                 .getIntOptionFromSubject(subject, String.format("nucleus.%s.cooldown", this.command.replace(" ", ".")))
                 .orElseGet(this::getCooldown);
@@ -680,7 +680,7 @@ public class CommandControl implements CommandCallable {
         return this.commandModifiersConfig.getWarmup();
     }
 
-    public int getWarmup(Subject subject) {
+    public int getWarmup(final Subject subject) {
         return this.serviceCollection.permissionService()
                 .getIntOptionFromSubject(subject, String.format("nucleus.%s.warmup", this.command.replace(" ", ".")))
                 .orElseGet(this::getWarmup);
@@ -690,7 +690,7 @@ public class CommandControl implements CommandCallable {
         return this.commandModifiersConfig.getCost();
     }
 
-    public double getCost(Subject subject) {
+    public double getCost(final Subject subject) {
         return this.serviceCollection.permissionService()
                 .getDoubleOptionFromSubject(subject, String.format("nucleus.%s.cost", this.command.replace(" ", ".")))
                 .orElseGet(this::getCost);
@@ -700,23 +700,23 @@ public class CommandControl implements CommandCallable {
         return ImmutableList.copyOf(this.aliases);
     }
 
-    private static ImmutableMap<CommandModifier, ICommandModifier> validateModifiers(CommandControl control, Logger logger, Command command) {
+    private static ImmutableMap<CommandModifier, ICommandModifier> validateModifiers(final CommandControl control, final Logger logger, final Command command) {
         if (command.modifiers().length == 0) {
             return ImmutableMap.of();
         }
 
-        ImmutableMap.Builder<CommandModifier, ICommandModifier> modifiers = new ImmutableMap.Builder<>();
-        for (CommandModifier modifier : command.modifiers()) {
+        final ImmutableMap.Builder<CommandModifier, ICommandModifier> modifiers = new ImmutableMap.Builder<>();
+        for (final CommandModifier modifier : command.modifiers()) {
             try {
                 // Get the registry entry.
-                ICommandModifier commandModifier = Sponge.getRegistry().getType(CommandModifierFactory.class, modifier.value())
+                final ICommandModifier commandModifier = Sponge.getRegistry().getType(CommandModifierFactory.class, modifier.value())
                         .map(x -> x.apply(control))
                         .orElseThrow(() -> new IllegalArgumentException("Could not get registry entry for \"" + modifier.value() + "\""));
                 commandModifier.validate(modifier);
                 modifiers.put(modifier, commandModifier);
-            } catch (IllegalArgumentException ex) {
+            } catch (final IllegalArgumentException ex) {
                 // could not validate
-                PrettyPrinter printer = new PrettyPrinter();
+                final PrettyPrinter printer = new PrettyPrinter();
                 // Sponge can't find an item type...
                 printer.add("Could not add modifier to command!").centre().hr();
                 printer.add("Command Description Key: ");
@@ -736,12 +736,12 @@ public class CommandControl implements CommandCallable {
         return modifiers.build();
     }
 
-    private static ICommandContext.Mutable<? extends CommandSource> getContextFrom(CommandSource source,
-            Cause cause,
-            CommandContext context,
-            Map<CommandModifier, ICommandModifier> modifiers,
-            CommandControl control,
-            INucleusServiceCollection serviceCollection) throws CommandException {
+    private static ICommandContext.Mutable<? extends CommandSource> getContextFrom(final CommandSource source,
+            final Cause cause,
+            final CommandContext context,
+            final Map<CommandModifier, ICommandModifier> modifiers,
+            final CommandControl control,
+            final INucleusServiceCollection serviceCollection) throws CommandException {
         if (source instanceof Player) {
             return new CommandContextImpl.PlayerSource(
                     cause,
@@ -776,7 +776,7 @@ public class CommandControl implements CommandCallable {
         }
     }
 
-    private static String getArgumentStringFromCurrentArgumentState(CommandArgs args) {
+    private static String getArgumentStringFromCurrentArgumentState(final CommandArgs args) {
         return args.getRaw().substring(args.getRawPosition()).trim();
     }
 

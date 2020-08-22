@@ -23,18 +23,18 @@ public class NamePlaceholder implements PlaceholderParser {
     private final String id;
     private final String name;
 
-    public NamePlaceholder(IPlayerDisplayNameService playerDisplayNameService,
-            BiFunction<IPlayerDisplayNameService, CommandSource, Text> parser,
-            String id,
-            String name) {
+    public NamePlaceholder(final IPlayerDisplayNameService playerDisplayNameService,
+            final BiFunction<IPlayerDisplayNameService, CommandSource, Text> parser,
+            final String id,
+            final String name) {
         this(playerDisplayNameService, parser, id, name, false);
     }
 
-    public NamePlaceholder(IPlayerDisplayNameService playerDisplayNameService,
-            BiFunction<IPlayerDisplayNameService, CommandSource, Text> parser,
-            String id,
-            String name,
-            boolean consoleFilter) {
+    public NamePlaceholder(final IPlayerDisplayNameService playerDisplayNameService,
+            final BiFunction<IPlayerDisplayNameService, CommandSource, Text> parser,
+            final String id,
+            final String name,
+            final boolean consoleFilter) {
         this.playerDisplayNameService = playerDisplayNameService;
         this.parser = parser;
         this.consoleFilter = consoleFilter;
@@ -43,8 +43,8 @@ public class NamePlaceholder implements PlaceholderParser {
     }
 
     @Override
-    public Text parse(PlaceholderContext placeholder) {
-        Optional<CommandSource> commandSource = placeholder.getAssociatedObject().filter(x -> x instanceof CommandSource).map(x -> (CommandSource) x);
+    public Text parse(final PlaceholderContext placeholder) {
+        final Optional<CommandSource> commandSource = placeholder.getAssociatedObject().filter(x -> x instanceof CommandSource).map(x -> (CommandSource) x);
         if (commandSource.isPresent()) {
             if (this.consoleFilter && placeholder.getAssociatedObject().map(x -> x instanceof ConsoleSource).isPresent()) {
                 return CONSOLE;

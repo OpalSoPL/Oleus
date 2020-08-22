@@ -19,7 +19,7 @@ public class PlayerInformationService implements IPlayerInformationService {
     private final List<Provider> providers = new ArrayList<>();
 
     @Override
-    public void registerProvider(Provider provider) {
+    public void registerProvider(final Provider provider) {
         this.providers.add(provider);
     }
 

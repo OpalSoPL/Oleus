@@ -26,7 +26,8 @@ public class NucleusRequirePermissionArgument extends WrappedElement {
     private final IPermissionService permissionService;
     private final boolean isOptional;
 
-    public NucleusRequirePermissionArgument(CommandElement wrapped, IPermissionService permissionService, String permission, boolean isOptional) {
+    public NucleusRequirePermissionArgument(
+            final CommandElement wrapped, final IPermissionService permissionService, final String permission, final boolean isOptional) {
         super(wrapped);
         this.permissionService = permissionService;
         this.permission = permission;
@@ -35,27 +36,27 @@ public class NucleusRequirePermissionArgument extends WrappedElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         return null;
     }
 
     @Override
-    public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
+    public void parse(final CommandSource source, final CommandArgs args, final CommandContext context) throws ArgumentParseException {
         if (!this.permissionService.hasPermission(source, this.permission)) {
             if (this.isOptional) {
                 return;
             }
-            Text key = getKey();
+            final Text key = this.getKey();
             throw args.createError(t("You do not have permission to use the %s argument", key != null ? key : t("unknown")));
         }
-        getWrappedElement().parse(source, args, context);
+        this.getWrappedElement().parse(source, args, context);
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         if (!this.permissionService.hasPermission(src, this.permission)) {
             return ImmutableList.of();
         }
-        return getWrappedElement().complete(src, args, context);
+        return this.getWrappedElement().complete(src, args, context);
     }
 }

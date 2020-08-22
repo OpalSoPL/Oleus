@@ -20,7 +20,7 @@ public abstract class AbstractQueryObject<K, T extends IQueryObject<K, T>> imple
     private final Map<QueryKey<?, T>, List<?>> queryKeyObjectMap = new HashMap<>();
 
     @SuppressWarnings("unchecked")
-    public <R> void addConstraint(QueryKey<R, T> key, R value) {
+    public <R> void addConstraint(final QueryKey<R, T> key, final R value) {
         this.queryKeyObjectMap.compute(key, (k, oldValue) -> {
             if (oldValue == null) {
                 oldValue = k.createList();
@@ -36,11 +36,11 @@ public abstract class AbstractQueryObject<K, T extends IQueryObject<K, T>> imple
         return ImmutableMap.copyOf(this.queryKeyObjectMap);
     }
 
-    @Override public void addKey(K uuid) {
+    @Override public void addKey(final K uuid) {
         this.keys.add(uuid);
     }
 
-    @Override public void addAllKeys(Collection<K> collection) {
+    @Override public void addAllKeys(final Collection<K> collection) {
         this.keys.addAll(collection);
     }
 

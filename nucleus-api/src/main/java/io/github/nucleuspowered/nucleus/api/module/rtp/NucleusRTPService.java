@@ -5,15 +5,14 @@
 package io.github.nucleuspowered.nucleus.api.module.rtp;
 
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
 import java.util.Set;
-
-import javax.annotation.Nullable;
 
 /**
  * Allows for the customisation of RTP selection routines.
@@ -27,7 +26,7 @@ public interface NucleusRTPService {
      * @return The {@link RTPOptions}
      */
     default RTPOptions options() {
-        return options(null);
+        return this.options(null);
     }
 
     /**
@@ -79,8 +78,8 @@ public interface NucleusRTPService {
      * @param options The RTP options to use
      * @return The location if one was found.
      */
-    default Optional<Location<World>> getLocation(@Nullable Location<World> currentLocation, World world, RTPOptions options) {
-        return getDefaultKernel().getLocation(currentLocation, world, options);
+    default Optional<ServerLocation> getLocation(@Nullable final ServerLocation currentLocation, final ServerWorld world, final RTPOptions options) {
+        return this.getDefaultKernel().getLocation(currentLocation, world, options);
     }
 
     /**

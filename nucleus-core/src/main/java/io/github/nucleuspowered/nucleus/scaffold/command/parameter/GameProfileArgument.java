@@ -29,20 +29,20 @@ public class GameProfileArgument extends CommandElement {
     private final Pattern p = Pattern.compile("[a-zA-Z0-9_]{1,16}");
     private final IMessageProviderService messageProviderService;
 
-    public GameProfileArgument(@Nullable Text key, INucleusServiceCollection nucleusServiceCollection) {
+    public GameProfileArgument(@Nullable final Text key, final INucleusServiceCollection nucleusServiceCollection) {
         super(key);
         this.messageProviderService = nucleusServiceCollection.messageProvider();
     }
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String name = args.next();
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String name = args.next();
         if (!this.p.matcher(name).matches()) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.gameprofile.format"));
         }
 
-        List<GameProfile> lgp = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll()
+        final List<GameProfile> lgp = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll()
                 .stream().filter(x -> x.getName().isPresent() && x.getName().get().equalsIgnoreCase(name))
                 .collect(Collectors.toList());
 
@@ -58,16 +58,16 @@ public class GameProfileArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         try {
-            String arg = args.peek().toLowerCase();
-            List<String> onlinePlayers = Sponge.getServer().getOnlinePlayers().stream().map(User::getName).collect(Collectors.toList());
+            final String arg = args.peek().toLowerCase();
+            final List<String> onlinePlayers = Sponge.getServer().getOnlinePlayers().stream().map(User::getName).collect(Collectors.toList());
             return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll()
                 .stream().filter(x -> x.getName().isPresent() && x.getName().get().toLowerCase().startsWith(arg))
                 .map(x -> x.getName().get())
                 .sorted((first, second) -> {
-                    boolean firstBool = onlinePlayers.contains(first);
-                    boolean secondBool = onlinePlayers.contains(second);
+                    final boolean firstBool = onlinePlayers.contains(first);
+                    final boolean secondBool = onlinePlayers.contains(second);
                     if (firstBool == secondBool) {
                         return first.compareTo(second);
                     }
@@ -75,7 +75,7 @@ public class GameProfileArgument extends CommandElement {
                     return firstBool ? -1 : 1;
                 })
                 .collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return new ArrayList<>();
         }
     }

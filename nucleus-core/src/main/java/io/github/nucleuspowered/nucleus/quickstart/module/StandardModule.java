@@ -70,8 +70,8 @@ public abstract class StandardModule implements Module {
     @Nullable private Map<String, List<String>> objectTypesToClassListMap;
 
     @Inject
-    public StandardModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
-        ModuleData md = this.getClass().getAnnotation(ModuleData.class);
+    public StandardModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
+        final ModuleData md = this.getClass().getAnnotation(ModuleData.class);
         this.moduleId = md.id();
         this.moduleName = md.name();
         this.serviceCollection = collection;
@@ -83,7 +83,7 @@ public abstract class StandardModule implements Module {
         return this.serviceCollection;
     }
 
-    public void init(Map<String, List<String>> m) {
+    public void init(final Map<String, List<String>> m) {
         this.objectTypesToClassListMap = m;
     }
 
@@ -109,50 +109,50 @@ public abstract class StandardModule implements Module {
     }
 
     public final void loadServices() throws Exception {
-        Set<Class<? extends ServiceBase>> servicesToLoad;
+        final Set<Class<? extends ServiceBase>> servicesToLoad;
         if (this.objectTypesToClassListMap != null) {
-            servicesToLoad = getClassesFromList(Constants.SERVICE);
+            servicesToLoad = this.getClassesFromList(Constants.SERVICE);
         } else {
-            servicesToLoad = getStreamForModule(ServiceBase.class).collect(Collectors.toSet());
+            servicesToLoad = this.getStreamForModule(ServiceBase.class).collect(Collectors.toSet());
         }
 
-        for (Class<? extends ServiceBase> serviceClass : servicesToLoad) {
-            registerService(serviceClass);
+        for (final Class<? extends ServiceBase> serviceClass : servicesToLoad) {
+            this.registerService(serviceClass);
         }
     }
 
-    private void registerReloadable(Object instance) {
+    private void registerReloadable(final Object instance) {
         if (instance instanceof IReloadableService.Reloadable) {
-            IReloadableService.Reloadable reloadable = (IReloadableService.Reloadable) instance;
+            final IReloadableService.Reloadable reloadable = (IReloadableService.Reloadable) instance;
             this.serviceCollection.reloadableService().registerReloadable(reloadable);
             reloadable.onReload(this.serviceCollection);
         }
     }
 
-    private <T extends ServiceBase> void registerService(Class<T> serviceClass) {
-        T serviceImpl = getInstance(serviceClass);
+    private <T extends ServiceBase> void registerService(final Class<T> serviceClass) {
+        final T serviceImpl = this.getInstance(serviceClass);
         if (serviceImpl == null) {
-            String error = "ERROR: Cannot instantiate " + serviceClass.getName();
+            final String error = "ERROR: Cannot instantiate " + serviceClass.getName();
             this.logger.error(error);
             throw new IllegalStateException(error);
         }
 
-        APIService apiService = serviceClass.getAnnotation(APIService.class);
+        final APIService apiService = serviceClass.getAnnotation(APIService.class);
         if (apiService != null) {
-            Class<?> apiInterface = apiService.value();
+            final Class<?> apiInterface = apiService.value();
             if (apiInterface.isInstance(serviceImpl)) {
                 // OK
-                register((Class) apiInterface, serviceClass, serviceImpl);
+                this.register((Class) apiInterface, serviceClass, serviceImpl);
             } else {
-                String error = "ERROR: " + apiInterface.getName() + " does not inherit from " + serviceClass.getName();
+                final String error = "ERROR: " + apiInterface.getName() + " does not inherit from " + serviceClass.getName();
                 this.logger.error(error);
                 throw new IllegalStateException(error);
             }
         } else {
-            register(serviceClass, serviceImpl);
+            this.register(serviceClass, serviceImpl);
         }
 
-        registerReloadable(serviceImpl);
+        this.registerReloadable(serviceImpl);
 
         if (serviceImpl instanceof IReloadableService.DataLocationReloadable) {
             // don't do anything let.
@@ -167,35 +167,35 @@ public abstract class StandardModule implements Module {
                 // register it
                 //noinspection unchecked
                 this.serviceCollection.permissionService().registerContextCalculator((ContextCalculator<Subject>) serviceImpl);
-            } catch (NoSuchMethodException e) {
+            } catch (final NoSuchMethodException e) {
                 // ignored
             }
         }
     }
 
     public void registerCommandInterceptors() {
-        Set<Class<? extends ICommandInterceptor>> interceptors;
+        final Set<Class<? extends ICommandInterceptor>> interceptors;
         if (this.objectTypesToClassListMap != null) {
-            interceptors = getClassesFromList(Constants.INTERCEPTOR);
+            interceptors = this.getClassesFromList(Constants.INTERCEPTOR);
         } else {
-            interceptors = getStreamForModule(ICommandInterceptor.class).collect(Collectors.toSet());
+            interceptors = this.getStreamForModule(ICommandInterceptor.class).collect(Collectors.toSet());
         }
 
         if (!interceptors.isEmpty()) {
             // for each annotation, attempt to register the service.
-            for (Class<? extends ICommandInterceptor> service : interceptors) {
+            for (final Class<? extends ICommandInterceptor> service : interceptors) {
 
                 // create the impl
-                ICommandInterceptor impl;
+                final ICommandInterceptor impl;
                 try {
                     impl = service.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
-                    String error = "ERROR: Cannot instantiate ICommandInterceptor " + service.getName();
+                } catch (final InstantiationException | IllegalAccessException e) {
+                    final String error = "ERROR: Cannot instantiate ICommandInterceptor " + service.getName();
                     this.serviceCollection.logger().error(error);
                     throw new IllegalStateException(error, e);
                 }
 
-                registerReloadable(impl);
+                this.registerReloadable(impl);
 
                 // hahahaha, no
                 this.serviceCollection.commandMetadataService().registerInterceptor(impl);
@@ -206,18 +206,18 @@ public abstract class StandardModule implements Module {
     @SuppressWarnings("unchecked")
     public final void loadCommands() {
 
-        Set<Class<? extends ICommandExecutor<?>>> cmds;
+        final Set<Class<? extends ICommandExecutor<?>>> cmds;
         if (this.objectTypesToClassListMap != null) {
-            cmds = getClassesFromList(Constants.COMMAND);
+            cmds = this.getClassesFromList(Constants.COMMAND);
         } else {
-            cmds = performFilter(getStreamForModule(ICommandExecutor.class)
+            cmds = this.performFilter(this.getStreamForModule(ICommandExecutor.class)
                     .map(x -> (Class<? extends ICommandExecutor<?>>) x))
                     .collect(Collectors.toSet());
         }
 
-        ICommandMetadataService metadataService = this.serviceCollection.commandMetadataService();
-        for (Class<? extends ICommandExecutor<?>> command : cmds) {
-            Command rc = command.getAnnotation(Command.class);
+        final ICommandMetadataService metadataService = this.serviceCollection.commandMetadataService();
+        for (final Class<? extends ICommandExecutor<?>> command : cmds) {
+            final Command rc = command.getAnnotation(Command.class);
             if (rc != null) {
                 // then we should add it.
                 metadataService.registerCommand(
@@ -233,25 +233,25 @@ public abstract class StandardModule implements Module {
     }
 
     public final void prepareAliasedCommands() {
-        this.serviceCollection.commandMetadataService().addMapping(remapCommand());
+        this.serviceCollection.commandMetadataService().addMapping(this.remapCommand());
     }
 
-    private Stream<Class<? extends ICommandExecutor<?>>> performFilter(Stream<Class<? extends ICommandExecutor<?>>> stream) {
+    private Stream<Class<? extends ICommandExecutor<?>>> performFilter(final Stream<Class<? extends ICommandExecutor<?>>> stream) {
         return stream.filter(x -> x.isAnnotationPresent(Command.class));
     }
 
     public final void loadEvents() {
-        Set<Class<? extends ListenerBase>> listenersToLoad;
+        final Set<Class<? extends ListenerBase>> listenersToLoad;
         if (this.objectTypesToClassListMap != null) {
-            listenersToLoad = getClassesFromList(Constants.LISTENER);
+            listenersToLoad = this.getClassesFromList(Constants.LISTENER);
         } else {
-            listenersToLoad = getStreamForModule(ListenerBase.class).collect(Collectors.toSet());
+            listenersToLoad = this.getStreamForModule(ListenerBase.class).collect(Collectors.toSet());
         }
 
         listenersToLoad.stream().map(x -> this.getInstance(x, true)).filter(Objects::nonNull).forEach(c -> {
             if (c instanceof ListenerBase.Conditional) {
                 // Add reloadable to load in the listener dynamically if required.
-                IReloadableService.Reloadable tae = serviceCollection -> {
+                final IReloadableService.Reloadable tae = serviceCollection -> {
                     Sponge.getEventManager().unregisterListeners(c);
                     if (c instanceof IReloadableService.Reloadable) {
                         ((IReloadableService.Reloadable) c).onReload(serviceCollection);
@@ -265,7 +265,7 @@ public abstract class StandardModule implements Module {
                 this.serviceCollection.reloadableService().registerReloadable(tae);
                 try {
                     tae.onReload(this.serviceCollection);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
                 }
             } else if (c instanceof IReloadableService.Reloadable) {
@@ -278,15 +278,15 @@ public abstract class StandardModule implements Module {
     }
 
     public final void loadRunnables() {
-        Set<Class<? extends TaskBase>> tasksToLoad;
+        final Set<Class<? extends TaskBase>> tasksToLoad;
         if (this.objectTypesToClassListMap != null) {
-            tasksToLoad = getClassesFromList(Constants.RUNNABLE);
+            tasksToLoad = this.getClassesFromList(Constants.RUNNABLE);
         } else {
-            tasksToLoad = getStreamForModule(TaskBase.class).collect(Collectors.toSet());
+            tasksToLoad = this.getStreamForModule(TaskBase.class).collect(Collectors.toSet());
         }
 
         tasksToLoad.stream().map(this::getInstance).filter(Objects::nonNull).forEach(c -> {
-            Task.Builder tb = Sponge.getScheduler().createTaskBuilder().interval(c.interval().toMillis(), TimeUnit.MILLISECONDS);
+            final Task.Builder tb = Sponge.getScheduler().createTaskBuilder().interval(c.interval().toMillis(), TimeUnit.MILLISECONDS);
             if (this.serviceCollection.platformService().isServer()) {
                 tb.execute(c);
             } else {
@@ -307,7 +307,7 @@ public abstract class StandardModule implements Module {
                 this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) c);
                 try {
                     ((IReloadableService.Reloadable) c).onReload(this.serviceCollection);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -315,12 +315,12 @@ public abstract class StandardModule implements Module {
     }
 
     public final void loadTokens() {
-        Map<String, PlaceholderParser> map = tokensToRegister();
+        final Map<String, PlaceholderParser> map = this.tokensToRegister();
         if (!map.isEmpty()) {
             map.forEach((k, t) -> {
                 try {
                     this.serviceCollection.placeholderService().registerToken(k, t);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     this.serviceCollection.logger().warn("Could not register nucleus token identifier " + k, e);
                 }
             });
@@ -329,39 +329,39 @@ public abstract class StandardModule implements Module {
 
     @SuppressWarnings("unchecked")
     public final void loadRegistries() {
-        Set<Class<? extends NucleusRegistryModule>> registries;
+        final Set<Class<? extends NucleusRegistryModule>> registries;
         if (this.objectTypesToClassListMap != null) {
-            registries = getClassesFromList(Constants.REGISTRY);
+            registries = this.getClassesFromList(Constants.REGISTRY);
         } else {
-            registries = getStreamForModule(NucleusRegistryModule.class).collect(Collectors.toSet());
+            registries = this.getStreamForModule(NucleusRegistryModule.class).collect(Collectors.toSet());
         }
 
-        for (Class<? extends NucleusRegistryModule> r : registries) {
-            NucleusRegistryModule<?> instance = getInstance(r);
+        for (final Class<? extends NucleusRegistryModule> r : registries) {
+            final NucleusRegistryModule<?> instance = this.getInstance(r);
             try {
                 instance.registerDefaults();
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 this.serviceCollection.logger().error("Could not register registry " + r.getName(), e);
             }
         }
     }
 
     public final void loadInfoProviders() {
-        Set<Class<? extends NucleusProvider>> registries;
+        final Set<Class<? extends NucleusProvider>> registries;
         if (this.objectTypesToClassListMap != null) {
-            registries = getClassesFromList(Constants.PLAYER_INFO);
+            registries = this.getClassesFromList(Constants.PLAYER_INFO);
         } else {
-            registries = getStreamForModule(NucleusProvider.class).collect(Collectors.toSet());
+            registries = this.getStreamForModule(NucleusProvider.class).collect(Collectors.toSet());
         }
 
-        for (Class<? extends NucleusProvider> r : registries) {
-            NucleusProvider instance = getInstance(r);
+        for (final Class<? extends NucleusProvider> r : registries) {
+            final NucleusProvider instance = this.getInstance(r);
             this.serviceCollection.playerInformationService().registerProvider(instance);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <T> Stream<Class<? extends T>> getStreamForModule(Class<T> assignableClass) {
+    private <T> Stream<Class<? extends T>> getStreamForModule(final Class<T> assignableClass) {
         return this.moduleHolderSupplier.get()
                 .getLoadedClasses()
                 .stream()
@@ -372,11 +372,11 @@ public abstract class StandardModule implements Module {
                 .map(x -> (Class<? extends T>)x);
     }
 
-    public void performPreTasks(INucleusServiceCollection serviceCollection) throws Exception { }
+    public void performPreTasks(final INucleusServiceCollection serviceCollection) throws Exception { }
 
-    public void performEnableTasks(INucleusServiceCollection serviceCollection) throws Exception { }
+    public void performEnableTasks(final INucleusServiceCollection serviceCollection) throws Exception { }
 
-    public void performPostTasks(INucleusServiceCollection serviceCollection) { }
+    public void performPostTasks(final INucleusServiceCollection serviceCollection) { }
 
     public void configTasks() {
 
@@ -386,18 +386,18 @@ public abstract class StandardModule implements Module {
         return ImmutableMap.of();
     }
 
-    private <T> T getInstance(Class<T> clazz) {
-        return getInstance(clazz, false);
+    private <T> T getInstance(final Class<T> clazz) {
+        return this.getInstance(clazz, false);
     }
 
-    private <T> T getInstance(Class<T> clazz, boolean checkMethods) {
+    private <T> T getInstance(final Class<T> clazz, final boolean checkMethods) {
         try {
-            RequireExistenceOf[] v = clazz.getAnnotationsByType(RequireExistenceOf.class);
+            final RequireExistenceOf[] v = clazz.getAnnotationsByType(RequireExistenceOf.class);
             if (v.length > 0) {
                 try {
-                    for (RequireExistenceOf r : v) {
-                        String toFind = r.value();
-                        String[] a;
+                    for (final RequireExistenceOf r : v) {
+                        final String toFind = r.value();
+                        final String[] a;
                         if (toFind.contains("#")) {
                             a = toFind.split("#", 2);
                         } else {
@@ -405,12 +405,12 @@ public abstract class StandardModule implements Module {
                         }
 
                         // Check the class.
-                        Class<?> c = Class.forName(a[0]);
+                        final Class<?> c = Class.forName(a[0]);
                         if (a.length == 2) {
                             // Check the method
-                            Method[] methods = c.getDeclaredMethods();
+                            final Method[] methods = c.getDeclaredMethods();
                             boolean methodFound = false;
-                            for (Method m : methods) {
+                            for (final Method m : methods) {
                                 if (m.getName().equals(a[1])) {
                                     methodFound = true;
                                     break;
@@ -426,7 +426,7 @@ public abstract class StandardModule implements Module {
                             }
                         }
                     }
-                } catch (ClassNotFoundException | RuntimeException | NoClassDefFoundError e) {
+                } catch (final ClassNotFoundException | RuntimeException | NoClassDefFoundError e) {
                     this.serviceCollection.logger().warn(this.serviceCollection.messageProvider().getMessageString("startup.injectablenotloaded", clazz.getName()));
                     return null;
                 }
@@ -437,10 +437,10 @@ public abstract class StandardModule implements Module {
                 clazz.getDeclaredMethods();
             }
 
-            return construct(clazz);
+            return this.construct(clazz);
 
         // I can't believe I have to do this...
-        } catch (Exception | NoClassDefFoundError e) {
+        } catch (final Exception | NoClassDefFoundError e) {
             if (clazz.isAnnotationPresent(SkipOnError.class)) {
                 this.serviceCollection.logger()
                         .warn(this.serviceCollection.messageProvider().getMessageString("startup.injectablenotloaded", clazz.getName()));
@@ -455,18 +455,18 @@ public abstract class StandardModule implements Module {
         }
     }
 
-    private <T extends Class<?>> Optional<T> checkPlatformOpt(T clazz) {
-        if (checkPlatform(clazz)) {
+    private <T extends Class<?>> Optional<T> checkPlatformOpt(final T clazz) {
+        if (this.checkPlatform(clazz)) {
             return Optional.of(clazz);
         }
 
         return Optional.empty();
     }
 
-    private <T extends Class<?>> boolean checkPlatform(T clazz) {
+    private <T extends Class<?>> boolean checkPlatform(final T clazz) {
         if (clazz.isAnnotationPresent(RequiresPlatform.class)) {
-            String platformId = Sponge.getPlatform().getContainer(Platform.Component.GAME).getId();
-            boolean loadable = Arrays.stream(clazz.getAnnotation(RequiresPlatform.class).value()).anyMatch(platformId::equalsIgnoreCase);
+            final String platformId = Sponge.getPlatform().getContainer(Platform.Component.GAME).getId();
+            final boolean loadable = Arrays.stream(clazz.getAnnotation(RequiresPlatform.class).value()).anyMatch(platformId::equalsIgnoreCase);
             if (!loadable) {
                 this.serviceCollection.logger().warn("Not loading /" + clazz.getSimpleName() + ": platform " + platformId + " is not supported.");
                 return false;
@@ -476,61 +476,61 @@ public abstract class StandardModule implements Module {
         return true;
     }
 
-    protected final <I, S extends I> void register(Class<S> impl) {
-        register(impl, this.serviceCollection.injector().getInstance(impl));
+    protected final <I, S extends I> void register(final Class<S> impl) {
+        this.register(impl, this.serviceCollection.injector().getInstance(impl));
     }
 
-    protected final <I, S extends I> void register(Class<I> api, Class<S> impl) {
-        S object = this.serviceCollection.injector().getInstance(impl);
+    protected final <I, S extends I> void register(final Class<I> api, final Class<S> impl) {
+        final S object = this.serviceCollection.injector().getInstance(impl);
         Sponge.getServiceManager().setProvider(this.serviceCollection.pluginContainer(), api, object);
-        register(api, object);
-        register(impl, object);
+        this.register(api, object);
+        this.register(impl, object);
     }
 
-    protected final <I, S extends I> void register(Class<? super S> impl, S object) {
+    protected final <I, S extends I> void register(final Class<? super S> impl, final S object) {
         this.serviceCollection.registerService(impl, object, false);
     }
 
-    protected final <I, S extends I> void register(Class<I> internalApi, Class<S> impl, S object, boolean remap) {
-        register(impl, object);
+    protected final <I, S extends I> void register(final Class<I> internalApi, final Class<S> impl, final S object, final boolean remap) {
+        this.register(impl, object);
         this.serviceCollection.registerService(internalApi, object, remap);
     }
 
-    protected final <I, S extends I> void register(Class<I> api, Class<S> impl, S object) {
+    protected final <I, S extends I> void register(final Class<I> api, final Class<S> impl, final S object) {
         Sponge.getServiceManager().setProvider(this.serviceCollection.pluginContainer(), api, object);
         this.serviceCollection.registerService(api, object, false);
-        register(impl, object);
+        this.register(impl, object);
     }
 
-    private <T> Set<Class<? extends T>> getClassesFromList(String key) {
-        List<String> list = this.objectTypesToClassListMap.get(key);
+    private <T> Set<Class<? extends T>> getClassesFromList(final String key) {
+        final List<String> list = this.objectTypesToClassListMap.get(key);
         if (list == null) {
             return new HashSet<>();
         }
 
-        Set<Class<? extends T>> classes = new HashSet<>();
-        for (String s : list) {
+        final Set<Class<? extends T>> classes = new HashSet<>();
+        for (final String s : list) {
             try {
-                checkPlatformOpt((Class<? extends T>) Class.forName(s)).ifPresent(classes::add);
-            } catch (ClassNotFoundException e) {
+                this.checkPlatformOpt((Class<? extends T>) Class.forName(s)).ifPresent(classes::add);
+            } catch (final ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
         return classes;
     }
 
-    private <T> T construct(Class<T> cls) throws Exception {
+    private <T> T construct(final Class<T> cls) throws Exception {
         try {
-            Constructor<T> c = cls.getDeclaredConstructor(INucleusServiceCollection.class);
+            final Constructor<T> c = cls.getDeclaredConstructor(INucleusServiceCollection.class);
             c.setAccessible(true);
             return c.newInstance(this.serviceCollection);
-        } catch (NoSuchMethodException e) {
+        } catch (final NoSuchMethodException e) {
             // nope, do we have parameterless?
             try {
-                Constructor<T> c = cls.getDeclaredConstructor();
+                final Constructor<T> c = cls.getDeclaredConstructor();
                 c.setAccessible(true);
                 return c.newInstance();
-            } catch (NoSuchMethodException ex) {
+            } catch (final NoSuchMethodException ex) {
                 // nope
                 return this.serviceCollection.injector().getInstance(cls);
             }
@@ -538,9 +538,9 @@ public abstract class StandardModule implements Module {
     }
 
     public void registerPermissions() {
-        IPermissionService permissionService = this.serviceCollection.permissionService();
-        for (Class<?> c : getClassesFromList(Constants.PERMISSIONS)) {
-            for (Field field : c.getDeclaredFields()) {
+        final IPermissionService permissionService = this.serviceCollection.permissionService();
+        for (final Class<?> c : this.getClassesFromList(Constants.PERMISSIONS)) {
+            for (final Field field : c.getDeclaredFields()) {
                 if (field.isAnnotationPresent(PermissionMetadata.class)
                         && String.class.isAssignableFrom(field.getType())
                         && (field.getModifiers() & Modifier.STATIC) == Modifier.STATIC) {
@@ -550,7 +550,7 @@ public abstract class StandardModule implements Module {
                                 field.getAnnotation(PermissionMetadata.class),
                                 this.moduleId
                         );
-                    } catch (IllegalAccessException e) {
+                    } catch (final IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }

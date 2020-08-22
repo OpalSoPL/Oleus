@@ -17,7 +17,7 @@ public abstract class ConfigurableModule<C, A extends NucleusConfigAdapter.Stand
 
     private A adapter;
 
-    public ConfigurableModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public ConfigurableModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 
@@ -30,7 +30,7 @@ public abstract class ConfigurableModule<C, A extends NucleusConfigAdapter.Stand
 
     protected final A getAdapter() {
         if (this.adapter == null) {
-            this.adapter = createAdapter();
+            this.adapter = this.createAdapter();
         }
 
         return this.adapter;
@@ -39,15 +39,15 @@ public abstract class ConfigurableModule<C, A extends NucleusConfigAdapter.Stand
     @Override
     public final Optional<AbstractConfigAdapter<?>> getConfigAdapter() {
         // We need to use the right type...
-        return Optional.of(getAdapter());
+        return Optional.of(this.getAdapter());
     }
 
     @Override public void configTasks() {
         // Register the config on the config provider
-        getServiceCollection().moduleDataProvider().registerModuleConfig(
-                getClass().getAnnotation(ModuleData.class).id(),
-                getAdapter().getConfigClass(),
-                () -> getAdapter().getNodeOrDefault());
+        this.getServiceCollection().moduleDataProvider().registerModuleConfig(
+                this.getClass().getAnnotation(ModuleData.class).id(),
+                this.getAdapter().getConfigClass(),
+                () -> this.getAdapter().getNodeOrDefault());
         // this.plugin.getDocGenCache().ifPresent(x -> x.addConfigurableModule(this.getClass().getAnnotation(ModuleData.class).id(), this));
     }
 

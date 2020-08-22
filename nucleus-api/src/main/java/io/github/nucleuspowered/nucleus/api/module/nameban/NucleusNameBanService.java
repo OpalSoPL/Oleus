@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.api.module.nameban;
 
 import io.github.nucleuspowered.nucleus.api.module.nameban.exception.NameBanException;
-import org.spongepowered.api.event.cause.Cause;
 
 import java.util.Optional;
 
@@ -19,10 +18,9 @@ public interface NucleusNameBanService {
      *
      * @param name The name
      * @param reason The reason to give for the banning
-     * @param cause The {@link Cause} of this request
      * @throws NameBanException thrown if the name could not be added to the list
      */
-    void addName(String name, String reason, Cause cause) throws NameBanException;
+    void addName(String name, String reason) throws NameBanException;
 
     /**
      * If a name is banned, returns the reason.
@@ -36,8 +34,7 @@ public interface NucleusNameBanService {
      * Removes a name from the blacklist.
      *
      * @param name The name to remove
-     * @param cause The {@link Cause} of this request
      * @throws NameBanException thrown if the name could not be removed from the list
      */
-    void removeName(String name, Cause cause) throws NameBanException;
+    void removeName(String name) throws NameBanException;
 }

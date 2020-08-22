@@ -11,7 +11,7 @@ public class PlaceholderMetadata {
     private final PlaceholderParser parser;
     private final boolean document;
 
-    PlaceholderMetadata(String token, PlaceholderParser parser, boolean document) {
+    PlaceholderMetadata(final String token, final PlaceholderParser parser, final boolean document) {
         this.token = token;
         this.parser = parser;
         this.document = document;

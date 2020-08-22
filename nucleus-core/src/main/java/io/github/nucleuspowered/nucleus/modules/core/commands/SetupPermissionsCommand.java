@@ -31,8 +31,6 @@ import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +40,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 @Command(
         aliases = {"setupperms", "setperms"},
         basePermission = CorePermissions.BASE_NUCLEUS_SETUPPERMS,

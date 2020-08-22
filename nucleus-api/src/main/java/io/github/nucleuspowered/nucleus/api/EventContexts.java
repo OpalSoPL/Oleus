@@ -5,13 +5,14 @@
 package io.github.nucleuspowered.nucleus.api;
 
 import io.github.nucleuspowered.nucleus.api.module.spawn.event.NucleusSendToSpawnEvent;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContextKey;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.event.EventContextKey;
+import org.spongepowered.api.event.EventContextKeys;
 
 /**
  * Contexts that may appear in the {@link Cause} of some events.
  */
-public class EventContexts {
+public final class EventContexts {
 
     private EventContexts() {}
 
@@ -23,7 +24,8 @@ public class EventContexts {
      * </p>
      */
     public static final EventContextKey<Boolean> SHOULD_FORMAT_CHANNEL =
-            EventContextKey.builder(Boolean.class)
+            EventContextKey.builder()
+                    .type(Boolean.class)
                     .id(Identifiers.SHOULD_FORMAT_CHANNEL)
                     .name("Nucleus - Context to indicate whether a chat message should be formatted.")
                     .build();
@@ -36,7 +38,11 @@ public class EventContexts {
      * </p>
      */
     public static final EventContextKey<NucleusSendToSpawnEvent.Type> SPAWN_EVENT_TYPE =
-            EventContextKey.builder(NucleusSendToSpawnEvent.Type.class).id(Identifiers.SPAWN_EVENT_TYPE).name("SPAWN_EVENT_TYPE").build();
+            EventContextKey.builder()
+                    .type(NucleusSendToSpawnEvent.Type.class)
+                    .id(Identifiers.SPAWN_EVENT_TYPE)
+                    .name("SPAWN_EVENT_TYPE")
+                    .build();
 
     /**
      * A context that indicates whether a teleport is a jailing action.
@@ -46,7 +52,8 @@ public class EventContexts {
      * </p>
      */
     public static final EventContextKey<Boolean> IS_JAILING_ACTION =
-            EventContextKey.builder(Boolean.class)
+            EventContextKey.builder()
+                    .type(Boolean.class)
                     .id("nucleus:is_jailing_action")
                     .name("Nucleus - Context to indicate whether a teleport is a jailing teleport.")
                     .build();
@@ -59,12 +66,13 @@ public class EventContexts {
      * </p>
      */
     public static final EventContextKey<Boolean> BYPASS_JAILING_RESTRICTION =
-            EventContextKey.builder(Boolean.class)
+            EventContextKey.builder()
+                    .type(Boolean.class)
                     .id("nucleus:bypass_jailing_restriction")
                     .name("Nucleus - Context to indicate whether the Nucleus system should ignore jailed status when teleporting a player.")
                     .build();
 
-    public static class Identifiers {
+    public final static class Identifiers {
 
         private Identifiers() {}
 

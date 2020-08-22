@@ -12,17 +12,17 @@ import ninja.leaping.configurate.ConfigurationNode;
 public interface IConfigurateBackedDataTranslator<R extends IConfigurateBackedDataObject> extends IDataTranslator<R, JsonObject> {
 
     @Override
-    default R fromDataAccessObject(JsonObject object) {
+    default R fromDataAccessObject(final JsonObject object) {
         // Get the ConfigNode from the JsonObject
-        ConfigurationNode node = ConfigurationNodeJsonTranslator.INSTANCE.from(createNewNode(), object);
-        R obj = createNew();
+        final ConfigurationNode node = ConfigurationNodeJsonTranslator.INSTANCE.from(this.createNewNode(), object);
+        final R obj = this.createNew();
         obj.setBackingNode(node);
         return obj;
     }
 
     @Override
-    default JsonObject toDataAccessObject(R object) {
-        ConfigurationNode node = object.getBackingNode();
+    default JsonObject toDataAccessObject(final R object) {
+        final ConfigurationNode node = object.getBackingNode();
         return ConfigurationNodeJsonTranslator.INSTANCE.jsonFrom(node);
     }
 

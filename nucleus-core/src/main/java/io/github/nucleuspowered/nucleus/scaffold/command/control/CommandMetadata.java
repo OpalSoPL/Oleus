@@ -14,18 +14,18 @@ import java.util.List;
 
 public final class CommandMetadata {
 
-    private static void aliases(String[] v, boolean isRoot, boolean addPrefix,
-            ImmutableList.Builder<String> root,
-            ImmutableList.Builder<String> sub,
-            ImmutableList.Builder<String> disabled) {
-        for (String alias : v) {
+    private static void aliases(final String[] v, final boolean isRoot, final boolean addPrefix,
+            final ImmutableList.Builder<String> root,
+            final ImmutableList.Builder<String> sub,
+            final ImmutableList.Builder<String> disabled) {
+        for (final String alias : v) {
             if (alias.startsWith("#")) {
                 root.add(alias.substring(1).toLowerCase());
                 if (addPrefix) {
                     root.add("n" + alias.substring(1).toLowerCase());
                 }
             } else if (alias.startsWith("$")) {
-                String x = alias.substring(1).toLowerCase();
+                final String x = alias.substring(1).toLowerCase();
                 root.add(x);
                 disabled.add(x);
                 if (addPrefix) {
@@ -57,20 +57,20 @@ public final class CommandMetadata {
     @Nullable private final EssentialsEquivalent essentialsEquivalent;
 
     public CommandMetadata(
-            String moduleid,
-            String modulename,
-            Command annotation,
-            Class<? extends ICommandExecutor<?>> executor,
-            String commandKey,
-            @Nullable EssentialsEquivalent essentialsEquivalent) {
+            final String moduleid,
+            final String modulename,
+            final Command annotation,
+            final Class<? extends ICommandExecutor<?>> executor,
+            final String commandKey,
+            @Nullable final EssentialsEquivalent essentialsEquivalent) {
         this.moduleid = moduleid;
         this.modulename = modulename;
         this.annotation = annotation;
         this.executor = executor;
         this.commandKey = commandKey;
-        ImmutableList.Builder<String> rootBuilder = new ImmutableList.Builder<>();
-        ImmutableList.Builder<String> subBuilder = new ImmutableList.Builder<>();
-        ImmutableList.Builder<String> disabledRootBuilder = new ImmutableList.Builder<>();
+        final ImmutableList.Builder<String> rootBuilder = new ImmutableList.Builder<>();
+        final ImmutableList.Builder<String> subBuilder = new ImmutableList.Builder<>();
+        final ImmutableList.Builder<String> disabledRootBuilder = new ImmutableList.Builder<>();
         aliases(annotation.aliases(),
                 annotation.parentCommand() == ICommandExecutor.class,
                 annotation.prefixAliasesWithN(),

@@ -24,24 +24,24 @@ public class ModuleDataProvider implements IModuleDataProvider {
 
     private final Supplier<DiscoveryModuleHolder<StandardModule, StandardModule>> moduleHolderSupplier;
 
-    public ModuleDataProvider(Supplier<DiscoveryModuleHolder<StandardModule, StandardModule>> moduleHolderSupplier) {
+    public ModuleDataProvider(final Supplier<DiscoveryModuleHolder<StandardModule, StandardModule>> moduleHolderSupplier) {
         this.moduleHolderSupplier = moduleHolderSupplier;
     }
 
     private final Map<String, Class<?>> moduleConfigs = new HashMap<>();
     private final Map<Class<?>, Supplier<?>> providers = new HashMap<>();
 
-    @Override public boolean isLoaded(String id) {
+    @Override public boolean isLoaded(final String id) {
         try {
             return this.moduleHolderSupplier.get().isModuleLoaded(id);
-        } catch (NoModuleException e) {
+        } catch (final NoModuleException e) {
             throw new IllegalArgumentException("The module " + id + " does not exist.");
         }
     }
 
-    @Override public <T> void registerModuleConfig(String moduleId,
-            Class<T> typeOfConfig,
-            Supplier<T> configGetter) {
+    @Override public <T> void registerModuleConfig(final String moduleId,
+            final Class<T> typeOfConfig,
+            final Supplier<T> configGetter) {
         if (this.providers.containsKey(typeOfConfig) || this.moduleConfigs.containsKey(moduleId)) {
             throw new IllegalStateException("Cannot register type or module more than once!");
         }
@@ -52,7 +52,7 @@ public class ModuleDataProvider implements IModuleDataProvider {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getModuleConfig(Class<T> configType) throws IllegalArgumentException {
+    public <T> T getModuleConfig(final Class<T> configType) throws IllegalArgumentException {
         if (this.providers.containsKey(configType)) {
             return (T) this.providers.get(configType).get();
         }
@@ -64,11 +64,11 @@ public class ModuleDataProvider implements IModuleDataProvider {
         return ImmutableMap.copyOf(this.moduleConfigs);
     }
 
-    @Override public <T> T getDefaultModuleConfig(Class<T> configType) throws IllegalArgumentException {
+    @Override public <T> T getDefaultModuleConfig(final Class<T> configType) throws IllegalArgumentException {
         if (this.providers.containsKey(configType)) {
             try {
                 return configType.newInstance();
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (final InstantiationException | IllegalAccessException e) {
                 throw new IllegalArgumentException("Could not instantiate", e);
             }
         }
@@ -76,8 +76,8 @@ public class ModuleDataProvider implements IModuleDataProvider {
         throw new IllegalArgumentException(configType.getSimpleName() + " does not exist");
     }
 
-    @Override public Collection<String> getModules(Tristate isEnabled) {
-        ModuleHolder.ModuleStatusTristate tristate;
+    @Override public Collection<String> getModules(final Tristate isEnabled) {
+        final ModuleHolder.ModuleStatusTristate tristate;
         switch (isEnabled) {
             case TRUE:
                 tristate = ModuleHolder.ModuleStatusTristate.ENABLE;

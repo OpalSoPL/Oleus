@@ -4,12 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.back;
 
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * A service that handles the subject's last location before a warp, that is, the location they will warp to if they
@@ -25,39 +25,47 @@ public interface NucleusBackService {
     /**
      * Gets the location of the subject before they executed the last warp that was marked as Returnable.
      *
-     * @param user The {@link User}
-     * @return If it exists, an {@link Optional} containing the {@link Transform}
+     * @param user The {@link UUID} of the user
+     * @return If it exists, an {@link Optional} containing the {@link ServerLocation}
      */
-    Optional<Transform<World>> getLastLocation(User user);
+    Optional<ServerLocation> getLastLocation(UUID user);
+
+    /**
+     * Gets the rotation of the subject before they executed the last warp that was marked as Returnable.
+     *
+     * @param user The {@link UUID}
+     * @return If it exists, an {@link Optional} containing the {@link Vector3d rotation}
+     */
+    Optional<Vector3d> getLastRotation(UUID user);
 
     /**
      * Sets the location that the subject will be warped to if they execute /back
-     *  @param user The {@link User}
+     * @param uuid The {@link UUID}
      * @param location The {@link Location} to set as the /back target.
      */
-    void setLastLocation(User user, Transform<World> location);
+    void setLastLocation(UUID uuid, ServerLocation location);
 
     /**
      * Removes the last location from the subject, so that /back will not work for them.
      *
-     * @param user The {@link User}
+     * @param user The {@link UUID}
      */
-    void removeLastLocation(User user);
+    void removeLastLocation(UUID user);
 
     /**
      * Gets a value indicating whether the user will have their last location logged.
      *
-     * @param user The {@link User}
+     * @param user The {@link UUID} of the user
      *
      * @return <code>true</code> if it is being logged.
      */
-    boolean isLoggingLastLocation(User user);
+    boolean isLoggingLastLocation(UUID user);
 
     /**
      * Sets whether the user will have their last location logged.
      *
-     * @param user The {@link User}
+     * @param user The {@link UUID}
      * @param log Whether to log the user's last location.
      */
-    void setLoggingLastLocation(User user, boolean log);
+    void setLoggingLastLocation(UUID user, boolean log);
 }

@@ -45,7 +45,7 @@ public class SingleCachedService<O extends IDataObject> implements IStorageServi
     public CompletableFuture<Void> ensureSaved() {
         return ServicesUtil.run(() -> {
             if (this.cached != null) {
-                save(this.cached);
+                this.save(this.cached);
             }
             return null;
         }, this.pluginContainer);
@@ -53,7 +53,7 @@ public class SingleCachedService<O extends IDataObject> implements IStorageServi
 
     @Override
     public void saveCached() {
-        ensureSaved();
+        this.ensureSaved();
     }
 
     @Override
@@ -82,21 +82,21 @@ public class SingleCachedService<O extends IDataObject> implements IStorageServi
         }
 
         try {
-            return getFromRepo();
-        } catch (Exception e) {
+            return this.getFromRepo();
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private Optional<O> getFromRepo() throws Exception {
-        Optional<O> gdo = this.repositorySupplier.get().get().map(x -> this.dataAccessSupplier.get().fromDataAccessObject(x));
+        final Optional<O> gdo = this.repositorySupplier.get().get().map(x -> this.dataAccessSupplier.get().fromDataAccessObject(x));
         gdo.ifPresent(x -> this.cached = x);
         return gdo;
     }
 
     @Override
     public CompletableFuture<O> getOrNew() {
-        CompletableFuture<O> d = IStorageService.SingleCached.super.getOrNew();
+        final CompletableFuture<O> d = IStorageService.SingleCached.super.getOrNew();
         d.whenComplete((r, x) -> {
             if (r != null) {
                 this.cached = r;
@@ -106,7 +106,7 @@ public class SingleCachedService<O extends IDataObject> implements IStorageServi
     }
 
     @Override
-    public CompletableFuture<Void> save(@Nonnull O value) {
+    public CompletableFuture<Void> save(@Nonnull final O value) {
         return ServicesUtil.run(() -> {
             this.repositorySupplier.get().save(this.dataAccessSupplier.get().toDataAccessObject(value));
             this.cached = value;

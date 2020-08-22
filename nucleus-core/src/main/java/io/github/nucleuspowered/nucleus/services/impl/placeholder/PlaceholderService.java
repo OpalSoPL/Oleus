@@ -59,8 +59,8 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     private static Pattern buildModifiers() {
-        StringBuilder builder = new StringBuilder(":([");
-        for (TextModifiers m : TextModifiers.values()) {
+        final StringBuilder builder = new StringBuilder(":([");
+        for (final TextModifiers m : TextModifiers.values()) {
             builder.append(m.getKey());
         }
         builder.append("]+)$");
@@ -68,7 +68,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     @Inject
-    public PlaceholderService(INucleusServiceCollection serviceCollection) {
+    public PlaceholderService(final INucleusServiceCollection serviceCollection) {
         this.pluginContainer = serviceCollection.pluginContainer();
         this.optionParser = new OptionPlaceholder(serviceCollection.permissionService());
         this.emptyParser = PlaceholderParser.builder().plugin(this.pluginContainer).id("empty").parser(p -> Text.EMPTY).name("Empty parser").build();
@@ -77,54 +77,54 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
         // player, variables, map?
-        registerToken("empty", this.emptyParser, false);
-        NamePlaceholder normalName = new NamePlaceholder(
+        this.registerToken("empty", this.emptyParser, false);
+        final NamePlaceholder normalName = new NamePlaceholder(
                 serviceCollection.playerDisplayNameService(),
                 IPlayerDisplayNameService::addCommandToName,
                 "nucleus:name",
                 "Nucleus Name placeholder");
-        registerToken("name", normalName);
-        registerToken("playername", normalName);
-        registerToken("subject", new NamePlaceholder(
+        this.registerToken("name", normalName);
+        this.registerToken("playername", normalName);
+        this.registerToken("subject", new NamePlaceholder(
                 serviceCollection.playerDisplayNameService(),
                 IPlayerDisplayNameService::addCommandToName,
                 "nucleus:subject",
                 "Nucleus subject (including console) placeholder",
                 true));
 
-        NamePlaceholder displayName = new NamePlaceholder(
+        final NamePlaceholder displayName = new NamePlaceholder(
                 serviceCollection.playerDisplayNameService(),
                 IPlayerDisplayNameService::getDisplayName,
                 "nucleus:displayname",
                 "Nucleus subject (including console) placeholder");
-        registerToken("player", displayName);
-        registerToken("playerdisplayname", displayName);
-        registerToken("displayname", displayName);
+        this.registerToken("player", displayName);
+        this.registerToken("playerdisplayname", displayName);
+        this.registerToken("displayname", displayName);
 
-        IPermissionService permissionService = serviceCollection.permissionService();
-        registerToken("option", this.optionParser);
-        registerToken("prefix", new NamedOptionPlaceholder(permissionService, "prefix"));
-        registerToken("suffix", new NamedOptionPlaceholder(permissionService, "suffix"));
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        this.registerToken("option", this.optionParser);
+        this.registerToken("prefix", new NamedOptionPlaceholder(permissionService, "prefix"));
+        this.registerToken("suffix", new NamedOptionPlaceholder(permissionService, "suffix"));
 
-        registerToken("maxplayers", PlaceholderParser.builder()
+        this.registerToken("maxplayers", PlaceholderParser.builder()
                 .plugin(this.pluginContainer)
                 .id("maxplayers")
                 .name("Nucleus Max Players parser")
                 .parser(p -> Text.of(Sponge.getServer().getMaxPlayers()))
                 .build());
-        registerToken("onlineplayers", PlaceholderParser.builder()
+        this.registerToken("onlineplayers", PlaceholderParser.builder()
                         .plugin(this.pluginContainer)
                         .id("onlineplayers")
                         .name("Nucleus Online Player Count parser")
                         .parser(p -> Text.of(Sponge.getServer().getOnlinePlayers().size()))
                         .build());
-        registerToken("currentworld", PlaceholderParser.builder()
+        this.registerToken("currentworld", PlaceholderParser.builder()
                 .plugin(this.pluginContainer)
                 .id("currentworld")
                 .name("Nucleus Current World parser")
                 .parser(placeholder -> Text.of(getWorld(placeholder)))
                 .build());
-        registerToken("time",
+        this.registerToken("time",
                 PlaceholderParser.builder()
                         .plugin(this.pluginContainer)
                         .id("time")
@@ -133,14 +133,14 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
                                 Text.of(Util.getTimeFromTicks(serviceCollection.messageProvider(), getWorld(placeholder).getProperties().getWorldTime())))
                         .build());
 
-        registerToken("uniquevisitor",
+        this.registerToken("uniquevisitor",
                 PlaceholderParser.builder()
                         .plugin(this.pluginContainer)
                         .id("uniquevisitor")
                         .name("Nucleus unique visitor parser")
                         .parser(placeholder -> Text.of(serviceCollection.getServiceUnchecked(UniqueUserService.class).getUniqueUserCount()))
                         .build());
-        registerToken("ipaddress",
+        this.registerToken("ipaddress",
                 PlaceholderParser.builder()
                         .plugin(this.pluginContainer)
                         .id("ipaddress")
@@ -157,14 +157,14 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     @Override
-    public TextRepresentable parse(@Nullable CommandSource commandSource, String input) {
+    public TextRepresentable parse(@Nullable final CommandSource commandSource, final String input) {
         String token = input.toLowerCase().trim().replace("{{", "").replace("}}", "");
         final Matcher m = SUFFIX_PATTERN.matcher(token);
         final List<Function<Text, Text>> modifiersCollection;
         if (m.find(0)) {
-            String match = m.group(1).toLowerCase();
+            final String match = m.group(1).toLowerCase();
             modifiersCollection = new ArrayList<>();
-            for (TextModifiers modifier : TextModifiers.values()) {
+            for (final TextModifiers modifier : TextModifiers.values()) {
                 if (match.contains(modifier.getKey())) {
                     modifiersCollection.add(modifier);
                 }
@@ -183,7 +183,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
             }
             // option
             parser = this.optionParser;
-            context = contextForSubjectAndOption(commandSource, token.substring(2));
+            context = this.contextForSubjectAndOption(commandSource, token.substring(2));
         } else {
             final String[] s = token.split("\\|", 2);
             final String tokenIn = s[0].toLowerCase();
@@ -192,24 +192,24 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
                     .setAssociatedObject(commandSource)
                     .setArgumentString(arg)
                     .build();
-            parser = getParser(tokenIn).orElse(this.emptyParser);
+            parser = this.getParser(tokenIn).orElse(this.emptyParser);
         }
 
         return new NucleusPlaceholderText(context, parser, modifiersCollection);
     }
 
     @Override
-    public void registerToken(String tokenName, PlaceholderParser parser) {
-        registerToken(tokenName, parser, true);
+    public void registerToken(final String tokenName, final PlaceholderParser parser) {
+        this.registerToken(tokenName, parser, true);
     }
 
     @Override
-    public void registerToken(String tokenName, PlaceholderParser parser, boolean document) {
+    public void registerToken(final String tokenName, final PlaceholderParser parser, final boolean document) {
         if (SEPARATOR.asPredicate().test(tokenName)) {
             // can't be registered.
             throw new IllegalArgumentException("Tokens must not contain |, :, _ or space characters.");
         }
-        String token = tokenName.toLowerCase();
+        final String token = tokenName.toLowerCase();
         if (!this.parsers.containsKey(token)) {
             this.parsers.put(token, new PlaceholderMetadata(token, parser, document));
         } else {
@@ -218,11 +218,11 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     @Override
-    public Optional<PlaceholderParser> getParser(String token) {
+    public Optional<PlaceholderParser> getParser(final String token) {
         if (token.contains(":")) {
             return Sponge.getRegistry().getType(PlaceholderParser.class, token);
         }
-        PlaceholderMetadata placeholderMetadata = this.parsers.get(SEPARATOR.split(token.toLowerCase(), 2)[0]);
+        final PlaceholderMetadata placeholderMetadata = this.parsers.get(SEPARATOR.split(token.toLowerCase(), 2)[0]);
         if (placeholderMetadata == null) {
             return Optional.empty();
         }
@@ -234,15 +234,15 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         return this.optionParser;
     }
 
-    private PlaceholderContext contextForSubjectAndOption(Subject subject, String option) {
+    private PlaceholderContext contextForSubjectAndOption(final Subject subject, final String option) {
         return PlaceholderContext.builder().setArgumentString(option).setAssociatedObject(subject).build();
     }
 
     @Override
-    public PlaceholderText textForSubjectAndOption(Subject subject, String option) {
+    public PlaceholderText textForSubjectAndOption(final Subject subject, final String option) {
         return PlaceholderText.builder()
                 .setParser(this.optionParser)
-                .setContext(contextForSubjectAndOption(subject, option))
+                .setContext(this.contextForSubjectAndOption(subject, option))
                 .build();
     }
 
@@ -252,10 +252,10 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
 
     // --
 
-    private static World getWorld(PlaceholderContext placeholder) {
-        CommandSource p = placeholder.getAssociatedObject().filter(x -> x instanceof CommandSource).map(x -> (CommandSource) x)
+    private static World getWorld(final PlaceholderContext placeholder) {
+        final CommandSource p = placeholder.getAssociatedObject().filter(x -> x instanceof CommandSource).map(x -> (CommandSource) x)
                         .orElseGet(Sponge.getServer()::getConsole);
-        World world;
+        final World world;
         if (p instanceof Locatable) {
             world = ((Locatable) p).getWorld();
         } else {

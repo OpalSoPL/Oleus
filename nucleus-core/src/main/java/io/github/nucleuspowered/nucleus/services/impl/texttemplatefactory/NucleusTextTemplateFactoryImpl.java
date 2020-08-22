@@ -19,7 +19,7 @@ public class NucleusTextTemplateFactoryImpl implements INucleusTextTemplateFacto
     private final NucleusTextTemplateImpl.Empty emptyInstance;
 
     @Inject
-    public NucleusTextTemplateFactoryImpl(INucleusServiceCollection serviceCollection) {
+    public NucleusTextTemplateFactoryImpl(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.emptyInstance = new NucleusTextTemplateImpl.Empty(serviceCollection);
     }
@@ -29,38 +29,38 @@ public class NucleusTextTemplateFactoryImpl implements INucleusTextTemplateFacto
     }
 
     @Override
-    public NucleusTextTemplateImpl createFromString(String string) {
-        return create(string);
+    public NucleusTextTemplateImpl createFromString(final String string) {
+        return this.create(string);
     }
 
     @Override
-    public NucleusTextTemplateImpl createFromAmpersandString(String string) {
+    public NucleusTextTemplateImpl createFromAmpersandString(final String string) {
         return new NucleusTextTemplateImpl.Ampersand(string, this.serviceCollection);
     }
 
-    @Override public NucleusTextTemplateImpl createFromAmpersandString(String string, Text prefix, Text suffix) {
+    @Override public NucleusTextTemplateImpl createFromAmpersandString(final String string, final Text prefix, final Text suffix) {
         return new NucleusTextTemplateImpl.Ampersand(string, prefix, suffix, this.serviceCollection);
     }
 
-    public NucleusTextTemplateImpl create(String string) {
+    public NucleusTextTemplateImpl create(final String string) {
         if (string.isEmpty()) {
             return this.emptyInstance;
         }
 
         try {
             return new NucleusTextTemplateImpl.Json(string, this.serviceCollection);
-        } catch (NullPointerException e) {
-            return createFromAmpersand(string);
-        } catch (RuntimeException e) {
+        } catch (final NullPointerException e) {
+            return this.createFromAmpersand(string);
+        } catch (final RuntimeException e) {
             if (e.getCause() != null && e.getCause() instanceof ObjectMappingException) {
-                return createFromAmpersand(string);
+                return this.createFromAmpersand(string);
             } else {
                 throw e;
             }
         }
     }
 
-    private NucleusTextTemplateImpl createFromAmpersand(String string) {
+    private NucleusTextTemplateImpl createFromAmpersand(final String string) {
         return new NucleusTextTemplateImpl.Ampersand(string, this.serviceCollection);
     }
 

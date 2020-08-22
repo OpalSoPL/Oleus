@@ -15,7 +15,7 @@ public class DataKeyImpl<R, O extends IKeyedDataObject<?>> implements DataKey<R,
     private final R def;
     private Class<O> target;
 
-    public DataKeyImpl(String[] key, TypeToken<R> type, Class<O> target, @Nullable R def) {
+    public DataKeyImpl(final String[] key, final TypeToken<R> type, final Class<O> target, @Nullable final R def) {
         this.key = key;
         this.type = type;
         this.def = def;

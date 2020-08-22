@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.api.module.mail;
 
 import com.google.common.base.Preconditions;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.time.Instant;
@@ -16,8 +17,6 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
-
 /**
  * A service that handles sending and retrieving mail.
  */
@@ -26,37 +25,38 @@ public interface NucleusMailService {
     /**
      * Gets mail for a specific player, optionally including a list of filters.
      *
-     * @param player The {@link User} of the player to get the mail of.
+     * @param player The {@link UUID} of the player to get the mail of.
      * @param filters The {@link MailFilter}s
      * @return A list of mail.
      */
-    List<MailMessage> getMail(User player, MailFilter... filters);
+    List<MailMessage> getMail(UUID player, MailFilter... filters);
 
     /**
      * Removes a specific mail for a specific player.
      *
-     * @param player The {@link User} to remove the mail from.
+     * @param player The {@link UUID} of the player to remove the mail from.
      * @param mailData The {@link MailMessage} to remove from the player.
-     * @return <code>true</code> if the mail was removed, <code>false</code> if the player didn't have the mail.
+     * @return <code>true</code> if the mail was removed, <code>false</code>
+     *      if the player didn't have the mail.
      */
-    boolean removeMail(User player, MailMessage mailData);
+    boolean removeMail(UUID player, MailMessage mailData);
 
     /**
      * Sends mail to a subject, addressed from another subject.
      *
-     * @param playerFrom The {@link User} of the player to send the message from.
-     * @param playerTo The {@link User} of the player to send the message to.
+     * @param playerFrom The {@link UUID} of the player to send the message from.
+     * @param playerTo The {@link UUID} of the player to send the message to.
      * @param message The message.
      */
-    void sendMail(User playerFrom, User playerTo, String message);
+    void sendMail(UUID playerFrom, User playerTo, String message);
 
     /**
      * Sends mail to a player, addressed from the console.
      *
-     * @param playerTo The {@link User} of the player to send the message to.
+     * @param playerTo The {@link UUID} of the player to send the message to.
      * @param message The message.
      */
-    void sendMailFromConsole(User playerTo, String message);
+    void sendMailFromConsole(UUID playerTo, String message);
 
     /**
      * Clears the player's mail.
@@ -64,7 +64,7 @@ public interface NucleusMailService {
      * @param player The {@link UUID} of the player.
      * @return If there was any mail cleared
      */
-    boolean clearUserMail(User player);
+    boolean clearUserMail(UUID player);
 
     /**
      * Create a filter that restricts the mail to the senders provided.
@@ -77,8 +77,8 @@ public interface NucleusMailService {
      * @param player The {@link UUID}s of the players.
      * @return The {@link MailFilter}
      */
-    default MailFilter createSenderFilter(boolean includeConsole, UUID... player) {
-        return createSenderFilter(includeConsole, Arrays.asList(player));
+    default MailFilter createSenderFilter(final boolean includeConsole, final UUID... player) {
+        return this.createSenderFilter(includeConsole, Arrays.asList(player));
     }
 
     /**
@@ -92,8 +92,8 @@ public interface NucleusMailService {
      * @param player The {@link UUID}s of the players.
      * @return The {@link MailFilter}
      */
-    default MailFilter createSenderFilter(boolean includeConsole, final Collection<UUID> player) {
-        return m -> m.getSender().map(x -> player.contains(x.getUniqueId())).orElse(includeConsole);
+    default MailFilter createSenderFilter(final boolean includeConsole, final Collection<UUID> player) {
+        return m -> m.getSender().map(player::contains).orElse(includeConsole);
     }
 
     /**
@@ -108,7 +108,7 @@ public interface NucleusMailService {
      * @param before The {@link Instant} which indicates the latest date to return.
      * @return The {@link MailFilter}
      */
-    default MailFilter createDateFilter(@Nullable Instant after, @Nullable Instant before) {
+    default MailFilter createDateFilter(@Nullable final Instant after, @Nullable final Instant before) {
         Preconditions.checkArgument(after != null || before != null);
         final Instant inAfter = after == null ? Instant.ofEpochMilli(0) : after;
         final Instant inBefore = before == null ? Instant.now() : before;
@@ -127,8 +127,8 @@ public interface NucleusMailService {
      * @param message The message.
      * @return The {@link MailFilter}
      */
-    default MailFilter createMessageFilter(final boolean caseSensitive, String... message) {
-        return createMessageFilter(caseSensitive, Arrays.asList(message));
+    default MailFilter createMessageFilter(final boolean caseSensitive, final String... message) {
+        return this.createMessageFilter(caseSensitive, Arrays.asList(message));
     }
 
     /**
@@ -142,10 +142,10 @@ public interface NucleusMailService {
      * @param message The message.
      * @return The {@link MailFilter}
      */
-    default MailFilter createMessageFilter(final boolean caseSensitive, Collection<String> message) {
+    default MailFilter createMessageFilter(final boolean caseSensitive, final Collection<String> message) {
         final List<String> strings = message.stream().map(x -> !caseSensitive ? x.toLowerCase() : x).collect(Collectors.toList());
         return m -> {
-            String mm = caseSensitive ? m.getMessage() : m.getMessage().toLowerCase();
+            final String mm = caseSensitive ? m.getMessage() : m.getMessage().toLowerCase();
             return strings.stream().allMatch(mm::contains);
         };
     }

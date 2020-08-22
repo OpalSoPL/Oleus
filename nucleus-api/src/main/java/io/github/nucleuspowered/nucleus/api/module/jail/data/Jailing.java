@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.api.module.jail.data;
 
 import io.github.nucleuspowered.nucleus.api.util.data.TimedEntry;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.World;
 
 import java.time.Instant;
@@ -43,7 +44,7 @@ public interface Jailing extends TimedEntry {
      *
      * @return The previous location of the player, if known.
      */
-    Optional<Location<World>> getPreviousLocation();
+    Optional<ServerLocation> getPreviousLocation();
 
     /**
      * Gets the {@link Instant} this inmate was jailed, if this information was recorded.

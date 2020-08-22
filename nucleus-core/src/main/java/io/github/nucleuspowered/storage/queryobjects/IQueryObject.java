@@ -64,7 +64,7 @@ public interface IQueryObject<K, T extends IQueryObject<K, T>> {
      * @return The keys.
      */
     default boolean restrictedToKeys() {
-        return !keys().isEmpty();
+        return !this.keys().isEmpty();
     }
 
 }

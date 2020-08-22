@@ -31,7 +31,7 @@ public class NucleusWorldPropertiesArgument extends CommandElement {
     private final Type type;
     private final IMessageProviderService messageProviderService;
 
-    public NucleusWorldPropertiesArgument(@Nullable Text key, Type type, INucleusServiceCollection serviceCollection) {
+    public NucleusWorldPropertiesArgument(@Nullable final Text key, final Type type, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.type = type;
         this.messageProviderService = serviceCollection.messageProvider();
@@ -39,9 +39,9 @@ public class NucleusWorldPropertiesArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String next = args.next();
-        Optional<WorldProperties> owp = getChoices().filter(x -> x.getWorldName().equalsIgnoreCase(next)).findFirst();
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String next = args.next();
+        final Optional<WorldProperties> owp = this.getChoices().filter(x -> x.getWorldName().equalsIgnoreCase(next)).findFirst();
         if (owp.isPresent()) {
             return owp.get();
         }
@@ -49,11 +49,11 @@ public class NucleusWorldPropertiesArgument extends CommandElement {
         throw args.createError(this.messageProviderService.getMessageFor(source, this.type.key, next));
     }
 
-    @Override public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        return getChoices().filter(x -> {
+    @Override public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
+        return this.getChoices().filter(x -> {
             try {
                 return x.getWorldName().toLowerCase().startsWith(args.peek());
-            } catch (ArgumentParseException e) {
+            } catch (final ArgumentParseException e) {
                 return true;
             }
         }).map(WorldProperties::getWorldName).collect(Collectors.toList());
@@ -73,7 +73,7 @@ public class NucleusWorldPropertiesArgument extends CommandElement {
         private final Predicate<WorldProperties> predicate;
         private final String key;
 
-        Type(Predicate<WorldProperties> predicate, String key) {
+        Type(final Predicate<WorldProperties> predicate, final String key) {
             this.predicate = predicate;
             this.key = key;
         }

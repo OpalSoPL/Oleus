@@ -22,15 +22,15 @@ public class CommandModifiersConfig {
         return this.cooldown;
     }
 
-    public void setCost(double cost) {
+    public void setCost(final double cost) {
         this.cost = Math.max(0, cost);
     }
 
-    public void setWarmup(int warmup) {
+    public void setWarmup(final int warmup) {
         this.warmup = Math.max(0, warmup);
     }
 
-    public void setCooldown(int cooldown) {
+    public void setCooldown(final int cooldown) {
         this.cooldown = Math.max(0, cooldown);
     }
 

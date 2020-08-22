@@ -6,7 +6,7 @@ package io.github.nucleuspowered.storage.exceptions;
 
 public class DataSaveException extends Exception {
 
-    public DataSaveException(String mesage, Exception innerException) {
+    public DataSaveException(final String mesage, final Exception innerException) {
         super(mesage, innerException);
     }
 }

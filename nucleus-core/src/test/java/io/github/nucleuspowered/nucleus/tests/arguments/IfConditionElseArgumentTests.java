@@ -17,8 +17,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -44,7 +42,6 @@ public class IfConditionElseArgumentTests extends TestBase {
         return context.<Boolean>getOne("key").orElseThrow(NullPointerException::new);
     }
 
-    @NonnullByDefault
     public static class TrueArgument extends CommandElement {
 
         public TrueArgument() {
@@ -61,7 +58,6 @@ public class IfConditionElseArgumentTests extends TestBase {
     }
 
 
-    @NonnullByDefault
     public static class FalseArgument extends CommandElement {
 
         public FalseArgument() {

@@ -22,14 +22,11 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-@NonnullByDefault
 @Command(
         aliases = "getuuids",
         basePermission = CorePermissions.BASE_DEBUG_GETUUIDS,

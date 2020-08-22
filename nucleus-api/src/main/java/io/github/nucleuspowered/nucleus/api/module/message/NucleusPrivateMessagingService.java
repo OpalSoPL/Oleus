@@ -4,18 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.message;
 
-import org.spongepowered.api.command.CommandSource;
+import io.github.nucleuspowered.nucleus.api.module.message.target.CustomMessageTarget;
+import io.github.nucleuspowered.nucleus.api.module.message.target.MessageTarget;
+import io.github.nucleuspowered.nucleus.api.module.message.target.SystemMessageTarget;
+import io.github.nucleuspowered.nucleus.api.module.message.target.UserMessageTarget;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
 
 /**
  * A service that contains message related APIs.
@@ -26,10 +24,10 @@ public interface NucleusPrivateMessagingService {
      * Returns whether the user is able to see all private messages sent on the server. This indicates that the user
      * has the correct permission AND has activated it.
      *
-     * @param user The {@link User} to check.
+     * @param uuid The {@link UUID} of the user to check.
      * @return <code>true</code> if the user has Social Spy enabled.
      */
-    boolean isSocialSpy(User user);
+    boolean isSocialSpy(UUID uuid);
 
     /**
      * Returns whether the server is using social spy levels.
@@ -59,7 +57,8 @@ public interface NucleusPrivateMessagingService {
     boolean canSpySameLevel();
 
     /**
-     * Gets the social spy level for any message targets registered using {@link #registerMessageTarget(UUID, String, Text, Supplier)}.
+     * Gets the social spy level for any message targets registered using
+     * {@link #registerMessageTarget(CustomMessageTarget)}.
      *
      * @return The target's social spy level.
      */
@@ -79,7 +78,7 @@ public interface NucleusPrivateMessagingService {
      * @param user The user to check.
      * @return The level.
      */
-    int getSocialSpyLevel(User user);
+    int getSocialSpyLevel(UUID user);
 
     /**
      * Returns whether the specified user can toggle social spy {@link Tristate#UNDEFINED}, or whether they are forced to use social spy {@link
@@ -88,7 +87,7 @@ public interface NucleusPrivateMessagingService {
      * @param user The use to check.
      * @return A {@link Tristate} that indicates what state the user might be forced into.
      */
-    Tristate forcedSocialSpyState(User user);
+    Tristate forcedSocialSpyState(UUID user);
 
     /**
      * Sets whether the user is able to see all private messages on the server. This method will return whether the
@@ -98,7 +97,7 @@ public interface NucleusPrivateMessagingService {
      * @param isSocialSpy <code>true</code> to turn Social Spy on, <code>false</code> otherwise.
      * @return <code>true</code> if the change was fulfilled, <code>false</code> if the user does not have permission
      */
-    boolean setSocialSpy(User user, boolean isSocialSpy);
+    boolean setSocialSpy(UUID user, boolean isSocialSpy);
 
     /**
      * Returns whether the specified user can spy on <strong>all</strong> of the specified sources.
@@ -108,124 +107,110 @@ public interface NucleusPrivateMessagingService {
      * </p>
      *
      * @param spyingUser The user that will be spying.
-     * @param sourcesToSpyOn The {@link CommandSource}s to spy upon.
+     * @param sourcesToSpyOn The {@link UUID}s of the sources to spy upon.
      * @return <code>true</code> if the user can spy on <strong>all</strong> the users.
-     * @throws IllegalArgumentException thrown if no {@link CommandSource}s are supplied.
+     * @throws IllegalArgumentException thrown if no {@link UUID}s are supplied.
      */
-    boolean canSpyOn(User spyingUser, CommandSource... sourcesToSpyOn) throws IllegalArgumentException;
+    boolean canSpyOn(UUID spyingUser, MessageTarget... sourcesToSpyOn) throws IllegalArgumentException;
 
     /**
-     * Returns the {@link CommandSource}s that are online and can spy on <strong>all</strong> of the specified sources.
+     * Returns the {@link UUID}s of players that are online and can spy on
+     * <strong>all</strong> of the specified sources.
      *
      * <p>
      *     This will not return players in the list of users to spy on.
      * </p>
      *
      * @param includeConsole Whether to include the console in the returned {@link Set}.
-     * @param sourcesToSpyOn The {@link CommandSource}s to spy upon.
-     * @return A {@link Set} of {@link CommandSource}s that can spy upon the specified users.
-     * @throws IllegalArgumentException thrown if no {@link CommandSource}s are supplied.
+     * @param sourcesToSpyOn The {@link UUID}s to spy upon.
+     * @return A {@link Set} of {@link UUID}s that can spy upon the specified users.
+     * @throws IllegalArgumentException thrown if no {@link UUID}s are supplied.
      */
-    Set<CommandSource> onlinePlayersCanSpyOn(boolean includeConsole, CommandSource... sourcesToSpyOn) throws IllegalArgumentException;
+    Set<UUID> onlinePlayersCanSpyOn(boolean includeConsole, MessageTarget... sourcesToSpyOn) throws IllegalArgumentException;
 
     /**
      * Sends a message as the sender to the receiver. Takes a string to mirror what the command would do.
      *
      * @param sender The sender.
-     * @param receiver The reciever.
+     * @param receiver The receiver.
      * @param message The message to send.
      * @return <code>true</code> if the message was sent, <code>false</code> otherwise.
      */
-    boolean sendMessage(CommandSource sender, CommandSource receiver, String message);
+    boolean sendMessage(MessageTarget sender, MessageTarget receiver, String message);
 
     /**
-     * Gets the {@link CommandSource} that the console will reply to if <code>/r</code> is used, if any.
+     * Gets the {@link SystemMessageTarget}
      *
-     * @return The {@link CommandSource}.
+     * @return The system target
      */
-    Optional<CommandSource> getConsoleReplyTo();
+    SystemMessageTarget getSystemMessageTarget();
 
     /**
-     * Gets the {@link CommandSource} that the specified {@link User} will reply to if <code>/r</code> is used, if any.
+     * Gets the {@link UserMessageTarget} for the given {@link UUID}
      *
-     * @param from The {@link User} to inspect.
-     * @return The {@link CommandSource}.
+     * @return The {@link UserMessageTarget}
      */
-    Optional<CommandSource> getReplyTo(User from);
+    UserMessageTarget getUserMessageTarget(UUID uuid);
 
     /**
-     * Gets the {@link CommandSource} that the specified {@link T} will reply to if <code>/r</code> is used, if any.
+     * Gets the {@link CustomMessageTarget} for the given identifier.
      *
-     * @param from The {@link T} to inspect.
-     * @param <T> The {@link Identifiable} {@link CommandSource} type.
-     * @return The {@link CommandSource}.
-     */
-    <T extends CommandSource & Identifiable> Optional<CommandSource> getCommandSourceReplyTo(T from);
-
-    /**
-     * Sets the {@link CommandSource} that the specified {@link User} will reply to if <code>/r</code> is used.
-     * @param user The {@link User} to modify.
-     * @param toReplyTo The {@link CommandSource}.
-     */
-    void setReplyTo(User user, CommandSource toReplyTo);
-
-    /**
-     * Sets the {@link CommandSource} that the console will reply to if <code>/r</code> is used.
-     * @param toReplyTo The {@link CommandSource}.
-     */
-    void setConsoleReplyTo(CommandSource toReplyTo);
-
-    /**
-     * Sets the {@link CommandSource} that the specified {@link CommandSource} will reply to if <code>/r</code> is used.
+     * <p>This identifier should not be prefixed with #.</p>
      *
-     * <p>
-     *     If the {@link CommandSource} in both cases isn't a normal target or isn't registered, this will fail silently.
-     * </p>
+     * @return The {@link CustomMessageTarget}
+     */
+    CustomMessageTarget getCustomMessageTarget(String identifier);
+
+    /**
+     * Gets the current {@link MessageTarget} that the given
+     * {@link MessageTarget} will reply to if {@code /r} is used.
      *
-     * @param source The {@link T} to modify.
-     * @param <T> The {@link Identifiable} {@link CommandSource} type.
-     * @param replyTo The {@link CommandSource} to now reply to.
+     * @param target The target.
+     * @return The target to reply to, if any.
      */
-    <T extends CommandSource & Identifiable> void setCommandSourceReplyTo(T source, CommandSource replyTo);
+    Optional<MessageTarget> getCurrentReplyTarget(MessageTarget target);
 
     /**
-     * Removes the {@link CommandSource} that the specified {@link User} will reply to if <code>/r</code> is used.
-     * @param user The {@link User} to modify.
+     * Gets the current {@link MessageTarget} that the user associated with the
+     * given {@link UUID} will reply to if {@code /r} is used.
+     *
+     * @param user The UUID of the user.
+     * @return The target to reply to, if any.
      */
-    void clearReplyTo(User user);
+    default Optional<MessageTarget> getCurrentReplyTarget(final UUID user) {
+        return this.getCurrentReplyTarget(this.getUserMessageTarget(user));
+    }
 
     /**
-     * Removes the {@link CommandSource} that the specified {@link CommandSource} will reply to if <code>/r</code> is used.
-     * @param user The {@link User} to modify.
-     * @param <T> The {@link Identifiable} {@link CommandSource} type.
+     * Sets the reply target for the given {@link MessageTarget} to the
+     * given {@link MessageTarget}.
+     *
+     * @param source The target to change the reply target for
+     * @param newTarget The target who the source will now reply to
      */
-    <T extends CommandSource & Identifiable> void clearCommandSourceReplyTo(T user);
+    void setReplyTarget(MessageTarget source, MessageTarget newTarget);
 
     /**
-     * Removes the {@link CommandSource} that the console will reply to if <code>/r</code> is used.
+     * Removes the reply target for the given {@link MessageTarget}, such that
+     * the target will not reply to anyone if {@code /r} is used.
+     *
+     * @param source The target to clear the reply target for
      */
-    void clearConsoleReplyTo();
+    void clearReplyTarget(MessageTarget source);
 
     /**
-     * Registers a message target. The target's UUID must remain constant, otherwise Nucleus will treat any interaction as coming from the console.
+     * Registers a message target that players can message.
      *
      * <p>
-     *     A message target is, perhaps unsurprisingly, a valid target for messaging. Players can message this target using
-     *     <code>/m &lt;targetName&gt; [message]</code>
+     *     A message target is, perhaps unsurprisingly, a valid target for messaging. Players can
+     *     message this target using <code>/m #&lt;targetName&gt; [message]</code>
      * </p>
      * <p>
      *     Message targets <em>cannot</em> be ignored. They are mostly intended for bot use.
      * </p>
      *
-     * @param uniqueId The {@link UUID} of the target.
-     * @param targetName The name of the target in commands.
-     * @param displayName The display name of the target. If <code>null</code>, {@link CommandSource#getName()} is used.
-     * @param target A {@link Supplier} of the message target, which must implement both {@link CommandSource} and {@link Identifiable}.
-     * @param <T> The type that implements both {@link CommandSource} and {@link Identifiable}.
-     * @throws NullPointerException thrown if any non {@link Nullable} parameter is null.
-     * @throws IllegalArgumentException thrown if the {@link UUID} is the zero UUID.
-     * @throws IllegalStateException thrown if the {@link UUID} has already been registered.
+     * @param messageTarget The {@link CustomMessageTarget}
      */
-    <T extends CommandSource & Identifiable> void registerMessageTarget(UUID uniqueId, String targetName, @Nullable Text displayName, Supplier<T> target)
+    void registerMessageTarget(CustomMessageTarget messageTarget)
         throws NullPointerException, IllegalArgumentException, IllegalStateException;
 }

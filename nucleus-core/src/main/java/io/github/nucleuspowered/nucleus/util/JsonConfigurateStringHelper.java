@@ -18,29 +18,29 @@ import java.util.Optional;
 public class JsonConfigurateStringHelper {
     private final static TypeToken<TextTemplate> textTemplateTypeToken = TypeToken.of(TextTemplate.class);
 
-    public static Optional<ConfigurationNode> getNodeFromJson(String string) {
+    public static Optional<ConfigurationNode> getNodeFromJson(final String string) {
         try (final StringReader reader = new StringReader(string); final BufferedReader br = new BufferedReader(reader)) {
-            GsonConfigurationLoader loader =  GsonConfigurationLoader
+            final GsonConfigurationLoader loader =  GsonConfigurationLoader
                     .builder()
                     .setSource(() -> br)
                     .build();
             return Optional.of(loader.load());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return Optional.empty();
         }
     }
 
-    public static String getJsonStringFrom(TextTemplate template) {
+    public static String getJsonStringFrom(final TextTemplate template) {
         try (final StringWriter writer = new StringWriter(); final BufferedWriter bw = new BufferedWriter(writer)) {
-            GsonConfigurationLoader loader =  GsonConfigurationLoader
+            final GsonConfigurationLoader loader =  GsonConfigurationLoader
                     .builder()
                     .setSink(() -> bw)
                     .build();
-            ConfigurationNode node = loader.createEmptyNode();
+            final ConfigurationNode node = loader.createEmptyNode();
             node.setValue(textTemplateTypeToken, template);
             loader.save(node);
             return writer.toString();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             return "{}";
         }

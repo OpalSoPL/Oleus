@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
@@ -22,13 +22,13 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
 
     @Nullable
     @Override
-    public NamedLocation deserialize(@NonNull TypeToken<?> type, @NonNull ConfigurationNode value) throws ObjectMappingException {
+    public NamedLocation deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
         if (type.isSubtypeOf(TypeTokens.WARP)) {
             return WarpSerialiser.INSTANCE.deserialize(type, value);
         }
 
-        Vector3d pos = getPosition(value);
-        Vector3d rot = getRotation(value);
+        final Vector3d pos = getPosition(value);
+        final Vector3d rot = getRotation(value);
 
         return new LocationData(
                 getName(value),
@@ -39,7 +39,7 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
     }
 
     @Override
-    public void serialize(@NonNull TypeToken<?> type, @Nullable NamedLocation obj, @NonNull ConfigurationNode value) throws ObjectMappingException {
+    public void serialize(@NonNull final TypeToken<?> type, @Nullable final NamedLocation obj, @NonNull final ConfigurationNode value) throws ObjectMappingException {
         if (obj == null) {
             return;
         }
@@ -52,15 +52,15 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
         serializeLocation(obj, value);
     }
 
-    static String getName(ConfigurationNode value) {
+    static String getName(final ConfigurationNode value) {
         return value.getNode("name").getString(String.valueOf(value.getKey()));
     }
 
-    static UUID getWorldUUID(ConfigurationNode value) throws ObjectMappingException {
+    static UUID getWorldUUID(final ConfigurationNode value) throws ObjectMappingException {
         return value.getNode("world").getValue(TypeTokens.UUID);
     }
 
-    static Vector3d getPosition(ConfigurationNode value) {
+    static Vector3d getPosition(final ConfigurationNode value) {
         return new Vector3d(
                 value.getNode("x").getDouble(),
                 value.getNode("y").getDouble(),
@@ -68,7 +68,7 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
         );
     }
 
-    static Vector3d getRotation(ConfigurationNode value) {
+    static Vector3d getRotation(final ConfigurationNode value) {
         return new Vector3d(
                 value.getNode("rotx").getDouble(),
                 value.getNode("roty").getDouble(),
@@ -76,7 +76,7 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
         );
     }
 
-    static void serializeLocation(NamedLocation obj, ConfigurationNode value) throws ObjectMappingException {
+    static void serializeLocation(final NamedLocation obj, final ConfigurationNode value) throws ObjectMappingException {
         value.getNode("world").setValue(TypeTokens.UUID, obj.getWorldUUID());
 
         value.getNode("x").setValue(obj.getPosition().getX());

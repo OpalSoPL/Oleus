@@ -5,9 +5,6 @@
 package io.github.nucleuspowered.nucleus.api.module.home.data;
 
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
 
 import java.util.UUID;
 
@@ -23,12 +20,4 @@ public interface Home extends NamedLocation {
      */
     UUID getOwnersUniqueId();
 
-    /**
-     * Gets the {@link User} who owns this home.
-     *
-     * @return The {@link User}
-     */
-    default User getUser() {
-        return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(getOwnersUniqueId()).orElseThrow(() -> new IllegalStateException("user"));
-    }
 }

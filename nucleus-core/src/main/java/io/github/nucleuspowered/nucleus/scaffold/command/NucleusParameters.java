@@ -53,9 +53,9 @@ public class NucleusParameters {
 
         @Nullable private CommandElement load;
 
-        public final CommandElement get(INucleusServiceCollection serviceCollection) {
+        public final CommandElement get(final INucleusServiceCollection serviceCollection) {
             if (this.load == null) {
-                this.load = create(serviceCollection);
+                this.load = this.create(serviceCollection);
             }
 
             return this.load;
@@ -72,14 +72,14 @@ public class NucleusParameters {
     public static final CommandElement OPTIONAL_ONE_TRUE_FALSE = GenericArguments.optional(ONE_TRUE_FALSE);
 
     public static final LazyLoadedCommandElement MANY_ENTITY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new SelectorArgument(new DisplayNameArgument(Text.of(Keys.SUBJECT), DisplayNameArgument.Target.PLAYER, serviceCollection),
                     Entity.class, serviceCollection);
         }
     };
 
     public static final LazyLoadedCommandElement MANY_LIVING = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new SelectorArgument(new DisplayNameArgument(Text.of(Keys.SUBJECT), DisplayNameArgument.Target.PLAYER, serviceCollection),
                     Living.class, serviceCollection);
         }
@@ -87,57 +87,57 @@ public class NucleusParameters {
 
     // users
     private static final LazyLoadedCommandElement MANY_PLAYER_NO_SELECTOR = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new DisplayNameArgument(Text.of(Keys.PLAYER), DisplayNameArgument.Target.PLAYER, serviceCollection);
         }
     };
 
     public static final LazyLoadedCommandElement MANY_USER_NO_SELECTOR = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new DisplayNameArgument(Text.of(Keys.USER), DisplayNameArgument.Target.USER, serviceCollection);
         }
     };
 
     public static final LazyLoadedCommandElement ONE_PLAYER_NO_SELECTOR = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(MANY_PLAYER_NO_SELECTOR.get(serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement MANY_PLAYER = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new SelectorArgument(MANY_PLAYER_NO_SELECTOR.get(serviceCollection), Player.class, serviceCollection);
         }
     };
 
     public static final LazyLoadedCommandElement ONE_PLAYER = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(MANY_PLAYER.get(serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement OPTIONAL_ONE_PLAYER = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.optionalWeak(ONE_PLAYER.get(serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement MANY_PLAYER_OR_CONSOLE = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new SelectorArgument(new DisplayNameArgument(Text.of(Keys.PLAYER_OR_CONSOLE), DisplayNameArgument.Target.PLAYER,
                     serviceCollection), Player.class, serviceCollection);
         }
     };
 
     public static final LazyLoadedCommandElement ONE_PLAYER_OR_CONSOLE = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(MANY_PLAYER_OR_CONSOLE.get(serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement ONE_USER = new LazyLoadedCommandElement() {
 
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(
                     new SelectorArgument(new DisplayNameArgument(Text.of(Keys.USER), DisplayNameArgument.Target.USER, serviceCollection),
                             Player.class, serviceCollection));
@@ -145,13 +145,13 @@ public class NucleusParameters {
     };
 
     public static final LazyLoadedCommandElement ONE_USER_UUID = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(UUIDArgument.user(Text.of(Keys.USER_UUID), serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement ONE_USER_PLAYER_KEY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(
                     new SelectorArgument(new DisplayNameArgument(Text.of(Keys.PLAYER), DisplayNameArgument.Target.USER, serviceCollection),
                             Player.class, serviceCollection));
@@ -160,13 +160,13 @@ public class NucleusParameters {
 
 
     public static final LazyLoadedCommandElement ONE_GAME_PROFILE_UUID = new LazyLoadedCommandElement() {
-                @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+                @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
                     return GenericArguments.onlyOne(UUIDArgument.gameProfile(Text.of(Keys.USER_UUID), serviceCollection));
                 }
             };
 
     public static final LazyLoadedCommandElement ONE_GAME_PROFILE = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(new GameProfileArgument(Text.of(Keys.USER), serviceCollection));
         }
     };
@@ -190,69 +190,69 @@ public class NucleusParameters {
     public static final CommandElement OPTIONAL_REASON = GenericArguments.optional(REASON);
 
     public static final LazyLoadedCommandElement WORLD_PROPERTIES_ENABLED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.ENABLED_ONLY, serviceCollection);
         }
     };
 
     public static final LazyLoadedCommandElement OPTIONAL_WEAK_WORLD_PROPERTIES_ENABLED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.optionalWeak(WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.optional(WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement WORLD_PROPERTIES_DISABLED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.DISABLED_ONLY, serviceCollection);
         }
     };
 
     public static final LazyLoadedCommandElement WORLD_PROPERTIES_ALL = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.ALL, serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement OPTIONAL_WORLD_PROPERTIES_ALL = new LazyLoadedCommandElement() {
-                @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+                @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
                     return GenericArguments.optionalWeak(WORLD_PROPERTIES_ALL.get(serviceCollection));
                 }
             };
 
     public static final LazyLoadedCommandElement WORLD_PROPERTIES_UNLOADED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(
                     new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.UNLOADED_ONLY, serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement WORLD_PROPERTIES_LOADED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(
                     new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.LOADED_ONLY, serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement DURATION = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.onlyOne(new TimespanArgument(Text.of(Keys.DURATION), serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement OPTIONAL_DURATION = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.optional(DURATION.get(serviceCollection));
         }
     };
 
     public static final LazyLoadedCommandElement OPTIONAL_WEAK_DURATION = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.optionalWeak(DURATION.get(serviceCollection));
         }
     };

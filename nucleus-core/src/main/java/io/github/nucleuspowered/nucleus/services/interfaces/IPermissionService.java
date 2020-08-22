@@ -68,8 +68,8 @@ public interface IPermissionService {
 
     Optional<Metadata> getMetadataFor(String permission);
 
-    default OptionalInt getDeclaredLevel(Subject subject, String key) {
-        return getIntOptionFromSubject(subject, key);
+    default OptionalInt getDeclaredLevel(final Subject subject, final String key) {
+        return this.getIntOptionFromSubject(subject, key);
     }
 
     boolean isPermissionLevelOkay(Subject actor, Subject actee, String key, String permission, boolean isSameOkay);

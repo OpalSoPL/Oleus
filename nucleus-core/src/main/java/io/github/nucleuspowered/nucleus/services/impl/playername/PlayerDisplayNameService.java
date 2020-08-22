@@ -44,29 +44,29 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     private String commandNameOnClick = null;
 
     @Inject
-    public PlayerDisplayNameService(INucleusServiceCollection serviceCollection) {
+    public PlayerDisplayNameService(final INucleusServiceCollection serviceCollection) {
         this.messageProviderService = serviceCollection.messageProvider();
     }
 
     @Override
-    public void provideDisplayNameResolver(DisplayNameResolver resolver) {
+    public void provideDisplayNameResolver(final DisplayNameResolver resolver) {
         this.resolvers.add(resolver);
     }
 
     @Override
-    public void provideDisplayNameQuery(DisplayNameQuery resolver) {
+    public void provideDisplayNameQuery(final DisplayNameQuery resolver) {
         this.queries.add(resolver);
     }
 
     @Override
-    public Optional<User> getUser(String displayName) {
-        Optional<User> withRealName = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(displayName);
+    public Optional<User> getUser(final String displayName) {
+        final Optional<User> withRealName = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(displayName);
         if (withRealName.isPresent()) {
             return withRealName;
         }
 
-        for (DisplayNameQuery query : this.queries) {
-            Optional<User> user = query.resolve(displayName);
+        for (final DisplayNameQuery query : this.queries) {
+            final Optional<User> user = query.resolve(displayName);
             if (user.isPresent()) {
                 return user;
             }
@@ -75,13 +75,13 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         return Optional.empty();
     }
 
-    @Override public Map<UUID, List<String>> startsWith(String displayName) {
-        Map<UUID, List<String>> uuids = new HashMap<>();
+    @Override public Map<UUID, List<String>> startsWith(final String displayName) {
+        final Map<UUID, List<String>> uuids = new HashMap<>();
         Sponge.getServer().getOnlinePlayers().stream()
             .filter(x -> x.getName().toLowerCase().startsWith(displayName.toLowerCase()))
             .forEach(x -> uuids.put(x.getUniqueId(), Lists.newArrayList(x.getName())));
 
-        for (DisplayNameQuery query : this.queries) {
+        for (final DisplayNameQuery query : this.queries) {
             query.startsWith(displayName).forEach(
                     (uuid, name) -> uuids.computeIfAbsent(uuid, x -> new ArrayList<>()).add(name)
             );
@@ -91,7 +91,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     }
 
     @Override
-    public Optional<User> getUser(Text displayName) {
+    public Optional<User> getUser(final Text displayName) {
         return getUser(displayName.toPlain());
     }
 
@@ -105,8 +105,8 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
                 .provideUnchecked(UserStorageService.class)
                 .get(playerUUID)
                 .orElseThrow(() -> new IllegalArgumentException("UUID does not map to a player"));
-        for (DisplayNameResolver resolver : this.resolvers) {
-            Optional<Text> userName = resolver.resolve(playerUUID);
+        for (final DisplayNameResolver resolver : this.resolvers) {
+            final Optional<Text> userName = resolver.resolve(playerUUID);
             if (userName.isPresent()) {
                 return userName
                         .map(x -> this.addHover(x, user))
@@ -116,67 +116,67 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
         // Set name colours
 
-        return addHover(user.get(Keys.DISPLAY_NAME).orElseGet(() -> Text.of(user.getName())), user);
+        return this.addHover(user.get(Keys.DISPLAY_NAME).orElseGet(() -> Text.of(user.getName())), user);
     }
 
     @Override
-    public Text getDisplayName(CommandSource source) {
+    public Text getDisplayName(final CommandSource source) {
         if (source instanceof User) {
-            return getDisplayName(((User) source).getUniqueId());
+            return this.getDisplayName(((User) source).getUniqueId());
         }
 
         return Text.of(source.getName());
     }
 
     @Override
-    public Text getName(CommandSource user) {
+    public Text getName(final CommandSource user) {
         if (user instanceof User) {
-            return addHover(Text.of(user.getName()), (User) user, null, null);
+            return this.addHover(Text.of(user.getName()), (User) user, null, null);
         }
 
         return Text.of(user.getName());
     }
 
-    public Text addHover(Text text, User user) {
-        return addHover(text, user, null, null);
+    public Text addHover(final Text text, final User user) {
+        return this.addHover(text, user, null, null);
     }
 
-    private Text addHover(Text text, User user, @Nullable TextColor colour, @Nullable TextStyle style) {
-        Text.Builder builder = text.toBuilder();
+    private Text addHover(final Text text, final User user, @Nullable final TextColor colour, @Nullable final TextStyle style) {
+        final Text.Builder builder = text.toBuilder();
         if (colour != null) {
             builder.color(colour);
         }
         if (style != null) {
             builder.style(style);
         }
-        return addCommandToNameInternal(builder, user);
+        return this.addCommandToNameInternal(builder, user);
     }
 
-    @Override public Text addCommandToName(CommandSource p) {
-        Text.Builder text = Text.builder(p.getName());
+    @Override public Text addCommandToName(final CommandSource p) {
+        final Text.Builder text = Text.builder(p.getName());
         if (p instanceof User) {
-            return addCommandToNameInternal(text, (User)p);
+            return this.addCommandToNameInternal(text, (User)p);
         }
 
         return text.build();
     }
 
-    @Override public Text addCommandToDisplayName(CommandSource p) {
-        Text.Builder name = getName(p).toBuilder();
+    @Override public Text addCommandToDisplayName(final CommandSource p) {
+        final Text.Builder name = this.getName(p).toBuilder();
         if (p instanceof User) {
-            return addCommandToNameInternal(name, (User)p);
+            return this.addCommandToNameInternal(name, (User)p);
         }
 
         return name.build();
     }
 
-    private Text addCommandToNameInternal(Text.Builder name, User user) {
+    private Text addCommandToNameInternal(final Text.Builder name, final User user) {
         if (this.commandNameOnClick == null) {
             return name.onHover(TextActions.showText(this.messageProviderService.getMessage("name.hover.ign", user.getName()))).build();
         }
 
         final String commandToRun = this.commandNameOnClick.replace("{{subject}}", user.getName()).replace("{{player}}", user.getName());
-        Text.Builder hoverAction =
+        final Text.Builder hoverAction =
                 Text.builder()
                     .append(this.messageProviderService.getMessage("name.hover.ign", user.getName()))
                     .append(Text.NEW_LINE)
@@ -185,7 +185,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.commandNameOnClick = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
         if (this.commandNameOnClick == null || this.commandNameOnClick.isEmpty()) {
             return;

@@ -15,11 +15,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Optional;
 
-@NonnullByDefault
 public class RequiresEconomyModifier implements ICommandModifier, IReloadableService.Reloadable {
     @Override public String getId() {
         return CommandModifiers.REQUIRE_ECONOMY;
@@ -32,8 +29,8 @@ public class RequiresEconomyModifier implements ICommandModifier, IReloadableSer
     @Nullable private Text lazyLoad = null;
 
     @Override
-    public Optional<Text> testRequirement(ICommandContext.Mutable<? extends CommandSource> source, CommandControl control,
-            INucleusServiceCollection serviceCollection, CommandModifier modifier) throws CommandException {
+    public Optional<Text> testRequirement(final ICommandContext.Mutable<? extends CommandSource> source, final CommandControl control,
+            final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
         if (!serviceCollection.economyServiceProvider().serviceExists()) {
             if (this.lazyLoad == null) {
                 this.lazyLoad = serviceCollection.messageProvider().getMessageFor(source.getCommandSource(), "command.economyrequired");
@@ -46,7 +43,7 @@ public class RequiresEconomyModifier implements ICommandModifier, IReloadableSer
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.lazyLoad = null;
     }
 }

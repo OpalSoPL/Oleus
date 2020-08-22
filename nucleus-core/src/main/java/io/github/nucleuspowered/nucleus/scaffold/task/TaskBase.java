@@ -8,13 +8,10 @@ import io.github.nucleuspowered.nucleus.Constants;
 import io.github.nucleuspowered.nucleus.annotationprocessor.Store;
 import io.github.nucleuspowered.nucleus.scaffold.EntryPoint;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.time.Duration;
 import java.util.function.Consumer;
 
 @EntryPoint
-@NonnullByDefault
 @Store(Constants.RUNNABLE)
 public interface TaskBase extends Consumer<Task> {
 

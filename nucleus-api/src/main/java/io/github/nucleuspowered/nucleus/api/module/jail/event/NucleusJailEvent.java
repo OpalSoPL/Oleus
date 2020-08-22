@@ -4,19 +4,24 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.jail.event;
 
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.user.TargetUserEvent;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
+import org.spongepowered.api.event.Event;
 import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Called when a {@link User} is jailed or unjailed.
  */
-@NonnullByDefault
-public interface NucleusJailEvent extends TargetUserEvent {
+public interface NucleusJailEvent extends Event {
+
+    /**
+     * The {@link UUID} of the jailed user.
+     *
+     * @return The jailed user.
+     */
+    UUID getJailedUser();
 
     /**
      * Fired when a player is jailed.
@@ -42,7 +47,7 @@ public interface NucleusJailEvent extends TargetUserEvent {
          *
          * @return The reason.
          */
-        Text getReason();
+        Component getReason();
     }
 
     /**

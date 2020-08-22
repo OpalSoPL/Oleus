@@ -65,13 +65,13 @@ public interface ICommandContext<C extends CommandSource> {
     Player getPlayerFromArgs(String key, String errorKey) throws CommandException;
 
     default Player getPlayerFromArgs() throws CommandException {
-        return getPlayerFromArgs(NucleusParameters.Keys.PLAYER, "command.playeronly");
+        return this.getPlayerFromArgs(NucleusParameters.Keys.PLAYER, "command.playeronly");
     }
 
     Player getCommandSourceAsPlayerUnchecked();
 
     default User getUserFromArgs() throws CommandException {
-        return getUserFromArgs(NucleusParameters.Keys.USER, "command.playeronly");
+        return this.getUserFromArgs(NucleusParameters.Keys.USER, "command.playeronly");
     }
 
     User getUserFromArgs(String key, String errorKey) throws CommandException;
@@ -110,7 +110,7 @@ public interface ICommandContext<C extends CommandSource> {
 
     @NonNull
     default Player getIfPlayer() throws CommandException {
-        return getIfPlayer("command.playeronly");
+        return this.getIfPlayer("command.playeronly");
     }
 
     @NonNull
@@ -132,8 +132,8 @@ public interface ICommandContext<C extends CommandSource> {
 
     Text getMessageFor(CommandSource to, String key, Object... replacements);
 
-    default String getTimeString(Duration duration) {
-        return getTimeString(duration.getSeconds());
+    default String getTimeString(final Duration duration) {
+        return this.getTimeString(duration.getSeconds());
     }
 
     String getTimeString(long seconds);
@@ -150,7 +150,7 @@ public interface ICommandContext<C extends CommandSource> {
 
     void sendMessageTo(MessageReceiver to, String key, Object... replacements);
 
-    default boolean is(Player other) {
+    default boolean is(final Player other) {
         return is(other.getCommandSource().get());
     }
 
@@ -172,22 +172,22 @@ public interface ICommandContext<C extends CommandSource> {
 
     Text getDisplayName(UUID uuid);
 
-    default String getTimeToNowString(Instant endTime) {
-        return getTimeString(Duration.between(Instant.now(), endTime).abs());
+    default String getTimeToNowString(final Instant endTime) {
+        return this.getTimeString(Duration.between(Instant.now(), endTime).abs());
     }
 
-    default OptionalInt getLevel(String key) {
-        return getLevelFor(getCommandSourceUnchecked(), key);
+    default OptionalInt getLevel(final String key) {
+        return this.getLevelFor(this.getCommandSourceUnchecked(), key);
     }
 
     OptionalInt getLevelFor(Subject subject, String key);
 
-    default int getLevel(String key, String permissionIfNoLevel) {
-        return getLevelFor(getCommandSourceUnchecked(), key, permissionIfNoLevel);
+    default int getLevel(final String key, final String permissionIfNoLevel) {
+        return this.getLevelFor(this.getCommandSourceUnchecked(), key, permissionIfNoLevel);
     }
 
-    default int getLevelFor(Subject subject, String key, String permissionIfNoLevel) {
-        return getLevelFor(subject, key).orElseGet(() -> testPermissionFor(subject, permissionIfNoLevel) ? 1 : 0);
+    default int getLevelFor(final Subject subject, final String key, final String permissionIfNoLevel) {
+        return this.getLevelFor(subject, key).orElseGet(() -> this.testPermissionFor(subject, permissionIfNoLevel) ? 1 : 0);
     }
 
     /**

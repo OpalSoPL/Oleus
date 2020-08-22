@@ -30,7 +30,7 @@ import java.util.Optional;
 public class NucleusKeysProvider implements NucleusUserPreferenceService.Keys {
 
     private final IModuleDataProvider moduleDataProvider;
-    public NucleusKeysProvider(INucleusServiceCollection serviceCollection) {
+    public NucleusKeysProvider(final INucleusServiceCollection serviceCollection) {
         this.moduleDataProvider = serviceCollection.moduleDataProvider();
     }
 
@@ -103,16 +103,16 @@ public class NucleusKeysProvider implements NucleusUserPreferenceService.Keys {
     );
 
     public Collection<NucleusUserPreferenceService.PreferenceKey<?>> getAll() {
-        ImmutableSet.Builder<NucleusUserPreferenceService.PreferenceKey<?>> builder
+        final ImmutableSet.Builder<NucleusUserPreferenceService.PreferenceKey<?>> builder
                 = ImmutableSet.builder();
-        vanishOnLogin().ifPresent(builder::add);
-        teleportTarget().ifPresent(builder::add);
-        powertoolsEnabled().ifPresent(builder::add);
-        socialSpyEnabled().ifPresent(builder::add);
-        messageReceivingEnabled().ifPresent(builder::add);
-        commandSpyEnabled().ifPresent(builder::add);
-        viewStaffChat().ifPresent(builder::add);
-        playerLocale().ifPresent(builder::add);
+        this.vanishOnLogin().ifPresent(builder::add);
+        this.teleportTarget().ifPresent(builder::add);
+        this.powertoolsEnabled().ifPresent(builder::add);
+        this.socialSpyEnabled().ifPresent(builder::add);
+        this.messageReceivingEnabled().ifPresent(builder::add);
+        this.commandSpyEnabled().ifPresent(builder::add);
+        this.viewStaffChat().ifPresent(builder::add);
+        this.playerLocale().ifPresent(builder::add);
         return builder.build();
     }
 

@@ -16,18 +16,18 @@ public class NucleusRegistration {
 
     private final INucleusServiceCollection serviceCollection;
 
-    NucleusRegistration(INucleusServiceCollection serviceCollection) {
+    NucleusRegistration(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
     @Listener
-    public void onRegisterTeleportHelperFilters(GameRegistryEvent.Register<TeleportHelperFilter> event) {
+    public void onRegisterTeleportHelperFilters(final GameRegistryEvent.Register<TeleportHelperFilter> event) {
         event.register(new NoCheckFilter());
         event.register(new WallCheckFilter());
     }
 
     @Listener
-    public void onRegisterPlaceholders(GameRegistryEvent.Register<PlaceholderParser> event) {
+    public void onRegisterPlaceholders(final GameRegistryEvent.Register<PlaceholderParser> event) {
         this.serviceCollection.placeholderService().getParsers().forEach(event::register);
         this.serviceCollection.logger().info("Registered placeholder parsers.");
     }

@@ -4,8 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.staffchat;
 
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.audience.Audience;
+
+import java.awt.Component;
 
 /**
  * Provides a way to get the Staff Chat message channel instance.
@@ -15,9 +16,9 @@ public interface NucleusStaffChatService {
     /**
      * Sends a message to the Staff Chat channel.
      *
-     * @param source The {@link CommandSource} that is sending this message.
+     * @param source The {@link Audience} that is sending this message.
      * @param message The message to send.
      */
-    void sendMessageFrom(CommandSource source, Text message);
+    void sendMessageFrom(Audience source, Component message);
 
 }

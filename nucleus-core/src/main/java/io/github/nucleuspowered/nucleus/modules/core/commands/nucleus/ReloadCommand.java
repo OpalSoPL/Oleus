@@ -12,9 +12,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 @Command(
         aliases = "reload",
         basePermission = CorePermissions.BASE_NUCLEUS_RELOAD,

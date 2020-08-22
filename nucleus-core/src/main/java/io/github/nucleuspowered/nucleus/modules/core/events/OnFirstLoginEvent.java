@@ -10,13 +10,10 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class OnFirstLoginEvent extends AbstractEvent implements NucleusFirstJoinEvent {
 
     private final Cause cause;

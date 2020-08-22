@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.core.teleport.filters;
 
-import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.world.World;

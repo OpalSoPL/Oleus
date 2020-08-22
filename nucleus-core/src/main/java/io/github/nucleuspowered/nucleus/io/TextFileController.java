@@ -68,20 +68,21 @@ public final class TextFileController {
     private long fileTimeStamp = 0;
     @Nullable private NucleusTextTemplate title;
 
-    public TextFileController(INucleusTextTemplateFactory textTemplateFactory, Path fileLocation, boolean getTitle) throws IOException {
+    public TextFileController(final INucleusTextTemplateFactory textTemplateFactory, final Path fileLocation, final boolean getTitle) throws IOException {
         this(textTemplateFactory, null, fileLocation, getTitle);
     }
 
-    public TextFileController(INucleusTextTemplateFactory textTemplateFactory, @Nullable Asset asset, Path fileLocation) throws IOException {
+    public TextFileController(final INucleusTextTemplateFactory textTemplateFactory, @Nullable final Asset asset, final Path fileLocation) throws IOException {
         this(textTemplateFactory, asset, fileLocation, false);
     }
 
-    private TextFileController(INucleusTextTemplateFactory textTemplateFactory, @Nullable Asset asset, Path fileLocation, boolean getTitle) throws IOException {
+    private TextFileController(
+            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final Asset asset, final Path fileLocation, final boolean getTitle) throws IOException {
         this.textTemplateFactory = textTemplateFactory;
         this.asset = asset;
         this.fileLocation = fileLocation;
         this.getTitle = getTitle;
-        load();
+        this.load();
     }
 
     /**
@@ -95,16 +96,16 @@ public final class TextFileController {
             this.asset.copyToFile(this.fileLocation);
         }
 
-        List<String> fileContents = Lists.newArrayList();
+        final List<String> fileContents = Lists.newArrayList();
 
         // Load the file into the list.
         MalformedInputException exception = null;
-        for (Charset charset : characterSetsToTest) {
+        for (final Charset charset : characterSetsToTest) {
             try {
                 fileContents.addAll(Files.readAllLines(this.fileLocation, charset));
                 exception = null;
                 break;
-            } catch (MalformedInputException ex) {
+            } catch (final MalformedInputException ex) {
                 exception = ex;
             }
         }
@@ -120,26 +121,26 @@ public final class TextFileController {
         this.textTemplates.clear();
     }
 
-    public Optional<Text> getTitle(CommandSource source) {
+    public Optional<Text> getTitle(final CommandSource source) {
         if (this.getTitle && this.textTemplates.isEmpty() && !this.fileContents.isEmpty()) {
             // Initialisation!
-            getFileContentsAsText();
+            this.getFileContentsAsText();
         }
 
         if (this.title != null) {
-            return Optional.of(this.title.getForCommandSource(source));
+            return Optional.of(this.title.getForSource(source));
         }
 
         return Optional.empty();
     }
 
-    public List<Text> getTextFromNucleusTextTemplates(CommandSource source) {
-        return getFileContentsAsText().stream().map(x -> x.getForCommandSource(source)).collect(Collectors.toList());
+    public List<Text> getTextFromNucleusTextTemplates(final CommandSource source) {
+        return this.getFileContentsAsText().stream().map(x -> x.getForCommandSource(source)).collect(Collectors.toList());
     }
 
-    public void sendToPlayer(CommandSource src, Text title) {
+    public void sendToPlayer(final CommandSource src, final Text title) {
 
-        PaginationList.Builder pb = Util.getPaginationBuilder(src).contents(getTextFromNucleusTextTemplates(src));
+        final PaginationList.Builder pb = Util.getPaginationBuilder(src).contents(this.getTextFromNucleusTextTemplates(src));
 
         if (title != null && !title.isEmpty()) {
             pb.title(title).padding(padding);
@@ -156,18 +157,18 @@ public final class TextFileController {
      * @return An {@link ImmutableList} that contains the file contents.
      */
     private ImmutableList<NucleusTextTemplateImpl> getFileContentsAsText() {
-        checkFileStamp();
+        this.checkFileStamp();
         if (this.textTemplates.isEmpty()) {
-            List<String> contents = Lists.newArrayList(this.fileContents);
+            final List<String> contents = Lists.newArrayList(this.fileContents);
             if (this.getTitle) {
-                this.title = getTitleFromStrings(contents);
+                this.title = this.getTitleFromStrings(contents);
 
                 if (this.title != null) {
                     contents.remove(0);
 
-                    Iterator<String> i = contents.iterator();
+                    final Iterator<String> i = contents.iterator();
                     while (i.hasNext()) {
-                        String n = i.next();
+                        final String n = i.next();
                         if (n.isEmpty() || n.matches("^\\s+$")) {
                             i.remove();
                         } else {
@@ -183,7 +184,7 @@ public final class TextFileController {
         return ImmutableList.copyOf(this.textTemplates);
     }
 
-    @Nullable private NucleusTextTemplate getTitleFromStrings(List<String> info) {
+    @Nullable private NucleusTextTemplate getTitleFromStrings(final List<String> info) {
         if (!info.isEmpty()) {
             String sec1 = info.get(0);
             if (sec1.startsWith("#")) {
@@ -203,9 +204,9 @@ public final class TextFileController {
     private void checkFileStamp() {
         try {
             if (this.fileContents.isEmpty() || Files.getLastModifiedTime(this.fileLocation).toMillis() > this.fileTimeStamp) {
-                load();
+                this.load();
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // ignored
         }
     }

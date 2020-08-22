@@ -13,9 +13,9 @@ public class CauseStackHelper {
 
     private CauseStackHelper() {}
 
-    public static Cause createCause(Object o) {
+    public static Cause createCause(final Object o) {
         if (Sponge.getServer().isMainThread()) {
-            try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 frame.pushCause(o);
                 return Sponge.getCauseStackManager().getCurrentCause();
             }

@@ -4,12 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.datatypes;
 
-import com.flowpowered.math.vector.Vector3d;
+import net.kyori.adventure.text.Component;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,33 +27,33 @@ public class WarpNode extends LocationNode {
 
     @Setting("description")
     @Nullable
-    private Text description = null;
+    private Component description = null;
 
     public WarpNode() {
         super();
     }
 
-    public WarpNode(UUID world, Vector3d length, Vector3d rotation, double cost, String category, Text description) {
+    public WarpNode(final UUID world, final Vector3d length, final Vector3d rotation, final double cost, final String category, final Component description) {
         super(world, length, rotation);
         this.cost = cost;
         this.category = category;
         this.description = description;
     }
 
-    public WarpNode(Location<World> location, Vector3d rotation) {
+    public WarpNode(final ServerLocation location, final Vector3d rotation) {
         this(location, rotation, -1);
     }
 
-    private WarpNode(Location<World> location, Vector3d rotation, int cost) {
+    private WarpNode(final ServerLocation location, final Vector3d rotation, final int cost) {
         super(location, rotation);
         this.cost = cost;
     }
 
-    public WarpNode(Location<World> location) {
+    public WarpNode(final ServerLocation location) {
         this(location, -1);
     }
 
-    private WarpNode(Location<World> location, int cost) {
+    private WarpNode(final ServerLocation location, final int cost) {
         super(location);
         this.cost = cost;
     }
@@ -63,7 +62,7 @@ public class WarpNode extends LocationNode {
         return this.cost;
     }
 
-    public void setCost(double cost) {
+    public void setCost(final double cost) {
         if (cost < -1) {
             this.cost = -1;
         }
@@ -75,15 +74,15 @@ public class WarpNode extends LocationNode {
         return Optional.ofNullable(this.category);
     }
 
-    public void setCategory(@Nullable String category) {
+    public void setCategory(@Nullable final String category) {
         this.category = category;
     }
 
-    public Text getDescription() {
+    public Component getDescription() {
         return this.description;
     }
 
-    public void setDescription(@Nullable Text description) {
+    public void setDescription(@Nullable final Component description) {
         this.description = description;
     }
 }

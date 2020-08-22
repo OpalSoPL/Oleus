@@ -26,10 +26,10 @@ class NucleusTextTemplateEventImpl extends AbstractEvent implements NucleusTextT
     private final Cause cause;
 
     NucleusTextTemplateEventImpl(
-            NucleusTextTemplate originalMessage,
-            Collection<CommandSource> originalMembers,
-            INucleusTextTemplateFactory textTemplateFactory,
-            Cause cause) {
+            final NucleusTextTemplate originalMessage,
+            final Collection<CommandSource> originalMembers,
+            final INucleusTextTemplateFactory textTemplateFactory,
+            final Cause cause) {
         this.originalMessage = originalMessage;
         this.message = originalMessage;
         this.originalMembers = ImmutableSet.copyOf(originalMembers);
@@ -49,14 +49,14 @@ class NucleusTextTemplateEventImpl extends AbstractEvent implements NucleusTextT
     }
 
     @Override
-    public void setMessage(NucleusTextTemplate message) {
+    public void setMessage(final NucleusTextTemplate message) {
         this.message = message;
     }
 
-    @Override public void setMessage(String message) {
+    @Override public void setMessage(final String message) {
         try {
             this.textTemplateFactory.createFromString(message);
-        } catch (Throwable throwable) {
+        } catch (final Throwable throwable) {
             throw new IllegalArgumentException("Could not create text", throwable);
         }
     }
@@ -71,7 +71,7 @@ class NucleusTextTemplateEventImpl extends AbstractEvent implements NucleusTextT
     }
 
     @Override
-    public void setRecipients(Collection<? extends CommandSource> recipients) {
+    public void setRecipients(final Collection<? extends CommandSource> recipients) {
         this.members = ImmutableSet.copyOf(recipients);
     }
 
@@ -81,7 +81,7 @@ class NucleusTextTemplateEventImpl extends AbstractEvent implements NucleusTextT
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.cancelled = cancel;
     }
 
@@ -93,10 +93,10 @@ class NucleusTextTemplateEventImpl extends AbstractEvent implements NucleusTextT
 
     static class Broadcast extends NucleusTextTemplateEventImpl implements NucleusTextTemplateEvent.Broadcast {
 
-        Broadcast(NucleusTextTemplate originalMessage,
-                Collection<CommandSource> originalMembers,
-                INucleusTextTemplateFactory factory,
-                Cause cause) {
+        Broadcast(final NucleusTextTemplate originalMessage,
+                final Collection<CommandSource> originalMembers,
+                final INucleusTextTemplateFactory factory,
+                final Cause cause) {
             super(originalMessage, originalMembers, factory, cause);
         }
     }

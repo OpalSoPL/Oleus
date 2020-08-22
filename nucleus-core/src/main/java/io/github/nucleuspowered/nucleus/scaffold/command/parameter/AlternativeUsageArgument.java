@@ -21,24 +21,24 @@ public class AlternativeUsageArgument extends WrappedElement {
 
     private final Function<CommandSource, Text> usage;
 
-    public AlternativeUsageArgument(CommandElement wrappedElement, Function<CommandSource, Text> usage) {
+    public AlternativeUsageArgument(final CommandElement wrappedElement, final Function<CommandSource, Text> usage) {
         super(wrappedElement);
         this.usage = usage;
     }
 
-    @Nullable @Override protected Object parseValue(CommandSource source, CommandArgs args) {
+    @Nullable @Override protected Object parseValue(final CommandSource source, final CommandArgs args) {
         return null;
     }
 
-    @Override public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
-        getWrappedElement().parse(source, args, context);
+    @Override public void parse(final CommandSource source, final CommandArgs args, final CommandContext context) throws ArgumentParseException {
+        this.getWrappedElement().parse(source, args, context);
     }
 
-    @Override public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        return getWrappedElement().complete(src, args, context);
+    @Override public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
+        return this.getWrappedElement().complete(src, args, context);
     }
 
-    @Override public Text getUsage(CommandSource src) {
+    @Override public Text getUsage(final CommandSource src) {
         return this.usage.apply(src);
     }
 }

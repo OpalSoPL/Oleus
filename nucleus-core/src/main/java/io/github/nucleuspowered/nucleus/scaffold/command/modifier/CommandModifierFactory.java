@@ -6,11 +6,8 @@ package io.github.nucleuspowered.nucleus.scaffold.command.modifier;
 
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.function.Function;
 
-@NonnullByDefault
 public abstract class CommandModifierFactory implements CatalogType, Function<CommandControl, ICommandModifier> {
 
     public static class Simple extends CommandModifierFactory {
@@ -19,11 +16,11 @@ public abstract class CommandModifierFactory implements CatalogType, Function<Co
         private final String name;
         private final Function<CommandControl, ICommandModifier> modifierFunction;
 
-        public Simple(ICommandModifier modifier) {
+        public Simple(final ICommandModifier modifier) {
             this(modifier.getId(), modifier.getName(), control -> modifier);
         }
 
-        public Simple(String id, String name, Function<CommandControl, ICommandModifier> modifierFunction) {
+        public Simple(final String id, final String name, final Function<CommandControl, ICommandModifier> modifierFunction) {
             this.id = id;
             this.name = name;
             this.modifierFunction = modifierFunction;
@@ -37,7 +34,7 @@ public abstract class CommandModifierFactory implements CatalogType, Function<Co
             return this.name;
         }
 
-        @Override public ICommandModifier apply(CommandControl control) {
+        @Override public ICommandModifier apply(final CommandControl control) {
             return this.modifierFunction.apply(control);
         }
     }

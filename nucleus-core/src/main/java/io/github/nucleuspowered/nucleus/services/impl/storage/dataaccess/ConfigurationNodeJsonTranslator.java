@@ -20,27 +20,27 @@ public class ConfigurationNodeJsonTranslator {
 
     private ConfigurationNodeJsonTranslator() {}
 
-    public ConfigurationNode from(ConfigurationNode nodeToPopulate, JsonObject object) {
-        parseObject(object, nodeToPopulate);
+    public ConfigurationNode from(final ConfigurationNode nodeToPopulate, final JsonObject object) {
+        this.parseObject(object, nodeToPopulate);
         return nodeToPopulate;
     }
 
     // The node has map
-    public JsonObject jsonFrom(ConfigurationNode node) {
-        JsonObject object = new JsonObject();
+    public JsonObject jsonFrom(final ConfigurationNode node) {
+        final JsonObject object = new JsonObject();
         if (!node.hasMapChildren()) {
             // nope.
             return object;
         }
 
-        for (Map.Entry<Object, ? extends ConfigurationNode> entry : node.getChildrenMap().entrySet()) {
-            ConfigurationNode value = entry.getValue();
+        for (final Map.Entry<Object, ? extends ConfigurationNode> entry : node.getChildrenMap().entrySet()) {
+            final ConfigurationNode value = entry.getValue();
             if (value.isVirtual()) {
                 continue;
             }
 
-            String key = String.valueOf(entry.getKey());
-            JsonElement element = fromNode(value);
+            final String key = String.valueOf(entry.getKey());
+            final JsonElement element = this.fromNode(value);
 
             if (element != null) {
                 object.add(key, element);
@@ -50,21 +50,21 @@ public class ConfigurationNodeJsonTranslator {
         return object;
     }
 
-    private JsonElement fromNode(ConfigurationNode value) {
+    private JsonElement fromNode(final ConfigurationNode value) {
         JsonElement element = null;
         if (value.getValueType() == ValueType.MAP) {
-            element = jsonFrom(value);
+            element = this.jsonFrom(value);
         } else if (value.getValueType() == ValueType.LIST) {
-            element = jsonFromList(value.getChildrenList());
+            element = this.jsonFromList(value.getChildrenList());
         } else if (value.getValueType() == ValueType.SCALAR) {
-            element = jsonFromScalar(value.getValue());
+            element = this.jsonFromScalar(value.getValue());
         }
 
         return element;
     }
 
-    private JsonPrimitive jsonFromScalar(Object value) {
-        JsonPrimitive primitive;
+    private JsonPrimitive jsonFromScalar(final Object value) {
+        final JsonPrimitive primitive;
         if (value instanceof Number) {
             primitive = new JsonPrimitive((Number) value);
         } else if (value instanceof Boolean) {
@@ -76,7 +76,7 @@ public class ConfigurationNodeJsonTranslator {
         return primitive;
     }
 
-    private JsonArray jsonFromList(List<? extends ConfigurationNode> listNode) {
+    private JsonArray jsonFromList(final List<? extends ConfigurationNode> listNode) {
         return listNode.stream().map(this::fromNode).collect(
                 JsonArray::new,
                 JsonArray::add,
@@ -84,31 +84,31 @@ public class ConfigurationNodeJsonTranslator {
         );
     }
 
-    private void parseArray(JsonArray array, ConfigurationNode node) {
-        for (JsonElement element : array) {
+    private void parseArray(final JsonArray array, final ConfigurationNode node) {
+        for (final JsonElement element : array) {
             if (!element.isJsonNull()) {
-                parseElement(element, node.getAppendedNode());
+                this.parseElement(element, node.getAppendedNode());
             }
         }
     }
 
-    private void parseObject(JsonObject object, ConfigurationNode node) {
-        for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
-            JsonElement element = entry.getValue();
-            parseElement(element, node.getNode(entry.getKey()));
+    private void parseObject(final JsonObject object, final ConfigurationNode node) {
+        for (final Map.Entry<String, JsonElement> entry : object.entrySet()) {
+            final JsonElement element = entry.getValue();
+            this.parseElement(element, node.getNode(entry.getKey()));
         }
     }
 
-    private void parsePrimitive(JsonPrimitive primitive, ConfigurationNode node) {
+    private void parsePrimitive(final JsonPrimitive primitive, final ConfigurationNode node) {
         if (primitive.isBoolean()) {
             node.setValue(primitive.getAsBoolean());
         } else if (primitive.isString()) {
             node.setValue(primitive.getAsString());
         } else if (primitive.isNumber()) {
-            double d = primitive.getAsDouble();
-            long l = primitive.getAsLong();
+            final double d = primitive.getAsDouble();
+            final long l = primitive.getAsLong();
             if (d == l) {
-                int i = primitive.getAsInt();
+                final int i = primitive.getAsInt();
                 if (i == l) {
                     node.setValue(i);
                 } else {
@@ -120,13 +120,13 @@ public class ConfigurationNodeJsonTranslator {
         }
     }
 
-    private void parseElement(JsonElement element, ConfigurationNode node) {
+    private void parseElement(final JsonElement element, final ConfigurationNode node) {
         if (element.isJsonObject()) {
-            from(node, element.getAsJsonObject());
+            this.from(node, element.getAsJsonObject());
         } else if (element.isJsonArray()) {
-            parseArray(element.getAsJsonArray(), node);
+            this.parseArray(element.getAsJsonArray(), node);
         } else if (element.isJsonPrimitive()) {
-            parsePrimitive(element.getAsJsonPrimitive(), node);
+            this.parsePrimitive(element.getAsJsonPrimitive(), node);
         }
     }
 

@@ -5,11 +5,11 @@
 package io.github.nucleuspowered.nucleus.api.module.nickname.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
-import org.spongepowered.api.entity.living.player.User;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Fired when a player requests or deletes a nickname.
@@ -23,23 +23,23 @@ public interface NucleusChangeNicknameEvent {
     /**
      * The user whose nickname was changed.
      *
-     * @return The {@link User}
+     * @return The {@link UUID} of the user
      */
-    User getUser();
+    UUID getUser();
 
     /**
      * The previous nickname for the {@link #getUser()}
      *
      * @return The previous nickname.
      */
-    Optional<Text> getPreviousNickname();
+    Optional<Component> getPreviousNickname();
 
     /**
      * The new nickname, if any, for the {@link #getUser()}
      *
      * @return The nickname, if any is given
      */
-    Optional<Text> getNickname();
+    Optional<Component> getNickname();
 
     @MightOccurAsync
     interface Pre extends NucleusChangeNicknameEvent, Cancellable { }

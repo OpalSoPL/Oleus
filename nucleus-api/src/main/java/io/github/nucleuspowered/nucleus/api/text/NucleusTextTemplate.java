@@ -5,21 +5,19 @@
 package io.github.nucleuspowered.nucleus.api.text;
 
 import io.github.nucleuspowered.nucleus.api.placeholder.NucleusPlaceholderService;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.TextTemplate;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
-
 /**
- * Represents a wrapped {@link TextTemplate} that Nucleus uses to create texts from templates.
+ * Represents a template that Nucleus uses to create texts from templates.
  */
-public interface NucleusTextTemplate extends TextRepresentable {
+public interface NucleusTextTemplate extends ComponentLike {
 
     /**
      * Whether the text is empty.
@@ -29,25 +27,18 @@ public interface NucleusTextTemplate extends TextRepresentable {
     boolean isEmpty();
 
     /**
-     * Gets the static {@link Text} this message will be prefixed with, if any.
+     * Gets the static {@link Component} this message will be prefixed with, if any.
      *
      * @return The text
      */
-    Optional<Text> getPrefix();
+    Optional<Component> getPrefix();
 
     /**
-     * Gets the static {@link Text} this message will be suffixed with, if any.
+     * Gets the static {@link Component} this message will be suffixed with, if any.
      *
      * @return The text
      */
-    Optional<Text> getSuffix();
-
-    /**
-     * Gets the underlying {@link TextTemplate}
-     *
-     * @return The {@link TextTemplate}
-     */
-    TextTemplate getTextTemplate();
+    Optional<Component> getSuffix();
 
     /**
      * Returns whether there are tokens to parse.
@@ -57,26 +48,26 @@ public interface NucleusTextTemplate extends TextRepresentable {
     boolean containsTokens();
 
     /**
-     * Gets the {@link Text} where the tokens have been parsed from the viewpoint of the supplied {@link CommandSource}. Any unknown tokens in
-     * the parsed text will be left blank.
+     * Gets the {@link Component} where the tokens have been parsed from the viewpoint of the
+     * supplied {@link Audience}. Any unknown tokens in the parsed text will be left blank.
      *
-     * @param source The {@link CommandSource} that will influence what is displayed by the tokens.
-     * @return The parsed {@link Text}
+     * @param source The {@link Object} that will influence what is displayed by the tokens.
+     * @return The parsed {@link Component}
      */
-    Text getForCommandSource(CommandSource source);
+    Component getForSource(Object source);
 
     /**
-     * Gets the {@link Text} where the tokens have been parsed from the viewpoint of the supplied {@link CommandSource}. Any unknown tokens in
-     * the parsed text will be left blank.
+     * Gets the {@link Component} where the tokens have been parsed from the viewpoint of the
+     * supplied {@link Object}. Any unknown tokens in the parsed text will be left blank.
      *
-     * @param source The {@link CommandSource} that will influence what is displayed by the tokens.
-     * @param sender The {@link CommandSource} that can be considered the <code>{{sender}}</code>
-     * @return The parsed {@link Text}
+     * @param source The {@link Object} that will influence what is displayed by the tokens.
+     * @param sender The {@link Object} that can be considered the <code>{{sender}}</code>
+     * @return The parsed {@link Component}
      */
-    Text getForCommandSource(CommandSource source, CommandSource sender);
+    Component getForSource(Object source, Object sender);
 
     /**
-     * Gets the {@link Text} where the tokens have been parsed from the viewpoint of the supplied {@link CommandSource}.
+     * Gets the {@link Component} where the tokens have been parsed from the viewpoint of the supplied {@link Object}.
      *
      * <p>
      *     By supplying a token array, these token identifiers act as additional tokens that could be encountered, and will be used above standard
@@ -84,10 +75,10 @@ public interface NucleusTextTemplate extends TextRepresentable {
      *     not worth registering in a {@link NucleusPlaceholderService}. They must not contain the token start or end delimiters.
      * </p>
      *
-     * @param source The {@link CommandSource} that will influence what is displayed by the tokens.
+     * @param source The {@link Object} that will influence what is displayed by the tokens.
      * @param tokensArray The extra tokens that can be used to parse a text.
-     * @return The parsed {@link Text}
+     * @return The parsed {@link Component}
      */
-    Text getForCommandSource(CommandSource source, @Nullable Map<String, Function<CommandSource, Optional<Text>>> tokensArray);
+    Component getForSource(Object source, @Nullable Map<String, Function<Object, Optional<ComponentLike>>> tokensArray);
 
 }

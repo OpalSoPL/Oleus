@@ -13,62 +13,57 @@ import io.github.nucleuspowered.nucleus.util.TypeHelper;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.slf4j.Logger;
-import org.slf4j.event.Level;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataFormats;
 import org.spongepowered.api.data.persistence.DataTranslators;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.util.Tuple;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class NucleusItemStackSnapshotSerialiser implements TypeSerializer<NucleusItemStackSnapshot> {
 
     private final Logger logger;
 
-    public NucleusItemStackSnapshotSerialiser(INucleusServiceCollection serviceCollection) {
+    public NucleusItemStackSnapshotSerialiser(final INucleusServiceCollection serviceCollection) {
         this.logger = serviceCollection.logger();
     }
 
     @Override
-    public NucleusItemStackSnapshot deserialize(TypeToken<?> type, ConfigurationNode value) {
+    public NucleusItemStackSnapshot deserialize(final TypeToken<?> type, final ConfigurationNode value) {
         // Process enchantments, temporary fix before Sponge gets a more general fix in.
         boolean emptyEnchant = false;
-        ConfigurationNode ench = value.getNode("UnsafeData", "ench");
+        final ConfigurationNode ench = value.getNode("UnsafeData", "ench");
         if (!ench.isVirtual()) {
-            List<? extends ConfigurationNode> enchantments = ench.getChildrenList();
+            final List<? extends ConfigurationNode> enchantments = ench.getChildrenList();
             if (enchantments.isEmpty()) {
                 // Remove empty enchantment list.
                 value.getNode("UnsafeData").removeChild("ench");
             } else {
                 enchantments.forEach(x -> {
                     try {
-                        short id = Short.parseShort(x.getNode("id").getString());
-                        short lvl = Short.parseShort(x.getNode("lvl").getString());
+                        final short id = Short.parseShort(x.getNode("id").getString());
+                        final short lvl = Short.parseShort(x.getNode("lvl").getString());
 
                         x.getNode("id").setValue(id);
                         x.getNode("lvl").setValue(lvl);
-                    } catch (NumberFormatException e) {
+                    } catch (final NumberFormatException e) {
                         x.setValue(null);
                     }
                 });
             }
         }
 
-        ConfigurationNode data = value.getNode("Data");
+        final ConfigurationNode data = value.getNode("Data");
         if (!data.isVirtual() && data.hasListChildren()) {
-            List<? extends ConfigurationNode> n = data.getChildrenList().stream()
+            final List<? extends ConfigurationNode> n = data.getChildrenList().stream()
                 .filter(x ->
                         !x.getNode("DataClass").getString("").endsWith("SpongeEnchantmentData")
                     || (!x.getNode("ManipulatorData", "ItemEnchantments").isVirtual() && x.getNode("ManipulatorData", "ItemEnchantments").hasListChildren()))
@@ -84,16 +79,16 @@ public class NucleusItemStackSnapshotSerialiser implements TypeSerializer<Nucleu
             }
         }
 
-        DataContainer dataContainer = DataTranslators.CONFIGURATION_NODE.translate(value);
-        Set<DataQuery> ldq = dataContainer.getKeys(true);
+        final DataContainer dataContainer = DataTranslators.CONFIGURATION_NODE.translate(value);
+        final Set<DataQuery> ldq = dataContainer.getKeys(true);
 
-        for (DataQuery dataQuery : ldq) {
-            String el = dataQuery.asString(".");
+        for (final DataQuery dataQuery : ldq) {
+            final String el = dataQuery.asString(".");
             if (el.contains("$Array$")) {
                 try {
-                    Tuple<DataQuery, Object> r = TypeHelper.getArray(dataQuery, dataContainer);
+                    final Tuple<DataQuery, Object> r = TypeHelper.getArray(dataQuery, dataContainer);
                     dataContainer.set(r.getFirst(), r.getSecond());
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     e.printStackTrace();
                 }
 
@@ -101,10 +96,10 @@ public class NucleusItemStackSnapshotSerialiser implements TypeSerializer<Nucleu
             }
         }
 
-        ItemStack snapshot;
+        final ItemStack snapshot;
         try {
             snapshot = ItemStack.builder().fromContainer(dataContainer).build();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return NucleusItemStackSnapshot.NONE;
         }
 
@@ -116,14 +111,14 @@ public class NucleusItemStackSnapshotSerialiser implements TypeSerializer<Nucleu
 
         if (snapshot.getType() == null) {
             // well, this isn't going to work, is it?
-            PrettyPrinter printer = new PrettyPrinter();
+            final PrettyPrinter printer = new PrettyPrinter();
             printer.add("Null item type recorded when trying to create an item stack").centre().hr();
             printer.add("When trying to load item stacks for kits, a null item type was found. This can occur when changing packs and items no "
                     + "longer exist. The item has been discarded.");
             printer.add("Item Info:");
             try {
                 printer.add(DataFormats.JSON.write(dataContainer));
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 printer.add("Unable to write info");
             }
             printer.log(this.logger, Level.WARN);
@@ -145,19 +140,19 @@ public class NucleusItemStackSnapshotSerialiser implements TypeSerializer<Nucleu
     }
 
     @Override
-    public void serialize(TypeToken<?> type, NucleusItemStackSnapshot obj, ConfigurationNode value) throws ObjectMappingException {
-        ItemStackSnapshot snapshot = obj.getSnapshot();
-        DataView view;
+    public void serialize(final TypeToken<?> type, final NucleusItemStackSnapshot obj, final ConfigurationNode value) throws ObjectMappingException {
+        final ItemStackSnapshot snapshot = obj.getSnapshot();
+        final DataView view;
         try {
              view = snapshot.toContainer();
-        } catch (NullPointerException ex) {
-            PrettyPrinter printer = new PrettyPrinter();
+        } catch (final NullPointerException ex) {
+            final PrettyPrinter printer = new PrettyPrinter();
             // Sponge can't find an item type...
             printer.add("NPE encountered when trying to save an item to a kit").centre().hr();
             printer.add("When trying to save an item to the kit, Sponge could not turn the item into data Nucleus can save.");
             printer.add("This can occur when changing packs and items no longer exist.");
             printer.hr();
-            ItemType itemType = snapshot.getType();
+            final ItemType itemType = snapshot.getType();
             if (itemType == null) {
                 printer.add("The ItemType was set to null, but is not class as an empty snapshot. It will not be saved.");
             } else {
@@ -170,14 +165,14 @@ public class NucleusItemStackSnapshotSerialiser implements TypeSerializer<Nucleu
             printer.log(this.logger, Level.WARN);
             return;
         }
-        Map<DataQuery, Object> dataQueryObjectMap = view.getValues(true);
-        for (Map.Entry<DataQuery, Object> entry : dataQueryObjectMap.entrySet()) {
+        final Map<DataQuery, Object> dataQueryObjectMap = view.getValues(true);
+        for (final Map.Entry<DataQuery, Object> entry : dataQueryObjectMap.entrySet()) {
             if (entry.getValue().getClass().isArray()) {
                 // Convert to a list with type, make it the key.
                 if (entry.getValue().getClass().getComponentType().isPrimitive()) {
                     // Create the list of the primitive type.
-                    DataQuery old = entry.getKey();
-                    Tuple<DataQuery, List<?>> dqo = TypeHelper.getList(old, entry.getValue());
+                    final DataQuery old = entry.getKey();
+                    final Tuple<DataQuery, List<?>> dqo = TypeHelper.getList(old, entry.getValue());
                     view.remove(old);
                     view.set(dqo.getFirst(), dqo.getSecond());
                 } else {

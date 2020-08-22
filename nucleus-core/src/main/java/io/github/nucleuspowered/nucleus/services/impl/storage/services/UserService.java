@@ -12,7 +12,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 public class UserService extends AbstractKeyedService<IUserQueryObject, IUserDataObject> {
 
-    public UserService(IStorageManager repository, PluginContainer pluginContainer) {
+    public UserService(final IStorageManager repository, final PluginContainer pluginContainer) {
         super(repository::getUserDataAccess, repository::getUserRepository, pluginContainer);
     }
 }

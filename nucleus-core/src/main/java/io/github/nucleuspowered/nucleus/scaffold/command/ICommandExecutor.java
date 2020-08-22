@@ -30,7 +30,7 @@ public interface ICommandExecutor<C extends CommandSource> {
      * @return The elements.
      * @param serviceCollection The {@link INucleusServiceCollection} to use
      */
-    default CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    default CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[0];
     }
 
@@ -44,7 +44,7 @@ public interface ICommandExecutor<C extends CommandSource> {
      * @param context The {@link ICommandContext}
      * @return The result, if any
      */
-    default Optional<ICommandResult> preExecute(ICommandContext.Mutable<? extends C> context) throws CommandException {
+    default Optional<ICommandResult> preExecute(final ICommandContext.Mutable<? extends C> context) throws CommandException {
         return Optional.empty();
     }
 

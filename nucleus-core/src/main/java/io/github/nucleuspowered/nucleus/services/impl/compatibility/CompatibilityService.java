@@ -29,7 +29,7 @@ public class CompatibilityService implements ICompatibilityService {
     private List<CompatibilityMessages> applicableMessages = null;
 
     @Inject
-    public CompatibilityService(IModuleDataProvider moduleDataProvider) {
+    public CompatibilityService(final IModuleDataProvider moduleDataProvider) {
         this.moduleDataProvider = moduleDataProvider;
     }
 
@@ -45,35 +45,35 @@ public class CompatibilityService implements ICompatibilityService {
         }
 
         if (this.applicableMessages == null) {
-            this.applicableMessages = applyMessages();
+            this.applicableMessages = this.applyMessages();
         }
 
         return this.applicableMessages;
     }
 
-    @Override public void set(JsonArray jsonArray) {
+    @Override public void set(final JsonArray jsonArray) {
         if (this.messages.isEmpty()) {
-            for (JsonElement el : jsonArray) {
+            for (final JsonElement el : jsonArray) {
                 try {
-                    JsonObject obj = el.getAsJsonObject();
+                    final JsonObject obj = el.getAsJsonObject();
                     List<String> l = null;
                     if (obj.has("modules")) {
                         l = new ArrayList<>();
-                        for (JsonElement element : obj.getAsJsonArray("modules")) {
+                        for (final JsonElement element : obj.getAsJsonArray("modules")) {
                             l.add(el.getAsString());
                         }
                     }
                     this.messages.add(
                             new Message(
                                     obj.get("modid").getAsString(),
-                                    get(obj.get("severity").getAsInt()),
+                                    this.get(obj.get("severity").getAsInt()),
                                     obj.get("symptom").getAsString(),
                                     obj.get("message").getAsString(),
                                     obj.get("resolution").getAsString(),
                                     l
                             )
                     );
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     // ignore
                 }
             }
@@ -81,14 +81,14 @@ public class CompatibilityService implements ICompatibilityService {
     }
 
     private List<CompatibilityMessages> applyMessages() {
-        Collection<String> id = this.moduleDataProvider.getModules(Tristate.TRUE);
+        final Collection<String> id = this.moduleDataProvider.getModules(Tristate.TRUE);
         return this.messages
                 .stream()
                 .filter(x -> id.contains(x.getModId()))
                 .collect(Collectors.toList());
     }
 
-    private ICompatibilityService.Severity get(int i) {
+    private ICompatibilityService.Severity get(final int i) {
         switch (i) {
             case 3:
                 return Severity.CRITICAL;

@@ -26,20 +26,20 @@ public interface ICommandModifier extends CatalogType {
      *
      * @throws IllegalArgumentException if the annotation could not be validated.
      */
-    default void validate(CommandModifier annotation) throws IllegalArgumentException { }
+    default void validate(final CommandModifier annotation) throws IllegalArgumentException { }
 
-    default void getDefaultNode(ConfigurationNode node, IMessageProviderService messageProviderService) { }
+    default void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) { }
 
-    default void setDataFromNode(CommandModifiersConfig config, ConfigurationNode node) { }
+    default void setDataFromNode(final CommandModifiersConfig config, final ConfigurationNode node) { }
 
-    default void setValueFromOther(CommandModifiersConfig from, CommandModifiersConfig to) { }
+    default void setValueFromOther(final CommandModifiersConfig from, final CommandModifiersConfig to) { }
 
     /**
      * Returns whether this can execute and therefore modify the command.
      *
      * @return if so.
      */
-    default boolean canExecuteModifier(INucleusServiceCollection serviceCollection, CommandSource source) throws CommandException {
+    default boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandSource source) throws CommandException {
         return true;
     }
 
@@ -49,10 +49,10 @@ public interface ICommandModifier extends CatalogType {
      * <p>This will return an empty optional if the requirement is met, or
      * a {@link Text} object otherwise, explaining the problem.</p>
      */
-    default Optional<Text> testRequirement(ICommandContext.Mutable<? extends CommandSource> source,
-            CommandControl control,
-            INucleusServiceCollection serviceCollection,
-            CommandModifier modifier) throws CommandException {
+    default Optional<Text> testRequirement(final ICommandContext.Mutable<? extends CommandSource> source,
+            final CommandControl control,
+            final INucleusServiceCollection serviceCollection,
+            final CommandModifier modifier) throws CommandException {
         return Optional.empty();
     }
 
@@ -66,25 +66,25 @@ public interface ICommandModifier extends CatalogType {
      * @return a success if everything is OK but we need to stop, a fail if we're stopping, empty to continue.
      */
     default Optional<ICommandResult> preExecute(
-            ICommandContext.Mutable<? extends CommandSource> source,
-            CommandControl control,
-            INucleusServiceCollection serviceCollection,
-            CommandModifier modifier) {
+            final ICommandContext.Mutable<? extends CommandSource> source,
+            final CommandControl control,
+            final INucleusServiceCollection serviceCollection,
+            final CommandModifier modifier) {
         return Optional.empty();
     }
 
     default void onCompletion(
-            ICommandContext<? extends CommandSource> source,
-            CommandControl control,
-            INucleusServiceCollection serviceCollection,
-            CommandModifier modifier) throws CommandException {
+            final ICommandContext<? extends CommandSource> source,
+            final CommandControl control,
+            final INucleusServiceCollection serviceCollection,
+            final CommandModifier modifier) throws CommandException {
     }
 
     default void onFailure(
-            ICommandContext<? extends CommandSource> source,
-            CommandControl control,
-            INucleusServiceCollection serviceCollection,
-            CommandModifier modifier) throws CommandException {
+            final ICommandContext<? extends CommandSource> source,
+            final CommandControl control,
+            final INucleusServiceCollection serviceCollection,
+            final CommandModifier modifier) throws CommandException {
 
     }
 

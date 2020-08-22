@@ -32,8 +32,8 @@ import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserCacheService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
-import org.slf4j.Logger;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.nio.file.Path;
 import java.util.Optional;

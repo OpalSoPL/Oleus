@@ -16,6 +16,6 @@ public interface IConfigurateHelper {
     ConfigurationOptions setOptions(ConfigurationOptions options);
 
     default CommentedConfigurationNode createNode() {
-        return SimpleCommentedConfigurationNode.root(setOptions(ConfigurationOptions.defaults()));
+        return SimpleCommentedConfigurationNode.root(this.setOptions(ConfigurationOptions.defaults()));
     }
 }

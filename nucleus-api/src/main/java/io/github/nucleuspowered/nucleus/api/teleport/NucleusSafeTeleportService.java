@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.teleport;
 
-import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import org.spongepowered.api.entity.Transform;

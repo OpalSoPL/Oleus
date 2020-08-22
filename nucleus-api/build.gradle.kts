@@ -17,7 +17,10 @@ defaultTasks.add("build")
 
 repositories {
     jcenter()
+    maven("https://repo-new.spongepowered.org/repository/maven-public")
     maven("http://repo.spongepowered.org/maven")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
+
 }
 
 dependencies {

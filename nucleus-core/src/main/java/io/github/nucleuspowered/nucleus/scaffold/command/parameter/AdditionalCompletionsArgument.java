@@ -23,7 +23,7 @@ public class AdditionalCompletionsArgument extends WrappedElement {
     private final int minArgs;
     private final int maxArgs;
 
-    public AdditionalCompletionsArgument(CommandElement wrapped, int min, int max, BiFunction<CommandSource, String, List<String>> additional) {
+    public AdditionalCompletionsArgument(final CommandElement wrapped, final int min, final int max, final BiFunction<CommandSource, String, List<String>> additional) {
         super(wrapped);
         this.additional = additional;
         this.maxArgs = max;
@@ -31,24 +31,24 @@ public class AdditionalCompletionsArgument extends WrappedElement {
     }
 
 
-    @Nullable @Override protected Object parseValue(CommandSource source, CommandArgs args) {
+    @Nullable @Override protected Object parseValue(final CommandSource source, final CommandArgs args) {
         return null;
     }
 
-    @Override public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
-        getWrappedElement().parse(source, args, context);
+    @Override public void parse(final CommandSource source, final CommandArgs args, final CommandContext context) throws ArgumentParseException {
+        this.getWrappedElement().parse(source, args, context);
     }
 
-    @Override public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        List<String> s = getWrappedElement().complete(src, args, context);
+    @Override public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
+        final List<String> s = this.getWrappedElement().complete(src, args, context);
 
         if (args.getAll().size() >= this.minArgs && args.getAll().size() <= this.maxArgs) {
             try {
-                String a = args.peek();
-                List<String> result = Lists.newArrayList(s);
+                final String a = args.peek();
+                final List<String> result = Lists.newArrayList(s);
                 result.addAll(this.additional.apply(src, a));
                 return result;
-            } catch (ArgumentParseException e) {
+            } catch (final ArgumentParseException e) {
                 // ignored
             }
         }

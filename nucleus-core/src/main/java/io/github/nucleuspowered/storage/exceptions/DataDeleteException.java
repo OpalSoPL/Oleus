@@ -6,7 +6,7 @@ package io.github.nucleuspowered.storage.exceptions;
 
 public class DataDeleteException extends Exception {
 
-    public DataDeleteException(String mesage, Exception innerException) {
+    public DataDeleteException(final String mesage, final Exception innerException) {
         super(mesage, innerException);
     }
 }

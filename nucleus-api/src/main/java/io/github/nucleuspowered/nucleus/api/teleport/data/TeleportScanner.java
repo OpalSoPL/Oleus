@@ -4,11 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus.api.teleport.data;
 
-import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.teleport.TeleportHelper;
+import org.spongepowered.math.vector.Vector3i;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.TeleportHelper;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
 import java.util.Optional;
@@ -18,11 +19,11 @@ import java.util.Optional;
  */
 public interface TeleportScanner extends CatalogType {
 
-    default Optional<Location<World>> scanFrom(
-            World world,
-            Vector3i position,
-            TeleportHelperFilter filter,
-            TeleportHelperFilter... filters) {
+    default Optional<ServerLocation> scanFrom(
+            final ServerWorld world,
+            final Vector3i position,
+            final TeleportHelperFilter filter,
+            final TeleportHelperFilter... filters) {
         return scanFrom(
                 world,
                 position,
@@ -34,8 +35,8 @@ public interface TeleportScanner extends CatalogType {
         );
     }
 
-    Optional<Location<World>> scanFrom(
-            World world,
+    Optional<ServerLocation> scanFrom(
+            ServerWorld world,
             Vector3i position,
             int height,
             int width,

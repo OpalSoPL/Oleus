@@ -22,27 +22,27 @@ public class LocaleElement extends CommandElement {
 
     private final INucleusServiceCollection serviceCollection;
 
-    public LocaleElement(Text key, INucleusServiceCollection serviceCollection) {
+    public LocaleElement(final Text key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.serviceCollection = serviceCollection;
     }
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String s = args.next();
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String s = args.next();
         return this.serviceCollection.messageProvider().getLocaleFromName(s).orElseGet(() -> Locale.forLanguageTag(s.replace("_", "-")));
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        List<String> l = this.serviceCollection.messageProvider().getAllLocaleNames();
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
+        final List<String> l = this.serviceCollection.messageProvider().getAllLocaleNames();
         try {
-            String a = args.peek().toLowerCase();
+            final String a = args.peek().toLowerCase();
             return l.stream()
                     .filter(x -> x.toLowerCase().startsWith(a))
                     .collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return l;
         }
     }

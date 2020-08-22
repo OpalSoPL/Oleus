@@ -27,18 +27,18 @@ public class MobTypeSettingProcessor implements SettingProcessor {
             new TypeToken<List<EntityType>>() {};
 
     @Override
-    public void process(ConfigurationNode cn) throws ObjectMappingException {
-        List<EntityType> types = Sponge.getRegistry().getAllOf(EntityType.class).stream()
+    public void process(final ConfigurationNode cn) throws ObjectMappingException {
+        final List<EntityType> types = Sponge.getRegistry().getAllOf(EntityType.class).stream()
                 .filter(x -> Living.class.isAssignableFrom(x.getEntityClass()))
                 .collect(Collectors.toList());
-        List<EntityType> whitelist = Lists.newArrayList();
+        final List<EntityType> whitelist = Lists.newArrayList();
         cn.getList(stringTypeToken).forEach(x -> {
             if (x.contains(":")) {
                 types.stream().filter(y -> y.getId().equalsIgnoreCase(x)).findFirst()
                         .ifPresent(whitelist::add);
             } else {
-                String potentialId = "minecraft:" + x.toLowerCase();
-                Optional<EntityType> typeOptional =
+                final String potentialId = "minecraft:" + x.toLowerCase();
+                final Optional<EntityType> typeOptional =
                         types.stream().filter(y -> y.getId().equalsIgnoreCase(potentialId)).findFirst();
                 if (typeOptional.isPresent()) {
                     whitelist.add(typeOptional.get());

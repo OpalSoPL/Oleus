@@ -25,34 +25,34 @@ public class CooldownService implements ICooldownService {
     private final Map<DualKey, Instant> cooldowns = new HashMap<>();
 
     private Map<DualKey, Instant> cleanUp() {
-        Instant now = Instant.now();
-        Collection<DualKey> keys = this.cooldowns.entrySet()
+        final Instant now = Instant.now();
+        final Collection<DualKey> keys = this.cooldowns.entrySet()
                 .stream()
                 .filter(x -> x.getValue().isBefore(now))
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
-        for (DualKey key : keys) {
+        for (final DualKey key : keys) {
             this.cooldowns.remove(key);
         }
 
         return this.cooldowns;
     }
 
-    @Override public boolean hasCooldown(String key, Identifiable identifiable) {
-        return cleanUp().containsKey(new DualKey(key, identifiable.getUniqueId()));
+    @Override public boolean hasCooldown(final String key, final Identifiable identifiable) {
+        return this.cleanUp().containsKey(new DualKey(key, identifiable.getUniqueId()));
     }
 
-    @Override public Optional<Duration> getCooldown(String key, Identifiable identifiable) {
-        return Optional.ofNullable(cleanUp()
+    @Override public Optional<Duration> getCooldown(final String key, final Identifiable identifiable) {
+        return Optional.ofNullable(this.cleanUp()
                 .get(new DualKey(key, identifiable.getUniqueId())))
                 .map(x -> Duration.between(Instant.now(), x));
     }
 
-    @Override public void setCooldown(String key, Identifiable identifiable, Duration cooldownLength) {
+    @Override public void setCooldown(final String key, final Identifiable identifiable, final Duration cooldownLength) {
         this.cooldowns.put(new DualKey(key, identifiable.getUniqueId()), Instant.now().plus(cooldownLength));
     }
 
-    @Override public void clearCooldown(String key, Identifiable identifiable) {
+    @Override public void clearCooldown(final String key, final Identifiable identifiable) {
         this.cooldowns.remove(new DualKey(key, identifiable.getUniqueId()));
     }
 
@@ -61,19 +61,19 @@ public class CooldownService implements ICooldownService {
         private final String key;
         private final UUID uuid;
 
-        private DualKey(String key, UUID uuid) {
+        private DualKey(final String key, final UUID uuid) {
             this.key = key;
             this.uuid = uuid;
         }
 
-        @Override public boolean equals(Object o) {
+        @Override public boolean equals(final Object o) {
             if (this == o) {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if (o == null || this.getClass() != o.getClass()) {
                 return false;
             }
-            DualKey dualKey = (DualKey) o;
+            final DualKey dualKey = (DualKey) o;
             return Objects.equals(key, dualKey.key) &&
                     Objects.equals(uuid, dualKey.uuid);
         }

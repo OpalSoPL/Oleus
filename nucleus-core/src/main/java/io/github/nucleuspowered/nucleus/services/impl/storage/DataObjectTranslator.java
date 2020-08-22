@@ -26,7 +26,7 @@ public class DataObjectTranslator implements TypeSerializer<AbstractConfigurateB
 
     @Nullable
     @Override
-    public AbstractConfigurateBackedDataObject deserialize(@NonNull TypeToken<?> type, @NonNull ConfigurationNode value) throws ObjectMappingException {
+    public AbstractConfigurateBackedDataObject deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
         AbstractConfigurateBackedDataObject ado = null;
         if (type.isSupertypeOf(UserDataObject.class)) {
             ado = new UserDataObject();
@@ -44,7 +44,7 @@ public class DataObjectTranslator implements TypeSerializer<AbstractConfigurateB
     }
 
     @Override
-    public void serialize(@NonNull TypeToken<?> type, @Nullable AbstractConfigurateBackedDataObject obj, @NonNull ConfigurationNode value) throws ObjectMappingException {
+    public void serialize(@NonNull final TypeToken<?> type, @Nullable final AbstractConfigurateBackedDataObject obj, @NonNull final ConfigurationNode value) throws ObjectMappingException {
         if (obj != null) {
             value.setValue(obj.getBackingNode());
         }

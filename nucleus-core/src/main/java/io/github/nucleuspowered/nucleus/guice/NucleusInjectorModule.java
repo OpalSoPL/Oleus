@@ -26,11 +26,11 @@ public class NucleusInjectorModule extends AbstractModule {
     private final Supplier<DiscoveryModuleHolder<?, ?>> discoveryModuleHolderSupplier;
 
     public NucleusInjectorModule(
-            Supplier<INucleusServiceCollection> serviceCollection,
-            Supplier<Path> dataDirectory,
-            Supplier<DiscoveryModuleHolder<?, ?>> discoveryModuleHolderSupplier,
-            Path configDirectory,
-            IModuleDataProvider moduleDataProvider) {
+            final Supplier<INucleusServiceCollection> serviceCollection,
+            final Supplier<Path> dataDirectory,
+            final Supplier<DiscoveryModuleHolder<?, ?>> discoveryModuleHolderSupplier,
+            final Path configDirectory,
+            final IModuleDataProvider moduleDataProvider) {
         this.dataDirectory = dataDirectory;
         this.configDirectory = configDirectory;
         this.moduleDataProvider = moduleDataProvider;
@@ -39,9 +39,9 @@ public class NucleusInjectorModule extends AbstractModule {
     }
 
     @Override protected void configure() {
-        bind(new TypeLiteral<Supplier<Path>>() {}).annotatedWith(DataDirectory.class).toInstance(this.dataDirectory);
-        bind(Path.class).annotatedWith(ConfigDirectory.class).toInstance(this.configDirectory);
-        bind(IModuleDataProvider.class).toInstance(this.moduleDataProvider);
+        this.bind(new TypeLiteral<Supplier<Path>>() {}).annotatedWith(DataDirectory.class).toInstance(this.dataDirectory);
+        this.bind(Path.class).annotatedWith(ConfigDirectory.class).toInstance(this.configDirectory);
+        this.bind(IModuleDataProvider.class).toInstance(this.moduleDataProvider);
     }
 
     @Provides

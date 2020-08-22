@@ -18,8 +18,6 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -34,7 +32,6 @@ import java.util.function.Supplier;
         commandDescriptionKey = "docgen",
         parentCommand = NucleusCommand.class
 )
-@NonnullByDefault
 public class DocGenCommand implements ICommandExecutor<CommandSource> {
 
     @Override

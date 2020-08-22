@@ -5,18 +5,18 @@
 package io.github.nucleuspowered.nucleus.api.module.inventory;
 
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.user.TargetUserEvent;
+import org.spongepowered.api.event.Event;
 
 /**
  * Fired when a player's inventory is cleared. Should be used to clear other, secondary, inventories
  *
  * <p>Note that the target user may be a {@link org.spongepowered.api.entity.living.player.Player}</p>
  */
-public interface NucleusClearInventoryEvent extends TargetUserEvent {
+public interface NucleusClearInventoryEvent extends Event {
 
     /**
      * Gets whether the entire inventory is being cleared, or the
-     * {@link org.spongepowered.api.item.inventory.entity.MainPlayerInventory} only.
+     * main player inventory only.
      *
      * @return whether the entire inventory is being cleared or not
      */

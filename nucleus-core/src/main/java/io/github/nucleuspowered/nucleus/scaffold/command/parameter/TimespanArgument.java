@@ -36,32 +36,32 @@ public class TimespanArgument extends CommandElement {
     private final int secondsInWeek = 7 * this.secondsInDay;
     private final IMessageProviderService messageProvider;
 
-    public TimespanArgument(@Nullable Text key, INucleusServiceCollection serviceCollection) {
+    public TimespanArgument(@Nullable final Text key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProvider = serviceCollection.messageProvider();
     }
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         if (!args.hasNext()) {
             throw args.createError(this.messageProvider.getMessageFor(source, "args.timespan.notime"));
         }
 
-        String s = args.next();
+        final String s = args.next();
 
         // First, if just digits, return the number in seconds.
         if (this.minorTimeString.matcher(s).matches()) {
             return Long.parseUnsignedLong(s);
         }
 
-        Matcher m = this.timeString.matcher(s);
+        final Matcher m = this.timeString.matcher(s);
         if (m.matches()) {
-            long time = amount(m.group(2), this.secondsInWeek);
-            time += amount(m.group(4), this.secondsInDay);
-            time += amount(m.group(6), this.secondsInHour);
-            time += amount(m.group(8), this.secondsInMinute);
-            time += amount(m.group(10), 1);
+            long time = this.amount(m.group(2), this.secondsInWeek);
+            time += this.amount(m.group(4), this.secondsInDay);
+            time += this.amount(m.group(6), this.secondsInHour);
+            time += this.amount(m.group(8), this.secondsInMinute);
+            time += this.amount(m.group(10), 1);
 
             if (time > 0) {
                 return time;
@@ -71,7 +71,7 @@ public class TimespanArgument extends CommandElement {
         throw args.createError(this.messageProvider.getMessageFor(source, "args.timespan.incorrectformat", s));
     }
 
-    private long amount(@Nullable String g, int multipler) {
+    private long amount(@Nullable final String g, final int multipler) {
         if (g != null && g.length() > 0) {
             return multipler * Long.parseUnsignedLong(g);
         }
@@ -80,7 +80,7 @@ public class TimespanArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return Lists.newArrayList();
     }
 }

@@ -26,12 +26,12 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
     private final Map<UUID, Channel> chatChannels = new HashMap<>();
 
     @Override
-    public Optional<Channel> getNucleusChannel(UUID uuid) {
+    public Optional<Channel> getNucleusChannel(final UUID uuid) {
         return Optional.ofNullable(this.chatChannels.get(uuid));
     }
 
     @Override
-    public void setPlayerNucleusChannel(UUID uuid, @Nullable Channel channel) {
+    public void setPlayerNucleusChannel(final UUID uuid, @Nullable final Channel channel) {
         if (channel == null) {
             this.chatChannels.remove(uuid);
         } else {
@@ -40,7 +40,7 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
     }
 
     @Override
-    public NoExceptionAutoClosable setPlayerNucleusChannelTemporarily(UUID uuid, Channel channel) {
+    public NoExceptionAutoClosable setPlayerNucleusChannelTemporarily(final UUID uuid, final Channel channel) {
         Preconditions.checkNotNull(channel);
         final Channel original = this.chatChannels.get(uuid);
         final Optional<Player> player = Sponge.getServer().getPlayer(uuid);

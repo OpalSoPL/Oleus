@@ -4,18 +4,22 @@
  */
 package io.github.nucleuspowered.nucleus.api.core.event;
 
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.entity.living.humanoid.player.TargetPlayerEvent;
 import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 /**
  * Fired on a player's first time on the server.
  *
  * <p>
- *     This will fire during {@link ClientConnectionEvent.Join} at the {@link Order#LATE} priority. Also note that these methods
- *     wrap around the {@link ClientConnectionEvent.Join} event methods, so any changes to these parameters will be fed back to
+ *     This will fire during {@link ServerSideConnectionEvent.Join} at the {@link Order#LATE} priority. Also note that these methods
+ *     wrap around the {@link ServerSideConnectionEvent.Join} event methods, so any changes to these parameters will be fed back to
  *     the original event.
  * </p>
  */
-public interface NucleusFirstJoinEvent extends TargetPlayerEvent, MessageChannelEvent {}
+public interface NucleusFirstJoinEvent extends MessageChannelEvent {
+
+    ServerPlayer getPlayer();
+
+}

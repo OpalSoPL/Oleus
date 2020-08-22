@@ -21,13 +21,10 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-@NonnullByDefault
 @Command(
         aliases = "getuser",
         basePermission = CorePermissions.BASE_NUCLEUS_GETUSER,
