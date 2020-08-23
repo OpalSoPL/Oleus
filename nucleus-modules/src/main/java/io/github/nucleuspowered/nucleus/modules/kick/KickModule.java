@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 @ModuleData(id = "kick", name = "Kick")
 public class KickModule extends ConfigurableModule<KickConfig, KickConfigAdapter> {
 
-    public KickModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public KickModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

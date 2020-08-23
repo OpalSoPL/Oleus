@@ -18,7 +18,7 @@ import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class FirstSpawnConditionalListener implements ListenerBase.Conditional {
 
@@ -26,13 +26,13 @@ public class FirstSpawnConditionalListener implements ListenerBase.Conditional {
     private final PluginContainer pluginContainer;
 
     @Inject
-    public FirstSpawnConditionalListener(INucleusServiceCollection serviceCollection) {
+    public FirstSpawnConditionalListener(final INucleusServiceCollection serviceCollection) {
         this.storageManager = serviceCollection.storageManager();
         this.pluginContainer = serviceCollection.pluginContainer();
     }
 
     @Listener(order = Order.LATE)
-    public void onJoin(NucleusFirstJoinEvent event, @Getter("getTargetEntity") Player player) {
+    public void onJoin(final NucleusFirstJoinEvent event, @Getter("getTargetEntity") final Player player) {
         // Try to force a subject location in a tick.
         Task.builder().execute(() -> this.storageManager
                 .getGeneralService()
@@ -45,7 +45,7 @@ public class FirstSpawnConditionalListener implements ListenerBase.Conditional {
                 .submit(this.pluginContainer);
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class).isForceFirstSpawn();
     }
 

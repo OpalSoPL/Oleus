@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -26,20 +26,20 @@ import org.spongepowered.api.text.serializer.TextSerializers;
         parentCommand = CategoryCommand.class,
         async = true
 )
-public class CategoryDisplayNameCommand implements ICommandExecutor<CommandSource> {
+public class CategoryDisplayNameCommand implements ICommandExecutor {
 
     private final String DISPLAY_NAME_KEY = "display name";
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpCategoryElement(),
                 GenericArguments.onlyOne(GenericArguments.string(Text.of(DISPLAY_NAME_KEY)))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WarpCategory category = context.requireOne(WarpService.WARP_CATEGORY_KEY, WarpCategory.class);
-        String displayName = context.requireOne(DISPLAY_NAME_KEY, String.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WarpCategory category = context.requireOne(WarpService.WARP_CATEGORY_KEY, WarpCategory.class);
+        final String displayName = context.requireOne(DISPLAY_NAME_KEY, String.class);
         context.getServiceCollection()
                 .getServiceUnchecked(WarpService.class)
                 .setWarpCategoryDisplayName(

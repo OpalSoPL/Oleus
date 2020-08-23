@@ -29,10 +29,10 @@ public class WarpArgument extends CommandElement {
     private final IPermissionService permissionService;
     private final boolean permissionCheck;
 
-    public WarpArgument(@Nullable Text key,
-            INucleusServiceCollection serviceCollection,
-            NucleusWarpService warpService,
-            boolean permissionCheck) {
+    public WarpArgument(@Nullable final TextComponent key,
+            final INucleusServiceCollection serviceCollection,
+            final NucleusWarpService warpService,
+            final boolean permissionCheck) {
         super(key);
         this.permissionCheck = permissionCheck;
         this.permissionService = serviceCollection.permissionService();
@@ -42,9 +42,9 @@ public class WarpArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String warpName = args.next();
-        String warp = warpName.toLowerCase();
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String warpName = args.next();
+        final String warp = warpName.toLowerCase();
         if (!this.service.warpExists(warp)) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.warps.noexist"));
         }
@@ -59,11 +59,11 @@ public class WarpArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         try {
-            String el = args.peek();
-            String name = el.toLowerCase();
-            List<String> elements = this.service.getWarpNames().stream()
+            final String el = args.peek();
+            final String name = el.toLowerCase();
+            final List<String> elements = this.service.getWarpNames().stream()
                     .filter(s -> s.startsWith(name))
                     .limit(21).collect(Collectors.toList());
             if (elements.size() >= 21) {
@@ -75,17 +75,17 @@ public class WarpArgument extends CommandElement {
                 return elements;
             }
 
-            Predicate<String> predicate = s -> {
+            final Predicate<String> predicate = s -> {
                 return this.service.getWarp(s).get().getLocation().isPresent() && checkPermission(src, s);
             };
 
             return elements.stream().filter(predicate).collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return ImmutableList.of();
         }
     }
 
-    private boolean checkPermission(CommandSource src, String name) {
+    private boolean checkPermission(final CommandSource src, final String name) {
         // No permissions, no entry!
         return this.permissionService.hasPermission(src, WarpPermissions.getWarpPermission(name));
     }

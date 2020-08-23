@@ -22,21 +22,21 @@ public class MessageTargetArgument extends CommandElement {
 
     private final MessageHandler messageHandler;
 
-    public MessageTargetArgument(MessageHandler messageHandler,  @Nullable Text key) {
+    public MessageTargetArgument(final MessageHandler messageHandler,  @Nullable final TextComponent key) {
         super(key);
         this.messageHandler = messageHandler;
     }
 
-    @Nullable @Override protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    @Nullable @Override protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         return this.messageHandler.getTarget(args.next().toLowerCase()).orElseThrow(() -> args.createError(Text.of("No bot exists with that name")));
     }
 
-    @Override public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        List<String> m = Lists.newArrayList(this.messageHandler.getTargetNames().keySet());
+    @Override public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
+        final List<String> m = Lists.newArrayList(this.messageHandler.getTargetNames().keySet());
         try {
-            String a = args.peek().toLowerCase();
+            final String a = args.peek().toLowerCase();
             return m.stream().filter(x -> x.startsWith(a)).collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return m;
         }
     }

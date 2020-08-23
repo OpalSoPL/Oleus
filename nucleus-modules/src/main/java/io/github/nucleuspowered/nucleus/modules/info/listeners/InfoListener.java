@@ -23,7 +23,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class InfoListener implements IReloadableService.Reloadable, ListenerBase.Conditional {
 
@@ -32,19 +32,19 @@ public class InfoListener implements IReloadableService.Reloadable, ListenerBase
     private final PluginContainer pluginContainer;
 
     @Inject
-    public InfoListener(INucleusServiceCollection serviceCollection) {
+    public InfoListener(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
         this.textFileControllerCollection = serviceCollection.textFileControllerCollection();
         this.pluginContainer = serviceCollection.pluginContainer();
     }
 
     private boolean usePagination = true;
-    private Text title = Text.EMPTY;
+    private TextComponent title = Text.EMPTY;
 
     private int delay = 500;
 
     @Listener
-    public void playerJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+    public void playerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
         // Send message one second later on the Async thread.
         Sponge.getScheduler().createAsyncExecutor(this.pluginContainer).schedule(() -> {
                 if (this.permissionService.hasPermission(player, InfoPermissions.MOTD_JOIN)) {
@@ -59,12 +59,12 @@ public class InfoListener implements IReloadableService.Reloadable, ListenerBase
             }, this.delay, TimeUnit.MILLISECONDS);
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        InfoConfig config = serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class);
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final InfoConfig config = serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class);
         this.delay = (int)(config.getMotdDelay() * 1000);
         this.usePagination = config.isMotdUsePagination();
 
-        String title = config.getMotdTitle();
+        final String title = config.getMotdTitle();
         if (title.isEmpty()) {
             this.title = Text.EMPTY;
         } else {
@@ -73,7 +73,7 @@ public class InfoListener implements IReloadableService.Reloadable, ListenerBase
 
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class).isShowMotdOnJoin();
     }
 }

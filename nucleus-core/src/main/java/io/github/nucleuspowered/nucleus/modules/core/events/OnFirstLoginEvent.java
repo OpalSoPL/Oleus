@@ -19,13 +19,13 @@ public class OnFirstLoginEvent extends AbstractEvent implements NucleusFirstJoin
     private final Cause cause;
     private final Player player;
     private final MessageChannel originalChannel;
-    private final Text originalMessage;
+    private final TextComponent originalMessage;
     private final MessageFormatter formatter;
     @Nullable private MessageChannel currentChannel;
     private boolean cancelled;
 
     public OnFirstLoginEvent(Cause cause, Player player, MessageChannel originalChannel,
-        @Nullable MessageChannel currentChannel, Text originalMessage, boolean messageCancelled, MessageFormatter formatter) {
+        @Nullable MessageChannel currentChannel, TextComponent originalMessage, boolean messageCancelled, MessageFormatter formatter) {
 
         this.cause = cause;
         this.player = player;
@@ -56,7 +56,7 @@ public class OnFirstLoginEvent extends AbstractEvent implements NucleusFirstJoin
         this.currentChannel = channel;
     }
 
-    @Override public Text getOriginalMessage() {
+    @Override public TextComponent getOriginalMessage() {
         return this.originalMessage;
     }
 

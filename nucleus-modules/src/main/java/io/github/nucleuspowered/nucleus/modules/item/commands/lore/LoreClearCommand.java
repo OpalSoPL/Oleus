@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -27,16 +27,16 @@ import org.spongepowered.api.item.inventory.ItemStack;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_LORE_SET)
         }
 )
-public class LoreClearCommand implements ICommandExecutor<Player> {
+public class LoreClearCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
         if (!src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
             return context.errorResult("command.lore.clear.noitem");
         }
 
-        ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).get();
-        LoreData loreData = stack.getOrCreate(LoreData.class).get();
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).get();
+        final LoreData loreData = stack.getOrCreate(LoreData.class).get();
         if (loreData.lore().isEmpty()) {
             return context.errorResult("command.lore.clear.none");
         }

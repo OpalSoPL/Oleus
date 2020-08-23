@@ -10,9 +10,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -25,18 +24,18 @@ import java.util.UUID;
         commandDescriptionKey = "powertool.delete",
         parentCommand = PowertoolCommand.class
 )
-public class DeletePowertoolCommand implements ICommandExecutor<Player> {
+public class DeletePowertoolCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Optional<ItemStack> itemStack = context.getCommandSource().getItemInHand(HandTypes.MAIN_HAND);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Optional<ItemStack> itemStack = context.getCommandSourceRoot().getItemInHand(HandTypes.MAIN_HAND);
         if (!itemStack.isPresent()) {
             return context.errorResult("command.powertool.noitem");
         }
 
-        ItemStack inHand = itemStack.get();
-        ItemType type = inHand.getType();
-        UUID uuid = context.getUniqueId().get();
-        PowertoolService service = context.getServiceCollection().getServiceUnchecked(PowertoolService.class);
+        final ItemStack inHand = itemStack.get();
+        final ItemType type = inHand.getType();
+        final UUID uuid = context.getUniqueId().get();
+        final PowertoolService service = context.getServiceCollection().getServiceUnchecked(PowertoolService.class);
         service.getPowertoolForItem(uuid, type)
                 .orElseThrow(() -> context.createException("command.powertool.nocmds", Text.of(inHand)));
         service.clearPowertool(uuid, type);

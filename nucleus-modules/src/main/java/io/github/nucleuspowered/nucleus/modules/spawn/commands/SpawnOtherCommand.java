@@ -20,7 +20,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.Transform;
@@ -39,35 +39,35 @@ import org.spongepowered.api.world.storage.WorldProperties;
                 SpawnPermissions.SPAWNOTHER_OFFLINE
         }
 )
-public class SpawnOtherCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private GlobalSpawnConfig gsc = new GlobalSpawnConfig();
     private boolean safeTeleport = true;
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection),
                 NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection)
         };
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        SpawnConfig sc = serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class);
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final SpawnConfig sc = serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class);
         this.gsc = sc.getGlobalSpawn();
         this.safeTeleport = sc.isSafeTeleport();
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User target = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        WorldProperties world = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User target = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final WorldProperties world = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
             .orElseGet(() -> gsc.isOnSpawnCommand() ? gsc.getWorld().get() : Sponge.getServer().getDefaultWorld().get());
 
-        Transform<World> worldTransform = SpawnHelper.getSpawn(world, target.getPlayer().orElse(null), context);
+        final Transform<World> worldTransform = SpawnHelper.getSpawn(world, target.getPlayer().orElse(null), context);
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.addContext(EventContexts.SPAWN_EVENT_TYPE, SendToSpawnEvent.Type.COMMAND);
-            frame.pushCause(context.getCommandSource());
-            SendToSpawnEvent event = new SendToSpawnEvent(worldTransform, target, frame.getCurrentCause());
+            frame.pushCause(context.getCommandSourceRoot());
+            final SendToSpawnEvent event = new SendToSpawnEvent(worldTransform, target, frame.getCurrentCause());
             if (Sponge.getEventManager().post(event)) {
                 if (event.getCancelReason().isPresent()) {
                     return context.errorResult("command.spawnother.other.failed.reason", target.getName(), event.getCancelReason().get());
@@ -81,8 +81,8 @@ public class SpawnOtherCommand implements ICommandExecutor<CommandSource>, IRelo
             }
 
             // If we don't have a rotation, then use the current rotation
-            Player player = target.getPlayer().get();
-            TeleportResult result = context.getServiceCollection()
+            final Player player = target.getPlayer().get();
+            final TeleportResult result = context.getServiceCollection()
                     .teleportService()
                     .teleportPlayerSmart(
                             player,
@@ -101,7 +101,7 @@ public class SpawnOtherCommand implements ICommandExecutor<CommandSource>, IRelo
         }
     }
 
-    private ICommandResult isOffline(ICommandContext<? extends CommandSource> context, User user, Transform<World> worldTransform) throws CommandException {
+    private ICommandResult isOffline(final ICommandContext context, final User user, final Transform<World> worldTransform) throws CommandException {
         if (!context.testPermission(SpawnPermissions.SPAWNOTHER_OFFLINE)) {
             return context.errorResult("command.spawnother.offline.permission");
         }

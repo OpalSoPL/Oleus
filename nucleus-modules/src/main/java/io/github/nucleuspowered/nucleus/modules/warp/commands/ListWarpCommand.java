@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -45,7 +45,7 @@ import javax.annotation.Nullable;
         parentCommand = WarpCommand.class,
         associatedPermissions = WarpPermissions.PERMISSIONS_WARPS
 )
-public class ListWarpCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class ListWarpCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean isDescriptionInList = true;
     private double defaultCost = 0;
@@ -53,14 +53,14 @@ public class ListWarpCommand implements ICommandExecutor<CommandSource>, IReload
     private boolean isSeparatePerms = true;
     private boolean isCategorise = false;
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags().flag("u").buildWith(GenericArguments.none())
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WarpService service = context.getServiceCollection().getServiceUnchecked(WarpService.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WarpService service = context.getServiceCollection().getServiceUnchecked(WarpService.class);
         if (service.getWarpNames().isEmpty()) {
             return context.errorResult("command.warps.list.nowarps");
         }
@@ -68,22 +68,22 @@ public class ListWarpCommand implements ICommandExecutor<CommandSource>, IReload
         return !context.hasAny("u") && this.isCategorise ? categories(service, context) : noCategories(service, context);
     }
 
-    private boolean canView(ICommandContext<? extends CommandSource> context, String warp) {
+    private boolean canView(final ICommandContext context, final String warp) {
         return !this.isSeparatePerms || context.testPermission(WarpPermissions.getWarpPermission(warp));
     }
 
-    private ICommandResult categories(final WarpService service, final ICommandContext<? extends CommandSource> context) {
+    private ICommandResult categories(final WarpService service, final ICommandContext context) {
         // Get the warp list.
-        Map<WarpCategory, List<Warp>> warps = service.getWarpsWithCategories(x -> canView(context, x.getName()));
+        final Map<WarpCategory, List<Warp>> warps = service.getWarpsWithCategories(x -> canView(context, x.getName()));
         createMain(context, warps);
         return context.successResult();
     }
 
-    private void createMain(final ICommandContext<? extends CommandSource> context, final Map<WarpCategory, List<Warp>> warps) {
-        List<Text> lt = warps.keySet().stream().filter(Objects::nonNull)
+    private void createMain(final ICommandContext context, final Map<WarpCategory, List<Warp>> warps) {
+        final List<Text> lt = warps.keySet().stream().filter(Objects::nonNull)
                 .sorted(Comparator.comparing(WarpCategory::getId))
                 .map(s -> {
-                    Text.Builder t = Text.builder("> ").color(TextColors.GREEN).style(TextStyles.ITALIC)
+                    final Text.Builder t = Text.builder("> ").color(TextColors.GREEN).style(TextStyles.ITALIC)
                             .append(s.getDisplayName())
                             .onClick(TextActions.executeCallback(source -> createSub(context, s, warps)));
                     s.getDescription().ifPresent(x -> t.append(Text.of(" - ")).append(Text.of(TextColors.RESET, TextStyles.NONE, x)));
@@ -97,64 +97,64 @@ public class ListWarpCommand implements ICommandExecutor<CommandSource>, IReload
                 .onClick(TextActions.executeCallback(source -> createSub(context, null, warps))).build());
         }
 
-        Util.getPaginationBuilder(context.getCommandSourceUnchecked())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
             .header(context.getMessage("command.warps.list.headercategory"))
             .title(context.getMessage("command.warps.list.maincategory")).padding(Text.of(TextColors.GREEN, "-"))
             .contents(lt)
-            .sendTo(context.getCommandSourceUnchecked());
+            .sendTo(context.getCommandSourceRoot());
     }
 
-    private void createSub(final ICommandContext<? extends CommandSource> context,
+    private void createSub(final ICommandContext context,
             @Nullable final WarpCategory category, final Map<WarpCategory, List<Warp>> warpDataList) {
         final boolean econExists = context.getServiceCollection().economyServiceProvider().serviceExists();
-        Text name = category == null ? Text.of(this.defaultName) : category.getDisplayName();
+        final TextComponent name = category == null ? Text.of(this.defaultName) : category.getDisplayName();
 
-        List<Text> lt = warpDataList.get(category).stream().sorted(Comparator.comparing(Warp::getName))
+        final List<Text> lt = warpDataList.get(category).stream().sorted(Comparator.comparing(Warp::getName))
             .map(s -> createWarp(s, s.getName(), econExists, this.defaultCost, context)).collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getCommandSourceUnchecked())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
             .title(context.getMessage("command.warps.list.category", name)).padding(Text.of(TextColors.GREEN, "-"))
             .contents(lt)
             .footer(context.getMessage("command.warps.list.back").toBuilder()
                 .onClick(TextActions.executeCallback(s -> createMain(context, warpDataList))).build())
-            .sendTo(context.getCommandSourceUnchecked());
+            .sendTo(context.getCommandSourceRoot());
     }
 
-    private ICommandResult noCategories(final WarpService service, final ICommandContext<? extends CommandSource> context) {
+    private ICommandResult noCategories(final WarpService service, final ICommandContext context) {
         // Get the warp list.
-        Set<String> ws = service.getWarpNames();
+        final Set<String> ws = service.getWarpNames();
         final boolean econExists = context.getServiceCollection().economyServiceProvider().serviceExists();
-        List<Text> lt = ws.stream().filter(s -> canView(context, s.toLowerCase())).sorted(String::compareTo).map(s -> {
-            Optional<Warp> wd = service.getWarp(s);
+        final List<Text> lt = ws.stream().filter(s -> canView(context, s.toLowerCase())).sorted(String::compareTo).map(s -> {
+            final Optional<Warp> wd = service.getWarp(s);
             return createWarp(wd.orElse(null), s, econExists, this.defaultCost, context);
         }).collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getCommandSourceUnchecked())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
             .title(context.getMessage("command.warps.list.header")).padding(Text.of(TextColors.GREEN, "-"))
             .contents(lt)
-            .sendTo(context.getCommandSourceUnchecked());
+            .sendTo(context.getCommandSourceRoot());
 
         return context.successResult();
     }
 
-    private Text createWarp(@Nullable Warp data, String name, boolean econExists, double defaultCost,
-            ICommandContext<? extends CommandSource> context) {
+    private TextComponent createWarp(@Nullable final Warp data, final String name, final boolean econExists, final double defaultCost,
+            final ICommandContext context) {
         if (data == null || !data.getWorldProperties().map(WorldProperties::isEnabled).orElse(false)) {
             return Text.builder(name).color(TextColors.RED)
                     .onHover(TextActions.showText(
                             context.getMessage("command.warps.unavailable"))).build();
         }
 
-        String pos = data.getLocation().map(Location::getBlockPosition).orElseGet(() -> data.getPosition().toInt()).toString();
-        String worldName = data.getWorldProperties().get().getWorldName();
+        final String pos = data.getLocation().map(Location::getBlockPosition).orElseGet(() -> data.getPosition().toInt()).toString();
+        final String worldName = data.getWorldProperties().get().getWorldName();
 
-        Text.Builder inner = Text.builder(name).color(TextColors.GREEN).style(TextStyles.ITALIC)
+        final Text.Builder inner = Text.builder(name).color(TextColors.GREEN).style(TextStyles.ITALIC)
                 .onClick(TextActions.runCommand("/warp \"" + name + "\""));
 
-        Text.Builder tb;
-        Optional<Text> description = data.getDescription();
+        final Text.Builder tb;
+        final Optional<Text> description = data.getDescription();
         if (this.isDescriptionInList) {
-            Text.Builder hoverBuilder = Text.builder()
+            final Text.Builder hoverBuilder = Text.builder()
                     .append(context.getMessage("command.warps.warpprompt", name))
                     .append(Text.NEW_LINE)
                     .append(context.getMessage("command.warps.warplochover",
@@ -162,7 +162,7 @@ public class ListWarpCommand implements ICommandExecutor<CommandSource>, IReload
                             pos));
 
             if (econExists) {
-                double cost = data.getCost().orElse(defaultCost);
+                final double cost = data.getCost().orElse(defaultCost);
                 if (cost > 0) {
                     hoverBuilder
                         .append(Text.NEW_LINE)
@@ -192,7 +192,7 @@ public class ListWarpCommand implements ICommandExecutor<CommandSource>, IReload
                             ));
 
             if (econExists) {
-                double cost = data.getCost().orElse(defaultCost);
+                final double cost = data.getCost().orElse(defaultCost);
                 if (cost > 0) {
                     tb.append(context.getMessage("command.warps.list.cost",
                             context.getServiceCollection().economyServiceProvider().getCurrencySymbol(cost)));
@@ -203,8 +203,8 @@ public class ListWarpCommand implements ICommandExecutor<CommandSource>, IReload
         return tb.build();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        WarpConfig warpConfig = serviceCollection.moduleDataProvider().getModuleConfig(WarpConfig.class);
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final WarpConfig warpConfig = serviceCollection.moduleDataProvider().getModuleConfig(WarpConfig.class);
         this.defaultName = warpConfig.getDefaultName();
         this.defaultCost = warpConfig.getDefaultWarpCost();
         this.isDescriptionInList = warpConfig.isDescriptionInList();

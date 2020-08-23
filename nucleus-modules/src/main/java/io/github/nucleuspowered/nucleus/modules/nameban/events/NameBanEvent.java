@@ -14,7 +14,7 @@ public abstract class NameBanEvent extends AbstractEvent implements NucleusNameB
     private final Cause cause;
     private final String reason;
 
-    private NameBanEvent(String entry, String reason, Cause cause) {
+    private NameBanEvent(final String entry, final String reason, final Cause cause) {
         this.entry = entry;
         this.reason = reason;
         this.cause = cause;
@@ -34,14 +34,14 @@ public abstract class NameBanEvent extends AbstractEvent implements NucleusNameB
 
     public static class Banned extends NameBanEvent {
 
-        public Banned(String entry, String reason, Cause cause) {
+        public Banned(final String entry, final String reason, final Cause cause) {
             super(entry, reason, cause);
         }
     }
 
     public static class Unbanned extends NameBanEvent {
 
-        public Unbanned(String entry, String reason, Cause cause) {
+        public Unbanned(final String entry, final String reason, final Cause cause) {
             super(entry, reason, cause);
         }
     }

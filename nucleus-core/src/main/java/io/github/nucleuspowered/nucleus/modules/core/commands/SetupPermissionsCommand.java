@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
         commandDescriptionKey = "nucleus.setupperms",
         parentCommand = NucleusCommand.class
 )
-public class SetupPermissionsCommand implements ICommandExecutor<CommandSource> {
+public class SetupPermissionsCommand implements ICommandExecutor {
 
     private final String roleKey = "Nucleus Role";
     private final String groupKey = "Permission Group";
@@ -71,7 +71,7 @@ public class SetupPermissionsCommand implements ICommandExecutor<CommandSource> 
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         IPermissionService permissionService = context.getServiceCollection().permissionService();
         if (context.hasAny(this.withGroupsKey)) {
             if (permissionService.isOpOnly()) {
@@ -83,9 +83,9 @@ public class SetupPermissionsCommand implements ICommandExecutor<CommandSource> 
                 setupGroups(context);
             } else {
                 context.sendMessage("command.nucleus.permission.groups.info");
-                context.getCommandSource().sendMessage(
+                context.getCommandSourceRoot().sendMessage(
                         context.getServiceCollection().messageProvider().getMessageFor(
-                                context.getCommandSource(), "command.nucleus.permission.groups.info2")
+                                context.getCommandSourceRoot(), "command.nucleus.permission.groups.info2")
                             .toBuilder().onClick(TextActions.runCommand("/nucleus:nucleus setupperms -g -y"))
                             .onHover(TextActions.showText(Text.of("/nucleus:nucleus setupperms -g -y")))
                             .build()
@@ -106,7 +106,7 @@ public class SetupPermissionsCommand implements ICommandExecutor<CommandSource> 
         return context.successResult();
     }
 
-    private void setupGroups(ICommandContext<? extends CommandSource> context) throws CommandException {
+    private void setupGroups(ICommandContext context) throws CommandException {
         IMessageProviderService messageProvider = context.getServiceCollection().messageProvider();
         String ownerGroup = "owner";
         String adminGroup = "admin";
@@ -124,7 +124,7 @@ public class SetupPermissionsCommand implements ICommandExecutor<CommandSource> 
         Subject defaults = getSubject(defaultGroup, context, permissionService);
 
         BiFunction<String, String, CommandException> biFunction = (key, group) -> new CommandException(
-                messageProvider.getMessageFor(context.getCommandSourceUnchecked(), key, group)
+                messageProvider.getMessageFor(context.getCommandSourceRoot(), key, group)
         );
 
         context.sendMessage("command.nucleus.permission.inherit", adminGroup, ownerGroup);
@@ -151,14 +151,14 @@ public class SetupPermissionsCommand implements ICommandExecutor<CommandSource> 
         }
     }
 
-    private Subject getSubject(String group, ICommandContext<? extends CommandSource> src, PermissionService service) {
+    private Subject getSubject(String group, ICommandContext src, PermissionService service) {
         return service.getGroupSubjects().getSubject(group).orElseGet(() -> {
             src.sendMessage("command.nucleus.permission.create", group);
             return service.getGroupSubjects().loadSubject(group).join();
         });
     }
 
-    private void setupPerms(ICommandContext<? extends CommandSource> src, Subject group, SuggestedLevel level, boolean reset, boolean inherit) {
+    private void setupPerms(ICommandContext src, Subject group, SuggestedLevel level, boolean reset, boolean inherit) {
         if (inherit && level.getLowerLevel() != null) {
             setupPerms(src, group, level.getLowerLevel(), reset, inherit);
         }
@@ -186,7 +186,7 @@ public class SetupPermissionsCommand implements ICommandExecutor<CommandSource> 
 
         private final IMessageProviderService messageProviderService;
 
-        GroupArgument(@Nullable Text key, IMessageProviderService messageProviderService) {
+        GroupArgument(@Nullable TextComponent key, IMessageProviderService messageProviderService) {
             super(key);
             this.messageProviderService = messageProviderService;
         }

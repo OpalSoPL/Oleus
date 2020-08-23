@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -23,17 +23,17 @@ import org.spongepowered.api.entity.living.player.User;
         basePermission = BackPermissions.BASE_CLEARBACK,
         commandDescriptionKey = "clearback"
 )
-public class ClearBackCommand implements ICommandExecutor<CommandSource> {
+public class ClearBackCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.optionalWeak(NucleusParameters.ONE_USER.get(serviceCollection))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User target = context.getUserFromArgs();
-        boolean isSelf = context.is(target);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User target = context.getUserFromArgs();
+        final boolean isSelf = context.is(target);
         if (!isSelf) {
             if (!context.testPermission(BackPermissions.OTHERS_CLEARBACK)) {
                 // no permission

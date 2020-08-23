@@ -18,10 +18,10 @@ import org.spongepowered.api.command.CommandSource;
         commandDescriptionKey = "nucleus.reload",
         parentCommand = NucleusCommand.class
 )
-public class ReloadCommand implements ICommandExecutor<CommandSource> {
+public class ReloadCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         try {
             context.getServiceCollection().reloadableService().fireReloadables(context.getServiceCollection());
             context.sendMessage("command.reload.one");

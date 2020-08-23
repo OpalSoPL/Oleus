@@ -12,7 +12,7 @@ public class DeleteHomeEvent extends AbstractHomeEvent implements NucleusHomeEve
 
     private final Home home;
 
-    public DeleteHomeEvent(Cause cause, Home home) {
+    public DeleteHomeEvent(final Cause cause, final Home home) {
         super(home.getName(), home.getUser(), cause, home.getLocation().orElse(null));
         this.home = home;
     }

@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class ServerListListener implements IReloadableService.Reloadable, ListenerBase.Conditional {
 
@@ -35,15 +35,15 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
     private ServerListConfig config = new ServerListConfig();
 
     @Inject
-    public ServerListListener(INucleusServiceCollection serviceCollection) {
+    public ServerListListener(final INucleusServiceCollection serviceCollection) {
         this.service = serviceCollection.getServiceUnchecked(ServerListService.class);
     }
 
     @Listener
-    public void onServerListPing(ClientPingServerEvent event, @Getter("getResponse") ClientPingServerEvent.Response response) {
+    public void onServerListPing(final ClientPingServerEvent event, @Getter("getResponse") final ClientPingServerEvent.Response response) {
         if (this.config.isModifyServerList()) {
             List<NucleusTextTemplateImpl> list = null;
-            Optional<Text> ott = this.service.getMessage();
+            final Optional<Text> ott = this.service.getMessage();
 
             if (ott.isPresent()) {
                 response.setDescription(ott.get());
@@ -55,7 +55,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
                 }
 
                 if (list != null) {
-                    NucleusTextTemplate template = list.get(this.random.nextInt(list.size()));
+                    final NucleusTextTemplate template = list.get(this.random.nextInt(list.size()));
                     response.setDescription(template.getForSource(Sponge.getServer().getConsole()));
                 }
             }
@@ -64,7 +64,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
         if (this.config.isHidePlayerCount()) {
             response.setHidePlayers(true);
         } else if (this.config.isHideVanishedPlayers()) {
-            Collection<GameProfile> players = Sponge.getServer().getOnlinePlayers().stream()
+            final Collection<GameProfile> players = Sponge.getServer().getOnlinePlayers().stream()
                     .filter(x -> !x.get(Keys.VANISH).orElse(false))
                     .map(User::getProfile).collect(Collectors.toList());
 
@@ -77,12 +77,12 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(ServerListConfig.class);
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(ServerListConfig.class).enableListener();
     }
 }

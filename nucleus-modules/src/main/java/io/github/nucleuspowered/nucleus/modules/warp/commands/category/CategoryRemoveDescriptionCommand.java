@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 
@@ -23,16 +23,16 @@ import org.spongepowered.api.command.args.CommandElement;
         parentCommand = CategoryCommand.class,
         async = true
 )
-public class CategoryRemoveDescriptionCommand implements ICommandExecutor<CommandSource> {
+public class CategoryRemoveDescriptionCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpCategoryElement()
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WarpCategory category = context.requireOne(WarpService.WARP_CATEGORY_KEY, WarpCategory.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WarpCategory category = context.requireOne(WarpService.WARP_CATEGORY_KEY, WarpCategory.class);
         context.getServiceCollection()
                 .getServiceUnchecked(WarpService.class)
                 .setWarpCategoryDescription(category.getId(), null);

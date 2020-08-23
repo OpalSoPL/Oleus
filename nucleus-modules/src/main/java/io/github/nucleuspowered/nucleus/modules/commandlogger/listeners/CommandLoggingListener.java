@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class CommandLoggingListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -38,7 +38,7 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
     private Logger logger;
 
     @Inject
-    public CommandLoggingListener(INucleusServiceCollection serviceCollection) {
+    public CommandLoggingListener(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(CommandLoggerHandler.class);
         this.c = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
         this.messageProvider = serviceCollection.messageProvider();
@@ -46,9 +46,9 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
     }
 
     @Listener(order = Order.LAST)
-    public void onCommand(SendCommandEvent event, @First CommandSource source) {
+    public void onCommand(final SendCommandEvent event, @First final CommandSource source) {
         // Check source.
-        boolean accept;
+        final boolean accept;
         if (source instanceof Player) {
             accept = this.c.getLoggerTarget().isLogPlayer();
         } else if (source instanceof CommandBlockSource) {
@@ -64,28 +64,28 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
             return;
         }
 
-        String command = event.getCommand().toLowerCase();
-        Set<String> commands = CommandNameCache.INSTANCE.getFromCommandAndSource(command, source);
+        final String command = event.getCommand().toLowerCase();
+        final Set<String> commands = CommandNameCache.INSTANCE.getFromCommandAndSource(command, source);
         commands.retainAll(this.commandsToFilter);
 
         // If whitelist, and we have the command, or if not blacklist, and we do not have the command.
         if (this.c.isWhitelist() == !commands.isEmpty()) {
-            String message = this.messageProvider.getMessageString("commandlog.message", source.getName(), event.getCommand(), event.getArguments());
+            final String message = this.messageProvider.getMessageString("commandlog.message", source.getName(), event.getCommand(), event.getArguments());
             this.logger.info(message);
             this.handler.queueEntry(message);
         }
     }
 
     @Listener
-    public void onShutdown(GameStoppedServerEvent event) {
+    public void onShutdown(final GameStoppedServerEvent event) {
         try {
             this.handler.onServerShutdown();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.c = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
         this.commandsToFilter = this.c.getCommandsToFilter().stream().map(String::toLowerCase).collect(ImmutableSet.toImmutableSet());
     }

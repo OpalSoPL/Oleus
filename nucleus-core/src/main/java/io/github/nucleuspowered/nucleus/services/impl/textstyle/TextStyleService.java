@@ -9,24 +9,26 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
-import org.slf4j.Logger;
-import org.spongepowered.api.Sponge;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextElement;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyle;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,20 +42,16 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 @Singleton
 public class TextStyleService implements ITextStyleService, IReloadableService.Reloadable {
 
-    private final Pattern COLOURS = Pattern.compile(".*?(?<colour>(&[0-9a-flmnrok])+)$");
-    private final Pattern URL_PARSER =
+    private final Pattern colours = Pattern.compile(".*?(?<colour>(&[0-9a-flmnrok])+)$");
+    private final Pattern urlParser =
             Pattern.compile("(?<first>(^|\\s))(?<reset>&r)?(?<colour>(&[0-9a-flmnrok])+)?"
                             + "(?<options>\\{[a-z]+?})?(?<url>(http(s)?://)?([A-Za-z0-9-]+\\.)+[A-Za-z0-9]{2,}\\S*)",
                     Pattern.CASE_INSENSITIVE);
 
-    private final static TextFormat EMPTY = new TextFormatImpl(TextColors.NONE, TextStyles.NONE);
+    private final static TextFormat EMPTY = ITextStyleService.EMPTY;
 
     private final Logger logger;
     private final IPermissionService permissionService;
@@ -62,68 +60,67 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
     // I want these to be fixed names, no Sponge impl should change these.
     private final BiMap<TextColor, String> colourToPermissionSuffix =
             HashBiMap.create(ImmutableMap.<TextColor, String>builder()
-                .put(TextColors.AQUA, "aqua")
-                .put(TextColors.BLACK, "black")
-                .put(TextColors.BLUE, "blue")
-                .put(TextColors.DARK_AQUA, "dark_aqua")
-                .put(TextColors.DARK_BLUE, "dark_blue")
-                .put(TextColors.DARK_GRAY, "dark_gray")
-                .put(TextColors.DARK_GREEN, "dark_green")
-                .put(TextColors.DARK_PURPLE, "dark_purple")
-                .put(TextColors.DARK_RED, "dark_red")
-                .put(TextColors.GOLD, "gold")
-                .put(TextColors.GRAY, "gray")
-                .put(TextColors.GREEN, "green")
-                .put(TextColors.LIGHT_PURPLE, "light_purple")
-                .put(TextColors.NONE, "")
-                .put(TextColors.RED, "red")
-                .put(TextColors.RESET, "reset")
-                .put(TextColors.WHITE, "white")
-                .put(TextColors.YELLOW, "yellow")
+                .put(NamedTextColor.AQUA, "aqua")
+                .put(NamedTextColor.BLACK, "black")
+                .put(NamedTextColor.BLUE, "blue")
+                .put(NamedTextColor.DARK_AQUA, "dark_aqua")
+                .put(NamedTextColor.DARK_BLUE, "dark_blue")
+                .put(NamedTextColor.DARK_GRAY, "dark_gray")
+                .put(NamedTextColor.DARK_GREEN, "dark_green")
+                .put(NamedTextColor.DARK_PURPLE, "dark_purple")
+                .put(NamedTextColor.DARK_RED, "dark_red")
+                .put(NamedTextColor.GOLD, "gold")
+                .put(NamedTextColor.GRAY, "gray")
+                .put(NamedTextColor.GREEN, "green")
+                .put(NamedTextColor.LIGHT_PURPLE, "light_purple")
+                .put(NamedTextColor.RED, "red")
+                .put(NamedTextColor.WHITE, "white")
+                .put(NamedTextColor.YELLOW, "yellow")
                 .build());
 
     private final BiMap<Character, TextColor> idToColour =
             HashBiMap.create(
                 ImmutableMap.<Character, TextColor>builder()
-                        .put('0', TextColors.BLACK)
-                        .put('1', TextColors.DARK_BLUE)
-                        .put('2', TextColors.DARK_GREEN)
-                        .put('3', TextColors.DARK_AQUA)
-                        .put('4', TextColors.DARK_RED)
-                        .put('5', TextColors.DARK_PURPLE)
-                        .put('6', TextColors.GOLD)
-                        .put('7', TextColors.GRAY)
-                        .put('8', TextColors.DARK_GRAY)
-                        .put('9', TextColors.BLUE)
-                        .put('a', TextColors.GREEN)
-                        .put('b', TextColors.AQUA)
-                        .put('c', TextColors.RED)
-                        .put('d', TextColors.LIGHT_PURPLE)
-                        .put('e', TextColors.YELLOW)
-                        .put('f', TextColors.WHITE)
-                        .put('r', TextColors.RESET)
+                        .put('0', NamedTextColor.BLACK)
+                        .put('1', NamedTextColor.DARK_BLUE)
+                        .put('2', NamedTextColor.DARK_GREEN)
+                        .put('3', NamedTextColor.DARK_AQUA)
+                        .put('4', NamedTextColor.DARK_RED)
+                        .put('5', NamedTextColor.DARK_PURPLE)
+                        .put('6', NamedTextColor.GOLD)
+                        .put('7', NamedTextColor.GRAY)
+                        .put('8', NamedTextColor.DARK_GRAY)
+                        .put('9', NamedTextColor.BLUE)
+                        .put('a', NamedTextColor.GREEN)
+                        .put('b', NamedTextColor.AQUA)
+                        .put('c', NamedTextColor.RED)
+                        .put('d', NamedTextColor.LIGHT_PURPLE)
+                        .put('e', NamedTextColor.YELLOW)
+                        .put('f', NamedTextColor.WHITE)
                         .build()
             );
 
-    private final HashBiMap<TextStyle, String> styleToPerms =
+    private final HashBiMap<TextDecoration, String> styleToPerms =
             HashBiMap.create(
-            ImmutableMap.<TextStyle, String>builder()
-                    .put(TextStyles.BOLD, "bold")
-                    .put(TextStyles.ITALIC, "italic")
-                    .put(TextStyles.UNDERLINE, "underline")
-                    .put(TextStyles.STRIKETHROUGH, "strikethrough")
-                    .put(TextStyles.OBFUSCATED, "obfuscated")
+            ImmutableMap.<TextDecoration, String>builder()
+                    .put(TextDecoration.BOLD, "bold")
+                    .put(TextDecoration.ITALIC, "italic")
+                    .put(TextDecoration.UNDERLINED, "underline")
+                    .put(TextDecoration.STRIKETHROUGH, "strikethrough")
+                    .put(TextDecoration.OBFUSCATED, "obfuscated")
                     .build());
-    private final BiMap<Character, TextStyle> idToStyle =
+    private final BiMap<Character, TextDecoration> idToStyle =
             HashBiMap.create(
-                    ImmutableMap.<Character, TextStyle>builder()
-                            .put('l', TextStyles.BOLD)
-                            .put('o', TextStyles.ITALIC)
-                            .put('n', TextStyles.UNDERLINE)
-                            .put('m', TextStyles.STRIKETHROUGH)
-                            .put('k', TextStyles.OBFUSCATED)
+                    ImmutableMap.<Character, TextDecoration>builder()
+                            .put('l', TextDecoration.BOLD)
+                            .put('o', TextDecoration.ITALIC)
+                            .put('n', TextDecoration.UNDERLINED)
+                            .put('m', TextDecoration.STRIKETHROUGH)
+                            .put('k', TextDecoration.OBFUSCATED)
                             .build()
             );
+
+    private final Style resetStyle;
 
     @Inject
     public TextStyleService(
@@ -133,6 +130,12 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         this.permissionService = permissionService;
         this.messageProviderService = messageProviderService;
         this.logger = logger;
+
+        final Style.Builder sb = Style.builder();
+        for (final TextDecoration decoration : this.styleToPerms.keySet()) {
+            sb.decoration(decoration, false);
+        }
+        this.resetStyle = sb.build();
     }
 
     @Override
@@ -143,9 +146,8 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
 
         final String r = this.colourToPermissionSuffix.get(colour);
         if (r == null) {
-            // We have a colour based on a mod, I guess?
-            final String[] n = colour.getId().split(":", 2);
-            final String name = ((n.length == 2) ? n[1] : n[0]).toLowerCase(Locale.ENGLISH);
+            // Use the hex string
+            final String name = colour.asHexString().toLowerCase(Locale.ENGLISH);
             this.colourToPermissionSuffix.put(colour, name);
             return Optional.of(prefix + name);
         } else if (r.isEmpty()) {
@@ -155,43 +157,22 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
     }
 
     @Override
-    public List<String> getPermissionsFor(String prefix, final TextStyle style) {
+    public List<String> getPermissionsFor(final String prefix, final TextDecoration style) {
+        return this.getPermissionsFor(prefix, Style.of(style));
+    }
+
+    @Override
+    public List<String> getPermissionsFor(String prefix, final Style style) {
         if (!prefix.endsWith(".")) {
             prefix += ".";
         }
 
-        final String p = this.styleToPerms.get(style);
-        if (p != null) {
-            return ImmutableList.of(prefix + p);
-        }
-
         final ImmutableList.Builder<String> builder = ImmutableList.builder();
-        addStylePermIf(
-                style.hasStrikethrough().orElse(false),
-                prefix,
-                "strikethrough",
-                builder);
-        addStylePermIf(
-                style.hasUnderline().orElse(false),
-                prefix,
-                "underline",
-                builder);
-        addStylePermIf(
-                style.isBold().orElse(false),
-                prefix,
-                "bold",
-                builder);
-        addStylePermIf(
-                style.isItalic().orElse(false),
-                prefix,
-                "italic",
-                builder);
-        addStylePermIf(
-                style.isObfuscated().orElse(false),
-                prefix,
-                "obfuscated",
-                builder);
-
+        for (final Map.Entry<TextDecoration, String> entry : this.styleToPerms.entrySet()) {
+            if (style.hasDecoration(entry.getKey())) {
+                builder.add(prefix + entry.getValue());
+            }
+        }
         return builder.build();
     }
 
@@ -223,11 +204,6 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         return message;
     }
 
-    @Override public Collection<String> wouldStrip(final String permissionPrefixColour, final String permissionPrefixColor, final String permissionPrefixStyle,
-            final Subject source, final String text) {
-        return this.wouldStrip(Arrays.asList(permissionPrefixColour, permissionPrefixColor), permissionPrefixStyle, source, text);
-    }
-
     @Override public Collection<String> wouldStrip(final String permissionPrefixColour, final String permissionPrefixStyle, final Subject source, final String text) {
         return this.wouldStrip(Collections.singletonList(permissionPrefixColour), permissionPrefixStyle, source, text);
     }
@@ -245,7 +221,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
                 for (final char a : p.toCharArray()) {
                     final TextColor textColor = this.idToColour.get(a);
                     if (textColor != null) {
-                        name.add(textColor.getName());
+                        name.add(textColor.asHexString());
                     } else {
                         //noinspection ConstantConditions
                         name.add(this.styleToPerms.get(this.idToStyle.get(a)));
@@ -257,12 +233,6 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         }
 
         return ImmutableList.of();
-    }
-
-    private static void addStylePermIf(final boolean condition, final String prefix, final String suffix, final ImmutableList.Builder<String> builder) {
-        if (condition) {
-            builder.add(prefix + suffix);
-        }
     }
 
     @Nullable
@@ -287,7 +257,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             }
         }
 
-        for (final Map.Entry<TextStyle, String> suffix : this.styleToPerms.entrySet()) {
+        for (final Map.Entry<TextDecoration, String> suffix : this.styleToPerms.entrySet()) {
             if (!this.permissionService.hasPermission(subject, stylePrefix + suffix.getValue())) {
                 final Character c = this.idToStyle.inverse().get(suffix.getKey());
                 if (c != null) {
@@ -304,27 +274,28 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
     }
 
     @Override
-    public TextFormat getLastColourAndStyle(final TextRepresentable text,
+    public TextFormat getLastColourAndStyle(
+            final Component text,
             @Nullable final TextFormat current,
-            final TextColor defaultColour,
-            final TextStyle defaultStyle) {
-        final List<Text> texts = this.flatten(text.toText());
+            @Nullable final TextColor defaultColour,
+            final Style defaultStyle) {
+        final List<Component> texts = this.flatten(text);
         if (texts.isEmpty()) {
             return current == null ? new TextFormatImpl(defaultColour, defaultStyle) : current;
         }
 
-        TextColor tc = TextColors.NONE;
-        final TextStyle ts =  texts.get(texts.size() - 1).getStyle();
+        TextColor tc = null;
+        final Style ts =  texts.get(texts.size() - 1).style();
 
         for (int i = texts.size() - 1; i > -1; i--) {
-            // If we have both a Text Colour and a Text Style, then break out.
-            tc = texts.get(i).getColor();
-            if (tc != TextColors.NONE) {
+            // If we have both a TextComponent Colour and a TextComponent Style, then break out.
+            tc = texts.get(i).color();
+            if (tc != null) {
                 break;
             }
         }
 
-        if (tc == TextColors.NONE) {
+        if (tc == null) {
             tc = defaultColour;
         }
 
@@ -332,73 +303,80 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             return new TextFormatImpl(tc, ts);
         }
 
-        return new TextFormatImpl(tc != TextColors.NONE ? tc : current.colour(), ts);
+        return new TextFormatImpl(tc != null ? tc : current.colour().orElse(null), ts);
     }
 
-    private List<Text> flatten(final Text text) {
-        final List<Text> texts = Lists.newArrayList(text);
-        if (!text.getChildren().isEmpty()) {
-            text.getChildren().forEach(x -> texts.addAll(this.flatten(x)));
+    private List<Component> flatten(final Component text) {
+        final List<Component> texts = Lists.newArrayList(text);
+        if (!text.children().isEmpty()) {
+            text.children().forEach(x -> texts.addAll(this.flatten(x)));
         }
 
         return texts;
     }
 
     @Override
-    public TextColor getColourFromString(@Nullable final String s) {
+    public Optional<TextColor> getColourFromString(@Nullable final String s) {
         if (s == null || s.length() == 0) {
-            return TextColors.NONE;
+            return Optional.empty();
         }
 
         if (s.length() == 1) {
-            return this.idToColour.getOrDefault(s.charAt(0), TextColors.NONE);
+            return Optional.ofNullable(this.idToColour.getOrDefault(s.charAt(0), null));
         } else {
-            return Sponge.getRegistry().getType(TextColor.class, s.toUpperCase()).orElse(TextColors.NONE);
+            return Optional.ofNullable(NamedTextColor.NAMES.value(s.toLowerCase()));
         }
     }
 
     @Override
-    public TextStyle getTextStyleFromString(@Nullable final String s) {
+    public Style getTextStyleFromString(@Nullable final String s) {
         if (s == null || s.length() == 0) {
-            return TextStyles.NONE;
+            return Style.empty();
         }
 
-        TextStyle ts = TextStyles.NONE;
+        final Style.Builder ts = Style.builder();
         for (final String split : s.split("\\s*,\\s*")) {
             if (split.length() == 1) {
-                ts = ts.and(this.idToStyle.getOrDefault(split.charAt(0), TextStyles.NONE));
+                final TextDecoration decoration = this.idToStyle.get(split.charAt(0));
+                if (decoration != null) {
+                    ts.apply(decoration);
+                }
             } else {
-                ts = ts.and(this.styleToPerms.inverse().getOrDefault(split.toLowerCase(), TextStyles.NONE));
+                final TextDecoration decoration = this.styleToPerms.inverse().get(split.toLowerCase());
+                if (decoration != null) {
+                    ts.apply(decoration);
+                }
             }
         }
 
-        return ts;
+        return ts.build();
     }
 
-    @Override public Text addUrls(final String message) {
+    @Override public TextComponent addUrls(final String message) {
         return this.addUrls(message, false);
     }
 
-    @Override public Text addUrls(final String message, final boolean replaceBlueUnderline) {
+    @Override public TextComponent addUrls(final String message, final boolean replaceBlueUnderline) {
         if (message == null || message.isEmpty()) {
-            return Text.EMPTY;
+            return TextComponent.empty();
         }
 
-        final Matcher m = URL_PARSER.matcher(message);
+        final Matcher m = this.urlParser.matcher(message);
         if (!m.find()) {
-            return TextSerializers.FORMATTING_CODE.deserialize(message);
+            return LegacyComponentSerializer.legacyAmpersand().deserialize(message);
         }
 
-        final List<TextElement> texts = Lists.newArrayList();
+        final List<Component> texts = Lists.newArrayList();
         String remaining = message;
         ITextStyleService.TextFormat st = EMPTY;
         do {
             // We found a URL. We split on the URL that we have.
-            final String[] textArray = remaining.split(URL_PARSER.pattern(), 2);
-            final Text first = Text.builder().color(st.colour()).style(st.style())
-                    .append(TextSerializers.FORMATTING_CODE.deserialize(textArray[0])).build();
-
-            // Add this text to the list regardless.
+            final String[] textArray = remaining.split(this.urlParser.pattern(), 2);
+            final TextComponent.Builder firstB = TextComponent.builder().style(st.style());
+            if (st.colour().isPresent()) {
+                firstB.color(st.colour().get());
+            }
+            final TextComponent first = firstB.append(LegacyComponentSerializer.legacyAmpersand().deserialize(textArray[0])).build();
             texts.add(first);
 
             // If we have more to do, shove it into the "remaining" variable.
@@ -411,16 +389,19 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             // Get the last colour & styles
             final String colourMatch = m.group("colour");
             if (replaceBlueUnderline) {
-                st = new TextFormatImpl(TextColors.BLUE, TextStyles.UNDERLINE);
+                st = new TextFormatImpl(NamedTextColor.BLUE, Style.of(TextDecoration.UNDERLINED));
             } else if (colourMatch != null && !colourMatch.isEmpty()) {
 
                 // If there is a reset, explicitly do it.
-                TextStyle reset = TextStyles.NONE;
+                Style reset = Style.empty();
                 if (m.group("reset") != null) {
-                    reset = TextStyles.RESET;
+                    reset = this.resetStyle;
                 }
 
-                st = this.getLastColourAndStyle(Text.of(reset, TextSerializers.FORMATTING_CODE.deserialize(m.group("colour") + " ")), st);
+                st = this.getLastColourAndStyle(
+                        TextComponent.builder().style(reset).append(
+                                LegacyComponentSerializer.legacyAmpersand().deserialize(m.group("colour") + " ")).build(),
+                        st);
             } else {
                 st = this.getLastColourAndStyle(first, st);
             }
@@ -428,7 +409,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             // Build the URL
             final String whiteSpace = m.group("first");
             if (replaceBlueUnderline) {
-                st = new TextFormatImpl(TextColors.BLUE, TextStyles.UNDERLINE);
+                st = new TextFormatImpl(NamedTextColor.BLUE, Style.of(TextDecoration.UNDERLINED));
             } else {
                 st = this.getLastColourAndStyle(first, st);
             }
@@ -441,25 +422,25 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             }
 
             if (replaceBlueUnderline) {
-                st = this.getLastColourAndStyle(first, st, TextColors.WHITE, TextStyles.NONE);
+                st = this.getLastColourAndStyle(first, st, NamedTextColor.WHITE, Style.empty());
             }
         } while (remaining != null && m.find());
 
         // Add the last bit.
         if (remaining != null) {
-            texts.add(
-                    Text.builder().color(st.colour()).style(st.style()).append(TextSerializers.FORMATTING_CODE.deserialize(remaining)).build());
+            texts.add(TextStyleService.create(null, st).append(LegacyComponentSerializer.legacyAmpersand().deserialize(remaining)).build());
         }
 
         // Join it all together.
-        //noinspection SuspiciousToArrayCall,ToArrayCallWithZeroLengthArrayArgument
-        return Text.of((Object[]) texts.toArray(new TextElement[texts.size()]));
+        final TextComponent.Builder finalcomponent = TextComponent.builder();
+        texts.forEach(finalcomponent::append);
+        return finalcomponent.build();
     }
 
-    @Override public Text getTextForUrl(
-            final String url, final String msg, final String whiteSpace, final ITextStyleService.TextFormat st, @Nullable final String optionString) {
-        final String toParse = TextSerializers.FORMATTING_CODE.stripCodes(url);
-
+    @Override
+    public TextComponent getTextForUrl(
+            final String toParse, final String msg, final String whiteSpace, final ITextStyleService.TextFormat st,
+            @Nullable final String optionString) {
         try {
             final URL urlObj;
             if (!toParse.startsWith("http://") && !toParse.startsWith("https://")) {
@@ -468,48 +449,54 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
                 urlObj = new URL(toParse);
             }
 
-            final Text.Builder textBuilder = Text.builder(msg).color(st.colour()).style(st.style()).onClick(TextActions.openUrl(urlObj));
+            final TextComponent.Builder textBuilder = TextStyleService.create(msg, st).clickEvent(ClickEvent.openUrl(urlObj.toString()));
             if (optionString == null || !optionString.contains("h")) {
-                textBuilder.onHover(TextActions.showText(this.messageProviderService.getMessage("chat.url.click", url)));
+                textBuilder.hoverEvent(HoverEvent.showText(this.messageProviderService.getMessage("chat.url.click", toParse)));
             }
 
             if (!whiteSpace.isEmpty()) {
-                return Text.builder(whiteSpace).append(textBuilder.build()).build();
+                return TextComponent.builder(whiteSpace).append(textBuilder.build()).build();
             }
 
             return textBuilder.build();
         } catch (final MalformedURLException e) {
             // URL parsing failed, just put the original text in here.
-            this.logger.warn(this.messageProviderService.getMessageString("chat.url.malformed", url));
+            this.logger.warn(this.messageProviderService.getMessageString("chat.url.malformed", toParse));
             e.printStackTrace();
-            final Text ret = Text.builder(url).color(st.colour()).style(st.style()).build();
+            final TextComponent ret = TextStyleService.create(toParse, st).build();
             if (!whiteSpace.isEmpty()) {
-                return Text.builder(whiteSpace).append(ret).build();
+                return TextComponent.builder(whiteSpace).append(ret).build();
             }
 
             return ret;
         }
     }
 
-    @Override public Text oldLegacy(final String message) {
-        final Matcher colourMatcher = COLOURS.matcher(message);
+    @Override
+    public TextComponent oldLegacy(final String message) {
+        final Matcher colourMatcher = this.colours.matcher(message);
         if (colourMatcher.matches()) {
-            final Text first = TextSerializers.FORMATTING_CODE.deserialize(message.replace(colourMatcher.group("colour"), ""));
+            final TextComponent first = LegacyComponentSerializer.legacyAmpersand()
+                    .deserialize(message.replace(colourMatcher.group("colour"), ""));
             final String match = colourMatcher.group("colour") + " ";
-            final Text t = TextSerializers.FORMATTING_CODE.deserialize(match);
-            return Text.of(first, t.getColor(), first.getStyle().and(t.getStyle()));
+            final TextComponent t = LegacyComponentSerializer.legacyAmpersand().deserialize(match);
+            return first.toBuilder().color(t.color()).style(first.style().merge(t.style())).build();
         }
 
-        return TextSerializers.FORMATTING_CODE.deserialize(message);
+        return LegacyComponentSerializer.legacyAmpersand().deserialize(message);
     }
 
-    @Override public Text joinTextsWithColoursFlowing(final Text... texts) {
-        final List<Text> result = Lists.newArrayList();
-        Text last = null;
-        for (final Text n : texts) {
+    @Override
+    public TextComponent joinTextsWithColoursFlowing(final TextComponent... texts) {
+        final List<TextComponent> result = Lists.newArrayList();
+        TextComponent last = null;
+        for (final TextComponent n : texts) {
             if (last != null) {
                 final TextFormat st = this.getLastColourAndStyle(last, null);
-                result.add(Text.of(st.colour(), st.style(), n));
+                final TextComponent.Builder builder = n.toBuilder();
+                st.colour().ifPresent(builder::color);
+                builder.style(st.style());
+                result.add(builder.build());
             } else {
                 result.add(n);
             }
@@ -517,7 +504,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             last = n;
         }
 
-        return Text.join(result);
+        return TextComponent.join(TextComponent.empty(), result);
     }
 
 
@@ -525,32 +512,53 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         final String commandNameOnClick = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
     }
 
+    private static TextComponent.Builder create(@Nullable final String string, final TextFormat format) {
+        final TextComponent.Builder builder;
+        if (string == null) {
+            builder = TextComponent.builder();
+        } else {
+            builder = TextComponent.builder(string);
+        }
+        builder.style(format.style());
+        format.colour().ifPresent(builder::color);
+        return builder;
+    }
+
     public static class TextFormatImpl implements TextFormat {
 
-        private final TextColor colour;
-        private final TextStyle style;
+        @Nullable private final TextColor colour;
+        private final Style style;
 
-        TextFormatImpl(final TextColor colour, final TextStyle style) {
+        TextFormatImpl(final TextColor colour, final Style style) {
             this.colour = colour;
             this.style = style;
         }
 
-        @Override public TextColor colour() {
-            return this.colour;
+        @Override public Optional<TextColor> colour() {
+            return Optional.ofNullable(this.colour);
         }
 
-        @Override public TextStyle style() {
+        @Override public Style style() {
             return this.style;
         }
 
-        @Override public Text textOf() {
-            final Text.Builder tb = Text.builder();
-            if (this.colour != TextColors.NONE) {
-                tb.color(this.colour);
+        @Override public TextComponent textOf() {
+            final TextComponent.Builder builder = TextComponent.builder("");
+            if (this.colour != null) {
+                builder.color(this.colour);
             }
+            builder.style(this.style);
+            return builder.build();
+        }
 
-            tb.style(this.style);
-            return tb.toText();
+        @Override
+        public TextComponent.Builder apply(final Component component) {
+            final TextComponent.Builder builder = TextComponent.builder();
+            if (this.colour != null) {
+                builder.color(this.colour);
+            }
+            builder.style(this.style);
+            return builder;
         }
     }
 }

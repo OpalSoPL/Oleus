@@ -75,9 +75,9 @@ public class CommandResultImpl implements ICommandResult {
 
     public static class Literal extends CommandResultImpl {
 
-        private final Text literal;
+        private final TextComponent literal;
 
-        public Literal(final Text literal) {
+        public Literal(final TextComponent literal) {
             super(false, false);
             this.literal = literal;
         }

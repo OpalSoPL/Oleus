@@ -15,15 +15,15 @@ abstract class AbstractAFKListener implements ListenerBase {
 
     private final AFKHandler handler;
 
-    protected AbstractAFKListener(AFKHandler handler) {
+    protected AbstractAFKListener(final AFKHandler handler) {
         this.handler = handler;
     }
 
-    final void update(Player player) {
+    final void update(final Player player) {
         this.handler.stageUserActivityUpdate(player);
     }
 
-    final boolean getTriggerConfigEntry(AFKConfig config, Predicate<AFKConfig.Triggers> triggersPredicate) {
+    final boolean getTriggerConfigEntry(final AFKConfig config, final Predicate<AFKConfig.Triggers> triggersPredicate) {
         return triggersPredicate.test(config.getTriggers());
     }
 }

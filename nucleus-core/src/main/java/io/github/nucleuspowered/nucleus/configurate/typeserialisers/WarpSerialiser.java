@@ -25,7 +25,7 @@ public class WarpSerialiser implements TypeSerializer<Warp> {
     @Override
     public Warp deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
         final String desc = value.getNode("description").getString();
-        Text res = null;
+        TextComponent res = null;
         if (desc != null) {
             res = TextSerializers.JSON.deserialize(desc);
         }

@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.item.commands;
 
-import io.github.nucleuspowered.nucleus.modules.inventory.InventoryPermissions;
 import io.github.nucleuspowered.nucleus.modules.item.ItemPermissions;
 import io.github.nucleuspowered.nucleus.quickstart.annotation.RequireExistenceOf;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -15,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
@@ -43,10 +42,10 @@ import java.util.Optional;
         },
         associatedPermissions = ItemPermissions.OTHERS_UNSIGNBOOK
 )
-public class UnsignBookCommand implements ICommandExecutor<CommandSource> {
+public class UnsignBookCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier()
                     .createOnlyOtherUserPermissionElement(true, ItemPermissions.OTHERS_UNSIGNBOOK)
@@ -54,15 +53,15 @@ public class UnsignBookCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User target = context.getUserFromArgs();
-        boolean isSelf = context.is(target);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User target = context.getUserFromArgs();
+        final boolean isSelf = context.is(target);
 
         // Very basic for now, unsign book in hand.
-        Optional<ItemStack> bookToUnsign =
+        final Optional<ItemStack> bookToUnsign =
                 target.getItemInHand(HandTypes.MAIN_HAND).filter(item -> item.getType().equals(ItemTypes.WRITTEN_BOOK));
         if (bookToUnsign.isPresent()) {
-            ItemStack unsignedBook = ItemStack.builder()
+            final ItemStack unsignedBook = ItemStack.builder()
                     .itemType(ItemTypes.WRITABLE_BOOK)
                     .itemData(bookToUnsign.get().get(Keys.BOOK_PAGES).map(this::from).orElseGet(this::createData))
                     .quantity(bookToUnsign.get().getQuantity())
@@ -84,9 +83,9 @@ public class UnsignBookCommand implements ICommandExecutor<CommandSource> {
         }
     }
 
-    private PlainPagedData from(List<Text> texts) {
-        PlainPagedData ppd = createData();
-        for (Text text : texts) {
+    private PlainPagedData from(final List<Text> texts) {
+        final PlainPagedData ppd = createData();
+        for (final TextComponent text : texts) {
             ppd.addElement(TextSerializers.FORMATTING_CODE.serialize(text));
         }
 

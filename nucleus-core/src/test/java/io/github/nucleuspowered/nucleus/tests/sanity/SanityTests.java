@@ -54,8 +54,8 @@ public class SanityTests {
     public void testCommandKeysExistInMessagesFile() throws IOException {
         Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
                 .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");
-        Set<Class<? extends ICommandExecutor<?>>> sc = ci.stream().map(ClassPath.ClassInfo::load).filter(ICommandExecutor.class::isAssignableFrom)
-                .map(x -> (Class<? extends ICommandExecutor<?>>)x).collect(Collectors.toSet());
+        Set<Class<? extends ICommandExecutor>> sc = ci.stream().map(ClassPath.ClassInfo::load).filter(ICommandExecutor.class::isAssignableFrom)
+                .map(x -> (Class<? extends ICommandExecutor>)x).collect(Collectors.toSet());
 
         // Get the resource
         String bundle = "assets.nucleus.messages";
@@ -69,7 +69,7 @@ public class SanityTests {
             s.add(keys.nextElement());
         }
 
-        List<Class<? extends ICommandExecutor<?>>> keyRoots = sc.stream()
+        List<Class<? extends ICommandExecutor>> keyRoots = sc.stream()
                 .filter(x -> x.isAnnotationPresent(Command.class))
                 .filter(x -> !s.contains(x.getAnnotation(Command.class).commandDescriptionKey() + ".desc"))
                 .collect(Collectors.toList());
@@ -142,10 +142,10 @@ public class SanityTests {
     public void testThatAnyConstructorInCommandsThatIsNotTheDefaultConstructorIsInjected() throws Exception {
         Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
                 .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");
-        Set<Class<? extends ICommandExecutor<?>>> sc = ci.stream().map(ClassPath.ClassInfo::load)
+        Set<Class<? extends ICommandExecutor>> sc = ci.stream().map(ClassPath.ClassInfo::load)
                 .filter(ICommandExecutor.class::isAssignableFrom)
                 .filter(x -> !Modifier.isAbstract(x.getModifiers()))
-                .map(x -> (Class<? extends ICommandExecutor<?>>)x)
+                .map(x -> (Class<? extends ICommandExecutor>)x)
                 .filter(x -> {
                     boolean isDefault = true;
                     for (Constructor t : x.getDeclaredConstructors()) {

@@ -17,7 +17,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -50,20 +50,20 @@ import java.util.List;
         },
         associatedPermissions = ItemPermissions.OTHERS_REPAIR
 )
-public class RepairCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class RepairCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean whitelist = false;
     private List<ItemType> restrictions = new ArrayList<>();
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        RepairConfig config = serviceCollection.moduleDataProvider().getModuleConfig(ItemConfig.class).getRepairConfig();
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final RepairConfig config = serviceCollection.moduleDataProvider().getModuleConfig(ItemConfig.class).getRepairConfig();
         this.whitelist = config.isWhitelist();
         this.restrictions = config.getRestrictions();
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags()
                         .flag("m", "-mainhand")
@@ -76,27 +76,27 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        EnumMap<ResultType, Integer> resultCount = new EnumMap<ResultType, Integer>(ResultType.class) {{
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final EnumMap<ResultType, Integer> resultCount = new EnumMap<ResultType, Integer>(ResultType.class) {{
             put(ResultType.SUCCESS, 0);
             put(ResultType.ERROR, 0);
             put(ResultType.NEGATIVE_DURABILITY, 0);
             put(ResultType.NO_DURABILITY, 0);
             put(ResultType.RESTRICTED, 0);
         }};
-        EnumMap<ResultType, ItemStackSnapshot> lastItem = new EnumMap<>(ResultType.class);
+        final EnumMap<ResultType, ItemStackSnapshot> lastItem = new EnumMap<>(ResultType.class);
 
-        boolean checkRestrictions = !context.testPermission(ItemPermissions.EXEMPT_REPAIR_RESTRICTION_CHECK);
+        final boolean checkRestrictions = !context.testPermission(ItemPermissions.EXEMPT_REPAIR_RESTRICTION_CHECK);
 
-        Player pl = context.getIfPlayer();
+        final Player pl = context.getIfPlayer();
         String location = "inventory";
         if (context.hasAny("a")) {
             repairInventory(pl.getInventory(), checkRestrictions, resultCount, lastItem);
         } else {
-            boolean repairHotbar = context.hasAny("h");
-            boolean repairEquip = context.hasAny("e");
-            boolean repairOffhand = context.hasAny("o");
-            boolean repairMainhand = context.hasAny("m") || !repairHotbar && !repairEquip && !repairOffhand;
+            final boolean repairHotbar = context.hasAny("h");
+            final boolean repairEquip = context.hasAny("e");
+            final boolean repairOffhand = context.hasAny("o");
+            final boolean repairMainhand = context.hasAny("m") || !repairHotbar && !repairEquip && !repairOffhand;
 
             if (repairHotbar && !repairEquip && !repairOffhand && !repairMainhand) {
                 location = "hotbar";
@@ -110,8 +110,8 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
 
             // Repair item in main hand
             if (repairMainhand && pl.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
-                ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND).get();
-                RepairResult result = repairStack(stack, checkRestrictions);
+                final ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND).get();
+                final RepairResult result = repairStack(stack, checkRestrictions);
                 resultCount.compute(result.type, (t, i) -> i += 1);
                 lastItem.put(result.type, result.stack.createSnapshot());
                 if (result.isSuccessful()) {
@@ -121,8 +121,8 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
 
             // Repair item in off hand
             if (repairOffhand && pl.getItemInHand(HandTypes.OFF_HAND).isPresent()) {
-                ItemStack stack = pl.getItemInHand(HandTypes.OFF_HAND).get();
-                RepairResult result = repairStack(stack, checkRestrictions);
+                final ItemStack stack = pl.getItemInHand(HandTypes.OFF_HAND).get();
+                final RepairResult result = repairStack(stack, checkRestrictions);
                 resultCount.compute(result.type, (t, i) -> i += 1);
                 lastItem.put(result.type, result.stack.createSnapshot());
                 if (result.isSuccessful()) {
@@ -143,8 +143,8 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
             }
         }
 
-        String key = "command.repair.location." + location;
-        IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
+        final String key = "command.repair.location." + location;
+        final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         if (messageProviderService.hasKey(key)) {
             location = messageProviderService.getMessageString(pl, key);
         } else {
@@ -156,7 +156,7 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
             return context.errorResult("command.repair.empty", pl.getName(), location);
         } else {
             // Non-repairable Message - Only used when all items processed had no durability
-            int durabilityCount = resultCount.get(ResultType.NO_DURABILITY) + resultCount.get(ResultType.NEGATIVE_DURABILITY);
+            final int durabilityCount = resultCount.get(ResultType.NO_DURABILITY) + resultCount.get(ResultType.NEGATIVE_DURABILITY);
             if (durabilityCount > 0 && resultCount.get(ResultType.SUCCESS) == 0
                     && resultCount.get(ResultType.ERROR) == 0 && resultCount.get(ResultType.RESTRICTED) == 0) {
                 if (durabilityCount == 1) {
@@ -182,7 +182,7 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
 
             // Success Message
             if (resultCount.get(ResultType.SUCCESS) == 1) {
-                ItemStackSnapshot item = lastItem.get(ResultType.SUCCESS);
+                final ItemStackSnapshot item = lastItem.get(ResultType.SUCCESS);
                 context.sendMessage(
                         "command.repair.success.single",
                         item.get(Keys.DISPLAY_NAME).orElse(Text.of(item.getTranslation().get())).toBuilder()
@@ -200,7 +200,7 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
 
             // Error Message
             if (resultCount.get(ResultType.ERROR) == 1) {
-                ItemStackSnapshot item = lastItem.get(ResultType.ERROR);
+                final ItemStackSnapshot item = lastItem.get(ResultType.ERROR);
                 context.sendMessage(
                         "command.repair.error.single",
                         item.get(Keys.DISPLAY_NAME).orElse(Text.of(item.getTranslation().get())).toBuilder()
@@ -218,7 +218,7 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
 
             // Restriction Message
             if (resultCount.get(ResultType.RESTRICTED) == 1) {
-                ItemStackSnapshot item = lastItem.get(ResultType.RESTRICTED);
+                final ItemStackSnapshot item = lastItem.get(ResultType.RESTRICTED);
                 context.sendMessage(
                         "command.repair.restricted.single",
                         item.get(Keys.DISPLAY_NAME).orElse(Text.of(item.getTranslation().get())).toBuilder()
@@ -242,12 +242,12 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
         }
     }
 
-    private void repairInventory(Inventory inventory, boolean checkRestrictions,
-            EnumMap<ResultType, Integer> resultCount, EnumMap<ResultType, ItemStackSnapshot> lastItem) {
-        for (Inventory slot : inventory.slots()) {
+    private void repairInventory(final Inventory inventory, final boolean checkRestrictions,
+            final EnumMap<ResultType, Integer> resultCount, final EnumMap<ResultType, ItemStackSnapshot> lastItem) {
+        for (final Inventory slot : inventory.slots()) {
             if (slot.peek().isPresent() && !slot.peek().get().isEmpty()) {
-                ItemStack stack = slot.peek().get();
-                RepairResult result = repairStack(stack, checkRestrictions);
+                final ItemStack stack = slot.peek().get();
+                final RepairResult result = repairStack(stack, checkRestrictions);
                 resultCount.compute(result.type, (t, i) -> i += 1);
                 lastItem.put(result.type, result.stack.createSnapshot());
                 if (result.isSuccessful()) {
@@ -257,21 +257,21 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
         }
     }
 
-    private RepairResult repairStack(ItemStack stack, boolean checkRestrictions) {
+    private RepairResult repairStack(final ItemStack stack, final boolean checkRestrictions) {
         if (checkRestrictions && (this.whitelist && !this.restrictions.contains(stack.getType()) || this.restrictions.contains(stack.getType()))) {
             return new RepairResult(stack, ResultType.RESTRICTED);
         }
         try {
             if (stack.get(DurabilityData.class).isPresent()) {
-                DurabilityData durabilityData = stack.get(DurabilityData.class).get();
-                DataTransactionResult transactionResult = stack.offer(Keys.ITEM_DURABILITY, durabilityData.durability().getMaxValue());
+                final DurabilityData durabilityData = stack.get(DurabilityData.class).get();
+                final DataTransactionResult transactionResult = stack.offer(Keys.ITEM_DURABILITY, durabilityData.durability().getMaxValue());
                 if (transactionResult.isSuccessful()) {
                     return new RepairResult(stack, ResultType.SUCCESS);
                 } else {
                     return new RepairResult(stack, ResultType.ERROR);
                 }
             }
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             return new RepairResult(stack, ResultType.NEGATIVE_DURABILITY);
         }
         return new RepairResult(stack, ResultType.NO_DURABILITY);
@@ -286,7 +286,7 @@ public class RepairCommand implements ICommandExecutor<Player>, IReloadableServi
         private final ItemStack stack;
         private final ResultType type;
 
-        RepairResult(ItemStack stack, ResultType type) {
+        RepairResult(final ItemStack stack, final ResultType type) {
             this.stack = stack;
             this.type = type;
         }

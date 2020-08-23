@@ -23,11 +23,11 @@ public class SetHardcoreCommand extends AbstractPropertiesSetCommand {
         super("hardcore");
     }
 
-    @Override protected void setter(WorldProperties worldProperties, boolean set) {
+    @Override protected void setter(final WorldProperties worldProperties, final boolean set) {
         worldProperties.setHardcore(set);
     }
 
-    @Override protected void extraLogic(ICommandContext<? extends CommandSource> context, WorldProperties worldProperties, boolean set) {
+    @Override protected void extraLogic(final ICommandContext context, final WorldProperties worldProperties, final boolean set) {
         if (!set) {
             context.sendMessage("command.world.sethardcore.diff", worldProperties.getDifficulty().getName());
         }

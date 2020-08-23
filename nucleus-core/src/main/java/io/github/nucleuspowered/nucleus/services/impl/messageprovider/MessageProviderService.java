@@ -9,6 +9,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
@@ -20,11 +22,11 @@ import io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.translation.locale.Locales;
+import org.spongepowered.api.util.locale.LocaleSource;
+import org.spongepowered.api.util.locale.Locales;
 
 import java.nio.file.Path;
 import java.text.MessageFormat;
@@ -40,8 +42,6 @@ import java.util.UUID;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class MessageProviderService implements IMessageProviderService, IReloadableService.Reloadable {
@@ -67,7 +67,7 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     private final INucleusServiceCollection serviceCollection;
     private final IUserPreferenceService userPreferenceService;
 
-    private Locale defaultLocale = Sponge.getServer().getConsole().getLocale();
+    private Locale defaultLocale = Sponge.getServer().getLocale();
     private boolean useMessagesFile;
     private boolean useClientLocalesWhenPossible;
 
@@ -81,8 +81,8 @@ public class MessageProviderService implements IMessageProviderService, IReloada
                 @Override
                 public Locale load(@Nonnull final UUID key) {
                     final NucleusUserPreferenceService.PreferenceKey<Locale> l =
-                            userPreferenceService.keys().playerLocale().get();
-                    return userPreferenceService.get(key, l).orElse(new Locale(""));
+                            MessageProviderService.this.userPreferenceService.keys().playerLocale().get();
+                    return MessageProviderService.this.userPreferenceService.get(key, l).orElse(new Locale(""));
                 }
             });
 
@@ -143,17 +143,10 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     }
 
     @Override
-    public Locale getLocaleFor(final CommandSource commandSource) {
-        if (commandSource instanceof User) {
-            final Locale l = this.localeCache.get(((User) commandSource).getUniqueId());
-            if (l != null && !l.toString().isEmpty()) {
-                return l;
-            }
-        }
-
+    public Locale getLocaleFor(final Audience commandSource) {
         final Locale toUse;
-        if (this.useClientLocalesWhenPossible) {
-            toUse = commandSource.getLocale();
+        if (this.useClientLocalesWhenPossible && commandSource instanceof LocaleSource) {
+            toUse = ((LocaleSource) commandSource).getLocale();
         } else {
             toUse = this.defaultLocale;
         }
@@ -161,32 +154,38 @@ public class MessageProviderService implements IMessageProviderService, IReloada
         return toUse;
     }
 
-    @Override public Text getMessageFor(final Locale locale, final String key) {
+    @Override
+    public TextComponent getMessageFor(final Locale locale, final String key) {
         return this.getMessagesRepository(locale).getText(key);
     }
 
     @Override
-    public Text getMessageFor(final Locale locale, final String key, final Text... args) {
+    public TextComponent getMessageFor(final Locale locale, final String key, final TextComponent... args) {
         return this.getMessagesRepository(locale).getText(key, args);
     }
 
-    @Override public Text getMessageFor(final Locale locale, final String key, final Object... replacements) {
+    @Override
+    public TextComponent getMessageFor(final Locale locale, final String key, final Object... replacements) {
         return this.getMessagesRepository(locale).getText(key, replacements);
     }
 
-    @Override public Text getMessageFor(final Locale locale, final String key, final String... replacements) {
+    @Override
+    public TextComponent getMessageFor(final Locale locale, final String key, final String... replacements) {
         return this.getMessagesRepository(locale).getText(key, replacements);
     }
 
-    @Override public String getMessageString(final Locale locale, final String key, final String... replacements) {
+    @Override
+    public String getMessageString(final Locale locale, final String key, final String... replacements) {
         return this.getMessagesRepository(locale).getString(key, replacements);
     }
 
-    @Override public String getMessageString(final Locale locale, final String key, final Object... replacements) {
+    @Override
+    public String getMessageString(final Locale locale, final String key, final Object... replacements) {
         return this.getMessagesRepository(locale).getString(key, replacements);
     }
 
-    @Override public boolean reloadMessageFile() {
+    @Override
+    public boolean reloadMessageFile() {
         if (this.useMessagesFile) {
             this.configFileMessagesRepository.invalidateIfNecessary();
             return true;
@@ -204,7 +203,8 @@ public class MessageProviderService implements IMessageProviderService, IReloada
         this.reloadMessageFile();
     }
 
-    @Override public IMessageRepository getMessagesRepository(final Locale locale) {
+    @Override
+    public IMessageRepository getMessagesRepository(final Locale locale) {
         if (this.useMessagesFile) {
             return this.configFileMessagesRepository;
         }

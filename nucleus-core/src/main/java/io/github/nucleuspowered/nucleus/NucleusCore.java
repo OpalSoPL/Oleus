@@ -42,14 +42,18 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
+import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.economy.EconomyService;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.plugin.PluginContainer;
 import uk.co.drnaylor.quickstart.annotations.ModuleData;
 import uk.co.drnaylor.quickstart.config.AbstractConfigAdapter;
@@ -444,7 +448,7 @@ public class NucleusCore {
         this.logger.info(messageProvider.getMessageString("startup.postinit", NucleusPluginInfo.NAME));
 
         // Actual command registration happens here
-        this.serviceCollection.commandMetadataService().completeRegistrationPhase(this.serviceCollection);
+        this.serviceCollection.commandMetadataService().completeRegistrationPhase(this.serviceCollection, );
         this.serviceCollection.permissionService().registerDescriptions();
 
         if (this.docgenOnly) {
@@ -509,7 +513,12 @@ public class NucleusCore {
     }
 
     @Listener
-    public void onGameStarting(final GameStartingServerEvent event) {
+    public void onRegisterCommands(final RegisterCommandEvent<Command.Parameterized> event) {
+        this.serviceCollection.commandMetadataService().completeRegistrationPhase(this.serviceCollection, event);
+    }
+
+    @Listener
+    public void onGameStarting(final StartingEngineEvent<Server> event) {
         if (this.docgenOnly) {
             return;
         }
@@ -535,7 +544,7 @@ public class NucleusCore {
     }
 
     @Listener(order = Order.PRE)
-    public void onGameStarted(final GameStartedServerEvent event) {
+    public void onGameStarted(final StartedEngineEvent<Server> event) {
         if (this.shutdownAtLoadEnd) {
             Sponge.getServer().shutdown();
             return;
@@ -616,17 +625,6 @@ public class NucleusCore {
             this.saveData();
             this.serviceCollection.commandMetadataService().deactivate();
         }
-    }
-
-    // Need this as soon as possible.
-    @Listener
-    @SuppressWarnings("unchecked")
-    public void onProviderRegistration(final ChangeServiceProviderEvent event) {
-        final ProviderRegistration<?> providerRegistration = event.getNewProviderRegistration();
-        if (providerRegistration.getService() == PermissionService.class) {
-            this.serviceCollection.permissionService().checkServiceChange((ProviderRegistration<PermissionService>) providerRegistration);
-        }
-
     }
 
     private void saveData() {
@@ -753,7 +751,7 @@ public class NucleusCore {
     }
 
     private void addX(final List<Text> messages, final int spacing) {
-        final Text space = Text.of(String.join("", Collections.nCopies(spacing, " ")));
+        final TextComponent space = Text.of(String.join("", Collections.nCopies(spacing, " ")));
         messages.add(Text.of(space, TextColors.RED, "\\              /"));
         messages.add(Text.of(space, TextColors.RED, " \\            /"));
         messages.add(Text.of(space, TextColors.RED, "  \\          /"));

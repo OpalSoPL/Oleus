@@ -23,7 +23,7 @@ public abstract class AbstractHomeEvent extends AbstractCancelMessageEvent imple
     private boolean isCancelled = false;
     private final Location<World> location;
 
-    AbstractHomeEvent(String name, User owner, Cause cause, @Nullable Location<World> location) {
+    AbstractHomeEvent(final String name, final User owner, final Cause cause, @Nullable final Location<World> location) {
         super(cause);
         this.name = name;
         this.owner = owner;
@@ -46,7 +46,7 @@ public abstract class AbstractHomeEvent extends AbstractCancelMessageEvent imple
         return this.isCancelled;
     }
 
-    @Override public void setCancelled(boolean cancel) {
+    @Override public void setCancelled(final boolean cancel) {
         this.isCancelled = cancel;
     }
 }

@@ -13,29 +13,29 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
 @Command(aliases = "globalmute", basePermission = MutePermissions.BASE_GLOBALMUTE, commandDescriptionKey = "globalmute", async = true)
-public class GlobalMuteCommand implements ICommandExecutor<CommandSource> {
+public class GlobalMuteCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        MuteHandler muteHandler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
-        boolean turnOn = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!muteHandler.isGlobalMuteEnabled());
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final MuteHandler muteHandler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
+        final boolean turnOn = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!muteHandler.isGlobalMuteEnabled());
 
         muteHandler.setGlobalMuteEnabled(turnOn);
-        String onOff = context.getMessageString(turnOn ? "standard.enabled" : "standard.disabled");
+        final String onOff = context.getMessageString(turnOn ? "standard.enabled" : "standard.disabled");
         context.sendMessage("command.globalmute.status", onOff);
-        String key = "command.globalmute.broadcast." + (turnOn ? "enabled" : "disabled");
-        for (Player player : Sponge.getServer().getOnlinePlayers()) {
+        final String key = "command.globalmute.broadcast." + (turnOn ? "enabled" : "disabled");
+        for (final Player player : Sponge.getServer().getOnlinePlayers()) {
             context.sendMessageTo(player, key);
         }
         context.sendMessageTo(Sponge.getServer().getConsole(), key);

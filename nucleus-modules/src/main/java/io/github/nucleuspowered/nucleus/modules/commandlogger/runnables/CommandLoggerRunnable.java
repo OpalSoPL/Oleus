@@ -15,7 +15,7 @@ import org.spongepowered.api.scheduler.Task;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloadable {
 
@@ -23,7 +23,7 @@ public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloa
     private CommandLoggerConfig config;
 
     @Inject
-    public CommandLoggerRunnable(INucleusServiceCollection serviceCollection) {
+    public CommandLoggerRunnable(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(CommandLoggerHandler.class);
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
     }
@@ -39,7 +39,7 @@ public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloa
     }
 
     @Override
-    public void accept(Task task) {
+    public void accept(final Task task) {
         if (Sponge.getGame().getState() == GameState.SERVER_STOPPED) {
             return;
         }
@@ -50,7 +50,7 @@ public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloa
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
     }
 }

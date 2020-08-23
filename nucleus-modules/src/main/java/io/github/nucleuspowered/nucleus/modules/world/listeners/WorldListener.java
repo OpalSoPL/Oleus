@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class WorldListener implements ListenerBase.Conditional {
 
@@ -34,16 +34,16 @@ public class WorldListener implements ListenerBase.Conditional {
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
-    public WorldListener(INucleusServiceCollection serviceCollection) {
+    public WorldListener(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
     @Listener
-    public void onPlayerTeleport(MoveEntityEvent.Teleport event, @Getter("getTargetEntity") Player player) {
-        World target = event.getToTransform().getExtent();
+    public void onPlayerTeleport(final MoveEntityEvent.Teleport event, @Getter("getTargetEntity") final Player player) {
+        final World target = event.getToTransform().getExtent();
         if (player.getWorld().equals(target)) return;
 
-        IPermissionService permissionService = this.serviceCollection.permissionService();
+        final IPermissionService permissionService = this.serviceCollection.permissionService();
         if (!permissionService.isConsoleOverride(event.getCause().first(CommandSource.class).orElse(player)) &&
                 !this.serviceCollection.permissionService().hasPermission(player, WorldPermissions.getWorldAccessPermission(target.getName()))) {
             event.setCancelled(true);
@@ -62,13 +62,13 @@ public class WorldListener implements ListenerBase.Conditional {
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return this.serviceCollection.moduleDataProvider().getModuleConfig(WorldConfig.class).isSeparatePermissions();
     }
 
-    private Consumer<Task> relocate(Player player) {
+    private Consumer<Task> relocate(final Player player) {
         return task -> {
-            Optional<Location<World>> location = Sponge.getTeleportHelper().getSafeLocationWithBlacklist(player.getLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL);
+            final Optional<Location<World>> location = Sponge.getTeleportHelper().getSafeLocationWithBlacklist(player.getLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL);
             if (location.isPresent()) {
                 player.setLocation(location.get());
             } else {

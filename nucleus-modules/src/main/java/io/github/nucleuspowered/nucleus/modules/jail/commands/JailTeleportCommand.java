@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -24,21 +24,21 @@ import org.spongepowered.api.world.World;
         commandDescriptionKey = "jails.tp",
         parentCommand = JailsCommand.class
 )
-public class JailTeleportCommand implements ICommandExecutor<Player> {
+public class JailTeleportCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 JailParameters.JAIL.get(serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        NamedLocation location = context.requireOne(JailParameters.JAIL_KEY, NamedLocation.class);
-        Transform<World> location1 = location.getTransform().orElseThrow(() -> context.createException("command.jails.tp.noworld",
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final NamedLocation location = context.requireOne(JailParameters.JAIL_KEY, NamedLocation.class);
+        final Transform<World> location1 = location.getTransform().orElseThrow(() -> context.createException("command.jails.tp.noworld",
                 location.getName()));
 
-        Player player = context.getIfPlayer();
+        final Player player = context.getIfPlayer();
         player.setTransform(location1);
         context.sendMessage("command.jails.tp.success", location.getName());
         return context.successResult();

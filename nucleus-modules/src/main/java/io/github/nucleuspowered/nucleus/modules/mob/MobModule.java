@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = MobModule.ID, name = "Mob")
 public class MobModule extends ConfigurableModule<MobConfig, MobConfigAdapter> {
@@ -21,7 +21,7 @@ public class MobModule extends ConfigurableModule<MobConfig, MobConfigAdapter> {
     public final static String ID = "mob";
 
     @Inject
-    public MobModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public MobModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

@@ -45,8 +45,8 @@ import javax.annotation.Nullable;
 
 public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
-    @Nullable private final Text prefix;
-    @Nullable private final Text suffix;
+    @Nullable private final TextComponent prefix;
+    @Nullable private final TextComponent suffix;
     private final String representation;
     private final TextTemplate textTemplate;
     private final Map<String, Function<CommandSource, Text>> tokenMap = Maps.newHashMap();
@@ -60,8 +60,8 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
                     Pattern.CASE_INSENSITIVE);
 
     public NucleusTextTemplateImpl(final String representation,
-            @Nullable final Text prefix,
-            @Nullable final Text suffix,
+            @Nullable final TextComponent prefix,
+            @Nullable final TextComponent suffix,
             final INucleusServiceCollection serviceCollection
     ) {
         this.serviceCollection = serviceCollection;
@@ -105,12 +105,12 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
     }
 
     @Override
-    public Text getForCommandSource(final CommandSource source) {
+    public TextComponent getForCommandSource(final CommandSource source) {
         return this.getForCommandSource(source, ImmutableMap.of());
     }
 
     @Override
-    public Text getForSource(final CommandSource source, final CommandSource sender) {
+    public TextComponent getForSource(final CommandSource source, final CommandSource sender) {
         final Optional<Text> s =
                 Optional.of(this.serviceCollection.placeholderService().parse(sender, "displayname").toText());
         return this.getForCommandSource(source,
@@ -120,7 +120,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
     }
 
     @Override @SuppressWarnings("SameParameterValue")
-    public Text getForCommandSource(final CommandSource source,
+    public TextComponent getForCommandSource(final CommandSource source,
             @Nullable final Map<String, Function<CommandSource, Optional<Text>>> tokensArray) {
 
         final Map<String, TextTemplate.Arg> tokens = this.textTemplate.getArguments();
@@ -150,7 +150,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             st = this.serviceCollection.textStyleService().getLastColourAndStyle(this.prefix, null);
         }
 
-        final Text finalText = this.textTemplate.apply(finalArgs).build();
+        final TextComponent finalTextComponent = this.textTemplate.apply(finalArgs).build();
 
         // Don't append text if there is no text to append!
         if (!finalText.isEmpty()) {
@@ -168,7 +168,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
         return builder.build();
     }
 
-    public Text toText() {
+    public TextComponent toText() {
         return this.textTemplate.toText();
     }
 
@@ -262,7 +262,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
         return new Tuples.NullableTuple<>(texts, args);
     }
 
-    private Text getCmd(final String msg, final String cmd, @org.checkerframework.checker.nullness.qual.Nullable final String optionList, final String whiteSpace) {
+    private TextComponent getCmd(final String msg, final String cmd, @org.checkerframework.checker.nullness.qual.Nullable final String optionList, final String whiteSpace) {
         final Text.Builder textBuilder = Text.builder(msg)
                 .onClick(TextActions.runCommand(cmd))
                 .onHover(this.setupHoverOnCmd(cmd, optionList));
@@ -270,7 +270,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             textBuilder.onClick(TextActions.suggestCommand(cmd));
         }
 
-        Text toAdd = textBuilder.build();
+        TextComponent toAdd = textBuilder.build();
         if (!whiteSpace.isEmpty()) {
             toAdd = Text.join(Text.of(whiteSpace), toAdd);
         }
@@ -293,7 +293,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
         return TextActions.showText(this.serviceCollection.messageProvider().getMessage("chat.command.click", cmd));
     }
 
-    private Text getTextForUrl(
+    private TextComponent getTextForUrl(
             final String url, final String msg, final String whiteSpace, final ITextStyleService.TextFormat st, @Nullable final String optionString) {
         final String toParse = TextSerializers.FORMATTING_CODE.stripCodes(url);
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
@@ -321,7 +321,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             this.serviceCollection.logger().warn(messageProviderService.getMessageString("chat.url.malformed", url));
             e.printStackTrace();
             
-            final Text ret = Text.builder(url).color(st.colour()).style(st.style()).build();
+            final TextComponent ret = Text.builder(url).color(st.colour()).style(st.style()).build();
             if (!whiteSpace.isEmpty()) {
                 return Text.builder(whiteSpace).append(ret).build();
             }
@@ -343,7 +343,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             super(representation, serviceCollection);
         }
 
-        Ampersand(final String representation, @Nullable final Text prefix, @Nullable final Text suffix, final INucleusServiceCollection serviceCollection) {
+        Ampersand(final String representation, @Nullable final TextComponent prefix, @Nullable final TextComponent suffix, final INucleusServiceCollection serviceCollection) {
             super(representation, prefix, suffix, serviceCollection);
         }
 
@@ -435,7 +435,7 @@ public abstract class NucleusTextTemplateImpl implements NucleusTextTemplate {
             return textTemplateTypeSerializer;
         }
 
-        Json(final String representation, @Nullable final Text prefix, @Nullable final Text suffix, final INucleusServiceCollection serviceCollection) {
+        Json(final String representation, @Nullable final TextComponent prefix, @Nullable final TextComponent suffix, final INucleusServiceCollection serviceCollection) {
             super(representation, prefix, suffix, serviceCollection);
         }
 

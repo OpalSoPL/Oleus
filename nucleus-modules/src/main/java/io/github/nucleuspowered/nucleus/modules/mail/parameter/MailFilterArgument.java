@@ -35,24 +35,24 @@ public class MailFilterArgument extends CommandElement {
     private static final Pattern early = Pattern.compile("a:(\\d+)");
     private final MailHandler handler;
 
-    public MailFilterArgument(@Nullable Text key, MailHandler handler) {
+    public MailFilterArgument(@Nullable final TextComponent key, final MailHandler handler) {
         super(key);
         this.handler = handler;
     }
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         // Get all the arguments in list.
-        List<UUID> players = Lists.newArrayList();
+        final List<UUID> players = Lists.newArrayList();
         boolean console = false;
         Instant ea = null;
         Instant l = null;
-        List<String> message = Lists.newArrayList();
+        final List<String> message = Lists.newArrayList();
         while (args.hasNext()) {
-            String toParse = args.next();
+            final String toParse = args.next();
             try {
-                String s = toParse.substring(0, 2);
+                final String s = toParse.substring(0, 2);
 
                 switch (s) {
                     case "p:":
@@ -65,7 +65,7 @@ public class MailFilterArgument extends CommandElement {
                         console = true;
                         break;
                     case "b:":
-                        Matcher b = late.matcher(toParse);
+                        final Matcher b = late.matcher(toParse);
                         if (b.find()) {
                             // Days before
                             l = Instant.now().minus(Integer.parseInt(b.group(1)), ChronoUnit.DAYS);
@@ -73,19 +73,19 @@ public class MailFilterArgument extends CommandElement {
 
                         break;
                     case "a:":
-                        Matcher a = early.matcher(toParse);
+                        final Matcher a = early.matcher(toParse);
                         if (a.find()) {
                             ea = Instant.now().minus(Integer.parseInt(a.group(1)), ChronoUnit.DAYS);
                         }
 
                         break;
                 }
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // ignored
             }
         }
 
-        List<NucleusMailService.MailFilter> lmf = Lists.newArrayList();
+        final List<NucleusMailService.MailFilter> lmf = Lists.newArrayList();
         if (console || !players.isEmpty()) {
             lmf.add(this.handler.createSenderFilter(console, players));
         }
@@ -102,17 +102,17 @@ public class MailFilterArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return Lists.newArrayList();
     }
 
-    private Optional<UUID> player(String text) {
+    private Optional<UUID> player(final String text) {
         if (text.equalsIgnoreCase("server") || (text.equalsIgnoreCase("console"))) {
             return Optional.of(Util.CONSOLE_FAKE_UUID);
         }
 
-        UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-        Optional<User> ou = uss.get(text);
+        final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        final Optional<User> ou = uss.get(text);
         return ou.map(Identifiable::getUniqueId);
     }
 

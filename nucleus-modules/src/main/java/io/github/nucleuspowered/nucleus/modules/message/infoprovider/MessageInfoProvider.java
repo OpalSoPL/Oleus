@@ -25,15 +25,15 @@ public class MessageInfoProvider implements NucleusProvider {
         return "message";
     }
 
-    @Override public Optional<Text> get(User user, CommandSource source,
-            INucleusServiceCollection serviceCollection) {
+    @Override public Optional<Text> get(final User user, final CommandSource source,
+            final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, MessagePermissions.BASE_SOCIALSPY)) {
-            MessageHandler handler = serviceCollection.getServiceUnchecked(MessageHandler.class);
-            boolean socialSpy = handler.isSocialSpy(user);
-            boolean msgToggle = serviceCollection.userPreferenceService()
+            final MessageHandler handler = serviceCollection.getServiceUnchecked(MessageHandler.class);
+            final boolean socialSpy = handler.isSocialSpy(user);
+            final boolean msgToggle = serviceCollection.userPreferenceService()
                     .getUnwrapped(user.getUniqueId(), NucleusKeysProvider.RECEIVING_MESSAGES);
-            IMessageProviderService mp = serviceCollection.messageProvider();
-            List<Text> lt = Lists.newArrayList(
+            final IMessageProviderService mp = serviceCollection.messageProvider();
+            final List<Text> lt = Lists.newArrayList(
                     mp.getMessageFor(source, "seen.socialspy",
                             mp.getMessageFor(source, "standard.yesno." + Boolean.toString(socialSpy).toLowerCase())));
 

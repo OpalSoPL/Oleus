@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
@@ -34,26 +34,26 @@ import java.util.List;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_LORE_SET)
         }
 )
-public class LoreDeleteCommand implements ICommandExecutor<Player> {
+public class LoreDeleteCommand implements ICommandExecutor {
 
     private final String loreLine = "line";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 new PositiveIntegerArgument(Text.of(this.loreLine), false, serviceCollection)
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
-        int line = context.requireOne(this.loreLine, Integer.class) - 1;
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
+        final int line = context.requireOne(this.loreLine, Integer.class) - 1;
 
-        ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).orElseThrow(() -> context.createException("command.lore.clear.noitem"));
-        LoreData loreData = stack.getOrCreate(LoreData.class).get();
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).orElseThrow(() -> context.createException("command.lore.clear.noitem"));
+        final LoreData loreData = stack.getOrCreate(LoreData.class).get();
 
-        List<Text> loreList = loreData.lore().get();
+        final List<Text> loreList = loreData.lore().get();
         if (loreList.size() < line) {
             return context.errorResult("command.lore.set.invalidLine");
         }

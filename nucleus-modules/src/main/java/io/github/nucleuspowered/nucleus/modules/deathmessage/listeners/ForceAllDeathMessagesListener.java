@@ -18,14 +18,14 @@ import org.spongepowered.api.text.channel.MessageChannel;
 public class ForceAllDeathMessagesListener implements ListenerBase.Conditional {
 
     @Listener(order = Order.LATE)
-    public void onDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Living living) {
+    public void onDeath(final DestructEntityEvent.Death event, @Getter("getTargetEntity") final Living living) {
         if (living instanceof Player) {
             event.setChannel(MessageChannel.TO_ALL);
         }
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
-        DeathMessageConfig deathMessageConfig = serviceCollection.moduleDataProvider().getModuleConfig(DeathMessageConfig.class);
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
+        final DeathMessageConfig deathMessageConfig = serviceCollection.moduleDataProvider().getModuleConfig(DeathMessageConfig.class);
         return deathMessageConfig.isEnableDeathMessages() && deathMessageConfig.isForceForAll();
     }
 

@@ -12,9 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.command.CommandSource;
 @Command(aliases = "afkrefresh", commandDescriptionKey = "afkrefresh", basePermission = AFKPermissions.BASE_AFKREFRESH)
-public class AFKRefresh implements ICommandExecutor<CommandSource> {
+public class AFKRefresh implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) {
+    @Override public ICommandResult execute(final ICommandContext context) {
         context.getServiceCollection().getServiceUnchecked(AFKHandler.class).invalidateAfkCache();
         context.sendMessage("command.afkrefresh.complete");
         return context.successResult();

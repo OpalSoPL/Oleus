@@ -18,12 +18,12 @@ public class ConnectionMessagesForceListener implements ListenerBase.Conditional
 
     @Listener(order = Order.FIRST)
     @Include({ClientConnectionEvent.Disconnect.class, ClientConnectionEvent.Join.class})
-    public void onPlayerLogin(MessageChannelEvent joinEvent) {
+    public void onPlayerLogin(final MessageChannelEvent joinEvent) {
         joinEvent.setChannel(MessageChannel.TO_ALL);
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(ConnectionMessagesConfig.class).isForceForAll();
     }
 }

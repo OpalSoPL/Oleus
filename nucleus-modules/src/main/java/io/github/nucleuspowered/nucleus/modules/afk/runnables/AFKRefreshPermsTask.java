@@ -11,14 +11,14 @@ import org.spongepowered.api.scheduler.Task;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class AFKRefreshPermsTask implements TaskBase {
 
     private final AFKHandler handler;
 
     @Inject
-    public AFKRefreshPermsTask(INucleusServiceCollection serviceCollection) {
+    public AFKRefreshPermsTask(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(AFKHandler.class);
     }
 
@@ -30,7 +30,7 @@ public class AFKRefreshPermsTask implements TaskBase {
         return Duration.of(2, ChronoUnit.MINUTES);
     }
 
-    @Override public void accept(Task task) {
+    @Override public void accept(final Task task) {
         this.handler.invalidateAfkCache();
     }
 }

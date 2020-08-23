@@ -12,12 +12,12 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class AFKChatListener extends AbstractAFKListener implements ListenerBase.Conditional {
 
     @Inject
-    public AFKChatListener(INucleusServiceCollection serviceCollection) {
+    public AFKChatListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection.getServiceUnchecked(AFKHandler.class));
     }
 
@@ -27,7 +27,7 @@ public class AFKChatListener extends AbstractAFKListener implements ListenerBase
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
                 .getTriggers()
                 .isOnChat();

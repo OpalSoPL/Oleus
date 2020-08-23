@@ -57,7 +57,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @APIService(NucleusJailService.class)
 public class JailHandler implements NucleusJailService, ContextCalculator<Subject>, ServiceBase {
@@ -73,7 +73,7 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
     private final PluginContainer pluginContainer;
 
     @Inject
-    public JailHandler(INucleusServiceCollection serviceCollection) {
+    public JailHandler(final INucleusServiceCollection serviceCollection) {
         this.storageManager = serviceCollection.storageManager();
         this.teleportService = serviceCollection.teleportService();
         this.messageProviderService = serviceCollection.messageProvider();
@@ -90,9 +90,9 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
 
     public void updateCache() {
         this.jailLocations = new HashMap<>();
-        IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
+        final IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
 
-        Map<String, NamedLocation> jails = dataObject.get(JailKeys.JAILS).orElseGet(HashMap::new);
+        final Map<String, NamedLocation> jails = dataObject.get(JailKeys.JAILS).orElseGet(HashMap::new);
         jails.forEach((k, v) -> this.jailLocations.put(k.toLowerCase(), v));
     }
 
@@ -101,24 +101,24 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
             return; // not loaded
         }
 
-        IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
+        final IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
         dataObject.set(JailKeys.JAILS, new HashMap<>(this.jailLocations));
         this.storageManager.getGeneralService().save(dataObject);
     }
 
     @Override
-    public Optional<NamedLocation> getJail(String warpName) {
+    public Optional<NamedLocation> getJail(final String warpName) {
         return Optional.ofNullable(getJailLocations().get(warpName.toLowerCase()));
     }
 
     @Override
-    public boolean removeJail(String warpName) {
+    public boolean removeJail(final String warpName) {
         return getJailLocations().remove(warpName.toLowerCase()) != null;
     }
 
     @Override
-    public boolean setJail(String warpName, Location<World> location, Vector3d rotation) {
-        Map<String, NamedLocation> locationMap = getJailLocations();
+    public boolean setJail(final String warpName, final Location<World> location, final Vector3d rotation) {
+        final Map<String, NamedLocation> locationMap = getJailLocations();
         if (locationMap.containsKey(warpName.toLowerCase())) {
             return false;
         }
@@ -138,23 +138,23 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
         return ImmutableMap.copyOf(getJailLocations());
     }
 
-    public boolean isPlayerJailedCached(User user) {
+    public boolean isPlayerJailedCached(final User user) {
         return this.jailDataCache.containsKey(user.getUniqueId());
     }
 
     @Override
-    public boolean isPlayerJailed(User user) {
+    public boolean isPlayerJailed(final User user) {
         return getPlayerJailDataInternal(user).isPresent();
     }
 
     @Override
-    public Optional<Jailing> getPlayerJailData(User user) {
+    public Optional<Jailing> getPlayerJailData(final User user) {
         return getPlayerJailDataInternal(user).map(x -> x);
     }
 
-    public Optional<JailData> getPlayerJailDataInternal(User user) {
+    public Optional<JailData> getPlayerJailDataInternal(final User user) {
         try {
-            Optional<JailData> data = this.storageManager.getUserOnThread(user.getUniqueId())
+            final Optional<JailData> data = this.storageManager.getUserOnThread(user.getUniqueId())
                     .flatMap(y -> y.get(JailKeys.JAIL_DATA));
             if (data.isPresent()) {
                 this.jailDataCache.put(user.getUniqueId(), new Context(NucleusJailService.JAIL_CONTEXT, data.get().getJailName()));
@@ -163,42 +163,42 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
             }
 
             return data;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             return Optional.empty();
         }
     }
 
-    public boolean shouldJailOnNextLogin(User user) {
+    public boolean shouldJailOnNextLogin(final User user) {
         return this.storageManager.getOrCreateUserOnThread(user.getUniqueId()).get(JailKeys.JAIL_ON_NEXT_LOGIN).orElse(false);
     }
 
-    public void setJailOnNextLogin(User user, boolean r) {
-        IUserDataObject u = this.storageManager.getOrCreateUserOnThread(user.getUniqueId());
+    public void setJailOnNextLogin(final User user, final boolean r) {
+        final IUserDataObject u = this.storageManager.getOrCreateUserOnThread(user.getUniqueId());
         u.set(JailKeys.JAIL_ON_NEXT_LOGIN, r);
         this.storageManager.saveUser(user.getUniqueId(), u);
     }
 
     @Override
-    public boolean jailPlayer(User victim, String jail, CommandSource jailer, String reason) throws NoSuchLocationException {
+    public boolean jailPlayer(final User victim, final String jail, final CommandSource jailer, final String reason) throws NoSuchLocationException {
         Preconditions.checkNotNull(victim);
         Preconditions.checkNotNull(jail);
         Preconditions.checkNotNull(jailer);
         Preconditions.checkNotNull(reason);
-        NamedLocation location = getJail(jail).orElseThrow(NoSuchLocationException::new);
+        final NamedLocation location = getJail(jail).orElseThrow(NoSuchLocationException::new);
         return jailPlayer(victim,
                 new JailData(Util.getUUID(jailer), location.getName(), reason, victim.getPlayer().map(Locatable::getLocation).orElse(null)));
     }
 
-    public boolean jailPlayer(User user, JailData data) {
-        IUserDataObject udo = this.storageManager.getOrCreateUserOnThread(user.getUniqueId());
+    public boolean jailPlayer(final User user, final JailData data) {
+        final IUserDataObject udo = this.storageManager.getOrCreateUserOnThread(user.getUniqueId());
         if (udo.get(JailKeys.JAIL_DATA).isPresent()) {
             return false;
         }
 
         // Get the jail.
-        Optional<NamedLocation> owl = getJail(data.getJailName());
-        NamedLocation wl = owl.filter(x -> x.getTransform().isPresent()).orElseGet(() -> {
+        final Optional<NamedLocation> owl = getJail(data.getJailName());
+        final NamedLocation wl = owl.filter(x -> x.getTransform().isPresent()).orElseGet(() -> {
             if (!getJails().isEmpty()) {
                 return null;
             }
@@ -213,9 +213,9 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
         udo.set(JailKeys.JAIL_DATA, data);
         if (user.isOnline()) {
             Sponge.getScheduler().createSyncExecutor(this.pluginContainer).execute(() -> {
-                try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+                try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                     frame.addContext(EventContexts.IS_JAILING_ACTION, true);
-                    Player player = user.getPlayer().get();
+                    final Player player = user.getPlayer().get();
                             this.teleportService.teleportPlayerSmart(
                                     player,
                                     owl.get().getTransform().get(), // The transform exists.
@@ -246,29 +246,29 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
         return true;
     }
 
-    public void updateJailData(User user, JailData data) {
-        IUserDataObject udo = this.storageManager.getOrCreateUserOnThread(user.getUniqueId());
+    public void updateJailData(final User user, final JailData data) {
+        final IUserDataObject udo = this.storageManager.getOrCreateUserOnThread(user.getUniqueId());
         udo.set(JailKeys.JAIL_DATA, data);
         this.storageManager.saveUser(user.getUniqueId(), udo);
     }
 
     // Test
     @Override
-    public boolean unjailPlayer(User user) {
+    public boolean unjailPlayer(final User user) {
         return unjailPlayer(user, Sponge.getCauseStackManager().getCurrentCause());
     }
 
-    public boolean unjailPlayer(User user, Cause cause) {
-        IUserDataObject udo = this.storageManager.getOrCreateUser(user.getUniqueId()).join();
-        Optional<JailData> ojd = udo.get(JailKeys.JAIL_DATA);
+    public boolean unjailPlayer(final User user, final Cause cause) {
+        final IUserDataObject udo = this.storageManager.getOrCreateUser(user.getUniqueId()).join();
+        final Optional<JailData> ojd = udo.get(JailKeys.JAIL_DATA);
         if (!ojd.isPresent()) {
             return false;
         }
 
-        Optional<Location<World>> ow = ojd.get().getPreviousLocation();
+        final Optional<Location<World>> ow = ojd.get().getPreviousLocation();
         this.jailDataCache.put(user.getUniqueId(), null);
         if (user.isOnline()) {
-            Player player = user.getPlayer().get();
+            final Player player = user.getPlayer().get();
             Sponge.getScheduler().createSyncExecutor(this.pluginContainer).execute(() -> {
                 this.teleportService.setLocation(player, ow.orElseGet(() -> player.getWorld().getSpawnLocation()));
                 this.messageProviderService.sendMessageTo(player, "jail.elapsed");
@@ -279,10 +279,10 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
             });
         } else {
             if (ow.isPresent()) {
-                Location<World> l = ow.get();
+                final Location<World> l = ow.get();
                 user.setLocation(l.getPosition(), l.getExtent().getUniqueId());
             } else {
-                WorldProperties w = Sponge.getServer().getDefaultWorld().get();
+                final WorldProperties w = Sponge.getServer().getDefaultWorld().get();
                 user.setLocation(
                         w.getSpawnPosition().toDouble(), w.getUniqueId()
                 );
@@ -297,14 +297,14 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
         return true;
     }
 
-    public Optional<NamedLocation> getWarpLocation(User user) {
+    public Optional<NamedLocation> getWarpLocation(final User user) {
         if (!isPlayerJailed(user)) {
             return Optional.empty();
         }
 
         Optional<NamedLocation> owl = getJail(getPlayerJailDataInternal(user).get().getJailName());
         if (!owl.isPresent()) {
-            Collection<NamedLocation> wl = getJails().values();
+            final Collection<NamedLocation> wl = getJails().values();
             if (wl.isEmpty()) {
                 return Optional.empty();
             }
@@ -315,14 +315,14 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
         return owl;
     }
 
-    @Override public void accumulateContexts(Subject calculable, Set<Context> accumulator) {
+    @Override public void accumulateContexts(final Subject calculable, final Set<Context> accumulator) {
         if (calculable instanceof User) {
-            UUID c = ((User) calculable).getUniqueId();
+            final UUID c = ((User) calculable).getUniqueId();
             if (!this.jailDataCache.containsKey(c)) {
                 getPlayerJailDataInternal((User) calculable);
             }
 
-            Context co = this.jailDataCache.get(c);
+            final Context co = this.jailDataCache.get(c);
             if (co != null) {
                 accumulator.add(co);
                 accumulator.add(jailContext);
@@ -330,15 +330,15 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
         }
     }
 
-    @Override public boolean matches(Context context, Subject subject) {
+    @Override public boolean matches(final Context context, final Subject subject) {
         if (context.getKey().equals(NucleusJailService.JAIL_CONTEXT)) {
             if (subject instanceof User) {
-                UUID u = ((User) subject).getUniqueId();
+                final UUID u = ((User) subject).getUniqueId();
                 return context.equals(this.jailDataCache.get(u));
             }
         } else if (context.getKey().equals(NucleusJailService.JAILED_CONTEXT)) {
             if (subject instanceof User) {
-                UUID u = ((User) subject).getUniqueId();
+                final UUID u = ((User) subject).getUniqueId();
                 return this.jailDataCache.get(u) != null;
             }
         }
@@ -346,11 +346,11 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
         return false;
     }
 
-    public boolean checkJail(final User player, boolean sendMessage) {
+    public boolean checkJail(final User player, final boolean sendMessage) {
         // if the jail doesn't exist, treat it as expired.
         if (!getPlayerJailDataInternal(player).map(EndTimestamp::expired).orElse(true)) {
             if (sendMessage) {
-                IUserDataObject udo = this.storageManager.getOrCreateUserOnThread(player.getUniqueId());
+                final IUserDataObject udo = this.storageManager.getOrCreateUserOnThread(player.getUniqueId());
                 udo.set(FlyKeys.FLY_TOGGLE, false);
                 player.offer(Keys.CAN_FLY, false);
                 player.offer(Keys.IS_FLYING, false);
@@ -364,11 +364,11 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
         return false;
     }
 
-    private void onJail(Player user) {
+    private void onJail(final Player user) {
         getPlayerJailDataInternal(user).ifPresent(x -> onJail(x, user));
     }
 
-    public void onJail(JailData md, Player user) {
+    public void onJail(final JailData md, final Player user) {
         if (md.getEndTimestamp().isPresent()) {
             this.messageProviderService.sendMessageTo(
                     user, "jail.playernotify.time",

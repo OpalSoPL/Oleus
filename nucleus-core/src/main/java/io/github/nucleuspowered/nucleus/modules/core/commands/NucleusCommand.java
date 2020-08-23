@@ -29,13 +29,13 @@ import javax.annotation.Nullable;
         commandDescriptionKey = "nucleus",
         prefixAliasesWithN = false
 )
-public class NucleusCommand implements ICommandExecutor<CommandSource> {
+public class NucleusCommand implements ICommandExecutor {
 
-    private final Text version = Text.of(TextColors.GREEN, NAME + " version " + VERSION + " (built from commit " + GIT_HASH + ")");
-    @Nullable private Text modules = null;
+    private final TextComponent version = Text.of(TextColors.GREEN, NAME + " version " + VERSION + " (built from commit " + GIT_HASH + ")");
+    @Nullable private TextComponent modules = null;
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         if (this.modules == null) {
             Text.Builder tb = Text.builder("Modules: ").color(TextColors.GREEN);
 
@@ -54,8 +54,8 @@ public class NucleusCommand implements ICommandExecutor<CommandSource> {
             this.modules = tb.append(Text.of(TextColors.GREEN, ".")).build();
         }
 
-        context.getCommandSource().sendMessage(this.version);
-        context.getCommandSource().sendMessage(this.modules);
+        context.getCommandSourceRoot().sendMessage(this.version);
+        context.getCommandSourceRoot().sendMessage(this.modules);
         return context.successResult();
     }
 }

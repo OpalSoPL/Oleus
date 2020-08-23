@@ -18,18 +18,18 @@ public class KernelHelper {
 
     private final Random random = new Random();
 
-    public int getRandomBetween(int min, int max) {
+    public int getRandomBetween(final int min, final int max) {
         return random.nextInt(max - min) + min;
     }
 
-    public int randomSign(int in) {
+    public int randomSign(final int in) {
         return random.nextInt(2) == 0 ? -in : in;
     }
 
-    public Vector3d getLocationWithOffset(Vector3i centre, NucleusRTPService.RTPOptions options) {
-        int x = this.randomSign(this.getRandomBetween(options.minRadius(), options.maxRadius())) + centre.getX();
-        int y = this.getRandomBetween(options.minHeight(), options.maxHeight());
-        int z = this.randomSign(this.getRandomBetween(options.minRadius(), options.maxRadius())) + centre.getZ();
+    public Vector3d getLocationWithOffset(final Vector3i centre, final NucleusRTPService.RTPOptions options) {
+        final int x = this.randomSign(this.getRandomBetween(options.minRadius(), options.maxRadius())) + centre.getX();
+        final int y = this.getRandomBetween(options.minHeight(), options.maxHeight());
+        final int z = this.randomSign(this.getRandomBetween(options.minRadius(), options.maxRadius())) + centre.getZ();
         return new Vector3d(x, y, z);
     }
 

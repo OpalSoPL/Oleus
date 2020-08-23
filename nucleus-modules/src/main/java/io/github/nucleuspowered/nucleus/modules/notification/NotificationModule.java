@@ -15,7 +15,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = ID, name = "Notification")
 public class NotificationModule extends ConfigurableModule<NotificationConfig, NotificationConfigAdapter> {
@@ -23,7 +23,7 @@ public class NotificationModule extends ConfigurableModule<NotificationConfig, N
     public static final String ID = "notification";
 
     @Inject
-    public NotificationModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public NotificationModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

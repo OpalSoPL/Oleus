@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = StaffChatModule.ID, name = "Staff Chat")
 public class StaffChatModule extends ConfigurableModule<StaffChatConfig, StaffChatConfigAdapter> {
@@ -21,7 +21,7 @@ public class StaffChatModule extends ConfigurableModule<StaffChatConfig, StaffCh
     public static final String ID = "staff-chat";
 
     @Inject
-    public StaffChatModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public StaffChatModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 
@@ -30,7 +30,7 @@ public class StaffChatModule extends ConfigurableModule<StaffChatConfig, StaffCh
         return new StaffChatConfigAdapter();
     }
 
-    @Override public void performPreTasks(INucleusServiceCollection serviceCollection) throws Exception {
+    @Override public void performPreTasks(final INucleusServiceCollection serviceCollection) throws Exception {
         super.performPreTasks(serviceCollection);
 
         // Registers itself.

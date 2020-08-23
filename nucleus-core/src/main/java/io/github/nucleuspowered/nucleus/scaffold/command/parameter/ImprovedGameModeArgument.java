@@ -45,7 +45,7 @@ public class ImprovedGameModeArgument extends CommandElement {
 
     private final IMessageProviderService messageProviderService;
 
-    public ImprovedGameModeArgument(@Nullable final Text key, final INucleusServiceCollection serviceCollection) {
+    public ImprovedGameModeArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProviderService = serviceCollection.messageProvider();
     }
@@ -74,7 +74,7 @@ public class ImprovedGameModeArgument extends CommandElement {
     }
 
     @Override
-    public Text getUsage(final CommandSource src) {
+    public TextComponent getUsage(final CommandSource src) {
         return Text.of("game mode");
     }
 }

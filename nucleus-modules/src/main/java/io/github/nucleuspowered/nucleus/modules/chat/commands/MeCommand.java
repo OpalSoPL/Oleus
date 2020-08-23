@@ -22,7 +22,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatte
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.event.CauseStackManager;
@@ -38,7 +38,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.Collection;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @Command(
         aliases = {"me", "action"},
@@ -51,35 +51,35 @@ import javax.inject.Inject;
         }
 )
 @EssentialsEquivalent({"me", "action", "describe"})
-public class MeCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class MeCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final IChatMessageFormatterService chatMessageFormatterService;
     private ChatConfig config = new ChatConfig();
 
     @Inject
-    public MeCommand(INucleusServiceCollection serviceCollection) {
+    public MeCommand(final INucleusServiceCollection serviceCollection) {
         this.chatMessageFormatterService = serviceCollection.chatMessageFormatter();
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.MESSAGE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        ITextStyleService textStyleService = context.getServiceCollection().textStyleService();
-        String message = textStyleService.stripPermissionless(
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ITextStyleService textStyleService = context.getServiceCollection().textStyleService();
+        final String message = textStyleService.stripPermissionless(
                 ChatPermissions.CHAT_COLOR,
                 ChatPermissions.CHAT_STYLE,
-                context.getCommandSource(),
+                context.getCommandSourceRoot(),
                 context.requireOne(NucleusParameters.Keys.MESSAGE, String.class));
 
-        Text header = this.config.getMePrefix().getForCommandSource(context.getCommandSource());
-        ITextStyleService.TextFormat t = textStyleService.getLastColourAndStyle(header, null);
-        Text originalMessage = TextSerializers.FORMATTING_CODE.deserialize(message);
-        MessageEvent.MessageFormatter formatter = new MessageEvent.MessageFormatter(
+        final TextComponent header = this.config.getMePrefix().getForCommandSource(context.getCommandSourceRoot());
+        final ITextStyleService.TextFormat t = textStyleService.getLastColourAndStyle(header, null);
+        final TextComponent originalMessage = TextSerializers.FORMATTING_CODE.deserialize(message);
+        final MessageEvent.MessageFormatter formatter = new MessageEvent.MessageFormatter(
                 Text.builder().color(t.colour()).style(t.style())
                         .append(TextSerializers.FORMATTING_CODE.deserialize(message)).toText()
         );
@@ -89,16 +89,16 @@ public class MeCommand implements ICommandExecutor<CommandSource>, IReloadableSe
 
         // We create an event so that other plugins can provide transforms, such as Boop, and that we
         // can catch it in ignore and mutes, and so can other plugins.
-        CommandSource src = context.getCommandSource();
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame();
-                NoExceptionAutoClosable c =
+        final CommandSource src = context.getCommandSourceRoot();
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame();
+                final NoExceptionAutoClosable c =
                         this.chatMessageFormatterService.setPlayerNucleusChannelTemporarily(Util.CONSOLE_FAKE_UUID, new MeChannel(header))) {
             frame.addContext(EventContexts.SHOULD_FORMAT_CHANNEL, false);
             if (frame.getCurrentCause().root() != src) {
                 frame.pushCause(src);
             }
 
-            MessageChannelEvent.Chat event =
+            final MessageChannelEvent.Chat event =
                     SpongeEventFactory.createMessageChannelEventChat(
                             frame.getCurrentCause(),
                             src.getMessageChannel(),
@@ -116,15 +116,15 @@ public class MeCommand implements ICommandExecutor<CommandSource>, IReloadableSe
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class);
     }
 
     public static class MeChannel implements IChatMessageFormatterService.Channel {
 
-        private final Text header;
+        private final TextComponent header;
 
-        private MeChannel(Text header) {
+        private MeChannel(final TextComponent header) {
             this.header = header;
         }
 
@@ -134,7 +134,7 @@ public class MeCommand implements ICommandExecutor<CommandSource>, IReloadableSe
         }
 
         @Override
-        public void formatMessageEvent(CommandSource source, MessageEvent.MessageFormatter formatters) {
+        public void formatMessageEvent(final CommandSource source, final MessageEvent.MessageFormatter formatters) {
             formatters.setHeader(Text.of(formatters.getHeader(), this.header));
         }
 

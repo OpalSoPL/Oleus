@@ -20,7 +20,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -56,19 +56,19 @@ import java.util.function.Consumer;
         }
 )
 @EssentialsEquivalent({"tpa", "call", "tpask"})
-public class TeleportAskCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class TeleportAskCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean isCooldownOnAsk = false;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags().permissionFlag(TeleportPermissions.TELEPORT_ASK_FORCE, "f").buildWith(NucleusParameters.ONE_PLAYER.get(serviceCollection))
         };
     }
 
-    @Override public Optional<ICommandResult> preExecute(ICommandContext.Mutable<? extends Player> context) throws CommandException {
-        boolean canTeleport = context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
+    @Override public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
+        final boolean canTeleport = context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
                 .canTeleportTo(
                         context.getIfPlayer(),
                         context.requireOne(NucleusParameters.Keys.PLAYER, Player.class)
@@ -81,13 +81,13 @@ public class TeleportAskCommand implements ICommandExecutor<Player>, IReloadable
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player target = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player target = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
         if (context.is(target)) {
             return context.errorResult("command.teleport.self");
         }
 
-        RequestEvent.CauseToPlayer event = new RequestEvent.CauseToPlayer(context.getCause(), target);
+        final RequestEvent.CauseToPlayer event = new RequestEvent.CauseToPlayer(context.getCause(), target);
         if (Sponge.getEventManager().post(event)) {
             if (event.getCancelMessage().isPresent()) {
                 return context.errorResultLiteral(event.getCancelMessage().get());
@@ -120,7 +120,7 @@ public class TeleportAskCommand implements ICommandExecutor<Player>, IReloadable
         return context.successResult();
     }
 
-    private void setCooldown(ICommandContext<? extends Player> context) {
+    private void setCooldown(final ICommandContext context) {
         try {
             context.getServiceCollection()
                     .cooldownService()
@@ -129,13 +129,13 @@ public class TeleportAskCommand implements ICommandExecutor<Player>, IReloadable
                             context.getIfPlayer(),
                             Duration.ofSeconds(context.getCooldown())
                     );
-        } catch (CommandException e) {
+        } catch (final CommandException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.isCooldownOnAsk = serviceCollection.moduleDataProvider()
                 .getModuleConfig(TeleportConfig.class)
                 .isCooldownOnAsk();

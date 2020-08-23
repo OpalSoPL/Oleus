@@ -25,7 +25,7 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @APIService(NucleusSeenService.class)
 public class SeenHandler implements NucleusSeenService, ServiceBase {
@@ -34,20 +34,20 @@ public class SeenHandler implements NucleusSeenService, ServiceBase {
     private final Map<String, List<SeenInformationProvider>> pluginInformationProviders = Maps.newTreeMap();
 
     @Inject
-    public SeenHandler(INucleusServiceCollection serviceCollection) {
+    public SeenHandler(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
     @Override
-    public void register(@Nonnull PluginContainer plugin, @Nonnull SeenInformationProvider seenInformationProvider) throws IllegalArgumentException {
+    public void register(@Nonnull final PluginContainer plugin, @Nonnull final SeenInformationProvider seenInformationProvider) throws IllegalArgumentException {
         Preconditions.checkNotNull(plugin);
         Preconditions.checkNotNull(seenInformationProvider);
 
-        Plugin pl = plugin.getClass().getAnnotation(Plugin.class);
+        final Plugin pl = plugin.getClass().getAnnotation(Plugin.class);
         Preconditions.checkArgument(pl != null, this.serviceCollection.messageProvider().getMessage("seen.error.requireplugin"));
 
-        String name = pl.name();
-        List<SeenInformationProvider> providers;
+        final String name = pl.name();
+        final List<SeenInformationProvider> providers;
         if (this.pluginInformationProviders.containsKey(name)) {
             providers = this.pluginInformationProviders.get(name);
         } else {
@@ -59,30 +59,30 @@ public class SeenHandler implements NucleusSeenService, ServiceBase {
     }
 
     @Override
-    public void register(PluginContainer plugin, Predicate<CommandSource> permissionCheck, BiFunction<CommandSource, User, Collection<Text>> informationGetter)
+    public void register(final PluginContainer plugin, final Predicate<CommandSource> permissionCheck, final BiFunction<CommandSource, User, Collection<Text>> informationGetter)
         throws IllegalArgumentException {
         register(plugin, new SeenInformationProvider() {
-            @Override public boolean hasPermission(@Nonnull CommandSource source, @Nonnull User user) {
+            @Override public boolean hasPermission(@Nonnull final CommandSource source, @Nonnull final User user) {
                 return permissionCheck.test(source);
             }
 
-            @Override public Collection<Text> getInformation(@Nonnull CommandSource source, @Nonnull User user) {
+            @Override public Collection<Text> getInformation(@Nonnull final CommandSource source, @Nonnull final User user) {
                 return informationGetter.apply(source, user);
             }
         });
     }
 
     public List<Text> getText(final CommandSource requester, final User user) {
-        List<Text> information = Lists.newArrayList();
+        final List<Text> information = Lists.newArrayList();
 
-        Collection<IPlayerInformationService.Provider> providers = this.serviceCollection.playerInformationService().getProviders();
-        for (IPlayerInformationService.Provider provider : providers) {
+        final Collection<IPlayerInformationService.Provider> providers = this.serviceCollection.playerInformationService().getProviders();
+        for (final IPlayerInformationService.Provider provider : providers) {
             provider.get(user, requester, this.serviceCollection).ifPresent(information::add);
         }
 
-        for (Map.Entry<String, List<SeenInformationProvider>> entry : this.pluginInformationProviders.entrySet()) {
+        for (final Map.Entry<String, List<SeenInformationProvider>> entry : this.pluginInformationProviders.entrySet()) {
             entry.getValue().stream().filter(sip -> sip.hasPermission(requester, user)).forEach(sip -> {
-                Collection<Text> input = sip.getInformation(requester, user);
+                final Collection<Text> input = sip.getInformation(requester, user);
                 if (input != null && !input.isEmpty()) {
                     if (information.isEmpty()) {
                         information.add(Text.EMPTY);

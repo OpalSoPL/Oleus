@@ -12,21 +12,21 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.entity.living.player.Player;
 @Command(aliases = {"afk", "away"}, basePermission = AFKPermissions.BASE_AFK, commandDescriptionKey = "afk")
 @EssentialsEquivalent({"afk", "away"})
-public class AFKCommand implements ICommandExecutor<Player> {
+public class AFKCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        IPermissionService permissionService = context.getServiceCollection().permissionService();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final IPermissionService permissionService = context.getServiceCollection().permissionService();
         if (!permissionService.isOpOnly() && context.testPermission(AFKPermissions.AFK_EXEMPT_TOGGLE)) {
             return context.errorResult("command.afk.exempt");
         }
 
-        Player src = context.getIfPlayer();
-        AFKHandler afkHandler = context.getServiceCollection().getServiceUnchecked(AFKHandler.class);
-        boolean isAFK = afkHandler.isAFK(src);
+        final Player src = context.getIfPlayer();
+        final AFKHandler afkHandler = context.getServiceCollection().getServiceUnchecked(AFKHandler.class);
+        final boolean isAFK = afkHandler.isAFK(src);
 
         if (isAFK) {
             afkHandler.stageUserActivityUpdate(src);

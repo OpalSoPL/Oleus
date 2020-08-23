@@ -46,7 +46,7 @@ public class NucleusRequirePermissionArgument extends WrappedElement {
             if (this.isOptional) {
                 return;
             }
-            final Text key = this.getKey();
+            final TextComponent key = this.getKey();
             throw args.createError(t("You do not have permission to use the %s argument", key != null ? key : t("unknown")));
         }
         this.getWrappedElement().parse(source, args, context);

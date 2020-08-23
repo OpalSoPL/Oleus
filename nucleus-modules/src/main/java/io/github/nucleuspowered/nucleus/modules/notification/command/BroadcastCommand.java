@@ -17,31 +17,31 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateMessageSender;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.TypeTokens;
 @Command(aliases = {"broadcast", "bcast", "bc"}, basePermission = NotificationPermissions.BASE_BROADCAST, commandDescriptionKey = "broadcast")
 @EssentialsEquivalent({"broadcast", "bcast"})
-public class BroadcastCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class BroadcastCommand implements ICommandExecutor, IReloadableService.Reloadable {
     private BroadcastConfig bc = new BroadcastConfig();
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.MESSAGE
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        String m = context.requireOne(NucleusParameters.Keys.MESSAGE, TypeTokens.STRING_TOKEN);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String m = context.requireOne(NucleusParameters.Keys.MESSAGE, TypeTokens.STRING_TOKEN);
 
-        Text p = this.bc.getPrefix().getForCommandSource(context.getCommandSource());
-        Text s = this.bc.getSuffix().getForCommandSource(context.getCommandSource());
+        final TextComponent p = this.bc.getPrefix().getForCommandSource(context.getCommandSourceRoot());
+        final TextComponent s = this.bc.getSuffix().getForCommandSource(context.getCommandSourceRoot());
 
-        NucleusTextTemplate textTemplate =
+        final NucleusTextTemplate textTemplate =
                 context.getServiceCollection().textTemplateFactory()
                         .createFromAmpersandString(m, p, s);
 
@@ -49,12 +49,12 @@ public class BroadcastCommand implements ICommandExecutor<CommandSource>, IReloa
                 context.getServiceCollection().textTemplateFactory(),
                 textTemplate,
                 context.getServiceCollection().placeholderService(),
-                context.getCommandSource()
+                context.getCommandSourceRoot()
         ).send(context.getCause());
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.bc = serviceCollection
                 .moduleDataProvider()
                 .getModuleConfig(NotificationConfig.class)

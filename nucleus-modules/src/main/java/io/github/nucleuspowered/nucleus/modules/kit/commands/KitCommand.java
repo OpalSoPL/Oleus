@@ -21,7 +21,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -46,24 +46,24 @@ import java.time.Duration;
         }
 )
 @EssentialsEquivalent(value = "kit, kits", isExact = false, notes = "'/kit' redeems, '/kits' lists.")
-public class KitCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class KitCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean isDrop;
     private boolean mustGetAll;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(true)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
 
-        KitService kitService = context.getServiceCollection().getServiceUnchecked(KitService.class);
-        Player player = context.getCommandSourceAsPlayerUnchecked();
-        IEconomyServiceProvider econHelper = context.getServiceCollection().economyServiceProvider();
+        final KitService kitService = context.getServiceCollection().getServiceUnchecked(KitService.class);
+        final Player player = context.getCommandSourceAsPlayerUnchecked();
+        final IEconomyServiceProvider econHelper = context.getServiceCollection().economyServiceProvider();
         double cost = econHelper.serviceExists() ? kit.getCost() : 0;
         if (context.testPermission(KitPermissions.KIT_EXEMPT_COST)) {
             // If exempt - no cost.
@@ -75,7 +75,7 @@ public class KitCommand implements ICommandExecutor<Player>, IReloadableService.
             return context.errorResult("command.kit.notenough", kit.getName(), econHelper.getCurrencySymbol(cost));
         }
 
-        KitRedeemResult redeemResult = kitService.redeemKit(kit, player, true, this.mustGetAll);
+        final KitRedeemResult redeemResult = kitService.redeemKit(kit, player, true, this.mustGetAll);
         if (redeemResult.isSuccess()) {
             if (!redeemResult.rejectedItems().isEmpty()) {
                 // If we drop them, tell the user
@@ -121,8 +121,8 @@ public class KitCommand implements ICommandExecutor<Player>, IReloadableService.
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        KitConfig kca = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final KitConfig kca = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
         this.isDrop = kca.isDropKitIfFull();
         this.mustGetAll = kca.isMustGetAll();
     }

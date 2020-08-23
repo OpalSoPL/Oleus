@@ -206,17 +206,17 @@ public abstract class StandardModule implements Module {
     @SuppressWarnings("unchecked")
     public final void loadCommands() {
 
-        final Set<Class<? extends ICommandExecutor<?>>> cmds;
+        final Set<Class<? extends ICommandExecutor>> cmds;
         if (this.objectTypesToClassListMap != null) {
             cmds = this.getClassesFromList(Constants.COMMAND);
         } else {
             cmds = this.performFilter(this.getStreamForModule(ICommandExecutor.class)
-                    .map(x -> (Class<? extends ICommandExecutor<?>>) x))
+                    .map(x -> (Class<? extends ICommandExecutor>) x))
                     .collect(Collectors.toSet());
         }
 
         final ICommandMetadataService metadataService = this.serviceCollection.commandMetadataService();
-        for (final Class<? extends ICommandExecutor<?>> command : cmds) {
+        for (final Class<? extends ICommandExecutor> command : cmds) {
             final Command rc = command.getAnnotation(Command.class);
             if (rc != null) {
                 // then we should add it.
@@ -224,7 +224,7 @@ public abstract class StandardModule implements Module {
                     this.moduleId,
                     this.moduleName,
                     rc,
-                    command
+                    command,
                 );
             }
         }
@@ -236,7 +236,7 @@ public abstract class StandardModule implements Module {
         this.serviceCollection.commandMetadataService().addMapping(this.remapCommand());
     }
 
-    private Stream<Class<? extends ICommandExecutor<?>>> performFilter(final Stream<Class<? extends ICommandExecutor<?>>> stream) {
+    private Stream<Class<? extends ICommandExecutor>> performFilter(final Stream<Class<? extends ICommandExecutor>> stream) {
         return stream.filter(x -> x.isAnnotationPresent(Command.class));
     }
 

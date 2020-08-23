@@ -23,7 +23,7 @@ public class CreateNoteEvent implements NucleusNoteEvent.Created {
     private final Cause cause;
     private final Instant instant;
 
-    public CreateNoteEvent(@Nullable UUID author, String note, Instant date, User targetUser, Cause cause) {
+    public CreateNoteEvent(@Nullable final UUID author, final String note, final Instant date, final User targetUser, final Cause cause) {
         this.author = author;
         this.note = note;
         this.instant = date;

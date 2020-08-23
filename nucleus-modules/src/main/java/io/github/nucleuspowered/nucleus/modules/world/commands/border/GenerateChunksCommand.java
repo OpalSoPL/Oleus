@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.parameter.BoundedIntege
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.TimespanArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -30,14 +30,14 @@ import org.spongepowered.api.world.storage.WorldProperties;
         parentCommand = BorderCommand.class,
         associatedPermissions = WorldPermissions.WORLD_BORDER_GEN_NOTIFY
 )
-public class GenerateChunksCommand implements ICommandExecutor<CommandSource> {
+public class GenerateChunksCommand implements ICommandExecutor {
 
     private static final String ticksKey = "tickPercent";
     private static final String tickFrequency = "tickFrequency";
     private static final String saveTimeKey = "time between saves";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags()
                     .flag("a")
@@ -49,16 +49,16 @@ public class GenerateChunksCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
 
-        WorldHelper worldHelper = context.getServiceCollection().getServiceUnchecked(WorldHelper.class);
+        final WorldHelper worldHelper = context.getServiceCollection().getServiceUnchecked(WorldHelper.class);
         if (worldHelper.isPregenRunningForWorld(wp.getUniqueId())) {
             return context.errorResult("command.world.gen.alreadyrunning", wp.getWorldName());
         }
 
-        World w = Sponge.getServer().getWorld(wp.getUniqueId())
+        final World w = Sponge.getServer().getWorld(wp.getUniqueId())
                 .orElseThrow(() -> context.createException("command.world.gen.notloaded", wp.getWorldName()));
         worldHelper.startPregenningForWorld(w,
                 context.hasAny("a"),

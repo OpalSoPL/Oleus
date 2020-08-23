@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = WorldModule.ID, name = "World")
 public class WorldModule extends ConfigurableModule<WorldConfig, WorldConfigAdapter> {
@@ -21,8 +21,8 @@ public class WorldModule extends ConfigurableModule<WorldConfig, WorldConfigAdap
     public static final String ID = "world";
 
     @Inject
-    public WorldModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public WorldModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

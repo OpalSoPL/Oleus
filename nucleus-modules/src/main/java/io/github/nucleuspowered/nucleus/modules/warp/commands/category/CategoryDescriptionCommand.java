@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -24,18 +24,18 @@ import org.spongepowered.api.text.serializer.TextSerializers;
         commandDescriptionKey = "warp.category.setdescription",
         parentCommand = CategoryCommand.class
 )
-public class CategoryDescriptionCommand implements ICommandExecutor<CommandSource> {
+public class CategoryDescriptionCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpCategoryElement(),
                 NucleusParameters.DESCRIPTION
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WarpCategory category = context.requireOne(WarpService.WARP_CATEGORY_KEY, WarpCategory.class);
-        String d = context.requireOne(NucleusParameters.Keys.DESCRIPTION, String.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WarpCategory category = context.requireOne(WarpService.WARP_CATEGORY_KEY, WarpCategory.class);
+        final String d = context.requireOne(NucleusParameters.Keys.DESCRIPTION, String.class);
         context.getServiceCollection().getServiceUnchecked(WarpService.class)
                 .setWarpCategoryDescription(category.getId(), TextSerializers.FORMATTING_CODE.deserialize(d));
         context.sendMessage("command.warp.category.description.set", category.getId(), d);

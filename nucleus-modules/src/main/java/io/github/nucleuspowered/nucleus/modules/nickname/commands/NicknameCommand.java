@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -40,25 +40,25 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 )
 @EssentialsEquivalent(value = {"nick", "nickname"}, isExact = false,
         notes = "To remove a nickname, use '/delnick'")
-public class NicknameCommand implements ICommandExecutor<CommandSource> {
+public class NicknameCommand implements ICommandExecutor {
 
     private final String nickName = "nickname";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier()
                     .createOtherUserPermissionElement(false, NicknamePermissions.OTHERS_NICK),
                 GenericArguments.onlyOne(GenericArguments.string(Text.of(this.nickName)))};
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User pl = context.getUserFromArgs();
-        Text name = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(this.nickName, String.class));
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User pl = context.getUserFromArgs();
+        final TextComponent name = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(this.nickName, String.class));
 
         try {
-            context.getServiceCollection().getServiceUnchecked(NicknameService.class).setNick(pl, context.getCommandSource(), name, false);
-        } catch (NicknameException e) {
+            context.getServiceCollection().getServiceUnchecked(NicknameService.class).setNick(pl, context.getCommandSourceRoot(), name, false);
+        } catch (final NicknameException e) {
             return context.errorResultLiteral(e.getTextMessage());
         }
 

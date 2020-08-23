@@ -8,7 +8,7 @@ import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.modules.spawn.SpawnKeys;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -26,9 +26,9 @@ public final class SpawnHelper {
 
     private SpawnHelper() {}
 
-    public static Transform<World> getSpawn(@Nonnull WorldProperties wp, @Nullable Player player, ICommandContext<? extends CommandSource> context) throws CommandException {
-        UUID worldUUID = Objects.requireNonNull(wp, "WorldProperties").getUniqueId();
-        Optional<World> ow = Sponge.getServer().getWorld(worldUUID);
+    public static Transform<World> getSpawn(@Nonnull final WorldProperties wp, @Nullable final Player player, final ICommandContext context) throws CommandException {
+        final UUID worldUUID = Objects.requireNonNull(wp, "WorldProperties").getUniqueId();
+        final Optional<World> ow = Sponge.getServer().getWorld(worldUUID);
 
         if (!ow.isPresent()) {
             throw context.createException("command.spawn.noworld");

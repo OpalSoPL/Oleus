@@ -24,7 +24,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class RespawnConditionalListener implements ListenerBase.Conditional {
 
@@ -32,22 +32,22 @@ public class RespawnConditionalListener implements ListenerBase.Conditional {
     private final IMessageProviderService messageProviderService;
 
     @Inject
-    public RespawnConditionalListener(INucleusServiceCollection serviceCollection) {
+    public RespawnConditionalListener(final INucleusServiceCollection serviceCollection) {
         this.homeService = serviceCollection.getServiceUnchecked(HomeService.class);
         this.messageProviderService = serviceCollection.messageProvider();
     }
 
     @Listener
     public void onRespawn(final RespawnPlayerEvent event, @Getter("getTargetEntity") final Player player) {
-        Optional<Home> oh = this.homeService.getHome(player.getUniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
+        final Optional<Home> oh = this.homeService.getHome(player.getUniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
 
-        Optional<Transform<World>> ot = oh.flatMap(Home::getTransform);
+        final Optional<Transform<World>> ot = oh.flatMap(Home::getTransform);
 
         if (ot.isPresent()) {
-            try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 frame.pushCause(event.getTargetEntity());
                 frame.addContext(EventContexts.SPAWN_EVENT_TYPE, SendToSpawnEvent.Type.HOME_ON_DEATH);
-                SendToSpawnEvent sEvent = new SendToSpawnEvent(ot.get(), event.getTargetEntity(), frame.getCurrentCause());
+                final SendToSpawnEvent sEvent = new SendToSpawnEvent(ot.get(), event.getTargetEntity(), frame.getCurrentCause());
                 if (Sponge.getEventManager().post(sEvent)) {
                     this.messageProviderService.sendMessageTo(event.getTargetEntity(), "command.home.fail", oh.get().getName());
                     return;
@@ -60,7 +60,7 @@ public class RespawnConditionalListener implements ListenerBase.Conditional {
 
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class).isRespawnAtHome();
     }
 

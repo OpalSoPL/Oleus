@@ -17,7 +17,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -31,22 +31,22 @@ import java.util.Map;
         commandDescriptionKey = "kit.resetusage",
         parentCommand = KitCommand.class
 )
-public class KitResetUsageCommand implements ICommandExecutor<CommandSource> {
+public class KitResetUsageCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection),
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        User u = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        IStorageManager storageManager = context.getServiceCollection().storageManager();
-        IUserDataObject userDataObject = storageManager.getUserService().getOrNewOnThread(u.getUniqueId());
-        Map<String, Instant> data = userDataObject.getNullable(KitKeys.REDEEMED_KITS);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+        final User u = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final IStorageManager storageManager = context.getServiceCollection().storageManager();
+        final IUserDataObject userDataObject = storageManager.getUserService().getOrNewOnThread(u.getUniqueId());
+        final Map<String, Instant> data = userDataObject.getNullable(KitKeys.REDEEMED_KITS);
         if (data != null && data.containsKey(kitInfo.getName().toLowerCase())) {
             // Remove the key.
             data.remove(kitInfo.getName().toLowerCase());

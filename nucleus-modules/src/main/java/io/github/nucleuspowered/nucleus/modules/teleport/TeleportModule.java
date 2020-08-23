@@ -15,7 +15,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = TeleportModule.ID, name = "Teleport", dependencies = CoreModule.ID)
 public class TeleportModule extends ConfigurableModule<TeleportConfig, TeleportConfigAdapter> {
@@ -23,7 +23,7 @@ public class TeleportModule extends ConfigurableModule<TeleportConfig, TeleportC
     public static final String ID = "teleport";
 
     @Inject
-    public TeleportModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public TeleportModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

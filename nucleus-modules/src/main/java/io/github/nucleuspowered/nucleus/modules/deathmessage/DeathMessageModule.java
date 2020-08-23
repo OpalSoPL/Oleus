@@ -15,7 +15,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = ID, name = "Death Messages")
 public class DeathMessageModule extends ConfigurableModule<DeathMessageConfig, DeathMessageConfigAdapter> {
@@ -23,7 +23,7 @@ public class DeathMessageModule extends ConfigurableModule<DeathMessageConfig, D
     public static final String ID = "death-message";
 
     @Inject
-    public DeathMessageModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public DeathMessageModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

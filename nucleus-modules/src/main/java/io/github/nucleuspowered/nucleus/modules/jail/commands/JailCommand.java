@@ -22,7 +22,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -35,7 +35,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @Command(
         aliases = {"jail"},
@@ -51,18 +51,18 @@ import javax.inject.Inject;
         associatedPermissionLevelKeys = JailPermissions.JAIL_LEVEL_KEY
 )
 @EssentialsEquivalent(value = {"togglejail", "tjail", "jail"}, isExact = false, notes = "This command is not a toggle.")
-public class JailCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class JailCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
     private final JailHandler handler;
 
     @Inject
-    public JailCommand(INucleusServiceCollection serviceCollection) {
+    public JailCommand(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection),
                 JailParameters.OPTIONAL_JAIL.get(serviceCollection),
@@ -71,9 +71,9 @@ public class JailCommand implements ICommandExecutor<CommandSource>, IReloadable
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the subject.
-        User pl = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final User pl = context.requireOne(NucleusParameters.Keys.USER, User.class);
         if (!pl.isOnline() && !context.testPermission(JailPermissions.JAIL_OFFLINE)) {
             return context.errorResult("command.jail.offline.noperms");
         }
@@ -98,21 +98,21 @@ public class JailCommand implements ICommandExecutor<CommandSource>, IReloadable
         return onJail(context, pl);
     }
 
-    private ICommandResult onJail(ICommandContext<? extends CommandSource> context, User user) throws CommandException {
-        Optional<LocationData> owl = context.getOne(JailParameters.JAIL_KEY, LocationData.class);
+    private ICommandResult onJail(final ICommandContext context, final User user) throws CommandException {
+        final Optional<LocationData> owl = context.getOne(JailParameters.JAIL_KEY, LocationData.class);
         if (!owl.isPresent()) {
             return context.errorResult("command.jail.jail.nojail");
         }
 
         // This might not be there.
-        Optional<Long> duration = context.getOne(NucleusParameters.Keys.DURATION, Long.class);
-        String reason = context.getOne(NucleusParameters.Keys.REASON, String.class)
+        final Optional<Long> duration = context.getOne(NucleusParameters.Keys.DURATION, Long.class);
+        final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class)
                 .orElseGet(() -> context.getMessageString("command.jail.reason"));
-        JailData jd;
-        Text message;
-        Text messageTo;
+        final JailData jd;
+        final TextComponent message;
+        final TextComponent messageTo;
 
-        CommandSource src = context.getCommandSource();
+        final CommandSource src = context.getCommandSourceRoot();
         if (duration.isPresent()) {
             if (user.isOnline()) {
                 jd = new JailData(Util.getUUID(src), owl.get().getName(), reason, user.getPlayer().get().getLocation(),
@@ -121,7 +121,7 @@ public class JailCommand implements ICommandExecutor<CommandSource>, IReloadable
                 jd = new JailData(Util.getUUID(src), owl.get().getName(), reason, null, Duration.of(duration.get(), ChronoUnit.SECONDS));
             }
 
-            IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
+            final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
             message = context.getMessage("command.checkjail.jailedfor", user.getName(), jd.getJailName(),
                     src.getName(), messageProviderService.getTimeString(src.getLocale(), duration.get()));
             messageTo = context.getMessage("command.jail.jailedfor", owl.get().getName(), src.getName(),
@@ -133,7 +133,7 @@ public class JailCommand implements ICommandExecutor<CommandSource>, IReloadable
         }
 
         if (this.handler.jailPlayer(user, jd)) {
-            MutableMessageChannel mc = new PermissionMessageChannel(context.getServiceCollection().permissionService(),
+            final MutableMessageChannel mc = new PermissionMessageChannel(context.getServiceCollection().permissionService(),
                     JailPermissions.JAIL_NOTIFY).asMutable();
             mc.addMember(src);
             mc.send(message);
@@ -151,8 +151,8 @@ public class JailCommand implements ICommandExecutor<CommandSource>, IReloadable
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        boolean requireUnjailPermission = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).isRequireUnjailPermission();
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final boolean requireUnjailPermission = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).isRequireUnjailPermission();
         this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).getCommonPermissionLevelConfig();
     }
 }

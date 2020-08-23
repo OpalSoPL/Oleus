@@ -16,7 +16,7 @@ public class UseWarpEvent extends AbstractWarpEvent implements NucleusWarpEvent.
     private final User user;
     private final Warp warp;
 
-    public UseWarpEvent(Cause cause, User user, Warp warp) {
+    public UseWarpEvent(final Cause cause, final User user, final Warp warp) {
         super(cause, warp.getName());
         this.user = user;
         this.warp = warp;

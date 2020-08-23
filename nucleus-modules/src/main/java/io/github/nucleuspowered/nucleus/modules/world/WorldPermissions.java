@@ -119,7 +119,7 @@ public class WorldPermissions {
     @PermissionMetadata(descriptionKey = "permission.worlds.access", level = SuggestedLevel.ADMIN, isPrefix = true)
     public static final String WORLDS_ACCESS_PERMISSION_PREFIX = "nucleus.worlds";
 
-    public static String getWorldAccessPermission(String world) {
+    public static String getWorldAccessPermission(final String world) {
         return WORLDS_ACCESS_PERMISSION_PREFIX + "." + world.toLowerCase();
     }
 

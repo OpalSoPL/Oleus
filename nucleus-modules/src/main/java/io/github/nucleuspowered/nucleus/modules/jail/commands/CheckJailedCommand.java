@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserCacheService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
@@ -30,40 +30,40 @@ import java.util.stream.Collectors;
         async = true,
         commandDescriptionKey = "checkjailed"
 )
-public class CheckJailedCommand implements ICommandExecutor<CommandSource> {
+public class CheckJailedCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 JailParameters.OPTIONAL_JAIL.get(serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Using the cache, tell us who is jailed.
-        Optional<NamedLocation> jail = context.getOne(JailParameters.JAIL_KEY, NamedLocation.class);
+        final Optional<NamedLocation> jail = context.getOne(JailParameters.JAIL_KEY, NamedLocation.class);
 
         //
-        IUserCacheService userCacheService = context.getServiceCollection().userCacheService();
-        List<UUID> usersInJail = jail.map(x -> userCacheService.getJailedIn(x.getName()))
+        final IUserCacheService userCacheService = context.getServiceCollection().userCacheService();
+        final List<UUID> usersInJail = jail.map(x -> userCacheService.getJailedIn(x.getName()))
                 .orElseGet(userCacheService::getJailed);
         //
 
-        String jailName = jail.map(NamedLocation::getName).orElseGet(() -> context.getMessageString("standard.alljails"));
+        final String jailName = jail.map(NamedLocation::getName).orElseGet(() -> context.getMessageString("standard.alljails"));
 
         if (usersInJail.isEmpty()) {
             context.sendMessage("command.checkjailed.none", jailName);
             return context.successResult();
         }
 
-        CommandSource src = context.getCommandSource();
+        final CommandSource src = context.getCommandSourceRoot();
         // Get the users in this jail, or all jails
         Util.getPaginationBuilder(src)
             .title(context.getMessage("command.checkjailed.header", jailName))
             .contents(usersInJail.stream().map(x -> {
-                Text name;
+                TextComponent name;
                         try {
                             name = context.getDisplayName(x);
-                        } catch (IllegalArgumentException ex) {
+                        } catch (final IllegalArgumentException ex) {
                             name = Text.of("unknown: ", x.toString());
                         }
                 return name.toBuilder()

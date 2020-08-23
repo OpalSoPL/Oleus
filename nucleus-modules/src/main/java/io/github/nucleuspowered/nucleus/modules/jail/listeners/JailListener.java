@@ -45,7 +45,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class JailListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -57,7 +57,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     private PluginContainer pluginContainer;
 
     @Inject
-    public JailListener(INucleusServiceCollection serviceCollection) {
+    public JailListener(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
         this.messageProviderService = serviceCollection.messageProvider();
         this.playerDisplayNameService = serviceCollection.playerDisplayNameService();
@@ -67,16 +67,17 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
     // fires after spawn login event
     @Listener
-    public void onPlayerLogin(final NucleusOnLoginEvent event, @Getter("getTargetUser") User user, @Getter("getUserService") IUserDataObject qs) {
-        Optional<JailData> optionalJailData = this.handler.getPlayerJailDataInternal(user);
+    public void onPlayerLogin(final NucleusOnLoginEvent event, @Getter("getTargetUser") final User user, @Getter("getUserService")
+    final IUserDataObject qs) {
+        final Optional<JailData> optionalJailData = this.handler.getPlayerJailDataInternal(user);
         if (!optionalJailData.isPresent()) {
             return;
         }
 
-        JailData jd = optionalJailData.get();
+        final JailData jd = optionalJailData.get();
 
         // Send them back to where they should be.
-        Optional<NamedLocation> owl = this.handler.getWarpLocation(user);
+        final Optional<NamedLocation> owl = this.handler.getWarpLocation(user);
         if (!owl.isPresent()) {
             new PermissionMessageChannel(this.permissionService, JailPermissions.JAIL_NOTIFY)
                     .send(Text.of(TextColors.RED, "WARNING: No jail is defined. Jailed players are going free!"));
@@ -89,7 +90,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
         // Jailing the subject if we need to.
         if (this.handler.shouldJailOnNextLogin(user)) {
-            try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.IS_JAILING_ACTION, true);
                 // only set previous location if the player hasn't been moved to the jail before.
                 if (event.getFrom().equals(owl.get().getTransform().get())) {
@@ -112,15 +113,15 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
         final Player user = event.getTargetEntity();
 
         // Jailing the subject if we need to.
-        Optional<JailData> data = this.handler.getPlayerJailDataInternal(user);
+        final Optional<JailData> data = this.handler.getPlayerJailDataInternal(user);
         if (this.handler.shouldJailOnNextLogin(user) && data.isPresent()) {
-            try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.IS_JAILING_ACTION, true);
                 // It exists.
-                NamedLocation owl = this.handler.getWarpLocation(user).get();
-                JailData jd = data.get();
-                Optional<Duration> timeLeft = jd.getRemainingTime();
-                Text message = timeLeft.map(duration ->
+                final NamedLocation owl = this.handler.getWarpLocation(user).get();
+                final JailData jd = data.get();
+                final Optional<Duration> timeLeft = jd.getRemainingTime();
+                final TextComponent message = timeLeft.map(duration ->
                         this.messageProviderService.getMessageFor(
                                 user.getLocale(),
                                 "command.jail.jailedfor",
@@ -140,9 +141,9 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
         // Kick off a scheduled task to do jail time checks.
         Sponge.getScheduler().createTaskBuilder().async().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
-            Optional<JailData> omd = this.handler.getPlayerJailDataInternal(user);
+            final Optional<JailData> omd = this.handler.getPlayerJailDataInternal(user);
             if (omd.isPresent()) {
-                JailData md = omd.get();
+                final JailData md = omd.get();
                 md.nextLoginToTimestamp();
 
                 if (md.expired()) {
@@ -157,7 +158,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onRequestSent(NucleusTeleportEvent.Request event, @Root Player cause, @Getter("getTargetEntity") Player player) {
+    public void onRequestSent(final NucleusTeleportEvent.Request event, @Root final Player cause, @Getter("getTargetEntity") final Player player) {
         if (this.handler.isPlayerJailed(cause)) {
             event.setCancelled(true);
             event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(), "jail.teleportcause.isjailed"));
@@ -168,7 +169,8 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onAboutToTeleport(NucleusTeleportEvent.AboutToTeleport event, @Root CommandSource cause, @Getter("getTargetEntity") Player player) {
+    public void onAboutToTeleport(
+            final NucleusTeleportEvent.AboutToTeleport event, @Root final CommandSource cause, @Getter("getTargetEntity") final Player player) {
         if (event.getCause().getContext().get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
             if (this.handler.isPlayerJailed(player)) {
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
@@ -185,7 +187,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onCommand(SendCommandEvent event, @Root Player player) {
+    public void onCommand(final SendCommandEvent event, @Root final Player player) {
         // Only if the command is not in the control list.
         if (this.handler.checkJail(player, false) && this.allowedCommands.stream().noneMatch(x -> event.getCommand().equalsIgnoreCase(x))) {
             event.setCancelled(true);
@@ -196,24 +198,24 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onBlockChange(ChangeBlockEvent event, @Root Player player) {
+    public void onBlockChange(final ChangeBlockEvent event, @Root final Player player) {
         event.setCancelled(this.handler.checkJail(player, true));
     }
 
     @Listener
-    public void onInteract(InteractEvent event, @Root Player player) {
+    public void onInteract(final InteractEvent event, @Root final Player player) {
         event.setCancelled(this.handler.checkJail(player, true));
     }
 
     @Listener
-    public void onSpawn(RespawnPlayerEvent event) {
+    public void onSpawn(final RespawnPlayerEvent event) {
         if (this.handler.checkJail(event.getTargetEntity(), false)) {
             event.setToTransform(event.getToTransform().setLocation(this.handler.getWarpLocation(event.getTargetEntity()).get().getLocation().get()));
         }
     }
 
     @Listener
-    public void onSendToSpawn(NucleusSendToSpawnEvent event, @Getter("getTargetUser") User user) {
+    public void onSendToSpawn(final NucleusSendToSpawnEvent event, @Getter("getTargetUser") final User user) {
         if (this.handler.checkJail(user, false)) {
             event.setCancelled(true);
             event.setCancelReason(this.messageProviderService.getMessageString(event.getCause().first(CommandSource.class)
@@ -222,7 +224,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.allowedCommands = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).getAllowedCommands();
     }
 }

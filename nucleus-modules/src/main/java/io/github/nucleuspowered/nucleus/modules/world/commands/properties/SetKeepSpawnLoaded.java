@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.world.commands.properties;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.commands.WorldCommand;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 @Command(
@@ -22,7 +22,7 @@ public class SetKeepSpawnLoaded extends AbstractPropertiesSetCommand {
         super("keep spawn loaded");
     }
 
-    @Override protected void setter(WorldProperties worldProperties, boolean set)
+    @Override protected void setter(final WorldProperties worldProperties, final boolean set)
             throws CommandException {
         worldProperties.setKeepSpawnLoaded(set);
     }

@@ -39,17 +39,17 @@ public class TeleportTask implements CancellableTask {
     private final INucleusServiceCollection serviceCollection;
 
     public TeleportTask(
-            INucleusServiceCollection serviceCollection,
-            UUID toTeleport,
-            UUID target,
-            double cost,
-            int warmup,
-            boolean safe,
-            boolean silentSource,
-            boolean silentTarget,
-            @Nullable Transform<World> requestLocation,
-            @Nullable UUID requester,
-            @Nullable Consumer<Player> successCallback) {
+            final INucleusServiceCollection serviceCollection,
+            final UUID toTeleport,
+            final UUID target,
+            final double cost,
+            final int warmup,
+            final boolean safe,
+            final boolean silentSource,
+            final boolean silentTarget,
+            @Nullable final Transform<World> requestLocation,
+            @Nullable final UUID requester,
+            @Nullable final Consumer<Player> successCallback) {
         this.toTeleport = toTeleport;
         this.target = target;
         this.cost = cost;
@@ -69,27 +69,27 @@ public class TeleportTask implements CancellableTask {
     }
 
     @Override
-    public void accept(Task task) {
+    public void accept(final Task task) {
         run();
     }
 
     public void run() {
         // Teleport them
-        Player teleportingPlayer = Sponge.getServer().getPlayer(this.toTeleport).orElse(null);
-        Player targetPlayer = Sponge.getServer().getPlayer(this.target).orElse(null);
-        @Nullable User source = Util.getUserFromUUID(this.requester).orElse(null);
-        CommandSource receiver = source != null && source.isOnline() ? source.getPlayer().get() : Sponge.getServer().getConsole();
+        final Player teleportingPlayer = Sponge.getServer().getPlayer(this.toTeleport).orElse(null);
+        final Player targetPlayer = Sponge.getServer().getPlayer(this.target).orElse(null);
+        @Nullable final User source = Util.getUserFromUUID(this.requester).orElse(null);
+        final CommandSource receiver = source != null && source.isOnline() ? source.getPlayer().get() : Sponge.getServer().getConsole();
         if (teleportingPlayer != null && targetPlayer != null) {
             // If safe, get the teleport mode
-            INucleusTeleportService tpHandler = this.serviceCollection.teleportService();
-            try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            final INucleusTeleportService tpHandler = this.serviceCollection.teleportService();
+            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 if (source == null) {
                     frame.pushCause(Sponge.getServer().getConsole());
                 } else {
                     frame.pushCause(source);
                 }
 
-                TeleportResult result = tpHandler.teleportPlayerSmart(
+                final TeleportResult result = tpHandler.teleportPlayerSmart(
                         teleportingPlayer,
                         this.requestLocation == null ? targetPlayer.getTransform() : this.requestLocation,
                         false,

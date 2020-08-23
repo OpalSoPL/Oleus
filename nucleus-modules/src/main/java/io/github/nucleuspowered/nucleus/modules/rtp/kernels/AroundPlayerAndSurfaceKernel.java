@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 public class AroundPlayerAndSurfaceKernel extends SurfaceKernel {
 
-    @Override Vector3i getCentralLocation(@Nullable Location<World> currentLocation, World world) {
+    @Override Vector3i getCentralLocation(@Nullable final Location<World> currentLocation, final World world) {
         if (currentLocation != null && world.getUniqueId().equals(currentLocation.getExtent().getUniqueId())) {
             return currentLocation.getBlockPosition();
         }

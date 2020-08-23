@@ -12,7 +12,7 @@ import org.spongepowered.api.text.placeholder.PlaceholderText;
 import java.util.Collection;
 import java.util.function.Function;
 
-public class NucleusPlaceholderText implements PlaceholderText {
+public class NucleusPlaceholderTextComponent implements PlaceholderTextComponent {
 
     private final PlaceholderContext context;
     private final PlaceholderParser parser;
@@ -35,8 +35,8 @@ public class NucleusPlaceholderText implements PlaceholderText {
     }
 
     @Override
-    public Text toText() {
-        Text result = this.parser.parse(this.context);
+    public TextComponent toText() {
+        TextComponent result = this.parser.parse(this.context);
         if (!result.isEmpty()) {
             for (final Function<Text, Text> modifier : this.modifiers) {
                 result = modifier.apply(result);

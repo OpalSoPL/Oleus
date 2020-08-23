@@ -13,13 +13,15 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = "environment", name = "Environment")
 public class EnvironmentModule extends ConfigurableModule<EnvironmentConfig, EnvironmentConfigAdapter> {
 
+    public static final String ID = "environment";
+
     @Inject
-    public EnvironmentModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public EnvironmentModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

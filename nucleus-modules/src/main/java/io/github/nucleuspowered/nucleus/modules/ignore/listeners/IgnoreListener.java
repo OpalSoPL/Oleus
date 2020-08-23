@@ -27,7 +27,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class IgnoreListener implements ListenerBase {
 
@@ -36,24 +36,24 @@ public class IgnoreListener implements ListenerBase {
     private final IChatMessageFormatterService chatMessageFormatterService;
 
     @Inject
-    public IgnoreListener(INucleusServiceCollection serviceCollection) {
+    public IgnoreListener(final INucleusServiceCollection serviceCollection) {
         this.service = serviceCollection.getServiceUnchecked(IgnoreService.class);
         this.permissionService = serviceCollection.permissionService();
         this.chatMessageFormatterService = serviceCollection.chatMessageFormatter();
     }
 
     @Listener(order = Order.LAST)
-    public void onChat(MessageChannelEvent.Chat event) {
+    public void onChat(final MessageChannelEvent.Chat event) {
         Util.onPlayerSimulatedOrPlayer(event, this::onChat);
     }
 
-    private void onChat(MessageChannelEvent.Chat event, Player player) {
+    private void onChat(final MessageChannelEvent.Chat event, final Player player) {
         // Reset the channel - but only if we have to.
         if (!this.chatMessageFormatterService.getNucleusChannel(player.getUniqueId())
                 .map(IChatMessageFormatterService.Channel::ignoreIgnoreList)
                 .orElse(false)) {
             checkCancels(event.getChannel().orElseGet(event::getOriginalChannel).getMembers(), player).ifPresent(x -> {
-                MutableMessageChannel mmc = event.getChannel().orElseGet(event::getOriginalChannel).asMutable();
+                final MutableMessageChannel mmc = event.getChannel().orElseGet(event::getOriginalChannel).asMutable();
                 x.forEach(mmc::removeMember);
                 event.setChannel(mmc);
             });
@@ -61,21 +61,21 @@ public class IgnoreListener implements ListenerBase {
     }
 
     @Listener(order = Order.FIRST)
-    public void onMessage(NucleusMessageEvent event, @Root Player player) {
+    public void onMessage(final NucleusMessageEvent event, @Root final Player player) {
         if (event.getRecipient() instanceof User) {
             try {
                 event.setCancelled(this.service.isIgnored(((User) event.getRecipient()).getUniqueId(), player.getUniqueId()));
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
     @Listener(order = Order.FIRST)
-    public void onMail(NucleusSendMailEvent event, @Root Player player) {
+    public void onMail(final NucleusSendMailEvent event, @Root final Player player) {
         try {
             event.setCancelled(this.service.isIgnored(event.getRecipient().getUniqueId(), player.getUniqueId()));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
@@ -87,12 +87,12 @@ public class IgnoreListener implements ListenerBase {
      * @param player The subject who is sending the message.
      * @return {@link Optional} if unchanged, otherwise a {@link Collection} of {@link MessageReceiver}s to remove
      */
-    private Optional<Collection<MessageReceiver>> checkCancels(Collection<MessageReceiver> collection, Player player) {
+    private Optional<Collection<MessageReceiver>> checkCancels(final Collection<MessageReceiver> collection, final Player player) {
         if (this.permissionService.hasPermission(player, IgnorePermissions.IGNORE_CHAT)) {
             return Optional.empty();
         }
 
-        List<MessageReceiver> list = Lists.newArrayList(collection);
+        final List<MessageReceiver> list = Lists.newArrayList(collection);
         list.removeIf(x -> {
             try {
                 if (!(x instanceof Player)) {
@@ -107,7 +107,7 @@ public class IgnoreListener implements ListenerBase {
 
                 // Don't remove if they are in the list.
                 return !this.service.isIgnored(((Player) x).getUniqueId(), player.getUniqueId());
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
 
                 // Remove them.

@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class StaffChatMessageChannel implements
         IChatMessageFormatterService.Channel.External<StaffChatMessageChannel.APIChannel>,
@@ -51,7 +51,7 @@ public class StaffChatMessageChannel implements
     private TextColor colour;
 
     @Inject
-    StaffChatMessageChannel(INucleusServiceCollection serviceCollection) {
+    StaffChatMessageChannel(final INucleusServiceCollection serviceCollection) {
         serviceCollection.reloadableService().registerReloadable(this);
         this.permissionService = serviceCollection.permissionService();
         this.userPreferenceService = serviceCollection.userPreferenceService();
@@ -64,7 +64,7 @@ public class StaffChatMessageChannel implements
         return true;
     }
 
-    public APIChannel createChannel(MessageChannel delegated) {
+    public APIChannel createChannel(final MessageChannel delegated) {
         return new APIChannel(
                 delegated,
                 receivers().stream().filter(x -> delegated.getMembers().contains(x)).collect(Collectors.toList())
@@ -75,19 +75,19 @@ public class StaffChatMessageChannel implements
         return this.formatting;
     }
 
-    public void sendMessageFrom(CommandSource source, Text text) {
-        MessageEvent.MessageFormatter formatters = new MessageEvent.MessageFormatter();
+    public void sendMessageFrom(final CommandSource source, final TextComponent text) {
+        final MessageEvent.MessageFormatter formatters = new MessageEvent.MessageFormatter();
         formatters.setBody(text);
         formatMessageEvent(source, formatters);
         MessageChannel.fixed(receivers()).send(source, formatters.format(), ChatTypes.CHAT);
     }
 
     @Override
-    public void formatMessageEvent(CommandSource source, MessageEvent.MessageFormatter formatters) {
-        Text prefix = this.template.getForCommandSource(source);
+    public void formatMessageEvent(final CommandSource source, final MessageEvent.MessageFormatter formatters) {
+        final TextComponent prefix = this.template.getForCommandSource(source);
         if (TextSerializers.PLAIN.serialize(formatters.getHeader().toText()).contains("<" + source.getName() + ">")) {
             // Remove it.
-            Text p = formatters.getHeader().toText().replace("<" + source.getName() + ">", Text.of(), true);
+            final TextComponent p = formatters.getHeader().toText().replace("<" + source.getName() + ">", Text.of(), true);
             if (p.toPlain().trim().isEmpty()) {
                 formatters.setHeader(prefix);
             } else {
@@ -101,7 +101,7 @@ public class StaffChatMessageChannel implements
 
     @Override
     public Collection<MessageReceiver> receivers() {
-        List<MessageReceiver> c =
+        final List<MessageReceiver> c =
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(this::test)
                         .collect(Collectors.toList());
@@ -114,7 +114,7 @@ public class StaffChatMessageChannel implements
         return true;
     }
 
-    private boolean test(Player player) {
+    private boolean test(final Player player) {
         if (this.permissionService.hasPermission(player, StaffChatPermissions.BASE_STAFFCHAT)) {
             return this.userPreferenceService
                     .getPreferenceFor(player, NucleusKeysProvider.VIEW_STAFF_CHAT)
@@ -124,8 +124,8 @@ public class StaffChatMessageChannel implements
         return false;
     }
 
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        StaffChatConfig sc = serviceCollection.moduleDataProvider().getModuleConfig(StaffChatConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final StaffChatConfig sc = serviceCollection.moduleDataProvider().getModuleConfig(StaffChatConfig.class);
         this.formatting = sc.isIncludeStandardChatFormatting();
         this.template = sc.getMessageTemplate();
         this.colour = serviceCollection.textStyleService().getColourFromString(sc.getMessageColour());
@@ -134,7 +134,7 @@ public class StaffChatMessageChannel implements
     public static class APIChannel extends AbstractNucleusChatChannel.Mutable<APIChannel>
             implements NucleusStaffChatChannel {
 
-        public APIChannel(MessageChannel messageChannel, Collection<MessageReceiver> messageReceivers) {
+        public APIChannel(final MessageChannel messageChannel, final Collection<MessageReceiver> messageReceivers) {
             super(messageChannel, messageReceivers);
         }
     }

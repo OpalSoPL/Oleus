@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
@@ -20,30 +20,30 @@ import org.spongepowered.api.text.channel.MutableMessageChannel;
 import java.util.UUID;
 
 @Command(aliases = { "voice" }, basePermission = MutePermissions.BASE_VOICE, commandDescriptionKey = "voice")
-public class VoiceCommand implements ICommandExecutor<CommandSource> {
+public class VoiceCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_PLAYER.get(serviceCollection),
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        MuteHandler muteHandler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final MuteHandler muteHandler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
         if (!muteHandler.isGlobalMuteEnabled()) {
             return context.errorResult("command.voice.globaloff");
         }
 
-        Player pl = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
+        final Player pl = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
         if (context.testPermissionFor(pl, MutePermissions.VOICE_AUTO)) {
             return context.errorResult("command.voice.autovoice", pl.getName());
         }
 
-        boolean turnOn = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElseGet(() -> !muteHandler.isVoiced(pl.getUniqueId()));
+        final boolean turnOn = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElseGet(() -> !muteHandler.isVoiced(pl.getUniqueId()));
 
-        UUID voice = pl.getUniqueId();
+        final UUID voice = pl.getUniqueId();
         if (turnOn == muteHandler.isVoiced(voice)) {
             if (turnOn) {
                 context.sendMessage("command.voice.alreadyvoiced", pl.getName());
@@ -54,9 +54,9 @@ public class VoiceCommand implements ICommandExecutor<CommandSource> {
             return context.failResult();
         }
 
-        MutableMessageChannel mmc =
+        final MutableMessageChannel mmc =
                 context.getServiceCollection().permissionService().permissionMessageChannel(MutePermissions.VOICE_NOTIFY).asMutable();
-        mmc.addMember(context.getCommandSource());
+        mmc.addMember(context.getCommandSourceRoot());
         if (turnOn) {
             muteHandler.addVoice(pl.getUniqueId());
             mmc.send(context.getMessage("command.voice.voiced.source", pl.getName()));

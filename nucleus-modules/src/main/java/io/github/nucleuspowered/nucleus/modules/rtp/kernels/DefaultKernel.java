@@ -26,7 +26,7 @@ public class DefaultKernel implements RTPKernel {
     public static final DefaultKernel INSTANCE = new DefaultKernel();
 
     @Override
-    public Optional<ServerLocation> getLocation(@Nullable Location<World> currentLocation, World target, NucleusRTPService.RTPOptions options) {
+    public Optional<ServerLocation> getLocation(@Nullable final Location<World> currentLocation, final World target, final NucleusRTPService.RTPOptions options) {
         // from world spawn
         Vector3d location;
         int count = 25;
@@ -39,12 +39,12 @@ public class DefaultKernel implements RTPKernel {
             location = KernelHelper.INSTANCE.getLocationWithOffset(getCentralLocation(currentLocation, target), options);
         } while (!Util.isLocationInWorldBorder(location.toDouble(), target));
 
-        Location<World> worldLocation = getStartingLocation(new Location<>(target, location));
+        final Location<World> worldLocation = getStartingLocation(new Location<>(target, location));
         if (worldLocation == null) {
             return Optional.empty();
         }
 
-        Optional<Location<World>> targetLocation = Sponge.getTeleportHelper().getSafeLocation(worldLocation,
+        final Optional<Location<World>> targetLocation = Sponge.getTeleportHelper().getSafeLocation(worldLocation,
                 TeleportHelper.DEFAULT_HEIGHT,
                 TeleportHelper.DEFAULT_WIDTH,
                 TeleportHelper.DEFAULT_FLOOR_CHECK_DISTANCE,
@@ -69,7 +69,7 @@ public class DefaultKernel implements RTPKernel {
         return TeleportHelperFilters.DEFAULT;
     }
 
-    Vector3i getCentralLocation(@Nullable Location<World> currentLocation, World world) {
+    Vector3i getCentralLocation(@Nullable final Location<World> currentLocation, final World world) {
         return world.getSpawnLocation().getBlockPosition();
     }
 
@@ -84,7 +84,7 @@ public class DefaultKernel implements RTPKernel {
         return world;
     }
 
-    boolean verifyLocation(Location<World> world) {
+    boolean verifyLocation(final Location<World> world) {
         return true;
     }
 

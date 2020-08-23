@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveDoubleArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -39,12 +39,12 @@ import java.util.concurrent.TimeUnit;
         },
         associatedPermissions = FunPermissions.OTHERS_ROCKET
 )
-public class RocketCommand implements ICommandExecutor<CommandSource> {
+public class RocketCommand implements ICommandExecutor {
 
     private final String velocity = "velocity";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags()
                         .flag("h", "-hard")
@@ -57,9 +57,9 @@ public class RocketCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player target = context.getPlayerFromArgs();
-        boolean isSelf = context.is(target);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player target = context.getPlayerFromArgs();
+        final boolean isSelf = context.is(target);
         if (!isSelf && !context.testPermission(FunPermissions.OTHERS_ROCKET)) {
             return context.errorResult("command.rocket.noothers");
         }
@@ -74,7 +74,7 @@ public class RocketCommand implements ICommandExecutor<CommandSource> {
         }
 
         if (context.hasAny("e")) {
-            Explosion ex = Explosion.builder()
+            final Explosion ex = Explosion.builder()
                     .canCauseFire(false)
                     .location(target.getLocation())
                     .shouldBreakBlocks(false)
@@ -90,7 +90,7 @@ public class RocketCommand implements ICommandExecutor<CommandSource> {
                             TimeUnit.MILLISECONDS);
         }
 
-        Vector3d velocity = new Vector3d(0, v, 0);
+        final Vector3d velocity = new Vector3d(0, v, 0);
         target.offer(Keys.VELOCITY, velocity);
         if (!context.hasAny("s")) {
             context.sendMessageTo(target, "command.rocket.self");

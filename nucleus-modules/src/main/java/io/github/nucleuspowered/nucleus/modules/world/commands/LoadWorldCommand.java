@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.CommandFlags;
@@ -28,10 +28,10 @@ import java.util.Optional;
         commandDescriptionKey = "world.load",
         parentCommand = WorldCommand.class
 )
-public class LoadWorldCommand implements ICommandExecutor<CommandSource> {
+public class LoadWorldCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
                     .permissionFlag(WorldPermissions.BASE_WORLD_ENABLE, "e", "-enable")
@@ -41,8 +41,8 @@ public class LoadWorldCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties worldProperties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties worldProperties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
         if (!worldProperties.isEnabled() && !context.hasAny("e")) {
             // Not enabled, cannot load.
             if (context.testPermission(WorldPermissions.BASE_WORLD_ENABLE)) {
@@ -58,7 +58,7 @@ public class LoadWorldCommand implements ICommandExecutor<CommandSource> {
 
         worldProperties.setEnabled(true);
         context.sendMessage("command.world.load.start", worldProperties.getWorldName());
-        Optional<World> optional = Sponge.getServer().loadWorld(worldProperties);
+        final Optional<World> optional = Sponge.getServer().loadWorld(worldProperties);
         if (optional.isPresent()) {
             context.sendMessage("command.world.load.loaded", worldProperties.getWorldName());
             return context.successResult();

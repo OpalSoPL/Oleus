@@ -17,7 +17,7 @@ public class ClientMessageReciever implements MessageReceiver {
     }
 
     @Override
-    public void sendMessage(final Text message) {
+    public void sendMessage(final TextComponent message) {
         this.logger.info(message.toPlain());
     }
 

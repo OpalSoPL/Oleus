@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -36,13 +36,13 @@ import java.time.Duration;
         parentCommand = KitCommand.class,
         associatedPermissions = KitPermissions.KIT_GIVE_OVERRIDE
 )
-public class KitGiveCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class KitGiveCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean mustGetAll;
     private boolean isDrop;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags().permissionFlag(KitPermissions.KIT_GIVE_OVERRIDE, "i", "-ignore")
                     .buildWith(GenericArguments.seq(
@@ -53,18 +53,18 @@ public class KitGiveCommand implements ICommandExecutor<CommandSource>, IReloada
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
-        Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        Player player = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
-        boolean skip = context.hasAny("i");
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
+        final Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+        final Player player = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
+        final boolean skip = context.hasAny("i");
         if (context.is(player)) {
             return context.errorResult("command.kit.give.self");
         }
 
-        Text playerName = context.getDisplayName(player.getUniqueId());
-        Text kitName = Text.of(kit.getName());
-        KitRedeemResult redeemResult = service.redeemKit(kit, player, !skip, this.mustGetAll);
+        final TextComponent playerName = context.getDisplayName(player.getUniqueId());
+        final TextComponent kitName = Text.of(kit.getName());
+        final KitRedeemResult redeemResult = service.redeemKit(kit, player, !skip, this.mustGetAll);
         if (redeemResult.isSuccess()) {
             if (!redeemResult.rejectedItems().isEmpty()) {
                 // If we drop them, tell the user
@@ -107,8 +107,8 @@ public class KitGiveCommand implements ICommandExecutor<CommandSource>, IReloada
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        KitConfig kca = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final KitConfig kca = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
         this.isDrop = kca.isDropKitIfFull();
         this.mustGetAll = kca.isMustGetAll();
     }

@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.modules.admin.AdminPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -19,22 +19,22 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import java.util.HashMap;
 import java.util.Map;
 
-abstract class GamemodeBase<T extends CommandSource> implements ICommandExecutor<T> {
+abstract class GamemodeBase<T> implements ICommandExecutor {
 
     private static final Map<String, String> MODE_MAP = new HashMap<String, String>() {{
-        put(GameModes.SURVIVAL.getId(), AdminPermissions.GAMEMODE_MODES_SURVIVAL);
-        put(GameModes.CREATIVE.getId(), AdminPermissions.GAMEMODE_MODES_CREATIVE);
-        put(GameModes.ADVENTURE.getId(), AdminPermissions.GAMEMODE_MODES_ADVENTURE);
-        put(GameModes.SPECTATOR.getId(), AdminPermissions.GAMEMODE_MODES_SPECTATOR);
+        put(GameModes.SURVIVAL.get().getKey().getValue(), AdminPermissions.GAMEMODE_MODES_SURVIVAL);
+        put(GameModes.CREATIVE.get().getKey().getValue(), AdminPermissions.GAMEMODE_MODES_CREATIVE);
+        put(GameModes.ADVENTURE.get().getKey().getValue(), AdminPermissions.GAMEMODE_MODES_ADVENTURE);
+        put(GameModes.SPECTATOR.get().getKey().getValue(), AdminPermissions.GAMEMODE_MODES_SPECTATOR);
     }};
 
-    ICommandResult baseCommand(ICommandContext<? extends CommandSource> context, Player user, GameMode gm) throws CommandException {
+    ICommandResult baseCommand(final ICommandContext context, final Player user, final GameMode gm) throws CommandException {
 
         if (!context.testPermission(MODE_MAP.computeIfAbsent(
-                gm.getId(), key -> {
-                    String[] keySplit = key.split(":", 2);
-                    String r = keySplit[keySplit.length - 1].toLowerCase();
-                    String perm = AdminPermissions.GAMEMODE_MODES_ROOT + "." + r;
+                gm.getKey().asString(), key -> {
+                    final String[] keySplit = key.split(":", 2);
+                    final String r = keySplit[keySplit.length - 1].toLowerCase();
+                    final String perm = AdminPermissions.GAMEMODE_MODES_ROOT + "." + r;
                     MODE_MAP.put(key, perm);
                     return perm;
                 }
@@ -42,7 +42,7 @@ abstract class GamemodeBase<T extends CommandSource> implements ICommandExecutor
             return context.errorResult("command.gamemode.permission", gm.getTranslation().get());
         }
 
-        DataTransactionResult dtr = user.offer(Keys.GAME_MODE, gm);
+        final DataTransactionResult dtr = user.offer(Keys.GAME_MODE, gm);
         if (dtr.isSuccessful()) {
             if (!context.is(user)) {
                 context.sendMessage("command.gamemode.set.other", user.getName(), gm.getName());

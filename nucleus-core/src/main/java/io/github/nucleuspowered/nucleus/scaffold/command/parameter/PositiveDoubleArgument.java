@@ -21,7 +21,7 @@ public class PositiveDoubleArgument extends CommandElement {
 
     private final IMessageProviderService messageProvider;
 
-    public PositiveDoubleArgument(@Nullable final Text key, final INucleusServiceCollection serviceCollection) {
+    public PositiveDoubleArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProvider = serviceCollection.messageProvider();
     }

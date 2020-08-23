@@ -11,19 +11,19 @@ import org.spongepowered.api.scheduler.Task;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class AFKTask implements TaskBase {
 
     private final AFKHandler handler;
 
     @Inject
-    public AFKTask(INucleusServiceCollection serviceCollection) {
+    public AFKTask(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(AFKHandler.class);
     }
 
     @Override
-    public void accept(Task task) {
+    public void accept(final Task task) {
         this.handler.onTick();
     }
 

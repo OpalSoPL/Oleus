@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
@@ -30,17 +30,17 @@ import org.spongepowered.api.entity.living.player.Player;
         },
         associatedPermissions = MiscPermissions.OTHERS_HEAL
 )
-public class HealCommand implements ICommandExecutor<CommandSource> { // extends AbstractCommand.SimpleTargetOtherPlayer {
+public class HealCommand implements ICommandExecutor { // extends AbstractCommand.SimpleTargetOtherPlayer {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier()
                         .createOnlyOtherUserPermissionElement(true, MiscPermissions.OTHERS_HEAL)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
         if (pl.offer(Keys.HEALTH, pl.get(Keys.MAX_HEALTH).get()).isSuccessful()) {
             pl.offer(Keys.FIRE_TICKS, 0);
             context.sendMessageTo(pl, "command.heal.success.self");

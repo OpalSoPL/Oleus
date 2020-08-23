@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.services.impl.placeholder;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.core.services.UniqueUserService;
 import io.github.nucleuspowered.nucleus.services.IInitService;
@@ -18,31 +19,19 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.RemoteSource;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.placeholder.PlaceholderContext;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import org.spongepowered.api.text.placeholder.PlaceholderText;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class PlaceholderService implements IPlaceholderService, IInitService {
@@ -239,7 +228,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     @Override
-    public PlaceholderText textForSubjectAndOption(final Subject subject, final String option) {
+    public PlaceholderTextComponent textForSubjectAndOption(final Subject subject, final String option) {
         return PlaceholderText.builder()
                 .setParser(this.optionParser)
                 .setContext(this.contextForSubjectAndOption(subject, option))
@@ -252,10 +241,11 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
 
     // --
 
-    private static World getWorld(final PlaceholderContext placeholder) {
-        final CommandSource p = placeholder.getAssociatedObject().filter(x -> x instanceof CommandSource).map(x -> (CommandSource) x)
-                        .orElseGet(Sponge.getServer()::getConsole);
-        final World world;
+    private static ServerWorld getWorld(final PlaceholderContext placeholder) {
+        final CommandSource p = placeholder.getAssociatedObject()
+                .filter(x -> x instanceof Locatable).map(x -> (Locatable) x)
+                .orElseGet(Sponge.getServer()::getConsole);
+        final ServerWorld world;
         if (p instanceof Locatable) {
             world = ((Locatable) p).getWorld();
         } else {

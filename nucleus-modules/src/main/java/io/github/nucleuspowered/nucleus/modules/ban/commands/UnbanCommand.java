@@ -17,7 +17,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -38,12 +38,12 @@ import java.util.Optional;
         associatedPermissionLevelKeys = BanPermissions.BAN_LEVEL_KEY
 )
 @EssentialsEquivalent({"unban", "pardon"})
-public class UnbanCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class UnbanCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.firstParsing(
                     NucleusParameters.ONE_GAME_PROFILE_UUID.get(serviceCollection),
@@ -53,23 +53,23 @@ public class UnbanCommand implements ICommandExecutor<CommandSource>, IReloadabl
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        GameProfile gp;
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final GameProfile gp;
         if (context.hasAny(NucleusParameters.Keys.USER_UUID)) {
             gp = context.requireOne(NucleusParameters.Keys.USER_UUID, GameProfile.class);
         } else {
             gp = context.requireOne(NucleusParameters.Keys.USER, GameProfile.class);
         }
 
-        BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        final BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
 
-        Optional<Ban.Profile> obp = service.getBanFor(gp);
+        final Optional<Ban.Profile> obp = service.getBanFor(gp);
         if (!obp.isPresent()) {
             return context.errorResult(
                     "command.checkban.notset", Util.getNameOrUnkown(context, gp));
         }
 
-        User user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gp);
+        final User user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gp);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
                         BanPermissions.BAN_LEVEL_KEY,
@@ -81,15 +81,15 @@ public class UnbanCommand implements ICommandExecutor<CommandSource>, IReloadabl
 
         service.removeBan(obp.get());
 
-        MutableMessageChannel notify = context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY).asMutable();
-        notify.addMember(context.getCommandSource());
-        for (MessageReceiver receiver : notify.getMembers()) {
+        final MutableMessageChannel notify = context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY).asMutable();
+        notify.addMember(context.getCommandSourceRoot());
+        for (final MessageReceiver receiver : notify.getMembers()) {
             context.sendMessageTo(receiver, "command.unban.success", Util.getNameOrUnkown(context, obp.get().getProfile()));
         }
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(BanConfig.class).getLevelConfig();
     }
 }

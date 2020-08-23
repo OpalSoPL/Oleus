@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
@@ -33,26 +33,26 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "kit.view",
         parentCommand = KitCommand.class
 )
-public class KitViewCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class KitViewCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean processTokens = false;
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(true)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
         final KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
         final Player src = context.getIfPlayer();
 
-        Inventory inventory = Util.getKitInventoryBuilder()
+        final Inventory inventory = Util.getKitInventoryBuilder()
                 .property(InventoryTitle.PROPERTY_NAME, InventoryTitle.of(context.getMessage("command.kit.view.title", kitInfo.getName())))
                 .build(context.getServiceCollection().pluginContainer());
 
-        List<ItemStack> lis = kitInfo.getStacks().stream().filter(x -> !x.getType().equals(ItemTypes.NONE)).map(ItemStackSnapshot::createStack)
+        final List<ItemStack> lis = kitInfo.getStacks().stream().filter(x -> !x.getType().equals(ItemTypes.NONE)).map(ItemStackSnapshot::createStack)
                 .collect(Collectors.toList());
         if (this.processTokens) {
             service.processTokensInItemStacks(src, lis);
@@ -68,7 +68,7 @@ public class KitViewCommand implements ICommandExecutor<Player>, IReloadableServ
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.processTokens = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class).isProcessTokens();
     }
 }

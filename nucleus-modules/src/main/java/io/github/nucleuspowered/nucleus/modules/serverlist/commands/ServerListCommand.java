@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -25,11 +25,11 @@ import org.spongepowered.api.text.action.TextActions;
 import java.util.List;
 
 @Command(aliases = {"serverlist", "sl"}, basePermission = ServerListPermissions.BASE_SERVERLIST, commandDescriptionKey = "serverlist", async = true)
-public class ServerListCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class ServerListCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private ServerListConfig slc = new ServerListConfig();
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags()
                     .flag("m", "-messages")
@@ -38,7 +38,7 @@ public class ServerListCommand implements ICommandExecutor<CommandSource>, IRelo
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Display current information
         if (context.hasAny("m")) {
             onMessage(context, this.slc.getMessages(), "command.serverlist.head.messages");
@@ -70,7 +70,7 @@ public class ServerListCommand implements ICommandExecutor<CommandSource>, IRelo
             context.sendMessage("command.serverlist.modify.false");
         }
 
-        ServerListService ss = context.getServiceCollection().getServiceUnchecked(ServerListService.class);
+        final ServerListService ss = context.getServiceCollection().getServiceUnchecked(ServerListService.class);
         ss.getMessage().ifPresent(
                 t -> {
                     context.sendMessageText(Util.SPACE);
@@ -90,13 +90,13 @@ public class ServerListCommand implements ICommandExecutor<CommandSource>, IRelo
         return context.successResult();
     }
 
-    private void onMessage(ICommandContext<? extends CommandSource> context, List<NucleusTextTemplateImpl> messages, String key) throws CommandException {
+    private void onMessage(final ICommandContext context, final List<NucleusTextTemplateImpl> messages, final String key) throws CommandException {
         if (messages.isEmpty()) {
             throw context.createException("command.serverlist.nomessages");
         }
 
-        CommandSource source = context.getCommandSource();
-        List<Text> m = Lists.newArrayList();
+        final CommandSource source = context.getCommandSourceRoot();
+        final List<Text> m = Lists.newArrayList();
         messages.stream().map(x -> x.getForCommandSource(source)).forEach(x -> {
             if (!m.isEmpty()) {
                 m.add(Util.SPACE);
@@ -108,7 +108,7 @@ public class ServerListCommand implements ICommandExecutor<CommandSource>, IRelo
         Util.getPaginationBuilder(source).contents(m).title(context.getMessage(key)).sendTo(source);
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.slc = serviceCollection.moduleDataProvider().getModuleConfig(ServerListConfig.class);
     }
 }

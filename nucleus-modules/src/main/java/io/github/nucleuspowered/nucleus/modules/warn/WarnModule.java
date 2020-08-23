@@ -11,17 +11,17 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = "warn", name = "Warning")
 public class WarnModule extends StandardModule {
 
     @Inject
-    public WarnModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public WarnModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 
-    @Override public void performPreTasks(INucleusServiceCollection serviceCollection) {
+    @Override public void performPreTasks(final INucleusServiceCollection serviceCollection) {
         serviceCollection.logger()
                 .warn("The Nucleus Warning module has been removed. Please use other plugins for warning support.");
     }

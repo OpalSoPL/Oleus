@@ -36,7 +36,7 @@ public class TimespanArgument extends CommandElement {
     private final int secondsInWeek = 7 * this.secondsInDay;
     private final IMessageProviderService messageProvider;
 
-    public TimespanArgument(@Nullable final Text key, final INucleusServiceCollection serviceCollection) {
+    public TimespanArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProvider = serviceCollection.messageProvider();
     }

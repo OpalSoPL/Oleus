@@ -17,10 +17,10 @@ import org.spongepowered.api.command.args.CommandElement;
 @Command(aliases = {"tellplain", "plaintell", "ptell"},
         basePermission = AdminPermissions.BASE_TELLPLAIN,
         commandDescriptionKey = "tellplain")
-public class TellPlainCommand implements ICommandExecutor<CommandSource> {
+public class TellPlainCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.MANY_PLAYER_OR_CONSOLE.get(serviceCollection),
                 NucleusParameters.MESSAGE
@@ -28,16 +28,16 @@ public class TellPlainCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) {
+    public ICommandResult execute(final ICommandContext context) {
         try {
             new NucleusTextTemplateMessageSender(
                     context.getServiceCollection().textTemplateFactory(),
                     context.getServiceCollection().textTemplateFactory().createFromString(
                         context.requireOne(NucleusParameters.Keys.MESSAGE, String.class)),
                     context.getServiceCollection().placeholderService(),
-                    context.getCommandSource())
+                    context.getCommandSourceRoot())
                     .send(context.getAll(NucleusParameters.Keys.PLAYER_OR_CONSOLE, CommandSource.class), context.getCause());
-        } catch (Throwable throwable) {
+        } catch (final Throwable throwable) {
             throwable.printStackTrace();
             return context.errorResult("command.tellplain.failed");
         }

@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -28,20 +28,20 @@ import org.spongepowered.api.text.Text;
         parentCommand = KitCommand.class,
         async = true
 )
-public class KitCostCommand implements ICommandExecutor<CommandSource> {
+public class KitCostCommand implements ICommandExecutor {
 
     private final String costKey = "cost";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false),
                 GenericArguments.onlyOne(GenericArguments.doubleNum(Text.of(this.costKey)))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
         double cost = context.requireOne(this.costKey, Double.class);
 
         if (cost < 0) {

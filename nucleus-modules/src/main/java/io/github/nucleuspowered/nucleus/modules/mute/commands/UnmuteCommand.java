@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -28,21 +28,21 @@ import org.spongepowered.api.event.CauseStackManager;
         commandDescriptionKey = "unmute",
         associatedPermissionLevelKeys = MutePermissions.MUTE_LEVEL_KEY
 )
-public class UnmuteCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class UnmuteCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection)
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        MuteHandler handler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final MuteHandler handler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
                         MutePermissions.MUTE_LEVEL_KEY,
@@ -56,8 +56,8 @@ public class UnmuteCommand implements ICommandExecutor<CommandSource>, IReloadab
             return context.errorResult("command.unmute.notmuted", user.getName());
         }
         // Unmute.
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
             handler.unmutePlayer(user, frame.getCurrentCause(), false);
             context.sendMessage("command.unmute.success", user.getName(), context.getName());
             return context.successResult();
@@ -65,8 +65,8 @@ public class UnmuteCommand implements ICommandExecutor<CommandSource>, IReloadab
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        MuteConfig config = serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final MuteConfig config = serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class);
         this.levelConfig = config.getLevelConfig();
     }
 }

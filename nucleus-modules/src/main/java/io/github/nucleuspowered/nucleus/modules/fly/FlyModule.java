@@ -20,13 +20,13 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = "fly", name = "Fly")
 public class FlyModule extends ConfigurableModule<FlyConfig, FlyConfigAdapter> {
 
     @Inject
-    public FlyModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public FlyModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

@@ -11,10 +11,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.commandmetadata.CommandMetadataService;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 
 @ImplementedBy(CommandMetadataService.class)
@@ -24,26 +23,13 @@ public interface ICommandMetadataService {
             String id,
             String name,
             Command command,
-            Class<? extends ICommandExecutor<?>> associatedContext
+            Class<? extends ICommandExecutor> associatedContext
     );
 
-    void completeRegistrationPhase(INucleusServiceCollection serviceCollection);
+    void completeRegistrationPhase(INucleusServiceCollection serviceCollection,
+            RegisterCommandEvent<org.spongepowered.api.command.Command.Parameterized> event);
 
-    default void addMapping(final Map<String, String> mappings) {
-        for (final Map.Entry<String, String> entry : mappings.entrySet()) {
-            this.addMapping(entry.getKey(), entry.getValue());
-        }
-    }
-
-    void addMapping(String newCommand, String remapped);
-
-    void activate();
-
-    void deactivate();
-
-    boolean isNucleusCommand(String command);
-
-    Optional<CommandControl> getControl(Class<? extends ICommandExecutor<? extends CommandSource>> executorClass);
+    Optional<CommandControl> getControl(Class<? extends ICommandExecutor> executorClass);
 
     Collection<CommandControl> getCommands();
 

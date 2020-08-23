@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -31,19 +31,19 @@ import org.spongepowered.api.entity.living.player.User;
         },
         associatedPermissions = FreezePlayerPermissions.OTHERS_FREEZEPLAYER
 )
-public class FreezePlayerCommand implements ICommandExecutor<CommandSource> {
+public class FreezePlayerCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOtherUserPermissionElement(false, FreezePlayerPermissions.OTHERS_FREEZEPLAYER),
                 GenericArguments.optional(NucleusParameters.ONE_TRUE_FALSE)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User pl = context.getUserFromArgs();
-        FreezePlayerService service = context.getServiceCollection().getServiceUnchecked(FreezePlayerService.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User pl = context.getUserFromArgs();
+        final FreezePlayerService service = context.getServiceCollection().getServiceUnchecked(FreezePlayerService.class);
         final boolean f = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElseGet(() -> !service.isFrozen(pl));
         service.setFrozen(pl, f);
         context.sendMessage(

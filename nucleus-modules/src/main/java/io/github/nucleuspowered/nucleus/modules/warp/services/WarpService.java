@@ -35,8 +35,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 @APIService(NucleusWarpService.class)
@@ -57,7 +57,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     private final WarpCategoryArgument warpCategoryArgument;
 
     @Inject
-    public WarpService(INucleusServiceCollection serviceCollection) {
+    public WarpService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.warpPermissionArgument = new WarpArgument(
                 Text.of(WARP_KEY),
@@ -99,7 +99,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
         this.warpCache = new HashMap<>();
         this.warpCategoryCache = new HashMap<>();
         this.uncategorised = null;
-        IGeneralDataObject dataObject =
+        final IGeneralDataObject dataObject =
                 this.serviceCollection
                         .storageManager()
                         .getGeneralService()
@@ -118,7 +118,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
             return; // not loaded
         }
 
-        IGeneralDataObject dataObject =
+        final IGeneralDataObject dataObject =
                 this.serviceCollection
                         .storageManager()
                         .getGeneralService()
@@ -128,7 +128,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
         this.serviceCollection.storageManager().getGeneralService().save(dataObject);
     }
 
-    public CommandElement warpElement(boolean requirePermission) {
+    public CommandElement warpElement(final boolean requirePermission) {
         if (requirePermission) {
             return this.warpPermissionArgument;
         } else {
@@ -141,12 +141,12 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public Optional<Warp> getWarp(String warpName) {
+    public Optional<Warp> getWarp(final String warpName) {
         return Optional.ofNullable(getWarpCache().get(warpName.toLowerCase()));
     }
 
     @Override
-    public boolean removeWarp(String warpName) {
+    public boolean removeWarp(final String warpName) {
         if (getWarpCache().remove(warpName.toLowerCase()) != null) {
             saveFromCache();
             return true;
@@ -156,9 +156,9 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean setWarp(String warpName, Location<World> location, Vector3d rotation) {
-        Map<String, Warp> cache = getWarpCache();
-        String key = warpName.toLowerCase();
+    public boolean setWarp(final String warpName, final Location<World> location, final Vector3d rotation) {
+        final Map<String, Warp> cache = getWarpCache();
+        final String key = warpName.toLowerCase();
         if (!cache.containsKey(key)) {
             cache.put(key, new WarpData(
                     null,
@@ -197,8 +197,8 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public List<Warp> getWarpsForCategory(String category) {
-        List<Warp> warps = this.categoryCollectionMap.computeIfAbsent(category.toLowerCase(),
+    public List<Warp> getWarpsForCategory(final String category) {
+        final List<Warp> warps = this.categoryCollectionMap.computeIfAbsent(category.toLowerCase(),
                 c -> Lists.newArrayList(getAllWarps().stream().filter(x ->
                         x.getCategory().map(cat -> cat.equalsIgnoreCase(c)).orElse(false))
                         .collect(Collectors.toList())));
@@ -210,11 +210,11 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public Map<WarpCategory, List<Warp>> getWarpsWithCategories(Predicate<Warp> warpDataPredicate) {
+    public Map<WarpCategory, List<Warp>> getWarpsWithCategories(final Predicate<Warp> warpDataPredicate) {
         // Populate cache
-        Map<WarpCategory, List<Warp>> map = new HashMap<>();
+        final Map<WarpCategory, List<Warp>> map = new HashMap<>();
         getWarpCategoryCache().keySet().forEach(x -> {
-            List<Warp> warps = getWarpsForCategory(x).stream().filter(warpDataPredicate).collect(Collectors.toList());
+            final List<Warp> warps = getWarpsForCategory(x).stream().filter(warpDataPredicate).collect(Collectors.toList());
             if (!warps.isEmpty()) {
                 map.put(getWarpCategoryCache().get(x.toLowerCase()), warps);
             }
@@ -223,10 +223,10 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean removeWarpCost(String warpName) {
-        Optional<Warp> warp = getWarp(warpName);
+    public boolean removeWarpCost(final String warpName) {
+        final Optional<Warp> warp = getWarp(warpName);
         if (warp.isPresent()) {
-            Warp w = warp.get();
+            final Warp w = warp.get();
             removeWarp(warpName);
             getWarpCache().put(w.getName().toLowerCase(), new WarpData(
                     w.getCategory().orElse(null),
@@ -244,14 +244,14 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean setWarpCost(String warpName, double cost) {
+    public boolean setWarpCost(final String warpName, final double cost) {
         if (cost < 0) {
             return false;
         }
 
-        Optional<Warp> warp = getWarp(warpName);
+        final Optional<Warp> warp = getWarp(warpName);
         if (warp.isPresent()) {
-            Warp w = warp.get();
+            final Warp w = warp.get();
             removeWarp(warpName);
             getWarpCache().put(w.getName().toLowerCase(), new WarpData(
                     w.getCategory().orElse(null),
@@ -269,11 +269,11 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean setWarpCategory(String warpName, @Nullable String category) {
+    public boolean setWarpCategory(final String warpName, @Nullable String category) {
         if (category != null) {
-            Optional<WarpCategory> c = getWarpCategory(category);
+            final Optional<WarpCategory> c = getWarpCategory(category);
             if (!c.isPresent()) {
-                WarpCategory wc = new WarpCategoryData(
+                final WarpCategory wc = new WarpCategoryData(
                         category,
                         null,
                         null);
@@ -287,9 +287,9 @@ public class WarpService implements NucleusWarpService, ServiceBase {
             this.uncategorised = null;
         }
 
-        Optional<Warp> warp = getWarp(warpName);
+        final Optional<Warp> warp = getWarp(warpName);
         if (warp.isPresent()) {
-            Warp w = warp.get();
+            final Warp w = warp.get();
             removeWarp(warpName);
             getWarpCache().put(w.getName().toLowerCase(), new WarpData(
                     category,
@@ -307,10 +307,10 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean setWarpDescription(String warpName, @Nullable Text description) {
-        Optional<Warp> warp = getWarp(warpName);
+    public boolean setWarpDescription(final String warpName, @Nullable final TextComponent description) {
+        final Optional<Warp> warp = getWarp(warpName);
         if (warp.isPresent()) {
-            Warp w = warp.get();
+            final Warp w = warp.get();
             removeWarp(warpName);
             getWarpCache().put(w.getName().toLowerCase(), new WarpData(
                     w.getCategory().orElse(null),
@@ -333,15 +333,15 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public Optional<WarpCategory> getWarpCategory(String category) {
+    public Optional<WarpCategory> getWarpCategory(final String category) {
         return Optional.ofNullable(getWarpCategoryCache().get(category.toLowerCase()));
     }
 
     @Override
-    public boolean setWarpCategoryDisplayName(String category, @Nullable Text displayName) {
-        Optional<WarpCategory> c = getWarpCategory(category);
+    public boolean setWarpCategoryDisplayName(final String category, @Nullable final TextComponent displayName) {
+        final Optional<WarpCategory> c = getWarpCategory(category);
         if (c.isPresent()) {
-            WarpCategory cat = c.get();
+            final WarpCategory cat = c.get();
             getWarpCategoryCache().remove(category.toLowerCase());
             getWarpCategoryCache().put(category.toLowerCase(), new WarpCategoryData(
                     cat.getId(),
@@ -356,10 +356,10 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean setWarpCategoryDescription(String category, @Nullable Text description) {
-        Optional<WarpCategory> c = getWarpCategory(Objects.requireNonNull(category));
+    public boolean setWarpCategoryDescription(final String category, @Nullable final TextComponent description) {
+        final Optional<WarpCategory> c = getWarpCategory(Objects.requireNonNull(category));
         if (c.isPresent()) {
-            WarpCategory cat = c.get();
+            final WarpCategory cat = c.get();
             getWarpCategoryCache().remove(category.toLowerCase());
             getWarpCategoryCache().put(category.toLowerCase(), new WarpCategoryData(
                     cat.getId(),

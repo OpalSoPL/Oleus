@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.event.cause.Cause;
@@ -28,28 +28,28 @@ import org.spongepowered.api.event.cause.Cause;
         async = true,
         parentCommand = WarpCommand.class
 )
-public class DeleteWarpCommand implements ICommandExecutor<CommandSource> {
+public class DeleteWarpCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpElement(false)
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Warp warp = context.requireOne(WarpService.WARP_KEY, Warp.class);
-        NucleusWarpService qs = Sponge.getServiceManager().provideUnchecked(NucleusWarpService.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Warp warp = context.requireOne(WarpService.WARP_KEY, Warp.class);
+        final NucleusWarpService qs = Sponge.getServiceManager().provideUnchecked(NucleusWarpService.class);
 
         final Cause cause;
-        if (context.getCause().root() == context.getCommandSource()) {
+        if (context.getCause().root() == context.getCommandSourceRoot()) {
             cause = context.getCause();
         } else {
-            cause = context.getCause().with(context.getCommandSource());
+            cause = context.getCause().with(context.getCommandSourceRoot());
         }
 
-        DeleteWarpEvent event = new DeleteWarpEvent(cause, warp);
+        final DeleteWarpEvent event = new DeleteWarpEvent(cause, warp);
         if (Sponge.getEventManager().post(event)) {
             return event.getCancelMessage().map(context::errorResultLiteral)
                     .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));

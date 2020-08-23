@@ -7,7 +7,7 @@ plugins {
 repositories {
     jcenter()
     maven("https://repo-new.spongepowered.org/repository/maven-public")
-    maven("https://repo.spongepowered.org/maven")
+   // maven("https://repo.spongepowered.org/maven")
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
     // maven("https://jitpack.io")
 }

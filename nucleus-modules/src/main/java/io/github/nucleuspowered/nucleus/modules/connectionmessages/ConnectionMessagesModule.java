@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = ConnectionMessagesModule.ID, name = "Connection Messages")
 public class ConnectionMessagesModule extends ConfigurableModule<ConnectionMessagesConfig, ConnectionMessagesConfigAdapter> {
@@ -21,8 +21,8 @@ public class ConnectionMessagesModule extends ConfigurableModule<ConnectionMessa
     public static final String ID = "connection-messages";
 
     @Inject
-    public ConnectionMessagesModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public ConnectionMessagesModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

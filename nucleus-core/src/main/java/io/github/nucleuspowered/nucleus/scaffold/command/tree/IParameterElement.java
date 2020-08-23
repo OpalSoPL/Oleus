@@ -12,7 +12,7 @@ public interface IParameterElement<R> {
 
     boolean optional();
 
-    Predicate<ICommandContext<?>> condition();
+    Predicate<ICommandContext> condition();
 
     IParameterType<R> type();
 

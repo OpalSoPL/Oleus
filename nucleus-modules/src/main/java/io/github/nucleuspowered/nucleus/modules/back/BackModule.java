@@ -13,13 +13,15 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
-@ModuleData(id = "back", name = "Back", softDependencies = "jail")
+@ModuleData(id = BackModule.ID, name = "Back", softDependencies = "jail")
 public class BackModule extends ConfigurableModule<BackConfig, BackConfigAdapter> {
 
+    public static final String ID = "back";
+
     @Inject
-    public BackModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public BackModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

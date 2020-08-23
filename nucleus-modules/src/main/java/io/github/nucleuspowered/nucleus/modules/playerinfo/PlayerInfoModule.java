@@ -14,7 +14,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = PlayerInfoModule.ID, name = "Player Info", softDependencies = AFKModule.ID)
 public class PlayerInfoModule extends ConfigurableModule<PlayerInfoConfig, PlayerInfoConfigAdapter> {
@@ -22,7 +22,7 @@ public class PlayerInfoModule extends ConfigurableModule<PlayerInfoConfig, Playe
     public static final String ID = "playerinfo";
 
     @Inject
-    public PlayerInfoModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public PlayerInfoModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

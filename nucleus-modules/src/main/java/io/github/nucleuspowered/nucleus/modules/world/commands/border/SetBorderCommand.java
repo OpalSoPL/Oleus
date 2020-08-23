@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -31,7 +31,7 @@ import java.util.Optional;
         commandDescriptionKey = "world.border.set",
         parentCommand = BorderCommand.class
 )
-public class SetBorderCommand implements ICommandExecutor<CommandSource> {
+public class SetBorderCommand implements ICommandExecutor {
 
     private final String xKey = "x";
     private final String zKey = "z";
@@ -39,7 +39,7 @@ public class SetBorderCommand implements ICommandExecutor<CommandSource> {
     private final String delayKey = "delay";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.firstParsing(
                 // Console + player
@@ -61,16 +61,16 @@ public class SetBorderCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
-        int x;
-        int z;
-        int dia = context.requireOne(this.diameter, Integer.class);
-        int delay = context.getOne(this.delayKey, Integer.class).orElse(0);
+        final int x;
+        final int z;
+        final int dia = context.requireOne(this.diameter, Integer.class);
+        final int delay = context.getOne(this.delayKey, Integer.class).orElse(0);
 
         if (context.is(Locatable.class)) {
-            Location<World> lw = ((Locatable) context.getCommandSource()).getLocation();
+            final Location<World> lw = ((Locatable) context.getCommandSourceRoot()).getLocation();
             if (context.hasAny(this.zKey)) {
                 x = context.requireOne(this.xKey, Integer.class);
                 z = context.requireOne(this.zKey, Integer.class);
@@ -85,7 +85,7 @@ public class SetBorderCommand implements ICommandExecutor<CommandSource> {
 
         // Now, if we have an x and a z key, get the centre from that.
         wp.setWorldBorderCenter(x, z);
-        Optional<World> world = Sponge.getServer().getWorld(wp.getUniqueId());
+        final Optional<World> world = Sponge.getServer().getWorld(wp.getUniqueId());
         world.ifPresent(w -> w.getWorldBorder().setCenter(x, z));
 
         wp.setWorldBorderCenter(x, z);

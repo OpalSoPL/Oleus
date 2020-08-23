@@ -18,10 +18,10 @@ import org.spongepowered.api.command.CommandSource;
         parentCommand = NucleusCommand.class,
         hasExecutor = false
 )
-public class DebugCommand implements ICommandExecutor<CommandSource> {
+public class DebugCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) {
+    public ICommandResult execute(ICommandContext context) {
         return context.failResult();
     }
 

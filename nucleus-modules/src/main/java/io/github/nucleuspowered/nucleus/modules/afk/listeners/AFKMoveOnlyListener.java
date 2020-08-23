@@ -17,27 +17,27 @@ import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.world.World;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class AFKMoveOnlyListener extends AbstractAFKListener implements ListenerBase.Conditional {
 
     @Inject
-    public AFKMoveOnlyListener(INucleusServiceCollection serviceCollection) {
+    public AFKMoveOnlyListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection.getServiceUnchecked(AFKHandler.class));
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerMove(final MoveEntityEvent event, @Root Player player,
-            @Getter("getFromTransform") Transform<World> from,
-            @Getter("getToTransform") Transform<World> to) {
+    public void onPlayerMove(final MoveEntityEvent event, @Root final Player player,
+            @Getter("getFromTransform") final Transform<World> from,
+            @Getter("getToTransform") final Transform<World> to) {
         if (!from.getPosition().equals(to.getPosition())) {
             update(player);
         }
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
-        AFKConfig.Triggers triggers = serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
+        final AFKConfig.Triggers triggers = serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
                 .getTriggers();
         return triggers.isOnMovement() && !triggers.isOnRotation();
     }

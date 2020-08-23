@@ -8,15 +8,16 @@ import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.TextComponent;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageReceiver;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.time.Duration;
@@ -28,15 +29,15 @@ import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public interface ICommandContext<C extends CommandSource> {
+public interface ICommandContext {
 
-    Cause getCause();
+    ServerPlayer reqiurePlayer() throws CommandException;
+
+    CommandCause getCause();
 
     String getCommandKey();
 
-    C getCommandSource() throws CommandException;
-
-    C getCommandSourceUnchecked();
+    Object getCommandSourceRoot();
 
     Optional<UUID> getUniqueId();
 
@@ -62,13 +63,15 @@ public interface ICommandContext<C extends CommandSource> {
      */
     void setWarmup(int warmup);
 
-    Player getPlayerFromArgs(String key, String errorKey) throws CommandException;
+    <T> T requireOne(Parameter.Value<T> key);
+
+    ServerPlayer getPlayerFromArgs(String key, String errorKey) throws CommandException;
 
     default Player getPlayerFromArgs() throws CommandException {
         return this.getPlayerFromArgs(NucleusParameters.Keys.PLAYER, "command.playeronly");
     }
 
-    Player getCommandSourceAsPlayerUnchecked();
+    ServerPlayer getCommandSourceAsPlayerUnchecked();
 
     default User getUserFromArgs() throws CommandException {
         return this.getUserFromArgs(NucleusParameters.Keys.USER, "command.playeronly");
@@ -76,21 +79,43 @@ public interface ICommandContext<C extends CommandSource> {
 
     User getUserFromArgs(String key, String errorKey) throws CommandException;
 
-    boolean hasAny(String name);
+    boolean hasAny(Parameter.Key<?> name);
 
-    <T> Optional<T> getOne(String name, Class<T> clazz);
+    <T> Optional<? extends T> getOne(Parameter.Key<T> name);
 
-    <T> Optional<T> getOne(String name, TypeToken<T> clazz);
+    <T> Optional<? extends T> getOne(Parameter.Value<T> name);
 
-    <T> Collection<T> getAll(String name, Class<T> clazz);
+    <T> Collection<? extends T> getAll(Parameter.Key<T> name);
 
-    <T> Collection<T> getAll(String name, TypeToken<T> clazz);
+    default <T> Optional<? extends T> getOne(final String name, final Class<T> clazz) {
+        return this.getOne(Parameter.key(name, TypeToken.of(clazz)));
+    }
+
+    default <T> Optional<? extends T> getOne(final String name, final TypeToken<T> clazz) {
+        return this.getOne(Parameter.key(name, clazz));
+    }
+
+    default <T> Collection<? extends T> getAll(final String name, final Class<T> clazz) {
+        return this.getAll(Parameter.key(name, TypeToken.of(clazz)));
+    }
+
+    default <T> Collection<? extends T> getAll(final String name, final TypeToken<T> clazz) {
+        return this.getAll(Parameter.key(name, clazz));
+    }
+
+    <T> Collection<? extends T> getAll(Parameter.Value<T> name);
+
+    <T> T requireOne(Parameter.Key<T> key);
 
     @NonNull
-    <T> T requireOne(String name, Class<T> clazz);
+    default <T> T requireOne(final String name, final Class<T> clazz) {
+        return this.requireOne(Parameter.key(name, TypeToken.of(clazz)));
+    }
 
     @NonNull
-    <T> T requireOne(String name, TypeToken<T> clazz);
+    default <T> T requireOne(final String name, final TypeToken<T> clazz) {
+        return this.requireOne(Parameter.key(name, clazz));
+    }
 
     INucleusServiceCollection getServiceCollection();
 
@@ -98,7 +123,7 @@ public interface ICommandContext<C extends CommandSource> {
 
     ICommandResult failResult();
 
-    ICommandResult errorResultLiteral(Text message);
+    ICommandResult errorResultLiteral(TextComponent message);
 
     ICommandResult errorResult(String key, Object... args);
 
@@ -109,16 +134,16 @@ public interface ICommandContext<C extends CommandSource> {
     CommandException createException(String key, Object... args);
 
     @NonNull
-    default Player getIfPlayer() throws CommandException {
+    default ServerPlayer getIfPlayer() throws CommandException {
         return this.getIfPlayer("command.playeronly");
     }
 
     @NonNull
-    Player getIfPlayer(String errorKey) throws CommandException;
+    ServerPlayer getIfPlayer(String errorKey) throws CommandException;
 
     Map<CommandModifier, ICommandModifier> modifiers();
 
-    Collection<Consumer<ICommandContext<C>>> failActions();
+    Collection<Consumer<ICommandContext>> failActions();
 
     boolean testPermission(String permission);
 
@@ -126,11 +151,11 @@ public interface ICommandContext<C extends CommandSource> {
 
     String getMessageString(String key, Object... replacements);
 
-    String getMessageStringFor(CommandSource to, String key, Object... replacements);
+    String getMessageStringFor(Audience to, String key, Object... replacements);
 
-    Text getMessage(String key, Object... replacements);
+    TextComponent getMessage(String key, Object... replacements);
 
-    Text getMessageFor(CommandSource to, String key, Object... replacements);
+    TextComponent getMessageFor(Audience to, String key, Object... replacements);
 
     default String getTimeString(final Duration duration) {
         return this.getTimeString(duration.getSeconds());
@@ -146,44 +171,44 @@ public interface ICommandContext<C extends CommandSource> {
      */
     void sendMessage(String key, Object... replacements);
 
-    void sendMessageText(Text message);
+    void sendMessageText(TextComponent message);
 
-    void sendMessageTo(MessageReceiver to, String key, Object... replacements);
+    void sendMessageTo(Audience to, String key, Object... replacements);
 
-    default boolean is(final Player other) {
-        return is(other.getCommandSource().get());
-    }
-
-    boolean is(CommandSource other);
+    boolean is(Object other);
 
     boolean is(Class<?> other);
 
     boolean is(User x);
 
+    default boolean isNot(final User x) {
+        return !this.is(x);
+    }
+
     boolean isUser();
 
     boolean isConsoleAndBypass();
 
-    Optional<WorldProperties> getWorldPropertiesOrFromSelf(String worldKey);
+    Optional<WorldProperties> getWorldPropertiesOrFromSelf(Parameter.Key<WorldProperties> worldKey);
 
     String getName();
 
-    Text getDisplayName();
+    TextComponent getDisplayName();
 
-    Text getDisplayName(UUID uuid);
+    TextComponent getDisplayName(UUID uuid);
 
     default String getTimeToNowString(final Instant endTime) {
         return this.getTimeString(Duration.between(Instant.now(), endTime).abs());
     }
 
     default OptionalInt getLevel(final String key) {
-        return this.getLevelFor(this.getCommandSourceUnchecked(), key);
+        return this.getLevelFor(this.getCause(), key);
     }
 
     OptionalInt getLevelFor(Subject subject, String key);
 
     default int getLevel(final String key, final String permissionIfNoLevel) {
-        return this.getLevelFor(this.getCommandSourceUnchecked(), key, permissionIfNoLevel);
+        return this.getLevelFor(this.getCause(), key, permissionIfNoLevel);
     }
 
     default int getLevelFor(final Subject subject, final String key, final String permissionIfNoLevel) {
@@ -202,18 +227,10 @@ public interface ICommandContext<C extends CommandSource> {
      */
     boolean isPermissionLevelOkay(Subject actee, String key, String permissionIfNoLevel, boolean isSameLevel);
 
-    interface Mutable<C extends CommandSource> extends ICommandContext<C> {
+    void removeModifier(String modifierId);
 
-        <T> void put(String name, Class<T> clazz, T obj);
+    void removeModifier(ICommandModifier modifier);
 
-        <T> void putAll(String name, Class<T> clazz, Collection<? extends T> obj);
-
-        void removeModifier(String modifierId);
-
-        void removeModifier(ICommandModifier modifier);
-
-        void addFailAction(Consumer<ICommandContext<C>> action);
-
-    }
+    void addFailAction(Consumer<ICommandContext> action);
 
 }

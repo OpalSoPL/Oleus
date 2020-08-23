@@ -12,19 +12,19 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class CommandLoggerHandler extends AbstractLoggingHandler implements IReloadableService.Reloadable, ServiceBase {
 
     private CommandLoggerConfig config;
 
     @Inject
-    public CommandLoggerHandler(INucleusServiceCollection serviceCollection) {
+    public CommandLoggerHandler(final INucleusServiceCollection serviceCollection) {
         super("command", "cmds", serviceCollection.messageProvider(), serviceCollection.logger());
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
         try {
             if (this.config.isLogToFile() && this.logger == null) {
@@ -32,7 +32,7 @@ public class CommandLoggerHandler extends AbstractLoggingHandler implements IRel
             } else if (!this.config.isLogToFile() && this.logger != null) {
                 this.onShutdown();
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }

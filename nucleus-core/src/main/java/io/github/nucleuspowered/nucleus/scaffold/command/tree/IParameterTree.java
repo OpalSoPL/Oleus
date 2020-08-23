@@ -37,7 +37,7 @@ public interface IParameterTree<B extends IParameterTree<B>> {
 
         Element<P, T> setKey(IParameterKey<T> key);
 
-        Element<P, T> setRequirement(Predicate<ICommandContext<?>> requirement);
+        Element<P, T> setRequirement(Predicate<ICommandContext> requirement);
 
         Element<P, T> setOptional(boolean optional);
 
@@ -53,7 +53,7 @@ public interface IParameterTree<B extends IParameterTree<B>> {
 
         Flag<P, T> setKey(IParameterKey<T> key);
 
-        Flag<P, T> setRequirement(Predicate<ICommandContext<?>> requirement);
+        Flag<P, T> setRequirement(Predicate<ICommandContext> requirement);
 
         <T> Flag<P, T> value(IParameterType<? extends T> parameterType);
 

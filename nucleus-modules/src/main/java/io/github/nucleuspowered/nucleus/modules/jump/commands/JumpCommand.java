@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
@@ -42,22 +42,22 @@ import javax.annotation.Nullable;
             @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = JumpPermissions.EXEMPT_COST_JUMP)
         }
 )
-public class JumpCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class JumpCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private int maxJump = 20;
 
     // Original code taken from EssentialCmds. With thanks to 12AwsomeMan34 for
     // the initial contribution.
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player player = context.getIfPlayer();
-        BlockRay<World> playerBlockRay = BlockRay.from(player).distanceLimit(this.maxJump).build();
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player player = context.getIfPlayer();
+        final BlockRay<World> playerBlockRay = BlockRay.from(player).distanceLimit(this.maxJump).build();
 
         BlockRayHit<World> finalHitRay = null;
 
         // Iterate over the blocks until we get a solid block.
         while (finalHitRay == null && playerBlockRay.hasNext()) {
-            BlockRayHit<World> currentHitRay = playerBlockRay.next();
+            final BlockRayHit<World> currentHitRay = playerBlockRay.next();
             if (!player.getWorld().getBlockType(currentHitRay.getBlockPosition()).equals(BlockTypes.AIR)) {
                 finalHitRay = currentHitRay;
             }
@@ -70,11 +70,11 @@ public class JumpCommand implements ICommandExecutor<Player>, IReloadableService
 
         // If the block not passable, then it is a solid block
         Location<World> finalLocation = finalHitRay.getLocation();
-        Optional<PassableProperty> pp = finalHitRay.getLocation().getProperty(PassableProperty.class);
+        final Optional<PassableProperty> pp = finalHitRay.getLocation().getProperty(PassableProperty.class);
         if (pp.isPresent() && !getFromBoxed(pp.get().getValue())) {
             finalLocation = finalLocation.add(0, 1, 0);
         } else {
-            Optional<PassableProperty> ppbelow = finalHitRay.getLocation().getRelative(Direction.DOWN).getProperty(PassableProperty.class);
+            final Optional<PassableProperty> ppbelow = finalHitRay.getLocation().getRelative(Direction.DOWN).getProperty(PassableProperty.class);
             if (ppbelow.isPresent() && !getFromBoxed(ppbelow.get().getValue())) {
                 finalLocation = finalLocation.sub(0, 1, 0);
             }
@@ -84,7 +84,7 @@ public class JumpCommand implements ICommandExecutor<Player>, IReloadableService
             return context.errorResult("command.jump.outsideborder");
         }
 
-        boolean result = context.getServiceCollection()
+        final boolean result = context.getServiceCollection()
                 .teleportService()
                 .teleportPlayerSmart(
                         player,
@@ -101,12 +101,12 @@ public class JumpCommand implements ICommandExecutor<Player>, IReloadableService
         return context.errorResult("command.jump.notsafe");
     }
 
-    private boolean getFromBoxed(@Nullable Boolean bool) {
+    private boolean getFromBoxed(@Nullable final Boolean bool) {
         return bool != null ? bool : false;
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.maxJump = serviceCollection.moduleDataProvider().getModuleConfig(JumpConfig.class).getMaxJump();
     }
 }

@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -37,32 +37,32 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "checknotes",
         async = true
 )
-public class CheckNotesCommand implements ICommandExecutor<CommandSource> {
+public class CheckNotesCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection)
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
-        User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
+        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
 
-        List<NoteData> notes = handler.getNotesInternal(user);
+        final List<NoteData> notes = handler.getNotesInternal(user);
         if (notes.isEmpty()) {
             context.sendMessage("command.checknotes.none", user.getName());
             return context.successResult();
         }
 
-        List<Text> messages =
+        final List<Text> messages =
                 notes.stream().sorted(Comparator.comparing(NoteData::getDate)).map(x -> createMessage(x, user, context, handler))
                         .collect(Collectors.toList());
         messages.add(0, context.getMessage("command.checknotes.info"));
 
-        PaginationService paginationService = Sponge.getGame().getServiceManager().provideUnchecked(PaginationService.class);
+        final PaginationService paginationService = Sponge.getGame().getServiceManager().provideUnchecked(PaginationService.class);
         paginationService.builder()
                 .title(
                         Text.builder()
@@ -75,28 +75,28 @@ public class CheckNotesCommand implements ICommandExecutor<CommandSource> {
                         .append(Text.of("="))
                         .build())
                 .contents(messages)
-                .sendTo(context.getCommandSource());
+                .sendTo(context.getCommandSourceRoot());
 
         return context.successResult();
     }
 
-    private Text createMessage(NoteData note,
-            User user,
-            ICommandContext<? extends CommandSource> context,
-            NoteHandler handler) {
-        String name;
+    private TextComponent createMessage(final NoteData note,
+            final User user,
+            final ICommandContext context,
+            final NoteHandler handler) {
+        final String name;
         if (note.getNoterInternal().equals(Util.CONSOLE_FAKE_UUID)) {
             name = Sponge.getServer().getConsole().getName();
         } else {
-            Optional<User> ou = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(note.getNoterInternal());
+            final Optional<User> ou = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(note.getNoterInternal());
             name = ou.map(User::getName).orElseGet(() -> context.getMessageString("standard.unknown"));
         }
 
         //Get the ID of the note, its index in the users List<NoteData>. Add one to start with an ID of 1.
-        int id = handler.getNotesInternal(user).indexOf(note) + 1;
+        final int id = handler.getNotesInternal(user).indexOf(note) + 1;
 
         //Action buttons, this should look like 'Action > [Delete] - [Return] <'
-        Text.Builder actions = context.getMessage("command.checknotes.action").toBuilder();
+        final Text.Builder actions = context.getMessage("command.checknotes.action").toBuilder();
 
         //Add separation between the word 'Action' and action buttons
         actions.append(Text.of(TextColors.GOLD, " > "));
@@ -120,13 +120,13 @@ public class CheckNotesCommand implements ICommandExecutor<CommandSource> {
         actions.append(Text.of(TextColors.GOLD, " < "));
 
         //Get and format the date of the warning
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd, yyyy").withZone(ZoneId.systemDefault());
-        String date = dtf.format(note.getDate());
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd, yyyy").withZone(ZoneId.systemDefault());
+        final String date = dtf.format(note.getDate());
 
-        Text nodeMessage = context.getServiceCollection().textStyleService().addUrls(note.getNote());
+        final TextComponent nodeMessage = context.getServiceCollection().textStyleService().addUrls(note.getNote());
 
         //Create a clickable name providing more information about the warning
-        Text.Builder information = Text.builder(name)
+        final Text.Builder information = Text.builder(name)
                 .onHover(TextActions.showText(context.getMessage("command.checknotes.hover.check")))
                 .onClick(TextActions.executeCallback(commandSource -> {
                     context.getMessage("command.checknotes.id", String.valueOf(id));
@@ -137,7 +137,7 @@ public class CheckNotesCommand implements ICommandExecutor<CommandSource> {
                 }));
 
         //Create the warning message
-        Text.Builder message = Text.builder()
+        final Text.Builder message = Text.builder()
                 .append(Text.of(TextColors.GREEN, information.build()))
                 .append(Text.of(": "))
                 .append(Text.of(TextColors.YELLOW, note.getNote()));

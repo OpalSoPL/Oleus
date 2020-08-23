@@ -26,14 +26,14 @@ public class RequiresEconomyModifier implements ICommandModifier, IReloadableSer
         return "Requires Economy Modifier";
     }
 
-    @Nullable private Text lazyLoad = null;
+    @Nullable private TextComponent lazyLoad = null;
 
     @Override
-    public Optional<Text> testRequirement(final ICommandContext.Mutable<? extends CommandSource> source, final CommandControl control,
+    public Optional<Text> testRequirement(final ICommandContext source, final CommandControl control,
             final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
         if (!serviceCollection.economyServiceProvider().serviceExists()) {
             if (this.lazyLoad == null) {
-                this.lazyLoad = serviceCollection.messageProvider().getMessageFor(source.getCommandSource(), "command.economyrequired");
+                this.lazyLoad = serviceCollection.messageProvider().getMessageFor(source.getCommandSourceRoot(), "command.economyrequired");
             }
 
             return Optional.of(this.lazyLoad);

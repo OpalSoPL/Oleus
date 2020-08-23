@@ -27,7 +27,7 @@ public class InvSeeListener implements ListenerBase {
 
     private static Map<UUID, Inventory> preventModify = Maps.newHashMap();
 
-    public static void addEntry(UUID uuid, Container inventory) {
+    public static void addEntry(final UUID uuid, final Container inventory) {
         preventModify.put(uuid, inventory);
     }
 
@@ -40,7 +40,7 @@ public class InvSeeListener implements ListenerBase {
      */
     @Listener
     @Exclude({InteractInventoryEvent.Open.class, InteractInventoryEvent.Close.class})
-    public void onInventoryChange(InteractInventoryEvent event, @First Player player, @Getter("getTargetInventory") Container targetInventory) {
+    public void onInventoryChange(final InteractInventoryEvent event, @First final Player player, @Getter("getTargetInventory") final Container targetInventory) {
 
         if (preventModify.get(player.getUniqueId()) == targetInventory) {
             event.setCancelled(true);
@@ -50,14 +50,14 @@ public class InvSeeListener implements ListenerBase {
     }
 
     @Listener(order = Order.POST)
-    public void onInventoryClose(InteractInventoryEvent.Close event, @First Player player, @Getter("getTargetInventory") Container targetInventory) {
+    public void onInventoryClose(final InteractInventoryEvent.Close event, @First final Player player, @Getter("getTargetInventory") final Container targetInventory) {
         if (preventModify.get(player.getUniqueId()) == targetInventory) {
             preventModify.remove(player.getUniqueId());
         }
     }
 
     @Listener
-    public void onLogout(ClientConnectionEvent.Disconnect event, @Root Player player) {
+    public void onLogout(final ClientConnectionEvent.Disconnect event, @Root final Player player) {
         preventModify.remove(player.getUniqueId());
     }
 

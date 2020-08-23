@@ -32,14 +32,14 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
     private final INucleusServiceCollection serviceCollection;
     private FlyConfig flyConfig;
 
-    public FlyListener(INucleusServiceCollection serviceCollection) {
+    public FlyListener(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.flyConfig = serviceCollection.moduleDataProvider().getDefaultModuleConfig(FlyConfig.class);
     }
 
     // Do it first, so other plugins can have a say.
     @Listener(order = Order.FIRST)
-    public void onPlayerJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player pl) {
+    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player pl) {
         if (shouldIgnoreFromGameMode(pl)) {
             return;
         }
@@ -66,7 +66,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
         }));
     }
 
-    private void exec(Player pl) {
+    private void exec(final Player pl) {
         pl.offer(Keys.CAN_FLY, true);
 
         // If in the air, flying!
@@ -76,7 +76,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
     }
 
     @Listener
-    public void onPlayerQuit(ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player pl) {
+    public void onPlayerQuit(final ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") final Player pl) {
         if (!this.flyConfig.isSaveOnQuit()) {
             return;
         }
@@ -92,22 +92,22 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
 
     // Only fire if there is no cancellation at the end.
     @Listener(order = Order.LAST)
-    public void onPlayerTransferWorld(MoveEntityEvent.Teleport event,
-                                      @Getter("getTargetEntity") Entity target,
-                                      @Getter("getFromTransform") Transform<World> twfrom,
-                                      @Getter("getToTransform") Transform<World> twto) {
+    public void onPlayerTransferWorld(final MoveEntityEvent.Teleport event,
+                                      @Getter("getTargetEntity") final Entity target,
+                                      @Getter("getFromTransform") final Transform<World> twfrom,
+                                      @Getter("getToTransform") final Transform<World> twto) {
 
         if (!(target instanceof Player)) {
             return;
         }
 
-        Player pl = (Player)target;
+        final Player pl = (Player)target;
         if (shouldIgnoreFromGameMode(pl)) {
             return;
         }
 
         // If we have a subject, and this happens...
-        boolean isFlying = target.get(Keys.IS_FLYING).orElse(false);
+        final boolean isFlying = target.get(Keys.IS_FLYING).orElse(false);
 
         // If we're moving world...
         if (!twfrom.getExtent().getUniqueId().equals(twto.getExtent().getUniqueId())) {
@@ -127,17 +127,17 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
         }
     }
 
-    static boolean shouldIgnoreFromGameMode(Player player) {
-        GameMode gm = player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET);
+    static boolean shouldIgnoreFromGameMode(final Player player) {
+        final GameMode gm = player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET);
         return (gm.equals(GameModes.CREATIVE) || gm.equals(GameModes.SPECTATOR));
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.flyConfig = this.serviceCollection.moduleDataProvider().getModuleConfig(FlyConfig.class);
     }
 
-    private void safeTeleport(Player pl) {
+    private void safeTeleport(final Player pl) {
         if (!pl.isOnGround() && this.flyConfig.isFindSafeOnLogin()) {
             // Try to bring the subject down.
             this.serviceCollection

@@ -40,15 +40,15 @@ public class WeatherArgument extends CommandElement {
 
     private final IMessageProviderService messageProvider;
 
-    public WeatherArgument(@Nullable Text key, INucleusServiceCollection serviceCollection) {
+    public WeatherArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProvider = serviceCollection.messageProvider();
     }
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String arg = args.next().toLowerCase();
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String arg = args.next().toLowerCase();
         if (weather.containsKey(arg)) {
             return weather.get(arg);
         }
@@ -57,11 +57,11 @@ public class WeatherArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         try {
-            String a = args.peek();
+            final String a = args.peek();
             return weather.entrySet().stream().filter(x -> x.getKey().toLowerCase().startsWith(a)).map(Map.Entry::getKey).collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             e.printStackTrace();
             return Lists.newArrayList(weather.keySet());
         }

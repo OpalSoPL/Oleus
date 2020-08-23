@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
 
@@ -44,29 +44,29 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
     private final Map<UUID, ChunkPreGenerate> pregen = Maps.newHashMap();
 
     @Inject
-    public WorldHelper(INucleusServiceCollection serviceCollection) {
+    public WorldHelper(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
-    public boolean isPregenRunningForWorld(UUID uuid) {
+    public boolean isPregenRunningForWorld(final UUID uuid) {
         cleanup();
         return this.pregen.containsKey(uuid);
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        WorldConfig config = serviceCollection.moduleDataProvider().getModuleConfig(WorldConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final WorldConfig config = serviceCollection.moduleDataProvider().getModuleConfig(WorldConfig.class);
         this.notify = config.isDisplayAfterEachGen();
         this.display = config.isDisplayWarningGeneration();
         this.timeToNotify = config.getNotificationInterval() * 1000L;
     }
 
-    public boolean startPregenningForWorld(World world, boolean aggressive, long saveTime, @Nullable Integer tickPercent,
-            @Nullable Integer tickFrequency, boolean onRestart) {
+    public boolean startPregenningForWorld(final World world, final boolean aggressive, final long saveTime, @Nullable Integer tickPercent,
+            @Nullable Integer tickFrequency, final boolean onRestart) {
         cleanup();
         if (!isPregenRunningForWorld(world.getUniqueId())) {
-            WorldProperties wp = world.getProperties();
-            ChunkPreGenerate.Builder wbcp = world.newChunkPreGenerate(wp.getWorldBorderCenter(), wp.getWorldBorderDiameter())
+            final WorldProperties wp = world.getProperties();
+            final ChunkPreGenerate.Builder wbcp = world.newChunkPreGenerate(wp.getWorldBorderCenter(), wp.getWorldBorderDiameter())
                 .owner(this.serviceCollection.pluginContainer()).addListener(new Listener(this.serviceCollection,
                             aggressive,
                             saveTime,
@@ -90,7 +90,7 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
             }
 
             if (onRestart) {
-                IWorldDataObject service = this.serviceCollection
+                final IWorldDataObject service = this.serviceCollection
                         .storageManager()
                         .getWorldService()
                         .getOrNewOnThread(world.getUniqueId());
@@ -111,10 +111,10 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
         return false;
     }
 
-    public boolean cancelPregenRunningForWorld(UUID uuid) {
+    public boolean cancelPregenRunningForWorld(final UUID uuid) {
         cleanup();
         if (this.pregen.containsKey(uuid)) {
-            ChunkPreGenerate cpg = this.pregen.remove(uuid);
+            final ChunkPreGenerate cpg = this.pregen.remove(uuid);
             getChannel().send(
                 this.serviceCollection.messageProvider().getMessage("command.pregen.gen.cancelled2",
                     String.valueOf(cpg.getTotalGeneratedChunks()),
@@ -151,12 +151,12 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
         private long lastSaveTime;
         private long lastNotifyTime;
 
-        Listener(INucleusServiceCollection serviceCollection,
-                boolean aggressive,
-                long timeToSave,
-                boolean notify,
-                boolean display,
-                long timeToNotify) {
+        Listener(final INucleusServiceCollection serviceCollection,
+                final boolean aggressive,
+                final long timeToSave,
+                final boolean notify,
+                final boolean display,
+                final long timeToNotify) {
             this.serviceCollection = serviceCollection;
             this.aggressive = aggressive;
             this.lastSaveTime = System.currentTimeMillis();
@@ -166,11 +166,11 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
             this.timeToNotify = timeToNotify;
         }
 
-        @Override public void accept(ChunkPreGenerationEvent event) {
-            ChunkPreGenerate cpg = event.getChunkPreGenerate();
+        @Override public void accept(final ChunkPreGenerationEvent event) {
+            final ChunkPreGenerate cpg = event.getChunkPreGenerate();
             if (event instanceof ChunkPreGenerationEvent.Pre) {
                 if (!this.aggressive) {
-                    long percent = getMemPercent();
+                    final long percent = getMemPercent();
                     if (percent >= 90) {
                         if (!this.highMemTriggered) {
                             event.getTargetWorld().getLoadedChunks().forEach(Chunk::unloadChunk);
@@ -190,8 +190,8 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
                 }
             } else if (event instanceof ChunkPreGenerationEvent.Post) {
 
-                ChunkPreGenerationEvent.Post cpp = ((ChunkPreGenerationEvent.Post) event);
-                Text message;
+                final ChunkPreGenerationEvent.Post cpp = ((ChunkPreGenerationEvent.Post) event);
+                final TextComponent message;
                 this.time += cpp.getTimeTakenForStep().toMillis();
                 if (cpp.getChunksSkippedThisStep() > 0) {
                     message = this.serviceCollection.messageProvider().getMessage("command.pregen.gen.notifyskipped",
@@ -212,7 +212,7 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
                     getChannel().send(message);
                 }
 
-                long time = System.currentTimeMillis();
+                final long time = System.currentTimeMillis();
                 if (this.lastSaveTime + this.timeToSave < time) {
                     save(event.getTargetWorld());
                 }
@@ -220,7 +220,7 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
                 if (this.display && this.lastNotifyTime + this.timeToNotify < time) {
                     MessageChannel.TO_ALL.send(this.serviceCollection.messageProvider().getMessage("command.pregen.gen.all"));
 
-                    double total = 100*(cpg.getTotalGeneratedChunks() + cpg.getTotalSkippedChunks())/(double) cpg.getTargetTotalChunks();
+                    final double total = 100*(cpg.getTotalGeneratedChunks() + cpg.getTotalSkippedChunks())/(double) cpg.getTargetTotalChunks();
 
                     getChannel().send(this.serviceCollection.messageProvider().getMessage("command.pregen.gen.quickstatus",
                             WorldHelper.PERCENT_FORMAT.format(total),
@@ -246,21 +246,21 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
 
         private long getMemPercent() {
             // Check system memory
-            long max = Runtime.getRuntime().maxMemory() / 1024 / 1024;
-            long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
-            long free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+            final long max = Runtime.getRuntime().maxMemory() / 1024 / 1024;
+            final long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+            final long free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
 
             return ((max - total + free ) * 100)/ max;
         }
 
-        private void save(World world) {
+        private void save(final World world) {
             getChannel().send(
                     this.serviceCollection.messageProvider().getMessage("command.pregen.gen.saving"));
             try {
                 world.save();
                 getChannel().send(
                         this.serviceCollection.messageProvider().getMessage("command.pregen.gen.saved"));
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 getChannel().send(
                         this.serviceCollection.messageProvider().getMessage("command.pregen.gen.savefailed"));
                 e.printStackTrace();

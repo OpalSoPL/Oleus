@@ -23,9 +23,9 @@ public class CropTrampleListener implements IReloadableService.Reloadable, Liste
 
     // Not sure this should be correct. Keep an eye.
     @Listener
-    public void onBlockChange(ChangeBlockEvent.Place breakEvent, @Root Entity entity) {
+    public void onBlockChange(final ChangeBlockEvent.Place breakEvent, @Root final Entity entity) {
         // If player or entity and the corresponding option is added
-        boolean isPlayer = entity instanceof Player;
+        final boolean isPlayer = entity instanceof Player;
         if (this.cropplayer && isPlayer || this.cropentity && !isPlayer) {
             // Go from Farmland to Dirt.
             breakEvent.getTransactions().stream()
@@ -37,14 +37,14 @@ public class CropTrampleListener implements IReloadableService.Reloadable, Liste
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        ProtectionConfig protectionConfig = serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final ProtectionConfig protectionConfig = serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class);
         this.cropentity = protectionConfig.isDisableMobCropTrample();
         this.cropplayer = protectionConfig.isDisablePlayerCropTrample();
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class).isDisableAnyCropTrample();
     }
 }

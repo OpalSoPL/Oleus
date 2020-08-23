@@ -12,24 +12,24 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.cause.First;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class MailLoggingListener extends AbstractLoggerListener {
 
     @Inject
-    MailLoggingListener(INucleusServiceCollection serviceCollection) {
+    MailLoggingListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection);
     }
 
     @Listener(order = Order.LAST)
-    public void onCommand(NucleusSendMailEvent event, @First CommandSource source) {
-        String message = this.messageProviderService.getMessageString("chatlog.mail",
+    public void onCommand(final NucleusSendMailEvent event, @First final CommandSource source) {
+        final String message = this.messageProviderService.getMessageString("chatlog.mail",
             source.getName(), event.getRecipient().getName(), event.getMessage());
         this.handler.queueEntry(message);
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
-        ChatLoggingConfig config = getConfig(serviceCollection);
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
+        final ChatLoggingConfig config = getConfig(serviceCollection);
         return config.isEnableLog() && config.isLogMail();
     }
 }

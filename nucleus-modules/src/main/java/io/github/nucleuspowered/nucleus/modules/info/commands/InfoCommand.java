@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -33,7 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @Command(
         aliases = {"info", "einfo"},
@@ -43,7 +43,7 @@ import javax.inject.Inject;
         associatedPermissions = InfoPermissions.INFO_LIST
 )
 @EssentialsEquivalent({"info", "ifo", "news", "about", "inform"})
-public class InfoCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class InfoCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final InfoHandler infoService;
     private InfoConfig infoConfig = new InfoConfig();
@@ -51,16 +51,16 @@ public class InfoCommand implements ICommandExecutor<CommandSource>, IReloadable
     private final String key = "section";
 
     @Inject
-    public InfoCommand(INucleusServiceCollection serviceCollection) {
+    public InfoCommand(final INucleusServiceCollection serviceCollection) {
         this.infoService = serviceCollection.getServiceUnchecked(InfoHandler.class);
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.infoConfig = serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class);
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
                     .valueFlag(serviceCollection.commandElementSupplier().createPermissionParameter(
@@ -73,12 +73,12 @@ public class InfoCommand implements ICommandExecutor<CommandSource>, IReloadable
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         Optional<InfoArgument.Result> oir = context.getOne(this.key, InfoArgument.Result.class);
         if (this.infoConfig.isUseDefaultFile() && !oir.isPresent() && !context.hasAny("l")) {
             // Do we have a default?
-            String def = this.infoConfig.getDefaultInfoSection();
-            Optional<TextFileController> list = this.infoService.getSection(def);
+            final String def = this.infoConfig.getDefaultInfoSection();
+            final Optional<TextFileController> list = this.infoService.getSection(def);
             if (list.isPresent()) {
                 oir = Optional.of(new InfoArgument.Result(
                         this.infoService.getInfoSections().stream().filter(def::equalsIgnoreCase).findFirst().get(), list.get()));
@@ -86,42 +86,42 @@ public class InfoCommand implements ICommandExecutor<CommandSource>, IReloadable
         }
 
         if (oir.isPresent()) {
-            TextFileController controller = oir.get().text;
-            Text def = TextSerializers.FORMATTING_CODE.deserialize(oir.get().name);
-            Text title = context.getMessage("command.info.title.section", controller.getTitle(context.getCommandSource()).orElseGet(() -> Text.of(def)));
+            final TextFileController controller = oir.get().text;
+            final TextComponent def = TextSerializers.FORMATTING_CODE.deserialize(oir.get().name);
+            final TextComponent title = context.getMessage("command.info.title.section", controller.getTitle(context.getCommandSourceRoot()).orElseGet(() -> Text.of(def)));
 
-            controller.sendToPlayer(context.getCommandSource(), title);
+            controller.sendToPlayer(context.getCommandSourceRoot(), title);
             return context.successResult();
         }
 
         // Create a list of pages to load.
-        Set<String> sections = this.infoService.getInfoSections();
+        final Set<String> sections = this.infoService.getInfoSections();
         if (sections.isEmpty()) {
             return context.errorResult("command.info.none");
         }
 
         // Create the text.
-        List<Text> s = Lists.newArrayList();
+        final List<Text> s = Lists.newArrayList();
         sections.forEach(x -> {
-            Text.Builder tb = Text.builder().append(Text.builder(x)
+            final Text.Builder tb = Text.builder().append(Text.builder(x)
                     .color(TextColors.GREEN).style(TextStyles.ITALIC)
                     .onHover(TextActions.showText(context.getMessage("command.info.hover", x)))
                     .onClick(TextActions.runCommand("/info " + x)).build());
 
             // If there is a title, then add it.
-            this.infoService.getSection(x).get().getTitle(context.getCommandSourceUnchecked()).ifPresent(sub ->
+            this.infoService.getSection(x).get().getTitle(context.getCommandSourceRoot()).ifPresent(sub ->
                 tb.append(Text.of(TextColors.GOLD, " - ")).append(sub)
             );
 
             s.add(tb.build());
         });
 
-        Util.getPaginationBuilder(context.getCommandSource()).contents()
+        Util.getPaginationBuilder(context.getCommandSourceRoot()).contents()
                 .header(context.getMessage("command.info.header.default"))
                 .title(context.getMessage("command.info.title.default"))
                 .contents(s.stream().sorted(Comparator.comparing(Text::toPlain)).collect(Collectors.toList()))
                 .padding(Text.of(TextColors.GOLD, "-"))
-                .sendTo(context.getCommandSource());
+                .sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 }

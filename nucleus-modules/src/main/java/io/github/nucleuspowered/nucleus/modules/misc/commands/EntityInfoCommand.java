@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.data.key.Key;
@@ -42,10 +42,10 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "entityinfo",
         associatedPermissions = MiscPermissions.ENTITYINFO_EXTENDED
 )
-public class EntityInfoCommand implements ICommandExecutor<Player> {
+public class EntityInfoCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags()
                         .permissionFlag(MiscPermissions.ENTITYINFO_EXTENDED, "e", "-extended")
@@ -53,43 +53,43 @@ public class EntityInfoCommand implements ICommandExecutor<Player> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the entities in the world.
-        Player player = context.getIfPlayer();
-        Vector3i playerPos = player.getLocation().getBlockPosition();
-        Collection<Entity> entities = player.getWorld().getEntities().stream()
+        final Player player = context.getIfPlayer();
+        final Vector3i playerPos = player.getLocation().getBlockPosition();
+        final Collection<Entity> entities = player.getWorld().getEntities().stream()
             .filter(x -> x.getLocation().getBlockPosition().distanceSquared(playerPos) < 121) // 11 blocks.
             .collect(Collectors.toList());
 
-        BlockRay<World> bl = BlockRay.from(player).distanceLimit(10).stopFilter(BlockRay.continueAfterFilter(x -> {
-            Vector3i pt1 = x.getLocation().getBlockPosition();
-            Vector3i pt2 = pt1.add(0, 1, 0);
+        final BlockRay<World> bl = BlockRay.from(player).distanceLimit(10).stopFilter(BlockRay.continueAfterFilter(x -> {
+            final Vector3i pt1 = x.getLocation().getBlockPosition();
+            final Vector3i pt2 = pt1.add(0, 1, 0);
             return entities.stream()
                 .allMatch(e -> {
-                    Vector3i current = e.getLocation().getBlockPosition();
+                    final Vector3i current = e.getLocation().getBlockPosition();
 
                     // We don't want it to stop until one of these are hit.
                     return !(current.equals(pt1) || current.equals(pt2));
                 });
         }, 1)).build();
-        Optional<BlockRayHit<World>> ob = bl.end();
+        final Optional<BlockRayHit<World>> ob = bl.end();
 
         if (ob.isPresent()) {
-            BlockRayHit<World> brh = ob.get();
-            Vector3d location = brh.getLocation().getPosition();
-            Vector3d locationOneUp = location.add(0, 1, 0);
+            final BlockRayHit<World> brh = ob.get();
+            final Vector3d location = brh.getLocation().getPosition();
+            final Vector3d locationOneUp = location.add(0, 1, 0);
 
-            Optional<Entity> entityOptional = entities.stream().filter(e -> {
-                Vector3i current = e.getLocation().getBlockPosition();
+            final Optional<Entity> entityOptional = entities.stream().filter(e -> {
+                final Vector3i current = e.getLocation().getBlockPosition();
                 return current.equals(location.toInt()) || current.equals(locationOneUp.toInt());
             }).min(Comparator.comparingDouble(x -> x.getLocation().getPosition().distanceSquared(location)));
 
             if (entityOptional.isPresent()) {
                 // Display info about the entity
-                Entity entity = entityOptional.get();
-                EntityType type = entity.getType();
+                final Entity entity = entityOptional.get();
+                final EntityType type = entity.getType();
 
-                List<Text> lt = new ArrayList<>();
+                final List<Text> lt = new ArrayList<>();
                 lt.add(context.getMessage("command.entityinfo.id", type.getId(), Util.getTranslatableIfPresent(type)));
                 lt.add(context.getMessage("command.entityinfo.uuid", entity.getUniqueId().toString()));
 
@@ -100,11 +100,11 @@ public class EntityInfoCommand implements ICommandExecutor<Player> {
                         // Work around a Sponge bug.
                         try {
                             return entity.supports(x.getValue());
-                        } catch (Exception e) {
+                        } catch (final Exception e) {
                             return false;
                         }
                     }).forEach(x -> {
-                        Key<? extends BaseValue<Object>> k = (Key<? extends BaseValue<Object>>) x.getValue();
+                        final Key<? extends BaseValue<Object>> k = (Key<? extends BaseValue<Object>>) x.getValue();
                         if (entity.get(k).isPresent()) {
                             DataScanner.getInstance(context.getServiceCollection().messageProvider())
                                     .getText(player, "command.entityinfo.key", x.getKey(), entity.get(k).get()).ifPresent(lt::add);

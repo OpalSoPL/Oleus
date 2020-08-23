@@ -39,7 +39,7 @@ public class MobConfig {
         return ImmutableMap.copyOf(this.blockSpawnsConfig);
     }
 
-    public Optional<BlockSpawnsConfig> getBlockSpawnsConfigForWorld(World world) {
+    public Optional<BlockSpawnsConfig> getBlockSpawnsConfigForWorld(final World world) {
         return Optional.ofNullable(this.blockSpawnsConfig.get(world.getName()));
     }
 

@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = ProtectionModule.ID, name = "Protection")
 public class ProtectionModule extends ConfigurableModule<ProtectionConfig, ProtectionConfigAdapter> {
@@ -21,7 +21,7 @@ public class ProtectionModule extends ConfigurableModule<ProtectionConfig, Prote
     public static final String ID = "protection";
 
     @Inject
-    public ProtectionModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public ProtectionModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

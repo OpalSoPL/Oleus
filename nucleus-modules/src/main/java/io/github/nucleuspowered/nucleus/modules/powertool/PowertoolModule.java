@@ -12,7 +12,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = PowertoolModule.ID, name = "Powertool", dependencies = CoreModule.ID)
 public class PowertoolModule extends StandardModule {
@@ -20,7 +20,7 @@ public class PowertoolModule extends StandardModule {
     public static final String ID = "powertool";
 
     @Inject
-    public PowertoolModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public PowertoolModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

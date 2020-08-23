@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -50,13 +50,13 @@ import java.util.function.Consumer;
         },
         associatedPermissions = FunPermissions.OTHERS_KITTYCANNON
 )
-public class KittyCannonCommand implements ICommandExecutor<CommandSource> {
+public class KittyCannonCommand implements ICommandExecutor {
 
     private final Random random = new Random();
     private final List<OcelotType> ocelotTypes = Lists.newArrayList(Sponge.getRegistry().getAllOf(OcelotType.class));
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
                 .permissionFlag(FunPermissions.KITTYCANNON_DAMAGE, "d", "-damageentities")
@@ -70,27 +70,27 @@ public class KittyCannonCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         Collection<Player> playerList = context.getAll(NucleusParameters.Keys.PLAYER, Player.class);
         if (playerList.isEmpty()) {
             playerList = ImmutableList.of(context.getIfPlayer());
         }
 
         // For each subject, create a kitten, throw it out in the direction of the subject, and make it explode after between 2 and 5 seconds
-        for (Player x : playerList) {
+        for (final Player x : playerList) {
             getACat(context, x, context.hasAny("d"), context.hasAny("b"), context.hasAny("f"));
         }
         return context.successResult();
     }
 
-    private void getACat(ICommandContext<? extends CommandSource> context, Player spawnAt, boolean damageEntities, boolean breakBlocks,
-            boolean causeFire) throws CommandException {
+    private void getACat(final ICommandContext context, final Player spawnAt, final boolean damageEntities, final boolean breakBlocks,
+            final boolean causeFire) throws CommandException {
         // Fire it in the direction that the subject is facing with a speed of 0.5 to 3.5, plus the subject's current velocity.
-        Vector3d headRotation = spawnAt.getHeadRotation();
-        Quaterniond rot = Quaterniond.fromAxesAnglesDeg(headRotation.getX(), -headRotation.getY(), headRotation.getZ());
-        Vector3d velocity = spawnAt.getVelocity().add(rot.rotate(Vector3d.UNIT_Z).mul(5 * this.random.nextDouble() + 1));
-        World world = spawnAt.getWorld();
-        Entity cat = world.createEntity(EntityTypes.OCELOT, spawnAt.getLocation()
+        final Vector3d headRotation = spawnAt.getHeadRotation();
+        final Quaterniond rot = Quaterniond.fromAxesAnglesDeg(headRotation.getX(), -headRotation.getY(), headRotation.getZ());
+        final Vector3d velocity = spawnAt.getVelocity().add(rot.rotate(Vector3d.UNIT_Z).mul(5 * this.random.nextDouble() + 1));
+        final World world = spawnAt.getWorld();
+        final Entity cat = world.createEntity(EntityTypes.OCELOT, spawnAt.getLocation()
             .getPosition().add(0, 1, 0).add(spawnAt.getTransform().getRotationAsQuaternion().getDirection()));
         cat.offer(Keys.OCELOT_TYPE, this.ocelotTypes.get(this.random.nextInt(this.ocelotTypes.size())));
 
@@ -99,8 +99,8 @@ public class KittyCannonCommand implements ICommandExecutor<CommandSource> {
                     causeFire))
             .submit(context.getServiceCollection().pluginContainer());
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
             world.spawnEntity(cat);
         }
 
@@ -117,7 +117,8 @@ public class KittyCannonCommand implements ICommandExecutor<CommandSource> {
         private final boolean breakBlocks;
         private int ticksToDestruction;
 
-        private CatTimer(UUID world, UUID entity, Player player, int ticksToDestruction, boolean damageEntities, boolean breakBlocks, boolean causeFire) {
+        private CatTimer(
+                final UUID world, final UUID entity, final Player player, final int ticksToDestruction, final boolean damageEntities, final boolean breakBlocks, final boolean causeFire) {
             this.entity = entity;
             this.ticksToDestruction = ticksToDestruction;
             this.world = world;
@@ -127,20 +128,20 @@ public class KittyCannonCommand implements ICommandExecutor<CommandSource> {
             this.causeFire = causeFire;
         }
 
-        @Override public void accept(Task task) {
-            Optional<World> oWorld = Sponge.getServer().getWorld(this.world);
+        @Override public void accept(final Task task) {
+            final Optional<World> oWorld = Sponge.getServer().getWorld(this.world);
             if (!oWorld.isPresent()) {
                 task.cancel();
                 return;
             }
 
-            Optional<Entity> oe = oWorld.get().getEntity(this.entity);
+            final Optional<Entity> oe = oWorld.get().getEntity(this.entity);
             if (!oe.isPresent()) {
                 task.cancel();
                 return;
             }
 
-            Entity e = oe.get();
+            final Entity e = oe.get();
             if (e.isRemoved()) {
                 task.cancel();
                 return;
@@ -149,11 +150,11 @@ public class KittyCannonCommand implements ICommandExecutor<CommandSource> {
             this.ticksToDestruction -= 5;
             if (this.ticksToDestruction <= 0 || e.isOnGround()) {
                 // Cat explodes.
-                Explosion explosion = Explosion.builder().location(e.getLocation()).canCauseFire(this.causeFire)
+                final Explosion explosion = Explosion.builder().location(e.getLocation()).canCauseFire(this.causeFire)
                     .shouldDamageEntities(this.damageEntities).shouldPlaySmoke(true).shouldBreakBlocks(this.breakBlocks)
                     .radius(2).build();
                 e.remove();
-                try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+                try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                     frame.pushCause(this.player);
                     oWorld.get().triggerExplosion(explosion);
                 }

@@ -24,13 +24,13 @@ public class AFKInfoProvider implements NucleusProvider {
     }
 
     @Override
-    public Optional<Text> get(User user, CommandSource source, INucleusServiceCollection serviceCollection) {
+    public Optional<Text> get(final User user, final CommandSource source, final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, AFKPermissions.AFK_NOTIFY)) {
-            AFKHandler handler = serviceCollection.getServiceUnchecked(AFKHandler.class);
-            IMessageProviderService messageProviderService = serviceCollection.messageProvider();
+            final AFKHandler handler = serviceCollection.getServiceUnchecked(AFKHandler.class);
+            final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             if (user.isOnline()) {
-                Player player = user.getPlayer().get();
-                String timeToNow = messageProviderService.getTimeToNow(source.getLocale(), handler.lastActivity(player));
+                final Player player = user.getPlayer().get();
+                final String timeToNow = messageProviderService.getTimeToNow(source.getLocale(), handler.lastActivity(player));
                 if (handler.canGoAFK(player)) {
                     if (handler.isAFK(player)) {
                         return Optional.of(

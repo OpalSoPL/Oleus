@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.NotifyIfAFK;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 /**
@@ -36,18 +36,18 @@ import org.spongepowered.api.command.args.CommandElement;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = MessagePermissions.EXEMPT_COST_MESSAGE)
         }
 )
-public class ReplyCommand implements ICommandExecutor<CommandSource> {
+public class ReplyCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.MESSAGE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        boolean b = context.getServiceCollection().getServiceUnchecked(MessageHandler.class)
-                .replyMessage(context.getCommandSource(), context.requireOne(NucleusParameters.Keys.MESSAGE, String.class));
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final boolean b = context.getServiceCollection().getServiceUnchecked(MessageHandler.class)
+                .replyMessage(context.getCommandSourceRoot(), context.requireOne(NucleusParameters.Keys.MESSAGE, String.class));
         if (b) {
             // For Notify on AFK - TODO: Better way to do this
             /* UUID uuid = context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID);

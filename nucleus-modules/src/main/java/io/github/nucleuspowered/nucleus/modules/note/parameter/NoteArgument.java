@@ -27,7 +27,7 @@ public class NoteArgument extends CommandElement {
     private final NoteHandler handler;
     private final IMessageProviderService messageProviderService;
 
-    public NoteArgument(@Nullable Text key, NoteHandler handler, IMessageProviderService messageProviderService) {
+    public NoteArgument(@Nullable final TextComponent key, final NoteHandler handler, final IMessageProviderService messageProviderService) {
         super(key);
         this.handler = handler;
         this.messageProviderService = messageProviderService;
@@ -35,32 +35,32 @@ public class NoteArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        Optional<String> optPlayer = args.nextIfPresent();
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final Optional<String> optPlayer = args.nextIfPresent();
         if (!optPlayer.isPresent()) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.note.nouserarg"));
         }
-        String player = optPlayer.get();
+        final String player = optPlayer.get();
 
-        Optional<User> optUser = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(player);
+        final Optional<User> optUser = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(player);
         if (!optUser.isPresent()) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.note.nouser", player));
         }
-        User user = optUser.get();
+        final User user = optUser.get();
 
-        Optional<String> optIndex = args.nextIfPresent();
+        final Optional<String> optIndex = args.nextIfPresent();
         if (!optIndex.isPresent()) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.note.noindex", user.getName()));
         }
 
-        List<NoteData> noteData = this.handler.getNotesInternal(user);
-        int index;
+        final List<NoteData> noteData = this.handler.getNotesInternal(user);
+        final int index;
         try {
             index = Integer.parseInt(optIndex.get()) - 1;
             if (index >= noteData.size() || index < 0) {
                 throw args.createError(this.messageProviderService.getMessageFor(source, "args.note.nonotedata", optIndex.get(), user.getName()));
             }
-        } catch (NumberFormatException ex) {
+        } catch (final NumberFormatException ex) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.note.indexnotnumber"));
         }
 
@@ -69,12 +69,12 @@ public class NoteArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return Collections.emptyList();
     }
 
     @Override
-    public Text getUsage(CommandSource src) {
+    public TextComponent getUsage(final CommandSource src) {
         return Text.of("<user> <ID>");
     }
 
@@ -82,7 +82,7 @@ public class NoteArgument extends CommandElement {
         public final User user;
         public final NoteData noteData;
 
-        Result(User user, NoteData noteData) {
+        Result(final User user, final NoteData noteData) {
             this.user = user;
             this.noteData = noteData;
         }

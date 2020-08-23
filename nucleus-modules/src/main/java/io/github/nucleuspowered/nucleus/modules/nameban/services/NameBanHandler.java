@@ -45,13 +45,13 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
     private Path currentPath;
 
     @Inject
-    public NameBanHandler(INucleusServiceCollection serviceCollection) {
+    public NameBanHandler(final INucleusServiceCollection serviceCollection) {
         this.pluginContainer = serviceCollection.pluginContainer();
         this.dataPath = serviceCollection.dataDir();
         this.configurateOptions = serviceCollection.configurateHelper();
     }
 
-    @Override public void addName(String name, String reason, Cause cause) throws NameBanException {
+    @Override public void addName(final String name, final String reason, final Cause cause) throws NameBanException {
         if (Util.usernameRegex.matcher(name).matches()) {
             this.entries.put(name.toLowerCase(), reason);
             Sponge.getEventManager().post(new NameBanEvent.Banned(name, reason, cause));
@@ -64,14 +64,14 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
                 Text.of("That is not a valid username."), NameBanException.Reason.DISALLOWED_NAME);
     }
 
-    @Override public Optional<String> getReasonForBan(String name) {
+    @Override public Optional<String> getReasonForBan(final String name) {
         Preconditions.checkNotNull(name);
         return Optional.ofNullable(this.entries.get(name.toLowerCase()));
     }
 
-    @Override public void removeName(String name, Cause cause) throws NameBanException {
+    @Override public void removeName(final String name, final Cause cause) throws NameBanException {
         if (Util.usernameRegex.matcher(name).matches()) {
-            Optional<String> reason = getReasonForBan(name);
+            final Optional<String> reason = getReasonForBan(name);
             if (reason.isPresent() && this.entries.remove(name.toLowerCase()) != null) {
                 Sponge.getEventManager().post(new NameBanEvent.Unbanned(name, reason.get(), cause));
             }
@@ -84,32 +84,32 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
 
     public void load() {
         try {
-            ConfigurationNode node = createLoader().load();
+            final ConfigurationNode node = createLoader().load();
             // Lowercase the keys.
             this.entries.clear();
             node.getChildrenMap()
                     .forEach((k, v) -> {
-                        String lower = k.toString().toLowerCase();
+                        final String lower = k.toString().toLowerCase();
                         if (!k.equals(lower)) {
                             entries.put(lower, v.getString());
                         }
                     });
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
 
     public void save() {
         try {
-            ConfigurationNode node = SimpleConfigurationNode.root(this.configurateOptions.setOptions(ConfigurationOptions.defaults()));
+            final ConfigurationNode node = SimpleConfigurationNode.root(this.configurateOptions.setOptions(ConfigurationOptions.defaults()));
             node.setValue(new TypeToken<Map<String, String>>() {}, this.entries);
             createLoader().save(node);
-        } catch (IOException | ObjectMappingException e) {
+        } catch (final IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
     }
 
-    @Override public void onDataFileLocationChange(INucleusServiceCollection serviceCollection) {
+    @Override public void onDataFileLocationChange(final INucleusServiceCollection serviceCollection) {
         // The path changes
         this.currentPath = this.dataPath.get().resolve("namebans.conf");
         load();

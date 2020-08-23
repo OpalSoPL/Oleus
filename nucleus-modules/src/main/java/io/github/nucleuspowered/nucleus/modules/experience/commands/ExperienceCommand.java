@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
@@ -27,40 +27,40 @@ import java.util.Optional;
         basePermission = ExperiencePermissions.BASE_EXP,
         commandDescriptionKey = "exp")
 @EssentialsEquivalent({"exp", "xp"})
-public class ExperienceCommand implements ICommandExecutor<CommandSource> {
+public class ExperienceCommand implements ICommandExecutor {
 
     static final String experienceKey = "experience";
     static final String levelKey = "level";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_ONE_PLAYER.get(serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
 
-        ExperienceHolderData ehd = pl.get(ExperienceHolderData.class).get();
-        int exp = ehd.totalExperience().get();
-        int lv = ehd.level().get();
+        final ExperienceHolderData ehd = pl.get(ExperienceHolderData.class).get();
+        final int exp = ehd.totalExperience().get();
+        final int lv = ehd.level().get();
 
         context.getServiceCollection().messageProvider()
-                .sendMessageTo(context.getCommandSource(), "command.exp.info", pl.getName(), exp, lv);
+                .sendMessageTo(context.getCommandSourceRoot(), "command.exp.info", pl.getName(), exp, lv);
         return context.successResult();
     }
 
-    static ICommandResult tellUserAboutExperience(ICommandContext<? extends CommandSource> context, Player pl, boolean isSuccess) throws CommandException {
+    static ICommandResult tellUserAboutExperience(final ICommandContext context, final Player pl, final boolean isSuccess) throws CommandException {
         if (!isSuccess) {
             return context.errorResult("command.exp.set.error");
         }
 
-        int exp = pl.get(Keys.TOTAL_EXPERIENCE).get();
-        int newLvl = pl.get(Keys.EXPERIENCE_LEVEL).get();
+        final int exp = pl.get(Keys.TOTAL_EXPERIENCE).get();
+        final int newLvl = pl.get(Keys.EXPERIENCE_LEVEL).get();
 
-        CommandSource src = context.getCommandSource();
-        IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
+        final CommandSource src = context.getCommandSourceRoot();
+        final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         if (!src.equals(pl)) {
             messageProviderService.sendMessageTo(
                             src,
@@ -75,8 +75,8 @@ public class ExperienceCommand implements ICommandExecutor<CommandSource> {
         return context.successResult();
     }
 
-    static Optional<ICommandResult> checkGameMode(ICommandContext<? extends CommandSource> source, Player pl) throws CommandException {
-        GameMode gm = pl.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL);
+    static Optional<ICommandResult> checkGameMode(final ICommandContext source, final Player pl) throws CommandException {
+        final GameMode gm = pl.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL);
         if (gm == GameModes.CREATIVE || gm == GameModes.SPECTATOR) {
             return Optional.of(source.errorResult("command.exp.gamemode", pl.getName()));
         }

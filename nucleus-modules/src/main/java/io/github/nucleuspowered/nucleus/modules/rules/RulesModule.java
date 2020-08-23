@@ -15,7 +15,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = "rules", name = "Rules")
 public class RulesModule extends ConfigurableModule<RulesConfig, RulesConfigAdapter> {
@@ -23,7 +23,7 @@ public class RulesModule extends ConfigurableModule<RulesConfig, RulesConfigAdap
     public static final String RULES_KEY = "rules";
 
     @Inject
-    public RulesModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public RulesModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 
@@ -32,7 +32,7 @@ public class RulesModule extends ConfigurableModule<RulesConfig, RulesConfigAdap
         return new RulesConfigAdapter();
     }
 
-    @Override public void performPreTasks(INucleusServiceCollection serviceCollection) throws Exception {
+    @Override public void performPreTasks(final INucleusServiceCollection serviceCollection) throws Exception {
         super.performPreTasks(serviceCollection);
 
         serviceCollection.textFileControllerCollection()

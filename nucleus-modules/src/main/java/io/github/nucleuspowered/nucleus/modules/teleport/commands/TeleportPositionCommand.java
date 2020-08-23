@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.CommandFlags;
@@ -39,14 +39,14 @@ import org.spongepowered.api.world.storage.WorldProperties;
                 TeleportPermissions.OTHERS_TPPOS
         }
 )
-public class TeleportPositionCommand implements ICommandExecutor<CommandSource> {
+public class TeleportPositionCommand implements ICommandExecutor {
 
     private final String location = "world";
 //    private final String p = "pitch";
 //    private final String yaw = "yaw";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags()
                     .setUnknownShortFlagBehavior(CommandFlags.UnknownFlagBehavior.IGNORE)
@@ -67,11 +67,11 @@ public class TeleportPositionCommand implements ICommandExecutor<CommandSource> 
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
-        WorldProperties wp = context.getOne(this.location, WorldProperties.class).orElseGet(() -> pl.getWorld().getProperties());
-        World world = Sponge.getServer().loadWorld(wp.getUniqueId()).get();
-        Vector3d location = context.requireOne(NucleusParameters.Keys.XYZ, Vector3d.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
+        final WorldProperties wp = context.getOne(this.location, WorldProperties.class).orElseGet(() -> pl.getWorld().getProperties());
+        final World world = Sponge.getServer().loadWorld(wp.getUniqueId()).get();
+        final Vector3d location = context.requireOne(NucleusParameters.Keys.XYZ, Vector3d.class);
 
         double xx = location.getX();
         double  zz = location.getZ();
@@ -88,22 +88,22 @@ public class TeleportPositionCommand implements ICommandExecutor<CommandSource> 
             context.sendMessage("command.tppos.fromchunk", xx, yy, zz);
         }
 
-        Vector3i max = world.getBlockMax();
-        Vector3i min = world.getBlockMin();
+        final Vector3i max = world.getBlockMax();
+        final Vector3i min = world.getBlockMin();
         if (!(isBetween(xx, max.getX(), min.getX()) && isBetween(yy, max.getY(), min.getY()) && isBetween(zz, max.getZ(), min.getZ()))) {
             return context.errorResult("command.tppos.invalid");
         }
 
         // Create the location
-        Location<World> loc = new Location<>(world, xx, yy, zz);
-        INucleusTeleportService teleportHandler = context.getServiceCollection().teleportService();
+        final Location<World> loc = new Location<>(world, xx, yy, zz);
+        final INucleusTeleportService teleportHandler = context.getServiceCollection().teleportService();
 
-        boolean safe = context.getOne("f", Boolean.class).orElse(false);
-        boolean border = context.hasAny("b");
+        final boolean safe = context.getOne("f", Boolean.class).orElse(false);
+        final boolean border = context.hasAny("b");
 
-        try (INucleusTeleportService.BorderDisableSession ac =
+        try (final INucleusTeleportService.BorderDisableSession ac =
                 teleportHandler.temporarilyDisableBorder(!safe && border, loc.getExtent())) {
-            TeleportResult result = teleportHandler.teleportPlayerSmart(
+            final TeleportResult result = teleportHandler.teleportPlayerSmart(
                     pl,
                     loc,
                     false,
@@ -126,7 +126,7 @@ public class TeleportPositionCommand implements ICommandExecutor<CommandSource> 
         }
     }
 
-    private boolean isBetween(double toCheck, double max, double min) {
+    private boolean isBetween(final double toCheck, final double max, final double min) {
         return toCheck >= min && toCheck <= max;
     }
 }

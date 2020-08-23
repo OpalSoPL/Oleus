@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
@@ -32,33 +32,33 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "world.gamerule",
         parentCommand = WorldCommand.class
 )
-public class GameruleCommand implements ICommandExecutor<CommandSource> {
+public class GameruleCommand implements ICommandExecutor {
 
     private static final String worldKey = "world";
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties worldProperties = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
-        Map<String, String> gameRules = worldProperties.getGameRules();
+        final Map<String, String> gameRules = worldProperties.getGameRules();
 
-        String message = context.getMessageString("command.world.gamerule.key");
-        List<Text> text = gameRules.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
+        final String message = context.getMessageString("command.world.gamerule.key");
+        final List<Text> text = gameRules.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getKey))
             .map(x -> Text.of(
                 TextActions.suggestCommand(String.format("/world gamerule set %s %s ", worldProperties.getWorldName(), x.getKey())),
                 TextSerializers.FORMATTING_CODE.deserialize(MessageFormat.format(message, x.getKey(), x.getValue()))
             ))
             .collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getCommandSourceUnchecked())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
             .title(context.getMessage("command.world.gamerule.header", worldProperties.getWorldName()))
             .contents(text)
-            .sendTo(context.getCommandSourceUnchecked());
+            .sendTo(context.getCommandSourceRoot());
 
         return context.successResult();
     }

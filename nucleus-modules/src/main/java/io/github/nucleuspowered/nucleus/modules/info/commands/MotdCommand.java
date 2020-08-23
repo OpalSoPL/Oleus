@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -28,18 +28,18 @@ import java.util.Optional;
         commandDescriptionKey = "motd"
 )
 @EssentialsEquivalent("motd")
-public class MotdCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class MotdCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private Text title = Text.EMPTY;
+    private TextComponent title = Text.EMPTY;
     private boolean usePagination = true;
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Optional<TextFileController> otfc = context.getServiceCollection().textFileControllerCollection().get(InfoModule.MOTD_KEY);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Optional<TextFileController> otfc = context.getServiceCollection().textFileControllerCollection().get(InfoModule.MOTD_KEY);
         if (!otfc.isPresent()) {
             return context.errorResult("command.motd.nocontroller");
         }
 
-        CommandSource src = context.getCommandSource();
+        final CommandSource src = context.getCommandSourceRoot();
         if (this.usePagination) {
             otfc.get().sendToPlayer(src, this.title);
         } else {
@@ -49,9 +49,9 @@ public class MotdCommand implements ICommandExecutor<CommandSource>, IReloadable
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        InfoConfig config = serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class);
-        String title = config.getMotdTitle();
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final InfoConfig config = serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class);
+        final String title = config.getMotdTitle();
         if (title.isEmpty()) {
             this.title = Text.EMPTY;
         } else {

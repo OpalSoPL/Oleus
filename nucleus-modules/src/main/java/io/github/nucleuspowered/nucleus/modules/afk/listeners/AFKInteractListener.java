@@ -14,23 +14,23 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class AFKInteractListener extends AbstractAFKListener implements ListenerBase.Conditional {
 
     @Inject
-    public AFKInteractListener(INucleusServiceCollection serviceCollection) {
+    public AFKInteractListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection.getServiceUnchecked(AFKHandler.class));
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerInteract(final InteractEvent event, @Root Player player) {
+    public void onPlayerInteract(final InteractEvent event, @Root final Player player) {
         update(player);
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
-        AFKConfig.Triggers triggers = serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
+        final AFKConfig.Triggers triggers = serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
                 .getTriggers();
         return triggers.isOnInteract();
     }

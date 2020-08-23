@@ -14,9 +14,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -30,15 +29,15 @@ import java.util.Optional;
         commandDescriptionKey = "kit.edit",
         parentCommand = KitCommand.class
 )
-public class KitEditCommand implements ICommandExecutor<Player> {
+public class KitEditCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
         final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
 
@@ -46,12 +45,12 @@ public class KitEditCommand implements ICommandExecutor<Player> {
             return context.errorResult("command.kit.edit.current", kitInfo.getName());
         }
 
-        Inventory inventory = Util.getKitInventoryBuilder()
+        final Inventory inventory = Util.getKitInventoryBuilder()
             .property(InventoryTitle.PROPERTY_NAME, InventoryTitle.of(context.getMessage("command.kit.edit.title", kitInfo.getName())))
             .build(context.getServiceCollection().pluginContainer());
 
         kitInfo.getStacks().stream().filter(x -> !x.getType().equals(ItemTypes.NONE)).forEach(x -> inventory.offer(x.createStack()));
-        Optional<Container> openedInventory = context.getIfPlayer().openInventory(inventory);
+        final Optional<Container> openedInventory = context.getIfPlayer().openInventory(inventory);
 
         if (openedInventory.isPresent()) {
             service.addKitInventoryToListener(Tuple.of(kitInfo, inventory), openedInventory.get());

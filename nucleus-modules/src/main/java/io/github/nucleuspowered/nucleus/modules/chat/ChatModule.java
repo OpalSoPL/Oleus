@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = ChatModule.ID, name = "Chat")
 public class ChatModule extends ConfigurableModule<ChatConfig, ChatConfigAdapter> {
@@ -21,7 +21,7 @@ public class ChatModule extends ConfigurableModule<ChatConfig, ChatConfigAdapter
     public final static String ID = "chat";
 
     @Inject
-    public ChatModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public ChatModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

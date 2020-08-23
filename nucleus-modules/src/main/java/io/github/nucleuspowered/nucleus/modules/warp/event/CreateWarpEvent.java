@@ -13,7 +13,7 @@ public class CreateWarpEvent extends AbstractWarpEvent implements NucleusWarpEve
 
     private final Location<World> location;
 
-    public CreateWarpEvent(Cause cause, String name, Location<World> location) {
+    public CreateWarpEvent(final Cause cause, final String name, final Location<World> location) {
         super(cause, name);
         this.location = location;
     }

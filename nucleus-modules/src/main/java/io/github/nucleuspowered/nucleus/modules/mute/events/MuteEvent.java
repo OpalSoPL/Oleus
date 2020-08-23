@@ -19,7 +19,7 @@ public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEven
     private final Cause cause;
     private final User target;
 
-    public MuteEvent(Cause cause, User target) {
+    public MuteEvent(final Cause cause, final User target) {
         this.cause = cause;
         this.target = target;
     }
@@ -35,9 +35,9 @@ public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEven
     public static class Muted extends MuteEvent implements NucleusMuteEvent.Muted {
 
         @Nullable public final Duration duration;
-        public final Text reason;
+        public final TextComponent reason;
 
-        public Muted(Cause cause, User target, @Nullable Duration duration, Text reason) {
+        public Muted(final Cause cause, final User target, @Nullable final Duration duration, final TextComponent reason) {
             super(cause, target);
             this.duration = duration;
             this.reason = reason;
@@ -47,7 +47,7 @@ public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEven
             return Optional.ofNullable(this.duration);
         }
 
-        @Override public Text getReason() {
+        @Override public TextComponent getReason() {
             return this.reason;
         }
     }
@@ -56,7 +56,7 @@ public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEven
 
         private final boolean expired;
 
-        public Unmuted(Cause cause, User target, boolean expired) {
+        public Unmuted(final Cause cause, final User target, final boolean expired) {
             super(cause, target);
             this.expired = expired;
         }

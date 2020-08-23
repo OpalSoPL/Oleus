@@ -33,7 +33,7 @@ public final class MuteData extends EndTimestamp implements Mute {
     // For Configurate
     public MuteData() { }
 
-    public MuteData(UUID muter, String reason) {
+    public MuteData(final UUID muter, final String reason) {
         this.muter = muter;
         this.reason = reason;
     }
@@ -45,7 +45,7 @@ public final class MuteData extends EndTimestamp implements Mute {
      * @param endtimestamp The end timestamp
      * @param reason The reason
      */
-    public MuteData(UUID muter, String reason, Instant endtimestamp) {
+    public MuteData(final UUID muter, final String reason, final Instant endtimestamp) {
         this(muter, reason);
         this.endtimestamp = endtimestamp.getEpochSecond();
     }
@@ -57,7 +57,7 @@ public final class MuteData extends EndTimestamp implements Mute {
      * @param reason The reason
      * @param timeFromNextLogin The time to mute for from next login.
      */
-    public MuteData(UUID muter, String reason, @Nullable Duration timeFromNextLogin) {
+    public MuteData(final UUID muter, final String reason, @Nullable final Duration timeFromNextLogin) {
         this(muter, reason);
         if (timeFromNextLogin != null) {
             this.timeFromNextLogin = timeFromNextLogin.getSeconds();

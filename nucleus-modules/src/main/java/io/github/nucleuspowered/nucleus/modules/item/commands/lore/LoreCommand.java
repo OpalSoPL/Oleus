@@ -9,19 +9,19 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;;
+
 @Command(
         aliases = { "lore" },
         basePermission = ItemPermissions.BASE_LORE,
         commandDescriptionKey = "lore",
         hasExecutor = false
 )
-public class LoreCommand implements ICommandExecutor<Player> {
+public class LoreCommand implements ICommandExecutor {
 
     // Not executed.
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         return context.failResult(); // no-op
     }
 }

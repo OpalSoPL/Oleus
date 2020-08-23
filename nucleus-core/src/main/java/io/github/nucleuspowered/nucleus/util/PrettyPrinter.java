@@ -135,7 +135,7 @@ public class PrettyPrinter {
     /**
      * Centred text
      */
-    class CentredText {
+    class CentredTextComponent {
 
         private final Object centred;
 

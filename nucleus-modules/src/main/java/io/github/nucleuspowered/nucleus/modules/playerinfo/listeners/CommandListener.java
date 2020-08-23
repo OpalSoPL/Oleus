@@ -16,7 +16,7 @@ import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.plugin.PluginContainer;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class CommandListener implements ListenerBase.Conditional {
 
@@ -25,13 +25,13 @@ public class CommandListener implements ListenerBase.Conditional {
     private boolean messageShown = false;
 
     @Inject
-    public CommandListener(INucleusServiceCollection serviceCollection) {
+    public CommandListener(final INucleusServiceCollection serviceCollection) {
         this.messageProviderService = serviceCollection.messageProvider();
         this.pluginContainer = serviceCollection.pluginContainer();
     }
 
     @Listener
-    public void onCommandPreProcess(SendCommandEvent event, @Root ConsoleSource source, @Getter("getCommand") String command) {
+    public void onCommandPreProcess(final SendCommandEvent event, @Root final ConsoleSource source, @Getter("getCommand") final String command) {
         if (command.equalsIgnoreCase("list")) {
             event.setCommand("minecraft:list");
             if (!this.messageShown) {
@@ -42,7 +42,7 @@ public class CommandListener implements ListenerBase.Conditional {
         }
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(PlayerInfoConfig.class).getList().isPanelCompatibility();
     }
 

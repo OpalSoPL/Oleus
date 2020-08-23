@@ -7,18 +7,17 @@ package io.github.nucleuspowered.nucleus.modules.craftinggui;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
-public abstract class BasicCraftingCommand implements ICommandExecutor<Player> {
+public abstract class BasicCraftingCommand implements ICommandExecutor {
 
     protected abstract InventoryArchetype getArchetype();
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Inventory i = Inventory.builder().of(getArchetype()).build(context.getServiceCollection().pluginContainer());
-        context.getCommandSource().openInventory(i).orElseThrow(() -> context.createException("command.crafting.error"));
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Inventory i = Inventory.builder().of(getArchetype()).build(context.getServiceCollection().pluginContainer());
+        context.getCommandSourceRoot().openInventory(i).orElseThrow(() -> context.createException("command.crafting.error"));
         return context.successResult();
     }
 }

@@ -12,12 +12,12 @@ import org.spongepowered.api.command.CommandSource;
 @Store(Constants.INTERCEPTOR)
 public interface ICommandInterceptor {
 
-    void onPreCommand(Class<? extends ICommandExecutor<?>> commandClass,
+    void onPreCommand(Class<? extends ICommandExecutor> commandClass,
             CommandControl commandControl,
-            ICommandContext<? extends CommandSource> context);
+            ICommandContext context);
 
-    void onPostCommand(Class<? extends ICommandExecutor<?>> commandClass,
+    void onPostCommand(Class<? extends ICommandExecutor> commandClass,
             CommandControl commandControl,
-            ICommandContext<? extends CommandSource> context,
+            ICommandContext context,
             ICommandResult result);
 }

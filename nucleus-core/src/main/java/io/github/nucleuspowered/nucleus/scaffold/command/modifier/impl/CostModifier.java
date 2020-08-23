@@ -55,13 +55,13 @@ public class CostModifier implements ICommandModifier {
         return serviceCollection.economyServiceProvider().serviceExists() && source instanceof Player;
     }
 
-    @Override public Optional<Text> testRequirement(final ICommandContext.Mutable<? extends CommandSource> source, final CommandControl control,
+    @Override public Optional<Text> testRequirement(final ICommandContext source, final CommandControl control,
             final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
         if (source.getCost() > 0) {
             final double cost = source.getCost();
             final IEconomyServiceProvider ies = serviceCollection.economyServiceProvider();
-            if (!ies.withdrawFromPlayer((Player) source.getCommandSource(), cost, false)) {
-                return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getCommandSource(), "cost.nofunds",
+            if (!ies.withdrawFromPlayer((Player) source.getCommandSourceRoot(), cost, false)) {
+                return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getCommandSourceRoot(), "cost.nofunds",
                         ies.getCurrencySymbol(source.getCost())));
             }
 
@@ -80,11 +80,11 @@ public class CostModifier implements ICommandModifier {
     }
 
     @Override
-    public void onFailure(final ICommandContext<? extends CommandSource> source, final CommandControl control, final INucleusServiceCollection serviceCollection,
+    public void onFailure(final ICommandContext source, final CommandControl control, final INucleusServiceCollection serviceCollection,
             final CommandModifier modifier) throws CommandException {
         if (source.getCost() > 0) {
             final IEconomyServiceProvider ies = serviceCollection.economyServiceProvider();
-            ies.depositInPlayer((Player) source.getCommandSource(), source.getCost(), false);
+            ies.depositInPlayer((Player) source.getCommandSourceRoot(), source.getCost(), false);
         }
     }
 }

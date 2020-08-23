@@ -25,22 +25,22 @@ public class MuteLogoutConditionalListener implements ListenerBase.Conditional {
 
     private final IStorageManager storageManager;
 
-    public MuteLogoutConditionalListener(INucleusServiceCollection serviceCollection) {
+    public MuteLogoutConditionalListener(final INucleusServiceCollection serviceCollection) {
         this.storageManager = serviceCollection.storageManager();
     }
 
     @Listener
-    public void onLogout(ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player player) {
+    public void onLogout(final ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") final Player player) {
         final UUID uuid = player.getUniqueId();
         this.storageManager
                 .getUserService()
                 .getOrNew(uuid)
                 .thenAccept(x -> {
                     if (!Sponge.getServer().getPlayer(uuid).map(User::isOnline).orElse(false)) {
-                        try (IKeyedDataObject.Value<MuteData> value = x.getAndSet(MuteKeys.MUTE_DATA)) {
-                            Optional<MuteData> data = value.getValue();
+                        try (final IKeyedDataObject.Value<MuteData> value = x.getAndSet(MuteKeys.MUTE_DATA)) {
+                            final Optional<MuteData> data = value.getValue();
                             if (data.isPresent()) {
-                                MuteData muteData = data.get();
+                                final MuteData muteData = data.get();
                                 muteData.getRemainingTime().ifPresent(muteData::setTimeFromNextLogin);
                             }
                         }
@@ -51,7 +51,7 @@ public class MuteLogoutConditionalListener implements ListenerBase.Conditional {
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class).isMuteOnlineOnly();
     }
 

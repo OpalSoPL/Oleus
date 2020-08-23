@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = RTPModule.ID, name = "rtp")
 public class RTPModule extends ConfigurableModule<RTPConfig, RTPConfigAdapter> {
@@ -21,8 +21,8 @@ public class RTPModule extends ConfigurableModule<RTPConfig, RTPConfigAdapter> {
     public static final String ID = "rtp";
 
     @Inject
-    public RTPModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public RTPModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

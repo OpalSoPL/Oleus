@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -33,28 +33,28 @@ import java.util.stream.Collectors;
         basePermission = PowertoolPermissions.BASE_POWERTOOL,
         commandDescriptionKey = "powertool"
 )
-public class PowertoolCommand implements ICommandExecutor<Player> {
+public class PowertoolCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_COMMAND
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getCommandSource();
-        ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getCommandSourceRoot();
+        final ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND)
                 .orElseThrow(() -> context.createException("command.powertool.noitem"));
 
-        Optional<String> command = context.getOne(NucleusParameters.Keys.COMMAND, String.class);
+        final Optional<String> command = context.getOne(NucleusParameters.Keys.COMMAND, String.class);
         return command
                 .map(s -> setPowertool(context, src, itemStack.getType(), s))
                 .orElseGet(() -> viewPowertool(context, src, itemStack));
     }
 
-    private ICommandResult viewPowertool(ICommandContext<? extends Player> context, Player src, ItemStack item) {
-        Optional<List<String>> cmds = context.getServiceCollection().getServiceUnchecked(PowertoolService.class)
+    private ICommandResult viewPowertool(final ICommandContext context, final Player src, final ItemStack item) {
+        final Optional<List<String>> cmds = context.getServiceCollection().getServiceUnchecked(PowertoolService.class)
                 .getPowertoolForItem(src.getUniqueId(), item.getType());
         if (cmds.isPresent() && !cmds.get().isEmpty()) {
             Util.getPaginationBuilder(src)
@@ -68,7 +68,7 @@ public class PowertoolCommand implements ICommandExecutor<Player> {
         return context.successResult();
     }
 
-    private ICommandResult setPowertool(ICommandContext<? extends Player> context, Player src, ItemType item, String command) {
+    private ICommandResult setPowertool(final ICommandContext context, final Player src, final ItemType item, String command) {
         // For consistency, if a command starts with "/", remove it, but just
         // once. WorldEdit commands can be input using "//"
         if (command.startsWith("/")) {

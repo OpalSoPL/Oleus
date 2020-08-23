@@ -13,15 +13,15 @@ import java.util.Optional;
 
 public class WarpCategoryData implements WarpCategory {
 
-    public WarpCategoryData(String id, Text displayName, Text description) {
+    public WarpCategoryData(final String id, final TextComponent displayName, final TextComponent description) {
         this.id = id;
         this.displayName = displayName;
         this.description = description;
     }
 
     private final String id;
-    private final Text displayName;
-    private final Text description;
+    private final TextComponent displayName;
+    private final TextComponent description;
 
     @Override
     public String getId() {
@@ -29,7 +29,7 @@ public class WarpCategoryData implements WarpCategory {
     }
 
     @Override
-    public Text getDisplayName() {
+    public TextComponent getDisplayName() {
         return this.displayName;
     }
 

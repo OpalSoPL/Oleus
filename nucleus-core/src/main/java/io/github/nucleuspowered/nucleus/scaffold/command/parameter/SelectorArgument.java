@@ -67,7 +67,7 @@ public class SelectorArgument extends CommandElement {
     }
 
     @Override
-    public Text getUsage(final CommandSource src) {
+    public TextComponent getUsage(final CommandSource src) {
         return this.wrapped.getUsage(src);
     }
 

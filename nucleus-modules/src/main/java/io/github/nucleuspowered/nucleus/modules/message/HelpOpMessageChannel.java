@@ -25,7 +25,7 @@ public class HelpOpMessageChannel implements IChatMessageFormatterService.Channe
     private final ITextStyleService textStyleService;
     @Nullable private final NucleusTextTemplate prefix;
 
-    public HelpOpMessageChannel(@Nullable NucleusTextTemplate prefix, IPermissionService permissionService, ITextStyleService textStyleService) {
+    public HelpOpMessageChannel(@Nullable final NucleusTextTemplate prefix, final IPermissionService permissionService, final ITextStyleService textStyleService) {
         this.permissionService = permissionService;
         this.textStyleService = textStyleService;
         this.prefix = prefix;
@@ -37,18 +37,18 @@ public class HelpOpMessageChannel implements IChatMessageFormatterService.Channe
     }
 
     @Override
-    public void formatMessageEvent(CommandSource source, MessageEvent.MessageFormatter formatters) {
+    public void formatMessageEvent(final CommandSource source, final MessageEvent.MessageFormatter formatters) {
         if (this.prefix != null) {
             formatters.setHeader(Text.of(formatters.getHeader(), this.prefix.getForSource(source)));
         }
 
-        ITextStyleService.TextFormat format = this.textStyleService.getLastColourAndStyle(formatters.getHeader(), null);
+        final ITextStyleService.TextFormat format = this.textStyleService.getLastColourAndStyle(formatters.getHeader(), null);
         formatters.setBody(Text.builder().color(format.colour()).style(format.style()).append(formatters.getBody().format()).build());
     }
 
     @Override
     public Collection<MessageReceiver> receivers() {
-        List<MessageReceiver> members = Lists.newArrayList(Sponge.getServer().getConsole());
+        final List<MessageReceiver> members = Lists.newArrayList(Sponge.getServer().getConsole());
         Sponge.getServer().getOnlinePlayers().stream()
                 .filter(x -> this.permissionService.hasPermission(x, MessagePermissions.HELPOP_RECEIVE)).forEach(members::add);
         return members;

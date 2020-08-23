@@ -25,18 +25,18 @@ public class TeleportRequest extends TeleportTask {
     private boolean expired;
 
     public TeleportRequest(
-            INucleusServiceCollection serviceCollection,
-            UUID toTeleport,
-            UUID target,
-            Instant expiry,
-            double cost,
-            int warmup,
-            @Nullable UUID requester,
-            boolean safe,
-            boolean silentTarget,
-            boolean silentSource,
-            @Nullable Transform<World> requestLocation,
-            @Nullable Consumer<Player> successCallback) {
+            final INucleusServiceCollection serviceCollection,
+            final UUID toTeleport,
+            final UUID target,
+            final Instant expiry,
+            final double cost,
+            final int warmup,
+            @Nullable final UUID requester,
+            final boolean safe,
+            final boolean silentTarget,
+            final boolean silentSource,
+            @Nullable final Transform<World> requestLocation,
+            @Nullable final Consumer<Player> successCallback) {
         super(serviceCollection, toTeleport, target, cost, warmup, safe, silentSource, silentTarget, requestLocation, requester, successCallback);
         this.expiry = expiry;
     }
@@ -49,7 +49,7 @@ public class TeleportRequest extends TeleportTask {
         return Sponge.getServer().getPlayer(this.target);
     }
 
-    public void forceExpire(boolean callback) {
+    public void forceExpire(final boolean callback) {
         if (!callback || isActive()) {
             this.forcedExpired = true;
             if (callback) {

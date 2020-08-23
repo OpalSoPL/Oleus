@@ -5,21 +5,25 @@
 package io.github.nucleuspowered.nucleus.services.impl.playername;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextStyle;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.Nameable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,10 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class PlayerDisplayNameService implements IPlayerDisplayNameService, IReloadableService.Reloadable {
@@ -60,7 +60,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
     @Override
     public Optional<User> getUser(final String displayName) {
-        final Optional<User> withRealName = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(displayName);
+        final Optional<User> withRealName = Sponge.getServer().getUserManager().get(displayName);
         if (withRealName.isPresent()) {
             return withRealName;
         }
@@ -75,7 +75,8 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         return Optional.empty();
     }
 
-    @Override public Map<UUID, List<String>> startsWith(final String displayName) {
+    @Override
+    public Map<UUID, List<String>> startsWith(final String displayName) {
         final Map<UUID, List<String>> uuids = new HashMap<>();
         Sponge.getServer().getOnlinePlayers().stream()
             .filter(x -> x.getName().toLowerCase().startsWith(displayName.toLowerCase()))
@@ -91,97 +92,106 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     }
 
     @Override
-    public Optional<User> getUser(final Text displayName) {
-        return getUser(displayName.toPlain());
+    public Optional<User> getUser(final TextComponent displayName) {
+        return this.getUser(displayName.toString());
     }
 
     @Override
-    public Text getDisplayName(final UUID playerUUID) {
+    public TextComponent getDisplayName(final UUID playerUUID) {
         if (playerUUID == Util.CONSOLE_FAKE_UUID) {
-            return getDisplayName(Sponge.getServer().getConsole());
+            return this.getDisplayName(Sponge.getSystemSubject());
         }
 
-        final User user = Sponge.getServiceManager()
-                .provideUnchecked(UserStorageService.class)
+        final User user = Sponge.getServer()
+                .getUserManager()
                 .get(playerUUID)
                 .orElseThrow(() -> new IllegalArgumentException("UUID does not map to a player"));
         for (final DisplayNameResolver resolver : this.resolvers) {
-            final Optional<Text> userName = resolver.resolve(playerUUID);
+            final Optional<TextComponent> userName = resolver.resolve(playerUUID);
             if (userName.isPresent()) {
                 return userName
-                        .map(x -> this.addHover(x, user))
+                        .map(x -> this.addHover(x, user.getName()))
                         .get();
             }
         }
 
         // Set name colours
 
-        return this.addHover(user.get(Keys.DISPLAY_NAME).orElseGet(() -> Text.of(user.getName())), user);
+        return this.addHover(user.get(Keys.DISPLAY_NAME).map(x -> TextComponent.builder().append(x).build())
+                .orElseGet(() -> TextComponent.of(user.getName())), user.getName());
     }
 
     @Override
-    public Text getDisplayName(final CommandSource source) {
-        if (source instanceof User) {
+    public TextComponent getDisplayName(final Audience source) {
+        if (source instanceof SystemSubject || source instanceof Server) {
+            return this.getDisplayName(Util.CONSOLE_FAKE_UUID);
+        } if (source instanceof User) {
             return this.getDisplayName(((User) source).getUniqueId());
+        } else if (source instanceof ServerPlayer) {
+            return this.getDisplayName(((ServerPlayer) source).getUniqueId());
+        } else if (source instanceof Nameable) {
+            return TextComponent.of(((Nameable) source).getName());
         }
 
-        return Text.of(source.getName());
+        return TextComponent.of("Unknown");
     }
 
     @Override
-    public Text getName(final CommandSource user) {
-        if (user instanceof User) {
-            return this.addHover(Text.of(user.getName()), (User) user, null, null);
+    public TextComponent getName(final Audience user) {
+        if (user instanceof Nameable) {
+            return this.getName((Nameable) user);
+        } else if (user instanceof SystemSubject || user instanceof Server) {
+            return this.getDisplayName(Util.CONSOLE_FAKE_UUID);
         }
-
-        return Text.of(user.getName());
+        return TextComponent.of("Unknown");
     }
 
-    public Text addHover(final Text text, final User user) {
-        return this.addHover(text, user, null, null);
+    @Override
+    public TextComponent getName(final Nameable user) {
+        final String name = user.getName();
+        if (user instanceof User || user instanceof ServerPlayer) {
+            return this.addHover(TextComponent.of(name), user.getName());
+        }
+
+        return TextComponent.of(name);
     }
 
-    private Text addHover(final Text text, final User user, @Nullable final TextColor colour, @Nullable final TextStyle style) {
-        final Text.Builder builder = text.toBuilder();
-        if (colour != null) {
-            builder.color(colour);
-        }
-        if (style != null) {
-            builder.style(style);
-        }
-        return this.addCommandToNameInternal(builder, user);
+    public TextComponent addHover(final TextComponent text, final String user) {
+        return this.addCommandToNameInternal(text.toBuilder(), user);
     }
 
-    @Override public Text addCommandToName(final CommandSource p) {
-        final Text.Builder text = Text.builder(p.getName());
-        if (p instanceof User) {
-            return this.addCommandToNameInternal(text, (User)p);
+    @Override
+    public TextComponent addCommandToName(final Nameable p) {
+        final TextComponent.Builder text = TextComponent.builder(p.getName());
+        if (p instanceof User || p instanceof ServerPlayer) {
+            return this.addCommandToNameInternal(text, p.getName());
         }
 
         return text.build();
     }
 
-    @Override public Text addCommandToDisplayName(final CommandSource p) {
-        final Text.Builder name = this.getName(p).toBuilder();
-        if (p instanceof User) {
-            return this.addCommandToNameInternal(name, (User)p);
+    @Override
+    public TextComponent addCommandToDisplayName(final Nameable p) {
+        final TextComponent.Builder name = this.getName(p).toBuilder();
+        if (p instanceof User || p instanceof ServerPlayer) {
+            return this.addCommandToNameInternal(name, p.getName());
         }
 
         return name.build();
     }
 
-    private Text addCommandToNameInternal(final Text.Builder name, final User user) {
+    private TextComponent addCommandToNameInternal(final TextComponent.Builder name, final String user) {
         if (this.commandNameOnClick == null) {
-            return name.onHover(TextActions.showText(this.messageProviderService.getMessage("name.hover.ign", user.getName()))).build();
+            return name.hoverEvent(HoverEvent.showText(this.messageProviderService.getMessage("name.hover.ign", user))).build();
         }
 
-        final String commandToRun = this.commandNameOnClick.replace("{{subject}}", user.getName()).replace("{{player}}", user.getName());
-        final Text.Builder hoverAction =
-                Text.builder()
-                    .append(this.messageProviderService.getMessage("name.hover.ign", user.getName()))
-                    .append(Text.NEW_LINE)
+        final String commandToRun = this.commandNameOnClick.replace("{{subject}}", user).replace("{{player}}", user);
+        final TextComponent.Builder hoverAction =
+                TextComponent.builder()
+                    .append(this.messageProviderService.getMessage("name.hover.ign", user))
+                    .append(TextComponent.newline())
                     .append(this.messageProviderService.getMessage("name.hover.command", commandToRun));
-        return name.onClick(TextActions.suggestCommand(commandToRun)).onHover(TextActions.showText(hoverAction.toText())).build();
+        return name.clickEvent(ClickEvent.suggestCommand(commandToRun)).hoverEvent(HoverEvent.showText(hoverAction.build())).build();
     }
 
     @Override
@@ -199,21 +209,5 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
             this.commandNameOnClick = this.commandNameOnClick + " ";
         }
     }
-
-    /*
-    private <T extends TextElement> T getStyle(User player,
-            Function<String, T> returnIfAvailable,
-            Function<ChatTemplateConfig, T> fromTemplate,
-            T def,
-            String... options) {
-        Optional<String> os = this.permissionService.getOptionFromSubject(player, options);
-        if (os.isPresent()) {
-            return returnIfAvailable.apply(os.get());
-        }
-
-        return getService(ChatService.class).map(templateUtil -> fromTemplate.apply(templateUtil.getTemplateNow(player))).orElse(def);
-
-    }
-     */
 
 }

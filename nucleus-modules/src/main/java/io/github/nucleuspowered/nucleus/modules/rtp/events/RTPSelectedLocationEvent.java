@@ -18,7 +18,7 @@ public class RTPSelectedLocationEvent extends AbstractEvent implements NucleusRT
     private final Cause cause;
     private boolean isCancelled = false;
 
-    public RTPSelectedLocationEvent(Location<World> location, Player player, Cause cause) {
+    public RTPSelectedLocationEvent(final Location<World> location, final Player player, final Cause cause) {
         this.location = location;
         this.player = player;
         this.cause = cause;
@@ -35,7 +35,7 @@ public class RTPSelectedLocationEvent extends AbstractEvent implements NucleusRT
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.isCancelled = cancel;
     }
 

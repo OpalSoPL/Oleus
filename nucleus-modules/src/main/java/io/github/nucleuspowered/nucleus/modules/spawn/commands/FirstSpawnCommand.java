@@ -18,9 +18,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
@@ -35,13 +34,13 @@ import java.util.Optional;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = SpawnPermissions.EXEMPT_COST_FIRSTSPAWN)
         }
 )
-public class FirstSpawnCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class FirstSpawnCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean isSafeTeleport = true;
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
 
-        Optional<Transform<World>> olwr =
+        final Optional<Transform<World>> olwr =
                 context.getServiceCollection().storageManager()
                         .getGeneralService()
                         .getOrNewOnThread()
@@ -51,7 +50,7 @@ public class FirstSpawnCommand implements ICommandExecutor<Player>, IReloadableS
             return context.errorResult("command.firstspawn.notset");
         }
 
-        TeleportResult result = context.getServiceCollection()
+        final TeleportResult result = context.getServiceCollection()
                 .teleportService()
                 .teleportPlayerSmart(
                         context.getIfPlayer(),
@@ -68,7 +67,7 @@ public class FirstSpawnCommand implements ICommandExecutor<Player>, IReloadableS
         return context.errorResult("command.firstspawn.fail");
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.isSafeTeleport = serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class).isSafeTeleport();
     }
 }

@@ -35,7 +35,7 @@ public interface NucleusAFKEvent extends TargetPlayerEvent {
      *
      * @param message The message. A null message suppresses the message.
      */
-    void setMessage(@Nullable Text message);
+    void setMessage(@Nullable TextComponent message);
 
     /**
      * Gets the original message channel to send the message to
@@ -117,6 +117,6 @@ public interface NucleusAFKEvent extends TargetPlayerEvent {
          *
          * @param message The message. A null message suppresses the message.
          */
-        void setMessage(@Nullable Text message);
+        void setMessage(@Nullable TextComponent message);
     }
 }

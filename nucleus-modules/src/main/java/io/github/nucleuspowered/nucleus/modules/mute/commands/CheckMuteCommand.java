@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.UUIDArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -26,12 +26,12 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Command(async = true, aliases = "checkmute", basePermission = MutePermissions.BASE_CHECKMUTE, commandDescriptionKey = "checkmute")
-public class CheckMuteCommand implements ICommandExecutor<CommandSource> {
+public class CheckMuteCommand implements ICommandExecutor {
 
     private final String playerKey = "user/UUID";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.firstParsing(
                 GenericArguments.user(Text.of(this.playerKey)),
@@ -41,20 +41,20 @@ public class CheckMuteCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the user.
-        User user = context.requireOne(this.playerKey, User.class);
-        MuteHandler muteHandler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
+        final User user = context.requireOne(this.playerKey, User.class);
+        final MuteHandler muteHandler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
 
-        Optional<MuteData> omd = muteHandler.getPlayerMuteData(user);
+        final Optional<MuteData> omd = muteHandler.getPlayerMuteData(user);
         if (!omd.isPresent()) {
             context.sendMessage("command.checkmute.none", user.getName());
             return context.successResult();
         }
 
         // Muted, get information.
-        MuteData md = omd.get();
-        String name;
+        final MuteData md = omd.get();
+        final String name;
         if (!md.getMuter().isPresent()) {
             name = Sponge.getServer().getConsole().getName();
         } else {
@@ -73,7 +73,7 @@ public class CheckMuteCommand implements ICommandExecutor<CommandSource> {
 
         if (md.getCreationTime() > 0) {
             context.sendMessage("command.checkmute.created",
-                    Util.FULL_TIME_FORMATTER.withLocale(context.getCommandSource().getLocale())
+                    Util.FULL_TIME_FORMATTER.withLocale(context.getCommandSourceRoot().getLocale())
                             .format(Instant.ofEpochSecond(md.getCreationTime())));
         } else {
             context.sendMessage("command.checkmute.created", "loc:standard.unknown");

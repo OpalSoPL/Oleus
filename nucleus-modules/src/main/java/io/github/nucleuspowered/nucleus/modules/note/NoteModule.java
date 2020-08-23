@@ -18,8 +18,8 @@ public class NoteModule extends ConfigurableModule<NoteConfig, NoteConfigAdapter
 
     public final static String ID = "note";
 
-    public NoteModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public NoteModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

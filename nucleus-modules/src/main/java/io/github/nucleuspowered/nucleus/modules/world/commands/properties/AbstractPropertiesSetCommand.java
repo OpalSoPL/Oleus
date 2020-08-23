@@ -9,30 +9,30 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-abstract class AbstractPropertiesSetCommand implements ICommandExecutor<CommandSource> {
+abstract class AbstractPropertiesSetCommand implements ICommandExecutor {
 
     private final String name;
 
-    AbstractPropertiesSetCommand(String name) {
+    AbstractPropertiesSetCommand(final String name) {
         this.name = name;
     }
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.get(serviceCollection),
                 NucleusParameters.ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties worldProperties = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));;
-        boolean set = context.requireOne(NucleusParameters.Keys.BOOL, Boolean.class);
+        final boolean set = context.requireOne(NucleusParameters.Keys.BOOL, Boolean.class);
         setter(worldProperties, set);
         context.sendMessage("command.world.setproperty.success", this.name, worldProperties.getWorldName(), String.valueOf(set));
         extraLogic(context, worldProperties, set);
@@ -41,7 +41,7 @@ abstract class AbstractPropertiesSetCommand implements ICommandExecutor<CommandS
 
     protected abstract void setter(WorldProperties worldProperties, boolean set) throws CommandException;
 
-    protected void extraLogic(ICommandContext<? extends CommandSource> context, WorldProperties worldProperties, boolean set) throws CommandException {
+    protected void extraLogic(final ICommandContext context, final WorldProperties worldProperties, final boolean set) throws CommandException {
         // noop
     }
 

@@ -1,38 +1,47 @@
 package io.github.nucleuspowered.nucleus.module;
 
-import java.util.function.Supplier;
-
-public final class ModuleContainer {
+public class ModuleContainer {
 
     private final String id;
-    private final String name;
     private final boolean isRequired;
-    private final Supplier<? extends IModule> moduleConstructor;
+    private final Class<? extends IModule> moduleClass;
 
     public ModuleContainer(final String id,
-            final String name,
             final boolean isRequired,
-            final Supplier<? extends IModule> moduleConstructor) {
+            final Class<? extends IModule> moduleClass) {
         this.id = id;
-        this.name = name;
         this.isRequired = isRequired;
-        this.moduleConstructor = moduleConstructor;
+        this.moduleClass = moduleClass;
     }
 
     public String getId() {
         return this.id;
     }
 
-    public String getName() {
-        return this.name;
-    }
-
     public boolean isRequired() {
         return this.isRequired;
     }
 
-    public Supplier<? extends IModule> getModuleConstructor() {
-        return this.moduleConstructor;
+    public Class<? extends IModule> getModuleClass() {
+        return this.moduleClass;
+    }
+
+    public static final class Configurable<T> extends ModuleContainer {
+
+        private final Class<T> configurationClass;
+
+        public Configurable(
+                final String id,
+                final boolean isRequired,
+                final Class<? extends IModule> moduleClass,
+                final Class<T> configurationClass) {
+            super(id, isRequired, moduleClass);
+            this.configurationClass = configurationClass;
+        }
+
+        public Class<T> getConfigurationClass() {
+            return this.configurationClass;
+        }
     }
 
 }

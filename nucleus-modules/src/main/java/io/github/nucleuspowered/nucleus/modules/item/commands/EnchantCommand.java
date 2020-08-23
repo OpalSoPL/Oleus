@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.BoundedIntegerArgument;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.ImprovedCatalogTypeArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -42,13 +42,13 @@ import java.util.stream.Collectors;
         },
         associatedPermissions = ItemPermissions.ENCHANT_UNSAFE
 )
-public class EnchantCommand implements ICommandExecutor<Player> {
+public class EnchantCommand implements ICommandExecutor {
 
     private final String enchantmentKey = "enchantment";
     private final String levelKey = "level";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             new ImprovedCatalogTypeArgument(Text.of(this.enchantmentKey), EnchantmentType.class, serviceCollection),
             new BoundedIntegerArgument(Text.of(this.levelKey), 0, Short.MAX_VALUE, serviceCollection),
@@ -60,19 +60,19 @@ public class EnchantCommand implements ICommandExecutor<Player> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
         // Check for item in hand
         if (!src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
             return context.errorResult("command.enchant.noitem");
         }
 
         // Get the arguments
-        ItemStack itemInHand = src.getItemInHand(HandTypes.MAIN_HAND).get();
-        EnchantmentType enchantment = context.requireOne(this.enchantmentKey, EnchantmentType.class);
-        int level = context.requireOne(this.levelKey, Integer.class);
-        boolean allowUnsafe = context.hasAny("u");
-        boolean allowOverwrite = context.hasAny("o");
+        final ItemStack itemInHand = src.getItemInHand(HandTypes.MAIN_HAND).get();
+        final EnchantmentType enchantment = context.requireOne(this.enchantmentKey, EnchantmentType.class);
+        final int level = context.requireOne(this.levelKey, Integer.class);
+        final boolean allowUnsafe = context.hasAny("u");
+        final boolean allowOverwrite = context.hasAny("o");
 
         // Can we apply the enchantment?
         if (!allowUnsafe) {
@@ -86,10 +86,10 @@ public class EnchantCommand implements ICommandExecutor<Player> {
         }
 
         // We know this should exist.
-        EnchantmentData ed = itemInHand.getOrCreate(EnchantmentData.class).get();
+        final EnchantmentData ed = itemInHand.getOrCreate(EnchantmentData.class).get();
 
         // Get all the enchantments.
-        List<Enchantment> currentEnchants = ed.getListValue().get();
+        final List<Enchantment> currentEnchants = ed.getListValue().get();
 
         if (level == 0) {
             // we want to remove only.
@@ -98,7 +98,7 @@ public class EnchantCommand implements ICommandExecutor<Player> {
             }
         } else {
 
-            List<Enchantment> enchantmentsToRemove = currentEnchants.stream()
+            final List<Enchantment> enchantmentsToRemove = currentEnchants.stream()
                     .filter(x -> !x.getType().isCompatibleWith(enchantment) || x.getType().equals(enchantment))
                     .collect(Collectors.toList());
 
@@ -126,7 +126,7 @@ public class EnchantCommand implements ICommandExecutor<Player> {
         ed.setElements(currentEnchants);
 
         // Offer it to the item.
-        DataTransactionResult dtr = itemInHand.offer(ed);
+        final DataTransactionResult dtr = itemInHand.offer(ed);
         if (dtr.isSuccessful()) {
             // If successful, we need to put the item in the player's hand for it to actually take effect.
             src.setItemInHand(HandTypes.MAIN_HAND, itemInHand);

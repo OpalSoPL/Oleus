@@ -23,11 +23,11 @@ public class NoteInfoProvider implements NucleusProvider {
     }
 
     @Override
-    public Optional<Text> get(User user, CommandSource source, INucleusServiceCollection serviceCollection) {
+    public Optional<Text> get(final User user, final CommandSource source, final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, NotePermissions.BASE_CHECKNOTES)) {
-            int active = serviceCollection.getServiceUnchecked(NoteHandler.class).getNotesInternal(user).size();
+            final int active = serviceCollection.getServiceUnchecked(NoteHandler.class).getNotesInternal(user).size();
 
-            Text r = serviceCollection.messageProvider().getMessageFor(source, "seen.notes", active);
+            final TextComponent r = serviceCollection.messageProvider().getMessageFor(source, "seen.notes", active);
             if (active > 0) {
                 return Optional.of(
                         r.toBuilder().onClick(TextActions.runCommand("/checknotes " + user.getName()))

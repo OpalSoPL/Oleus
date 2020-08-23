@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.RegexArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.event.CauseStackManager;
@@ -25,25 +25,25 @@ import org.spongepowered.api.text.Text;
         basePermission = NameBanPermissions.BASE_NAMEUNBAN,
         commandDescriptionKey = "nameunban",
         async = true)
-public class NameUnbanCommand implements ICommandExecutor<CommandSource> {
+public class NameUnbanCommand implements ICommandExecutor {
 
     private final String nameKey = "name";
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             new RegexArgument(Text.of(this.nameKey), Util.usernameRegexPattern, "command.nameban.notvalid", serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        String name = context.requireOne(this.nameKey, String.class).toLowerCase();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String name = context.requireOne(this.nameKey, String.class).toLowerCase();
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
             context.getServiceCollection().getServiceUnchecked(NameBanHandler.class).removeName(name, frame.getCurrentCause());
             context.sendMessage("command.nameban.pardon.success", name);
             return context.successResult();
-        } catch (NameBanException ex) {
+        } catch (final NameBanException ex) {
             ex.printStackTrace();
             return context.errorResult("command.nameban.pardon.failed", name);
         }

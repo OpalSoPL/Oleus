@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -26,12 +26,12 @@ import org.spongepowered.api.text.Text;
         commandDescriptionKey = "home.deleteother",
         parentCommand = HomeCommand.class
 )
-public class DeleteOtherHomeCommand implements ICommandExecutor<CommandSource> {
+public class DeleteOtherHomeCommand implements ICommandExecutor {
 
     private final String homeKey = "home";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.onlyOne(new HomeOtherArgument(
                         Text.of(this.homeKey),
@@ -41,11 +41,11 @@ public class DeleteOtherHomeCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Home wl = context.requireOne(this.homeKey, Home.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Home wl = context.requireOne(this.homeKey, Home.class);
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
             context.getServiceCollection().getServiceUnchecked(HomeService.class).removeHomeInternal(frame.getCurrentCause(), wl);
         }
 

@@ -16,7 +16,7 @@ import java.util.function.BiFunction;
 
 public class NamePlaceholder implements PlaceholderParser {
 
-    private static final Text CONSOLE = Text.of("-");
+    private static final TextComponent CONSOLE = Text.of("-");
     private final IPlayerDisplayNameService playerDisplayNameService;
     private final boolean consoleFilter;
     private final BiFunction<IPlayerDisplayNameService, CommandSource, Text> parser;
@@ -43,7 +43,7 @@ public class NamePlaceholder implements PlaceholderParser {
     }
 
     @Override
-    public Text parse(final PlaceholderContext placeholder) {
+    public TextComponent parse(final PlaceholderContext placeholder) {
         final Optional<CommandSource> commandSource = placeholder.getAssociatedObject().filter(x -> x instanceof CommandSource).map(x -> (CommandSource) x);
         if (commandSource.isPresent()) {
             if (this.consoleFilter && placeholder.getAssociatedObject().map(x -> x instanceof ConsoleSource).isPresent()) {

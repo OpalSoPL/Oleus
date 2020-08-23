@@ -14,15 +14,15 @@ import javax.annotation.Nullable;
 public class NucleusArgumentParseException extends ArgumentParseException {
 
     private final IMessageProviderService messageProviderService;
-    @Nullable private final Text subcommands;
-    @Nullable private final Text usage;
+    @Nullable private final TextComponent subcommands;
+    @Nullable private final TextComponent usage;
     private final boolean isEnd;
 
     public static NucleusArgumentParseException from(
             final IMessageProviderService messageProviderService,
             final ArgumentParseException exception,
-            @Nullable final Text usage,
-            @Nullable final Text subcommands) {
+            @Nullable final TextComponent usage,
+            @Nullable final TextComponent subcommands) {
         return new NucleusArgumentParseException(
                 messageProviderService,
                 Text.of(TextColors.RED, exception.getMessage()),
@@ -36,11 +36,11 @@ public class NucleusArgumentParseException extends ArgumentParseException {
 
     public NucleusArgumentParseException(
             final IMessageProviderService messageProviderService,
-            final Text message,
+            final TextComponent message,
             final String source,
             final int position,
-            @Nullable final Text usage,
-            @Nullable final Text subcommands,
+            @Nullable final TextComponent usage,
+            @Nullable final TextComponent subcommands,
             final boolean isEnd) {
         super(message, source, position);
         this.messageProviderService = messageProviderService;
@@ -49,8 +49,8 @@ public class NucleusArgumentParseException extends ArgumentParseException {
         this.isEnd = isEnd;
     }
 
-    @Override public Text getText() {
-        final Text t = super.getText();
+    @Override public TextComponent getText() {
+        final TextComponent t = super.getText();
         if (this.usage == null && this.subcommands == null) {
             return t;
         }
@@ -58,7 +58,7 @@ public class NucleusArgumentParseException extends ArgumentParseException {
         return Text.join(t, Text.NEW_LINE, this.getUsage());
     }
 
-    @Nullable public Text getUsage() {
+    @Nullable public TextComponent getUsage() {
         final Text.Builder builder = Text.builder();
         if (this.usage != null) {
             builder.append(Text.NEW_LINE).append(this.messageProviderService.getMessage("command.exception.usage", this.usage));

@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @APIService(NucleusFreezePlayerService.class)
 public class FreezePlayerService implements ServiceBase, NucleusFreezePlayerService {
@@ -27,31 +27,31 @@ public class FreezePlayerService implements ServiceBase, NucleusFreezePlayerServ
     private final LoadingCache<UUID, Boolean> cache;
 
     @Inject
-    public FreezePlayerService(INucleusServiceCollection serviceCollection) {
+    public FreezePlayerService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.cache = Caffeine.newBuilder().expireAfterAccess(2, TimeUnit.MINUTES)
                 .build(uuid -> this.serviceCollection.storageManager().getUserService().getOnThread(uuid)
                         .flatMap(x -> x.get(FreezePlayerKeys.FREEZE_PLAYER)).orElse(false));
     }
 
-    public boolean getFromUUID(@Nonnull UUID uuid) {
-        Boolean b = this.cache.get(uuid);
+    public boolean getFromUUID(@Nonnull final UUID uuid) {
+        final Boolean b = this.cache.get(uuid);
         return b != null ? b : false;
     }
 
-    public void invalidate(@Nonnull UUID uuid) {
+    public void invalidate(@Nonnull final UUID uuid) {
         this.cache.invalidate(uuid);
     }
 
     @Override
-    public boolean isFrozen(UUID uuid) {
+    public boolean isFrozen(final UUID uuid) {
         return getFromUUID(uuid);
     }
 
     @Override
-    public void setFrozen(UUID uuid, boolean freeze) {
-        IUserDataObject x = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(uuid);
-        try (IKeyedDataObject.Value<Boolean> v = x.getAndSet(FreezePlayerKeys.FREEZE_PLAYER)) {
+    public void setFrozen(final UUID uuid, final boolean freeze) {
+        final IUserDataObject x = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(uuid);
+        try (final IKeyedDataObject.Value<Boolean> v = x.getAndSet(FreezePlayerKeys.FREEZE_PLAYER)) {
             v.setValue(freeze);
             this.cache.put(uuid, freeze);
         }

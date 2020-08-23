@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -21,21 +21,21 @@ import org.spongepowered.api.entity.living.player.User;
         basePermission = NicknamePermissions.BASE_NICK,
         commandDescriptionKey = "delnick"
 )
-public class DelNickCommand implements ICommandExecutor<CommandSource> {
+public class DelNickCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[]{
                 serviceCollection.commandElementSupplier()
                         .createOnlyOtherUserPermissionElement(false, NicknamePermissions.OTHERS_NICK)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User pl = context.getUserFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User pl = context.getUserFromArgs();
         try {
-            context.getServiceCollection().getServiceUnchecked(NicknameService.class).removeNick(pl, context.getCommandSource());
-        } catch (NicknameException e) {
+            context.getServiceCollection().getServiceUnchecked(NicknameService.class).removeNick(pl, context.getCommandSourceRoot());
+        } catch (final NicknameException e) {
             e.printStackTrace();
             return context.errorResultLiteral(e.getTextMessage());
         }

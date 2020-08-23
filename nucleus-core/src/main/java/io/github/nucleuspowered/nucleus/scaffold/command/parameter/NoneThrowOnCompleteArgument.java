@@ -42,7 +42,7 @@ public class NoneThrowOnCompleteArgument extends CommandElement {
     }
 
     @Override
-    public Text getUsage(final CommandSource src) {
+    public TextComponent getUsage(final CommandSource src) {
         return Text.of();
     }
 }

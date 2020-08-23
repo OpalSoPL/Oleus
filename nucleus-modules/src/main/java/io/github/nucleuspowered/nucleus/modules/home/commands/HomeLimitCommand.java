@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -23,20 +23,20 @@ import org.spongepowered.api.entity.living.player.User;
         async = true,
         associatedPermissions = HomePermissions.OTHERS_LIMIT
 )
-public class HomeLimitCommand implements ICommandExecutor<CommandSource> {
+public class HomeLimitCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(false, HomePermissions.OTHERS_LIMIT)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User user = context.getUserFromArgs();
-        HomeService service = context.getServiceCollection().getServiceUnchecked(HomeService.class);
-        int current = service.getHomeCount(user);
-        int max = service.getMaximumHomes(user);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.getUserFromArgs();
+        final HomeService service = context.getServiceCollection().getServiceUnchecked(HomeService.class);
+        final int current = service.getHomeCount(user);
+        final int max = service.getMaximumHomes(user);
         if (context.is(user)) {
             if (max == Integer.MAX_VALUE) {
                 context.sendMessage("command.home.limit.selfu", current);

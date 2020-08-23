@@ -15,7 +15,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class ChatJailListener implements ListenerBase.Conditional {
 
@@ -23,24 +23,24 @@ public class ChatJailListener implements ListenerBase.Conditional {
     private final IMessageProviderService messageProviderService;
 
     @Inject
-    public ChatJailListener(INucleusServiceCollection serviceCollection) {
+    public ChatJailListener(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
         this.messageProviderService = serviceCollection.messageProvider();
     }
 
     @Listener(order = Order.FIRST)
-    public void onChat(MessageChannelEvent.Chat event) {
+    public void onChat(final MessageChannelEvent.Chat event) {
         Util.onPlayerSimulatedOrPlayer(event, this::onChat);
     }
 
-    private void onChat(MessageChannelEvent.Chat event, Player player) {
+    private void onChat(final MessageChannelEvent.Chat event, final Player player) {
         if (this.handler.checkJail(player, false)) {
             this.messageProviderService.sendMessageTo(player, "jail.muteonchat");
             event.setCancelled(true);
         }
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).isMuteOnJail();
     }
 

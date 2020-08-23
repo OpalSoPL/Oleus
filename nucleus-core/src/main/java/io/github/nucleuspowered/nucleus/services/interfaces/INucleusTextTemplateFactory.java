@@ -17,5 +17,5 @@ public interface INucleusTextTemplateFactory extends NucleusTextTemplateFactory 
 
     NucleusTextTemplateImpl createFromAmpersandString(String string);
 
-    NucleusTextTemplateImpl createFromAmpersandString(String string, Text prefix, Text suffix);
+    NucleusTextTemplateImpl createFromAmpersandString(String string, TextComponent prefix, TextComponent suffix);
 }

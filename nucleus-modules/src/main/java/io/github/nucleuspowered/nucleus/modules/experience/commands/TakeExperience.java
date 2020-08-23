@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -27,10 +27,10 @@ import java.util.Optional;
         parentCommand = ExperienceCommand.class,
         basePermission = ExperiencePermissions.BASE_EXP_TAKE,
         commandDescriptionKey = "exp.take")
-public class TakeExperience implements ICommandExecutor<CommandSource> {
+public class TakeExperience implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_ONE_PLAYER.get(serviceCollection),
                 GenericArguments.firstParsing(
@@ -40,9 +40,9 @@ public class TakeExperience implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
-        Optional<ICommandResult> r = ExperienceCommand.checkGameMode(context, pl);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
+        final Optional<ICommandResult> r = ExperienceCommand.checkGameMode(context, pl);
         if (r.isPresent()) {
             return r.get();
         }
@@ -50,13 +50,13 @@ public class TakeExperience implements ICommandExecutor<CommandSource> {
         // int currentExp = pl.get(Keys.TOTAL_EXPERIENCE).get();
         int toOffer = 0;
         if (context.hasAny(ExperienceCommand.levelKey)) {
-            ExperienceHolderData data = pl.get(ExperienceHolderData.class).get();
-            int currentLevel = data.level().get();
-            int levelReduction = context.requireOne(ExperienceCommand.levelKey, int.class);
+            final ExperienceHolderData data = pl.get(ExperienceHolderData.class).get();
+            final int currentLevel = data.level().get();
+            final int levelReduction = context.requireOne(ExperienceCommand.levelKey, int.class);
 
             // If this will take us down to below zero, we just let this continue to the return line. Else...
             if (currentLevel >= levelReduction) {
-                int extra = data.experienceSinceLevel().get();
+                final int extra = data.experienceSinceLevel().get();
                 data.set(data.level().set(currentLevel - levelReduction));
                 data.set(data.experienceSinceLevel().set(Math.min(extra, data.getExperienceBetweenLevels().getMaxValue())));
                 return ExperienceCommand.tellUserAboutExperience(context, pl, pl.offer(data).isSuccessful());

@@ -6,26 +6,23 @@ package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.NucleusRequirePermissionArgument;
 import io.github.nucleuspowered.nucleus.services.impl.commandelement.CommandElementSupplier;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
+import java.util.Locale;
+
 
 @ImplementedBy(CommandElementSupplier.class)
 public interface ICommandElementSupplier {
 
-    CommandElement createLocaleElement(Text key);
+    Parameter.Value<Locale> createLocaleElement(String key);
 
-    CommandElement createOnlyOtherUserPermissionElement(String permission);
+    Parameter.Value<User> createOnlyOtherUserPermissionElement(String permission);
 
-    CommandElement createOtherUserPermissionElement(boolean isPlayer, String permission);
+    Parameter.Value<ServerPlayer> createOnlyOtherPlayerPermissionElement(String permission);
 
-    CommandElement createOnlyOtherUserPermissionElement(boolean isPlayer, String permission);
-
-    NucleusRequirePermissionArgument createPermissionParameter(CommandElement wrapped, String permission, boolean isOptional);
-
-    User getUserFromParametersElseSelf(ICommandContext<? extends CommandSource> context) throws CommandException;
+    User getUserFromParametersElseSelf(ICommandContext context) throws CommandException;
 }

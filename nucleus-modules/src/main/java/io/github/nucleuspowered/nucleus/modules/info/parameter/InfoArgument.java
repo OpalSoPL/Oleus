@@ -28,7 +28,7 @@ public class InfoArgument extends CommandElement {
     private final InfoHandler handler;
     private final IMessageProviderService messageProviderService;
 
-    public InfoArgument(@Nullable Text key, InfoHandler handler, INucleusServiceCollection serviceCollection) {
+    public InfoArgument(@Nullable final TextComponent key, final InfoHandler handler, final INucleusServiceCollection serviceCollection) {
         super(key);
         Preconditions.checkNotNull(handler);
         this.handler = handler;
@@ -37,9 +37,9 @@ public class InfoArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String a = args.next();
-        Optional<TextFileController> list = this.handler.getSection(a);
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String a = args.next();
+        final Optional<TextFileController> list = this.handler.getSection(a);
         if (list.isPresent()) {
             return new Result(this.handler.getInfoSections().stream().filter(a::equalsIgnoreCase).findFirst().get(), list.get());
         }
@@ -48,11 +48,11 @@ public class InfoArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         try {
-            String p = args.peek();
+            final String p = args.peek();
             return this.handler.getInfoSections().stream().filter(x -> x.toLowerCase().startsWith(p.toLowerCase())).collect(Collectors.toList());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return new ArrayList<>(this.handler.getInfoSections());
         }
     }
@@ -61,7 +61,7 @@ public class InfoArgument extends CommandElement {
         public final String name;
         public final TextFileController text;
 
-        public Result(String name, TextFileController text) {
+        public Result(final String name, final TextFileController text) {
             this.name = name;
             this.text = text;
         }

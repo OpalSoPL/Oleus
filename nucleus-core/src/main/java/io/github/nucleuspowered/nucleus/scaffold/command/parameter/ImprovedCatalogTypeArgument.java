@@ -27,7 +27,7 @@ public class ImprovedCatalogTypeArgument extends CommandElement {
     private final Class<? extends CatalogType> type;
     private final IMessageProviderService messageProviderService;
 
-    public ImprovedCatalogTypeArgument(@Nonnull final Text key, final Class<? extends CatalogType> type, final INucleusServiceCollection serviceCollection) {
+    public ImprovedCatalogTypeArgument(@Nonnull final TextComponent key, final Class<? extends CatalogType> type, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.type = type;
         this.messageProviderService = serviceCollection.messageProvider();

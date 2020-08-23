@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 
 public class AroundPlayerKernel extends DefaultKernel {
 
-    @Override Vector3i getCentralLocation(@Nullable Location<World> currentLocation, World world) {
+    @Override Vector3i getCentralLocation(@Nullable final Location<World> currentLocation, final World world) {
         if (currentLocation != null && world.getUniqueId().equals(currentLocation.getExtent().getUniqueId())) {
             return currentLocation.getBlockPosition();
         }

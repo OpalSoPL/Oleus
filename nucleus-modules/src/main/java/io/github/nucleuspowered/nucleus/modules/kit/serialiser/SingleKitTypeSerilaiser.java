@@ -39,31 +39,31 @@ public class SingleKitTypeSerilaiser {
 
     private SingleKitTypeSerilaiser() {}
 
-    @Nullable public Map<String, Kit> deserialize(@NonNull ConfigurationNode value)
+    @Nullable public Map<String, Kit> deserialize(@NonNull final ConfigurationNode value)
             throws ObjectMappingException {
-        Map<String, Kit> kits = new HashMap<>();
-        for (Map.Entry<Object, ? extends ConfigurationNode> entry : value.getChildrenMap().entrySet()) {
-            String kitName = entry.getKey().toString().toLowerCase();
+        final Map<String, Kit> kits = new HashMap<>();
+        for (final Map.Entry<Object, ? extends ConfigurationNode> entry : value.getChildrenMap().entrySet()) {
+            final String kitName = entry.getKey().toString().toLowerCase();
 
-            ConfigurationNode node = entry.getValue();
+            final ConfigurationNode node = entry.getValue();
             if (!node.isVirtual()) {
-                List<ItemStackSnapshot> itemStackSnapshots =
+                final List<ItemStackSnapshot> itemStackSnapshots =
                         node.getNode(STACKS)
                                 .getList(TypeToken.of(NucleusItemStackSnapshot.class))
                                 .stream()
                                 .map(NucleusItemStackSnapshot::getSnapshot)
                                 .map(ValueContainer::copy)
                                 .collect(Collectors.toList());
-                long interval = node.getNode(INTERVAL).getLong(0);
-                double cost = node.getNode(COST).getDouble(0);
-                boolean autoRedeem = node.getNode(AUTO_REDEEM).getBoolean(false);
-                boolean oneTime = node.getNode(ONE_TIME).getBoolean(false);
-                boolean displayMessage = node.getNode(DISPLAY_MESSAGE).getBoolean(true);
-                boolean ignoresPermission = node.getNode(IGNORES_PERMISSION).getBoolean(false);
-                boolean hidden = node.getNode(HIDDEN).getBoolean(false);
-                List<String> commands = node.getNode(COMMANDS).getList(TypeTokens.STRING);
-                boolean firstJoin = node.getNode(FIRST_JOIN).getBoolean(false);
-                Kit k = new SingleKit(kitName,
+                final long interval = node.getNode(INTERVAL).getLong(0);
+                final double cost = node.getNode(COST).getDouble(0);
+                final boolean autoRedeem = node.getNode(AUTO_REDEEM).getBoolean(false);
+                final boolean oneTime = node.getNode(ONE_TIME).getBoolean(false);
+                final boolean displayMessage = node.getNode(DISPLAY_MESSAGE).getBoolean(true);
+                final boolean ignoresPermission = node.getNode(IGNORES_PERMISSION).getBoolean(false);
+                final boolean hidden = node.getNode(HIDDEN).getBoolean(false);
+                final List<String> commands = node.getNode(COMMANDS).getList(TypeTokens.STRING);
+                final boolean firstJoin = node.getNode(FIRST_JOIN).getBoolean(false);
+                final Kit k = new SingleKit(kitName,
                         itemStackSnapshots,
                         Duration.ofSeconds(interval),
                         cost,
@@ -81,12 +81,12 @@ public class SingleKitTypeSerilaiser {
         return kits;
     }
 
-    public void serialize(@Nullable Map<String, Kit> obj, @NonNull ConfigurationNode value)
+    public void serialize(@Nullable final Map<String, Kit> obj, @NonNull final ConfigurationNode value)
             throws ObjectMappingException {
         if (obj != null) {
-            for (Map.Entry<String, Kit> entry : obj.entrySet()) {
-                Kit kit = entry.getValue();
-                ConfigurationNode node = value.getNode(entry.getKey().toLowerCase());
+            for (final Map.Entry<String, Kit> entry : obj.entrySet()) {
+                final Kit kit = entry.getValue();
+                final ConfigurationNode node = value.getNode(entry.getKey().toLowerCase());
                 node.getNode(STACKS)
                         .setValue(new TypeToken<List<NucleusItemStackSnapshot>>() {},
                                 kit.getStacks().stream().map(NucleusItemStackSnapshot::new).collect(Collectors.toList()));

@@ -17,7 +17,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.parameter.UUIDArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -33,18 +33,18 @@ import java.util.Optional;
         commandDescriptionKey = "checkjail",
         async = true
 )
-public class CheckJailCommand implements ICommandExecutor<CommandSource> {
+public class CheckJailCommand implements ICommandExecutor {
 
     private final String playerKey = "user/UUID";
     private final JailHandler handler;
 
     @Inject
-    public CheckJailCommand(INucleusServiceCollection serviceCollection) {
+    public CheckJailCommand(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.firstParsing(
                 GenericArguments.user(Text.of(this.playerKey)),
@@ -53,17 +53,17 @@ public class CheckJailCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User user = context.requireOne(this.playerKey, User.class);
-        Optional<JailData> jail = this.handler.getPlayerJailDataInternal(user);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.requireOne(this.playerKey, User.class);
+        final Optional<JailData> jail = this.handler.getPlayerJailDataInternal(user);
 
         if (!jail.isPresent()) {
             return context.errorResult("command.checkjail.nojail", user.getName());
         }
 
-        IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
-        JailData md = jail.get();
-        String name;
+        final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
+        final JailData md = jail.get();
+        final String name;
         if (md.getJailerInternal().equals(Util.CONSOLE_FAKE_UUID)) {
             name = Sponge.getServer().getConsole().getName();
         } else {
@@ -75,7 +75,7 @@ public class CheckJailCommand implements ICommandExecutor<CommandSource> {
         if (md.getRemainingTime().isPresent()) {
             context.sendMessage("command.checkjail.jailedfor", user.getName(), md.getJailName(),
                     name, messageProviderService.getTimeString(
-                            context.getCommandSource().getLocale(),
+                            context.getCommandSourceRoot().getLocale(),
                             md.getRemainingTime().get().getSeconds()));
         } else {
             context.sendMessage("command.checkjail.jailedperm", user.getName(), md.getJailName(), name);
@@ -83,7 +83,7 @@ public class CheckJailCommand implements ICommandExecutor<CommandSource> {
 
         if (md.getCreationTime() > 0) {
             context.sendMessage("command.checkjail.created",
-                    Util.FULL_TIME_FORMATTER.withLocale(context.getCommandSource().getLocale()).format(Instant.ofEpochSecond(md.getCreationTime())));
+                    Util.FULL_TIME_FORMATTER.withLocale(context.getCommandSourceRoot().getLocale()).format(Instant.ofEpochSecond(md.getCreationTime())));
         } else {
             context.sendMessage("command.checkjail.created", "loc:standard.unknown");
         }

@@ -32,7 +32,7 @@ public class HomeArgument extends CommandElement {
     private final HomeService homeService;
     protected final IMessageProviderService messageProviderService;
 
-    public HomeArgument(@Nullable Text key, HomeService homeService, IMessageProviderService messageProviderService) {
+    public HomeArgument(@Nullable final TextComponent key, final HomeService homeService, final IMessageProviderService messageProviderService) {
         super(key);
         this.homeService = homeService;
         this.messageProviderService = messageProviderService;
@@ -40,7 +40,7 @@ public class HomeArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         if (!(source instanceof User)) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "command.playeronly"));
         }
@@ -48,13 +48,13 @@ public class HomeArgument extends CommandElement {
         return getHome((User) source, source, args.next(), args);
     }
 
-    Home getHome(User user, CommandSource source, String home, CommandArgs args) throws ArgumentParseException {
+    Home getHome(final User user, final CommandSource source, final String home, final CommandArgs args) throws ArgumentParseException {
         try {
-            Optional<Home> owl = this.homeService.getHome(user.getUniqueId(), home);
+            final Optional<Home> owl = this.homeService.getHome(user.getUniqueId(), home);
             if (owl.isPresent()) {
                 return owl.get();
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             throw args.createError(Text.of(TextColors.RED, "An unspecified error occurred"));
         }
@@ -63,28 +63,28 @@ public class HomeArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         if (!(src instanceof User)) {
             return Lists.newArrayList();
         }
 
-        User u = (User) src;
+        final User u = (User) src;
         try {
             return complete(u, args.peek());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return complete(u, "");
         }
     }
 
-    protected List<String> complete(User src, String homeName) {
-        Collection<String> s;
+    protected List<String> complete(final User src, final String homeName) {
+        final Collection<String> s;
         try {
             s = this.homeService.getHomeNames(src.getUniqueId());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return Lists.newArrayList();
         }
 
-        String name = homeName.toLowerCase();
+        final String name = homeName.toLowerCase();
         return s.stream().filter(x -> x.toLowerCase().startsWith(name)).limit(20).collect(Collectors.toList());
     }
 }

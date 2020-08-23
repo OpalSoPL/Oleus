@@ -14,14 +14,14 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class VanishInfoProvider implements NucleusProvider.Permission {
 
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
-    public VanishInfoProvider(INucleusServiceCollection serviceCollection) {
+    public VanishInfoProvider(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
@@ -35,7 +35,7 @@ public class VanishInfoProvider implements NucleusProvider.Permission {
 
     @Nullable
     @Override
-    public Text getText(User user, CommandSource source, INucleusServiceCollection serviceCollection) {
+    public TextComponent getText(final User user, final CommandSource source, final INucleusServiceCollection serviceCollection) {
         final IMessageProviderService providerService = this.serviceCollection.messageProvider();
         final String isVanished = Boolean.toString(user.get(Keys.VANISH).orElse(false));
         final String yesNo = providerService.getMessageString("standard.yesno." + isVanished.toLowerCase());

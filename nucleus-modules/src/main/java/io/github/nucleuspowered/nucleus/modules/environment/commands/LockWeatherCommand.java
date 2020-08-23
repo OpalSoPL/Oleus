@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -26,29 +26,29 @@ import java.util.Optional;
         commandDescriptionKey = "lockweather",
         async = true
 )
-public class LockWeatherCommand implements ICommandExecutor<CommandSource> {
+public class LockWeatherCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
-                NucleusParameters.OPTIONAL_WEAK_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection),
+                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection),
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Optional<WorldProperties> world = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Optional<WorldProperties> world = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD);
         if (!world.isPresent()) {
             return context.errorResult("command.specifyworld");
         }
 
-        WorldProperties wp = world.get();
-        try (IKeyedDataObject.Value<Boolean> vb = context.getServiceCollection().storageManager()
+        final WorldProperties wp = world.get();
+        try (final IKeyedDataObject.Value<Boolean> vb = context.getServiceCollection().storageManager()
                 .getOrCreateWorldOnThread(wp.getUniqueId())
                 .getAndSet(EnvironmentKeys.LOCKED_WEATHER)) {
-            boolean current = vb.getValue().orElse(false);
-            boolean toggle = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!current);
+            final boolean current = vb.getValue().orElse(false);
+            final boolean toggle = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!current);
             vb.setValue(toggle);
             if (toggle) {
                 context.sendMessage("command.lockweather.locked", wp.getWorldName());

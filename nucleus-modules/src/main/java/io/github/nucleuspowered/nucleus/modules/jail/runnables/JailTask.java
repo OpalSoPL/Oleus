@@ -17,7 +17,7 @@ import org.spongepowered.api.scheduler.Task;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class JailTask implements TaskBase {
 
@@ -26,13 +26,13 @@ public class JailTask implements TaskBase {
 
 
     @Inject
-    public JailTask(INucleusServiceCollection serviceCollection) {
+    public JailTask(final INucleusServiceCollection serviceCollection) {
         this.jailHandler = serviceCollection.getServiceUnchecked(JailHandler.class);
         this.pluginContainer = serviceCollection.pluginContainer();
     }
 
     @Override
-    public void accept(Task task) {
+    public void accept(final Task task) {
         Sponge.getServer()
                 .getOnlinePlayers()
                 .stream()

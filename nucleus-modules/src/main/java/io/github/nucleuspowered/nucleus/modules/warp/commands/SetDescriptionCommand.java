@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -26,9 +26,9 @@ import org.spongepowered.api.text.serializer.TextSerializers;
         async = true,
         parentCommand = WarpCommand.class
 )
-public class SetDescriptionCommand implements ICommandExecutor<CommandSource> {
+public class SetDescriptionCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags().flag("r", "-remove", "-delete").buildWith(
                 GenericArguments.seq(
@@ -39,9 +39,9 @@ public class SetDescriptionCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WarpService handler = context.getServiceCollection().getServiceUnchecked(WarpService.class);
-        String warpName = context.requireOne(WarpService.WARP_KEY, Warp.class).getName();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WarpService handler = context.getServiceCollection().getServiceUnchecked(WarpService.class);
+        final String warpName = context.requireOne(WarpService.WARP_KEY, Warp.class).getName();
         if (context.hasAny("r")) {
             // Remove the desc.
             if (handler.setWarpDescription(warpName, null)) {
@@ -53,7 +53,7 @@ public class SetDescriptionCommand implements ICommandExecutor<CommandSource> {
         }
 
         // Add the category.
-        Text message = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(NucleusParameters.Keys.DESCRIPTION, String.class));
+        final TextComponent message = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(NucleusParameters.Keys.DESCRIPTION, String.class));
         if (handler.setWarpDescription(warpName, message)) {
             context.sendMessage("command.warp.description.added", message, Text.of(warpName));
             return context.successResult();

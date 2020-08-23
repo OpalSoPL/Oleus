@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.util.Tuples;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -39,20 +39,20 @@ import javax.annotation.Nullable;
         commandDescriptionKey = "world.delete",
         parentCommand = WorldCommand.class
 )
-public class DeleteWorldCommand implements ICommandExecutor<CommandSource> {
+public class DeleteWorldCommand implements ICommandExecutor {
 
     @Nullable private Tuples.Tri<Instant, UUID, WorldProperties> confirm = null;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.WORLD_PROPERTIES_ALL.get(serviceCollection),
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties properties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties properties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
         if (this.confirm != null && this.confirm.getFirst().isAfter(Instant.now()) &&
                 this.confirm.getSecond().equals(context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID)) &&
                 this.confirm.getThird().getUniqueId().equals(properties.getUniqueId())) {
@@ -75,9 +75,9 @@ public class DeleteWorldCommand implements ICommandExecutor<CommandSource> {
         return context.successResult();
     }
 
-    private ICommandResult completeDeletion(ICommandContext<? extends CommandSource> context, WorldProperties properties) throws CommandException {
+    private ICommandResult completeDeletion(final ICommandContext context, final WorldProperties properties) throws CommandException {
         Preconditions.checkNotNull(this.confirm);
-        String worldName = this.confirm.getThird().getWorldName();
+        final String worldName = this.confirm.getThird().getWorldName();
         if (Sponge.getServer().getWorld(properties.getUniqueId()).isPresent()) {
             return context.errorResult("command.world.delete.loaded", this.confirm.getThird());
         }
@@ -89,8 +89,8 @@ public class DeleteWorldCommand implements ICommandExecutor<CommandSource> {
         }
 
         // Now request deletion
-        CompletableFuture<Boolean> completableFuture = Sponge.getServer().deleteWorld(properties);
-        final Supplier<Optional<? extends CommandSource>> source;
+        final CompletableFuture<Boolean> completableFuture = Sponge.getServer().deleteWorld(properties);
+        final Supplier<Optional<Object>> source;
         if (context.is(Player.class)) {
             final UUID uuid = context.getIfPlayer().getUniqueId();
             source = () -> Sponge.getServer().getPlayer(uuid);
@@ -103,7 +103,7 @@ public class DeleteWorldCommand implements ICommandExecutor<CommandSource> {
                     boolean result;
                     try {
                         result = completableFuture.get();
-                    } catch (InterruptedException | ExecutionException e) {
+                    } catch (final InterruptedException | ExecutionException e) {
                         result = false;
                         e.printStackTrace();
                     }

@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,29 +25,29 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Command(aliases = {"afkkick", "kickafk"}, basePermission = AFKPermissions.BASE_AFKKICK, commandDescriptionKey = "afkkick")
-public class AFKKickCommand implements ICommandExecutor<CommandSource> {
+public class AFKKickCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_REASON
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Optional<Text> reason = context
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Optional<Text> reason = context
                 .getOne(NucleusParameters.Keys.REASON, TypeTokens.STRING)
                 .map(TextSerializers.FORMATTING_CODE::deserialize);
 
-        Collection<Player> playersToKick = context.getServiceCollection().getServiceUnchecked(AFKHandler.class).getAfk(x ->
+        final Collection<Player> playersToKick = context.getServiceCollection().getServiceUnchecked(AFKHandler.class).getAfk(x ->
                 !context.testPermissionFor(x, AFKPermissions.AFK_EXEMPT_KICK));
         if (playersToKick.isEmpty()) {
             return context.errorResult("command.afkkick.nokick");
         }
 
-        IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
-        int number = playersToKick.size();
+        final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
+        final int number = playersToKick.size();
         playersToKick.forEach(x -> x.kick(reason.orElseGet(() -> messageProviderService.getMessageFor(x.getLocale(), "afk.kickreason"))));
 
         context.sendMessage("command.afkkick.success", number);

@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -30,21 +30,21 @@ import org.spongepowered.api.text.Text;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_SHOWITEMATTRIBUTES)
         }
 )
-public class ShowAttributesCommand implements ICommandExecutor<Player> {
+public class ShowAttributesCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
-        ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
+        final ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND)
                 .orElseThrow(() -> context.createException("command.generalerror.handempty"));
 
-        boolean b = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
+        final boolean b = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
                 .orElseGet(() -> itemStack.get(Keys.HIDE_ATTRIBUTES).orElse(false));
 
         // Command is show, key is hide. We invert.

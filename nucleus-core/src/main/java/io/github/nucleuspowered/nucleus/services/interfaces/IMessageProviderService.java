@@ -8,11 +8,10 @@ import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.MessageProviderService;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository.ConfigFileMessagesRepository;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository.IMessageRepository;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -34,50 +33,50 @@ public interface IMessageProviderService {
 
     Optional<Locale> getLocaleFromName(String name);
 
-    Locale getLocaleFor(CommandSource commandSource);
+    Locale getLocaleFor(Audience commandSource);
 
-    Text getMessageFor(Locale locale, String key);
+    TextComponent getMessageFor(Locale locale, String key);
 
-    Text getMessageFor(Locale locale, String key, Text... args);
+    TextComponent getMessageFor(Locale locale, String key, TextComponent... args);
 
-    Text getMessageFor(Locale locale, String key, Object... replacements);
+    TextComponent getMessageFor(Locale locale, String key, Object... replacements);
 
-    Text getMessageFor(Locale locale, String key, String... replacements);
+    TextComponent getMessageFor(Locale locale, String key, String... replacements);
 
     String getMessageString(Locale locale, String key, String... replacements);
 
     String getMessageString(Locale locale, String key, Object... replacements);
 
-    default Text getMessageForDefault(final String key, final Text... args) {
+    default TextComponent getMessageForDefault(final String key, final Component... args) {
         return this.getMessageFor(this.getDefaultLocale(), key, args);
     }
 
-    default Text getMessageFor(final CommandSource source, final String key) {
+    default TextComponent getMessageFor(final Audience source, final String key) {
         return this.getMessageFor(this.getLocaleFor(source), key);
     }
 
-    default Text getMessageFor(final CommandSource source, final String key, final Text... args) {
+    default TextComponent getMessageFor(final Audience source, final String key, final Component... args) {
         return this.getMessageFor(this.getLocaleFor(source), key, args);
     }
 
-    default Text getMessageFor(final CommandSource source, final String key, final String... args) {
-        final Text[] t = Arrays.stream(args).map(TextSerializers.FORMATTING_CODE::deserialize).toArray(Text[]::new);
+    default TextComponent getMessageFor(final Audience source, final String key, final String... args) {
+        final TextComponent[] t = Arrays.stream(args).map(LegacyComponentSerializer.legacyAmpersand()::deserialize).toArray(TextComponent[]::new);
         return this.getMessageFor(this.getLocaleFor(source), key, t);
     }
 
-    default Text getMessage(final String key) {
+    default TextComponent getMessage(final String key) {
         return this.getMessageForDefault(key);
     }
 
-    default Text getMessage(final String key, final String... replacements) {
+    default TextComponent getMessage(final String key, final String... replacements) {
         return this.getMessageFor(this.getDefaultLocale(), key, replacements);
     }
 
-    default Text getMessage(final String key, final Text... replacements) {
+    default TextComponent getMessage(final String key, final Component... replacements) {
         return this.getMessageFor(this.getDefaultLocale(), key, replacements);
     }
 
-    default Text getMessage(final String key, final Object... replacements) {
+    default TextComponent getMessage(final String key, final Object... replacements) {
         return this.getMessageFor(this.getDefaultLocale(), key, replacements);
     }
 
@@ -85,43 +84,31 @@ public interface IMessageProviderService {
         return this.getMessageString(this.getDefaultLocale(), key, replacements);
     }
 
-    default String getMessageString(final CommandSource source, final String key, final String... replacements) {
+    default String getMessageString(final Audience source, final String key, final String... replacements) {
         return this.getMessageString(this.getLocaleFor(source), key, replacements);
     }
 
-    default Text getMessageFor(final CommandSource source, final String key, final Object... replacements) {
+    default TextComponent getMessageFor(final Audience source, final String key, final Object... replacements) {
         return this.getMessageFor(this.getLocaleFor(source), key, replacements);
     }
 
-    default void sendMessageTo(final CommandSource receiver, final String key) {
+    default void sendMessageTo(final Audience receiver, final String key) {
         receiver.sendMessage(this.getMessageFor(this.getLocaleFor(receiver), key));
     }
 
-    default void sendMessageTo(final MessageReceiver receiver, final String key, final Object... replacements) {
-        if (receiver instanceof CommandSource) {
-            receiver.sendMessage(this.getMessageFor(this.getLocaleFor((CommandSource) receiver), key, replacements));
-        } else {
-            receiver.sendMessage(getMessageFor(Sponge.getServer().getConsole(), key, replacements));
-        }
-    }
-
-    default void sendMessageTo(final CommandSource receiver, final String key, final Object... replacements) {
+    default void sendMessageTo(final Audience receiver, final String key, final Object... replacements) {
         receiver.sendMessage(this.getMessageFor(this.getLocaleFor(receiver), key, replacements));
     }
 
-    default void sendMessageTo(final CommandSource receiver, final String key, final Text... replacements) {
+    default void sendMessageTo(final Audience receiver, final String key, final String... replacements) {
         receiver.sendMessage(this.getMessageFor(this.getLocaleFor(receiver), key, replacements));
     }
 
-    default void sendMessageTo(final CommandSource receiver, final String key, final String... replacements) {
-        receiver.sendMessage(this.getMessageFor(this.getLocaleFor(receiver), key, replacements));
-    }
-
-    default void sendMessageTo(final Supplier<CommandSource> receiver, final String key, final String... replacements) {
+    default void sendMessageTo(final Supplier<Audience> receiver, final String key, final String... replacements) {
         this.sendMessageTo(receiver.get(), key, replacements);
     }
 
-    default void sendMessageTo(final Supplier<CommandSource> receiver, final String key, final Object... replacements) {
+    default void sendMessageTo(final Supplier<Audience> receiver, final String key, final Object... replacements) {
         this.sendMessageTo(receiver.get(), key, replacements);
     }
 

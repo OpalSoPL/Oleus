@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICooldownService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -57,10 +57,10 @@ import java.util.function.Consumer;
                 TeleportPermissions.TELEPORT_HERE_FORCE
         }
 )
-public class TeleportAskHereCommand implements ICommandExecutor<Player> {
+public class TeleportAskHereCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
                     .permissionFlag(TeleportPermissions.TELEPORT_HERE_FORCE, "f")
@@ -68,34 +68,34 @@ public class TeleportAskHereCommand implements ICommandExecutor<Player> {
         };
     }
 
-    @Override public Optional<ICommandResult> preExecute(ICommandContext.Mutable<? extends Player> context) throws CommandException {
-        boolean cont = context.getServiceCollection()
+    @Override public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
+        final boolean cont = context.getServiceCollection()
                 .getServiceUnchecked(PlayerTeleporterService.class)
                 .canTeleportTo(context.getIfPlayer(), context.requireOne(NucleusParameters.Keys.PLAYER, Player.class));
         return cont ? Optional.empty() : Optional.of(context.failResult());
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player target = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player target = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
         if (context.is(target)) {
             return context.errorResult("command.teleport.self");
         }
 
-        Player src = context.getCommandSource();
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        final Player src = context.getCommandSourceRoot();
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(src);
             // Before we do all this, check the event.
-            RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(frame.getCurrentCause(), target);
+            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(frame.getCurrentCause(), target);
             if (Sponge.getEventManager().post(event)) {
                 return event.getCancelMessage()
                         .map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("command.tpa.eventfailed"));
             }
 
-            ICooldownService cooldownService = context.getServiceCollection().cooldownService();
-            Duration cooldownSeconds = Duration.ofSeconds(context.getCooldown());
-            String key = context.getCommandKey();
-            Consumer<Player> cooldownSetter = player -> cooldownService.setCooldown(
+            final ICooldownService cooldownService = context.getServiceCollection().cooldownService();
+            final Duration cooldownSeconds = Duration.ofSeconds(context.getCooldown());
+            final String key = context.getCommandKey();
+            final Consumer<Player> cooldownSetter = player -> cooldownService.setCooldown(
                     key,
                     player,
                     cooldownSeconds

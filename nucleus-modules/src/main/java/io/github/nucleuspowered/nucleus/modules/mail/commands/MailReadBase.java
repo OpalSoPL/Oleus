@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.modules.mail.data.MailData;
 import io.github.nucleuspowered.nucleus.modules.mail.services.MailHandler;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -38,11 +38,11 @@ public class MailReadBase {
 
     static final String FILTERS = "filters";
 
-    public ICommandResult executeCommand(ICommandContext<? extends CommandSource> context,
+    public ICommandResult executeCommand(final ICommandContext context,
             final User target,
-            Collection<NucleusMailService.MailFilter> lmf) throws CommandException {
-        MailHandler handler = context.getServiceCollection().getServiceUnchecked(MailHandler.class);
-        List<MailMessage> lmd;
+            final Collection<NucleusMailService.MailFilter> lmf) throws CommandException {
+        final MailHandler handler = context.getServiceCollection().getServiceUnchecked(MailHandler.class);
+        final List<MailMessage> lmd;
         if (!lmf.isEmpty()) {
             lmd = handler.getMailInternal(target, lmf.toArray(new NucleusMailService.MailFilter[0]));
         } else {
@@ -59,11 +59,11 @@ public class MailReadBase {
             return context.successResult();
         }
 
-        List<Text> mails = lmd.stream().sorted(Comparator.comparing(MailMessage::getDate))
+        final List<Text> mails = lmd.stream().sorted(Comparator.comparing(MailMessage::getDate))
                         .map(x -> createMessage(context, x, target)).collect(Collectors.toList());
 
         // Paginate the mail.
-        PaginationList.Builder b = Util.getPaginationBuilder(context.getCommandSource()).padding(Text.of(TextColors.GREEN, "-")).title(
+        final PaginationList.Builder b = Util.getPaginationBuilder(context.getCommandSourceRoot()).padding(Text.of(TextColors.GREEN, "-")).title(
                 getHeader(context, target, !lmf.isEmpty())).contents(mails);
         if (!context.is(Player.class)) {
             b.linesPerPage(-1);
@@ -71,11 +71,11 @@ public class MailReadBase {
             b.header(context.getMessage("mail.header"));
         }
 
-        b.sendTo(context.getCommandSource());
+        b.sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 
-    private Text getHeader(ICommandContext<? extends CommandSource> context, User user, boolean isFiltered) {
+    private TextComponent getHeader(final ICommandContext context, final User user, final boolean isFiltered) {
         if (context.is(user)) {
             return context.getMessage(isFiltered ? "mail.title.filter.self" : "mail.title.nofilter.self");
         }
@@ -83,16 +83,16 @@ public class MailReadBase {
         return  context.getMessage(isFiltered ? "mail.title.filter.other" : "mail.title.nofilter.other", user.getName());
     }
 
-    private Text createMessage(final ICommandContext<? extends CommandSource> context, final MailMessage md, final User user) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd, yyyy").withZone(ZoneId.systemDefault());
-        UUID uuid = getUuid(md);
-        Text name = context.getServiceCollection().playerDisplayNameService().getDisplayName(uuid);
+    private TextComponent createMessage(final ICommandContext context, final MailMessage md, final User user) {
+        final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("MMM dd, yyyy").withZone(ZoneId.systemDefault());
+        final UUID uuid = getUuid(md);
+        final TextComponent name = context.getServiceCollection().playerDisplayNameService().getDisplayName(uuid);
         return name.toBuilder().color(TextColors.GREEN).style(TextStyles.UNDERLINE)
                         .onHover(TextActions.showText(context.getMessage("command.mail.hover")))
                         .onClick(TextActions.executeCallback(src -> {
                             src.sendMessage(Text.builder().append(context.getMessage("command.mail.date"))
                                     .append(Text.of(" ", TextColors.WHITE, dtf.format(md.getDate()))).build());
-                            Text.Builder tb = Text.builder().append(context.getMessage("command.mail.sender"))
+                            final Text.Builder tb = Text.builder().append(context.getMessage("command.mail.sender"))
                                     .append(Text.of(" ", TextColors.WHITE, name))
                                     .append(Text.of(TextColors.YELLOW, " - "));
 
@@ -118,7 +118,7 @@ public class MailReadBase {
                         })).append(Text.of(": " + md.getMessage())).build();
     }
 
-    private UUID getUuid(MailMessage message) {
+    private UUID getUuid(final MailMessage message) {
         if (message instanceof MailData) {
             return ((MailData) message).getUuid();
         } else {

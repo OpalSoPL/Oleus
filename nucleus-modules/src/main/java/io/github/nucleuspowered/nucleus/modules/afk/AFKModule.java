@@ -20,7 +20,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = AFKModule.ID, name = "AFK")
 public class AFKModule extends ConfigurableModule<AFKConfig, AFKConfigAdapter> {
@@ -28,7 +28,7 @@ public class AFKModule extends ConfigurableModule<AFKConfig, AFKConfigAdapter> {
     public static final String ID = "afk";
 
     @Inject
-    public AFKModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public AFKModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

@@ -38,7 +38,7 @@ public class AlternativeUsageArgument extends WrappedElement {
         return this.getWrappedElement().complete(src, args, context);
     }
 
-    @Override public Text getUsage(final CommandSource src) {
+    @Override public TextComponent getUsage(final CommandSource src) {
         return this.usage.apply(src);
     }
 }

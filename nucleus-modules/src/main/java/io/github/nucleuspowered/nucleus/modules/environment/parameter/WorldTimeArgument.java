@@ -77,18 +77,18 @@ public class WorldTimeArgument extends CommandElement {
 
     private final IMessageProviderService messageProvider;
 
-    public WorldTimeArgument(@Nullable Text key, INucleusServiceCollection serviceCollection) {
+    public WorldTimeArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProvider = serviceCollection.messageProvider();
     }
 
-    private LongFunction<Long> getValue(CommandSource source, String arg, CommandArgs args) throws ArgumentParseException {
+    private LongFunction<Long> getValue(final CommandSource source, final String arg, final CommandArgs args) throws ArgumentParseException {
         if (tickAliases.containsKey(arg)) {
             return tickAliases.get(arg);
         }
 
         // <number>h
-        Matcher m1 = tfh.matcher(arg);
+        final Matcher m1 = tfh.matcher(arg);
         if (m1.matches()) {
             // Get the number, multiply by 1000, return.
             long i = Long.parseLong(m1.group(1));
@@ -106,7 +106,7 @@ public class WorldTimeArgument extends CommandElement {
         }
 
         // <number>am,pm
-        Matcher m2 = ampm.matcher(arg);
+        final Matcher m2 = ampm.matcher(arg);
         if (m2.matches()) {
             // Get the number, multiply by 1000, return.
             int i = Integer.parseInt(m2.group(1));
@@ -115,7 +115,7 @@ public class WorldTimeArgument extends CommandElement {
             }
 
             // Modify to 24 hour time, based on am/pm
-            String id = m2.group(2).toLowerCase();
+            final String id = m2.group(2).toLowerCase();
             if (id.startsWith("p") && i < 12) {
                 // 11 pm -> 23, 12 pm -> 12.
                 i += 12;
@@ -149,17 +149,17 @@ public class WorldTimeArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String arg = args.next().toLowerCase();
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String arg = args.next().toLowerCase();
         return getValue(source, arg, args);
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         try {
-            String a = args.peek().toLowerCase();
+            final String a = args.peek().toLowerCase();
             return tickAliases.keySet().stream().filter(x -> x.startsWith(a)).collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return new ArrayList<>(tickAliases.keySet());
         }
     }
@@ -168,7 +168,7 @@ public class WorldTimeArgument extends CommandElement {
 
         private final long target;
 
-        private RoundUp(long target) {
+        private RoundUp(final long target) {
             this.target = target;
         }
 
@@ -176,7 +176,7 @@ public class WorldTimeArgument extends CommandElement {
         public final Long apply(long value) {
             // 23999 is the max tick number
             // Get the time of day
-            long remainder = value % TICKS_IN_DAY;
+            final long remainder = value % TICKS_IN_DAY;
 
             if (this.target == remainder) {
                 // no advancement

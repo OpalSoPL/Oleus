@@ -28,15 +28,15 @@ public class ExperienceLevelArgument extends CommandElement {
     private static final Pattern ARGUMENT_PATTERN = Pattern.compile("^(l|lv|l:|lv:)?(\\d+)(l|lv)?$", Pattern.CASE_INSENSITIVE);
     private final IMessageProviderService messageProviderService;
 
-    public ExperienceLevelArgument(@Nullable Text key, INucleusServiceCollection serviceCollection) {
+    public ExperienceLevelArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.messageProviderService = serviceCollection.messageProvider();
     }
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        Matcher m = ARGUMENT_PATTERN.matcher(args.next());
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final Matcher m = ARGUMENT_PATTERN.matcher(args.next());
         if (m.find(0) && (m.group(1) != null || m.group(3) != null)) {
             return Integer.parseInt(m.group(2));
         }
@@ -45,7 +45,7 @@ public class ExperienceLevelArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         return ImmutableList.of();
     }
 }

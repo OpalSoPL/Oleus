@@ -18,10 +18,10 @@ import org.spongepowered.api.command.CommandSource;
         parentCommand = NucleusCommand.class,
         async = true
 )
-public class SaveCommand implements ICommandExecutor<CommandSource> {
+public class SaveCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) {
+    public ICommandResult execute(ICommandContext context) {
         context.sendMessage("command.nucleus.save.start");
         context.getServiceCollection().storageManager().saveAll().join();
         context.sendMessage("command.nucleus.save.complete");

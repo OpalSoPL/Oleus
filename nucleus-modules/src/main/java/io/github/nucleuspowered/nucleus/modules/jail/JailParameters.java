@@ -18,14 +18,14 @@ public final class JailParameters {
     public static final String JAIL_KEY = "jail";
 
     public static final NucleusParameters.LazyLoadedCommandElement JAIL = new NucleusParameters.LazyLoadedCommandElement() {
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return new JailArgument(Text.of(JAIL_KEY), serviceCollection);
         }
     };
 
     public static final NucleusParameters.LazyLoadedCommandElement OPTIONAL_JAIL = new NucleusParameters.LazyLoadedCommandElement() {
 
-        @Override protected CommandElement create(INucleusServiceCollection serviceCollection) {
+        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
             return GenericArguments.optional(JAIL.get(serviceCollection));
         }
     };

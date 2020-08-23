@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -26,14 +26,14 @@ import org.spongepowered.api.world.storage.WorldProperties;
         commandDescriptionKey = "world.setspawn",
         parentCommand = WorldCommand.class
 )
-public class SetSpawnWorldCommand implements ICommandExecutor<CommandSource> {
+public class SetSpawnWorldCommand implements ICommandExecutor {
 
     private final String xKey = "x";
     private final String yKey = "y";
     private final String zKey = "z";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.optional(
                         GenericArguments.seq(
@@ -46,10 +46,10 @@ public class SetSpawnWorldCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties world = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties world = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
-        Vector3i loc;
+        final Vector3i loc;
         if (context.hasAny(this.xKey)) {
             loc = new Vector3i(
                     context.requireOne(this.xKey, Integer.class),
@@ -57,7 +57,7 @@ public class SetSpawnWorldCommand implements ICommandExecutor<CommandSource> {
                     context.requireOne(this.zKey, Integer.class)
             );
         } else {
-            loc = ((Locatable) context.getCommandSource()).getLocation().getBlockPosition();
+            loc = ((Locatable) context.getCommandSourceRoot()).getLocation().getBlockPosition();
         }
 
         world.setSpawnPosition(loc);

@@ -21,7 +21,7 @@ public class SetPvpEnabled extends AbstractPropertiesSetCommand {
         super("pvp");
     }
 
-    @Override protected void setter(WorldProperties worldProperties, boolean set) {
+    @Override protected void setter(final WorldProperties worldProperties, final boolean set) {
         worldProperties.setPVPEnabled(set);
     }
 }

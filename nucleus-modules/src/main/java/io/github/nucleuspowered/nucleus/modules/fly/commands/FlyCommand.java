@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
@@ -32,18 +32,18 @@ import org.spongepowered.api.entity.living.player.Player;
         },
         associatedPermissions = FlyPermissions.OTHERS_FLY
 )
-public class FlyCommand implements ICommandExecutor<CommandSource> { // extends AbstractCommand.SimpleTargetOtherPlayer {
+public class FlyCommand implements ICommandExecutor { // extends AbstractCommand.SimpleTargetOtherPlayer {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, FlyPermissions.OTHERS_FLY),
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player player = context.getPlayerFromArgs();
-        boolean fly = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!player.get(Keys.CAN_FLY).orElse(false));
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player player = context.getPlayerFromArgs();
+        final boolean fly = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!player.get(Keys.CAN_FLY).orElse(false));
 
         if (!setFlying(player, fly)) {
             return context.errorResult("command.fly.error");
@@ -59,7 +59,7 @@ public class FlyCommand implements ICommandExecutor<CommandSource> { // extends 
         return context.successResult();
     }
 
-    private boolean setFlying(Player pl, boolean fly) {
+    private boolean setFlying(final Player pl, final boolean fly) {
         // Only if we don't want to fly, offer IS_FLYING as false.
         return !(!fly && !pl.offer(Keys.IS_FLYING, false).isSuccessful()) && pl.offer(Keys.CAN_FLY, fly).isSuccessful();
     }

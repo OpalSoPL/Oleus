@@ -24,7 +24,7 @@ public class MobProtectionListener implements IReloadableService.Reloadable, Lis
 
     @Listener
     @Exclude({ChangeBlockEvent.Grow.class, ChangeBlockEvent.Decay.class})
-    public void onMobChangeBlock(ChangeBlockEvent event, @Root Living living) {
+    public void onMobChangeBlock(final ChangeBlockEvent event, @Root final Living living) {
         if (living instanceof Player || whitelistedTypes.contains(living.getType())) {
             return;
         }
@@ -34,12 +34,12 @@ public class MobProtectionListener implements IReloadableService.Reloadable, Lis
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.whitelistedTypes = serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class).getWhitelistedEntities();
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class).isEnableProtection();
     }
 }

@@ -35,7 +35,7 @@ public class ConnectionConfig {
         return getMessageFrom(this.serverFullMessage);
     }
 
-    private Optional<Text> getMessageFrom(String text) {
+    private Optional<Text> getMessageFrom(final String text) {
         if (text == null || text.isEmpty()) {
             return Optional.empty();
         }

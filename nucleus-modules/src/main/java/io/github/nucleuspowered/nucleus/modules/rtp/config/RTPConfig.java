@@ -72,27 +72,27 @@ public class RTPConfig {
         return this.noOfAttempts;
     }
 
-    public Optional<PerWorldRTPConfig> get(@Nullable String worldName) {
+    public Optional<PerWorldRTPConfig> get(@Nullable final String worldName) {
         if (worldName == null) {
             return Optional.empty();
         }
         return Optional.ofNullable(this.perWorldRTPConfigList.get(worldName.toLowerCase()));
     }
 
-    public int getMinRadius(@Nullable String worldName) {
+    public int getMinRadius(@Nullable final String worldName) {
         return get(worldName).map(x -> x.minRadius).orElse(this.minRadius);
     }
 
-    public int getRadius(@Nullable String worldName) {
+    public int getRadius(@Nullable final String worldName) {
         return get(worldName).map(x -> x.radius).orElse(this.radius);
     }
 
-    public int getMinY(@Nullable String worldName) {
+    public int getMinY(@Nullable final String worldName) {
         return get(worldName).map(x -> GenericMath.clamp(x.minY, 0, Math.min(255, x.maxY)))
                 .orElseGet(() -> GenericMath.clamp(this.minY, 0, Math.min(255, this.maxY)));
     }
 
-    public int getMaxY(@Nullable String worldName) {
+    public int getMaxY(@Nullable final String worldName) {
         return get(worldName).map(x -> GenericMath.clamp(x.maxY, Math.max(0, x.minY), 255))
                 .orElseGet(() -> GenericMath.clamp(this.maxY, Math.max(0, this.minY), 255));
     }

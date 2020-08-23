@@ -18,14 +18,14 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = "freeze-subject", name = "Freeze Player")
 public class FreezePlayerModule extends StandardModule {
 
     @Inject
-    public FreezePlayerModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public FreezePlayerModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

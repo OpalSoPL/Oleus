@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
@@ -21,23 +21,23 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.List;
 
-abstract class LoreSetBaseCommand implements ICommandExecutor<Player> {
+abstract class LoreSetBaseCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.LORE
         };
     }
 
-    ICommandResult setLore(ICommandContext<? extends Player> context, String message, boolean replace) throws CommandException {
-        Player src = context.getIfPlayer();
-        ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).orElseThrow(() -> context.createException("command.lore.set.noitem"));
-        LoreData loreData = stack.getOrCreate(LoreData.class).get();
+    ICommandResult setLore(final ICommandContext context, final String message, final boolean replace) throws CommandException {
+        final Player src = context.getIfPlayer();
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).orElseThrow(() -> context.createException("command.lore.set.noitem"));
+        final LoreData loreData = stack.getOrCreate(LoreData.class).get();
 
-        Text getLore = TextSerializers.FORMATTING_CODE.deserialize(message);
+        final TextComponent getLore = TextSerializers.FORMATTING_CODE.deserialize(message);
 
-        List<Text> loreList;
+        final List<Text> loreList;
         if (replace) {
             loreList = Lists.newArrayList(getLore);
         } else {

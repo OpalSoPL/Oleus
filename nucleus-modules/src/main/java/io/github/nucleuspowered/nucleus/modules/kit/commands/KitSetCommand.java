@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
 @Command(
@@ -22,18 +22,18 @@ import org.spongepowered.api.entity.living.player.Player;
         commandDescriptionKey = "kit.set",
         parentCommand = KitCommand.class
 )
-public class KitSetCommand implements ICommandExecutor<Player> {
+public class KitSetCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player player = context.getIfPlayer();
-        Kit kitInfo =  context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player player = context.getIfPlayer();
+        final Kit kitInfo =  context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
         kitInfo.updateKitInventory(player);
         context.getServiceCollection().getServiceUnchecked(KitService.class).saveKit(kitInfo);
         context.sendMessage("command.kit.set.success", kitInfo.getName());

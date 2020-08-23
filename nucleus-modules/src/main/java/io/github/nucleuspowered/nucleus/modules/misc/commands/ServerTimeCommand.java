@@ -9,18 +9,18 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 
 @Command(aliases = { "servertime", "realtime" }, basePermission = MiscPermissions.BASE_SERVERTIME, commandDescriptionKey = "servertime")
-public class ServerTimeCommand implements ICommandExecutor<CommandSource> {
+public class ServerTimeCommand implements ICommandExecutor {
 
     private static DateTimeFormatter dtf = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         context.sendMessage("command.servertime.time", dtf.format(LocalDateTime.now()));
         return context.successResult();
     }

@@ -26,7 +26,7 @@ public class SendToSpawnEvent extends AbstractEvent implements NucleusSendToSpaw
     private String cancelReason = null;
     private boolean isCancelled = false;
 
-    public SendToSpawnEvent(Transform<World> transform, User targetUser, Cause cause) {
+    public SendToSpawnEvent(final Transform<World> transform, final User targetUser, final Cause cause) {
         this.transform = transform;
         this.originalTransform = transform;
         this.targetUser = targetUser;
@@ -42,13 +42,13 @@ public class SendToSpawnEvent extends AbstractEvent implements NucleusSendToSpaw
         return this.originalTransform;
     }
 
-    @Override public void setTransformTo(Transform<World> transform) {
+    @Override public void setTransformTo(final Transform<World> transform) {
         this.transform = transform;
     }
 
     public boolean isRedirected() { return this.transform != this.originalTransform; }
 
-    @Override public void setCancelReason(String reason) {
+    @Override public void setCancelReason(final String reason) {
         this.cancelReason = reason;
     }
 
@@ -60,7 +60,7 @@ public class SendToSpawnEvent extends AbstractEvent implements NucleusSendToSpaw
         return Optional.ofNullable(this.cancelReason);
     }
 
-    @Override public void setCancelled(boolean cancel) {
+    @Override public void setCancelled(final boolean cancel) {
         this.isCancelled = cancel;
     }
 

@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -26,26 +26,26 @@ import org.spongepowered.api.text.format.TextColors;
         commandDescriptionKey = "kit.rename",
         parentCommand = KitCommand.class
 )
-public class KitRenameCommand implements ICommandExecutor<CommandSource> {
+public class KitRenameCommand implements ICommandExecutor {
 
     private final String name = "target name";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false),
                 GenericArguments.onlyOne(GenericArguments.string(Text.of(this.name)))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         try {
-            String name1 = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class).getName();
-            String name2 = context.requireOne(this.name, String.class);
+            final String name1 = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class).getName();
+            final String name2 = context.requireOne(this.name, String.class);
             context.getServiceCollection().getServiceUnchecked(KitService.class).renameKit(name1, name2);
             context.sendMessage("command.kit.rename.renamed", name1, name2);
             return context.successResult();
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
             return context.errorResultLiteral(Text.of(TextColors.RED, e.getMessage()));
         }
     }

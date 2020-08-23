@@ -31,7 +31,7 @@ import javax.inject.Inject;
         async = true,
         associatedPermissions = CorePermissions.OTHERS_SETNUCLEUSLANGUAGE
 )
-public class SetNucleusLanguageCommand implements ICommandExecutor<CommandSource> {
+public class SetNucleusLanguageCommand implements ICommandExecutor {
 
     private final String LOCALE_ENTRY = "locale";
     private final IUserPreferenceService preferenceService;
@@ -48,12 +48,12 @@ public class SetNucleusLanguageCommand implements ICommandExecutor<CommandSource
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier()
                     .createOtherUserPermissionElement(false, CorePermissions.OTHERS_SETNUCLEUSLANGUAGE),
-                serviceCollection.commandElementSupplier().createLocaleElement(Text.of(LOCALE_ENTRY))
+                serviceCollection.commandElementSupplier().createLocaleElement()
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         User target = context.getUserFromArgs();
         Locale locale = context.requireOne(LOCALE_ENTRY, Locale.class);
         // This should exist...

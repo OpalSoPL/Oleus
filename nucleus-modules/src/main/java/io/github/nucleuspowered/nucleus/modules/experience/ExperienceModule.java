@@ -16,7 +16,7 @@ public class ExperienceModule extends StandardModule {
 
     public static final String ID = "experience";
 
-    public ExperienceModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public ExperienceModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 }

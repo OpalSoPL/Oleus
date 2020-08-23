@@ -39,7 +39,7 @@ public class WarpCategoryDataNode {
         return Optional.of(TextSerializers.JSON.deserialize(this.displayName));
     }
 
-    public void setDisplayName(@Nullable final Text displayName) {
+    public void setDisplayName(@Nullable final TextComponent displayName) {
         this.displayName = displayName == null ? null : TextSerializers.JSON.serialize(displayName);
     }
 
@@ -50,7 +50,7 @@ public class WarpCategoryDataNode {
         return Optional.of(TextSerializers.JSON.deserialize(this.description));
     }
 
-    public void setDescription(@Nullable final Text description) {
+    public void setDescription(@Nullable final TextComponent description) {
         this.description = description == null ? null : TextSerializers.JSON.serialize(description);
     }
 }

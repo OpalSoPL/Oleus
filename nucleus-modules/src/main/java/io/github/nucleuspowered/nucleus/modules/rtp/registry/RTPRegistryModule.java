@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.modules.rtp.kernels.SurfaceKernel;
 import io.github.nucleuspowered.nucleus.scaffold.registry.NucleusRegistryModule;
 import io.github.nucleuspowered.nucleus.scaffold.registry.Registry;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
 
 @Singleton
 @Registry(RTPKernels.class)

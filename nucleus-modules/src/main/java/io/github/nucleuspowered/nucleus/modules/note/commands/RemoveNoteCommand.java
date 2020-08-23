@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -28,25 +28,25 @@ import java.util.List;
         commandDescriptionKey = "removenote",
         async = true
 )
-public class RemoveNoteCommand implements ICommandExecutor<CommandSource> {
+public class RemoveNoteCommand implements ICommandExecutor {
 
     private final String noteKey = "note";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
-        NoteHandler handler = serviceCollection.getServiceUnchecked(NoteHandler.class);
-        IMessageProviderService messageProviderService = serviceCollection.messageProvider();
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
+        final NoteHandler handler = serviceCollection.getServiceUnchecked(NoteHandler.class);
+        final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
         return new CommandElement[] {
                 GenericArguments.onlyOne(new NoteArgument(Text.of(this.noteKey), handler, messageProviderService))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        NoteArgument.Result result = context.requireOne(this.noteKey, NoteArgument.Result.class);
-        NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
-        User user = result.user;
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final NoteArgument.Result result = context.requireOne(this.noteKey, NoteArgument.Result.class);
+        final NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
+        final User user = result.user;
 
-        List<NoteData> notes = handler.getNotesInternal(user);
+        final List<NoteData> notes = handler.getNotesInternal(user);
         if (notes.isEmpty()) {
             context.sendMessage("command.checkwarnings.none", user.getName());
             return context.successResult();

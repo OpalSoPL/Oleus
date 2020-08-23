@@ -19,10 +19,10 @@ import org.spongepowered.api.command.CommandSource;
         parentCommand = NucleusCommand.class,
         async = true
 )
-public class RebuildUserCacheCommand implements ICommandExecutor<CommandSource> {
+public class RebuildUserCacheCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) {
+    public ICommandResult execute(ICommandContext context) {
         context.sendMessage("command.nucleus.rebuild.start");
         if (context.getServiceCollection().userCacheService().fileWalk()) {
             context.sendMessage("command.nucleus.rebuild.end");

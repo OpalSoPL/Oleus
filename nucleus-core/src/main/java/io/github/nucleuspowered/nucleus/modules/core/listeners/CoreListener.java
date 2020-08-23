@@ -221,7 +221,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
         if (this.getKickOnStopMessage != null) {
             for (Player p : Sponge.getServer().getOnlinePlayers()) {
-                Text msg = this.getKickOnStopMessage.getForSource(p);
+                TextComponent msg = this.getKickOnStopMessage.getForSource(p);
                 if (msg.isEmpty()) {
                     p.kick();
                 } else {

@@ -22,14 +22,14 @@ public class JailInfoProvider implements NucleusProvider {
         return NucleusProvider.PUNISHMENT;
     }
 
-    @Override public Optional<Text> get(User user, CommandSource source,
-            INucleusServiceCollection serviceCollection) {
+    @Override public Optional<Text> get(final User user, final CommandSource source,
+            final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, JailPermissions.BASE_CHECKJAIL)) {
             // If we have a ban service, then check for a ban.
-            JailHandler jh = serviceCollection.getServiceUnchecked(JailHandler.class);
+            final JailHandler jh = serviceCollection.getServiceUnchecked(JailHandler.class);
             if (jh.isPlayerJailed(user)) {
-                JailData jd = jh.getPlayerJailDataInternal(user).get();
-                Text.Builder m;
+                final JailData jd = jh.getPlayerJailDataInternal(user).get();
+                final Text.Builder m;
                 if (jd.getRemainingTime().isPresent()) {
                     m = serviceCollection.messageProvider().getMessageFor(source, "seen.isjailed.temp",
                             serviceCollection.messageProvider().getTimeString(source.getLocale(),

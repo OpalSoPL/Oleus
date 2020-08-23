@@ -31,10 +31,10 @@ public class KitParameter extends CommandElement {
     private final IMessageProviderService messageProviderService;
     private boolean permissionCheck;
 
-    public KitParameter(KitService handler,
-            IMessageProviderService messageProviderService,
-            IPermissionService permissionService,
-            boolean permissionCheck) {
+    public KitParameter(final KitService handler,
+            final IMessageProviderService messageProviderService,
+            final IPermissionService permissionService,
+            final boolean permissionCheck) {
         super(Text.of(KIT_PARAMETER_KEY));
         this.kitService = handler;
         this.messageProviderService = messageProviderService;
@@ -44,13 +44,13 @@ public class KitParameter extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(@NonNull CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String kitName = args.next();
+    protected Object parseValue(@NonNull final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String kitName = args.next();
         if (kitName.isEmpty()) {
             throw args.createError(this.messageProviderService.getMessageFor(source, "args.kit.noname"));
         }
 
-        Kit kit = this.kitService.getKit(kitName)
+        final Kit kit = this.kitService.getKit(kitName)
                 .orElseThrow(() -> args.createError(this.messageProviderService.getMessageFor(source,"args.kit.noexist")));
 
         if (!checkPermission(source, kit)) {
@@ -62,10 +62,10 @@ public class KitParameter extends CommandElement {
 
     @Override
     @NonNull
-    public List<String> complete(@NonNull CommandSource src, CommandArgs args, @NonNull CommandContext context) {
+    public List<String> complete(@NonNull final CommandSource src, final CommandArgs args, @NonNull final CommandContext context) {
         try {
             final boolean showhidden = this.permissionService.hasPermission(src, KitPermissions.KIT_SHOWHIDDEN);
-            String name = args.peek().toLowerCase();
+            final String name = args.peek().toLowerCase();
             return this.kitService.getKitNames().stream()
                     .filter(s -> s.toLowerCase().startsWith(name))
                     .limit(20)
@@ -74,12 +74,12 @@ public class KitParameter extends CommandElement {
                     .filter(x -> this.permissionCheck && (showhidden || !x.isHiddenFromList()))
                     .map(x -> x.getName().toLowerCase())
                     .collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return ImmutableList.of();
         }
     }
 
-    private boolean checkPermission(CommandSource src, Kit kit) {
+    private boolean checkPermission(final CommandSource src, final Kit kit) {
         if (!this.permissionCheck) {
             return true;
         }

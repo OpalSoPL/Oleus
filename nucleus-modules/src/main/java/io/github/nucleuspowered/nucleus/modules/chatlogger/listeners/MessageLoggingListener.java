@@ -12,19 +12,19 @@ import org.spongepowered.api.event.Order;
 
 public class MessageLoggingListener extends AbstractLoggerListener {
 
-    MessageLoggingListener(INucleusServiceCollection serviceCollection) {
+    MessageLoggingListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection);
     }
 
     @Listener(order = Order.LAST)
-    public void onCommand(NucleusMessageEvent event) {
-        String message = this.messageProviderService.getMessageString("chatlog.message",
+    public void onCommand(final NucleusMessageEvent event) {
+        final String message = this.messageProviderService.getMessageString("chatlog.message",
             event.getSender().getName(), event.getRecipient().getName(), event.getMessage());
         this.handler.queueEntry(message);
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
-        ChatLoggingConfig config = getConfig(serviceCollection);
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
+        final ChatLoggingConfig config = getConfig(serviceCollection);
         return config.isEnableLog() && config.isLogMessages();
     }
 }

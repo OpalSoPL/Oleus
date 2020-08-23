@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -36,28 +36,28 @@ import java.util.Optional;
 
 @Command(aliases = { "serverstat", "uptime" }, basePermission = MiscPermissions.BASE_SERVERSTAT, commandDescriptionKey = "serverstat")
 @EssentialsEquivalent(value = {"gc", "lag", "mem", "memory", "uptime", "tps", "entities"})
-public class ServerStatCommand implements ICommandExecutor<CommandSource> {
+public class ServerStatCommand implements ICommandExecutor {
 
     private static final DecimalFormat TPS_FORMAT = new DecimalFormat("#0.00");
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags().flag("c", "s", "-compact", "-summary").buildWith(GenericArguments.none())
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Duration uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime());
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Duration uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime());
 
-        List<Text> messages = Lists.newArrayList();
+        final List<Text> messages = Lists.newArrayList();
 
         messages.add(context.getMessage("command.serverstat.tps", getTPS(Sponge.getServer().getTicksPerSecond())));
 
-        Optional<Instant> oi = context.getServiceCollection().platformService().gameStartedTime();
+        final Optional<Instant> oi = context.getServiceCollection().platformService().gameStartedTime();
         oi.ifPresent(instant -> {
-            Duration duration = Duration.between(instant, Instant.now());
-            double averageTPS = Math.min(20, ((double) Sponge.getServer().getRunningTimeTicks() / ((double) (duration.toMillis() + 50) / 1000.0d)));
+            final Duration duration = Duration.between(instant, Instant.now());
+            final double averageTPS = Math.min(20, ((double) Sponge.getServer().getRunningTimeTicks() / ((double) (duration.toMillis() + 50) / 1000.0d)));
             messages.add(context.getMessage("command.serverstat.averagetps", getTPS(averageTPS)));
             messages.add(createText(context, "command.serverstat.uptime.main", "command.serverstat.uptime.hover",
                     context.getTimeString(duration.getSeconds())));
@@ -67,27 +67,27 @@ public class ServerStatCommand implements ICommandExecutor<CommandSource> {
 
         messages.add(Util.SPACE);
 
-        long max = Runtime.getRuntime().maxMemory() / 1024 / 1024;
-        long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
-        long free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
+        final long max = Runtime.getRuntime().maxMemory() / 1024 / 1024;
+        final long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
+        final long free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
 
         messages.add(createText(context, "command.serverstat.maxmem.main", "command.serverstat.maxmem.hover", String.valueOf(max)));
         messages.add(createText(context, "command.serverstat.totalmem.main", "command.serverstat.totalmem.hover", String.valueOf(total)));
 
-        long allocated = total - free;
+        final long allocated = total - free;
         messages.add(createText(context, "command.serverstat.allocated.main", "command.serverstat.allocated.hover",
                 String.valueOf(allocated), String.valueOf((allocated * 100)/total), String.valueOf((allocated * 100)/max)));
         messages.add(createText(context, "command.serverstat.freemem.main", "command.serverstat.freemem.hover", String.valueOf(free)));
 
         if (!context.hasAny("c")) {
-            for (World world : Sponge.getServer().getWorlds()) {
-                int numOfEntities = world.getEntities().size();
-                int loadedChunks = Iterables.size(world.getLoadedChunks());
+            for (final World world : Sponge.getServer().getWorlds()) {
+                final int numOfEntities = world.getEntities().size();
+                final int loadedChunks = Iterables.size(world.getLoadedChunks());
                 messages.add(Util.SPACE);
                 messages.add(context.getMessage("command.serverstat.world.title", world.getName()));
 
                 // https://github.com/NucleusPowered/Nucleus/issues/888
-                GeneratorType genType = world.getDimension().getGeneratorType();
+                final GeneratorType genType = world.getDimension().getGeneratorType();
                 messages.add(context.getMessage(
                         "command.serverstat.world.info",
                         world.getDimension().getType().getName(),
@@ -97,16 +97,16 @@ public class ServerStatCommand implements ICommandExecutor<CommandSource> {
             }
         }
 
-        PaginationList.Builder plb = Util.getPaginationBuilder(context.getCommandSource())
+        final PaginationList.Builder plb = Util.getPaginationBuilder(context.getCommandSourceRoot())
                 .title(context.getMessage("command.serverstat.title")).padding(Text.of("="))
                 .contents(messages);
 
-        plb.sendTo(context.getCommandSource());
+        plb.sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 
-    private Text getTPS(double currentTps) {
-        TextColor colour;
+    private TextComponent getTPS(final double currentTps) {
+        final TextColor colour;
 
         if (currentTps > 18) {
             colour = TextColors.GREEN;
@@ -120,8 +120,8 @@ public class ServerStatCommand implements ICommandExecutor<CommandSource> {
     }
 
     @SuppressWarnings("RedundantCast")
-    private Text createText(ICommandContext<? extends CommandSource> context, String mainKey, String hoverKey, String... subs) {
-        Text.Builder tb = context.getMessage(mainKey, (Object[]) subs).toBuilder();
+    private TextComponent createText(final ICommandContext context, final String mainKey, final String hoverKey, final String... subs) {
+        final Text.Builder tb = context.getMessage(mainKey, (Object[]) subs).toBuilder();
         return tb.onHover(TextActions.showText(context.getMessage(hoverKey))).build();
     }
 

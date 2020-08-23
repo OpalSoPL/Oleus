@@ -31,7 +31,7 @@ import java.util.concurrent.CompletableFuture;
         commandDescriptionKey = "nucleus.getuser",
         parentCommand = NucleusCommand.class
 )
-public class GetUserCommand implements ICommandExecutor<CommandSource> {
+public class GetUserCommand implements ICommandExecutor {
 
     private final String uuidKey = "UUID";
     private final String playerKey = "name";
@@ -45,7 +45,7 @@ public class GetUserCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext<? extends CommandSource> context) {
+    @Override public ICommandResult execute(final ICommandContext context) {
         CompletableFuture<GameProfile> profile;
         final String toGet;
         final GameProfileManager manager = Sponge.getServer().getGameProfileManager();

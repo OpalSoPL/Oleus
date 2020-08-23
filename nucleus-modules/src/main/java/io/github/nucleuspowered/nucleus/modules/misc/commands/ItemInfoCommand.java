@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.parameter.ImprovedCatal
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -39,27 +39,27 @@ import java.util.Optional;
         commandDescriptionKey = "iteminfo",
         associatedPermissions = MiscPermissions.ITEMINFO_EXTENDED
 )
-public class ItemInfoCommand implements ICommandExecutor<CommandSource> {
+public class ItemInfoCommand implements ICommandExecutor {
 
     private final String key = "key";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags().permissionFlag(MiscPermissions.ITEMINFO_EXTENDED, "e", "-extended")
                     .buildWith(GenericArguments.optional(new ImprovedCatalogTypeArgument(Text.of(this.key), ItemType.class, serviceCollection)))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Optional<CatalogType> catalogTypeOptional = context.getOne(this.key, CatalogType.class);
-        ItemStack it;
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Optional<CatalogType> catalogTypeOptional = context.getOne(this.key, CatalogType.class);
+        final ItemStack it;
         if (catalogTypeOptional.isPresent()) {
-            CatalogType ct = catalogTypeOptional.get();
+            final CatalogType ct = catalogTypeOptional.get();
             if (ct instanceof ItemType) {
                 it = ((ItemType) ct).getTemplate().createStack();
             } else {
-                BlockState bs = ((BlockState) ct);
+                final BlockState bs = ((BlockState) ct);
                 it = bs.getType().getItem().orElseThrow(() -> context.createException("command.iteminfo.invalidblockstate")).getTemplate().createStack();
                 it.offer(Keys.ITEM_BLOCKSTATE, bs);
             }
@@ -72,7 +72,7 @@ public class ItemInfoCommand implements ICommandExecutor<CommandSource> {
         final List<Text> lt = new ArrayList<>();
         lt.add(context.getMessage("command.iteminfo.id", it.getType().getId(), it.getTranslation().get()));
 
-        Optional<BlockState> obs = it.get(Keys.ITEM_BLOCKSTATE);
+        final Optional<BlockState> obs = it.get(Keys.ITEM_BLOCKSTATE);
         obs.ifPresent(blockState -> lt.add(context.getMessage("command.iteminfo.extendedid", blockState.getId())));
 
         if (context.hasAny("e") || context.hasAny("extended")) {
@@ -83,14 +83,14 @@ public class ItemInfoCommand implements ICommandExecutor<CommandSource> {
                 // Work around a Sponge bug.
                 try {
                     return it.supports(x.getValue());
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     return false;
                 }
             }).forEach(x -> {
-                Key<? extends BaseValue<Object>> k = (Key<? extends BaseValue<Object>>) x.getValue();
+                final Key<? extends BaseValue<Object>> k = (Key<? extends BaseValue<Object>>) x.getValue();
                 if (it.get(k).isPresent()) {
                     DataScanner.getInstance(context.getServiceCollection().messageProvider())
-                            .getText(context.getCommandSourceUnchecked(),
+                            .getText(context.getCommandSourceRoot(),
                                 "command.iteminfo.key",
                                 x.getKey(),
                                 it.get(k).get()).ifPresent(lt::add);
@@ -98,8 +98,8 @@ public class ItemInfoCommand implements ICommandExecutor<CommandSource> {
             });
         }
 
-        Util.getPaginationBuilder(context.getCommandSource()).contents(lt).padding(Text.of(TextColors.GREEN, "-"))
-                .title(context.getMessage("command.iteminfo.list.header")).sendTo(context.getCommandSource());
+        Util.getPaginationBuilder(context.getCommandSourceRoot()).contents(lt).padding(Text.of(TextColors.GREEN, "-"))
+                .title(context.getMessage("command.iteminfo.list.header")).sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 }

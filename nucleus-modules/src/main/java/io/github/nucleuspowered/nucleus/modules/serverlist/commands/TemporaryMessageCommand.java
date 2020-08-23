@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.BoundedIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -29,11 +29,11 @@ import java.util.Optional;
         async = true,
         parentCommand = ServerListCommand.class
 )
-public class TemporaryMessageCommand implements ICommandExecutor<CommandSource> {
+public class TemporaryMessageCommand implements ICommandExecutor {
 
     private final String line = "line";
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
                 .flag("r", "-remove")
@@ -43,9 +43,9 @@ public class TemporaryMessageCommand implements ICommandExecutor<CommandSource> 
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the temporary message item.
-        ServerListService mod = context.getServiceCollection().getServiceUnchecked(ServerListService.class);
+        final ServerListService mod = context.getServiceCollection().getServiceUnchecked(ServerListService.class);
 
         if (context.hasAny("r")) {
             if (mod.getMessage().isPresent()) {
@@ -61,12 +61,12 @@ public class TemporaryMessageCommand implements ICommandExecutor<CommandSource> 
         }
 
         // Which line?
-        boolean linetwo = context.getOne(this.line, Integer.class).map(x -> x == 2).orElse(false);
+        final boolean linetwo = context.getOne(this.line, Integer.class).map(x -> x == 2).orElse(false);
 
-        Optional<String> onMessage = context.getOne(NucleusParameters.Keys.MESSAGE, String.class);
+        final Optional<String> onMessage = context.getOne(NucleusParameters.Keys.MESSAGE, String.class);
 
         if (!onMessage.isPresent()) {
-            boolean isValid = mod.getExpiry().map(x -> x.isAfter(Instant.now())).orElse(false);
+            final boolean isValid = mod.getExpiry().map(x -> x.isAfter(Instant.now())).orElse(false);
             if (!isValid) {
                 return context.errorResult("command.serverlist.message.isempty");
             }
@@ -77,7 +77,7 @@ public class TemporaryMessageCommand implements ICommandExecutor<CommandSource> 
                 mod.updateLineOne(null);
             }
 
-            Optional<Text> newMessage = mod.getMessage();
+            final Optional<Text> newMessage = mod.getMessage();
 
             if (newMessage.isPresent()) {
                 // Send message
@@ -90,10 +90,10 @@ public class TemporaryMessageCommand implements ICommandExecutor<CommandSource> 
             return context.successResult();
         }
 
-        String nMessage = onMessage.get();
+        final String nMessage = onMessage.get();
 
         // If the expiry is null or before now, and there is no timespan, then it's an hour.
-        Instant endTime = context.getOne(NucleusParameters.Keys.DURATION, Long.class).map(x -> Instant.now().plus(x, ChronoUnit.SECONDS))
+        final Instant endTime = context.getOne(NucleusParameters.Keys.DURATION, Long.class).map(x -> Instant.now().plus(x, ChronoUnit.SECONDS))
                 .orElseGet(() -> mod.getExpiry().map(x -> x.isBefore(Instant.now()) ? x.plusSeconds(3600) : x)
                 .orElseGet(() -> Instant.now().plusSeconds(3600)));
 
@@ -104,7 +104,7 @@ public class TemporaryMessageCommand implements ICommandExecutor<CommandSource> 
             mod.setMessage(nMessage, null, endTime);
         }
 
-        Optional<Text> newMessage = mod.getMessage();
+        final Optional<Text> newMessage = mod.getMessage();
 
         if (newMessage.isPresent()) {
             // Send message

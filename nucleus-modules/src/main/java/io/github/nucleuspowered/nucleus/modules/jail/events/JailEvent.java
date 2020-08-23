@@ -19,7 +19,7 @@ public abstract class JailEvent extends AbstractEvent implements NucleusJailEven
     private final User targetUser;
     private final Cause cause;
 
-    private JailEvent(User targetUser, Cause cause) {
+    private JailEvent(final User targetUser, final Cause cause) {
         this.targetUser = targetUser;
         this.cause = cause;
     }
@@ -35,10 +35,10 @@ public abstract class JailEvent extends AbstractEvent implements NucleusJailEven
     public static class Jailed extends JailEvent implements NucleusJailEvent.Jailed {
 
         private final String jailName;
-        private final Text reason;
+        private final TextComponent reason;
         @Nullable private final Duration duration;
 
-        public Jailed(User targetUser, Cause cause, String jailName, Text reason, @Nullable Duration duration) {
+        public Jailed(final User targetUser, final Cause cause, final String jailName, final TextComponent reason, @Nullable final Duration duration) {
             super(targetUser, cause);
             this.jailName = jailName;
             this.reason = reason;
@@ -53,14 +53,14 @@ public abstract class JailEvent extends AbstractEvent implements NucleusJailEven
             return Optional.ofNullable(this.duration);
         }
 
-        @Override public Text getReason() {
+        @Override public TextComponent getReason() {
             return this.reason;
         }
     }
 
     public static class Unjailed extends JailEvent implements NucleusJailEvent.Unjailed {
 
-        public Unjailed(User targetUser, Cause cause) {
+        public Unjailed(final User targetUser, final Cause cause) {
             super(targetUser, cause);
         }
     }

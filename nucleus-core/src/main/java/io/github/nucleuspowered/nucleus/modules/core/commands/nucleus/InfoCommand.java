@@ -39,10 +39,10 @@ import java.util.Set;
         parentCommand = NucleusCommand.class,
         async = true
 )
-public class InfoCommand implements ICommandExecutor<CommandSource> {
+public class InfoCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         // Sponge versions
         List<String> information = Lists.newArrayList();
 

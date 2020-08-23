@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.NucleusWorldPropertiesArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.CommandFlags;
@@ -33,12 +33,12 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "world.unload",
         parentCommand = WorldCommand.class
 )
-public class UnloadWorldCommand implements ICommandExecutor<CommandSource> {
+public class UnloadWorldCommand implements ICommandExecutor {
 
     private final String transferWorldKey = "transferWorld";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
                 .permissionFlag(WorldPermissions.BASE_WORLD_DISABLE, "d", "-disable")
@@ -49,12 +49,12 @@ public class UnloadWorldCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties worldProperties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
-        Optional<WorldProperties> transferWorld = context.getOne(this.transferWorldKey, WorldProperties.class);
-        boolean disable = context.hasAny("d");
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties worldProperties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
+        final Optional<WorldProperties> transferWorld = context.getOne(this.transferWorldKey, WorldProperties.class);
+        final boolean disable = context.hasAny("d");
 
-        Optional<World> worldOptional = Sponge.getServer().getWorld(worldProperties.getUniqueId());
+        final Optional<World> worldOptional = Sponge.getServer().getWorld(worldProperties.getUniqueId());
         if (!worldOptional.isPresent()) {
             // Not loaded.
             if (disable) {
@@ -64,8 +64,8 @@ public class UnloadWorldCommand implements ICommandExecutor<CommandSource> {
             return context.errorResult("command.world.unload.alreadyunloaded", worldProperties.getWorldName());
         }
 
-        World world = worldOptional.get();
-        List<Player> playerCollection = Sponge.getServer().getOnlinePlayers().stream().filter(x -> x.getWorld().equals(world)).collect(Collectors.toList());
+        final World world = worldOptional.get();
+        final List<Player> playerCollection = Sponge.getServer().getOnlinePlayers().stream().filter(x -> x.getWorld().equals(world)).collect(Collectors.toList());
 
         if ((transferWorld.isPresent() && transferWorld.get().isEnabled())) {
             playerCollection.forEach(x -> x.transferToWorld(transferWorld.get().getUniqueId(), transferWorld.get().getSpawnPosition().toDouble()));
@@ -74,9 +74,9 @@ public class UnloadWorldCommand implements ICommandExecutor<CommandSource> {
         return unloadWorld(context, world, disable);
     }
 
-    private static ICommandResult disable(WorldProperties worldProperties,
-            ICommandContext<? extends CommandSource> context,
-            boolean messageOnError) {
+    private static ICommandResult disable(final WorldProperties worldProperties,
+            final ICommandContext context,
+            final boolean messageOnError) {
         if (worldProperties.isEnabled()) {
             return DisableWorldCommand.disableWorld(context, worldProperties);
         } else if (messageOnError) {
@@ -86,10 +86,10 @@ public class UnloadWorldCommand implements ICommandExecutor<CommandSource> {
         return context.successResult();
     }
 
-    private static ICommandResult unloadWorld(ICommandContext<? extends CommandSource> context, World world, boolean disable) {
-        WorldProperties worldProperties = world.getProperties();
+    private static ICommandResult unloadWorld(final ICommandContext context, final World world, final boolean disable) {
+        final WorldProperties worldProperties = world.getProperties();
         context.sendMessage("command.world.unload.start", worldProperties.getWorldName());
-        boolean unloaded = Sponge.getServer().unloadWorld(world);
+        final boolean unloaded = Sponge.getServer().unloadWorld(world);
         if (unloaded) {
             context.sendMessage("command.world.unload.success", worldProperties.getWorldName());
             if (disable) {

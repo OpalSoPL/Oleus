@@ -42,7 +42,7 @@ import javax.annotation.Nullable;
         commandDescriptionKey = "commandinfo",
         hasHelpCommand = false
 )
-public class CommandInfoCommand implements ICommandExecutor<CommandSource> {
+public class CommandInfoCommand implements ICommandExecutor {
 
     private final String commandKey = "command";
 
@@ -54,13 +54,13 @@ public class CommandInfoCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         // we have the command, get the mapping
         CommandMapping mapping = context.requireOne(this.commandKey, CommandMapping.class);
 
-        CommandSource source = context.getCommandSourceUnchecked();
+        CommandSource source = context.getCommandSourceRoot();
         IMessageProviderService provider = context.getServiceCollection().messageProvider();
-        Text header = provider.getMessageFor(source, "command.commandinfo.title", mapping.getPrimaryAlias());
+        TextComponent header = provider.getMessageFor(source, "command.commandinfo.title", mapping.getPrimaryAlias());
 
         List<Text> content = Lists.newArrayList();
 
@@ -81,19 +81,19 @@ public class CommandInfoCommand implements ICommandExecutor<CommandSource> {
         Util.getPaginationBuilder(context.is(Player.class))
                 .title(header)
                 .contents(content)
-                .sendTo(context.getCommandSource());
+                .sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 
     private void nucleusCommand(
             List<Text> content,
-            ICommandContext<? extends CommandSource> context,
+            ICommandContext context,
             IMessageProviderService provider,
             CommandControl abstractCommand) throws CommandException{
-        CommandSource source = context.getCommandSource();
+        CommandSource source = context.getCommandSourceRoot();
         content.add(provider.getMessageFor(source, "command.commandinfo.type", "loc:command.commandinfo.nucleus"));
         content.add(Text.EMPTY);
-        Text text = abstractCommand.getUsageText(source);
+        TextComponent text = abstractCommand.getUsageText(source);
         if (text.isEmpty()) {
             content.add(provider.getMessageFor(source, "command.commandinfo.noinfo"));
         } else {
@@ -102,12 +102,12 @@ public class CommandInfoCommand implements ICommandExecutor<CommandSource> {
     }
 
     private void specCommand(List<Text> content,
-            ICommandContext<? extends CommandSource> context,
+            ICommandContext context,
             IMessageProviderService provider,
             String alias,
             CommandSpec spec) throws CommandException{ //List<Text> content, CommandSource source, MessageProvider provider, String
                                                                      // alias, CommandSpec spec) {
-        CommandSource src = context.getCommandSource();
+        CommandSource src = context.getCommandSourceRoot();
         content.add(provider.getMessageFor(src, "command.commandinfo.type", "loc:command.commandinfo.spec"));
         CommandExecutor executor = spec.getExecutor();
         if (executor instanceof ChildCommandElementExecutor) {
@@ -141,11 +141,11 @@ public class CommandInfoCommand implements ICommandExecutor<CommandSource> {
 
     private void lowCommand(
             List<Text> content,
-            ICommandContext<? extends CommandSource> context,
+            ICommandContext context,
             IMessageProviderService provider,
             String alias,
             CommandCallable callable) throws CommandException {
-        CommandSource src = context.getCommandSource();
+        CommandSource src = context.getCommandSourceRoot();
         content.add(provider.getMessageFor(src, "command.commandinfo.type", "loc:command.commandinfo.callable"));
         content.add(Text.EMPTY);
 

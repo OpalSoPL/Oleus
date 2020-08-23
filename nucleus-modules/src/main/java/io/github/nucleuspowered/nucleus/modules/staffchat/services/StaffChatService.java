@@ -16,7 +16,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @APIService(NucleusStaffChatService.class)
 public class StaffChatService implements NucleusStaffChatService, ServiceBase {
@@ -25,21 +25,21 @@ public class StaffChatService implements NucleusStaffChatService, ServiceBase {
     private final IChatMessageFormatterService chatMessageFormatService;
 
     @Inject
-    public StaffChatService(INucleusServiceCollection serviceCollection) {
+    public StaffChatService(final INucleusServiceCollection serviceCollection) {
         this.userPreferenceService = serviceCollection.userPreferenceService();
         this.chatMessageFormatService = serviceCollection.chatMessageFormatter();
     }
 
     @Override
-    public void sendMessageFrom(CommandSource source, Text message) {
+    public void sendMessageFrom(final CommandSource source, final TextComponent message) {
         StaffChatMessageChannel.getInstance().sendMessageFrom(source, message);
     }
 
-    public boolean isToggledChat(Player player) {
+    public boolean isToggledChat(final Player player) {
         return this.chatMessageFormatService.getNucleusChannel(player.getUniqueId()).filter(x -> x instanceof StaffChatMessageChannel).isPresent();
     }
 
-    public void toggle(Player player, boolean toggle) {
+    public void toggle(final Player player, final boolean toggle) {
         if (toggle) {
             this.chatMessageFormatService.setPlayerNucleusChannel(player.getUniqueId(), StaffChatMessageChannel.getInstance());
 

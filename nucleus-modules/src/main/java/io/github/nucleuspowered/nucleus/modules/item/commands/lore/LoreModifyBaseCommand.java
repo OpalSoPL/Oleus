@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
@@ -21,12 +21,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.List;
 
-abstract class LoreModifyBaseCommand implements ICommandExecutor<Player> {
+abstract class LoreModifyBaseCommand implements ICommandExecutor {
 
     final String loreLine = "line";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[]{
                 new PositiveIntegerArgument(Text.of(this.loreLine), false, serviceCollection),
                 NucleusParameters.LORE
@@ -45,17 +45,17 @@ abstract class LoreModifyBaseCommand implements ICommandExecutor<Player> {
      * @param editOrInsert True to edit, false to insert
      * @return The result of the operation
      */
-    ICommandResult setLore(ICommandContext<? extends Player> context, String message, int line, boolean editOrInsert) throws CommandException {
-        Player src = context.getIfPlayer();
+    ICommandResult setLore(final ICommandContext context, final String message, int line, final boolean editOrInsert) throws CommandException {
+        final Player src = context.getIfPlayer();
         // The number will come in one based - we need to reduce by one.
         line--;
 
-        ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).orElseThrow(() -> context.createException("command.lore.set.noitem"));
-        LoreData loreData = stack.getOrCreate(LoreData.class).get();
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).orElseThrow(() -> context.createException("command.lore.set.noitem"));
+        final LoreData loreData = stack.getOrCreate(LoreData.class).get();
 
-        Text getLore = TextSerializers.FORMATTING_CODE.deserialize(message);
+        final TextComponent getLore = TextSerializers.FORMATTING_CODE.deserialize(message);
 
-        List<Text> loreList = loreData.lore().get();
+        final List<Text> loreList = loreData.lore().get();
         if (editOrInsert) {
             if (loreList.size() < line) {
                 return context.errorResult("command.lore.set.invalidEdit");

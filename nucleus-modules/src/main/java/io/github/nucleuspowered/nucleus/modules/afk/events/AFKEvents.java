@@ -24,14 +24,14 @@ public abstract class AFKEvents extends AbstractEvent implements TargetPlayerEve
     private final Cause cause;
     private final MessageChannel original;
     private MessageChannel channel;
-    @Nullable private final Text originalMessage;
-    @Nullable private Text message;
+    @Nullable private final TextComponent originalMessage;
+    @Nullable private TextComponent message;
 
-    AFKEvents(Player target, @Nullable Text message, @Nullable MessageChannel original) {
+    AFKEvents(final Player target, @Nullable final TextComponent message, @Nullable final MessageChannel original) {
         this(target, message, original, Cause.of(EventContext.builder().add(EventContextKeys.OWNER, target).build(), target));
     }
 
-    AFKEvents(Player target, @Nullable Text message, @Nullable MessageChannel original, Cause cause) {
+    AFKEvents(final Player target, @Nullable final TextComponent message, @Nullable final MessageChannel original, final Cause cause) {
         this.target = target;
         this.cause = cause;
         this.originalMessage = message;
@@ -61,7 +61,7 @@ public abstract class AFKEvents extends AbstractEvent implements TargetPlayerEve
     }
 
     @Override
-    public void setMessage(@Nullable Text message) {
+    public void setMessage(@Nullable final TextComponent message) {
         this.message = message;
     }
 
@@ -76,24 +76,24 @@ public abstract class AFKEvents extends AbstractEvent implements TargetPlayerEve
     }
 
     @Override
-    public void setChannel(MessageChannel channel) {
+    public void setChannel(final MessageChannel channel) {
         this.channel = Preconditions.checkNotNull(channel);
     }
 
     public static class From extends AFKEvents implements NucleusAFKEvent.ReturningFromAFK {
 
-        public From(Player target, @Nullable Text message, @Nullable MessageChannel original, Cause cause) {
+        public From(final Player target, @Nullable final TextComponent message, @Nullable final MessageChannel original, final Cause cause) {
             super(target, message, original, cause);
         }
     }
 
     public static class To extends AFKEvents implements NucleusAFKEvent.GoingAFK {
 
-        public To(Player target, @Nullable Text message, @Nullable MessageChannel original) {
+        public To(final Player target, @Nullable final TextComponent message, @Nullable final MessageChannel original) {
             super(target, message, original);
         }
 
-        public To(Player target, @Nullable Text message, @Nullable MessageChannel original, Cause cause) {
+        public To(final Player target, @Nullable final TextComponent message, @Nullable final MessageChannel original, final Cause cause) {
             super(target, message, original, cause);
         }
     }
@@ -102,11 +102,11 @@ public abstract class AFKEvents extends AbstractEvent implements TargetPlayerEve
 
         private boolean cancelled = false;
 
-        public Kick(Player target, Text message, MessageChannel original) {
+        public Kick(final Player target, final TextComponent message, final MessageChannel original) {
             super(target, message, original);
         }
 
-        public Kick(Player target, Text message, MessageChannel original, Cause cause) {
+        public Kick(final Player target, final TextComponent message, final MessageChannel original, final Cause cause) {
             super(target, message, original, cause);
         }
 
@@ -114,7 +114,7 @@ public abstract class AFKEvents extends AbstractEvent implements TargetPlayerEve
             return this.cancelled;
         }
 
-        @Override public void setCancelled(boolean cancel) {
+        @Override public void setCancelled(final boolean cancel) {
             this.cancelled = cancel;
         }
     }
@@ -123,10 +123,10 @@ public abstract class AFKEvents extends AbstractEvent implements TargetPlayerEve
 
         private final Player target;
         private final Cause cause;
-        @Nullable private final Text originalMessage;
-        @Nullable private Text message;
+        @Nullable private final TextComponent originalMessage;
+        @Nullable private TextComponent message;
 
-        public Notify(Player target, @Nullable Text message, Cause cause) {
+        public Notify(final Player target, @Nullable final TextComponent message, final Cause cause) {
             this.target = target;
             this.originalMessage = message;
             this.message = message;
@@ -149,7 +149,7 @@ public abstract class AFKEvents extends AbstractEvent implements TargetPlayerEve
             return this.target;
         }
 
-        @Override public void setMessage(@Nullable Text message) {
+        @Override public void setMessage(@Nullable final TextComponent message) {
             this.message = message;
         }
     }

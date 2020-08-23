@@ -23,18 +23,18 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class ConnectionListener implements IReloadableService.Reloadable, ListenerBase {
 
     private final IPermissionService permissionService;
 
     private int reservedSlots = 0;
-    @Nullable private Text whitelistMessage;
-    @Nullable private Text fullMessage;
+    @Nullable private TextComponent whitelistMessage;
+    @Nullable private TextComponent fullMessage;
 
     @Inject
-    public ConnectionListener(IPermissionService permissionService) {
+    public ConnectionListener(final IPermissionService permissionService) {
         this.permissionService = permissionService;
     }
 
@@ -45,9 +45,9 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
      */
     @Listener(order = Order.FIRST)
     @IsCancelled(Tristate.TRUE)
-    public void onPlayerJoinAndCancelled(ClientConnectionEvent.Login event, @Getter("getTargetUser") User user) {
+    public void onPlayerJoinAndCancelled(final ClientConnectionEvent.Login event, @Getter("getTargetUser") final User user) {
         // Don't affect the banned.
-        BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        final BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
         if (banService.isBanned(user.getProfile()) || banService.isBanned(event.getConnection().getAddress().getAddress())) {
             return;
         }
@@ -63,7 +63,7 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
             return;
         }
 
-        int slotsLeft = Sponge.getServer().getMaxPlayers() - Sponge.getServer().getOnlinePlayers().size();
+        final int slotsLeft = Sponge.getServer().getMaxPlayers() - Sponge.getServer().getOnlinePlayers().size();
         if (slotsLeft <= 0) {
             if (this.permissionService.hasPermission(user, ConnectionPermissions.CONNECTION_JOINFULLSERVER)) {
 
@@ -83,8 +83,8 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        ConnectionConfig connectionConfig = serviceCollection.moduleDataProvider().getModuleConfig(ConnectionConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final ConnectionConfig connectionConfig = serviceCollection.moduleDataProvider().getModuleConfig(ConnectionConfig.class);
         this.reservedSlots = connectionConfig.getReservedSlots();
         this.whitelistMessage = connectionConfig.getWhitelistMessage().orElse(null);
         this.fullMessage = connectionConfig.getServerFullMessage().orElse(null);

@@ -16,13 +16,13 @@ import javax.annotation.Nullable;
 
 public abstract class RequestEvent extends AbstractEvent implements NucleusTeleportEvent.Request {
 
-    @Nullable private Text cancelMessage;
+    @Nullable private TextComponent cancelMessage;
     private boolean isCancelled = false;
 
     private final Cause cause;
     private final Player targetEntity;
 
-    private RequestEvent(Cause cause, Player targetEntity) {
+    private RequestEvent(final Cause cause, final Player targetEntity) {
         this.cause = cause;
         this.targetEntity = targetEntity;
     }
@@ -31,7 +31,7 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
         return Optional.ofNullable(this.cancelMessage);
     }
 
-    @Override public void setCancelMessage(@Nullable Text message) {
+    @Override public void setCancelMessage(@Nullable final TextComponent message) {
         this.cancelMessage = message;
     }
 
@@ -43,7 +43,7 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
         return this.isCancelled;
     }
 
-    @Override public void setCancelled(boolean cancel) {
+    @Override public void setCancelled(final boolean cancel) {
         this.isCancelled = cancel;
     }
 
@@ -53,14 +53,14 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
 
     public static class CauseToPlayer extends RequestEvent implements NucleusTeleportEvent.Request.CauseToPlayer {
 
-        public CauseToPlayer(Cause cause, Player targetEntity) {
+        public CauseToPlayer(final Cause cause, final Player targetEntity) {
             super(cause, targetEntity);
         }
     }
 
     public static class PlayerToCause extends RequestEvent implements NucleusTeleportEvent.Request.PlayerToCause {
 
-        public PlayerToCause(Cause cause, Player targetEntity) {
+        public PlayerToCause(final Cause cause, final Player targetEntity) {
             super(cause, targetEntity);
         }
     }

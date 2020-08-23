@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -30,16 +30,16 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "warp.category.list",
         parentCommand = CategoryCommand.class
 )
-public class ListCategoryCommand implements ICommandExecutor<CommandSource> {
+public class ListCategoryCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the categories.
-        CommandSource src = context.getCommandSource();
-        WarpService handler = context.getServiceCollection().getServiceUnchecked(WarpService.class);
+        final CommandSource src = context.getCommandSourceRoot();
+        final WarpService handler = context.getServiceCollection().getServiceUnchecked(WarpService.class);
         Util.getPaginationBuilder(src).contents(
                 handler.getWarpsWithCategories().keySet().stream().filter(Objects::nonNull)
                 .sorted(Comparator.comparing(WarpCategory::getId)).map(x -> {
-            List<Text> t = Lists.newArrayList();
+            final List<Text> t = Lists.newArrayList();
             t.add(context.getMessage("command.warp.category.listitem.simple", Text.of(x.getId()), x.getDisplayName()));
             x.getDescription().ifPresent(y -> t.add(context.getMessage("command.warp.category.listitem.description", y)));
             return t;

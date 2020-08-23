@@ -12,33 +12,33 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateMessageSender;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 @Command(aliases = { "plainbroadcast", "pbcast", "pbc" },
         basePermission = NotificationPermissions.BASE_PLAINBROADCAST,
         commandDescriptionKey = "plainbroadcast")
-public class PlainBroadcastCommand implements ICommandExecutor<CommandSource> {
+public class PlainBroadcastCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.MESSAGE
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         try {
             new NucleusTextTemplateMessageSender(
                     context.getServiceCollection().textTemplateFactory(),
                     context.getServiceCollection().textTemplateFactory()
                         .createFromString(context.requireOne(NucleusParameters.Keys.MESSAGE, String.class)),
                     context.getServiceCollection().placeholderService(),
-                    context.getCommandSourceUnchecked())
+                    context.getCommandSourceRoot())
                     .send(context.getCause());
             
-        } catch (Throwable throwable) {
+        } catch (final Throwable throwable) {
             throwable.printStackTrace();
             return context.errorResult("command.plainbroadcast.failed");
         }

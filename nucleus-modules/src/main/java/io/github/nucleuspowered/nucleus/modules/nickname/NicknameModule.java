@@ -14,7 +14,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = NicknameModule.ID, name = "Nickname")
 public class NicknameModule extends ConfigurableModule<NicknameConfig, NicknameConfigAdapter> {
@@ -22,12 +22,12 @@ public class NicknameModule extends ConfigurableModule<NicknameConfig, NicknameC
     public final static String ID = "nickname";
 
     @Inject
-    public NicknameModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public NicknameModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 
-    @Override public void performPostTasks(INucleusServiceCollection serviceCollection) {
+    @Override public void performPostTasks(final INucleusServiceCollection serviceCollection) {
         // Register resolver and query.
         serviceCollection.getServiceUnchecked(NicknameService.class).injectResolver(serviceCollection);
     }

@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class PowertoolService implements ServiceBase {
 
@@ -27,12 +27,12 @@ public class PowertoolService implements ServiceBase {
     private final IStorageManager storageManager;
 
     @Inject
-    public PowertoolService(INucleusServiceCollection serviceCollection) {
+    public PowertoolService(final INucleusServiceCollection serviceCollection) {
         this.storageManager = serviceCollection.storageManager();
     }
 
 
-    public Map<String, List<String>> getPowertools(UUID uuid) {
+    public Map<String, List<String>> getPowertools(final UUID uuid) {
         Map<String, List<String>> m = this.powertools.get(uuid);
         if (m == null) {
             // grab the user data
@@ -46,8 +46,8 @@ public class PowertoolService implements ServiceBase {
         return ImmutableMap.copyOf(m);
     }
 
-    public Optional<List<String>> getPowertoolForItem(UUID uuid, ItemType item) {
-        List<String> tools = getPowertools(uuid).get(item.getId());
+    public Optional<List<String>> getPowertoolForItem(final UUID uuid, final ItemType item) {
+        final List<String> tools = getPowertools(uuid).get(item.getId());
         if (tools != null) {
             return Optional.of(ImmutableList.copyOf(tools));
         }
@@ -55,26 +55,26 @@ public class PowertoolService implements ServiceBase {
         return Optional.empty();
     }
 
-    public void setPowertool(UUID uuid, ItemType type, List<String> commands) {
+    public void setPowertool(final UUID uuid, final ItemType type, final List<String> commands) {
         getPowertools(uuid).put(type.getId(), commands);
         setBack(uuid);
     }
 
-    public void clearPowertool(UUID uuid, ItemType type) {
+    public void clearPowertool(final UUID uuid, final ItemType type) {
         clearPowertool(uuid, type.getId());
     }
 
-    public void clearPowertool(UUID uuid, String type) {
+    public void clearPowertool(final UUID uuid, final String type) {
         getPowertools(uuid).remove(type);
         setBack(uuid);
     }
 
-    public void reset(UUID uuid) {
+    public void reset(final UUID uuid) {
         this.powertools.remove(uuid);
         setBack(uuid);
     }
 
-    private void setBack(UUID uuid) {
+    private void setBack(final UUID uuid) {
         this.storageManager
                 .getUserService()
                 .getOrNew(uuid)

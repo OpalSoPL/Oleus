@@ -31,7 +31,7 @@ public class NucleusWorldPropertiesArgument extends CommandElement {
     private final Type type;
     private final IMessageProviderService messageProviderService;
 
-    public NucleusWorldPropertiesArgument(@Nullable final Text key, final Type type, final INucleusServiceCollection serviceCollection) {
+    public NucleusWorldPropertiesArgument(@Nullable final TextComponent key, final Type type, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.type = type;
         this.messageProviderService = serviceCollection.messageProvider();

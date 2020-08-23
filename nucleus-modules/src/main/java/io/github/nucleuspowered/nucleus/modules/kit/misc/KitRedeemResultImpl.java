@@ -18,13 +18,13 @@ public class KitRedeemResultImpl implements io.github.nucleuspowered.nucleus.api
     private final Collection<ItemStackSnapshot> rejected;
     private final Status status;
     @Nullable private final Instant nextCooldown;
-    @Nullable private final Text message;
+    @Nullable private final TextComponent message;
 
     public KitRedeemResultImpl(
-            Status status,
-            Collection<ItemStackSnapshot> rejected,
-            @Nullable Instant nextCooldown,
-            @Nullable Text message) {
+            final Status status,
+            final Collection<ItemStackSnapshot> rejected,
+            @Nullable final Instant nextCooldown,
+            @Nullable final TextComponent message) {
         this.rejected = rejected;
         this.status = status;
         this.nextCooldown = nextCooldown;

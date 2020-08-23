@@ -24,7 +24,7 @@ import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.item.ItemType;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class PowertoolListener implements ListenerBase {
 
@@ -34,7 +34,7 @@ public class PowertoolListener implements ListenerBase {
     private final IMessageProviderService messageProviderService;
 
     @Inject
-    public PowertoolListener(INucleusServiceCollection serviceCollection) {
+    public PowertoolListener(final INucleusServiceCollection serviceCollection) {
         this.service = serviceCollection.getServiceUnchecked(PowertoolService.class);
         this.userPreferenceService = serviceCollection.userPreferenceService();
         this.permissionService = serviceCollection.permissionService();
@@ -42,13 +42,13 @@ public class PowertoolListener implements ListenerBase {
     }
 
     @Listener
-    public void onLogout(ClientConnectionEvent.Disconnect event) {
+    public void onLogout(final ClientConnectionEvent.Disconnect event) {
         this.service.reset(event.getTargetEntity().getUniqueId());
     }
 
     @Listener
     @Exclude(InteractBlockEvent.class)
-    public void onUserInteract(final InteractEvent event, @Root Player player) {
+    public void onUserInteract(final InteractEvent event, @Root final Player player) {
         // No item in hand or no permission -> no powertool.
         if (!this.permissionService.hasPermission(player, PowertoolPermissions.BASE_POWERTOOL)
                 || !player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
@@ -56,7 +56,7 @@ public class PowertoolListener implements ListenerBase {
         }
 
         // Get the item and the user.
-        ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).get().getType();
+        final ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).get().getType();
 
         // If the powertools are toggled on.
         if (this.userPreferenceService.get(player.getUniqueId(), NucleusKeysProvider.POWERTOOL_ENABLED).orElse(true)) {

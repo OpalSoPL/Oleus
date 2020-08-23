@@ -27,7 +27,7 @@ public class JailArgument extends CommandElement {
     private final JailHandler handler;
     private final IMessageProviderService messageProvider;
 
-    public JailArgument(@Nullable Text key, INucleusServiceCollection serviceCollection) {
+    public JailArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
         this.messageProvider = serviceCollection.messageProvider();
@@ -35,9 +35,9 @@ public class JailArgument extends CommandElement {
 
     @Nullable
     @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        String a = args.next().toLowerCase();
-        Optional<NamedLocation> owl = this.handler.getJail(a);
+    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
+        final String a = args.next().toLowerCase();
+        final Optional<NamedLocation> owl = this.handler.getJail(a);
         if (owl.isPresent()) {
             return owl.get();
         }
@@ -46,11 +46,11 @@ public class JailArgument extends CommandElement {
     }
 
     @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
         try {
-            String a = args.peek().toLowerCase();
+            final String a = args.peek().toLowerCase();
             return this.handler.getJails().keySet().stream().filter(x -> x.startsWith(a)).collect(Collectors.toList());
-        } catch (ArgumentParseException e) {
+        } catch (final ArgumentParseException e) {
             return Lists.newArrayList(this.handler.getJails().keySet());
         }
     }

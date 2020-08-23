@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class ExperienceListener implements ListenerBase {
 
@@ -36,7 +36,7 @@ public class ExperienceListener implements ListenerBase {
     private final PluginContainer pluginContainer;
 
     @Inject
-    public ExperienceListener(INucleusServiceCollection serviceCollection) {
+    public ExperienceListener(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
         this.pluginContainer = serviceCollection.pluginContainer();
     }
@@ -46,10 +46,10 @@ public class ExperienceListener implements ListenerBase {
     // * FALSE (Explicitly set): remove EXP
     // * UNDEFINED: do whatever the system wants us to do.
     @Listener(order = Order.POST)
-    public void onPlayerDeathMonitor(DestructEntityEvent.Death deathEvent, @Getter("getTargetEntity") Player player) {
-        Tristate tristate = this.permissionService.hasPermissionTristate(player, ExperiencePermissions.KEEP_EXP_PERMISSION);
+    public void onPlayerDeathMonitor(final DestructEntityEvent.Death deathEvent, @Getter("getTargetEntity") final Player player) {
+        final Tristate tristate = this.permissionService.hasPermissionTristate(player, ExperiencePermissions.KEEP_EXP_PERMISSION);
         if (tristate == Tristate.TRUE) {
-            int exp = player.get(Keys.TOTAL_EXPERIENCE).orElse(0);
+            final int exp = player.get(Keys.TOTAL_EXPERIENCE).orElse(0);
             this.deadExpPlayers.put(player.getUniqueId(), exp);
         } else if (tristate == Tristate.FALSE) {
             this.deadExpPlayers.put(player.getUniqueId(), 0);
@@ -57,7 +57,7 @@ public class ExperienceListener implements ListenerBase {
     }
 
     @Listener
-    public void preventExperienceDroppingOrb(SpawnEntityEvent event, @Root Player player) {
+    public void preventExperienceDroppingOrb(final SpawnEntityEvent event, @Root final Player player) {
         if (this.deadExpPlayers.getOrDefault(player.getUniqueId(), 0) > 0) {
             // don't drop orbs for people who die, unless we're setting to zero.
             event.filterEntities(entity -> !(entity instanceof ExperienceOrb));
@@ -65,18 +65,18 @@ public class ExperienceListener implements ListenerBase {
     }
 
     @Listener
-    public void onPlayerRespawn(RespawnPlayerEvent event, @Getter("getTargetEntity") Player player) {
+    public void onPlayerRespawn(final RespawnPlayerEvent event, @Getter("getTargetEntity") final Player player) {
         applyExperience(player);
     }
 
     @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
         applyExperience(player);
     }
 
-    private void applyExperience(Player player) {
+    private void applyExperience(final Player player) {
         if (this.deadExpPlayers.containsKey(player.getUniqueId())) {
-            int exp = this.deadExpPlayers.get(player.getUniqueId());
+            final int exp = this.deadExpPlayers.get(player.getUniqueId());
             Task.builder().delayTicks(1).execute(() -> player.offer(Keys.TOTAL_EXPERIENCE, exp)).submit(this.pluginContainer);
             this.deadExpPlayers.remove(player.getUniqueId());
         }

@@ -10,8 +10,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;;
+
 @Command(
         aliases = { "clear" },
         basePermission = MailPermissions.BASE_MAIL,
@@ -19,9 +19,9 @@ import org.spongepowered.api.entity.living.player.Player;
         parentCommand = MailCommand.class,
         async = true
 )
-public class ClearMailCommand implements ICommandExecutor<Player> {
+public class ClearMailCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         if (context.getServiceCollection().getServiceUnchecked(MailHandler.class).clearUserMail(context.getIfPlayer())) {
             context.sendMessage("command.mail.clear.success");
         } else {

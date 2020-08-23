@@ -21,7 +21,7 @@ import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class InterceptTeleportListener implements ListenerBase.Conditional {
 
@@ -30,15 +30,15 @@ public class InterceptTeleportListener implements ListenerBase.Conditional {
     private final IMessageProviderService messageProvider;
 
     @Inject
-    public InterceptTeleportListener(INucleusServiceCollection serviceCollection) {
+    public InterceptTeleportListener(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
         this.permissionService = serviceCollection.permissionService();
         this.messageProvider = serviceCollection.messageProvider();
     }
 
     @Listener(order = Order.LAST)
-    public void onTeleport(MoveEntityEvent.Teleport event, @Root CommandSource cause, @Getter("getTargetEntity") Player player) {
-        EventContext context = event.getCause().getContext();
+    public void onTeleport(final MoveEntityEvent.Teleport event, @Root final CommandSource cause, @Getter("getTargetEntity") final Player player) {
+        final EventContext context = event.getCause().getContext();
         if (!context.get(EventContexts.BYPASS_JAILING_RESTRICTION).orElse(false) &&
                 context.get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
             if (this.handler.isPlayerJailed(player)) {
@@ -54,7 +54,7 @@ public class InterceptTeleportListener implements ListenerBase.Conditional {
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).aggressivelyDisableTeleportsForJailed();
     }
 }

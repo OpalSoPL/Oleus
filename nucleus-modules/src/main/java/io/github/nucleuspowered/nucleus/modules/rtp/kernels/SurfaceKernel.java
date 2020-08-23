@@ -15,7 +15,7 @@ public class SurfaceKernel extends DefaultKernel {
 
     @Nullable
     @Override
-    Location<World> getStartingLocation(Location<World> world) {
+    Location<World> getStartingLocation(final Location<World> world) {
         return super.getStartingLocation(
                 new Location<>(world.getExtent(), world.getBlockX(), world.getExtent().getBlockMax().getY(), world.getBlockZ()));
     }

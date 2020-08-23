@@ -60,7 +60,7 @@ public class WarmupModifier implements ICommandModifier, IReloadableService.Relo
         return source instanceof Player;
     }
 
-    @Override public Optional<ICommandResult> preExecute(final ICommandContext.Mutable<? extends CommandSource> source, final CommandControl control,
+    @Override public Optional<ICommandResult> preExecute(final ICommandContext source, final CommandControl control,
             final INucleusServiceCollection serviceCollection, final CommandModifier modifier) {
         if (source.getWarmup() > 0) {
             // If the player had an exemption earlier, this would not be in the list. Therefore, we have a warmup.

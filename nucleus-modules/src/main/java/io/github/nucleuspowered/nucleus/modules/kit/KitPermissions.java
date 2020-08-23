@@ -104,7 +104,7 @@ public class KitPermissions {
     @PermissionMetadata(descriptionKey = "permission.kits", level = SuggestedLevel.ADMIN, isPrefix = true)
     public static final String KITS = "nucleus.kits";
 
-    public static String getKitPermission(String kit) {
+    public static String getKitPermission(final String kit) {
         return KITS + "." + kit.toLowerCase();
     }
 

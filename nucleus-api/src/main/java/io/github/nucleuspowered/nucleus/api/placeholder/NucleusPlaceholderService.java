@@ -38,6 +38,6 @@ public interface NucleusPlaceholderService {
      *
      * @return The {@link PlaceholderText}
      */
-    PlaceholderText textForSubjectAndOption(Subject subject, String option);
+    PlaceholderTextComponent textForSubjectAndOption(Subject subject, String option);
 
 }

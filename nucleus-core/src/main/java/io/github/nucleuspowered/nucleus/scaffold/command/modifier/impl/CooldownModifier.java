@@ -54,16 +54,16 @@ public class CooldownModifier implements ICommandModifier {
         return source instanceof Player;
     }
 
-    @Override public Optional<Text> testRequirement(final ICommandContext.Mutable<? extends CommandSource> source,
+    @Override public Optional<Text> testRequirement(final ICommandContext source,
             final CommandControl control,
             final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
-        final CommandSource c = source.getCommandSource();
+        final CommandSource c = source.getCommandSourceRoot();
         return serviceCollection.cooldownService().getCooldown(control.getModifierKey(), source.getIfPlayer())
                 .map(duration -> serviceCollection.messageProvider().getMessageFor(c, "cooldown.message",
                         source.getTimeString(duration.getSeconds())));
     }
 
-    @Override public void onCompletion(final ICommandContext<? extends CommandSource> source,
+    @Override public void onCompletion(final ICommandContext source,
             final CommandControl control,
             final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
         serviceCollection.cooldownService().setCooldown(control.getModifierKey(), source.getIfPlayer(), Duration.ofSeconds(source.getCooldown()));

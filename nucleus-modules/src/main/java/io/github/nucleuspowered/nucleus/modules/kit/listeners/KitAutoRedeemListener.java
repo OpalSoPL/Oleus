@@ -20,7 +20,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class KitAutoRedeemListener implements ListenerBase.Conditional, IReloadableService.Reloadable {
 
@@ -31,19 +31,19 @@ public class KitAutoRedeemListener implements ListenerBase.Conditional, IReloada
     private boolean logAutoRedeem = false;
 
     @Inject
-    public KitAutoRedeemListener(INucleusServiceCollection serviceCollection) {
+    public KitAutoRedeemListener(final INucleusServiceCollection serviceCollection) {
         this.kitService = serviceCollection.getServiceUnchecked(KitService.class);
         this.logger = serviceCollection.logger();
     }
 
     // TODO: Replace
     @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
-        List<Kit> autoRedeemable = this.kitService.getAutoRedeemable();
-        String name = "[Kit Auto Redeem - " + player.getName() + "]: ";
-        for (Kit kit : autoRedeemable) {
-            String permission = KitPermissions.getKitPermission(kit.getName().toLowerCase());
-            String kitName = kit.getName();
+    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Root final Player player) {
+        final List<Kit> autoRedeemable = this.kitService.getAutoRedeemable();
+        final String name = "[Kit Auto Redeem - " + player.getName() + "]: ";
+        for (final Kit kit : autoRedeemable) {
+            final String permission = KitPermissions.getKitPermission(kit.getName().toLowerCase());
+            final String kitName = kit.getName();
             if (kit.ignoresPermission()) {
                 log(name + kitName + " - permission check bypassed.");
             } else if (player.hasPermission(permission)) {
@@ -53,7 +53,7 @@ public class KitAutoRedeemListener implements ListenerBase.Conditional, IReloada
             }
 
             // Redeem kit in the normal way.
-            KitRedeemResult redeemResult = this.kitService.redeemKit(kit, player, true, true, this.mustGetAll, false);
+            final KitRedeemResult redeemResult = this.kitService.redeemKit(kit, player, true, true, this.mustGetAll, false);
             if (redeemResult.isSuccess()) {
                 log(name + kitName + " - kit redeemed.");
             } else if (this.logAutoRedeem) {
@@ -62,18 +62,18 @@ public class KitAutoRedeemListener implements ListenerBase.Conditional, IReloada
         }
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class).isEnableAutoredeem();
     }
 
-    private void log(String message) {
+    private void log(final String message) {
         if (this.logAutoRedeem) {
             this.logger.info(message);
         }
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        KitConfig kca = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final KitConfig kca = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
         this.mustGetAll = kca.isMustGetAll();
         this.logAutoRedeem = kca.isLogAutoredeem();
     }

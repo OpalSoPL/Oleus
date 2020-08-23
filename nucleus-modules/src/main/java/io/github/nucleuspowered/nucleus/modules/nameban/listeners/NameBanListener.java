@@ -11,19 +11,19 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class NameBanListener implements ListenerBase {
 
     private final NameBanHandler nameBanHandler;
 
     @Inject
-    public NameBanListener(INucleusServiceCollection serviceCollection) {
+    public NameBanListener(final INucleusServiceCollection serviceCollection) {
         this.nameBanHandler = serviceCollection.getServiceUnchecked(NameBanHandler.class);
     }
 
     @Listener
-    public void onPlayerLogin(ClientConnectionEvent.Auth event) {
+    public void onPlayerLogin(final ClientConnectionEvent.Auth event) {
         event.getProfile().getName().flatMap(name -> this.nameBanHandler.getReasonForBan(name.toLowerCase())).ifPresent(x -> {
             event.setCancelled(true);
             event.setMessage(TextSerializers.FORMATTING_CODE.deserialize(x));

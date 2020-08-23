@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,27 +25,27 @@ import java.util.stream.Collectors;
 
 @EssentialsEquivalent({"tpaall"})
 @Command(aliases = {"tpaall", "tpaskall"}, basePermission = TeleportPermissions.BASE_TPAALL, commandDescriptionKey = "tpaall")
-public class TeleportAskAllHereCommand implements ICommandExecutor<Player> {
+public class TeleportAskAllHereCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags().flag("f").buildWith(GenericArguments.none())
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        List<Player> cancelled = Lists.newArrayList();
-        PlayerTeleporterService playerTeleporterService = context
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final List<Player> cancelled = Lists.newArrayList();
+        final PlayerTeleporterService playerTeleporterService = context
                 .getServiceCollection()
                 .getServiceUnchecked(PlayerTeleporterService.class);
-        for (Player x : Sponge.getServer().getOnlinePlayers()) {
+        for (final Player x : Sponge.getServer().getOnlinePlayers()) {
             if (context.is(x)) {
                 continue;
             }
 
             // Before we do all this, check the event.
-            RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(Sponge.getCauseStackManager().getCurrentCause(), x);
+            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(Sponge.getCauseStackManager().getCurrentCause(), x);
             if (Sponge.getEventManager().post(event)) {
                 cancelled.add(x);
                 continue;

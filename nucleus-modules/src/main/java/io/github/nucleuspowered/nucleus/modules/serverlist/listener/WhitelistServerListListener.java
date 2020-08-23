@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class WhitelistServerListListener implements IReloadableService.Reloadable, ListenerBase.Conditional {
 
@@ -31,34 +31,34 @@ public class WhitelistServerListListener implements IReloadableService.Reloadabl
     private ServerListConfig config = new ServerListConfig();
 
     @Inject
-    public WhitelistServerListListener(INucleusServiceCollection serviceCollection) {
+    public WhitelistServerListListener(final INucleusServiceCollection serviceCollection) {
         this.service = serviceCollection.getServiceUnchecked(ServerListService.class);
     }
 
     @Listener(order = Order.LATE)
-    public void onServerListPing(ClientPingServerEvent event, @Getter("getResponse") ClientPingServerEvent.Response response) {
+    public void onServerListPing(final ClientPingServerEvent event, @Getter("getResponse") final ClientPingServerEvent.Response response) {
         if (!Sponge.getServer().hasWhitelist()) {
             return;
         }
 
-        Optional<Text> ott = this.service.getMessage();
+        final Optional<Text> ott = this.service.getMessage();
         if (!ott.isPresent() &&  !this.config.getWhitelist().isEmpty()) {
-            List<NucleusTextTemplateImpl> list = this.config.getWhitelist();
+            final List<NucleusTextTemplateImpl> list = this.config.getWhitelist();
 
             if (list != null) {
-                NucleusTextTemplate template = list.get(this.random.nextInt(list.size()));
+                final NucleusTextTemplate template = list.get(this.random.nextInt(list.size()));
                 response.setDescription(template.getForSource(Sponge.getServer().getConsole()));
             }
         }
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(ServerListConfig.class);
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(ServerListConfig.class).enableWhitelistListener();
     }
 }

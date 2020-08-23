@@ -15,19 +15,19 @@ import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class SignListener implements ListenerBase {
 
     private final IPermissionService permissionService;
 
     @Inject
-    public SignListener(INucleusServiceCollection serviceCollection) {
+    public SignListener(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
     }
 
     @Listener
-    public void onPlayerChangeSign(ChangeSignEvent event, @Root Player player) {
+    public void onPlayerChangeSign(final ChangeSignEvent event, @Root final Player player) {
         SignData signData = event.getText();
 
         if (this.permissionService.hasPermission(player, SignPermissions.SIGN_FORMATTING)) {

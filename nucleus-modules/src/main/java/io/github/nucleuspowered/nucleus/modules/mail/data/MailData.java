@@ -29,7 +29,7 @@ public class MailData implements MailMessage {
 
     public MailData() { }
 
-    public MailData(UUID uuid, Instant date, String message) {
+    public MailData(final UUID uuid, final Instant date, final String message) {
         this.uuid = uuid;
         this.date = date.toEpochMilli();
         this.message = message;
@@ -51,7 +51,7 @@ public class MailData implements MailMessage {
         return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(this.uuid);
     }
 
-    @Override public boolean equals(Object o) {
+    @Override public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -59,7 +59,7 @@ public class MailData implements MailMessage {
             return false;
         }
 
-        MailData mailData = (MailData) o;
+        final MailData mailData = (MailData) o;
 
         if (this.date != mailData.date) {
             return false;

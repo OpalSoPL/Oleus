@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -33,20 +33,20 @@ import org.spongepowered.api.text.Text;
                 VanishPermissions.VANISH_PERSIST
         }
 )
-public class VanishCommand implements ICommandExecutor<CommandSource> {
+public class VanishCommand implements ICommandExecutor {
 
     private final String b = "toggle";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOtherUserPermissionElement(false, VanishPermissions.OTHERS_VANISH),
                 GenericArguments.optional(GenericArguments.onlyOne(GenericArguments.bool(Text.of(this.b))))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User ou = context.getUserFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User ou = context.getUserFromArgs();
         if (ou.getPlayer().isPresent()) {
             return onPlayer(context, ou.getPlayer().get());
         }
@@ -55,8 +55,8 @@ public class VanishCommand implements ICommandExecutor<CommandSource> {
             return context.errorResult("command.vanish.noperm", ou.getName());
         }
 
-        boolean result;
-        try (IKeyedDataObject.Value<Boolean> value = context
+        final boolean result;
+        try (final IKeyedDataObject.Value<Boolean> value = context
                 .getServiceCollection()
                 .storageManager()
                 .getUserService()
@@ -64,7 +64,7 @@ public class VanishCommand implements ICommandExecutor<CommandSource> {
                 .getAndSet(VanishKeys.VANISH_STATUS)) {
             result = context.getOne(this.b, Boolean.class).orElseGet(() -> !value.getValue().orElse(false));
             value.setValue(result);
-            VanishService service = context.getServiceCollection().getServiceUnchecked(VanishService.class);
+            final VanishService service = context.getServiceCollection().getServiceUnchecked(VanishService.class);
             if (result) {
                 service.vanishPlayer(ou);
             } else {
@@ -80,14 +80,14 @@ public class VanishCommand implements ICommandExecutor<CommandSource> {
         return context.successResult();
     }
 
-    private ICommandResult onPlayer(ICommandContext<? extends CommandSource> context, Player playerToVanish) throws CommandException {
+    private ICommandResult onPlayer(final ICommandContext context, final Player playerToVanish) throws CommandException {
         if (playerToVanish.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.SPECTATOR)) {
             return context.errorResult("command.vanish.fail");
         }
 
         // If we don't specify whether to vanish, toggle
-        boolean toVanish = context.getOne(this.b, Boolean.class).orElse(!playerToVanish.get(Keys.VANISH).orElse(false));
-        VanishService service = context.getServiceCollection().getServiceUnchecked(VanishService.class);
+        final boolean toVanish = context.getOne(this.b, Boolean.class).orElse(!playerToVanish.get(Keys.VANISH).orElse(false));
+        final VanishService service = context.getServiceCollection().getServiceUnchecked(VanishService.class);
         if (toVanish) {
             service.vanishPlayer(playerToVanish);
         } else {

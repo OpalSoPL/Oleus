@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
@@ -26,11 +26,11 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_TRASH)
         }
 )
-public class TrashCommand implements ICommandExecutor<Player> {
+public class TrashCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
         if (src.openInventory(Inventory.builder().of(InventoryArchetypes.DOUBLE_CHEST)
                 .property(InventoryTitle.PROPERTY_NAME, new InventoryTitle(context.getMessage("command.trash.title")))
                 .build(context.getServiceCollection().pluginContainer())).isPresent()) {

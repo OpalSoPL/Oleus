@@ -73,7 +73,7 @@ public class NucleusTextTemplateMessageSender {
 
         final NucleusTextTemplate template = event.getMessage();
         if (!template.containsTokens()) {
-            final Text text = this.textTemplate.getForSource(Sponge.getServer().getConsole());
+            final TextComponent text = this.textTemplate.getForSource(Sponge.getServer().getConsole());
             event.getRecipients().forEach(x -> x.sendMessage(text));
         } else {
             final Map<String, Function<CommandSource, Optional<Text>>> m = Maps.newHashMap();

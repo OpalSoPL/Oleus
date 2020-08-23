@@ -21,7 +21,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = VanishModule.ID, name = "Vanish", dependencies = CoreModule.ID)
 public class VanishModule extends ConfigurableModule<VanishConfig, VanishConfigAdapter> {
@@ -29,7 +29,7 @@ public class VanishModule extends ConfigurableModule<VanishConfig, VanishConfigA
     public static final String ID = "vanish";
 
     @Inject
-    public VanishModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public VanishModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveInteg
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -50,7 +50,7 @@ import java.util.List;
         },
         associatedPermissions = ItemPermissions.OTHERS_SKULL
 )
-public class SkullCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class SkullCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final String amountKey = "amount";
 
@@ -58,24 +58,24 @@ public class SkullCommand implements ICommandExecutor<Player>, IReloadableServic
     private boolean isUseMinecraftCommand = false;
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        SkullConfig config = serviceCollection.moduleDataProvider().getModuleConfig(ItemConfig.class).getSkullConfig();
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final SkullConfig config = serviceCollection.moduleDataProvider().getModuleConfig(ItemConfig.class).getSkullConfig();
         this.isUseMinecraftCommand = config.isUseMinecraftCommand();
         this.amountLimit = config.getSkullLimit();
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOtherUserPermissionElement(false, ItemPermissions.OTHERS_SKULL),
                 GenericArguments.optional(new PositiveIntegerArgument(Text.of(this.amountKey), serviceCollection))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        User user = context.getUserFromArgs();
-        Player player = context.getIfPlayer();
-        int amount = context.getOne(this.amountKey, Integer.class).orElse(1);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.getUserFromArgs();
+        final Player player = context.getIfPlayer();
+        final int amount = context.getOne(this.amountKey, Integer.class).orElse(1);
 
         if (amount > this.amountLimit && !(context.isConsoleAndBypass() || context.testPermission(ItemPermissions.SKULL_EXEMPT_LIMIT))) {
             // fail
@@ -83,7 +83,7 @@ public class SkullCommand implements ICommandExecutor<Player>, IReloadableServic
         }
 
         if (this.isUseMinecraftCommand) {
-            CommandResult result = Sponge.getCommandManager().process(Sponge.getServer().getConsole(),
+            final CommandResult result = Sponge.getCommandManager().process(Sponge.getServer().getConsole(),
                 String.format("minecraft:give %s skull %d 3 {SkullOwner:%s}", player.getName(), amount, user.getName()));
             if (result.getSuccessCount().orElse(0) > 0) {
                 context.sendMessage("command.skull.success.plural", String.valueOf(amount), user.getName());
@@ -93,16 +93,16 @@ public class SkullCommand implements ICommandExecutor<Player>, IReloadableServic
             return context.errorResult("command.skull.error", user.getName());
         }
 
-        int fullStacks = amount / 64;
-        int partialStack = amount % 64;
+        final int fullStacks = amount / 64;
+        final int partialStack = amount % 64;
 
         // Create the Skull
-        ItemStack skullStack = ItemStack.builder().itemType(ItemTypes.SKULL).quantity(64).build();
+        final ItemStack skullStack = ItemStack.builder().itemType(ItemTypes.SKULL).quantity(64).build();
 
         // Set it to subject skull type and set the owner to the specified subject
         if (skullStack.offer(Keys.SKULL_TYPE, SkullTypes.PLAYER).isSuccessful()
                 && skullStack.offer(Keys.REPRESENTED_PLAYER, user.getProfile()).isSuccessful()) {
-            List<ItemStack> itemStackList = Lists.newArrayList();
+            final List<ItemStack> itemStackList = Lists.newArrayList();
 
             // If there were stacks, create as many as needed.
             if (fullStacks > 0) {
@@ -114,7 +114,7 @@ public class SkullCommand implements ICommandExecutor<Player>, IReloadableServic
 
             // Same with the partial stacks.
             if (partialStack > 0) {
-                ItemStack is = skullStack.copy();
+                final ItemStack is = skullStack.copy();
                 is.setQuantity(partialStack);
                 itemStackList.add(is);
             }
@@ -122,14 +122,14 @@ public class SkullCommand implements ICommandExecutor<Player>, IReloadableServic
             int accepted = 0;
             int failed = 0;
 
-            Inventory inventoryToOfferTo = player.getInventory()
+            final Inventory inventoryToOfferTo = player.getInventory()
                     .query(
                             QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class),
                             QueryOperationTypes.INVENTORY_TYPE.of(GridInventory.class));
-            for (ItemStack itemStack : itemStackList) {
-                int stackSize = itemStack.getQuantity();
-                InventoryTransactionResult itr = inventoryToOfferTo.offer(itemStack);
-                int currentFail = itr.getRejectedItems().stream().mapToInt(ItemStackSnapshot::getQuantity).sum();
+            for (final ItemStack itemStack : itemStackList) {
+                final int stackSize = itemStack.getQuantity();
+                final InventoryTransactionResult itr = inventoryToOfferTo.offer(itemStack);
+                final int currentFail = itr.getRejectedItems().stream().mapToInt(ItemStackSnapshot::getQuantity).sum();
                 failed += currentFail;
                 accepted += stackSize - currentFail;
             }

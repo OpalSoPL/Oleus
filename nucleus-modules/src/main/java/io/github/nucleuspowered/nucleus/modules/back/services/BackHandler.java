@@ -27,8 +27,8 @@ public class BackHandler implements NucleusBackService, ServiceBase {
     private final Set<UUID> preventLogLastLocation = new HashSet<>();
 
     @Override
-    public Optional<Transform<World>> getLastLocation(User user) {
-        UUIDTransform transform = this.lastLocation.get(user.getUniqueId());
+    public Optional<Transform<World>> getLastLocation(final User user) {
+        final UUIDTransform transform = this.lastLocation.get(user.getUniqueId());
         if (transform != null) {
             return transform.loadTransform();
         }
@@ -37,22 +37,22 @@ public class BackHandler implements NucleusBackService, ServiceBase {
     }
 
     @Override
-    public void setLastLocation(User user, ServerLocation location) {
+    public void setLastLocation(final User user, final ServerLocation location) {
         this.lastLocation.put(user.getUniqueId(), new UUIDTransform(location));
     }
 
     @Override
-    public void removeLastLocation(User user) {
+    public void removeLastLocation(final User user) {
         this.lastLocation.remove(user.getUniqueId());
     }
 
     @Override
-    public boolean isLoggingLastLocation(User user) {
+    public boolean isLoggingLastLocation(final User user) {
         return !this.preventLogLastLocation.contains(user.getUniqueId());
     }
 
     @Override
-    public void setLoggingLastLocation(User user, boolean log) {
+    public void setLoggingLastLocation(final User user, final boolean log) {
         if (log) {
             this.preventLogLastLocation.remove(user.getUniqueId());
         } else {

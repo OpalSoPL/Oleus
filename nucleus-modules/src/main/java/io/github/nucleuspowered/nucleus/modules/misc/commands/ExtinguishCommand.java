@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
@@ -28,18 +28,18 @@ import org.spongepowered.api.entity.living.player.Player;
         },
         associatedPermissions = MiscPermissions.OTHERS_EXTINGUISH
 )
-public class ExtinguishCommand implements ICommandExecutor<CommandSource> {
+public class ExtinguishCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier()
                     .createOnlyOtherUserPermissionElement(true, MiscPermissions.OTHERS_EXTINGUISH)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player target = context.getPlayerFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player target = context.getPlayerFromArgs();
                 // this.getUserFromArgs(Player.class, src, NucleusParameters.Keys.PLAYER, args);
         if (target.get(Keys.FIRE_TICKS).orElse(-1) > 0 && target.offer(Keys.FIRE_TICKS, 0).isSuccessful()) {
             context.sendMessage("command.extinguish.success", target.getName());

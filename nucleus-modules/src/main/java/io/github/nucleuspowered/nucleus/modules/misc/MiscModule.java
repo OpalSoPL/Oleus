@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = MiscModule.ID, name = "Miscellaneous")
 public class MiscModule extends ConfigurableModule<MiscConfig, MiscConfigAdapter> {
@@ -21,8 +21,8 @@ public class MiscModule extends ConfigurableModule<MiscConfig, MiscConfigAdapter
     public final static String ID = "misc";
 
     @Inject
-    public MiscModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public MiscModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

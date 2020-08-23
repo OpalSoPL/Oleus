@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 @Command(
         aliases = { "del", "rm" },
@@ -19,9 +19,9 @@ import org.spongepowered.api.command.CommandSource;
         async = true,
         parentCommand = SetFirstSpawnCommand.class
 )
-public class RemoveFirstSpawnCommand implements ICommandExecutor<CommandSource> {
+public class RemoveFirstSpawnCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         context.getServiceCollection().storageManager()
                 .getGeneralService()
                 .getOrNewOnThread()

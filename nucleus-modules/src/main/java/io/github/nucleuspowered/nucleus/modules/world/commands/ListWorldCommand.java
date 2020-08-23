@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.text.Text;
@@ -32,12 +32,13 @@ import java.util.List;
                 WorldPermissions.WORLD_SEED
         }
 )
-public class ListWorldCommand implements ICommandExecutor<CommandSource> {
+public class ListWorldCommand implements ICommandExecutor {
 
     // Use a space over EMPTY so pagination doesn't mess up.
-    private final static Text SPACE = Text.of(" ");
+    private final static TextComponent SPACE = Text.of(" ");
 
-    static void getWorldInfo(ICommandContext<? extends CommandSource> context, List<Text> listContent, WorldProperties x, boolean canSeeSeeds) {
+    static void getWorldInfo(
+            final ICommandContext context, final List<Text> listContent, final WorldProperties x, final boolean canSeeSeeds) {
         // Name of world
         if (!listContent.isEmpty()) {
             listContent.add(SPACE);
@@ -48,14 +49,14 @@ public class ListWorldCommand implements ICommandExecutor<CommandSource> {
         // As requested by Pixelmon for use in their config.
         x.getAdditionalProperties().getInt(DataQuery.of("SpongeData", "dimensionId")).ifPresent(i ->
             listContent.add(context.getMessage("command.world.list.dimensionid", String.valueOf(i))));
-        Vector3i spawnPosition = x.getSpawnPosition();
+        final Vector3i spawnPosition = x.getSpawnPosition();
         listContent.add(context.getMessage("command.world.list.spawnpoint",
                 String.valueOf(spawnPosition.getX()), String.valueOf(spawnPosition.getY()), String.valueOf(spawnPosition.getZ())));
 
         listContent.add(context.getMessage("command.world.list.uuid", x.getUniqueId().toString()));
         if (x.isEnabled()) {
-            boolean worldLoaded = Sponge.getServer().getWorld(x.getUniqueId()).isPresent();
-            String message =
+            final boolean worldLoaded = Sponge.getServer().getWorld(x.getUniqueId()).isPresent();
+            final String message =
                 (worldLoaded ? "&a" : "&c") + context.getMessageString(worldLoaded ? "standard.true" : "standard.false");
             listContent.add(context.getMessage("command.world.list.enabled", message));
         } else {
@@ -81,17 +82,17 @@ public class ListWorldCommand implements ICommandExecutor<CommandSource> {
         ));
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the worlds
-        Collection<WorldProperties> cwp = Sponge.getServer().getAllWorldProperties();
+        final Collection<WorldProperties> cwp = Sponge.getServer().getAllWorldProperties();
         final List<Text> listContent = Lists.newArrayList();
 
         final boolean canSeeSeeds = context.testPermission(WorldPermissions.WORLD_SEED);
         cwp.stream().sorted(Comparator.comparing(WorldProperties::getWorldName)).forEach(x -> getWorldInfo(context, listContent, x, canSeeSeeds));
 
-        Util.getPaginationBuilder(context.getCommandSourceUnchecked())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
             .contents(listContent).title(context.getMessage("command.world.list.title"))
-            .sendTo(context.getCommandSourceUnchecked());
+            .sendTo(context.getCommandSourceRoot());
 
         return context.successResult();
     }

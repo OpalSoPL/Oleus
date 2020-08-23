@@ -14,19 +14,19 @@ import org.spongepowered.api.scheduler.Task;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class MuteTask implements TaskBase {
 
     private final MuteHandler muteHandler;
 
     @Inject
-    public MuteTask(INucleusServiceCollection serviceCollection) {
+    public MuteTask(final INucleusServiceCollection serviceCollection) {
         this.muteHandler = serviceCollection.getServiceUnchecked(MuteHandler.class);
     }
 
     @Override
-    public void accept(Task task) {
+    public void accept(final Task task) {
         Sponge.getServer()
                 .getOnlinePlayers()
                 .stream()

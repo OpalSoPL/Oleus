@@ -36,11 +36,11 @@ public class SingleKit implements Kit {
     private boolean hidden = false;
     private boolean firstJoin = false;
 
-    public SingleKit(String name) {
+    public SingleKit(final String name) {
         this.name = name;
     }
 
-    public SingleKit(String name, Kit toClone) {
+    public SingleKit(final String name, final Kit toClone) {
         this(name, toClone.getStacks(),
                 toClone.getCooldown().orElse(null),
                 toClone.getCost(),
@@ -53,10 +53,10 @@ public class SingleKit implements Kit {
                 toClone.isFirstJoinKit());
     }
 
-    public SingleKit(String name,
-            List<ItemStackSnapshot> itemStackSnapshots,
-            @Nullable Duration interval, double cost, boolean autoRedeem, boolean oneTime, boolean displayOnRedeem,
-            boolean ignoresPermission, boolean hidden, List<String> commands, boolean firstJoin) {
+    public SingleKit(final String name,
+            final List<ItemStackSnapshot> itemStackSnapshots,
+            @Nullable final Duration interval, final double cost, final boolean autoRedeem, final boolean oneTime, final boolean displayOnRedeem,
+            final boolean ignoresPermission, final boolean hidden, final List<String> commands, final boolean firstJoin) {
         this(name);
         this.stacks.addAll(itemStackSnapshots);
         this.interval = interval;
@@ -80,7 +80,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setStacks(List<ItemStackSnapshot> stacks) {
+    public Kit setStacks(final List<ItemStackSnapshot> stacks) {
         this.stacks.clear();
         this.stacks.addAll(stacks);
         return this;
@@ -92,7 +92,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setCooldown(@Nullable Duration interval) {
+    public Kit setCooldown(@Nullable final Duration interval) {
         this.interval = interval;
         return this;
     }
@@ -103,7 +103,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setCost(double cost) {
+    public Kit setCost(final double cost) {
         this.cost = Math.max(0, cost);
         return this;
     }
@@ -114,7 +114,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setAutoRedeem(boolean autoRedeem) {
+    public Kit setAutoRedeem(final boolean autoRedeem) {
         this.autoRedeem = autoRedeem;
         return this;
     }
@@ -125,7 +125,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setOneTime(boolean oneTime) {
+    public Kit setOneTime(final boolean oneTime) {
         this.oneTime = oneTime;
         return this;
     }
@@ -136,15 +136,15 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setCommands(List<String> commands) {
+    public Kit setCommands(final List<String> commands) {
         this.commands.clear();
         this.commands.addAll(commands);
         return this;
     }
 
     @Override
-    public Kit updateKitInventory(Inventory inventory) {
-        List<Inventory> slots = Lists.newArrayList(inventory.slots());
+    public Kit updateKitInventory(final Inventory inventory) {
+        final List<Inventory> slots = Lists.newArrayList(inventory.slots());
         final List<ItemStackSnapshot> stacks = slots.stream()
                 .filter(x -> x.peek().isPresent() && x.peek().get().getType() != ItemTypes.NONE)
                 .map(x -> x.peek().get().createSnapshot()).collect(Collectors.toList());
@@ -154,14 +154,14 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit updateKitInventory(Player player) {
+    public Kit updateKitInventory(final Player player) {
         return updateKitInventory(Util.getStandardInventory(player));
     }
 
     @Override
-    public void redeemKitCommands(Player player) {
-        ConsoleSource source = Sponge.getServer().getConsole();
-        String playerName = player.getName();
+    public void redeemKitCommands(final Player player) {
+        final ConsoleSource source = Sponge.getServer().getConsole();
+        final String playerName = player.getName();
         getCommands().forEach(x -> Sponge.getCommandManager().process(source, x.replace("{{player}}", playerName)));
     }
 
@@ -171,7 +171,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setDisplayMessageOnRedeem(boolean displayMessage) {
+    public Kit setDisplayMessageOnRedeem(final boolean displayMessage) {
         this.displayOnRedeem = displayMessage;
         return this;
     }
@@ -182,7 +182,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setIgnoresPermission(boolean ignoresPermission) {
+    public Kit setIgnoresPermission(final boolean ignoresPermission) {
         this.ignoresPermission = ignoresPermission;
         return this;
     }
@@ -193,7 +193,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setHiddenFromList(boolean hide) {
+    public Kit setHiddenFromList(final boolean hide) {
         this.hidden = hide;
         return this;
     }
@@ -204,7 +204,7 @@ public class SingleKit implements Kit {
     }
 
     @Override
-    public Kit setFirstJoinKit(boolean firstJoinKit) {
+    public Kit setFirstJoinKit(final boolean firstJoinKit) {
         this.firstJoin = firstJoinKit;
         return this;
     }

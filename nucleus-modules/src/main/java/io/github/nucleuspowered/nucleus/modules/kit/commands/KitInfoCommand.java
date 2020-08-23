@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
@@ -26,20 +26,20 @@ import org.spongepowered.api.text.action.TextActions;
         commandDescriptionKey = "kit.info",
         parentCommand = KitCommand.class
 )
-public class KitInfoCommand implements ICommandExecutor<CommandSource> {
+public class KitInfoCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
         
 
-        Util.getPaginationBuilder(context.getCommandSource())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
                 .title(context.getMessage("command.kit.info.title", kit.getName()))
                 .contents(
                         addViewHover(context, kit),
@@ -55,23 +55,23 @@ public class KitInfoCommand implements ICommandExecutor<CommandSource> {
                         context.getMessage("command.kit.info.hidden", yesno(context, kit.isHiddenFromList())),
                         context.getMessage("command.kit.info.displayredeem", yesno(context, kit.isDisplayMessageOnRedeem())),
                         context.getMessage("command.kit.info.ignoresperm", yesno(context, kit.ignoresPermission()))
-                ).sendTo(context.getCommandSource());
+                ).sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 
-    private Text addViewHover(ICommandContext<? extends CommandSource> context, Kit kit) {
+    private TextComponent addViewHover(final ICommandContext context, final Kit kit) {
         return context.getMessage("command.kit.info.itemcount", String.valueOf(kit.getStacks().size())).toBuilder()
                 .onHover(TextActions.showText(context.getMessage("command.kit.info.hover.itemcount", kit.getName())))
                 .onClick(TextActions.runCommand("/nucleus:kit view " + kit.getName())).build();
     }
 
-    private Text addCommandHover(ICommandContext<? extends CommandSource> context, Kit kit) {
+    private TextComponent addCommandHover(final ICommandContext context, final Kit kit) {
         return context.getMessage("command.kit.info.commandcount", String.valueOf(kit.getCommands().size())).toBuilder()
                 .onHover(TextActions.showText(context.getMessage("command.kit.info.hover.commandcount", kit.getName())))
                 .onClick(TextActions.runCommand("/nucleus:kit command " + kit.getName())).build();
     }
 
-    private String yesno(ICommandContext<? extends CommandSource> context, boolean yesno) {
+    private String yesno(final ICommandContext context, final boolean yesno) {
         return context.getMessageString("standard.yesno." + yesno);
     }
 

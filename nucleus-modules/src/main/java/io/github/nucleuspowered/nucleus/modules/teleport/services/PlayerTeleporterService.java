@@ -39,7 +39,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class PlayerTeleporterService implements ServiceBase, IReloadableService.Reloadable {
 
@@ -58,7 +58,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
     private boolean isOnlySameDimension = false;
 
     @Inject
-    public PlayerTeleporterService(INucleusServiceCollection serviceCollection) {
+    public PlayerTeleporterService(final INucleusServiceCollection serviceCollection) {
         this.safeTeleportService = serviceCollection.teleportService();
         this.messageProviderService = serviceCollection.messageProvider();
         this.userPreferenceService = serviceCollection.userPreferenceService();
@@ -67,7 +67,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
         this.serviceCollection = serviceCollection;
     }
 
-    public boolean canTeleportTo(CommandSource source, User to)  {
+    public boolean canTeleportTo(final CommandSource source, final User to)  {
         if (source instanceof Player && !canBypassTpToggle(source)) {
             if (!this.userPreferenceService.get(to.getUniqueId(), NucleusKeysProvider.TELEPORT_TARGETABLE).orElse(true)) {
                 this.messageProviderService.sendMessageTo(source, "teleport.fail.targettoggle", to.getName());
@@ -88,7 +88,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
         return true;
     }
 
-    private boolean canBypassTpToggle(Subject from) {
+    private boolean canBypassTpToggle(final Subject from) {
         return this.permissionService.hasPermission(from, TeleportPermissions.TPTOGGLE_EXEMPT);
     }
 
@@ -96,14 +96,14 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
     private final Multimap<UUID, TeleportRequest> activeTeleportRequests = HashMultimap.create();
 
     public TeleportResult teleportWithMessage(
-            CommandSource source,
-            Player playerToTeleport,
-            Player target,
-            boolean safe,
-            boolean quietSource,
-            boolean quietTarget) {
+            final CommandSource source,
+            final Player playerToTeleport,
+            final Player target,
+            final boolean safe,
+            final boolean quietSource,
+            final boolean quietTarget) {
 
-        TeleportResult result =
+        final TeleportResult result =
                 this.safeTeleportService.teleportPlayerSmart(
                                 playerToTeleport,
                                 target.getTransform(),
@@ -130,23 +130,23 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
     }
 
     public boolean requestTeleport(
-            @Nullable Player requester,
-            Player toRequest,
-            double cost,
-            int warmup,
-            Player playerToTeleport,
-            Player target,
-            boolean safe,
-            boolean silentTarget,
-            boolean silentSource,
-            @Nullable Consumer<Player> successCallback,
-            String messageKey) {
+            @Nullable final Player requester,
+            final Player toRequest,
+            final double cost,
+            final int warmup,
+            final Player playerToTeleport,
+            final Player target,
+            final boolean safe,
+            final boolean silentTarget,
+            final boolean silentSource,
+            @Nullable final Consumer<Player> successCallback,
+            final String messageKey) {
         removeExpired();
 
         if (canTeleportTo(playerToTeleport, target)) {
-            CommandSource src = requester == null ? Sponge.getServer().getConsole() : requester;
+            final CommandSource src = requester == null ? Sponge.getServer().getConsole() : requester;
 
-            TeleportRequest request = new TeleportRequest(
+            final TeleportRequest request = new TeleportRequest(
                     this.serviceCollection,
                     playerToTeleport.getUniqueId(),
                     target.getUniqueId(),
@@ -193,7 +193,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
      *
      * @return The request, if any.
      */
-    public Optional<TeleportRequest> getCurrentRequest(Player player) {
+    public Optional<TeleportRequest> getCurrentRequest(final Player player) {
         return Optional.ofNullable(this.activeTeleportRequestsCommand.get(player.getUniqueId()));
     }
 
@@ -202,7 +202,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
      *
      * @param player The player
      */
-    public void removeRequestsFor(Player player) {
+    public void removeRequestsFor(final Player player) {
         this.activeTeleportRequests.removeAll(player.getUniqueId()).forEach(x -> x.forceExpire(true));
         this.activeTeleportRequestsCommand.remove(player.getUniqueId());
     }
@@ -212,9 +212,9 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
         this.activeTeleportRequestsCommand.values().removeIf(x -> !x.isActive());
     }
 
-    private Optional<Text> getAcceptDenyMessage(Player forPlayer, TeleportRequest target) {
+    private Optional<Text> getAcceptDenyMessage(final Player forPlayer, final TeleportRequest target) {
         if (this.showAcceptDeny) {
-            Text acceptText = this.messageProviderService.getMessageFor(forPlayer.getLocale(), "standard.accept")
+            final TextComponent acceptTextComponent = this.messageProviderService.getMessageFor(forPlayer.getLocale(), "standard.accept")
                     .toBuilder()
                     .style(TextStyles.UNDERLINE)
                     .onHover(TextActions.showText(
@@ -230,7 +230,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
                             accept((Player) src, target);
                         }
                     })).build();
-            Text denyText = this.messageProviderService.getMessageFor(forPlayer.getLocale(), "standard.deny")
+            final TextComponent denyTextComponent = this.messageProviderService.getMessageFor(forPlayer.getLocale(), "standard.deny")
                     .toBuilder()
                     .style(TextStyles.UNDERLINE)
                     .onHover(TextActions.showText(this.messageProviderService.getMessageFor(forPlayer.getLocale(), "teleport.deny.hover")))
@@ -255,11 +255,11 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
         return Optional.empty();
     }
 
-    public boolean accept(Player player) {
+    public boolean accept(final Player player) {
         return accept(player, getCurrentRequest(player).orElse(null));
     }
 
-    private boolean accept(Player player, @Nullable TeleportRequest target) {
+    private boolean accept(final Player player, @Nullable final TeleportRequest target) {
         if (target == null) {
             this.messageProviderService.sendMessageTo(player, "command.tpaccept.nothing");
             return false;
@@ -274,7 +274,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
         this.activeTeleportRequestsCommand.values().remove(target);
         target.forceExpire(false);
 
-        Optional<Player> playerToTeleport = target.getToBeTeleported();
+        final Optional<Player> playerToTeleport = target.getToBeTeleported();
         if (!playerToTeleport.isPresent()) {
             // error
             this.messageProviderService.sendMessageTo(player, "command.tpaccept.noplayer");
@@ -292,11 +292,11 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
         return true;
     }
 
-    public boolean deny(Player player) {
+    public boolean deny(final Player player) {
         return deny(player, getCurrentRequest(player).orElse(null));
     }
 
-    private boolean deny(Player player, @Nullable TeleportRequest target) {
+    private boolean deny(final Player player, @Nullable final TeleportRequest target) {
         if (target == null) {
             this.messageProviderService.sendMessageTo(player, "command.tpaccept.nothing");
             return false;
@@ -312,12 +312,12 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
         return true;
     }
 
-    static void onCancel(INucleusServiceCollection serviceCollection, UUID requester, UUID toTeleport, double cost) {
-        final Text name = serviceCollection.playerDisplayNameService().getDisplayName(toTeleport);
+    static void onCancel(final INucleusServiceCollection serviceCollection, final UUID requester, final UUID toTeleport, final double cost) {
+        final TextComponent name = serviceCollection.playerDisplayNameService().getDisplayName(toTeleport);
         if (requester == null) {
             serviceCollection.messageProvider().sendMessageTo(Sponge.getServer().getConsole(), "command.tpdeny.denyrequester", name);
         } else {
-            Optional<Player> op = Sponge.getServer().getPlayer(requester);
+            final Optional<Player> op = Sponge.getServer().getPlayer(requester);
             op.ifPresent(x -> serviceCollection.messageProvider().sendMessageTo(x, "command.tpdeny.denyrequester", name));
 
             if (serviceCollection.economyServiceProvider().serviceExists() && cost > 0) {
@@ -327,7 +327,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
                                 "teleport.prep.cancel",
                                 serviceCollection.economyServiceProvider().getCurrencySymbol(cost)));
 
-                User user = op.map(x -> (User) x).orElseGet(() -> Sponge.getServiceManager()
+                final User user = op.map(x -> (User) x).orElseGet(() -> Sponge.getServiceManager()
                         .provideUnchecked(UserStorageService.class)
                         .get(requester).orElse(null));
                 if (user != null) {
@@ -338,8 +338,8 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        TeleportConfig config = serviceCollection.moduleDataProvider().getModuleConfig(TeleportConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final TeleportConfig config = serviceCollection.moduleDataProvider().getModuleConfig(TeleportConfig.class);
         this.useCommandsOnClickAcceptDeny = config.isUseCommandsOnClickAcceptOrDeny();
         this.showAcceptDeny = config.isShowClickableAcceptDeny();
         this.refundOnDeny = config.isRefundOnDeny();

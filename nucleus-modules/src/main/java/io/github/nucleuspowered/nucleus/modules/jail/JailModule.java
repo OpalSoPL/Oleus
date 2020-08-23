@@ -21,7 +21,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = JailModule.ID, name = "Jail")
 public class JailModule extends ConfigurableModule<JailConfig, JailConfigAdapter> {
@@ -29,7 +29,7 @@ public class JailModule extends ConfigurableModule<JailConfig, JailConfigAdapter
     public static final String ID = "jail";
 
     @Inject
-    public JailModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public JailModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

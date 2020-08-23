@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -47,10 +47,10 @@ import javax.annotation.Nullable;
         },
         associatedPermissions = FunPermissions.OTHERS_LIGHTNING
 )
-public class LightningCommand implements ICommandExecutor<CommandSource> {
+public class LightningCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[]{
                 GenericArguments.optional(
                     serviceCollection.commandElementSupplier().createPermissionParameter(
@@ -59,17 +59,17 @@ public class LightningCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Collection<Living> playerCollection = context.getAll(NucleusParameters.Keys.SUBJECT, Living.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Collection<Living> playerCollection = context.getAll(NucleusParameters.Keys.SUBJECT, Living.class);
 
         // No argument, let's not smite the subject.
         if (playerCollection.isEmpty()) {
-            Player pl = context.getIfPlayer();
+            final Player pl = context.getIfPlayer();
 
             // 100 is a good limit here.
-            BlockRay<World> playerBlockRay = BlockRay.from(pl).distanceLimit(100).stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1)).build();
-            Optional<BlockRayHit<World>> obh = playerBlockRay.end();
-            Location<World> lightningLocation;
+            final BlockRay<World> playerBlockRay = BlockRay.from(pl).distanceLimit(100).stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1)).build();
+            final Optional<BlockRayHit<World>> obh = playerBlockRay.end();
+            final Location<World> lightningLocation;
             // Smite above, but not on.
             lightningLocation = obh.map(BlockRayHit::getLocation).orElseGet(() -> pl.getLocation().add(0, 3, 0));
 
@@ -77,7 +77,7 @@ public class LightningCommand implements ICommandExecutor<CommandSource> {
             return context.successResult();
         }
 
-        for (Living pl : playerCollection) {
+        for (final Living pl : playerCollection) {
             this.spawnLightning(
                     pl.getLocation(),
                     context,
@@ -88,15 +88,15 @@ public class LightningCommand implements ICommandExecutor<CommandSource> {
     }
 
     private void spawnLightning(
-            Location<World> location,
-            ICommandContext<? extends CommandSource> context,
-            @Nullable Player target) throws CommandException {
+            final Location<World> location,
+            final ICommandContext context,
+            @Nullable final Player target) throws CommandException {
 
-        World world = location.getExtent();
-        Entity bolt = world.createEntity(EntityTypes.LIGHTNING, location.getPosition());
+        final World world = location.getExtent();
+        final Entity bolt = world.createEntity(EntityTypes.LIGHTNING, location.getPosition());
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
             world.spawnEntity(bolt);
             if (target != null) {
                 context.sendMessage("command.lightning.success.other",

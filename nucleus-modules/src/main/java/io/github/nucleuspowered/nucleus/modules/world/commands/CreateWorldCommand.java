@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.CatalogTypes;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
@@ -69,7 +69,7 @@ import javax.annotation.Nullable;
         commandDescriptionKey = "world.create",
         parentCommand = WorldCommand.class
 )
-public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class CreateWorldCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final DataQuery uuidLeast = DataQuery.of("SpongeData", "UUIDLeast");
     private final DataQuery uuidMost = DataQuery.of("SpongeData", "UUIDMost");
@@ -87,7 +87,7 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
     @Nullable private Long worldBorderDefault;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
                 .valueFlag(GenericArguments.onlyOne(new ImprovedCatalogTypeArgument(Text.of(preset), WorldArchetype.class, serviceCollection)), "p", "-" + preset)
@@ -109,27 +109,27 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        String nameInput = context.requireOne(this.name, String.class);
-        Optional<DimensionType> dimensionInput = context.getOne(this.dimension, DimensionType.class);
-        Optional<GeneratorType> generatorInput = context.getOne(this.generator, GeneratorType.class);
-        Optional<GameMode> gamemodeInput = context.getOne(this.gamemode, GameMode.class);
-        Optional<Difficulty> difficultyInput = context.getOne(this.difficulty, Difficulty.class);
-        Collection<WorldGeneratorModifier> modifiers = context.getAll(this.modifier, WorldGeneratorModifier.class);
-        Optional<Long> seedInput = context.getOne(this.seed, Long.class);
-        boolean genStructures = !context.hasAny("n");
-        boolean loadOnStartup = !context.hasAny("l") || context.getOne("l", Boolean.class).orElse(true);
-        boolean keepSpawnLoaded = !context.hasAny("k") || context.getOne("k", Boolean.class).orElse(true);
-        boolean allowCommands = !context.hasAny("c") || context.getOne("c", Boolean.class).orElse(true);
-        boolean bonusChest = !context.hasAny("b") || context.getOne("b", Boolean.class).orElse(true);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String nameInput = context.requireOne(this.name, String.class);
+        final Optional<DimensionType> dimensionInput = context.getOne(this.dimension, DimensionType.class);
+        final Optional<GeneratorType> generatorInput = context.getOne(this.generator, GeneratorType.class);
+        final Optional<GameMode> gamemodeInput = context.getOne(this.gamemode, GameMode.class);
+        final Optional<Difficulty> difficultyInput = context.getOne(this.difficulty, Difficulty.class);
+        final Collection<WorldGeneratorModifier> modifiers = context.getAll(this.modifier, WorldGeneratorModifier.class);
+        final Optional<Long> seedInput = context.getOne(this.seed, Long.class);
+        final boolean genStructures = !context.hasAny("n");
+        final boolean loadOnStartup = !context.hasAny("l") || context.getOne("l", Boolean.class).orElse(true);
+        final boolean keepSpawnLoaded = !context.hasAny("k") || context.getOne("k", Boolean.class).orElse(true);
+        final boolean allowCommands = !context.hasAny("c") || context.getOne("c", Boolean.class).orElse(true);
+        final boolean bonusChest = !context.hasAny("b") || context.getOne("b", Boolean.class).orElse(true);
 
         if (Sponge.getServer().getAllWorldProperties().stream().anyMatch(x -> x.getWorldName().equalsIgnoreCase(nameInput))) {
             return context.errorResult("command.world.create.exists", nameInput);
         }
 
         // Does the world exist?
-        Path worldPath = Sponge.getGame().getGameDirectory().resolve("world");
-        Path worldDir = worldPath.resolve(nameInput);
+        final Path worldPath = Sponge.getGame().getGameDirectory().resolve("world");
+        final Path worldDir = worldPath.resolve(nameInput);
         if (!context.hasAny("i") && Files.exists(worldDir)) {
             context.errorResult("command.world.import.noexist", nameInput);
         }
@@ -139,10 +139,10 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
         }
 
 
-        WorldArchetype.Builder worldSettingsBuilder = WorldArchetype.builder().enabled(true);
+        final WorldArchetype.Builder worldSettingsBuilder = WorldArchetype.builder().enabled(true);
 
         if (context.hasAny(this.preset)) {
-            WorldArchetype preset1 = context.requireOne(this.preset, WorldArchetype.class);
+            final WorldArchetype preset1 = context.requireOne(this.preset, WorldArchetype.class);
             worldSettingsBuilder.from(preset1);
             dimensionInput.ifPresent(worldSettingsBuilder::dimension);
             generatorInput.ifPresent(worldSettingsBuilder::generator);
@@ -172,7 +172,7 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
 
         seedInput.ifPresent(worldSettingsBuilder::seed);
 
-        WorldArchetype wa = worldSettingsBuilder.build(nameInput.toLowerCase(), nameInput);
+        final WorldArchetype wa = worldSettingsBuilder.build(nameInput.toLowerCase(), nameInput);
 
         context.sendMessage("command.world.create.begin", nameInput);
         context.sendMessage("command.world.create.newparams",
@@ -188,10 +188,10 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
                 String.valueOf(allowCommands),
                 String.valueOf(bonusChest));
 
-        WorldProperties worldProperties;
+        final WorldProperties worldProperties;
         try {
             worldProperties = Sponge.getGame().getServer().createWorldProperties(nameInput, wa);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             return context.errorResultLiteral(Text.of(TextColors.RED, e.getMessage()));
         }
@@ -206,7 +206,7 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
             return context.errorResult("command.world.create.couldnotsave", nameInput);
         }
 
-        Optional<World> world = Sponge.getGame().getServer().loadWorld(worldProperties);
+        final Optional<World> world = Sponge.getGame().getServer().loadWorld(worldProperties);
 
         if (world.isPresent()) {
             world.get().getProperties().setDifficulty(wa.getDifficulty());
@@ -217,8 +217,8 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
         }
     }
 
-    private OutputStream getOutput(boolean gzip, Path file) throws IOException {
-        OutputStream os = Files.newOutputStream(file);
+    private OutputStream getOutput(final boolean gzip, final Path file) throws IOException {
+        final OutputStream os = Files.newOutputStream(file);
         if (gzip) {
             return new GZIPOutputStream(os, true);
         }
@@ -226,20 +226,20 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
         return os;
     }
 
-    private void onImport(ICommandContext<? extends CommandSource> context, Path world, String name) {
+    private void onImport(final ICommandContext context, final Path world, final String name) {
         // Get the file
-        Path level = world.resolve("level.dat");
-        Path levelSponge = world.resolve("level_sponge.dat");
+        final Path level = world.resolve("level.dat");
+        final Path levelSponge = world.resolve("level_sponge.dat");
 
         if (Files.exists(level)) {
             DataContainer dc;
             boolean gz = false;
             try {
-                try (InputStream is = Files.newInputStream(level, StandardOpenOption.READ)) {
+                try (final InputStream is = Files.newInputStream(level, StandardOpenOption.READ)) {
                     // Open it, get the Dimension ID
                     dc = DataFormats.NBT.readFrom(is);
-                } catch (EOFException ex) {
-                    try (GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(level, StandardOpenOption.READ))) {
+                } catch (final EOFException ex) {
+                    try (final GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(level, StandardOpenOption.READ))) {
                         dc = DataFormats.NBT.readFrom(gzip);
                         gz = true;
                     }
@@ -247,11 +247,11 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
 
                 Files.copy(level, world.resolve("level.dat.nbak"), StandardCopyOption.REPLACE_EXISTING);
                 dc.set(this.levelName, name);
-                try (OutputStream os = getOutput(gz, level)) {
+                try (final OutputStream os = getOutput(gz, level)) {
                     DataFormats.NBT.writeTo(os, dc);
                     os.flush();
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
                 context.getServiceCollection().logger().warn("Could not read the level.dat. Ignoring.");
             }
@@ -261,23 +261,23 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
             DataContainer dc;
             boolean gz = false;
             try {
-                try (InputStream is = Files.newInputStream(levelSponge, StandardOpenOption.READ)) {
+                try (final InputStream is = Files.newInputStream(levelSponge, StandardOpenOption.READ)) {
                     // Open it, get the Dimension ID
                     dc = DataFormats.NBT.readFrom(is);
-                } catch (EOFException ex) {
-                    try (GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(levelSponge, StandardOpenOption.READ))) {
+                } catch (final EOFException ex) {
+                    try (final GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(levelSponge, StandardOpenOption.READ))) {
                         dc = DataFormats.NBT.readFrom(gzip);
                         gz = true;
                     }
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
                 context.getServiceCollection().logger().warn("Could not read the level_sponge.dat. Ignoring.");
                 return;
             }
 
             // For each world, get the dim ID.
-            Set<Integer> si = Sponge.getServer().getAllWorldProperties().stream()
+            final Set<Integer> si = Sponge.getServer().getAllWorldProperties().stream()
                     .map(x -> x.getAdditionalProperties().getInt(this.toId).orElse(0))
                     .collect(Collectors.toSet());
 
@@ -290,34 +290,34 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
                 }
             }
 
-            UUID uuid = UUID.randomUUID();
+            final UUID uuid = UUID.randomUUID();
             dc.set(this.uuidLeast, uuid.getLeastSignificantBits());
             dc.set(this.uuidMost, uuid.getMostSignificantBits());
 
             try {
                 Files.copy(levelSponge, world.resolve("level_sponge.dat.nbak"), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
                 context.getServiceCollection().logger().warn("Could not backup the level_sponge.dat. Ignoring.");
                 return;
             }
 
-            try (OutputStream os = getOutput(gz, levelSponge)) {
+            try (final OutputStream os = getOutput(gz, levelSponge)) {
                 DataFormats.NBT.writeTo(os, dc);
                 os.flush();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
                 context.getServiceCollection().logger().warn("Could not save the level_sponge.dat. Ignoring.");
             }
         }
     }
 
-    static String modifierString(ICommandContext<? extends CommandSource> context, Collection<WorldGeneratorModifier> cw) {
+    static String modifierString(final ICommandContext context, final Collection<WorldGeneratorModifier> cw) {
         if (cw.isEmpty()) {
             return context.getMessageString("command.world.create.nomodifiers");
         }
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         cw.forEach(x -> {
             if (sb.length() > 0) {
                 sb.append(", ");
@@ -329,7 +329,7 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
         return sb.toString();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.worldBorderDefault = serviceCollection
                 .moduleDataProvider()
                 .getModuleConfig(WorldConfig.class)
@@ -347,12 +347,12 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
             put("dim1", DimensionTypes.THE_END);
         }};
 
-        private ExtendedDimensionArgument(@Nullable Text key, IMessageProviderService messageProviderService) {
+        private ExtendedDimensionArgument(@Nullable final TextComponent key, final IMessageProviderService messageProviderService) {
             super(key);
             this.messageProviderService = messageProviderService;
         }
 
-        @Nullable @Override protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+        @Nullable @Override protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
             final String arg = args.next();
             if (replacement.containsKey(arg.toLowerCase())) {
                 return replacement.get(arg.toLowerCase());
@@ -367,12 +367,12 @@ public class CreateWorldCommand implements ICommandExecutor<CommandSource>, IRel
                 .orElseThrow(() -> args.createError(this.messageProviderService.getMessageFor(source, "args.dimensiontype.notfound", arg)));
         }
 
-        @Override public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-            List<String> ids = Sponge.getRegistry().getAllOf(DimensionType.class).stream().map(CatalogType::getId).collect(Collectors.toList());
+        @Override public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
+            final List<String> ids = Sponge.getRegistry().getAllOf(DimensionType.class).stream().map(CatalogType::getId).collect(Collectors.toList());
             try {
-                String a = args.peek();
+                final String a = args.peek();
                 return ids.stream().filter(x -> x.startsWith(a)).collect(Collectors.toList());
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 return ids;
             }
         }

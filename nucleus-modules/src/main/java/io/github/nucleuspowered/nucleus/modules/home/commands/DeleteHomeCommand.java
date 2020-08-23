@@ -15,10 +15,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.text.Text;
 @Command(
@@ -28,12 +27,12 @@ import org.spongepowered.api.text.Text;
         parentCommand = HomeCommand.class
 )
 @EssentialsEquivalent({"delhome", "remhome", "rmhome"})
-public class DeleteHomeCommand implements ICommandExecutor<Player> {
+public class DeleteHomeCommand implements ICommandExecutor {
 
     private final String homeKey = "home";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.onlyOne(new HomeArgument(
                         Text.of(this.homeKey),
@@ -43,11 +42,11 @@ public class DeleteHomeCommand implements ICommandExecutor<Player> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Home wl = context.requireOne(this.homeKey, Home.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Home wl = context.requireOne(this.homeKey, Home.class);
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
             context.getServiceCollection().getServiceUnchecked(HomeService.class).removeHomeInternal(frame.getCurrentCause(), wl);
             context.sendMessage("command.home.delete.success", wl.getName());
         }

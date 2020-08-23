@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -37,7 +37,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 public class GamemodeToggleCommand extends GamemodeBase<Player> {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> src) throws CommandException {
+    public ICommandResult execute(final ICommandContext src) throws CommandException {
         GameMode mode = src.getIfPlayer().get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL);
         if (mode.equals(GameModes.SURVIVAL) || mode.equals(GameModes.NOT_SET)) {
             mode = GameModes.CREATIVE;

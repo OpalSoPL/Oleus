@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -24,12 +24,12 @@ import org.spongepowered.api.world.storage.WorldProperties;
         commandDescriptionKey = "world.gamerule.set",
         parentCommand = GameruleCommand.class
 )
-public class SetGameruleCommand implements ICommandExecutor<CommandSource> {
+public class SetGameruleCommand implements ICommandExecutor {
 
     private static final String gameRuleKey = "gamerule";
     private static final String valueKey = "value";
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection),
                 GenericArguments.string(Text.of(gameRuleKey)),
@@ -37,11 +37,11 @@ public class SetGameruleCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties worldProperties = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
-        String gameRule = context.requireOne(gameRuleKey, String.class);
-        String value = context.requireOne(valueKey, String.class);
+        final String gameRule = context.requireOne(gameRuleKey, String.class);
+        final String value = context.requireOne(valueKey, String.class);
 
         worldProperties.setGameRule(gameRule, value);
 

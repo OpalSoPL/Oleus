@@ -23,15 +23,15 @@ public class MuteInfoProvider implements NucleusProvider {
         return NucleusProvider.PUNISHMENT;
     }
 
-    @Override public Optional<Text> get(User user, CommandSource source, INucleusServiceCollection serviceCollection) {
+    @Override public Optional<Text> get(final User user, final CommandSource source, final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, MutePermissions.BASE_CHECKMUTE)) {
             // If we have a ban service, then check for a ban.
-            MuteHandler jh = serviceCollection.getServiceUnchecked(MuteHandler.class);
-            IMessageProviderService messageProviderService = serviceCollection.messageProvider();
+            final MuteHandler jh = serviceCollection.getServiceUnchecked(MuteHandler.class);
+            final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             if (jh.isMuted(user)) {
-                MuteData jd = jh.getPlayerMuteData(user).get();
+                final MuteData jd = jh.getPlayerMuteData(user).get();
                 // Lightweight checkban.
-                Text.Builder m;
+                final Text.Builder m;
                 if (jd.getRemainingTime().isPresent()) {
                     m = messageProviderService.getMessageFor(source, "seen.ismuted.temp",
                             messageProviderService.getTimeString(source.getLocale(), jd.getRemainingTime().get().getSeconds())).toBuilder();

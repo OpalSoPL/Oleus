@@ -14,7 +14,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ServerOnly
 @ModuleData(id = ConnectionModule.ID, name = "Connection")
@@ -23,8 +23,8 @@ public class ConnectionModule extends ConfigurableModule<ConnectionConfig, Conne
     public static final String ID = "connection";
 
     @Inject
-    public ConnectionModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public ConnectionModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

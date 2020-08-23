@@ -17,7 +17,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.IfConditionElseArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -38,11 +38,11 @@ import org.spongepowered.api.entity.living.player.User;
                 TeleportPermissions.TPTOGGLE_EXEMPT
         }
 )
-public class TeleportHereCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class TeleportHereCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean isDefaultQuiet = false;
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.isDefaultQuiet =
                 serviceCollection.moduleDataProvider()
                         .getModuleConfig(TeleportConfig.class)
@@ -50,7 +50,7 @@ public class TeleportHereCommand implements ICommandExecutor<Player>, IReloadabl
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags().flag("q", "-quiet").buildWith(
                         IfConditionElseArgument.permission(
@@ -61,13 +61,13 @@ public class TeleportHereCommand implements ICommandExecutor<Player>, IReloadabl
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        boolean beQuiet = context.getOne("q", Boolean.class).orElse(this.isDefaultQuiet);
-        User target = context.requireOne(NucleusParameters.Keys.PLAYER, User.class);
-        PlayerTeleporterService sts = context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final boolean beQuiet = context.getOne("q", Boolean.class).orElse(this.isDefaultQuiet);
+        final User target = context.requireOne(NucleusParameters.Keys.PLAYER, User.class);
+        final PlayerTeleporterService sts = context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class);
         if (target.getPlayer().isPresent()) {
-            Player to = target.getPlayer().get();
-            TeleportResult result = sts.teleportWithMessage(
+            final Player to = target.getPlayer().get();
+            final TeleportResult result = sts.teleportWithMessage(
                     context.getIfPlayer(),
                     to,
                     context.getIfPlayer(),
@@ -81,7 +81,7 @@ public class TeleportHereCommand implements ICommandExecutor<Player>, IReloadabl
                 return context.errorResult("command.tphere.noofflineperms");
             }
 
-            Player src = context.getIfPlayer();
+            final Player src = context.getIfPlayer();
             // Update the offline player's next location
             target.setLocation(src.getPosition(), src.getWorld().getUniqueId());
             context.sendMessage("command.tphere.offlinesuccess", target.getName());

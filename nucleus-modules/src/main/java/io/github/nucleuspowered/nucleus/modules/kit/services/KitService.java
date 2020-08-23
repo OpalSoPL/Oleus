@@ -64,7 +64,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @APIService(NucleusKitService.class)
 public class KitService implements NucleusKitService, IReloadableService.Reloadable, ServiceBase {
@@ -87,7 +87,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     private boolean isMustGetAll = false;
 
     @Inject
-    public KitService(INucleusServiceCollection serviceCollection) {
+    public KitService(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
         this.storageManager = serviceCollection.storageManager();
         this.messageProviderService = serviceCollection.messageProvider();
@@ -107,11 +107,11 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         );
     }
 
-    public CommandElement createKitElement(boolean permissionCheck) {
+    public CommandElement createKitElement(final boolean permissionCheck) {
         return permissionCheck ? this.perm : this.noPerm;
     }
 
-    public boolean exists(String name, boolean includeHidden) {
+    public boolean exists(final String name, final boolean includeHidden) {
         return getKitNames(includeHidden).stream().anyMatch(x -> x.equalsIgnoreCase(name));
     }
 
@@ -121,13 +121,13 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     }
 
     @Override
-    public Optional<Kit> getKit(String name) {
+    public Optional<Kit> getKit(final String name) {
         return Optional.ofNullable(this.storageManager.getKits().getKitMap().get(name.toLowerCase()));
     }
 
     @Override
-    public Collection<ItemStack> getItemsForPlayer(Kit kit, Player player) {
-        Collection<ItemStack> cis = kit.getStacks().stream().map(ItemStackSnapshot::createStack).collect(Collectors.toList());
+    public Collection<ItemStack> getItemsForPlayer(final Kit kit, final Player player) {
+        final Collection<ItemStack> cis = kit.getStacks().stream().map(ItemStackSnapshot::createStack).collect(Collectors.toList());
         if (this.isProcessTokens) {
             processTokensInItemStacks(player, cis);
         }
@@ -136,12 +136,12 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     }
 
     @Override
-    public CompletableFuture<Boolean> hasPreviouslyRedeemed(Kit kit, User user) {
+    public CompletableFuture<Boolean> hasPreviouslyRedeemed(final Kit kit, final User user) {
         return redeemTime(kit.getName(), user).thenApply(Optional::isPresent);
     }
 
     @Override
-    public CompletableFuture<Boolean> isRedeemable(Kit kit, User user) {
+    public CompletableFuture<Boolean> isRedeemable(final Kit kit, final User user) {
         return redeemTime(kit.getName(), user)
                 .thenApply(x -> {
                             if (x.isPresent()) {
@@ -157,7 +157,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     }
 
     @Override
-    public CompletableFuture<Optional<Instant>> getCooldownExpiry(Kit kit, User user) {
+    public CompletableFuture<Optional<Instant>> getCooldownExpiry(final Kit kit, final User user) {
         return redeemTime(kit.getName(), user).thenApply(x -> {
             if (x.isPresent()) {
                 if (x.get().isAfter(Instant.now())) {
@@ -168,41 +168,41 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         });
     }
 
-    private CompletableFuture<Optional<Instant>> redeemTime(final String name, User user) {
+    private CompletableFuture<Optional<Instant>> redeemTime(final String name, final User user) {
         return getUserRedemptionData(user).thenApply(x -> Optional.ofNullable(x.get(name)));
     }
 
     @Override
-    public KitRedeemResult redeemKit(Kit kit, Player player, boolean performChecks) {
+    public KitRedeemResult redeemKit(final Kit kit, final Player player, final boolean performChecks) {
         return redeemKit(kit, player, performChecks, performChecks, this.isMustGetAll, false);
     }
 
     @Override
-    public KitRedeemResult redeemKit(Kit kit, Player player, boolean performChecks, boolean mustRedeemAll) {
+    public KitRedeemResult redeemKit(final Kit kit, final Player player, final boolean performChecks, final boolean mustRedeemAll) {
         return redeemKit(kit, player, performChecks, performChecks, mustRedeemAll, false);
     }
 
-    public KitRedeemResult redeemKit(Kit kit,
-            Player player,
-            boolean checkOneTime,
-            boolean checkCooldown,
-            boolean isMustGetAll,
-            boolean isFirstJoin) {
+    public KitRedeemResult redeemKit(final Kit kit,
+            final Player player,
+            final boolean checkOneTime,
+            final boolean checkCooldown,
+            final boolean isMustGetAll,
+            final boolean isFirstJoin) {
         KitRedeemResult result = null;
 
-        Map<String, Instant> redeemed = getUserRedemptionData(player).join();
+        final Map<String, Instant> redeemed = getUserRedemptionData(player).join();
 
-        Instant timeOfLastUse = redeemed.get(kit.getName().toLowerCase());
-        Instant now = Instant.now();
+        final Instant timeOfLastUse = redeemed.get(kit.getName().toLowerCase());
+        final Instant now = Instant.now();
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(player);
 
             // If the kit was used before...
             // Get original list
-            Collection<ItemStackSnapshot> original = getItems(kit, this.isProcessTokens, player);
-            Collection<String> commands = kit.getCommands();
-            Optional<Instant> instant = getNextUseTime(kit, player, timeOfLastUse);
+            final Collection<ItemStackSnapshot> original = getItems(kit, this.isProcessTokens, player);
+            final Collection<String> commands = kit.getCommands();
+            final Optional<Instant> instant = getNextUseTime(kit, player, timeOfLastUse);
             if ((checkOneTime || checkCooldown) && timeOfLastUse != null) {
 
                 // if it's one time only and the user does not have an exemption...
@@ -232,7 +232,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
             }
             if (result == null) {
-                NucleusKitEvent.Redeem.Pre preEvent =
+                final NucleusKitEvent.Redeem.Pre preEvent =
                         new KitEvent.PreRedeem(frame.getCurrentCause(), timeOfLastUse, kit, player, original, commands);
                 if (Sponge.getEventManager().post(preEvent)) {
                     Sponge.getEventManager().post(
@@ -248,7 +248,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                             preEvent.getCancelMessage().orElse(null)
                     );
                 } else {
-                    List<Optional<ItemStackSnapshot>> slotList = Lists.newArrayList();
+                    final List<Optional<ItemStackSnapshot>> slotList = Lists.newArrayList();
                     Util.getStandardInventory(player).slots().forEach(x -> slotList.add(x.peek().map(ItemStack::createSnapshot)));
                     InventoryTransactionResult inventoryTransactionResult = EMPTY_ITR;
                     KitRedeemResultImpl ex = null;
@@ -256,14 +256,14 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                         inventoryTransactionResult =
                                 addToStandardInventory(player, preEvent.getStacksToRedeem().orElseGet(preEvent::getOriginalStacksToRedeem));
                         if (!isFirstJoin && !inventoryTransactionResult.getRejectedItems().isEmpty() && isMustGetAll) {
-                            Inventory inventory = Util.getStandardInventory(player);
+                            final Inventory inventory = Util.getStandardInventory(player);
 
                             // Slots
-                            Iterator<Inventory> slot = inventory.slots().iterator();
+                            final Iterator<Inventory> slot = inventory.slots().iterator();
 
                             // Slots to restore
                             slotList.forEach(x -> {
-                                Inventory i = slot.next();
+                                final Inventory i = slot.next();
                                 i.clear();
                                 x.ifPresent(y -> i.offer(y.createStack()));
                             });
@@ -290,7 +290,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                                 commands,
                                 preEvent.getCommandsToExecute().orElse(null)));
 
-                        Optional<Instant> nextCooldown = getNextUseTime(kit, player, Instant.now());
+                        final Optional<Instant> nextCooldown = getNextUseTime(kit, player, Instant.now());
 
                         result = new KitRedeemResultImpl(
                                 inventoryTransactionResult.getRejectedItems().isEmpty() ?
@@ -320,18 +320,18 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         return result;
     }
 
-    private void redeemKitCommands(Collection<String> commands, Player player) {
-        ConsoleSource source = Sponge.getServer().getConsole();
-        String playerName = player.getName();
+    private void redeemKitCommands(final Collection<String> commands, final Player player) {
+        final ConsoleSource source = Sponge.getServer().getConsole();
+        final String playerName = player.getName();
         commands.forEach(x -> Sponge.getCommandManager().process(source, x.replace("{{player}}", playerName)));
     }
 
-    public boolean checkOneTime(Kit kit, User player) {
+    public boolean checkOneTime(final Kit kit, final User player) {
         // if it's one time only and the user does not have an exemption...
         return !kit.isOneTime() || this.permissionService.hasPermission(player, KitPermissions.KIT_EXEMPT_ONETIME);
     }
 
-    public Optional<Instant> getNextUseTime(Kit kit, User player, Instant timeOfLastUse) {
+    public Optional<Instant> getNextUseTime(final Kit kit, final User player, final Instant timeOfLastUse) {
         // If the kit was used before...
         if (timeOfLastUse != null) {
 
@@ -341,7 +341,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                     && kit.getCooldown().map(Duration::getSeconds).orElse(0L) > 0) {
 
                 // ...and we haven't reached the cooldown point yet...
-                Instant timeForNextUse = timeOfLastUse.plus(kit.getCooldown().get());
+                final Instant timeForNextUse = timeOfLastUse.plus(kit.getCooldown().get());
                 if (timeForNextUse.isAfter(Instant.now())) {
                     return Optional.of(timeForNextUse);
                 }
@@ -351,7 +351,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         return Optional.empty();
     }
 
-    private CompletableFuture<Map<String, Instant>> getUserRedemptionData(User user) {
+    private CompletableFuture<Map<String, Instant>> getUserRedemptionData(final User user) {
         return this.storageManager
                 .getUserService()
                 .getOrNew(user.getUniqueId())
@@ -362,20 +362,20 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                 );
     }
 
-    private void setUserRedemptionData(User user, Map<String, Instant> set) {
+    private void setUserRedemptionData(final User user, final Map<String, Instant> set) {
         this.storageManager.getUserService().setAndSave(user.getUniqueId(), KitKeys.REDEEMED_KITS, set);
     }
 
     // ---
 
     @Override
-    public void saveKit(Kit kit) {
+    public void saveKit(final Kit kit) {
         saveKit(kit, true);
     }
 
-    public void saveKit(Kit kit, boolean save) {
-        IKitDataObject kitDataObject = this.storageManager.getKits();
-        Map<String, Kit> kits = new HashMap<>(kitDataObject.getKitMap());
+    public void saveKit(final Kit kit, final boolean save) {
+        final IKitDataObject kitDataObject = this.storageManager.getKits();
+        final Map<String, Kit> kits = new HashMap<>(kitDataObject.getKitMap());
         Util.getKeyIgnoreCase(getKitNames(true), kit.getName()).ifPresent(kits::remove);
         kits.put(kit.getName().toLowerCase(), kit);
         try {
@@ -383,28 +383,28 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
             if (save) {
                 this.storageManager.getKitsService().save(kitDataObject);
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public Kit createKit(String name) throws IllegalArgumentException {
-        IKitDataObject kitDataObject = this.storageManager.getKits();
-        Map<String, Kit> kits = new HashMap<>(kitDataObject.getKitMap());
+    public Kit createKit(final String name) throws IllegalArgumentException {
+        final IKitDataObject kitDataObject = this.storageManager.getKits();
+        final Map<String, Kit> kits = new HashMap<>(kitDataObject.getKitMap());
         Util.getKeyIgnoreCase(kits, name).ifPresent(s -> {
             throw new IllegalArgumentException("Kit " + name + " already exists!");
         });
-        Kit kit = new SingleKit(name);
+        final Kit kit = new SingleKit(name);
         saveKit(kit, true);
         return kit;
     }
 
     @Override
     public void renameKit(final String kitName, final String newKitName) throws IllegalArgumentException {
-        String from = kitName.toLowerCase();
-        String to = newKitName.toLowerCase();
-        Kit targetKit = getKit(from).orElseThrow(() -> new IllegalArgumentException(
+        final String from = kitName.toLowerCase();
+        final String to = newKitName.toLowerCase();
+        final Kit targetKit = getKit(from).orElseThrow(() -> new IllegalArgumentException(
                 this.messageProviderService.getMessageString("kit.noexists", kitName)));
         if (getKit(to).isPresent()) {
             throw new IllegalArgumentException(this.messageProviderService.getMessageString("kit.cannotrename", from, to));
@@ -413,36 +413,36 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         removeKit(from);
     }
 
-    public Optional<Tuple<Kit, Inventory>> getCurrentlyOpenInventoryKit(Container inventory) {
+    public Optional<Tuple<Kit, Inventory>> getCurrentlyOpenInventoryKit(final Container inventory) {
         return Optional.ofNullable(this.inventoryKitMap.get(inventory));
     }
 
-    public boolean isOpen(String kitName) {
+    public boolean isOpen(final String kitName) {
         return this.inventoryKitMap.values().stream().anyMatch(x -> x.getFirst().getName().equalsIgnoreCase(kitName));
     }
 
-    public void addKitInventoryToListener(Tuple<Kit, Inventory> kit, Container inventory) {
+    public void addKitInventoryToListener(final Tuple<Kit, Inventory> kit, final Container inventory) {
         Preconditions.checkState(!this.inventoryKitMap.containsKey(inventory));
         this.inventoryKitMap.put(inventory, kit);
     }
 
-    public void removeKitInventoryFromListener(Container inventory) {
+    public void removeKitInventoryFromListener(final Container inventory) {
         this.inventoryKitMap.remove(inventory);
     }
 
-    public void addViewer(Container inventory) {
+    public void addViewer(final Container inventory) {
         this.viewers.add(inventory);
     }
 
     @Nullable private Boolean hasViewersWorks = null;
 
-    public void removeViewer(Container inventory) {
+    public void removeViewer(final Container inventory) {
         this.viewers.remove(inventory);
         if (this.hasViewersWorks == null) {
             try {
                 inventory.hasViewers();
                 this.hasViewersWorks = true;
-            } catch (Throwable throwable) {
+            } catch (final Throwable throwable) {
                 this.hasViewersWorks = false;
                 return;
             }
@@ -453,13 +453,13 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         }
     }
 
-    public boolean isViewer(Container inventory) {
+    public boolean isViewer(final Container inventory) {
         return this.viewers.contains(inventory);
     }
 
-    public void processTokensInItemStacks(Player player, Collection<ItemStack> stacks) {
+    public void processTokensInItemStacks(final Player player, final Collection<ItemStack> stacks) {
         final Matcher m = inventory.matcher("");
-        for (ItemStack x : stacks) {
+        for (final ItemStack x : stacks) {
             x.get(Keys.DISPLAY_NAME).ifPresent(text -> {
                 if (m.reset(text.toPlain()).find()) {
                     x.offer(Keys.DISPLAY_NAME,
@@ -481,8 +481,8 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         }
     }
 
-    private ImmutableList<ItemStackSnapshot> getItems(Kit kit, boolean replaceTokensInLore, Player targetPlayer) {
-        Collection<ItemStack> toOffer = kit.getStacks().stream()
+    private ImmutableList<ItemStackSnapshot> getItems(final Kit kit, final boolean replaceTokensInLore, final Player targetPlayer) {
+        final Collection<ItemStack> toOffer = kit.getStacks().stream()
                 .filter(x -> x.getType() != ItemTypes.NONE)
                 .map(ItemStackSnapshot::createStack)
                 .collect(Collectors.toList());
@@ -502,21 +502,21 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
      * if some stacks were added.
      */
     private InventoryTransactionResult addToStandardInventory(
-            Player player, Collection<ItemStackSnapshot> itemStacks) {
+            final Player player, final Collection<ItemStackSnapshot> itemStacks) {
 
-        Inventory target = Util.getStandardInventory(player);
-        InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder();
+        final Inventory target = Util.getStandardInventory(player);
+        final InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder();
 
-        Collection<ItemStack> toOffer = itemStacks.stream()
+        final Collection<ItemStack> toOffer = itemStacks.stream()
                 .filter(x -> x.getType() != ItemTypes.NONE)
                 .map(ItemStackSnapshot::createStack)
                 .collect(Collectors.toList());
 
         boolean success = false;
-        for (ItemStack stack : toOffer) {
-            InventoryTransactionResult itr = target.offer(stack);
+        for (final ItemStack stack : toOffer) {
+            final InventoryTransactionResult itr = target.offer(stack);
             success = success || itr.getType() == InventoryTransactionResult.Type.SUCCESS;
-            for (ItemStackSnapshot iss : itr.getRejectedItems()) {
+            for (final ItemStackSnapshot iss : itr.getRejectedItems()) {
                 resultBuilder.reject(iss.createStack());
             }
 
@@ -527,7 +527,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
     // --
 
-    public Set<String> getKitNames(boolean showHidden) {
+    public Set<String> getKitNames(final boolean showHidden) {
         return this.storageManager.getKits().getKitMap().entrySet().stream()
                 .filter(x -> showHidden || (!x.getValue().isHiddenFromList() && !x.getValue().isFirstJoinKit()))
                 .map(Map.Entry::getKey).collect(ImmutableSet.toImmutableSet());
@@ -548,11 +548,11 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                 .collect(Collectors.toList());
     }
 
-    public boolean removeKit(String name) {
+    public boolean removeKit(final String name) {
         boolean r = false;
         try {
             r = this.storageManager.getKits().removeKit(name.toLowerCase());
-        } catch (Exception e) {
+        } catch (final Exception e) {
             this.logger.error("Could not update kits", e);
         }
         return r;
@@ -561,8 +561,8 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     // --
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        KitConfig kitConfig = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final KitConfig kitConfig = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
         this.isMustGetAll = kitConfig.isMustGetAll();
         this.isProcessTokens = kitConfig.isProcessTokens();
     }

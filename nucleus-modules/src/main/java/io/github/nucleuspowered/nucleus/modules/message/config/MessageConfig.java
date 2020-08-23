@@ -40,7 +40,7 @@ public class MessageConfig {
         return this.canMessageSelf;
     }
 
-    public NucleusTextTemplateImpl getHelpOpPrefix(INucleusTextTemplateFactory textTemplateFactory) {
+    public NucleusTextTemplateImpl getHelpOpPrefix(final INucleusTextTemplateFactory textTemplateFactory) {
         if (this.helpOpPrefix == null) {
             // set default
             this.helpOpPrefix = textTemplateFactory.createFromAmpersandString(HELP_OP_DEFAULT);
@@ -49,7 +49,7 @@ public class MessageConfig {
         return this.helpOpPrefix;
     }
 
-    public NucleusTextTemplateImpl getMessageReceiverPrefix(INucleusTextTemplateFactory textTemplateFactory) {
+    public NucleusTextTemplateImpl getMessageReceiverPrefix(final INucleusTextTemplateFactory textTemplateFactory) {
         if (this.messageReceiverPrefix == null) {
             // set default
             this.messageReceiverPrefix = textTemplateFactory.createFromAmpersandString(MESSAGE_RECEIVER_DEFAULT);
@@ -58,7 +58,7 @@ public class MessageConfig {
         return this.messageReceiverPrefix;
     }
 
-    public NucleusTextTemplateImpl getMessageSenderPrefix(INucleusTextTemplateFactory textTemplateFactory) {
+    public NucleusTextTemplateImpl getMessageSenderPrefix(final INucleusTextTemplateFactory textTemplateFactory) {
         if (this.messageSenderPrefix == null) {
             // set default
             this.messageSenderPrefix = textTemplateFactory.createFromAmpersandString(MESSAGE_SENDER_DEFAULT);
@@ -67,7 +67,7 @@ public class MessageConfig {
         return this.messageSenderPrefix;
     }
 
-    public NucleusTextTemplateImpl getMessageSocialSpyPrefix(INucleusTextTemplateFactory textTemplateFactory) {
+    public NucleusTextTemplateImpl getMessageSocialSpyPrefix(final INucleusTextTemplateFactory textTemplateFactory) {
         if (this.socialSpy.messageSocialSpyPrefix == null) {
             // set default
             this.socialSpy.messageSocialSpyPrefix = textTemplateFactory.createFromAmpersandString(MESSAGE_SOCIAL_SPY_DEFAULT);

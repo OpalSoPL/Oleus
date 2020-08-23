@@ -19,10 +19,10 @@ import org.spongepowered.api.command.CommandSource;
         parentCommand = NucleusCommand.class,
         async = true
 )
-public class ClearCacheCommand implements ICommandExecutor<CommandSource> {
+public class ClearCacheCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(final ICommandContext<? extends CommandSource> context) {
+    public ICommandResult execute(final ICommandContext context) {
         context.getServiceCollection().storageManager().getUserService().clearCache()
                 .whenComplete(
                 (complete, exception) -> {

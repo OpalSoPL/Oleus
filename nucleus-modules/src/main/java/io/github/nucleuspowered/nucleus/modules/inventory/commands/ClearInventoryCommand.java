@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -27,10 +27,10 @@ import org.spongepowered.api.entity.living.player.User;
         associatedPermissions = InventoryPermissions.OTHERS_CLEAR
 )
 @EssentialsEquivalent({"clearinventory", "ci", "clean", "clearinvent"})
-public class ClearInventoryCommand implements ICommandExecutor<CommandSource> {
+public class ClearInventoryCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags().flag("a", "-all").buildWith(
                 GenericArguments.optional(
@@ -44,10 +44,10 @@ public class ClearInventoryCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User user = context.getUserFromArgs();
-        boolean all = context.hasAny("a");
-        User target;
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.getUserFromArgs();
+        final boolean all = context.hasAny("a");
+        final User target;
         if (user.getPlayer().isPresent()) {
             target = user.getPlayer().get();
         } else {
@@ -56,12 +56,12 @@ public class ClearInventoryCommand implements ICommandExecutor<CommandSource> {
 
         try {
             return clear(context, target, all);
-        } catch (UnsupportedOperationException ex) {
+        } catch (final UnsupportedOperationException ex) {
             return context.errorResult("command.clearinventory.offlinenotsupported");
         }
     }
 
-    private ICommandResult clear(ICommandContext<? extends CommandSource> context, User target, boolean all) {
+    private ICommandResult clear(final ICommandContext context, final User target, final boolean all) {
         if (Sponge.getEventManager().post(new ClearInventoryEvent.Pre(Sponge.getCauseStackManager().getCurrentCause(), target, all))) {
             return context.errorResult("command.clearinventory.cancelled", target.getName());
         }

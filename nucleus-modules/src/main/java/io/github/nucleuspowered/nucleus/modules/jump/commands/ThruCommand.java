@@ -17,7 +17,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
@@ -33,14 +33,14 @@ import org.spongepowered.api.world.World;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = JumpPermissions.EXEMPT_COST_THRU)
         }
 )
-public class ThruCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class ThruCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private int maxThru = 20;
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player player = context.getIfPlayer();
-        BlockRay<World> playerBlockRay = BlockRay.from(player).distanceLimit(this.maxThru).build();
-        World world = player.getWorld();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player player = context.getIfPlayer();
+        final BlockRay<World> playerBlockRay = BlockRay.from(player).distanceLimit(this.maxThru).build();
+        final World world = player.getWorld();
 
         // First, see if we get a wall.
         while (playerBlockRay.hasNext()) {
@@ -56,14 +56,14 @@ public class ThruCommand implements ICommandExecutor<Player>, IReloadableService
         }
 
         do {
-            BlockRayHit<World> b = playerBlockRay.next();
+            final BlockRayHit<World> b = playerBlockRay.next();
             if (player.getWorld().getBlockType(b.getBlockPosition()).equals(BlockTypes.AIR)) {
                 if (!Util.isLocationInWorldBorder(b.getLocation())) {
                     return context.errorResult("command.jump.outsideborder");
                 }
 
                 // If we can go, do so.
-                boolean result =
+                final boolean result =
                         context.getServiceCollection().teleportService().teleportPlayerSmart(
                                 player,
                                 b.getLocation(),
@@ -84,7 +84,7 @@ public class ThruCommand implements ICommandExecutor<Player>, IReloadableService
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.maxThru = serviceCollection.moduleDataProvider().getModuleConfig(JumpConfig.class).getMaxThru();
     }
 

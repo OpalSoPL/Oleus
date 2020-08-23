@@ -24,7 +24,7 @@ public class NamedOptionPlaceholder implements PlaceholderParser {
     }
 
     @Override
-    public Text parse(final PlaceholderContext placeholderContext) {
+    public TextComponent parse(final PlaceholderContext placeholderContext) {
         final Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject().filter(x -> x instanceof Subject).map(x -> (Subject) x);
         return subjectOptional.flatMap(subject -> this.permissionService
                 .getOptionFromSubject(subject, this.namedOption)

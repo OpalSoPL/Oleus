@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -45,7 +45,7 @@ import java.util.Map;
                 MiscPermissions.OTHERS_SPEED
         }
 )
-public class SpeedCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable { //extends AbstractCommand.SimpleTargetOtherPlayer
+public class SpeedCommand implements ICommandExecutor, IReloadableService.Reloadable { //extends AbstractCommand.SimpleTargetOtherPlayer
 
     private final String speedKey = "speed";
     private final String resetKey = "reset";
@@ -60,8 +60,8 @@ public class SpeedCommand implements ICommandExecutor<CommandSource>, IReloadabl
     private int maxSpeed = 5;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
-        Map<String, SpeedType> keysMap = new HashMap<>();
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
+        final Map<String, SpeedType> keysMap = new HashMap<>();
         keysMap.put("fly", SpeedType.FLYING);
         keysMap.put("flying", SpeedType.FLYING);
         keysMap.put("f", SpeedType.FLYING);
@@ -82,11 +82,11 @@ public class SpeedCommand implements ICommandExecutor<CommandSource>, IReloadabl
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
-        SpeedType key = context.getOne(this.typeKey, SpeedType.class)
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
+        final SpeedType key = context.getOne(this.typeKey, SpeedType.class)
                 .orElseGet(() -> pl.get(Keys.IS_FLYING).orElse(false) ? SpeedType.FLYING : SpeedType.WALKING);
-        Integer speed = context.getOne(this.speedKey, Integer.class).orElseGet(() -> {
+        final Integer speed = context.getOne(this.speedKey, Integer.class).orElseGet(() -> {
             if (context.hasAny(this.resetKey)) {
                 return key == SpeedType.WALKING ? 2 : 1;
             }
@@ -95,7 +95,7 @@ public class SpeedCommand implements ICommandExecutor<CommandSource>, IReloadabl
         });
 
         if (speed == null) {
-            Text t = Text.builder().append(context.getMessage("command.speed.walk")).append(Text.of(" "))
+            final TextComponent t = Text.builder().append(context.getMessage("command.speed.walk")).append(Text.of(" "))
                     .append(Text.of(TextColors.YELLOW, Math.round(pl.get(Keys.WALKING_SPEED).orElse(0.1d) * 20)))
                     .append(Text.builder().append(Text.of(TextColors.GREEN, ", "))
                             .append(context.getMessage("command.speed.flying")).build())
@@ -116,7 +116,7 @@ public class SpeedCommand implements ICommandExecutor<CommandSource>, IReloadabl
             return context.errorResult("command.speed.max", String.valueOf(this.maxSpeed));
         }
 
-        DataTransactionResult dtr = pl.offer(key.speedKey, (double) speed / (double) multiplier);
+        final DataTransactionResult dtr = pl.offer(key.speedKey, (double) speed / (double) multiplier);
 
         if (dtr.isSuccessful()) {
             context.sendMessage("command.speed.success.base", key.name, String.valueOf(speed));
@@ -131,7 +131,7 @@ public class SpeedCommand implements ICommandExecutor<CommandSource>, IReloadabl
         return context.errorResult("command.speed.fail", key.name);
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.maxSpeed = serviceCollection.moduleDataProvider().getModuleConfig(MiscConfig.class).getMaxSpeed();
     }
 
@@ -142,7 +142,7 @@ public class SpeedCommand implements ICommandExecutor<CommandSource>, IReloadabl
         final Key<Value<Double>> speedKey;
         final String name;
 
-        SpeedType(Key<Value<Double>> speedKey, String name) {
+        SpeedType(final Key<Value<Double>> speedKey, final String name) {
             this.speedKey = speedKey;
             this.name = name;
         }

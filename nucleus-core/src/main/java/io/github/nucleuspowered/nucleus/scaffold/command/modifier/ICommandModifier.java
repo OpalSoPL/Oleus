@@ -49,7 +49,7 @@ public interface ICommandModifier extends CatalogType {
      * <p>This will return an empty optional if the requirement is met, or
      * a {@link Text} object otherwise, explaining the problem.</p>
      */
-    default Optional<Text> testRequirement(final ICommandContext.Mutable<? extends CommandSource> source,
+    default Optional<Text> testRequirement(final ICommandContext source,
             final CommandControl control,
             final INucleusServiceCollection serviceCollection,
             final CommandModifier modifier) throws CommandException {
@@ -66,7 +66,7 @@ public interface ICommandModifier extends CatalogType {
      * @return a success if everything is OK but we need to stop, a fail if we're stopping, empty to continue.
      */
     default Optional<ICommandResult> preExecute(
-            final ICommandContext.Mutable<? extends CommandSource> source,
+            final ICommandContext source,
             final CommandControl control,
             final INucleusServiceCollection serviceCollection,
             final CommandModifier modifier) {
@@ -74,14 +74,14 @@ public interface ICommandModifier extends CatalogType {
     }
 
     default void onCompletion(
-            final ICommandContext<? extends CommandSource> source,
+            final ICommandContext source,
             final CommandControl control,
             final INucleusServiceCollection serviceCollection,
             final CommandModifier modifier) throws CommandException {
     }
 
     default void onFailure(
-            final ICommandContext<? extends CommandSource> source,
+            final ICommandContext source,
             final CommandControl control,
             final INucleusServiceCollection serviceCollection,
             final CommandModifier modifier) throws CommandException {

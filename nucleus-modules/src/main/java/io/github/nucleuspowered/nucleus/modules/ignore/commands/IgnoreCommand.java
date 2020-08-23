@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -25,17 +25,17 @@ import org.spongepowered.api.entity.living.player.User;
         async = true,
         associatedPermissions = IgnorePermissions.IGNORE_CHAT
 )
-public class IgnoreCommand implements ICommandExecutor<Player> {
+public class IgnoreCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection),
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the target
         final User target = context.requireOne(NucleusParameters.Keys.USER, User.class);
         final Player player = context.getIfPlayer();
@@ -52,7 +52,7 @@ public class IgnoreCommand implements ICommandExecutor<Player> {
         }
 
         // Ok, we can ignore or unignore them.
-        boolean ignore = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
+        final boolean ignore = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
                 .orElseGet(() -> !ignoreService.isIgnored(player.getUniqueId(), target.getUniqueId()));
 
         if (ignore) {

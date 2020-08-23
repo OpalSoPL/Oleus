@@ -19,20 +19,20 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class AFKSpectatorListener implements ListenerBase.Conditional {
 
     private final IPermissionService permissionService;
 
     @Inject
-    public AFKSpectatorListener(IPermissionService permissionService) {
+    public AFKSpectatorListener(final IPermissionService permissionService) {
         this.permissionService = permissionService;
     }
 
 
     @Listener
-    public void onAfk(NucleusAFKEvent event, @Getter("getTargetEntity") Player player) {
+    public void onAfk(final NucleusAFKEvent event, @Getter("getTargetEntity") final Player player) {
         if (player.gameMode().get().equals(GameModes.SPECTATOR)) {
             if (event.getChannel() == MessageChannel.TO_ALL) {
                 event.setChannel(this.permissionService.permissionMessageChannel(AFKPermissions.AFK_NOTIFY));
@@ -42,14 +42,14 @@ public class AFKSpectatorListener implements ListenerBase.Conditional {
     }
 
     @Listener(order = Order.FIRST)
-    public void onAfk(NucleusAFKEvent.Kick event, @Getter("getTargetEntity") Player player) {
+    public void onAfk(final NucleusAFKEvent.Kick event, @Getter("getTargetEntity") final Player player) {
         if (player.gameMode().get().equals(GameModes.SPECTATOR)) {
             event.setCancelled(true);
         }
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class).isDisableInSpectatorMode();
     }
 }

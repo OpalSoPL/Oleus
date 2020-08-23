@@ -26,7 +26,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @APIService(NucleusNoteService.class)
 public class NoteHandler implements NucleusNoteService, ServiceBase {
@@ -34,37 +34,37 @@ public class NoteHandler implements NucleusNoteService, ServiceBase {
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
-    public NoteHandler(INucleusServiceCollection serviceCollection) {
+    public NoteHandler(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
-    public List<NoteData> getNotesInternal(User user) {
-        Optional<IUserDataObject> userDataObject = this.serviceCollection.storageManager()
+    public List<NoteData> getNotesInternal(final User user) {
+        final Optional<IUserDataObject> userDataObject = this.serviceCollection.storageManager()
                 .getUserService().getOnThread(user.getUniqueId());
         return userDataObject.flatMap(udo -> udo.get(NoteKeys.NOTE_DATA)).orElseGet(ImmutableList::of);
     }
 
-    @Override public ImmutableList<Note> getNotes(User user) {
+    @Override public ImmutableList<Note> getNotes(final User user) {
         return ImmutableList.copyOf(getNotesInternal(user));
     }
 
-    @Override public boolean addNote(User user, String note) {
+    @Override public boolean addNote(final User user, final String note) {
         return addNote(user, new NoteData(Instant.now(), Util.getUUID(source), note));
     }
 
-    public boolean addNote(User user, NoteData note) {
+    public boolean addNote(final User user, final NoteData note) {
         Preconditions.checkNotNull(user);
         Preconditions.checkNotNull(note);
 
-        IUserDataObject udo = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(user.getUniqueId());
-        try (IKeyedDataObject.Value<List<NoteData>> v = udo.getAndSet(NoteKeys.NOTE_DATA)) {
-            List<NoteData> data = v.getValue().orElseGet(Lists::newArrayList);
+        final IUserDataObject udo = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(user.getUniqueId());
+        try (final IKeyedDataObject.Value<List<NoteData>> v = udo.getAndSet(NoteKeys.NOTE_DATA)) {
+            final List<NoteData> data = v.getValue().orElseGet(Lists::newArrayList);
             data.add(note);
             v.setValue(data);
         }
 
         // Create the note event.
-        CreateNoteEvent event = new CreateNoteEvent(
+        final CreateNoteEvent event = new CreateNoteEvent(
                 note.getNoterInternal(),
                 note.getNote(),
                 note.getDate(),
@@ -77,13 +77,13 @@ public class NoteHandler implements NucleusNoteService, ServiceBase {
     }
 
     @Override
-    public boolean removeNote(User user, Note note) {
-        Optional<IUserDataObject> udo = this.serviceCollection.storageManager().getUserService()
+    public boolean removeNote(final User user, final Note note) {
+        final Optional<IUserDataObject> udo = this.serviceCollection.storageManager().getUserService()
                 .getOnThread(user.getUniqueId());
         if (udo.isPresent()) {
-            boolean res;
-            try (IKeyedDataObject.Value<List<NoteData>> v = udo.get().getAndSet(NoteKeys.NOTE_DATA)) {
-                List<NoteData> data = v.getValue().orElseGet(Lists::newArrayList);
+            final boolean res;
+            try (final IKeyedDataObject.Value<List<NoteData>> v = udo.get().getAndSet(NoteKeys.NOTE_DATA)) {
+                final List<NoteData> data = v.getValue().orElseGet(Lists::newArrayList);
                 res = data.removeIf(x -> x.getNoterInternal().equals(note.getNoter().orElse(Util.CONSOLE_FAKE_UUID))
                         && x.getNote().equals(note.getNote()));
                 v.setValue(data);
@@ -97,8 +97,8 @@ public class NoteHandler implements NucleusNoteService, ServiceBase {
     }
 
     @Override
-    public boolean clearNotes(User user) {
-        Optional<IUserDataObject> udo = this.serviceCollection.storageManager().getUserService()
+    public boolean clearNotes(final User user) {
+        final Optional<IUserDataObject> udo = this.serviceCollection.storageManager().getUserService()
                 .getOnThread(user.getUniqueId());
         if (udo.isPresent()) {
             udo.get().remove(NoteKeys.NOTE_DATA);

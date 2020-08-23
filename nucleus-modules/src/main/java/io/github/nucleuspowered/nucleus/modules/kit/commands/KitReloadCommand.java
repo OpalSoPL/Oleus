@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import java.util.concurrent.CompletableFuture;
 
@@ -19,11 +19,11 @@ import java.util.concurrent.CompletableFuture;
         commandDescriptionKey = "kit.reload",
         parentCommand = KitCommand.class
 )
-public class KitReloadCommand implements ICommandExecutor<CommandSource> {
+public class KitReloadCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(final ICommandContext<? extends CommandSource> context) throws CommandException {
-        CompletableFuture<Void> res = context.getServiceCollection().storageManager().getKitsService().reload();
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final CompletableFuture<Void> res = context.getServiceCollection().storageManager().getKitsService().reload();
         res.whenComplete((v, e) -> {
             if (e == null) {
                 context.sendMessage("command.kit.reload.success");

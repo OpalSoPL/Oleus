@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = CommandLoggerModule.ID, name = "Command Logger")
 public class CommandLoggerModule extends ConfigurableModule<CommandLoggerConfig, CommandLoggerConfigAdapter> {
@@ -21,8 +21,8 @@ public class CommandLoggerModule extends ConfigurableModule<CommandLoggerConfig,
     public static final String ID = "command-logger";
 
     @Inject
-    public CommandLoggerModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public CommandLoggerModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

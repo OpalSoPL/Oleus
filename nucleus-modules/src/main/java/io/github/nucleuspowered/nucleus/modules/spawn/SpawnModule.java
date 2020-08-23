@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = SpawnModule.ID, name = "Spawn")
 public class SpawnModule extends ConfigurableModule<SpawnConfig, SpawnConfigAdapter> {
@@ -21,8 +21,8 @@ public class SpawnModule extends ConfigurableModule<SpawnConfig, SpawnConfigAdap
     public static final String ID = "spawn";
 
     @Inject
-    public SpawnModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public SpawnModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

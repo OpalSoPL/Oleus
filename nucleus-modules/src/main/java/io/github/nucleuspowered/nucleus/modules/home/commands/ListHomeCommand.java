@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
@@ -44,32 +44,32 @@ import java.util.stream.Collectors;
         async = true,
         associatedPermissions = HomePermissions.OTHERS_LIST_HOME
 )
-public class ListHomeCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class ListHomeCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean isOnlySameDimension = false;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(false, HomePermissions.OTHERS_LIST_HOME)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User user = context.getUserFromArgs();
-        Text header;
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.getUserFromArgs();
+        final TextComponent header;
 
-        boolean other = !context.is(user);
+        final boolean other = !context.is(user);
         if (other && (context.isConsoleAndBypass() || context.testPermissionFor(user, HomePermissions.HOME_OTHER_EXEMPT_TARGET))) {
             return context.errorResult("command.listhome.exempt");
         }
 
-        List<Home> msw = context.getServiceCollection().getServiceUnchecked(HomeService.class).getHomes(user);
+        final List<Home> msw = context.getServiceCollection().getServiceUnchecked(HomeService.class).getHomes(user);
         if (msw.isEmpty()) {
             return context.errorResult("command.home.nohomes");
         }
 
-        final CommandSource source = context.getCommandSource();
+        final CommandSource source = context.getCommandSourceRoot();
         final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         if (other) {
             header = messageProviderService.getMessageFor(source, "home.title.name", user.getName());
@@ -77,9 +77,9 @@ public class ListHomeCommand implements ICommandExecutor<CommandSource>, IReload
             header = messageProviderService.getMessageFor(source, "home.title.normal");
         }
 
-        IPermissionService permissionService = context.getServiceCollection().permissionService();
-        List<Text> lt = msw.stream().sorted(Comparator.comparing(NamedLocation::getName)).map(x -> {
-            Optional<Location<World>> olw = x.getLocation();
+        final IPermissionService permissionService = context.getServiceCollection().permissionService();
+        final List<Text> lt = msw.stream().sorted(Comparator.comparing(NamedLocation::getName)).map(x -> {
+            final Optional<Location<World>> olw = x.getLocation();
             if (!olw.isPresent()) {
                 return Text.builder().append(
                                 Text.builder(x.getName()).color(TextColors.RED)
@@ -89,7 +89,7 @@ public class ListHomeCommand implements ICommandExecutor<CommandSource>, IReload
                         .build();
             } else {
                 final Location<World> lw = olw.get();
-                final Text textMessage = messageProviderService.getMessageFor(source, "home.location",
+                final TextComponent textMessage = messageProviderService.getMessageFor(source, "home.location",
                                                  lw.getExtent().getName(), lw.getBlockX(), lw.getBlockY(), lw.getBlockZ());
 
                 if (this.isOnlySameDimension && source instanceof Player && !other) {
@@ -120,7 +120,7 @@ public class ListHomeCommand implements ICommandExecutor<CommandSource>, IReload
             }
         }).collect(Collectors.toList());
 
-        PaginationList.Builder pb =
+        final PaginationList.Builder pb =
             Util.getPaginationBuilder(source).title(Text.of(TextColors.YELLOW, header)).padding(Text.of(TextColors.GREEN, "-")).contents(lt);
 
         pb.sendTo(source);
@@ -128,8 +128,8 @@ public class ListHomeCommand implements ICommandExecutor<CommandSource>, IReload
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        HomeConfig hc = serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final HomeConfig hc = serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class);
         this.isOnlySameDimension = hc.isOnlySameDimension();
     }
 }

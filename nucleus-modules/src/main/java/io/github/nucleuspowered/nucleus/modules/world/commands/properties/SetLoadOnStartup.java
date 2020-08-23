@@ -21,7 +21,7 @@ public class SetLoadOnStartup extends AbstractPropertiesSetCommand {
         super("load on startup");
     }
 
-    @Override protected void setter(WorldProperties worldProperties, boolean set) {
+    @Override protected void setter(final WorldProperties worldProperties, final boolean set) {
         worldProperties.setLoadOnStartup(set);
     }
 }

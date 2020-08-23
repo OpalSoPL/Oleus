@@ -16,18 +16,18 @@ import org.spongepowered.api.event.filter.cause.Root;
 
 import java.util.List;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class AFKCommandListener extends AbstractAFKListener implements ListenerBase.Conditional {
     private final List<String> commands = Lists.newArrayList("afk", "away");
 
     @Inject
-    public AFKCommandListener(INucleusServiceCollection serviceCollection) {
+    public AFKCommandListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection.getServiceUnchecked(AFKHandler.class));
     }
 
     @Listener
-    public void onPlayerCommand(final SendCommandEvent event, @Root Player player) {
+    public void onPlayerCommand(final SendCommandEvent event, @Root final Player player) {
         // Did the subject run /afk? Then don't do anything, we'll toggle it
         // anyway.
         if (!this.commands.contains(event.getCommand().toLowerCase())) {
@@ -36,7 +36,7 @@ public class AFKCommandListener extends AbstractAFKListener implements ListenerB
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
                 .getTriggers()
                 .isOnCommand();

@@ -19,36 +19,36 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
     int maxheight = 255;
     final Set<BiomeType> prohibitedBiomes = new HashSet<>();
 
-    @Override public NucleusRTPService.RTPOptions.Builder setMaxRadius(int max) {
+    @Override public NucleusRTPService.RTPOptions.Builder setMaxRadius(final int max) {
         Preconditions.checkArgument(max > 0, "Max must be positive");
         this.max = max;
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder setMinRadius(int min) {
+    @Override public NucleusRTPService.RTPOptions.Builder setMinRadius(final int min) {
         Preconditions.checkArgument(min >= 0, "Min cannot be negative");
         this.min = min;
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder setMinHeight(int min) throws IllegalArgumentException {
+    @Override public NucleusRTPService.RTPOptions.Builder setMinHeight(final int min) throws IllegalArgumentException {
         Preconditions.checkArgument(min >= 0, "Min must be non-negative");
         this.minheight = min;
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder setMaxHeight(int max) throws IllegalArgumentException {
+    @Override public NucleusRTPService.RTPOptions.Builder setMaxHeight(final int max) throws IllegalArgumentException {
         Preconditions.checkArgument(min <= 255, "Max must be less than 255");
         this.maxheight = max;
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder prohibitedBiome(BiomeType biomeType) {
+    @Override public NucleusRTPService.RTPOptions.Builder prohibitedBiome(final BiomeType biomeType) {
         this.prohibitedBiomes.add(Preconditions.checkNotNull(biomeType));
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder from(NucleusRTPService.RTPOptions options) {
+    @Override public NucleusRTPService.RTPOptions.Builder from(final NucleusRTPService.RTPOptions options) {
         return setMinRadius(options.minRadius())
                 .setMaxRadius(options.maxRadius())
                 .setMaxHeight(options.maxHeight())

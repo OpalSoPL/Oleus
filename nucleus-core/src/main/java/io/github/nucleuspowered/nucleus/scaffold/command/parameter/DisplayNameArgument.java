@@ -54,7 +54,7 @@ public class DisplayNameArgument extends CommandElement {
     private final IMessageProviderService messageProviderService;
     // @Nullable private final NicknameService nicknameService;
 
-    public DisplayNameArgument(@Nullable final Text key, final Target target, final INucleusServiceCollection serviceCollection) {
+    public DisplayNameArgument(@Nullable final TextComponent key, final Target target, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.target = target;
         if (!init) {

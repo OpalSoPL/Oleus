@@ -17,12 +17,12 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @Command(
         aliases = {"unjail"},
@@ -31,26 +31,26 @@ import javax.inject.Inject;
         associatedPermissionLevelKeys = JailPermissions.JAIL_LEVEL_KEY
 )
 @EssentialsEquivalent(value = "unjail", isExact = false, notes = "Not a toggle.")
-public class UnjailCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class UnjailCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final JailHandler handler;
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
 
     @Inject
-    public UnjailCommand(INucleusServiceCollection serviceCollection) {
+    public UnjailCommand(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection)
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
                         JailPermissions.JAIL_LEVEL_KEY,
@@ -60,8 +60,8 @@ public class UnjailCommand implements ICommandExecutor<CommandSource>, IReloadab
             return context.errorResult("command.modifiers.level.insufficient", user.getName());
         }
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
             if (this.handler.unjailPlayer(user)) {
                 context.sendMessage("command.jail.unjail.success", user.getName());
                 return context.successResult();
@@ -71,7 +71,7 @@ public class UnjailCommand implements ICommandExecutor<CommandSource>, IReloadab
         }
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).getCommonPermissionLevelConfig();
     }
 }

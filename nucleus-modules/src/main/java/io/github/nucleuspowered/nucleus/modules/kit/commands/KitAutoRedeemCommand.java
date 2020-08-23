@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 /**
@@ -29,21 +29,21 @@ import org.spongepowered.api.command.args.CommandElement;
         parentCommand = KitCommand.class,
         async = true
 )
-public class KitAutoRedeemCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class KitAutoRedeemCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean autoRedeemEnabled = false;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(true),
                 NucleusParameters.ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        boolean b = context.requireOne(NucleusParameters.Keys.BOOL, Boolean.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+        final boolean b = context.requireOne(NucleusParameters.Keys.BOOL, Boolean.class);
 
         // This Kit is a reference back to the version in list, so we don't need
         // to update it explicitly
@@ -58,7 +58,7 @@ public class KitAutoRedeemCommand implements ICommandExecutor<CommandSource>, IR
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.autoRedeemEnabled = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class).isEnableAutoredeem();
     }
 }

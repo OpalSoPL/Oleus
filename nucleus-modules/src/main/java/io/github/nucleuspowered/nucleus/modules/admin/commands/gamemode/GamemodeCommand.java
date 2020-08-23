@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.ImprovedGameModeArgument;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.NoneThrowOnCompleteArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -44,7 +44,7 @@ public class GamemodeCommand extends GamemodeBase<CommandSource> {
     private final String gamemodeself = "gamemode_self";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.firstParsing(
                         GenericArguments.requiringPermission(
@@ -58,9 +58,9 @@ public class GamemodeCommand extends GamemodeBase<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player user;
-        Optional<GameMode> ogm;
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player user;
+        final Optional<GameMode> ogm;
         if (context.hasAny(this.gamemodeself)) {
             user = context.getIfPlayer();
             ogm = context.getOne(this.gamemodeself, GameMode.class);
@@ -70,7 +70,7 @@ public class GamemodeCommand extends GamemodeBase<CommandSource> {
         }
 
         if (!ogm.isPresent()) {
-            String mode = user.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL).getName();
+            final String mode = user.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL).getName();
             if (context.is(user)) {
                 context.sendMessage("command.gamemode.get.base", mode);
             } else {
@@ -80,7 +80,7 @@ public class GamemodeCommand extends GamemodeBase<CommandSource> {
             return context.successResult();
         }
 
-        GameMode gm = ogm.get();
+        final GameMode gm = ogm.get();
         return baseCommand(context, user, gm);
     }
 }

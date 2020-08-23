@@ -38,7 +38,7 @@ public class NucleusTextTemplateFactoryImpl implements INucleusTextTemplateFacto
         return new NucleusTextTemplateImpl.Ampersand(string, this.serviceCollection);
     }
 
-    @Override public NucleusTextTemplateImpl createFromAmpersandString(final String string, final Text prefix, final Text suffix) {
+    @Override public NucleusTextTemplateImpl createFromAmpersandString(final String string, final TextComponent prefix, final TextComponent suffix) {
         return new NucleusTextTemplateImpl.Ampersand(string, prefix, suffix, this.serviceCollection);
     }
 

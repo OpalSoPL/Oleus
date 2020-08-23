@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class CommandSpyListener implements IReloadableService.Reloadable, ListenerBase.Conditional {
 
@@ -41,28 +41,28 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
     private boolean listIsEmpty = true;
 
     @Inject
-    public CommandSpyListener(INucleusServiceCollection serviceCollection) {
+    public CommandSpyListener(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
         this.userPreferenceService = serviceCollection.userPreferenceService();
         this.textStyleService = serviceCollection.textStyleService();
     }
 
     @Listener(order = Order.LAST)
-    public void onCommand(SendCommandEvent event, @Root Player player) {
+    public void onCommand(final SendCommandEvent event, @Root final Player player) {
 
         if (!this.permissionService.hasPermission(player, CommandSpyPermissions.COMMANDSPY_EXEMPT_TARGET)) {
             boolean isInList = false;
             if (!this.listIsEmpty) {
-                String command = event.getCommand().toLowerCase();
-                Set<String> cmd = CommandNameCache.INSTANCE.getFromCommandAndSource(command, player);
+                final String command = event.getCommand().toLowerCase();
+                final Set<String> cmd = CommandNameCache.INSTANCE.getFromCommandAndSource(command, player);
                 cmd.retainAll(this.toSpy);
                 isInList = !cmd.isEmpty();
             }
 
             // If the command is in the list, report it.
             if (isInList == this.config.isUseWhitelist()) {
-                UUID currentUUID = player.getUniqueId();
-                List<Player> playerList = Sponge.getServer().getOnlinePlayers()
+                final UUID currentUUID = player.getUniqueId();
+                final List<Player> playerList = Sponge.getServer().getOnlinePlayers()
                     .stream()
                     .filter(x -> !x.getUniqueId().equals(currentUUID))
                     .filter(x -> this.permissionService.hasPermission(x, CommandSpyPermissions.BASE_COMMANDSPY))
@@ -70,9 +70,9 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
                     .collect(Collectors.toList());
 
                 if (!playerList.isEmpty()) {
-                    Text prefix = this.config.getTemplate().getForSource(player);
-                    ITextStyleService.TextFormat st = this.textStyleService.getLastColourAndStyle(prefix, null);
-                    Text messageToSend = prefix
+                    final TextComponent prefix = this.config.getTemplate().getForSource(player);
+                    final ITextStyleService.TextFormat st = this.textStyleService.getLastColourAndStyle(prefix, null);
+                    final TextComponent messageToSend = prefix
                             .toBuilder()
                             .append(Text.of(st.colour(), st.style(), "/", event.getCommand(), Util.SPACE, event.getArguments())).build();
                     playerList.forEach(x -> x.sendMessage(messageToSend));
@@ -82,14 +82,14 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(CommandSpyConfig.class);
         this.listIsEmpty = this.config.getCommands().isEmpty();
         this.toSpy = this.config.getCommands().stream().map(String::toLowerCase).collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return !this.config.isUseWhitelist() || !this.listIsEmpty;
     }
 }

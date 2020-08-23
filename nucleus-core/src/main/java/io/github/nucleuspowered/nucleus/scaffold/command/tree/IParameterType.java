@@ -12,8 +12,8 @@ import java.util.List;
 public interface IParameterType<R> {
 
     @Nullable
-    R parse(IArgumentReader reader, ICommandContext<?> context);
+    R parse(IArgumentReader reader, ICommandContext context);
 
-    List<String> complete(IArgumentReader reader, ICommandContext<?> context);
+    List<String> complete(IArgumentReader reader, ICommandContext context);
 
 }

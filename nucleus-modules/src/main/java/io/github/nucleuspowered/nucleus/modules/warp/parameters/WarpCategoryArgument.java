@@ -27,20 +27,20 @@ public class WarpCategoryArgument extends CommandElement {
     private final WarpService handler;
     private final IMessageProviderService messageProvider;
 
-    public WarpCategoryArgument(@Nullable Text key, INucleusServiceCollection serviceCollection, WarpService handler) {
+    public WarpCategoryArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection, final WarpService handler) {
         super(key);
         this.handler = handler;
         this.messageProvider = serviceCollection.messageProvider();
     }
 
-    @Nullable @Override protected Object parseValue(@Nonnull CommandSource source, @Nonnull CommandArgs args) throws ArgumentParseException {
-        String arg = args.next();
+    @Nullable @Override protected Object parseValue(@Nonnull final CommandSource source, @Nonnull final CommandArgs args) throws ArgumentParseException {
+        final String arg = args.next();
         return this.handler.getWarpsWithCategories().keySet().stream().filter(Objects::nonNull).filter(x -> x.getId().equals(arg)).findFirst()
                 .orElseThrow(() -> args.createError(
                     messageProvider.getMessageFor(source, "args.warpcategory.noexist", arg)));
     }
 
-    @Nonnull @Override public List<String> complete(@Nonnull CommandSource src, @Nonnull CommandArgs args, @Nonnull CommandContext context) {
+    @Nonnull @Override public List<String> complete(@Nonnull final CommandSource src, @Nonnull final CommandArgs args, @Nonnull final CommandContext context) {
         return this.handler.getWarpsWithCategories().keySet().stream().filter(Objects::nonNull).map(WarpCategory::getId).collect(Collectors.toList());
     }
 }

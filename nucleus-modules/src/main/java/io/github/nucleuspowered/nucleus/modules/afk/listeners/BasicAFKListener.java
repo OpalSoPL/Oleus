@@ -12,17 +12,17 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class BasicAFKListener extends AbstractAFKListener {
 
     @Inject
-    public BasicAFKListener(INucleusServiceCollection serviceCollection) {
+    public BasicAFKListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection.getServiceUnchecked(AFKHandler.class));
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
         update(player);
     }
 

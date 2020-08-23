@@ -16,7 +16,7 @@ public class InternalNucleusHelpOpEvent extends AbstractEvent implements Cancell
     private final Cause cause;
     private boolean isCancelled = false;
 
-    public InternalNucleusHelpOpEvent(CommandSource from, String message) {
+    public InternalNucleusHelpOpEvent(final CommandSource from, final String message) {
         this.cause = CauseStackHelper.createCause(from);
         this.message = message;
     }
@@ -32,7 +32,7 @@ public class InternalNucleusHelpOpEvent extends AbstractEvent implements Cancell
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.isCancelled = cancel;
     }
 

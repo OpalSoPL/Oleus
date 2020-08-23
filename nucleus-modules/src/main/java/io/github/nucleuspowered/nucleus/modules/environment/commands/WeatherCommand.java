@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -43,33 +43,33 @@ import java.util.Optional;
         },
         associatedPermissions = EnvironmentPermissions.WEATHER_EXEMPT_LENGTH
 )
-public class WeatherCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class WeatherCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final String weather = "weather";
 
     private long max = Long.MAX_VALUE;
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.max = serviceCollection.moduleDataProvider().getModuleConfig(EnvironmentConfig.class).getMaximumWeatherTimespan();
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[]{
-                NucleusParameters.OPTIONAL_WEAK_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection),
+                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection),
                 GenericArguments.onlyOne(new WeatherArgument(Text.of(this.weather), serviceCollection)), // More flexible with the arguments we can use.
                 NucleusParameters.OPTIONAL_DURATION.get(serviceCollection)
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         // We can predict the weather on multiple worlds now!
-        WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
                 .orElseGet(
                         () -> Sponge.getServer().getDefaultWorld().get()
                 );
-        World w = Sponge.getServer().getWorld(wp.getUniqueId())
+        final World w = Sponge.getServer().getWorld(wp.getUniqueId())
             .orElseThrow(() -> context.createException("args.worldproperties.notloaded", wp.getWorldName()));
 
         // Get whether we locked the weather.
@@ -80,10 +80,10 @@ public class WeatherCommand implements ICommandExecutor<CommandSource>, IReloada
         }
 
         // Houston, we have a world! Now, what was the forecast?
-        Weather we = context.requireOne(this.weather, Weather.class);
+        final Weather we = context.requireOne(this.weather, Weather.class);
 
         // Have we gotten an accurate forecast? Do we know how long this weather spell will go on for?
-        Optional<Long> oi = context.getOne(NucleusParameters.Keys.DURATION, Long.class);
+        final Optional<Long> oi = context.getOne(NucleusParameters.Keys.DURATION, Long.class);
 
         // Even weather masters have their limits. Sometimes.
         if (this.max > 0 && oi.orElse(Long.MAX_VALUE) > this.max && !context.testPermission(EnvironmentPermissions.WEATHER_EXEMPT_LENGTH)) {

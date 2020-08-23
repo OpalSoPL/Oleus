@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -28,10 +28,10 @@ import java.util.Optional;
         basePermission = ExperiencePermissions.BASE_EXP_GIVE,
         commandDescriptionKey = "exp.give"
 )
-public class GiveExperience implements ICommandExecutor<CommandSource> {
+public class GiveExperience implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_ONE_PLAYER.get(serviceCollection),
                 GenericArguments.firstParsing(
@@ -41,16 +41,16 @@ public class GiveExperience implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
-        Optional<ICommandResult> res = ExperienceCommand.checkGameMode(context, pl);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
+        final Optional<ICommandResult> res = ExperienceCommand.checkGameMode(context, pl);
         if (res.isPresent()) {
             return res.get();
         }
 
-        int extra;
+        final int extra;
         if (context.hasAny(ExperienceCommand.levelKey)) {
-            int lvl = pl.get(Keys.EXPERIENCE_LEVEL).orElse(0) + context.requireOne(ExperienceCommand.levelKey, int.class);
+            final int lvl = pl.get(Keys.EXPERIENCE_LEVEL).orElse(0) + context.requireOne(ExperienceCommand.levelKey, int.class);
             extra = pl.get(Keys.EXPERIENCE_SINCE_LEVEL).orElse(0);
 
             // Offer level, then we offer the extra experience.

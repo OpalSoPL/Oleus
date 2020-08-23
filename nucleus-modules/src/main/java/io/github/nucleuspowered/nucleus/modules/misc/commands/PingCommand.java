@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
@@ -22,17 +22,17 @@ import org.spongepowered.api.entity.living.player.Player;
         commandDescriptionKey = "ping",
         associatedPermissions = MiscPermissions.OTHERS_PING
 )
-public class PingCommand implements ICommandExecutor<CommandSource> { // extends AbstractCommand.SimpleTargetOtherPlayer {
+public class PingCommand implements ICommandExecutor { // extends AbstractCommand.SimpleTargetOtherPlayer {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier()
                         .createOnlyOtherUserPermissionElement(true, MiscPermissions.OTHERS_PING)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player player = context.getPlayerFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player player = context.getPlayerFromArgs();
         if (context.is(player)) {
             context.sendMessage("command.ping.current.self", player.getConnection().getLatency());
         } else {

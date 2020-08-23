@@ -23,7 +23,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerInformationSe
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
 import io.github.nucleuspowered.nucleus.util.TriFunction;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -71,13 +71,13 @@ import javax.annotation.Nullable;
             PlayerInfoPermissions.SEEN_EXTENDEDPERMS_GAMEMODE
         }
 )
-public class SeenCommand implements ICommandExecutor<CommandSource> {
+public class SeenCommand implements ICommandExecutor {
 
     private static final NumberFormat NUMBER_FORMATTER = new DecimalFormat("0.00");
 
     // keeps order!
-    private final ImmutableMap<String, TriFunction<ICommandContext<? extends CommandSource>, User, IUserDataObject, Text>> entries
-            = ImmutableMap.<String, TriFunction<ICommandContext<? extends CommandSource>, User, IUserDataObject, Text>>builder()
+    private final ImmutableMap<String, TriFunction<ICommandContext, User, IUserDataObject, Text>> entries
+            = ImmutableMap.<String, TriFunction<ICommandContext, User, IUserDataObject, Text>>builder()
                     .put(PlayerInfoPermissions.SEEN_EXTENDEDPERMS_UUID, this::getUUID)
                     .put(PlayerInfoPermissions.SEEN_EXTENDEDPERMS_IP, this::getIP)
                     .put(PlayerInfoPermissions.SEEN_EXTENDEDPERMS_FIRSTPLAYED, this::getFirstPlayed)
@@ -91,13 +91,13 @@ public class SeenCommand implements ICommandExecutor<CommandSource> {
                     .build();
 
     @Nullable
-    private Text getUUID(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getUUID(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         return context.getMessage("command.seen.uuid", user.getUniqueId());
     }
 
     @Nullable
-    private Text getIP(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
-        @Nullable Tuple<Text, String> res = user.getPlayer()
+    private TextComponent getIP(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
+        @Nullable final Tuple<Text, String> res = user.getPlayer()
                     .map(pl -> Tuple.of(
                             context.getMessage("command.seen.ipaddress",
                                     pl.getConnection().getAddress().getAddress().toString()),
@@ -121,7 +121,7 @@ public class SeenCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Nullable
-    private Text getFirstPlayed(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getFirstPlayed(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         Optional<Instant> i = user.get(Keys.FIRST_DATE_PLAYED);
         if (!i.isPresent()) {
             i = userDataModule.get(CoreKeys.FIRST_JOIN);
@@ -129,65 +129,65 @@ public class SeenCommand implements ICommandExecutor<CommandSource> {
 
         return i.map(x -> context.getMessage("command.seen.firstplayed",
                 DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-                        .withLocale(context.getCommandSourceUnchecked().getLocale())
+                        .withLocale(context.getCommandSourceRoot().getLocale())
                         .withZone(ZoneId.systemDefault()).format(x))).orElse(null);
     }
 
     @Nullable
-    private Text getLastPlayed(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getLastPlayed(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         if (user.isOnline()) {
             return null;
         }
 
         return user.get(Keys.LAST_DATE_PLAYED).map(x -> context.getMessage("command.seen.lastplayed",
                 DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-                        .withLocale(context.getCommandSourceUnchecked().getLocale())
+                        .withLocale(context.getCommandSourceRoot().getLocale())
                         .withZone(ZoneId.systemDefault()).format(x))).orElse(null);
     }
 
     @Nullable
-    private Text getLocation(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getLocation(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         if (user.isOnline()) {
             return getLocationString("command.seen.currentlocation", user.getPlayer().get().getLocation(), context);
         }
 
-        Optional<WorldProperties> wp = user.getWorldUniqueId().flatMap(x -> Sponge.getServer().getWorldProperties(x));
+        final Optional<WorldProperties> wp = user.getWorldUniqueId().flatMap(x -> Sponge.getServer().getWorldProperties(x));
         return wp.map(worldProperties ->
                     getLocationString("command.seen.lastlocation", worldProperties, user.getPosition(), context))
                 .orElseGet(() -> context.getMessage("standard.unknown"));
     }
 
     @Nullable
-    private Text getWalkingSpeed(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getWalkingSpeed(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         return user.get(Keys.WALKING_SPEED)
                 .map(x -> context.getMessage("command.seen.speed.walk", NUMBER_FORMATTER.format(x * SpeedCommand.multiplier)))
                 .orElse(null);
     }
 
     @Nullable
-    private Text getFlyingSpeed(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getFlyingSpeed(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         return user.get(Keys.FLYING_SPEED)
                 .map(x -> context.getMessage("command.seen.speed.fly", NUMBER_FORMATTER.format(x * SpeedCommand.multiplier)))
                 .orElse(null);
     }
 
     @Nullable
-    private Text getCanFly(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getCanFly(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         return context.getMessage("command.seen.canfly", getYesNo(user.get(Keys.CAN_FLY).orElse(false), context));
     }
 
     @Nullable
-    private Text getIsFlying(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getIsFlying(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         return context.getMessage("command.seen.isflying", getYesNo(user.get(Keys.IS_FLYING).orElse(false), context));
     }
 
     @Nullable
-    private Text getGameMode(ICommandContext<? extends CommandSource> context, User user, IUserDataObject userDataModule) {
+    private TextComponent getGameMode(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         return user.get(Keys.GAME_MODE).map(x -> context.getMessage("command.seen.gamemode", x.getName())).orElse(null);
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.firstParsing(
                 NucleusParameters.ONE_USER_UUID.get(serviceCollection),
@@ -196,36 +196,36 @@ public class SeenCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         User user = context.getOne(NucleusParameters.Keys.USER_UUID, User.class)
                 .orElseGet(() -> context.requireOne(NucleusParameters.Keys.USER, User.class));
         // Get the player in case the User is displaying the wrong name.
         user = user.getPlayer().map(x -> (User) x).orElse(user);
-        IUserDataObject userDataObject = context.getServiceCollection()
+        final IUserDataObject userDataObject = context.getServiceCollection()
                 .storageManager()
                 .getUserService()
                 .getOrNewOnThread(user.getUniqueId());
 
-        List<Text> messages = new ArrayList<>();
+        final List<Text> messages = new ArrayList<>();
 
         // Everyone gets the last online time.
-        IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
-        if (playerOnlineService.isOnline(context.getCommandSource(), user)) {
+        final IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
+        if (playerOnlineService.isOnline(context.getCommandSourceRoot(), user)) {
             messages.add(context.getMessage("command.seen.iscurrently.online", user.getName()));
             userDataObject.get(CoreKeys.LAST_LOGIN).ifPresent(x -> messages.add(
                     context.getMessage("command.seen.loggedon", context.getTimeString(Duration.between(x, Instant.now())))));
         } else {
             messages.add(context.getMessage("command.seen.iscurrently.offline", user.getName()));
-            playerOnlineService.lastSeen(context.getCommandSource(), user).ifPresent(x -> messages.add(
+            playerOnlineService.lastSeen(context.getCommandSourceRoot(), user).ifPresent(x -> messages.add(
                     context.getMessage("command.seen.loggedoff", context.getTimeString(Duration.between(Instant.now(), x)))));
         }
 
         messages.add(context.getMessage("command.seen.displayname", context.getDisplayName(user.getUniqueId())));
 
         messages.add(Util.SPACE);
-        for (Map.Entry<String, TriFunction<ICommandContext<? extends CommandSource>, User, IUserDataObject, Text>> entry : this.entries.entrySet()) {
+        for (final Map.Entry<String, TriFunction<ICommandContext, User, IUserDataObject, Text>> entry : this.entries.entrySet()) {
             if (context.testPermission(entry.getKey())) {
-                @Nullable Text m = entry.getValue().accept(context, user, userDataObject);
+                @Nullable final TextComponent m = entry.getValue().accept(context, user, userDataObject);
                 if (m != null) {
                     messages.add(m);
                 }
@@ -234,30 +234,30 @@ public class SeenCommand implements ICommandExecutor<CommandSource> {
 
         // Add the extra module information.
         // TODO: Ordering
-        IPlayerInformationService playerInformationService = context.getServiceCollection().playerInformationService();
-        for (IPlayerInformationService.Provider provider : playerInformationService.getProviders()) {
-            provider.get(user, context.getCommandSource(), context.getServiceCollection()).ifPresent(messages::add);
+        final IPlayerInformationService playerInformationService = context.getServiceCollection().playerInformationService();
+        for (final IPlayerInformationService.Provider provider : playerInformationService.getProviders()) {
+            provider.get(user, context.getCommandSourceRoot(), context.getServiceCollection()).ifPresent(messages::add);
         }
 
         messages.addAll(context.getServiceCollection().getServiceUnchecked(SeenHandler.class)
-                .getText(context.getCommandSource(), user));
+                .getText(context.getCommandSourceRoot(), user));
 
-        Util.getPaginationBuilder(context.getCommandSource())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
                 .contents(messages)
                 .padding(Text.of(TextColors.GREEN, "-"))
-                .title(context.getMessage("command.seen.title", user.getName())).sendTo(context.getCommandSource());
+                .title(context.getMessage("command.seen.title", user.getName())).sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 
-    private Text getLocationString(String key, Location<World> lw, ICommandContext<? extends CommandSource> source) {
+    private TextComponent getLocationString(final String key, final Location<World> lw, final ICommandContext source) {
         return getLocationString(key, lw.getExtent().getProperties(), lw.getPosition(), source);
     }
 
-    private Text getLocationString(String key, WorldProperties worldProperties, Vector3d position, ICommandContext<? extends CommandSource> context) {
-        Text text = context.getMessage(key, context.getMessage("command.seen.locationtemplate", worldProperties.getWorldName(),
+    private TextComponent getLocationString(final String key, final WorldProperties worldProperties, final Vector3d position, final ICommandContext context) {
+        final TextComponent text = context.getMessage(key, context.getMessage("command.seen.locationtemplate", worldProperties.getWorldName(),
                 position.toInt().toString()));
         if (Sponge.getCommandManager().get("nucleus:tppos")
-                .map(x -> x.getCallable().testPermission(context.getCommandSourceUnchecked()))
+                .map(x -> x.getCallable().testPermission(context.getCommandSourceRoot()))
                 .orElse(false)) {
 
             final Text.Builder building = text.toBuilder().onHover(TextActions.showText(
@@ -278,7 +278,7 @@ public class SeenCommand implements ICommandExecutor<CommandSource> {
         return text;
     }
 
-    private String getYesNo(@Nullable Boolean bool, ICommandContext<? extends CommandSource> context) {
+    private String getYesNo(@Nullable Boolean bool, final ICommandContext context) {
         if (bool == null) {
             bool = false;
         }

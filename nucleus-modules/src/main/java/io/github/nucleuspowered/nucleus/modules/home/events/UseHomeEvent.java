@@ -13,7 +13,7 @@ public class UseHomeEvent extends AbstractHomeEvent implements NucleusHomeEvent.
     private final User targetUser;
     private final Home home;
 
-    public UseHomeEvent(Cause cause, User targetUser, Home home) {
+    public UseHomeEvent(final Cause cause, final User targetUser, final Home home) {
         super(home.getName(), home.getUser(), cause, home.getLocation().orElse(null));
         this.targetUser = targetUser;
         this.home = home;

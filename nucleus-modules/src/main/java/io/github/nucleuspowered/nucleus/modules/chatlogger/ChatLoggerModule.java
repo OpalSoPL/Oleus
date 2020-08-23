@@ -15,7 +15,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = ID, name = "Chat Logger")
 public class ChatLoggerModule extends ConfigurableModule<ChatLoggingConfig, ChatLoggingConfigAdapter> {
@@ -23,8 +23,8 @@ public class ChatLoggerModule extends ConfigurableModule<ChatLoggingConfig, Chat
     public static final String ID = "chat-logger";
 
     @Inject
-    public ChatLoggerModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public ChatLoggerModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

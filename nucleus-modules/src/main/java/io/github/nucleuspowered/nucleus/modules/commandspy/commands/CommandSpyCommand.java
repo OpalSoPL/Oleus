@@ -13,9 +13,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import java.util.UUID;
 
@@ -24,18 +23,18 @@ import java.util.UUID;
         basePermission = CommandSpyPermissions.BASE_COMMANDSPY,
         commandDescriptionKey = "commandspy"
 )
-public class CommandSpyCommand implements ICommandExecutor<Player> {
+public class CommandSpyCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        IUserPreferenceService userPreferenceService = context.getServiceCollection().userPreferenceService();
-        UUID uuid = context.getUniqueId().orElseThrow(() -> new CommandException(Text.of("No UUID was found")));
-        boolean to =
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final IUserPreferenceService userPreferenceService = context.getServiceCollection().userPreferenceService();
+        final UUID uuid = context.getUniqueId().orElseThrow(() -> new CommandException(Text.of("No UUID was found")));
+        final boolean to =
                 context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
                     .orElseGet(() -> !userPreferenceService.getUnwrapped(
                             uuid,

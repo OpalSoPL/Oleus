@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.Transform;
@@ -39,12 +39,12 @@ import java.util.Optional;
             @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = BackPermissions.EXEMPT_COST_BACK)
         },
         associatedPermissions = { BackPermissions.TPPOS_BORDER, BackPermissions.BACK_EXEMPT_SAMEDIMENSION })
-public class BackCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class BackCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean sameDimensionCheck = false;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags()
                     .permissionFlag(BackPermissions.TPPOS_BORDER,"b", "-border")
@@ -54,25 +54,25 @@ public class BackCommand implements ICommandExecutor<Player>, IReloadableService
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        BackHandler handler = context.getServiceCollection().getServiceUnchecked(BackHandler.class);
-        Player src = context.getIfPlayer();
-        Optional<Transform<World>> ol = handler.getLastLocation(src);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final BackHandler handler = context.getServiceCollection().getServiceUnchecked(BackHandler.class);
+        final Player src = context.getIfPlayer();
+        final Optional<Transform<World>> ol = handler.getLastLocation(src);
         if (!ol.isPresent()) {
             return context.errorResult("command.back.noloc");
         }
 
-        boolean border = context.hasAny("b");
-        Transform<World> loc = ol.get();
+        final boolean border = context.hasAny("b");
+        final Transform<World> loc = ol.get();
         if (this.sameDimensionCheck && src.getWorld().getUniqueId() != loc.getExtent().getUniqueId()) {
             if (!context.testPermission(BackPermissions.BACK_EXEMPT_SAMEDIMENSION)) {
                 return context.errorResult("command.back.sameworld");
             }
         }
 
-        INucleusTeleportService service = context.getServiceCollection().teleportService();
-        try (INucleusTeleportService.BorderDisableSession ac = service.temporarilyDisableBorder(border, loc.getExtent())) {
-            TeleportResult result = service.teleportPlayerSmart(
+        final INucleusTeleportService service = context.getServiceCollection().teleportService();
+        try (final INucleusTeleportService.BorderDisableSession ac = service.temporarilyDisableBorder(border, loc.getExtent())) {
+            final TeleportResult result = service.teleportPlayerSmart(
                             src,
                             loc,
                             false,
@@ -91,7 +91,7 @@ public class BackCommand implements ICommandExecutor<Player>, IReloadableService
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.sameDimensionCheck = serviceCollection.moduleDataProvider().getModuleConfig(BackConfig.class).isOnlySameDimension();
     }
 }

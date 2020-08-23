@@ -13,9 +13,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.UserPreferenceService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.living.player.Player;
+
 import java.util.UUID;
 
 @Command(
@@ -26,19 +26,19 @@ import java.util.UUID;
                 MessagePermissions.MSGTOGGLE_BYPASS
         }
 )
-public class MsgToggleCommand implements ICommandExecutor<Player> {
+public class MsgToggleCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        UserPreferenceService userPreferenceService = context.getServiceCollection().getServiceUnchecked(UserPreferenceService.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final UserPreferenceService userPreferenceService = context.getServiceCollection().getServiceUnchecked(UserPreferenceService.class);
         final UUID player = context.getIfPlayer().getUniqueId();
-        boolean flip = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
+        final boolean flip = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
                 .orElseGet(() -> userPreferenceService.getUnwrapped(player, NucleusKeysProvider.RECEIVING_MESSAGES));
 
         userPreferenceService.set(player, NucleusKeysProvider.RECEIVING_MESSAGES, flip);

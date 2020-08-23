@@ -6,13 +6,13 @@ package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.services.impl.textstyle.TextStyleService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyle;
-import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.Collection;
 import java.util.List;
@@ -28,22 +28,28 @@ import javax.annotation.Nullable;
 public interface ITextStyleService {
 
     TextFormat EMPTY = new TextFormat() {
-        @Override public TextColor colour() {
-            return TextColors.NONE;
+        @Override public Optional<TextColor> colour() {
+            return Optional.empty();
         }
 
-        @Override public TextStyle style() {
-            return TextStyles.NONE;
+        @Override public Style style() {
+            return Style.empty();
         }
 
-        @Override public Text textOf() {
-            return Text.of();
+        @Override public TextComponent textOf() {
+            return TextComponent.empty();
+        }
+
+        @Override public TextComponent.Builder apply(final Component component) {
+            return TextComponent.builder().append(component);
         }
     };
 
+    List<String> getPermissionsFor(String prefix, Style colour);
+
     Optional<String> getPermissionFor(String prefix, TextColor colour);
 
-    List<String> getPermissionsFor(String prefix, TextStyle colour);
+    List<String> getPermissionsFor(String prefix, TextDecoration style);
 
     /**
      * Removes formating codes based on permission.
@@ -58,40 +64,41 @@ public interface ITextStyleService {
     String stripPermissionless(String permissionPrefixColour, String permissionPrefixColor, String permissionPrefixStyle, Subject source,
             String oldMessage);
 
-    Collection<String> wouldStrip(String permissionPrefixColour, String permissionPrefixColor, String permissionPrefixStyle, Subject source, String text);
-
     Collection<String> wouldStrip(String permissionPrefixColour, String permissionPrefixStyle, Subject source, String text);
 
-    default TextFormat getLastColourAndStyle(final TextRepresentable text, @Nullable final TextFormat current) {
-        return this.getLastColourAndStyle(text, current, TextColors.NONE, TextStyles.NONE);
+    default TextFormat getLastColourAndStyle(final Component text, @Nullable final TextFormat current) {
+        return this.getLastColourAndStyle(text, current, null, Style.empty());
     }
 
-    TextFormat getLastColourAndStyle(TextRepresentable text,
+    TextFormat getLastColourAndStyle(
+            Component text,
             @Nullable TextFormat current,
-            TextColor defaultColour,
-            TextStyle defaultStyle);
+            @Nullable TextColor defaultColour,
+            Style defaultStyle);
 
-    TextColor getColourFromString(@Nullable String s);
+    Optional<TextColor> getColourFromString(@Nullable String s);
 
-    TextStyle getTextStyleFromString(@Nullable String s);
+    Style getTextStyleFromString(@Nullable String s);
 
-    Text addUrls(String message);
+    TextComponent addUrls(String message);
 
-    Text addUrls(String message, boolean replaceBlueUnderline);
+    TextComponent addUrls(String message, boolean replaceBlueUnderline);
 
-    Text getTextForUrl(String url, String msg, String whiteSpace, TextFormat st, @Nullable String optionString);
+    TextComponent getTextForUrl(String url, String msg, String whiteSpace, TextFormat st, @Nullable String optionString);
 
-    Text oldLegacy(String message);
+    TextComponent oldLegacy(String message);
 
-    Text joinTextsWithColoursFlowing(Text... texts);
+    TextComponent joinTextsWithColoursFlowing(TextComponent... texts);
 
     interface TextFormat {
 
-        TextColor colour();
+        Optional<TextColor> colour();
 
-        TextStyle style();
+        Style style();
 
-        Text textOf();
+        TextComponent textOf();
+
+        TextComponent.Builder apply(Component component);
 
     }
 

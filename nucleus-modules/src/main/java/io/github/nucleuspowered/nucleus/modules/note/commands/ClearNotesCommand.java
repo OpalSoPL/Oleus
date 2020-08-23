@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -25,20 +25,20 @@ import java.util.List;
         commandDescriptionKey = "clearnotes",
         async = true
 )
-public class ClearNotesCommand implements ICommandExecutor<CommandSource> {
+public class ClearNotesCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
 
-        List<NoteData> notes = handler.getNotesInternal(user);
+        final List<NoteData> notes = handler.getNotesInternal(user);
         if (notes.isEmpty()) {
             context.sendMessage("command.checknotes.none", user.getName());
             return context.successResult();

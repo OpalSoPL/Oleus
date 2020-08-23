@@ -17,7 +17,7 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.trait.BlockTrait;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.CommandFlags;
@@ -42,10 +42,10 @@ import java.util.Optional;
         commandDescriptionKey = "blockinfo",
         associatedPermissions = MiscPermissions.BLOCKINFO_EXTENDED
 )
-public class BlockInfoCommand implements ICommandExecutor<CommandSource> {
+public class BlockInfoCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags()
                     .setUnknownShortFlagBehavior(CommandFlags.UnknownFlagBehavior.IGNORE)
@@ -55,7 +55,7 @@ public class BlockInfoCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         Location<World> loc = null;
         if (context.hasAny(NucleusParameters.Keys.LOCATION)) {
             // get the location
@@ -65,29 +65,29 @@ public class BlockInfoCommand implements ICommandExecutor<CommandSource> {
             if (!context.is(Player.class)) {
                 return context.errorResult("command.blockinfo.player");
             }
-            BlockRay<World> bl =
+            final BlockRay<World> bl =
                     BlockRay.from(context.getIfPlayer())
                             .distanceLimit(10).stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1)).build();
-            Optional<BlockRayHit<World>> ob = bl.end();
+            final Optional<BlockRayHit<World>> ob = bl.end();
 
             // If the last block is not air...
             if (ob.isPresent() && ob.get().getLocation().getBlockType() != BlockTypes.AIR) {
-                BlockRayHit<World> brh = ob.get();
+                final BlockRayHit<World> brh = ob.get();
                 loc = brh.getLocation();
             }
         }
 
         if (loc != null) {
             // get the information.
-            BlockState b = loc.getBlock();
-            BlockType it = b.getType();
+            final BlockState b = loc.getBlock();
+            final BlockType it = b.getType();
 
-            List<Text> lt = new ArrayList<>();
+            final List<Text> lt = new ArrayList<>();
             lt.add(context.getMessage("command.blockinfo.id", it.getId(), it.getTranslation().get()));
             lt.add(context.getMessage("command.iteminfo.extendedid", b.getId()));
 
             if (context.hasAny("e") || context.hasAny("extended")) {
-                Collection<Property<?, ?>> cp = b.getApplicableProperties();
+                final Collection<Property<?, ?>> cp = b.getApplicableProperties();
                 if (!cp.isEmpty()) {
                     cp.forEach(x -> {
                         if (x.getValue() != null) {
@@ -97,7 +97,7 @@ public class BlockInfoCommand implements ICommandExecutor<CommandSource> {
                     });
                 }
 
-                Collection<BlockTrait<?>> cb = b.getTraits();
+                final Collection<BlockTrait<?>> cb = b.getTraits();
                 if (!cb.isEmpty()) {
                     cb.forEach(x -> b.getTraitValue(x).flatMap(
                             v -> DataScanner.getInstance(context.getServiceCollection().messageProvider())
@@ -106,12 +106,12 @@ public class BlockInfoCommand implements ICommandExecutor<CommandSource> {
                 }
             }
 
-            Util.getPaginationBuilder(context.getCommandSource()).contents(lt).padding(Text.of(TextColors.GREEN, "-"))
+            Util.getPaginationBuilder(context.getCommandSourceRoot()).contents(lt).padding(Text.of(TextColors.GREEN, "-"))
                     .title(context.getMessage("command.blockinfo.list.header",
                             String.valueOf(loc.getBlockX()),
                             String.valueOf(loc.getBlockY()),
                             String.valueOf(loc.getBlockZ())))
-                    .sendTo(context.getCommandSource());
+                    .sendTo(context.getCommandSourceRoot());
 
             return context.successResult();
         }

@@ -25,9 +25,9 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "nucleus.debug.verifycmds",
         parentCommand = DebugCommand.class
 )
-public class VerifyCommandDescriptionsCommand implements ICommandExecutor<CommandSource> {
+public class VerifyCommandDescriptionsCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(ICommandContext context) throws CommandException {
         ICommandMetadataService commandMetadataService = context.getServiceCollection().commandMetadataService();
         IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         List<Text> messages = commandMetadataService.getCommands()

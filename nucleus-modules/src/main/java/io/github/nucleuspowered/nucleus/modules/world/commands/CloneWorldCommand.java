@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -32,19 +32,19 @@ import java.util.function.Supplier;
         commandDescriptionKey = "world.clone",
         parentCommand = WorldCommand.class
 )
-public class CloneWorldCommand implements ICommandExecutor<CommandSource> {
+public class CloneWorldCommand implements ICommandExecutor {
 
     private final String newKey = "new name";
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.WORLD_PROPERTIES_ALL.get(serviceCollection),
                 GenericArguments.string(Text.of(this.newKey))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties worldToCopy = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties worldToCopy = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
         final String oldName = worldToCopy.getWorldName();
         final String newName = context.requireOne(this.newKey, String.class);
         if (Sponge.getServer().getWorldProperties(newName).isPresent()) {
@@ -59,9 +59,9 @@ public class CloneWorldCommand implements ICommandExecutor<CommandSource> {
         // Well, you never know, the player might die or disconnect - we have to be vigilant.
         final Supplier<MessageReceiver> mr;
         if (context.is(Player.class)) {
-            UUID uuid = context.getIfPlayer().getUniqueId();
+            final UUID uuid = context.getIfPlayer().getUniqueId();
             mr = () -> Sponge.getServer().getPlayer(uuid).map(x -> (MessageReceiver) x).orElseGet(() -> new MessageReceiver() {
-                @Override public void sendMessage(Text message) {
+                @Override public void sendMessage(final TextComponent message) {
 
                 }
 
@@ -69,17 +69,17 @@ public class CloneWorldCommand implements ICommandExecutor<CommandSource> {
                     return MessageChannel.TO_NONE;
                 }
 
-                @Override public void setMessageChannel(MessageChannel channel) {
+                @Override public void setMessageChannel(final MessageChannel channel) {
 
                 }
             });
         } else {
-            mr = context::getCommandSourceUnchecked;
+            mr = context::getCommandSourceRoot;
         }
 
         Sponge.getServer().copyWorld(worldToCopy, newName).handle((result, ex) -> {
 
-            MessageReceiver m = mr.get();
+            final MessageReceiver m = mr.get();
             if (ex == null && result.isPresent()) {
                 context.sendMessage("command.world.clone.success", oldName, newName);
                 if (!(m instanceof ConsoleSource)) {

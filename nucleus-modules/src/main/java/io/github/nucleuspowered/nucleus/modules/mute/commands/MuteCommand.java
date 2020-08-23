@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
@@ -44,7 +44,7 @@ import java.util.UUID;
                 MutePermissions.MUTE_SEEMUTEDCHAT
         }
 )
-public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class MuteCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private long maxMute = Long.MAX_VALUE;
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
@@ -52,7 +52,7 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
     // seemuted
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             NucleusParameters.ONE_USER.get(serviceCollection),
             NucleusParameters.OPTIONAL_WEAK_DURATION.get(serviceCollection),
@@ -60,15 +60,15 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        MuteHandler handler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final MuteHandler handler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
         // Get the user.
-        User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
                 //args.<User>getOne(NucleusParameters.Keys.USER).get();
 
-        Optional<Long> time = context.getOne(NucleusParameters.Keys.DURATION, Long.class);
-        Optional<MuteData> omd = handler.getPlayerMuteData(user);
-        Optional<String> reas = context.getOne(NucleusParameters.Keys.REASON, String.class);
+        final Optional<Long> time = context.getOne(NucleusParameters.Keys.DURATION, Long.class);
+        final Optional<MuteData> omd = handler.getPlayerMuteData(user);
+        final Optional<String> reas = context.getOne(NucleusParameters.Keys.REASON, String.class);
 
         if (!context.isConsoleAndBypass() && context.testPermission(MutePermissions.MUTE_EXEMPT_TARGET)) {
             return context.errorResult("command.mute.exempt", user.getName());
@@ -84,7 +84,7 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
         }
 
         // Do we have a reason?
-        String rs = reas.orElseGet(() -> context.getMessageString("command.mute.defaultreason"));
+        final String rs = reas.orElseGet(() -> context.getMessageString("command.mute.defaultreason"));
         UUID ua = Util.CONSOLE_FAKE_UUID;
         if (context.is(Player.class)) {
             ua = context.getIfPlayer().getUniqueId();
@@ -94,7 +94,7 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
             return context.errorResult("command.mute.length.toolong", context.getTimeString(this.maxMute));
         }
 
-        MuteData data;
+        final MuteData data;
         if (time.isPresent()) {
             if (!user.isOnline()) {
                 data = new MuteData(ua, rs, Duration.ofSeconds(time.get()));
@@ -105,10 +105,10 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
             data = new MuteData(ua, rs);
         }
 
-        CommandSource src = context.getCommandSource();
+        final CommandSource src = context.getCommandSourceRoot();
         if (handler.mutePlayer(user, data)) {
             // Success.
-            MutableMessageChannel mc =
+            final MutableMessageChannel mc =
                     context.getServiceCollection().permissionService().permissionMessageChannel(MutePermissions.MUTE_NOTIFY).asMutable();
             mc.addMember(src);
 
@@ -124,8 +124,9 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
         return context.errorResult("command.mute.fail", user.getName());
     }
 
-    private void timedMute(ICommandContext<? extends CommandSource> context, User user, MuteData data, long time, MessageChannel mc) {
-        String ts = context.getTimeString(time);
+    private void timedMute(
+            final ICommandContext context, final User user, final MuteData data, final long time, final MessageChannel mc) {
+        final String ts = context.getTimeString(time);
         mc.send(context.getMessage("command.mute.success.time", user.getName(), context.getName(), ts));
         mc.send(context.getMessage("standard.reasoncoloured", data.getReason()));
 
@@ -135,7 +136,7 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
         }
     }
 
-    private void permMute(ICommandContext<? extends CommandSource> context, User user, MuteData data, MessageChannel mc) {
+    private void permMute(final ICommandContext context, final User user, final MuteData data, final MessageChannel mc) {
         mc.send(context.getMessage("command.mute.success.norm", user.getName(), context.getName()));
         mc.send(context.getMessage("standard.reasoncoloured", data.getReason()));
 
@@ -146,8 +147,8 @@ public class MuteCommand implements ICommandExecutor<CommandSource>, IReloadable
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        MuteConfig config = serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final MuteConfig config = serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class);
         this.maxMute = config.getMaximumMuteLength();
         this.levelConfig = config.getLevelConfig();
     }

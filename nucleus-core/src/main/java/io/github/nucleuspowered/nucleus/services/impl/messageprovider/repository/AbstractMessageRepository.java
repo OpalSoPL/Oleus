@@ -6,13 +6,14 @@ package io.github.nucleuspowered.nucleus.services.impl.messageprovider.repositor
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.Template;
+import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.TextElement;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.TextTemplate;
-import org.spongepowered.api.text.translation.Translatable;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
@@ -29,7 +30,7 @@ abstract class AbstractMessageRepository implements IMessageRepository {
     private final static Pattern STRING_LOCALISER = Pattern.compile("loc:([a-z\\-.]+)");
 
     final Map<String, String> cachedStringMessages = new HashMap<>();
-    final Map<String, TextTemplate> cachedMessages = new HashMap<>();
+    final Map<String, Template> cachedMessages = new HashMap<>();
     private final IPlayerDisplayNameService playerDisplayNameService;
     private final ITextStyleService textStyleService;
 
@@ -48,25 +49,26 @@ abstract class AbstractMessageRepository implements IMessageRepository {
         ).replaceAll("'$0'");
     }
 
-    private TextTemplate getTextTemplate(final String key) {
+    private Template getTextTemplate(final String key) {
         return this.cachedMessages.computeIfAbsent(key, k -> this.templateCreator(this.getEntry(k)));
     }
 
     @Override
-    public Text getText(final String key) {
-        return this.cachedMessages.computeIfAbsent(key, this::getTextTemplate).toText();
+    public TextComponent getText(final String key) {
+        return this.cachedMessages.computeIfAbsent(key, this::getTextTemplate).create();
     }
 
     @Override
-    public Text getText(final String key, final Object[] args) {
+    public TextComponent getText(final String key, final Object[] args) {
         return this.getTextMessageWithTextFormat(key,
                 Arrays.stream(args).map(x -> {
+                    final Component component;
                     if (x instanceof User) {
-                        return this.playerDisplayNameService.getDisplayName(((User) x).getUniqueId());
-                    } else if (x instanceof TextRepresentable) {
-                        return (TextRepresentable) x;
-                    } else if (x instanceof Translatable) {
-                        return Text.of(x);
+                        component = this.playerDisplayNameService.getDisplayName(((User) x).getUniqueId());
+                    } else if (x instanceof ServerPlayer) {
+                        component = this.playerDisplayNameService.getDisplayName(((ServerPlayer) x).getUniqueId());
+                    } else if (x instanceof Component) {
+                        component = (Component) x;
                     } else if (x instanceof String) {
                         final String s = (String) x;
                         final Matcher matcher = STRING_LOCALISER.matcher(s);
@@ -74,10 +76,11 @@ abstract class AbstractMessageRepository implements IMessageRepository {
                              return this.getText(matcher.group(1));
                         }
 
-                        return Text.of(x);
+                        component = TextComponent.of(s);
                     } else {
-                        return Text.of(x.toString());
+                        component = TextComponent.of(x.toString());
                     }
+                    return component;
                 }).collect(Collectors.toList()));
     }
 
@@ -91,21 +94,21 @@ abstract class AbstractMessageRepository implements IMessageRepository {
         return MessageFormat.format(this.getString(key), args);
     }
 
-    private Text getTextMessageWithTextFormat(final String key, final List<? extends TextRepresentable> textList) {
-        final TextTemplate template = this.getTextTemplate(key);
+    private TextComponent getTextMessageWithTextFormat(final String key, final List<? extends Component> textList) {
+        final Template template = this.getTextTemplate(key);
         if (textList.isEmpty()) {
-            return template.toText();
+            return template.create();
         }
 
-        final Map<String, TextRepresentable> objs = Maps.newHashMap();
+        final Map<String, Component> objs = Maps.newHashMap();
         for (int i = 0; i < textList.size(); i++) {
             objs.put(String.valueOf(i), textList.get(i));
         }
 
-        return template.apply(objs).build();
+        return template.create(objs);
     }
 
-    final TextTemplate templateCreator(final String string) {
+    final Template templateCreator(final String string) {
         // regex!
         final Matcher mat = Pattern.compile("\\{([\\d]+)}").matcher(string);
         final List<Integer> map = Lists.newArrayList();
@@ -116,23 +119,44 @@ abstract class AbstractMessageRepository implements IMessageRepository {
 
         final String[] s = string.split("\\{([\\d]+)}");
 
-        final List<Object> objects = Lists.newArrayList();
-        Text t = this.textStyleService.oldLegacy(s[0]);
+        final List<TextElement> objects = Lists.newArrayList();
+        final TextComponent t = this.textStyleService.oldLegacy(s[0]);
         ITextStyleService.TextFormat tuple = this.textStyleService.getLastColourAndStyle(t, null);
-        objects.add(t);
+        objects.add(input -> t);
         int count = 1;
         for (final Integer x : map) {
-            objects.add(TextTemplate.arg(x.toString()).optional().color(tuple.colour()).style(tuple.style()).build());
+            objects.add(new ArgumentElement(tuple, String.valueOf(x)));
             if (s.length > count) {
-                t = Text.of(tuple.colour(), tuple.style(), this.textStyleService.oldLegacy(s[count]));
+                final TextComponent r = tuple.apply(this.textStyleService.oldLegacy(s[count])).build();
                 tuple = this.textStyleService.getLastColourAndStyle(t, null);
-                objects.add(t);
+                objects.add(element -> r);
             }
 
             count++;
         }
 
-        return TextTemplate.of(objects.toArray(new Object[0]));
+        return new Template(objects);
+    }
+
+    private static final class ArgumentElement implements TextElement {
+
+        final ITextStyleService.TextFormat format;
+        final String key;
+
+        private ArgumentElement(final ITextStyleService.TextFormat format, final String key) {
+            this.format = format;
+            this.key = key;
+        }
+
+        @Override
+        public TextComponent retrieve(final Map<String, Component> args) {
+            final Component component = args.get(this.key);
+            if (component == null) {
+                return TextComponent.empty();
+            }
+
+            return null;
+        }
     }
 
 }

@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository;
 
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.TextComponent;
 
 public interface IMessageRepository {
 
@@ -15,9 +15,9 @@ public interface IMessageRepository {
 
     boolean hasEntry(String key);
 
-    Text getText(String key);
+    TextComponent getText(String key);
 
-    Text getText(String key, Object[] args);
+    TextComponent getText(String key, Object[] args);
 
     String getString(String key);
 

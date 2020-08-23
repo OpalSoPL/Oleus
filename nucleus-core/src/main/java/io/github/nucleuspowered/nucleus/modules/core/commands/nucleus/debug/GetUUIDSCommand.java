@@ -33,7 +33,7 @@ import javax.inject.Inject;
         commandDescriptionKey = "nucleus.debug.getuuids",
         parentCommand = DebugCommand.class
 )
-public class GetUUIDSCommand implements ICommandExecutor<CommandSource> {
+public class GetUUIDSCommand implements ICommandExecutor {
 
     private final IMessageProviderService messageProvider;
 
@@ -48,13 +48,13 @@ public class GetUUIDSCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(ICommandContext context) throws CommandException {
         Collection<User> users = context.getAll(NucleusParameters.Keys.USER, User.class);
         if (users.isEmpty()) {
             return context.errorResult("command.nucleus.debug.uuid.none");
         }
 
-        CommandSource source = context.getCommandSource();
+        CommandSource source = context.getCommandSourceRoot();
         Util.getPaginationBuilder(context.is(Player.class))
             .title(this.messageProvider.getMessageFor(source, "command.nucleus.debug.uuid.title", users.iterator().next().getName()))
             .header(this.messageProvider.getMessageFor(source,"command.nucleus.debug.uuid.header"))

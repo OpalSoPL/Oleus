@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = PlayerInfoPermissions.EXEMPT_COST_NEAR)
         }
 )
-public class NearCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class NearCommand implements ICommandExecutor, IReloadableService.Reloadable {
         // SimpleReloadable {
 
     private static final NumberFormat formatter =  NumberFormat.getInstance();
@@ -60,7 +60,7 @@ public class NearCommand implements ICommandExecutor<CommandSource>, IReloadable
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier()
                     .createOtherUserPermissionElement(false, PlayerInfoPermissions.OTHERS_NEAR),
@@ -68,7 +68,7 @@ public class NearCommand implements ICommandExecutor<CommandSource>, IReloadable
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.getUserFromArgs();
         final Location<World> location;
         final Vector3d position;
@@ -76,7 +76,7 @@ public class NearCommand implements ICommandExecutor<CommandSource>, IReloadable
             location = user.getPlayer().get().getLocation();
             position = location.getPosition();
         } else {
-            World world = user.getWorldUniqueId()
+            final World world = user.getWorldUniqueId()
                     .flatMap(x -> Sponge.getServer().getWorld(x))
                     .orElseThrow((() -> context.createException("command.near.location.nolocation", user.getName())));
             position = user.getPosition();
@@ -86,7 +86,7 @@ public class NearCommand implements ICommandExecutor<CommandSource>, IReloadable
         int radius = this.maxRadius;
         final Optional<Integer> radiusOpt = context.getOne(this.radiusKey, Integer.class);
         if (radiusOpt.isPresent()) {
-            int inputRadius = radiusOpt.get();
+            final int inputRadius = radiusOpt.get();
             // Check if executor has max radius override permission
             if (inputRadius > this.maxRadius && context.testPermission(PlayerInfoPermissions.EXEMPT_MAXRADIUS_NEAR)) {
                 radius = inputRadius;
@@ -95,7 +95,7 @@ public class NearCommand implements ICommandExecutor<CommandSource>, IReloadable
             }
         }
 
-        final CommandSource src = context.getCommandSource();
+        final CommandSource src = context.getCommandSourceRoot();
         final IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
         final List<Text> messagesToSend =
                 location.getExtent()
@@ -117,8 +117,8 @@ public class NearCommand implements ICommandExecutor<CommandSource>, IReloadable
         return context.successResult();
     }
 
-    private Text createPlayerLine(ICommandContext<? extends CommandSource> context, Tuple<Player, Double> player) {
-        Text.Builder line = Text.builder();
+    private TextComponent createPlayerLine(final ICommandContext context, final Tuple<Player, Double> player) {
+        final Text.Builder line = Text.builder();
         context.getMessage("command.near.playerdistancefrom", player.getFirst().getName());
         line.append(context.getMessage("command.near.playerdistancefrom", player.getFirst().getName(),
                 formatter.format(Math.abs(player.getSecond()))))
@@ -128,8 +128,8 @@ public class NearCommand implements ICommandExecutor<CommandSource>, IReloadable
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        PlayerInfoConfig configAdapter = serviceCollection
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final PlayerInfoConfig configAdapter = serviceCollection
                 .moduleDataProvider()
                 .getModuleConfig(PlayerInfoConfig.class);
         this.maxRadius = configAdapter.getNear().getMaxRadius();

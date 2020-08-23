@@ -11,20 +11,20 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class ChatLoggerHandler extends AbstractLoggingHandler implements ServiceBase {
 
     private boolean enabled = false;
 
     @Inject
-    public ChatLoggerHandler(INucleusServiceCollection serviceCollection) {
+    public ChatLoggerHandler(final INucleusServiceCollection serviceCollection) {
         super("chat", "chat", serviceCollection.messageProvider(), serviceCollection.logger());
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        ChatLoggingConfig clca = serviceCollection.moduleDataProvider().getModuleConfig(ChatLoggingConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final ChatLoggingConfig clca = serviceCollection.moduleDataProvider().getModuleConfig(ChatLoggingConfig.class);
         this.enabled = clca.isEnableLog();
         try {
             if (this.enabled && this.logger == null) {
@@ -32,7 +32,7 @@ public class ChatLoggerHandler extends AbstractLoggingHandler implements Service
             } else if (!this.enabled && this.logger != null) {
                 this.onShutdown();
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }

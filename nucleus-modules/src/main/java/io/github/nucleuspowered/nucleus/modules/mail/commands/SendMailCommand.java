@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
@@ -24,10 +24,10 @@ import org.spongepowered.api.entity.living.player.User;
         async = true,
         parentCommand = MailCommand.class
 )
-public class SendMailCommand implements ICommandExecutor<CommandSource> {
+public class SendMailCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection),
                 NucleusParameters.MESSAGE
@@ -35,8 +35,8 @@ public class SendMailCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User pl = context.getOne(NucleusParameters.Keys.USER, User.class)
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User pl = context.getOne(NucleusParameters.Keys.USER, User.class)
                 .orElseThrow(() -> context.createException("args.user.none"));
 
         // Only send mails to players that can read them.
@@ -45,9 +45,9 @@ public class SendMailCommand implements ICommandExecutor<CommandSource> {
         }
 
         // Send the message.
-        String m = context.getOne(NucleusParameters.Keys.MESSAGE, String.class)
+        final String m = context.getOne(NucleusParameters.Keys.MESSAGE, String.class)
                 .orElseThrow(() -> context.createException("args.message.none"));
-        MailHandler handler = context.getServiceCollection().getServiceUnchecked(MailHandler.class);
+        final MailHandler handler = context.getServiceCollection().getServiceUnchecked(MailHandler.class);
         if (context.is(Player.class)) {
             handler.sendMail(context.getIfPlayer(), pl, m);
         } else {

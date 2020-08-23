@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 abstract class AbstractLoggerListener implements ListenerBase.Conditional {
 
@@ -18,12 +18,12 @@ abstract class AbstractLoggerListener implements ListenerBase.Conditional {
     final IMessageProviderService messageProviderService;
 
     @Inject
-    AbstractLoggerListener(INucleusServiceCollection serviceCollection) {
+    AbstractLoggerListener(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(ChatLoggerHandler.class);
         this.messageProviderService = serviceCollection.messageProvider();
     }
 
-    ChatLoggingConfig getConfig(INucleusServiceCollection serviceCollection) {
+    ChatLoggingConfig getConfig(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(ChatLoggingConfig.class);
     }
 

@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.key.Keys;
@@ -31,29 +31,29 @@ import java.util.Optional;
         commandDescriptionKey = "hat",
         associatedPermissions = FunPermissions.OTHERS_HAT
 )
-public class HatCommand implements ICommandExecutor<CommandSource> {
+public class HatCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(true, FunPermissions.OTHERS_HAT)
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
-        boolean isSelf = context.is(pl);
-        Optional<ItemStack> helmetOptional = pl.getHelmet();
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
+        final boolean isSelf = context.is(pl);
+        final Optional<ItemStack> helmetOptional = pl.getHelmet();
 
-        ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND)
+        final ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND)
                 .orElseThrow(() -> context.createException("command.generalerror.handempty"));
-        ItemStack hand = stack.copy();
+        final ItemStack hand = stack.copy();
         hand.setQuantity(1);
         pl.setHelmet(hand);
-        Text itemName = hand.get(Keys.DISPLAY_NAME).orElseGet(() -> Text.of(stack));
+        final TextComponent itemName = hand.get(Keys.DISPLAY_NAME).orElseGet(() -> Text.of(stack));
 
-        GameMode gameMode = pl.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET);
+        final GameMode gameMode = pl.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET);
         if (gameMode != GameModes.CREATIVE) {
             if (stack.getQuantity() > 1) {
                 stack.setQuantity(stack.getQuantity() - 1);

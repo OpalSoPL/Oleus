@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
 @EssentialsEquivalent("tptoggle")
@@ -25,20 +25,20 @@ import org.spongepowered.api.entity.living.player.Player;
         async = true,
         associatedPermissions = TeleportPermissions.TPTOGGLE_EXEMPT
 )
-public class TeleportToggleCommand implements ICommandExecutor<Player> {
+public class TeleportToggleCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection service) {
+    public CommandElement[] parameters(final INucleusServiceCollection service) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        IUserPreferenceService ups = context.getServiceCollection().userPreferenceService();
-        Player pl = context.getIfPlayer();
-        boolean toggle = ups.get(pl.getUniqueId(), NucleusKeysProvider.TELEPORT_TARGETABLE).get(); // we know it's always there
-        boolean flip = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElseGet(() -> !toggle);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final IUserPreferenceService ups = context.getServiceCollection().userPreferenceService();
+        final Player pl = context.getIfPlayer();
+        final boolean toggle = ups.get(pl.getUniqueId(), NucleusKeysProvider.TELEPORT_TARGETABLE).get(); // we know it's always there
+        final boolean flip = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElseGet(() -> !toggle);
         ups.set(pl.getUniqueId(), NucleusKeysProvider.TELEPORT_TARGETABLE, flip);
         context.sendMessage(
                 "command.tptoggle.success", flip ? "loc:standard.enabled" : "loc:standard.disabled"

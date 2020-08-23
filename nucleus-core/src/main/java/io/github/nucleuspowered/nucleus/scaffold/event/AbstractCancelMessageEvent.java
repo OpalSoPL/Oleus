@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 public abstract class AbstractCancelMessageEvent extends AbstractEvent implements CancelMessageEvent {
 
     private final Cause cause;
-    @Nullable private Text cancelMessage = null;
+    @Nullable private TextComponent cancelMessage = null;
     private boolean cancelled = false;
 
     protected AbstractCancelMessageEvent(final Cause cause) {
@@ -26,7 +26,7 @@ public abstract class AbstractCancelMessageEvent extends AbstractEvent implement
         return Optional.ofNullable(this.cancelMessage);
     }
 
-    @Override public void setCancelMessage(@Nullable final Text message) {
+    @Override public void setCancelMessage(@Nullable final TextComponent message) {
         this.cancelMessage = message;
     }
 

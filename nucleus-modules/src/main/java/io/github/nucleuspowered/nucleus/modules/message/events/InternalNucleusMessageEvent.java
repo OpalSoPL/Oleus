@@ -17,7 +17,7 @@ public class InternalNucleusMessageEvent extends AbstractEvent implements Nucleu
     private final String message;
     private boolean isCancelled = false;
 
-    public InternalNucleusMessageEvent(CommandSource from, CommandSource to, String message) {
+    public InternalNucleusMessageEvent(final CommandSource from, final CommandSource to, final String message) {
         this.cause = CauseStackHelper.createCause(from);
         this.from = from;
         this.to = to;
@@ -50,7 +50,7 @@ public class InternalNucleusMessageEvent extends AbstractEvent implements Nucleu
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.isCancelled = cancel;
     }
 }

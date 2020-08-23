@@ -22,7 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class FreezePlayerListener implements ListenerBase {
 
@@ -32,34 +32,34 @@ public class FreezePlayerListener implements ListenerBase {
     private final Map<UUID, Instant> lastFreezeNotification = Maps.newHashMap();
 
     @Inject
-    public FreezePlayerListener(INucleusServiceCollection serviceCollection) {
+    public FreezePlayerListener(final INucleusServiceCollection serviceCollection) {
         this.messageProviderService = serviceCollection.messageProvider();
         this.service = serviceCollection.getServiceUnchecked(FreezePlayerService.class);
     }
 
     @Listener
-    public void onPlayerMovement(MoveEntityEvent event, @Root Player player) {
+    public void onPlayerMovement(final MoveEntityEvent event, @Root final Player player) {
         event.setCancelled(checkForFrozen(player, "freeze.cancelmove"));
     }
 
     @Listener
-    public void onPlayerInteractBlock(InteractEvent event, @Root Player player) {
+    public void onPlayerInteractBlock(final InteractEvent event, @Root final Player player) {
         event.setCancelled(checkForFrozen(player, "freeze.cancelinteract"));
     }
 
     @Listener
-    public void onPlayerInteractBlock(InteractBlockEvent event, @Root Player player) {
+    public void onPlayerInteractBlock(final InteractBlockEvent event, @Root final Player player) {
         event.setCancelled(checkForFrozen(player, "freeze.cancelinteractblock"));
     }
 
     @Listener
-    public void onPlayerDisconnect(ClientConnectionEvent.Disconnect event) {
+    public void onPlayerDisconnect(final ClientConnectionEvent.Disconnect event) {
         this.service.invalidate(event.getTargetEntity().getUniqueId());
     }
 
-    private boolean checkForFrozen(Player player, String message) {
+    private boolean checkForFrozen(final Player player, final String message) {
         if (this.service.getFromUUID(player.getUniqueId())) {
-            Instant now = Instant.now();
+            final Instant now = Instant.now();
             if (this.lastFreezeNotification.getOrDefault(player.getUniqueId(), now).isBefore(now)) {
                 this.messageProviderService.sendMessageTo(player, message);
                 this.lastFreezeNotification.put(player.getUniqueId(), now.plus(2, ChronoUnit.SECONDS));

@@ -23,7 +23,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -49,16 +49,16 @@ import java.util.Optional;
                 SpawnPermissions.SPAWN_WORLDS
         }
 )
-public class SpawnCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class SpawnCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private SpawnConfig sc = new SpawnConfig();
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.sc = serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class);
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags().permissionFlag(
                     SpawnPermissions.SPAWN_FORCE, "f", "-force").buildWith(
@@ -70,15 +70,15 @@ public class SpawnCommand implements ICommandExecutor<Player>, IReloadableServic
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        boolean force = context.hasAny("f");
-        Player src = context.getIfPlayer();
-        GlobalSpawnConfig gsc = this.sc.getGlobalSpawn();
-        WorldProperties wp = context.getOne(NucleusParameters.Keys.WORLD, WorldProperties.class)
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final boolean force = context.hasAny("f");
+        final Player src = context.getIfPlayer();
+        final GlobalSpawnConfig gsc = this.sc.getGlobalSpawn();
+        final WorldProperties wp = context.getOne(NucleusParameters.Keys.WORLD, WorldProperties.class)
             .orElseGet(() -> gsc.isOnSpawnCommand() ?
                     gsc.getWorld().orElse(src.getWorld().getProperties()) : src.getWorld().getProperties());
 
-        Optional<World> ow = Sponge.getServer().loadWorld(wp.getUniqueId());
+        final Optional<World> ow = Sponge.getServer().loadWorld(wp.getUniqueId());
 
         if (!ow.isPresent()) {
             return context.errorResult("command.spawn.noworld");
@@ -86,9 +86,9 @@ public class SpawnCommand implements ICommandExecutor<Player>, IReloadableServic
             return context.errorResult("command.spawn.nopermsworld", ow.get().getName());
         }
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.addContext(EventContexts.SPAWN_EVENT_TYPE, SendToSpawnEvent.Type.COMMAND);
-            SendToSpawnEvent event =
+            final SendToSpawnEvent event =
                     new SendToSpawnEvent(
                             SpawnHelper.getSpawn(
                                     ow.get().getProperties(),
@@ -105,7 +105,7 @@ public class SpawnCommand implements ICommandExecutor<Player>, IReloadableServic
             }
 
             // If we don't have a rotation, then use the current rotation
-            TeleportResult result = context
+            final TeleportResult result = context
                     .getServiceCollection()
                     .teleportService()
                     .teleportPlayerSmart(

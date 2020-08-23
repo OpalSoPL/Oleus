@@ -21,7 +21,7 @@ import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class MailListener implements ListenerBase {
 
@@ -30,16 +30,16 @@ public class MailListener implements ListenerBase {
     private final IMessageProviderService messageProvider;
 
     @Inject
-    public MailListener(INucleusServiceCollection serviceCollection) {
+    public MailListener(final INucleusServiceCollection serviceCollection) {
         this.messageProvider = serviceCollection.messageProvider();
         this.handler = serviceCollection.getServiceUnchecked(MailHandler.class);
         this.pluginContainer = serviceCollection.pluginContainer();
     }
 
     @Listener
-    public void onPlayerJoin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
+    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
         Sponge.getScheduler().createAsyncExecutor(this.pluginContainer).schedule(() -> {
-            int mailCount = this.handler.getMailInternal(event.getTargetEntity()).size();
+            final int mailCount = this.handler.getMailInternal(event.getTargetEntity()).size();
             if (mailCount > 0) {
                 this.messageProvider.sendMessageTo(player, "mail.login", String.valueOf(mailCount));
                 player.sendMessage(Text.builder()

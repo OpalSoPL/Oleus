@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -29,24 +29,24 @@ import java.util.List;
         async = true,
         parentCommand = KitCommandCommand.class
 )
-public class KitRemoveCommandCommand implements ICommandExecutor<CommandSource> {
+public class KitRemoveCommandCommand implements ICommandExecutor {
 
     private final String index = "index";
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false),
                 GenericArguments.firstParsing(new PositiveIntegerArgument(Text.of(this.index), serviceCollection), NucleusParameters.COMMAND)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        List<String> commands = kitInfo.getCommands();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+        final List<String> commands = kitInfo.getCommands();
 
-        String cmd;
+        final String cmd;
         if (context.hasAny(this.index)) {
-            int idx = context.requireOne(this.index, Integer.class);
+            final int idx = context.requireOne(this.index, Integer.class);
             if (idx == 0) {
                 return context.errorResult("command.kit.command.remove.onebased");
             }

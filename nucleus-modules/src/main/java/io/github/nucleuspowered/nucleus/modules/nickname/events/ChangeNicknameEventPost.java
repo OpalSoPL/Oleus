@@ -19,10 +19,10 @@ public class ChangeNicknameEventPost extends AbstractEvent implements NucleusCha
 
     private final Cause cause;
     private final User target;
-    @Nullable private final Text previousNickname;
-    @Nullable private final Text newNickname;
+    @Nullable private final TextComponent previousNickname;
+    @Nullable private final TextComponent newNickname;
 
-    public ChangeNicknameEventPost(Cause cause, @Nullable Text previousNickname, @Nullable Text newNickname, User target) {
+    public ChangeNicknameEventPost(final Cause cause, @Nullable final TextComponent previousNickname, @Nullable final TextComponent newNickname, final User target) {
         this.cause = cause;
         this.previousNickname = previousNickname;
         this.newNickname = newNickname;

@@ -18,7 +18,7 @@ import org.spongepowered.api.entity.living.player.User;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @APIService(NucleusWarningService.class)
 public class WarnHandler implements NucleusWarningService, ServiceBase {
@@ -26,11 +26,11 @@ public class WarnHandler implements NucleusWarningService, ServiceBase {
     private final IStorageManager storageManager;
 
     @Inject
-    public WarnHandler(INucleusServiceCollection serviceCollection) {
+    public WarnHandler(final INucleusServiceCollection serviceCollection) {
         this.storageManager = serviceCollection.storageManager();
     }
 
-    public CompletableFuture<List<Warning>> getWarningsInternal(User user) {
+    public CompletableFuture<List<Warning>> getWarningsInternal(final User user) {
         return this.storageManager
                 .getUserService()
                 .get(user.getUniqueId())
@@ -40,7 +40,7 @@ public class WarnHandler implements NucleusWarningService, ServiceBase {
                             .orElseGet(ImmutableList::of));
     }
 
-    @Override public CompletableFuture<List<Warning>> getWarnings(User user) {
+    @Override public CompletableFuture<List<Warning>> getWarnings(final User user) {
         return getWarningsInternal(user);
     }
 

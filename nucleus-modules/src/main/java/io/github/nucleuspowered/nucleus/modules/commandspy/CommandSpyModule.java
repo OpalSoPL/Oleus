@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = CommandSpyModule.ID, name = "Command Spy")
 public class CommandSpyModule extends ConfigurableModule<CommandSpyConfig, CommandSpyConfigAdapter> {
@@ -21,8 +21,8 @@ public class CommandSpyModule extends ConfigurableModule<CommandSpyConfig, Comma
     public final static String ID = "command-spy";
 
     @Inject
-    public CommandSpyModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public CommandSpyModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

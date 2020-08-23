@@ -38,12 +38,12 @@ import java.util.function.LongFunction;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = EnvironmentPermissions.EXEMPT_COST_TIME_SET)
         }
 )
-public class SetTimeCommand implements ICommandExecutor<CommandSource> {
+public class SetTimeCommand implements ICommandExecutor {
     private final String time = "time";
     private final String world = "world";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.world(Text.of(this.world)))),
             GenericArguments.onlyOne(new WorldTimeArgument(Text.of(this.time), serviceCollection))
@@ -51,13 +51,13 @@ public class SetTimeCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) {
-        WorldProperties pr = context.getWorldPropertiesOrFromSelf(this.world).orElseGet(
+    public ICommandResult execute(final ICommandContext context) {
+        final WorldProperties pr = context.getWorldPropertiesOrFromSelf(this.world).orElseGet(
                 () -> Sponge.getServer().getDefaultWorld().get()
         );
 
-        LongFunction<Long> tick = context.requireOne(this.time, new TypeToken<LongFunction<Long>>() {});
-        long time = tick.apply(pr.getWorldTime());
+        final LongFunction<Long> tick = context.requireOne(this.time, new TypeToken<LongFunction<Long>>() {});
+        final long time = tick.apply(pr.getWorldTime());
         pr.setWorldTime(time);
         context.sendMessage("command.settime.done2", pr.getWorldName(),
                 Util.getTimeFromTicks(context.getServiceCollection().messageProvider(), time));

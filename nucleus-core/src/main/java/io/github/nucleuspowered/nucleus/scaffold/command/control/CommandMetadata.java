@@ -47,7 +47,7 @@ public final class CommandMetadata {
     private final String modulename;
     private final String metadataKey;
     private final Command annotation;
-    private final Class<? extends ICommandExecutor<?>> executor;
+    private final Class<? extends ICommandExecutor> executor;
     private final String commandKey;
     private final List<String> root;
     private final List<String> sub;
@@ -60,7 +60,7 @@ public final class CommandMetadata {
             final String moduleid,
             final String modulename,
             final Command annotation,
-            final Class<? extends ICommandExecutor<?>> executor,
+            final Class<? extends ICommandExecutor> executor,
             final String commandKey,
             @Nullable final EssentialsEquivalent essentialsEquivalent) {
         this.moduleid = moduleid;
@@ -118,7 +118,7 @@ public final class CommandMetadata {
         return this.sub;
     }
 
-    public Class<? extends ICommandExecutor<?>> getExecutor() {
+    public Class<? extends ICommandExecutor> getExecutor() {
         return this.executor;
     }
 

@@ -30,7 +30,7 @@ public abstract class AbstractNucleusChatChannel<T extends Collection<MessageRec
     }
 
     @Override
-    public void send(@Nullable final Object sender, final Text original, final ChatType type) {
+    public void send(@Nullable final Object sender, final TextComponent original, final ChatType type) {
         this.messageChannel.send(sender, original, type);
     }
 

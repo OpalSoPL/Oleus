@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -35,19 +35,19 @@ import java.util.Optional;
                 InventoryPermissions.INVSEE_OFFLINE
         }
 )
-public class InvSeeCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class InvSeeCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean self = false;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        User target = context.requireOne(NucleusParameters.Keys.USER, User.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User target = context.requireOne(NucleusParameters.Keys.USER, User.class);
 
         if (!target.isOnline() && !context.testPermission(InventoryPermissions.INVSEE_OFFLINE)) {
             return context.errorResult("command.invsee.nooffline");
@@ -63,9 +63,9 @@ public class InvSeeCommand implements ICommandExecutor<Player>, IReloadableServi
 
         // Just in case, get the subject inventory if they are online.
         try {
-            Player src = context.getIfPlayer();
-            Inventory targetInv = target.isOnline() ? target.getPlayer().get().getInventory() : target.getInventory();
-            Optional<Container> oc = src.openInventory(targetInv);
+            final Player src = context.getIfPlayer();
+            final Inventory targetInv = target.isOnline() ? target.getPlayer().get().getInventory() : target.getInventory();
+            final Optional<Container> oc = src.openInventory(targetInv);
             if (oc.isPresent()) {
                 if (!context.testPermission(InventoryPermissions.INVSEE_MODIFY)
                         || context.testPermissionFor(target, InventoryPermissions.INVSEE_EXEMPT_INTERACT)) {
@@ -76,12 +76,12 @@ public class InvSeeCommand implements ICommandExecutor<Player>, IReloadableServi
             }
 
             return context.errorResult("command.invsee.failed");
-        } catch (UnsupportedOperationException e) {
+        } catch (final UnsupportedOperationException e) {
             return context.errorResult("command.invsee.offlinenotsupported");
         }
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.self = serviceCollection.moduleDataProvider()
                 .getModuleConfig(InventoryConfig.class)
                 .isAllowInvseeOnSelf();

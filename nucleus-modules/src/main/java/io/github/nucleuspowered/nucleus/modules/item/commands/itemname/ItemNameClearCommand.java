@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -30,16 +30,16 @@ import java.util.Optional;
             @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_ITEMNAME_CLEAR)
         }
 )
-public class ItemNameClearCommand implements ICommandExecutor<Player> {
+public class ItemNameClearCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
         if (!src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
             return context.errorResult("command.itemname.clear.noitem");
         }
 
-        ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).get();
-        Optional<Text> data = stack.get(Keys.DISPLAY_NAME);
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).get();
+        final Optional<Text> data = stack.get(Keys.DISPLAY_NAME);
 
         if (!data.isPresent()) {
             // No display name.

@@ -27,18 +27,18 @@ public class BackInfoProvider implements NucleusProvider {
         return "punishment";
     }
 
-    @Override public Optional<Text> get(User user, CommandSource source,
-            INucleusServiceCollection serviceCollection) {
+    @Override public Optional<Text> get(final User user, final CommandSource source,
+            final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, BanPermissions.BASE_CHECKBAN)) {
             // If we have a ban service, then check for a ban.
-            Optional<BanService> obs = Sponge.getServiceManager().provide(BanService.class);
-            IMessageProviderService messageProviderService = serviceCollection.messageProvider();
+            final Optional<BanService> obs = Sponge.getServiceManager().provide(BanService.class);
+            final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             if (obs.isPresent()) {
-                Optional<Ban.Profile> bs = obs.get().getBanFor(user.getProfile());
+                final Optional<Ban.Profile> bs = obs.get().getBanFor(user.getProfile());
                 if (bs.isPresent()) {
 
                     // Lightweight checkban.
-                    Text.Builder m;
+                    final Text.Builder m;
                     if (bs.get().getExpirationDate().isPresent()) {
                         m = messageProviderService.getMessageFor(source, "seen.isbanned.temp",
                                 messageProviderService.getTimeString(source.getLocale(),

@@ -22,7 +22,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -45,7 +45,7 @@ import java.util.Optional;
         },
         associatedPermissions = HomePermissions.HOME_EXEMPT_SAMEDIMENSION
 )
-public class HomeCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class HomeCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final String home = "home";
 
@@ -54,7 +54,7 @@ public class HomeCommand implements ICommandExecutor<Player>, IReloadableService
     private boolean isOnlySameDimension = false;
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.onlyOne(GenericArguments.optional(
                     new HomeArgument(Text.of(this.home), serviceCollection.getServiceUnchecked(HomeService.class), serviceCollection.messageProvider()))
@@ -62,23 +62,23 @@ public class HomeCommand implements ICommandExecutor<Player>, IReloadableService
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        HomeService homeService = context.getServiceCollection().getServiceUnchecked(HomeService.class);
-        Player player = context.getIfPlayer();
-        int max = homeService.getMaximumHomes(player) ;
-        int current = homeService.getHomeCount(player);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final HomeService homeService = context.getServiceCollection().getServiceUnchecked(HomeService.class);
+        final Player player = context.getIfPlayer();
+        final int max = homeService.getMaximumHomes(player) ;
+        final int current = homeService.getHomeCount(player);
         if (this.isPreventOverhang && max < current) {
             // If the player has too many homes, tell them
             return context.errorResult("command.home.overhang", max, current);
         }
 
         // Get the home.
-        Optional<Home> owl = context.getOne(this.home, Home.class);
-        Home wl;
+        final Optional<Home> owl = context.getOne(this.home, Home.class);
+        final Home wl;
         if (owl.isPresent()) {
             wl = owl.get();
         } else {
-            Optional<Home> home = homeService.getHome(player, NucleusHomeService.DEFAULT_HOME_NAME);
+            final Optional<Home> home = homeService.getHome(player, NucleusHomeService.DEFAULT_HOME_NAME);
             if (!home.isPresent()) {
                 return context.errorResult("args.home.nohome", NucleusHomeService.DEFAULT_HOME_NAME);
             }
@@ -88,7 +88,7 @@ public class HomeCommand implements ICommandExecutor<Player>, IReloadableService
         Sponge.getServer().loadWorld(wl.getWorldProperties()
                 .orElseThrow(() -> context.createException("command.home.invalid", wl.getName())));
 
-        Location<World> targetLocation = wl.getLocation().orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
+        final Location<World> targetLocation = wl.getLocation().orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
 
         if (this.isOnlySameDimension) {
             if (!targetLocation.getExtent().getUniqueId().equals(player.getLocation().getExtent().getUniqueId())) {
@@ -98,9 +98,9 @@ public class HomeCommand implements ICommandExecutor<Player>, IReloadableService
             }
         }
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(player);
-            UseHomeEvent event = new UseHomeEvent(frame.getCurrentCause(), player, wl);
+            final UseHomeEvent event = new UseHomeEvent(frame.getCurrentCause(), player, wl);
 
             if (Sponge.getEventManager().post(event)) {
                 return event.getCancelMessage().map(x -> context.errorResultLiteral(Text.of(x)))
@@ -108,7 +108,7 @@ public class HomeCommand implements ICommandExecutor<Player>, IReloadableService
             }
         }
 
-        TeleportResult result = homeService.warpToHome(
+        final TeleportResult result = homeService.warpToHome(
                 player,
                 wl,
                 this.isSafeTeleport
@@ -129,8 +129,8 @@ public class HomeCommand implements ICommandExecutor<Player>, IReloadableService
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
-        HomeConfig hc = serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class);
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        final HomeConfig hc = serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class);
         this.isSafeTeleport = hc.isSafeTeleport();
         this.isPreventOverhang = hc.isPreventHomeCountOverhang();
         this.isOnlySameDimension = hc.isOnlySameDimension();

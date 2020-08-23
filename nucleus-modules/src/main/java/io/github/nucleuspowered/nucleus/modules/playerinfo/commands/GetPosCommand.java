@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -33,21 +33,21 @@ import org.spongepowered.api.world.World;
         },
         associatedPermissions = PlayerInfoPermissions.GETPOS_OTHERS
 )
-public class GetPosCommand implements ICommandExecutor<CommandSource> {
+public class GetPosCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(false, PlayerInfoPermissions.GETPOS_OTHERS)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User user = context.getUserFromArgs();
-        Location<World> location;
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.getUserFromArgs();
+        final Location<World> location;
         if (user.isOnline()) {
             location = user.getPlayer().get().getLocation();
         } else {
-            World w =
+            final World w =
                     user.getWorldUniqueId().flatMap(x -> Sponge.getServer().getWorld(x))
                             .orElseThrow(() -> context.createException("command.getpos.location.nolocation", user.getName()));
             location = new Location<>(
@@ -56,8 +56,8 @@ public class GetPosCommand implements ICommandExecutor<CommandSource> {
             );
         }
 
-        boolean isSelf = context.is(user);
-        Vector3i blockPos = location.getBlockPosition();
+        final boolean isSelf = context.is(user);
+        final Vector3i blockPos = location.getBlockPosition();
         if (isSelf) {
             context.sendMessage(
                             "command.getpos.location.self",

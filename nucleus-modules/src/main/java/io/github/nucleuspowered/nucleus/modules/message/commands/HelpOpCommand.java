@@ -23,13 +23,13 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatte
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.text.Text;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @EssentialsEquivalent({"helpop", "amsg", "ac"})
 @Command(
@@ -44,37 +44,37 @@ import javax.inject.Inject;
         },
         associatedPermissions = MessagePermissions.HELPOP_RECEIVE
 )
-public class HelpOpCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class HelpOpCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final IChatMessageFormatterService chatMessageFormatterService;
     @Nullable private HelpOpMessageChannel channel;
 
     @Inject
-    public HelpOpCommand(INucleusServiceCollection serviceCollection) {
+    public HelpOpCommand(final INucleusServiceCollection serviceCollection) {
         this.chatMessageFormatterService = serviceCollection.chatMessageFormatter();
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.MESSAGE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        String message = context.requireOne(NucleusParameters.Keys.MESSAGE, String.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String message = context.requireOne(NucleusParameters.Keys.MESSAGE, String.class);
 
         // Message is about to be sent. Send the event out. If canceled, then
         // that's that.
-        if (Sponge.getEventManager().post(new InternalNucleusHelpOpEvent(context.getCommandSource(), message))) {
+        if (Sponge.getEventManager().post(new InternalNucleusHelpOpEvent(context.getCommandSourceRoot(), message))) {
             return context.errorResult("message.cancel");
         }
 
-        Player player = context.getIfPlayer();
+        final Player player = context.getIfPlayer();
 
-        MessageChannelEvent.Chat chat;
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame();
-                NoExceptionAutoClosable c = this.chatMessageFormatterService.setPlayerNucleusChannelTemporarily(player.getUniqueId(), this.channel)) {
+        final MessageChannelEvent.Chat chat;
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame();
+                final NoExceptionAutoClosable c = this.chatMessageFormatterService.setPlayerNucleusChannelTemporarily(player.getUniqueId(), this.channel)) {
             frame.addContext(EventContexts.SHOULD_FORMAT_CHANNEL, false);
             frame.pushCause(player);
             chat = player.simulateChat(Text.of(message), Sponge.getCauseStackManager().getCurrentCause());
@@ -89,7 +89,7 @@ public class HelpOpCommand implements ICommandExecutor<Player>, IReloadableServi
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.channel = new HelpOpMessageChannel(
                 serviceCollection.moduleDataProvider().getModuleConfig(MessageConfig.class).getHelpOpPrefix(serviceCollection.textTemplateFactory()),
                 serviceCollection.permissionService(),

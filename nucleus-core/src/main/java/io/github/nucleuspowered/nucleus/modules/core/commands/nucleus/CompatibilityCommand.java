@@ -25,10 +25,10 @@ import java.util.Comparator;
         parentCommand = NucleusCommand.class,
         async = true
 )
-public class CompatibilityCommand implements ICommandExecutor<CommandSource> {
+public class CompatibilityCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(final ICommandContext<? extends CommandSource> context) {
+    public ICommandResult execute(final ICommandContext context) {
         ICompatibilityService compatibilityService = context.getServiceCollection().compatibilityService();
         Collection<ICompatibilityService.CompatibilityMessages> messages = compatibilityService.getApplicableMessages();
         if (messages.isEmpty()) {
@@ -37,10 +37,10 @@ public class CompatibilityCommand implements ICommandExecutor<CommandSource> {
         }
 
         // Create pagination
-        Text text = messages.stream()
+        TextComponent text = messages.stream()
                 .sorted(Comparator.comparing(x -> -x.getSeverity().getIndex()))
                 .map(x -> {
-                    Text modulesAffected =
+                    TextComponent modulesAffected =
                             x.getModules().isEmpty() ?
                                     context.getMessage("command.nucleus.compat.all") :
                                     Text.of(String.join(" ,", x.getModules()));
@@ -56,10 +56,10 @@ public class CompatibilityCommand implements ICommandExecutor<CommandSource> {
                 })
                 .reduce((text1, text2) -> Text.of(text1, Text.NEW_LINE, Text.NEW_LINE, text2))
                 .orElse(Text.EMPTY);
-        Util.getPaginationBuilder(context.getCommandSourceUnchecked())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
                 .header(context.getMessage("command.nucleus.compat.header"))
                 .contents(text)
-                .sendTo(context.getCommandSourceUnchecked());
+                .sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 }

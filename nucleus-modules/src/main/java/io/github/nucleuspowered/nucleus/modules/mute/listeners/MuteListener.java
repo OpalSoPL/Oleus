@@ -34,7 +34,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class MuteListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -45,7 +45,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
     private final PluginContainer pluginContainer;
 
     @Inject
-    public MuteListener(INucleusServiceCollection serviceCollection) {
+    public MuteListener(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(MuteHandler.class);
         this.messageProvider = serviceCollection.messageProvider();
         this.permissionService = serviceCollection.permissionService();
@@ -61,10 +61,10 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
     public void onPlayerLogin(final ClientConnectionEvent.Join event) {
         // Kick off a scheduled task.
         Sponge.getScheduler().createTaskBuilder().async().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
-            Player user = event.getTargetEntity();
-            Optional<MuteData> omd = this.handler.getPlayerMuteData(user);
+            final Player user = event.getTargetEntity();
+            final Optional<MuteData> omd = this.handler.getPlayerMuteData(user);
             if (omd.isPresent()) {
-                MuteData md = omd.get();
+                final MuteData md = omd.get();
                 md.nextLoginToTimestamp();
 
                 if (isMuted(user)) {
@@ -75,11 +75,11 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener(order = Order.LATE)
-    public void onChat(MessageChannelEvent.Chat event) {
+    public void onChat(final MessageChannelEvent.Chat event) {
         Util.onPlayerSimulatedOrPlayer(event, this::onChat);
     }
 
-    private void onChat(MessageChannelEvent.Chat event, Player player) {
+    private void onChat(final MessageChannelEvent.Chat event, final Player player) {
         boolean cancel = false;
         if (isMuted(player)) {
             this.handler.onMute(player);
@@ -96,7 +96,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
         if (cancel) {
             if (this.muteConfig.isShowMutedChat()) {
                 // Send it to admins only.
-                String m = this.muteConfig.getCancelledTag();
+                final String m = this.muteConfig.getCancelledTag();
                 if (!m.isEmpty()) {
                     event.getFormatter().setHeader(
                         Text.join(TextSerializers.FORMATTING_CODE.deserialize(m), event.getFormatter().getHeader().toText()));
@@ -111,7 +111,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onPlayerMessage(NucleusMessageEvent event, @Getter("getSender") Player source) {
+    public void onPlayerMessage(final NucleusMessageEvent event, @Getter("getSender") final Player source) {
         boolean isCancelled = false;
         if (isMuted(source)) {
             if (source.isOnline()) {
@@ -128,7 +128,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onPlayerHelpOp(InternalNucleusHelpOpEvent event, @Root Player source) {
+    public void onPlayerHelpOp(final InternalNucleusHelpOpEvent event, @Root final Player source) {
         if (isMuted(source)) {
             if (source.isOnline()) {
                 this.handler.onMute(source);
@@ -143,7 +143,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
         }
     }
 
-    private boolean cancelOnGlobalMute(Player player, boolean isCancelled) {
+    private boolean cancelOnGlobalMute(final Player player, final boolean isCancelled) {
         if (isCancelled || !this.handler.isGlobalMuteEnabled() || this.permissionService.hasPermission(player, MutePermissions.VOICE_AUTO)) {
             return false;
         }
@@ -157,11 +157,11 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.muteConfig = serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class);
     }
 
-    private boolean isMuted(Player player) {
+    private boolean isMuted(final Player player) {
         if (!this.handler.isMutedCached(player)) {
             return false;
         } else if (this.handler.getPlayerMuteData(player).map(EndTimestamp::expired).orElse(true)) { // true indicates expiry

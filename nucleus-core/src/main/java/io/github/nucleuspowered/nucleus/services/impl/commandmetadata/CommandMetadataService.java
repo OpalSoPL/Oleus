@@ -9,7 +9,8 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
-import io.github.nucleuspowered.nucleus.NucleusPluginInfo;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandInterceptor;
@@ -29,10 +30,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandMapping;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -47,10 +45,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-@SuppressWarnings({"UnstableApiUsage", "rawtypes"})
 @Singleton
 public class CommandMetadataService implements ICommandMetadataService, IReloadableService.Reloadable {
 
@@ -60,7 +54,6 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
     private final Map<String, String> commandremap = new HashMap<>();
     private final Path commandsFile;
-    private final PluginContainer pluginContainer;
     private final IConfigurateHelper configurateHelper;
     private final IMessageProviderService messageProviderService;
     private final Map<String, CommandMetadata> commandMetadataMap = new HashMap<>();
@@ -69,20 +62,18 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
     private CommentedConfigurationNode commandsConfConfigNode;
     private boolean registrationComplete = false;
-    private List<ICommandInterceptor> interceptors = new ArrayList<>();
-    private List<String> registeredAliases = new ArrayList<>();
+    private final List<ICommandInterceptor> interceptors = new ArrayList<>();
+    private final List<String> registeredAliases = new ArrayList<>();
 
     @Inject
     public CommandMetadataService(@ConfigDirectory final Path configDirectory,
             final IReloadableService reloadableService,
             final IMessageProviderService messageProviderService,
-            final IConfigurateHelper helper,
-            final PluginContainer pluginContainer) {
+            final IConfigurateHelper helper) {
         reloadableService.registerReloadable(this);
         this.configurateHelper = helper;
         this.messageProviderService = messageProviderService;
         this.commandsFile = configDirectory.resolve("commands.conf");
-        this.pluginContainer = pluginContainer;
     }
 
     private String getKey(final Command command) {
@@ -114,8 +105,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             final String id,
             final String name,
             final Command command,
-            final Class<? extends ICommandExecutor<?>> associatedContext
-    ) {
+            final Class<? extends ICommandExecutor> associatedContext) {
         Preconditions.checkState(!this.registrationComplete, "Registration has completed.");
         final String key = this.getKey(command);
         this.commandMetadataMap.put(key, new CommandMetadata(
@@ -139,12 +129,13 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
      * </ol>
      */
     @Override
-    public void completeRegistrationPhase(final INucleusServiceCollection serviceCollection) {
+    public void completeRegistrationPhase(final INucleusServiceCollection serviceCollection,
+            final RegisterCommandEvent<org.spongepowered.api.command.Command.Parameterized> event) {
         Preconditions.checkState(!this.registrationComplete, "Registration has completed.");
         this.registrationComplete = true;
         this.load();
 
-        final Map<Class<? extends ICommandExecutor<?>>, String> metadataStringMap = this.commandMetadataMap.entrySet()
+        final Map<Class<? extends ICommandExecutor>, String> metadataStringMap = this.commandMetadataMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         entry -> entry.getValue().getExecutor(),
@@ -210,7 +201,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         // save();
 
         // use aliases to register commands.
-        this.register(toRegister, commands, ICommandExecutor.class, null, serviceCollection);
+        this.register(toRegister, commands, ICommandExecutor.class, null, serviceCollection, event);
 
         // Okay, now we've created our commands, time to update command conf with the modifiers.
         this.mergeModifierDefaults();
@@ -225,7 +216,8 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             final Map<CommandMetadata, CommandControl> commands,
             final Class<T> keyToCheck,
             @Nullable final CommandControl parentControl,
-            final INucleusServiceCollection collection) {
+            final INucleusServiceCollection collection,
+            final RegisterCommandEvent<org.spongepowered.api.command.Command.Parameterized> event) {
 
         for (final Map.Entry<String, CommandMetadata> entry : toStart.get(keyToCheck).entrySet()) {
             final CommandControl control = commands.computeIfAbsent(entry.getValue(), mm -> this.construct(parentControl, mm, collection));
@@ -234,7 +226,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             final boolean hasKey = toStart.containsKey(currentKey);
             if (hasKey) {
                 // register entries with this executor.
-                this.register(toStart, commands, entry.getValue().getExecutor(), control, collection);
+                this.register(toStart, commands, entry.getValue().getExecutor(), control, collection, event);
             }
 
             // actual parent
@@ -263,9 +255,13 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
                 // Additions
                 orderedAliases.addAll(aliasesToAdd);
-
-                Sponge.getCommandManager().register(collection.pluginContainer(), aliases.getKey(), orderedAliases)
-                    .ifPresent(x -> this.registeredAliases.addAll(x.getAllAliases()));
+                final String first = orderedAliases.get(0);
+                final Collection<String> others = orderedAliases.subList(1, orderedAliases.size());
+                this.registeredAliases.addAll(event.register(
+                        collection.pluginContainer(),
+                        aliases.getKey(),
+                        first,
+                        others).getAllAliases());
             }
 
             commands.values().forEach(x -> x.completeRegistration(collection));
@@ -332,7 +328,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     private CommandControl construct(@Nullable final CommandControl parent, final CommandMetadata metadata, final INucleusServiceCollection serviceCollection) {
-        final ICommandExecutor<?> executor = serviceCollection.injector().getInstance(metadata.getExecutor());
+        final ICommandExecutor executor = serviceCollection.injector().getInstance(metadata.getExecutor());
         return new CommandControl(
                 executor,
                 parent,
@@ -341,38 +337,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         );
     }
 
-    @Override public void addMapping(final String newCommand, final String remapped) {
-        if (this.commandremap.containsKey(newCommand.toLowerCase())) {
-            throw new IllegalArgumentException("command already in use");
-        }
-
-        this.commandremap.put(newCommand.toLowerCase(), remapped);
-    }
-
-    @Override public void activate() {
-        for (final Map.Entry<String, String> entry : this.commandremap.entrySet()) {
-            if (!Sponge.getCommandManager().get(entry.getKey()).isPresent()) {
-                Sponge.getCommandManager().get(entry.getValue()).ifPresent(x ->
-                        Sponge.getCommandManager().register(this.pluginContainer, x.getCallable(), entry.getKey()));
-            }
-        }
-    }
-
-    @Override public void deactivate() {
-        for (final Map.Entry<String, String> entry : this.commandremap.entrySet()) {
-            final Optional<? extends CommandMapping> mappingOptional = Sponge.getCommandManager().get(entry.getKey());
-            if (mappingOptional.isPresent() &&
-                    Sponge.getCommandManager().getOwner(mappingOptional.get()).map(x -> x.getId().equals(NucleusPluginInfo.ID)).orElse(false)) {
-                Sponge.getCommandManager().removeMapping(mappingOptional.get());
-            }
-        }
-    }
-
-    @Override public boolean isNucleusCommand(final String command) {
-        return this.registrationComplete && this.registeredAliases.contains(command.toLowerCase());
-    }
-
-    @Override public Optional<CommandControl> getControl(final Class<? extends ICommandExecutor<? extends CommandSource>> executorClass) {
+    @Override public Optional<CommandControl> getControl(final Class<? extends ICommandExecutor> executorClass) {
         return Optional.ofNullable(this.controlToExecutorClass.get(executorClass));
     }
 

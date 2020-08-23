@@ -13,26 +13,26 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class KeepInventoryListener implements ListenerBase.Conditional {
 
     private final IPermissionService permissionService;
 
     @Inject
-    public KeepInventoryListener(INucleusServiceCollection serviceCollection) {
+    public KeepInventoryListener(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
     }
 
     @Listener
-    public void onEntityDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Player living) {
+    public void onEntityDeath(final DestructEntityEvent.Death event, @Getter("getTargetEntity") final Player living) {
         if (this.permissionService.hasPermission(living, InventoryPermissions.INVENTORY_KEEP)) {
             event.setKeepInventory(true);
         }
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return !serviceCollection.permissionService().isOpOnly();
     }
 

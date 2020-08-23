@@ -13,15 +13,15 @@ import java.util.List;
 public class RTPConfigAdapter extends NucleusConfigAdapter.StandardWithSimpleDefault<RTPConfig> {
 
     @Override
-    protected void manualTransform(ConfigurationNode node) {
+    protected void manualTransform(final ConfigurationNode node) {
         nodeTransform(node);
         node.getNode("world-overrides").getChildrenMap().forEach((key, value) -> nodeTransform(value));
     }
 
-    private void nodeTransform(ConfigurationNode node) {
+    private void nodeTransform(final ConfigurationNode node) {
         if (node.getNode("default-method").isVirtual() && !node.getNode("center-on-player").isVirtual() && !node.getNode("surface-only").isVirtual()) {
-            boolean centreOnPlayer = node.getNode("center-on-player").getBoolean(false);
-            boolean surfaceonly = node.getNode("surface-only").getBoolean(false);
+            final boolean centreOnPlayer = node.getNode("center-on-player").getBoolean(false);
+            final boolean surfaceonly = node.getNode("surface-only").getBoolean(false);
 
             if (centreOnPlayer) {
                 if (surfaceonly) {

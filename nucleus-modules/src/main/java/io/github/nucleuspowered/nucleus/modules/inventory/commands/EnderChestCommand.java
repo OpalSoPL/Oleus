@@ -16,10 +16,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.IfConditionElseArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -41,10 +40,10 @@ import org.spongepowered.api.item.inventory.Inventory;
         }
 )
 @EssentialsEquivalent({"enderchest", "echest", "endersee", "ec"})
-public class EnderChestCommand implements ICommandExecutor<Player> {
+public class EnderChestCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.optional(
                         serviceCollection.commandElementSupplier().createPermissionParameter(
@@ -58,16 +57,16 @@ public class EnderChestCommand implements ICommandExecutor<Player> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        User target = context.getUserFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User target = context.getUserFromArgs();
 
         if (!context.is(target)) {
             if (context.testPermissionFor(target, InventoryPermissions.ENDERCHEST_EXEMPT_INSPECT)) {
                 return context.errorResult("command.enderchest.targetexempt", target.getName());
             }
 
-            Inventory ec = target.getEnderChestInventory();
-            Container container = context.getCommandSourceAsPlayerUnchecked()
+            final Inventory ec = target.getEnderChestInventory();
+            final Container container = context.getCommandSourceAsPlayerUnchecked()
                     .openInventory(ec)
                     .orElseThrow(() -> context.createException("command.invsee.failed"));
 

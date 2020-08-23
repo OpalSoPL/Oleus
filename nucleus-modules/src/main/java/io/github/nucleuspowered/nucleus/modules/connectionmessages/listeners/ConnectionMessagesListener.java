@@ -24,7 +24,7 @@ import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class ConnectionMessagesListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -35,14 +35,14 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
     private ConnectionMessagesConfig cmc = new ConnectionMessagesConfig();
 
     @Inject
-    public ConnectionMessagesListener(INucleusServiceCollection serviceCollection) {
+    public ConnectionMessagesListener(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
         this.storageManager = serviceCollection.storageManager();
         this.pluginContainer = serviceCollection.pluginContainer();
     }
 
     @Listener
-    public void onPlayerLogin(ClientConnectionEvent.Join joinEvent, @Getter("getTargetEntity") Player pl) {
+    public void onPlayerLogin(final ClientConnectionEvent.Join joinEvent, @Getter("getTargetEntity") final Player pl) {
         if (joinEvent.isMessageCancelled() || (this.cmc.isDisableWithPermission() &&
                 this.permissionService.hasPermission(pl, ConnectionMessagesPermissions.CONNECTIONMESSSAGES_DISABLE))) {
             joinEvent.setMessageCancelled(true);
@@ -50,7 +50,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
         }
 
         try {
-            Optional<String> lastKnown = storageManager.getUserOnThread(pl.getUniqueId()).flatMap(x -> x.get(CoreKeys.LAST_KNOWN_NAME));
+            final Optional<String> lastKnown = storageManager.getUserOnThread(pl.getUniqueId()).flatMap(x -> x.get(CoreKeys.LAST_KNOWN_NAME));
             if (this.cmc.isDisplayPriorName() &&
                 !this.cmc.getPriorNameMessage().isEmpty() &&
                 !lastKnown.orElseGet(pl::getName).equalsIgnoreCase(pl.getName())) {
@@ -60,7 +60,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
                                     .getForCommandSource(pl,
                                             ImmutableMap.of("previousname", cs -> Optional.of(Text.of(lastKnown.get())))));
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
 
@@ -74,14 +74,14 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
     }
 
     @Listener
-    public void onPlayerFirstJoin(NucleusFirstJoinEvent event, @Getter("getTargetEntity") Player pl) {
+    public void onPlayerFirstJoin(final NucleusFirstJoinEvent event, @Getter("getTargetEntity") final Player pl) {
         if (this.cmc.isShowFirstTimeMessage() && !this.cmc.getFirstTimeMessage().isEmpty()) {
             event.getChannel().orElse(MessageChannel.TO_ALL).send(this.pluginContainer, this.cmc.getFirstTimeMessage().getForSource(pl));
         }
     }
 
     @Listener
-    public void onPlayerQuit(ClientConnectionEvent.Disconnect leaveEvent, @Getter("getTargetEntity") Player pl) {
+    public void onPlayerQuit(final ClientConnectionEvent.Disconnect leaveEvent, @Getter("getTargetEntity") final Player pl) {
         if (leaveEvent.isMessageCancelled() || (this.cmc.isDisableWithPermission() &&
                 this.permissionService.hasPermission(pl, ConnectionMessagesPermissions.CONNECTIONMESSSAGES_DISABLE))) {
             leaveEvent.setMessageCancelled(true);
@@ -97,7 +97,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
         }
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.cmc = serviceCollection.moduleDataProvider().getModuleConfig(ConnectionMessagesConfig.class);
     }
 }

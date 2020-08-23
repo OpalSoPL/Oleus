@@ -17,20 +17,20 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class NicknameListener implements ListenerBase {
 
     private final NicknameService nicknameService;
 
     @Inject
-    public NicknameListener(INucleusServiceCollection serviceCollection) {
+    public NicknameListener(final INucleusServiceCollection serviceCollection) {
         this.nicknameService = serviceCollection.getServiceUnchecked(NicknameService.class);
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerJoin(ClientConnectionEvent.Join event, @Root Player player) {
-        Optional<Text> nickname = this.nicknameService.getNickname(player);
+    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Root final Player player) {
+        final Optional<Text> nickname = this.nicknameService.getNickname(player);
         this.nicknameService.markRead(player.getUniqueId());
         nickname.ifPresent(text -> {
             this.nicknameService.updateCache(player.getUniqueId(), text);
@@ -41,7 +41,7 @@ public class NicknameListener implements ListenerBase {
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerQuit(ClientConnectionEvent.Disconnect event, @Root Player player) {
+    public void onPlayerQuit(final ClientConnectionEvent.Disconnect event, @Root final Player player) {
         this.nicknameService.removeFromCache(player.getUniqueId());
     }
 

@@ -41,8 +41,8 @@ public class UserPreferenceService implements IUserPreferenceService {
     private final Map<String, NucleusUserPreferenceService.PreferenceKey<?>> registered = new HashMap<>();
     private final Element element;
 
-    public static final Text PREFERENCE_ARG = Text.of("preference");
-    public static final Text VALUE_ARG = Text.of("value");
+    public static final TextComponent PREFERENCE_ARG = Text.of("preference");
+    public static final TextComponent VALUE_ARG = Text.of("value");
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
@@ -168,7 +168,7 @@ public class UserPreferenceService implements IUserPreferenceService {
             DOUBLE(new LazyLoadFunction<>(s -> GenericArguments.doubleNum(VALUE_ARG))),
             INTEGER(new LazyLoadFunction<>(s -> GenericArguments.integer(VALUE_ARG))),
             STRING(new LazyLoadFunction<>(s -> GenericArguments.remainingRawJoinedStrings(VALUE_ARG))),
-            LOCALE(new LazyLoadFunction<>(s -> s.commandElementSupplier().createLocaleElement(VALUE_ARG)));
+            LOCALE(new LazyLoadFunction<>(s -> s.commandElementSupplier().createLocaleElement()));
 
             final LazyLoadFunction<INucleusServiceCollection, CommandElement> element;
 
@@ -184,7 +184,7 @@ public class UserPreferenceService implements IUserPreferenceService {
 
         private final Map<String, NucleusUserPreferenceService.PreferenceKey<?>> keys = new HashMap<>();
 
-        @Nullable @Override public Text getKey() {
+        @Nullable @Override public TextComponent getKey() {
             return Text.of("<preference> [value]");
         }
 
@@ -278,7 +278,7 @@ public class UserPreferenceService implements IUserPreferenceService {
         }
 
         @Override
-        public Text getUsage(final CommandSource src) {
+        public TextComponent getUsage(final CommandSource src) {
             return this.getKey();
         }
     }

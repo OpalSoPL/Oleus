@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "nucleus.printperms",
         parentCommand = NucleusCommand.class
 )
-public class PrintPermsCommand implements ICommandExecutor<CommandSource> {
+public class PrintPermsCommand implements ICommandExecutor {
 
     private static List<String> onStream(List<IPermissionService.Metadata> metadata, final SuggestedLevel suggestedLevel) {
         return metadata.stream()
@@ -38,7 +38,7 @@ public class PrintPermsCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         List<IPermissionService.Metadata> l = context.getServiceCollection()
                 .permissionService()
                 .getAllMetadata();

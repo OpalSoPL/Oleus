@@ -125,7 +125,7 @@ public interface NucleusWarpService {
      * @param description The description, or <code>null</code> to clear.
      * @return {@code true} if successful
      */
-    boolean setWarpDescription(String warpName, @Nullable Text description);
+    boolean setWarpDescription(String warpName, @Nullable TextComponent description);
 
     /**
      * Gets the names of all the warp that are available.
@@ -159,7 +159,7 @@ public interface NucleusWarpService {
      * @param displayName The display name. Set to null to revert to the category name.
      * @return <code>true</code> if the category exists and this is successful.
      */
-    boolean setWarpCategoryDisplayName(String category, @Nullable Text displayName);
+    boolean setWarpCategoryDisplayName(String category, @Nullable TextComponent displayName);
 
     /**
      * Sets the description of a warp category.
@@ -168,5 +168,5 @@ public interface NucleusWarpService {
      * @param description The description. Set to null to remove the description.
      * @return <code>true</code> if the category exists and this is successful.
      */
-    boolean setWarpCategoryDescription(String category, @Nullable Text description);
+    boolean setWarpCategoryDescription(String category, @Nullable TextComponent description);
 }

@@ -18,7 +18,7 @@ public class ChatService implements IReloadableService.Reloadable, ServiceBase {
 
     private ChatConfig config = new ChatConfig();
 
-    public ChatTemplateConfig getTemplateNow(Subject subject) {
+    public ChatTemplateConfig getTemplateNow(final Subject subject) {
         if (!this.config.isUseGroupTemplates()) {
             return this.config.getDefaultTemplate();
         }
@@ -27,7 +27,7 @@ public class ChatService implements IReloadableService.Reloadable, ServiceBase {
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class);
     }
 }

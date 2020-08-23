@@ -14,28 +14,28 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 @EssentialsEquivalent("rules")
 @Command(aliases = "rules", basePermission = RulesPermissions.BASE_RULES, commandDescriptionKey = "rules", async = true)
-public class RulesCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class RulesCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private Text title = Text.EMPTY;
+    private TextComponent title = Text.EMPTY;
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         context.getServiceCollection()
                 .textFileControllerCollection()
                 .get(RulesModule.RULES_KEY)
                 .orElseThrow(() -> context.createException("command.rules.empty"))
-                .sendToPlayer(context.getCommandSource(), this.title);
+                .sendToPlayer(context.getCommandSourceRoot(), this.title);
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        RulesConfig config = serviceCollection.moduleDataProvider().getModuleConfig(RulesConfig.class);
-        String title = config.getRulesTitle();
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final RulesConfig config = serviceCollection.moduleDataProvider().getModuleConfig(RulesConfig.class);
+        final String title = config.getRulesTitle();
         if (title.isEmpty()) {
             this.title = Text.EMPTY;
         } else {

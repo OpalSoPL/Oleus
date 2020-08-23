@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -37,9 +37,9 @@ import org.spongepowered.api.world.teleport.TeleportHelperFilters;
         },
         associatedPermissions = JumpPermissions.OTHERS_TOP
 )
-public class TopCommand implements ICommandExecutor<CommandSource> {
+public class TopCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             GenericArguments.flags().flag("f").buildWith(
                     serviceCollection.commandElementSupplier()
@@ -48,15 +48,15 @@ public class TopCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player playerToTeleport = context.getPlayerFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player playerToTeleport = context.getPlayerFromArgs();
 
         // Get the topmost block for the subject.
-        Location<World> location = playerToTeleport.getLocation();
-        double x = location.getX();
-        double z = location.getZ();
-        Location<World> start = new Location<>(location.getExtent(), x, location.getExtent().getBlockMax().getY(), z);
-        BlockRayHit<World> end = BlockRay.from(start).stopFilter(BlockRay.onlyAirFilter())
+        final Location<World> location = playerToTeleport.getLocation();
+        final double x = location.getX();
+        final double z = location.getZ();
+        final Location<World> start = new Location<>(location.getExtent(), x, location.getExtent().getBlockMax().getY(), z);
+        final BlockRayHit<World> end = BlockRay.from(start).stopFilter(BlockRay.onlyAirFilter())
             .to(playerToTeleport.getLocation().getPosition().sub(0, 1, 0)).end()
             .orElseThrow(() -> context.createException("command.top.nothingfound"));
 
@@ -70,8 +70,8 @@ public class TopCommand implements ICommandExecutor<CommandSource> {
             }
         }
 
-        boolean isSafe = !context.hasAny("f");
-        TeleportResult result = context.getServiceCollection()
+        final boolean isSafe = !context.hasAny("f");
+        final TeleportResult result = context.getServiceCollection()
                 .teleportService()
                 .teleportPlayer(
                         playerToTeleport,

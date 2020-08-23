@@ -10,6 +10,9 @@ import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.pagination.PaginationList;
@@ -34,7 +37,7 @@ import javax.annotation.Nullable;
  */
 public final class TextFileController {
 
-    private static final Text padding = Text.of(TextColors.GOLD, "-");
+    private static final TextComponent padding = TextComponent.of("-", NamedTextColor.GOLD);
 
     private static final List<Charset> characterSetsToTest = Lists.newArrayList(
         StandardCharsets.UTF_8,
@@ -121,7 +124,7 @@ public final class TextFileController {
         this.textTemplates.clear();
     }
 
-    public Optional<Text> getTitle(final CommandSource source) {
+    public Optional<TextComponent> getTitle(final Audience source) {
         if (this.getTitle && this.textTemplates.isEmpty() && !this.fileContents.isEmpty()) {
             // Initialisation!
             this.getFileContentsAsText();
@@ -134,11 +137,11 @@ public final class TextFileController {
         return Optional.empty();
     }
 
-    public List<Text> getTextFromNucleusTextTemplates(final CommandSource source) {
+    public List<TextComponent> getTextFromNucleusTextTemplates(final Audience source) {
         return this.getFileContentsAsText().stream().map(x -> x.getForCommandSource(source)).collect(Collectors.toList());
     }
 
-    public void sendToPlayer(final CommandSource src, final Text title) {
+    public void sendToPlayer(final CommandSource src, final TextComponent title) {
 
         final PaginationList.Builder pb = Util.getPaginationBuilder(src).contents(this.getTextFromNucleusTextTemplates(src));
 

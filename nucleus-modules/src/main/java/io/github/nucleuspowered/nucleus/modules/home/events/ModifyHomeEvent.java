@@ -16,7 +16,7 @@ public class ModifyHomeEvent extends AbstractHomeEvent implements NucleusHomeEve
 
     private final Home home;
 
-    public ModifyHomeEvent(Cause cause, Home home, Location<World> newLocation) {
+    public ModifyHomeEvent(final Cause cause, final Home home, final Location<World> newLocation) {
         super(home.getName(), home.getUser(), cause, newLocation);
         this.home = home;
     }

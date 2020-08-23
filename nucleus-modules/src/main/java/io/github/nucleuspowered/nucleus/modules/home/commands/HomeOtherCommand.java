@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -34,17 +34,17 @@ import org.spongepowered.api.text.Text;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = HomePermissions.EXEMPT_COST_HOME_OTHER)
         }
 )
-public class HomeOtherCommand implements ICommandExecutor<Player>, IReloadableService.Reloadable {
+public class HomeOtherCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final String home = "home";
     private boolean isSafeTeleport = true;
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.isSafeTeleport = serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class).isSafeTeleport();
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.onlyOne(
                         new HomeOtherArgument(
@@ -54,13 +54,13 @@ public class HomeOtherCommand implements ICommandExecutor<Player>, IReloadableSe
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the home.
-        Home wl = context.requireOne(this.home, Home.class);
-        HomeService service = context.getServiceCollection().getServiceUnchecked(HomeService.class);
+        final Home wl = context.requireOne(this.home, Home.class);
+        final HomeService service = context.getServiceCollection().getServiceUnchecked(HomeService.class);
 
-        Player player = context.getIfPlayer();
-        TeleportResult result = service.warpToHome(
+        final Player player = context.getIfPlayer();
+        final TeleportResult result = service.warpToHome(
                             player,
                             wl,
                             this.isSafeTeleport

@@ -41,29 +41,29 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
      * @return An {@link Optional} potentially containing the {@link TextFileController}.
      *
      */
-    public Optional<TextFileController> getSection(String name) {
-        Optional<String> os = this.infoFiles.keySet().stream().filter(name::equalsIgnoreCase).findFirst();
+    public Optional<TextFileController> getSection(final String name) {
+        final Optional<String> os = this.infoFiles.keySet().stream().filter(name::equalsIgnoreCase).findFirst();
         return os.map(this.infoFiles::get);
 
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         // Get the config directory, check to see if "info/" exists.
-        Path infoDir = serviceCollection.configDir().resolve("info");
+        final Path infoDir = serviceCollection.configDir().resolve("info");
         if (!Files.exists(infoDir)) {
             try {
                 Files.createDirectories(infoDir);
 
-                AssetManager am = Sponge.getAssetManager();
+                final AssetManager am = Sponge.getAssetManager();
 
-                PluginContainer pluginContainer = serviceCollection.pluginContainer();
+                final PluginContainer pluginContainer = serviceCollection.pluginContainer();
 
                 // They exist.
                 am.getAsset(pluginContainer, "info.txt").get().copyToFile(infoDir.resolve("info.txt"));
                 am.getAsset(pluginContainer, "colors.txt").get().copyToFile(infoDir.resolve("colors.txt"));
                 am.getAsset(pluginContainer, "links.txt").get().copyToFile(infoDir.resolve("links.txt"));
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
                 return;
             }
@@ -72,17 +72,17 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
         }
 
         // Get all txt files.
-        List<Path> files;
-        try (Stream<Path> sp = Files.list(infoDir)) {
+        final List<Path> files;
+        try (final Stream<Path> sp = Files.list(infoDir)) {
             files = sp.filter(Files::isRegularFile)
               .filter(x -> this.validFile.matcher(x.getFileName().toString()).matches()).collect(Collectors.toList());
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             ex.printStackTrace();
             return;
         }
 
         // Collect them and put the resultant controllers into a temporary map.
-        Map<String, TextFileController> mst = Maps.newHashMap();
+        final Map<String, TextFileController> mst = Maps.newHashMap();
         files.forEach(x -> {
             try {
                 String name = x.getFileName().toString();
@@ -96,7 +96,7 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
                 }
 
                 mst.put(name, new TextFileController(serviceCollection.textTemplateFactory(), x, true));
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         });

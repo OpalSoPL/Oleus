@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 /**
@@ -27,19 +27,19 @@ import org.spongepowered.api.command.args.CommandElement;
         commandDescriptionKey = "kit.onetime",
         parentCommand = KitCommand.class
 )
-public class KitOneTimeCommand implements ICommandExecutor<CommandSource> {
+public class KitOneTimeCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.getServiceUnchecked(KitService.class).createKitElement(true),
                 NucleusParameters.ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        boolean b = context.requireOne(NucleusParameters.Keys.BOOL, Boolean.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+        final boolean b = context.requireOne(NucleusParameters.Keys.BOOL, Boolean.class);
 
         // This Kit is a reference back to the version in list, so we don't need
         // to update it explicitly

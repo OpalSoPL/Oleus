@@ -20,18 +20,18 @@ import java.util.Optional;
 @Command(aliases = {"stop"},
         basePermission = AdminPermissions.BASE_STOP,
         commandDescriptionKey = "stop")
-public class StopCommand implements ICommandExecutor<CommandSource> {
+public class StopCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_MESSAGE
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) {
-        Optional<String> opt = context.getOne(NucleusParameters.Keys.MESSAGE, String.class);
+    public ICommandResult execute(final ICommandContext context) {
+        final Optional<String> opt = context.getOne(NucleusParameters.Keys.MESSAGE, String.class);
         if (opt.isPresent()) {
             Sponge.getServer().shutdown(TextSerializers.FORMATTING_CODE.deserialize(opt.get()));
         } else {

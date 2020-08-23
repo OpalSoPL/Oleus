@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.parameter.PositiveInteg
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.CatalogTypes;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -48,7 +48,7 @@ import java.util.Optional;
                 MobPermissions.SPAWNMOB_MOB
         }
 )
-public class SpawnMobCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable { //extends AbstractCommand.SimpleTargetOtherPlayer implements
+public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Reloadable { //extends AbstractCommand.SimpleTargetOtherPlayer implements
     // SimpleReloadable {
 
     private final String amountKey = "amount";
@@ -56,7 +56,7 @@ public class SpawnMobCommand implements ICommandExecutor<CommandSource>, IReload
 
     private MobConfig mobConfig = new MobConfig();
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, MobPermissions.OTHERS_SPAWNMOB),
                 new ImprovedCatalogTypeArgument(Text.of(this.mobTypeKey), CatalogTypes.ENTITY_TYPE, serviceCollection),
@@ -64,35 +64,35 @@ public class SpawnMobCommand implements ICommandExecutor<CommandSource>, IReload
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
         // Get the amount
-        int amount = context.requireOne(this.amountKey, Integer.class);
-        EntityType et = context.requireOne(this.mobTypeKey, EntityType.class);
+        final int amount = context.requireOne(this.amountKey, Integer.class);
+        final EntityType et = context.requireOne(this.mobTypeKey, EntityType.class);
 
         if (!Living.class.isAssignableFrom(et.getEntityClass())) {
             return context.errorResult("command.spawnmob.livingonly", et.getTranslation().get());
         }
 
-        String id = et.getId().toLowerCase();
+        final String id = et.getId().toLowerCase();
         if (this.mobConfig.isPerMobPermission() && !context.isConsoleAndBypass() && !context.testPermission(MobPermissions.getSpawnMobPermissionFor(et))) {
             return context.errorResult("command.spawnmob.mobnoperm", et.getTranslation().get());
         }
 
-        Optional<BlockSpawnsConfig> config = this.mobConfig.getBlockSpawnsConfigForWorld(pl.getWorld());
+        final Optional<BlockSpawnsConfig> config = this.mobConfig.getBlockSpawnsConfigForWorld(pl.getWorld());
         if (config.isPresent() && (config.get().isBlockVanillaMobs() && id.startsWith("minecraft:") || config.get().getIdsToBlock().contains(id))) {
             return context.errorResult("command.spawnmob.blockedinconfig", et.getTranslation().get());
         }
 
-        Location<World> loc = pl.getLocation();
-        World w = loc.getExtent();
+        final Location<World> loc = pl.getLocation();
+        final World w = loc.getExtent();
 
         // Count the number of entities spawned.
         int i = 0;
 
         Entity entityone = null;
         do {
-            Entity e = w.createEntity(et, loc.getPosition());
+            final Entity e = w.createEntity(et, loc.getPosition());
             if (!w.spawnEntity(e)) {
                 return context.errorResult("command.spawnmob.fail", Text.of(e));
             }
@@ -121,7 +121,7 @@ public class SpawnMobCommand implements ICommandExecutor<CommandSource>, IReload
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.mobConfig = serviceCollection.moduleDataProvider().getModuleConfig(MobConfig.class);
     }
 

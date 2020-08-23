@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = ServerListModule.ID, name = "Server List")
 public class ServerListModule extends ConfigurableModule<ServerListConfig, ServerListConfigAdapter> {
@@ -21,7 +21,7 @@ public class ServerListModule extends ConfigurableModule<ServerListConfig, Serve
     public static final String ID = "server-list";
 
     @Inject
-    public ServerListModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public ServerListModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

@@ -48,7 +48,7 @@ public final class JailData extends EndTimestamp implements Jailing {
     // Configurate
     public JailData() { }
 
-    public JailData(UUID jailer, String jailName, String reason, Location<World> previousLocation) {
+    public JailData(final UUID jailer, final String jailName, final String reason, final Location<World> previousLocation) {
         this.jailer = jailer;
         this.reason = reason;
         this.jailName = jailName;
@@ -61,17 +61,17 @@ public final class JailData extends EndTimestamp implements Jailing {
         }
     }
 
-    public JailData(UUID jailer, String jailName, String reason, Location<World> previousLocation, Instant endTimestamp) {
+    public JailData(final UUID jailer, final String jailName, final String reason, final Location<World> previousLocation, final Instant endTimestamp) {
         this(jailer, jailName, reason, previousLocation);
         this.endtimestamp = endTimestamp.getEpochSecond();
     }
 
-    public JailData(UUID jailer, String jailName, String reason, Location<World> previousLocation, Duration timeFromNextLogin) {
+    public JailData(final UUID jailer, final String jailName, final String reason, final Location<World> previousLocation, final Duration timeFromNextLogin) {
         this(jailer, jailName, reason, previousLocation);
         this.timeFromNextLogin = timeFromNextLogin.getSeconds();
     }
 
-    public void setPreviousLocation(Location<World> previousLocation) {
+    public void setPreviousLocation(final Location<World> previousLocation) {
         this.world = previousLocation.getExtent().getUniqueId();
         this.previousx = previousLocation.getX();
         this.previousy = previousLocation.getY();
@@ -104,7 +104,7 @@ public final class JailData extends EndTimestamp implements Jailing {
 
     @Override public Optional<Location<World>> getPreviousLocation() {
         if (this.world != null) {
-            Optional<World> ow = Sponge.getServer().getWorld(this.world);
+            final Optional<World> ow = Sponge.getServer().getWorld(this.world);
             if (ow.isPresent() && this.previousx != 0 && this.previousy != -1 && this.previousz != 0) {
                 return Optional.of(new Location<>(ow.get(), this.previousx, this.previousy, this.previousz));
             }

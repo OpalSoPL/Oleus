@@ -17,14 +17,14 @@ import org.spongepowered.api.event.filter.Getter;
 public class DisableDeathMessagesListener implements ListenerBase.Conditional {
 
     @Listener(order = Order.BEFORE_POST)
-    public void onDeath(DestructEntityEvent.Death event, @Getter("getTargetEntity") Living living) {
+    public void onDeath(final DestructEntityEvent.Death event, @Getter("getTargetEntity") final Living living) {
         if (living instanceof Player) {
             event.setMessageCancelled(true);
         }
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(DeathMessageConfig.class).isEnableDeathMessages();
     }
 

@@ -22,7 +22,7 @@ public class OptionPlaceholder implements PlaceholderParser {
     }
 
     @Override
-    public Text parse(final PlaceholderContext placeholderContext) {
+    public TextComponent parse(final PlaceholderContext placeholderContext) {
         final Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject().filter(x -> x instanceof Subject).map(x -> (Subject) x);
         if (subjectOptional.isPresent() && placeholderContext.getArgumentString().isPresent()) {
             return this.permissionService

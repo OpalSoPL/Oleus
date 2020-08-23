@@ -21,7 +21,7 @@ public class RTPOptions implements NucleusRTPService.RTPOptions {
     private final int maxHeight;
     private final ImmutableSet<BiomeType> prohibitedBiomes;
 
-    public RTPOptions(RTPConfig config, @Nullable String worldName) {
+    public RTPOptions(final RTPConfig config, @Nullable final String worldName) {
         this.min = config.getMinRadius(worldName);
         this.max = config.getRadius(worldName);
         this.maxHeight = config.getMaxY(worldName);
@@ -29,7 +29,7 @@ public class RTPOptions implements NucleusRTPService.RTPOptions {
         this.prohibitedBiomes = config.getProhibitedBiomes();
     }
 
-    RTPOptions(RTPOptionsBuilder builder) {
+    RTPOptions(final RTPOptionsBuilder builder) {
         this.min = builder.min;
         this.max = builder.max;
         this.minHeight = builder.minheight;

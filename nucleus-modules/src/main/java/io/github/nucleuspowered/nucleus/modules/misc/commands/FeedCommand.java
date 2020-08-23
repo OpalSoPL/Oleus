@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
@@ -31,21 +31,21 @@ import org.spongepowered.api.entity.living.player.Player;
         associatedPermissions = MiscPermissions.OTHERS_FEED
 )
 @EssentialsEquivalent({"feed", "eat"})
-public class FeedCommand implements ICommandExecutor<CommandSource> {
+public class FeedCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier()
                         .createOnlyOtherUserPermissionElement(true, MiscPermissions.OTHERS_FEED)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player pl = context.getPlayerFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player pl = context.getPlayerFromArgs();
         // Get the food data and modify it.
-        FoodData foodData = pl.getFoodData();
-        Value<Integer> f = foodData.foodLevel().set(foodData.foodLevel().getDefault());
-        Value<Double> d = foodData.saturation().set(foodData.saturation().getDefault());
+        final FoodData foodData = pl.getFoodData();
+        final Value<Integer> f = foodData.foodLevel().set(foodData.foodLevel().getDefault());
+        final Value<Double> d = foodData.saturation().set(foodData.saturation().getDefault());
         foodData.set(f, d);
 
         if (pl.offer(foodData).isSuccessful()) {

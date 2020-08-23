@@ -32,10 +32,10 @@ import java.util.function.Supplier;
         commandDescriptionKey = "docgen",
         parentCommand = NucleusCommand.class
 )
-public class DocGenCommand implements ICommandExecutor<CommandSource> {
+public class DocGenCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         context.sendMessage("command.nucleus.docgen.start");
         final INucleusServiceCollection serviceCollection = context.getServiceCollection();
         final Path dataPath = serviceCollection.injector().getInstance(Key.get(new TypeLiteral<Supplier<Path>>() {}, DataDirectory.class)).get();

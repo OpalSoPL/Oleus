@@ -5,45 +5,33 @@
 package io.github.nucleuspowered.nucleus.services.impl.commandelement;
 
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.ArgumentParseException;
-import org.spongepowered.api.command.args.CommandArgs;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.ValueParameter;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-import javax.annotation.Nullable;
-
-public class LocaleElement extends CommandElement {
+public final class LocaleElement implements ValueParameter<Locale> {
 
     private final INucleusServiceCollection serviceCollection;
 
-    public LocaleElement(final Text key, final INucleusServiceCollection serviceCollection) {
-        super(key);
+    public LocaleElement(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
-    @Nullable
     @Override
-    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
-        final String s = args.next();
-        return this.serviceCollection.messageProvider().getLocaleFromName(s).orElseGet(() -> Locale.forLanguageTag(s.replace("_", "-")));
+    public List<String> complete(final CommandContext context) {
+        return this.serviceCollection.messageProvider().getAllLocaleNames();
     }
 
     @Override
-    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
-        final List<String> l = this.serviceCollection.messageProvider().getAllLocaleNames();
-        try {
-            final String a = args.peek().toLowerCase();
-            return l.stream()
-                    .filter(x -> x.toLowerCase().startsWith(a))
-                    .collect(Collectors.toList());
-        } catch (final ArgumentParseException e) {
-            return l;
-        }
+    public Optional<? extends Locale> getValue(final Parameter.Key<? super Locale> parameterKey, final ArgumentReader.Mutable reader,
+            final CommandContext.Builder context) throws ArgumentParseException {
+        final String s = reader.parseString();
+        return Optional.of(this.serviceCollection.messageProvider().getLocaleFromName(s).orElseGet(() -> Locale.forLanguageTag(s.replace("_", "-"))));
     }
 }

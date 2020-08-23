@@ -11,8 +11,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;;
+
 @Command(
         aliases = {"spawn"},
         basePermission = WorldPermissions.BASE_WORLD_SPAWN,
@@ -24,9 +24,9 @@ import org.spongepowered.api.entity.living.player.Player;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = WorldPermissions.EXEMPT_COST_WORLD_SPAWN)
         }
 )
-public class WorldSpawnCommand implements ICommandExecutor<Player> {
+public class WorldSpawnCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         context.getServiceCollection().teleportService()
                 .setLocation(context.getIfPlayer(), context.getIfPlayer().getWorld().getSpawnLocation());
         context.sendMessage("command.world.spawn.success");

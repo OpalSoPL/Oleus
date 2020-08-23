@@ -24,7 +24,7 @@ import org.spongepowered.api.text.channel.MutableMessageChannel;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class NoteListener implements ListenerBase.Conditional {
 
@@ -34,7 +34,7 @@ public class NoteListener implements ListenerBase.Conditional {
     private final PluginContainer pluginContainer;
 
     @Inject
-    public NoteListener(INucleusServiceCollection serviceCollection) {
+    public NoteListener(final INucleusServiceCollection serviceCollection) {
         this.noteHandler = serviceCollection.getServiceUnchecked(NoteHandler.class);
         this.permissionService = serviceCollection.permissionService();
         this.messageService = serviceCollection.messageProvider();
@@ -51,9 +51,9 @@ public class NoteListener implements ListenerBase.Conditional {
     @Listener
     public void onPlayerLogin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
         Sponge.getScheduler().createTaskBuilder().async().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
-            List<NoteData> notes = this.noteHandler.getNotesInternal(player);
+            final List<NoteData> notes = this.noteHandler.getNotesInternal(player);
             if (notes != null && !notes.isEmpty()) {
-                MutableMessageChannel messageChannel =
+                final MutableMessageChannel messageChannel =
                         this.permissionService.permissionMessageChannel(NotePermissions.NOTE_SHOWONLOGIN).asMutable();
                 messageChannel.send(
                         this.messageService.getMessage("note.login.notify", player.getName(), String.valueOf(notes.size())).toBuilder()
@@ -65,7 +65,7 @@ public class NoteListener implements ListenerBase.Conditional {
         }).submit(this.pluginContainer);
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(NoteConfig.class).isShowOnLogin();
     }
 

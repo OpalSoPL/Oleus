@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -25,22 +25,22 @@ import org.spongepowered.api.text.title.Title;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public abstract class TitleBase implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public abstract class TitleBase implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final String multiplePerm;
     private final String type;
-    private final Text fadeIn = Text.of("fade in");
-    private final Text fadeOut = Text.of("fade out");
-    private final Text time = Text.of("time");
+    private final TextComponent fadeIn = Text.of("fade in");
+    private final TextComponent fadeOut = Text.of("fade out");
+    private final TextComponent time = Text.of("time");
     private TitleConfig titleConfig = new TitleConfig();
 
-    protected TitleBase(String multiplePerm, String type) {
+    protected TitleBase(final String multiplePerm, final String type) {
         this.multiplePerm = multiplePerm;
         this.type = type;
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags()
                         .valueFlag(NucleusParameters.MANY_PLAYER.get(serviceCollection), "p")
@@ -52,9 +52,9 @@ public abstract class TitleBase implements ICommandExecutor<CommandSource>, IRel
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         // If we don't have a player, check we can send to all.
-        Collection<Player> targets;
+        final Collection<Player> targets;
         if (!context.hasAny(NucleusParameters.Keys.PLAYER)) {
             targets = Sponge.getServer().getOnlinePlayers();
         } else {
@@ -69,22 +69,22 @@ public abstract class TitleBase implements ICommandExecutor<CommandSource>, IRel
             return context.errorResult("command.title.multi.noperms");
         }
 
-        CommandSource sender = context.getCommandSourceUnchecked();
-        String message = context.requireOne(NucleusParameters.Keys.MESSAGE, String.class);
-        NucleusTextTemplate textTemplate =
+        final CommandSource sender = context.getCommandSourceRoot();
+        final String message = context.requireOne(NucleusParameters.Keys.MESSAGE, String.class);
+        final NucleusTextTemplate textTemplate =
                 context.getServiceCollection().textTemplateFactory().createFromAmpersandString(message);
-        Title.Builder builder = Title.builder()
+        final Title.Builder builder = Title.builder()
                 .fadeIn(toTicks(context, this.fadeIn, this.titleConfig::getFadeIn))
                 .fadeOut(toTicks(context, this.fadeOut, this.titleConfig::getFadeOut))
                 .stay(toTicks(context, this.time, this.titleConfig::getTime));
         if (targets.size() > 1) {
-            for (Player pl : targets) {
+            for (final Player pl : targets) {
                 pl.sendTitle(applyToBuilder(builder, textTemplate.getForCommandSource(pl, sender)).build());
             }
             context.sendMessage("command.title.player.success.multi", this.type, targets.size());
         } else {
-            Player pl = targets.iterator().next();
-            Text t = textTemplate.getForCommandSource(pl, sender);
+            final Player pl = targets.iterator().next();
+            final TextComponent t = textTemplate.getForCommandSource(pl, sender);
             pl.sendTitle(applyToBuilder(builder, t).build());
             context.sendMessage("command.title.player.success.single", this.type, t, pl.getName());
         }
@@ -92,14 +92,14 @@ public abstract class TitleBase implements ICommandExecutor<CommandSource>, IRel
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.titleConfig = serviceCollection.moduleDataProvider().getModuleConfig(NotificationConfig.class).getTitleDefaults();
     }
 
-    private int toTicks(ICommandContext<? extends CommandSource> source, Text key, Supplier<Double> supplier) {
+    private int toTicks(final ICommandContext source, final TextComponent key, final Supplier<Double> supplier) {
         return (int) (Math.max(0.05, source.getOne(key.toPlainSingle(), double.class).orElseGet(supplier)) * 20.0);
     }
 
-    protected abstract Title.Builder applyToBuilder(Title.Builder builder, Text text);
+    protected abstract Title.Builder applyToBuilder(Title.Builder builder, TextComponent text);
 
 }

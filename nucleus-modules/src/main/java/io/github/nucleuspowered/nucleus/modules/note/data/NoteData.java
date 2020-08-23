@@ -26,7 +26,7 @@ public class NoteData implements Note {
 
     public NoteData() { }
 
-    public NoteData(Instant date, UUID noter, String note) {
+    public NoteData(final Instant date, final UUID noter, final String note) {
         this.noter = noter;
         this.note = note;
         this.date = date.toEpochMilli();

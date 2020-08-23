@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = KitModule.ID, name = "Kit")
 public class KitModule extends ConfigurableModule<KitConfig, KitConfigAdapter> {
@@ -21,7 +21,7 @@ public class KitModule extends ConfigurableModule<KitConfig, KitConfigAdapter> {
     public static final String ID = "kit";
 
     @Inject
-    public KitModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public KitModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

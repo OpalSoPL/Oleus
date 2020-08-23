@@ -10,25 +10,25 @@ import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 
 import java.io.IOException;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class BaseLoggerListener extends AbstractLoggerListener {
 
     @Inject
-    BaseLoggerListener(INucleusServiceCollection serviceCollection) {
+    BaseLoggerListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection);
     }
 
     @Listener
-    public void onShutdown(GameStoppedServerEvent event) {
+    public void onShutdown(final GameStoppedServerEvent event) {
         try {
             this.handler.onServerShutdown();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return getConfig(serviceCollection).isEnableLog();
     }
 }

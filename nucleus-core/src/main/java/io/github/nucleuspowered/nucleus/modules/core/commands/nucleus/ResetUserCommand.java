@@ -30,14 +30,12 @@ import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanTypes;
 
 import java.nio.file.Files;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +51,7 @@ import java.util.function.Consumer;
         parentCommand = NucleusCommand.class,
         async = true
 )
-public class ResetUserCommand implements ICommandExecutor<CommandSource> {
+public class ResetUserCommand implements ICommandExecutor {
 
     private final String userKey = "user";
     private final String uuidKey = "UUID";
@@ -74,7 +72,7 @@ public class ResetUserCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         final User user = context.getOne(this.userKey, User.class).orElseGet(() -> context.requireOne(this.uuidKey, User.class));
         final boolean deleteall = context.hasAny("a");
         final UUID responsible = context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID);
@@ -84,7 +82,7 @@ public class ResetUserCommand implements ICommandExecutor<CommandSource> {
             this.callbacks.remove(responsible);
             if (Instant.now().isBefore(delete.until) && delete.all == deleteall && delete.user.equals(user.getUniqueId())) {
                 // execute that callback
-                delete.accept(context.getCommandSource());
+                delete.accept(context.getCommandSourceRoot());
                 return context.successResult();
             }
         }
@@ -94,7 +92,7 @@ public class ResetUserCommand implements ICommandExecutor<CommandSource> {
         List<Text> messages = new ArrayList<>();
 
         IMessageProviderService messageProvider = context.getServiceCollection().messageProvider();
-        CommandSource source = context.getCommandSource();
+        CommandSource source = context.getCommandSourceRoot();
 
         messages.add(messageProvider.getMessageFor(source, "command.nucleus.reset.warning"));
         messages.add(messageProvider.getMessageFor(source, "command.nucleus.reset.warning2", user.getName()));
@@ -166,7 +164,7 @@ public class ResetUserCommand implements ICommandExecutor<CommandSource> {
             final User user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(this.user).get();
             if (user.isOnline()) {
                 Player player = user.getPlayer().get();
-                Text kickReason = messageProvider.getMessageFor(player, "command.kick.defaultreason");
+                TextComponent kickReason = messageProvider.getMessageFor(player, "command.kick.defaultreason");
                 player.kick(kickReason);
 
                 // Let Sponge do what it needs to close the user off.

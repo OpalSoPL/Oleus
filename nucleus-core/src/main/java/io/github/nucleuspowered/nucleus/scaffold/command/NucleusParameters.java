@@ -4,22 +4,28 @@
  */
 package io.github.nucleuspowered.nucleus.scaffold.command;
 
-import static io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters.Keys.WORLD;
-import static io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters.Keys.XYZ;
-
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.DisplayNameArgument;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.GameProfileArgument;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.NucleusWorldPropertiesArgument;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.SelectorArgument;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.TimespanArgument;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.UUIDArgument;
+import com.google.common.reflect.TypeToken;
+import io.github.nucleuspowered.nucleus.scaffold.command.parameter.WorldPropertiesValueParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import net.kyori.adventure.text.TextComponent;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.command.parameter.CommonParameters;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
+
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -30,10 +36,13 @@ public class NucleusParameters {
 
     public static class Keys {
 
-        private Keys() {}
+        private Keys() {
+        }
+
 
         public static final String BOOL = "true|false";
         public static final String COMMAND = "command";
+        public static final String CONSOLE = "-";
         public static final String DESCRIPTION = "description";
         public static final String DURATION = "duration";
         public static final String LOCATION = "location";
@@ -49,11 +58,11 @@ public class NucleusParameters {
         public static final String XYZ = "x y z";
     }
 
-    public static abstract class LazyLoadedCommandElement {
+    public static abstract class LazyLoadedCommandElement<T> {
 
-        @Nullable private CommandElement load;
+        @Nullable private Parameter.Value<T> load;
 
-        public final CommandElement get(final INucleusServiceCollection serviceCollection) {
+        public final Parameter.Value<T> get(final INucleusServiceCollection serviceCollection) {
             if (this.load == null) {
                 this.load = this.create(serviceCollection);
             }
@@ -61,205 +70,107 @@ public class NucleusParameters {
             return this.load;
         }
 
-        protected abstract CommandElement create(INucleusServiceCollection serviceCollection);
+        protected abstract Parameter.Value<T> create(INucleusServiceCollection serviceCollection);
 
     }
 
-    private NucleusParameters() {} // entirely static
+    private NucleusParameters() {
+    } // entirely static
 
-    public static final CommandElement ONE_TRUE_FALSE = GenericArguments.onlyOne(GenericArguments.bool(Text.of(Keys.BOOL)));
+    public static final Parameter.Value<Boolean> ONE_TRUE_FALSE = Parameter.bool().setKey(Keys.BOOL).build();
 
-    public static final CommandElement OPTIONAL_ONE_TRUE_FALSE = GenericArguments.optional(ONE_TRUE_FALSE);
+    public static final Parameter.Value<Boolean> OPTIONAL_ONE_TRUE_FALSE = Parameter.bool().setKey(Keys.BOOL).optional().build();
 
-    public static final LazyLoadedCommandElement MANY_ENTITY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return new SelectorArgument(new DisplayNameArgument(Text.of(Keys.SUBJECT), DisplayNameArgument.Target.PLAYER, serviceCollection),
-                    Entity.class, serviceCollection);
-        }
-    };
+    public static final Parameter.Value<List<Entity>> MANY_ENTITY = Parameter.builder(new TypeToken<List<Entity>>() {
+    })
+            .setKey(Keys.SUBJECT)
+            .parser(CatalogedValueParameters.MANY_ENTITIES)
+            .build();
 
-    public static final LazyLoadedCommandElement MANY_LIVING = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return new SelectorArgument(new DisplayNameArgument(Text.of(Keys.SUBJECT), DisplayNameArgument.Target.PLAYER, serviceCollection),
-                    Living.class, serviceCollection);
-        }
-    };
+    public static final Parameter.Value<List<ServerPlayer>> MANY_PLAYER = Parameter.builder(new TypeToken<List<ServerPlayer>>() {
+    })
+            .setKey(Keys.PLAYER)
+            .parser(CatalogedValueParameters.MANY_PLAYERS)
+            .build();
 
-    // users
-    private static final LazyLoadedCommandElement MANY_PLAYER_NO_SELECTOR = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return new DisplayNameArgument(Text.of(Keys.PLAYER), DisplayNameArgument.Target.PLAYER, serviceCollection);
-        }
-    };
+    public static final Parameter.Value<ServerPlayer> ONE_PLAYER = CommonParameters.PLAYER;
 
-    public static final LazyLoadedCommandElement MANY_USER_NO_SELECTOR = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return new DisplayNameArgument(Text.of(Keys.USER), DisplayNameArgument.Target.USER, serviceCollection);
-        }
-    };
+    public static final Parameter.Value<ServerPlayer> OPTIONAL_ONE_PLAYER = CommonParameters.PLAYER_OPTIONAL;
 
-    public static final LazyLoadedCommandElement ONE_PLAYER_NO_SELECTOR = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(MANY_PLAYER_NO_SELECTOR.get(serviceCollection));
-        }
-    };
+    public static final Parameter.Value<SystemSubject> CONSOLE_FROM_DASH = Parameter
+            .builder(SystemSubject.class)
+            .setKey(Keys.CONSOLE)
+            .parser(VariableValueParameters.literalBuilder(SystemSubject.class)
+                    .setLiteral(Collections.singletonList("-"))
+                    .setReturnValue(Sponge::getSystemSubject)
+                    .build())
+            .build();
 
-    public static final LazyLoadedCommandElement MANY_PLAYER = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return new SelectorArgument(MANY_PLAYER_NO_SELECTOR.get(serviceCollection), Player.class, serviceCollection);
-        }
-    };
+    public static final Parameter.Value<User> ONE_USER = Parameter.user().setKey(Keys.USER).build();
 
-    public static final LazyLoadedCommandElement ONE_PLAYER = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(MANY_PLAYER.get(serviceCollection));
-        }
-    };
+    public static final Parameter.Value<Collection<GameProfile>> GAME_PROFILE =
+            Parameter.builder(new TypeToken<Collection<GameProfile>>() {}).parser(CatalogedValueParameters.GAME_PROFILE).build();
 
-    public static final LazyLoadedCommandElement OPTIONAL_ONE_PLAYER = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.optionalWeak(ONE_PLAYER.get(serviceCollection));
-        }
-    };
+    public static final Parameter.Value<String> COMMAND = Parameter.remainingJoinedStrings().setKey(Keys.COMMAND).build();
 
-    public static final LazyLoadedCommandElement MANY_PLAYER_OR_CONSOLE = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return new SelectorArgument(new DisplayNameArgument(Text.of(Keys.PLAYER_OR_CONSOLE), DisplayNameArgument.Target.PLAYER,
-                    serviceCollection), Player.class, serviceCollection);
-        }
-    };
+    public static final Parameter.Value<String> OPTIONAL_COMMAND = Parameter.remainingJoinedStrings().setKey(Keys.COMMAND).optional().build();
 
-    public static final LazyLoadedCommandElement ONE_PLAYER_OR_CONSOLE = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(MANY_PLAYER_OR_CONSOLE.get(serviceCollection));
-        }
-    };
+    public static final Parameter.Value<String> DESCRIPTION = Parameter.remainingJoinedStrings().setKey(Keys.DESCRIPTION).build();
 
-    public static final LazyLoadedCommandElement ONE_USER = new LazyLoadedCommandElement() {
+    public static final Parameter.Value<String> OPTIONAL_DESCRIPTION = Parameter.remainingJoinedStrings().setKey(Keys.DESCRIPTION).optional().build();
 
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(
-                    new SelectorArgument(new DisplayNameArgument(Text.of(Keys.USER), DisplayNameArgument.Target.USER, serviceCollection),
-                            Player.class, serviceCollection));
-        }
-    };
+    public static final Parameter.Value<String> LORE = Parameter.remainingJoinedStrings().setKey(Keys.LORE).build();
 
-    public static final LazyLoadedCommandElement ONE_USER_UUID = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(UUIDArgument.user(Text.of(Keys.USER_UUID), serviceCollection));
-        }
-    };
+    public static final Parameter.Value<String> MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).build();
 
-    public static final LazyLoadedCommandElement ONE_USER_PLAYER_KEY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(
-                    new SelectorArgument(new DisplayNameArgument(Text.of(Keys.PLAYER), DisplayNameArgument.Target.USER, serviceCollection),
-                            Player.class, serviceCollection));
-        }
-    };
+    public static final Parameter.Value<String> OPTIONAL_MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).optional().build();
 
+    public static final Parameter.Value<String> REASON = Parameter.remainingJoinedStrings().setKey(Keys.REASON).build();
 
-    public static final LazyLoadedCommandElement ONE_GAME_PROFILE_UUID = new LazyLoadedCommandElement() {
-                @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-                    return GenericArguments.onlyOne(UUIDArgument.gameProfile(Text.of(Keys.USER_UUID), serviceCollection));
-                }
-            };
+    public static final Parameter.Value<String> OPTIONAL_REASON = Parameter.remainingJoinedStrings().setKey(Keys.REASON).optional().build();
 
-    public static final LazyLoadedCommandElement ONE_GAME_PROFILE = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(new GameProfileArgument(Text.of(Keys.USER), serviceCollection));
-        }
-    };
+    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_ENABLED_ONLY =
+            Parameter.builder(WorldProperties.class)
+                    .setKey(Keys.WORLD)
+                    .parser(new WorldPropertiesValueParameter(
+                            x -> x.isEnabled(),
+                            key -> TextComponent.of(key.getFormatted() + " is not a disabled world properties.")))
+                    .build();
 
-    public static final CommandElement COMMAND = GenericArguments.remainingRawJoinedStrings(Text.of(Keys.COMMAND));
+    public static final Parameter.Value<WorldProperties> OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY =
+            CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY_OPTIONAL;
 
-    public static final CommandElement OPTIONAL_COMMAND = GenericArguments.optional(COMMAND);
+    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_DISABLED_ONLY =
+            Parameter.builder(WorldProperties.class)
+                    .setKey(Keys.WORLD)
+                    .parser(new WorldPropertiesValueParameter(
+                            x -> !x.isEnabled(),
+                            key -> TextComponent.of(key.getFormatted() + " is not a disabled world properties.")))
+                    .build();
 
-    public static final CommandElement DESCRIPTION = GenericArguments.remainingRawJoinedStrings(Text.of(Keys.DESCRIPTION));
+    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_ALL = CommonParameters.ALL_WORLD_PROPERTIES;
 
-    public static final CommandElement OPTIONAL_DESCRIPTION = GenericArguments.optional(DESCRIPTION);
+    public static final Parameter.Value<WorldProperties> OPTIONAL_WORLD_PROPERTIES_ALL =
+            Parameter.worldProperties(false).optional().setKey(Keys.WORLD).build();
 
-    public static final CommandElement LORE = GenericArguments.remainingRawJoinedStrings(Text.of(Keys.LORE));
+    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_UNLOADED_ONLY =
+            Parameter.builder(WorldProperties.class)
+                    .setKey(Keys.WORLD)
+                    .parser(new WorldPropertiesValueParameter(
+                            x -> !x.getWorld().isPresent(),
+                            key -> TextComponent.of(key.getFormatted() + " is not an unloaded world properties.")))
+                    .build();
 
-    public static final CommandElement MESSAGE = GenericArguments.remainingRawJoinedStrings(Text.of(Keys.MESSAGE));
+    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_LOADED_ONLY = CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY;
 
-    public static final CommandElement OPTIONAL_MESSAGE = GenericArguments.optional(MESSAGE);
+    public static final Parameter.Value<Duration> DURATION = Parameter.duration().setKey(Keys.DURATION).build();
 
-    public static final CommandElement REASON = GenericArguments.remainingRawJoinedStrings(Text.of(Keys.REASON));
+    public static final Parameter.Value<Duration> OPTIONAL_DURATION = Parameter.duration().setKey(Keys.DURATION).optional().build();
 
-    public static final CommandElement OPTIONAL_REASON = GenericArguments.optional(REASON);
+    public static final Parameter.Value<Vector3d> POSITION = Parameter.vector3d().setKey(Keys.XYZ).build();
 
-    public static final LazyLoadedCommandElement WORLD_PROPERTIES_ENABLED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.ENABLED_ONLY, serviceCollection);
-        }
-    };
+    public static final Parameter.Value<ServerLocation> LOCATION = Parameter.location().setKey(Keys.LOCATION).build();
 
-    public static final LazyLoadedCommandElement OPTIONAL_WEAK_WORLD_PROPERTIES_ENABLED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.optionalWeak(WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection));
-        }
-    };
+    public static final Parameter.Value<ServerLocation> OPTIONAL_LOCATION = Parameter.location().setKey(Keys.LOCATION).optional().build();
 
-    public static final LazyLoadedCommandElement OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.optional(WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection));
-        }
-    };
-
-    public static final LazyLoadedCommandElement WORLD_PROPERTIES_DISABLED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.DISABLED_ONLY, serviceCollection);
-        }
-    };
-
-    public static final LazyLoadedCommandElement WORLD_PROPERTIES_ALL = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.ALL, serviceCollection));
-        }
-    };
-
-    public static final LazyLoadedCommandElement OPTIONAL_WORLD_PROPERTIES_ALL = new LazyLoadedCommandElement() {
-                @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-                    return GenericArguments.optionalWeak(WORLD_PROPERTIES_ALL.get(serviceCollection));
-                }
-            };
-
-    public static final LazyLoadedCommandElement WORLD_PROPERTIES_UNLOADED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(
-                    new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.UNLOADED_ONLY, serviceCollection));
-        }
-    };
-
-    public static final LazyLoadedCommandElement WORLD_PROPERTIES_LOADED_ONLY = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(
-                    new NucleusWorldPropertiesArgument(Text.of(WORLD), NucleusWorldPropertiesArgument.Type.LOADED_ONLY, serviceCollection));
-        }
-    };
-
-    public static final LazyLoadedCommandElement DURATION = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.onlyOne(new TimespanArgument(Text.of(Keys.DURATION), serviceCollection));
-        }
-    };
-
-    public static final LazyLoadedCommandElement OPTIONAL_DURATION = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.optional(DURATION.get(serviceCollection));
-        }
-    };
-
-    public static final LazyLoadedCommandElement OPTIONAL_WEAK_DURATION = new LazyLoadedCommandElement() {
-        @Override protected CommandElement create(final INucleusServiceCollection serviceCollection) {
-            return GenericArguments.optionalWeak(DURATION.get(serviceCollection));
-        }
-    };
-
-    public static final CommandElement POSITION = GenericArguments.onlyOne(GenericArguments.vector3d(Text.of(XYZ)));
-
-    public static final CommandElement LOCATION = GenericArguments.onlyOne(GenericArguments.location(Text.of(Keys.LOCATION)));
-
-    public static final CommandElement OPTIONAL_LOCATION = GenericArguments.optional(LOCATION);
 }

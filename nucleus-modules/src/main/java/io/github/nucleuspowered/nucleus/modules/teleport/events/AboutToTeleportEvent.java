@@ -18,14 +18,14 @@ import javax.annotation.Nullable;
 
 public class AboutToTeleportEvent extends AbstractEvent implements NucleusTeleportEvent.AboutToTeleport {
 
-    @Nullable private Text cancelMessage;
+    @Nullable private TextComponent cancelMessage;
     private boolean isCancelled = false;
 
     private final Cause cause;
     private final Transform<World> toTransform;
     private final Player teleportingEntity;
 
-    public AboutToTeleportEvent(Cause cause, Transform<World> toTransform, Player teleportingEntity) {
+    public AboutToTeleportEvent(final Cause cause, final Transform<World> toTransform, final Player teleportingEntity) {
         this.cause = cause;
         this.toTransform = toTransform;
         this.teleportingEntity = teleportingEntity;
@@ -35,7 +35,7 @@ public class AboutToTeleportEvent extends AbstractEvent implements NucleusTelepo
         return Optional.ofNullable(this.cancelMessage);
     }
 
-    @Override public void setCancelMessage(@Nullable Text message) {
+    @Override public void setCancelMessage(@Nullable final TextComponent message) {
         this.cancelMessage = message;
     }
 
@@ -51,7 +51,7 @@ public class AboutToTeleportEvent extends AbstractEvent implements NucleusTelepo
         return this.isCancelled;
     }
 
-    @Override public void setCancelled(boolean cancel) {
+    @Override public void setCancelled(final boolean cancel) {
         this.isCancelled = cancel;
     }
 

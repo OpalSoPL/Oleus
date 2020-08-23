@@ -25,7 +25,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -44,7 +44,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.WeakHashMap;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @Command(
         aliases = {"rtp", "randomteleport", "rteleport"},
@@ -64,7 +64,7 @@ import javax.inject.Inject;
                 RTPPermissions.RTP_WORLDS
         }
 )
-public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class RandomTeleportCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private RTPConfig rc = new RTPConfig();
     private final Map<Task, UUID> cachedTasks = new WeakHashMap<>();
@@ -72,19 +72,19 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
     private final Timing TIMINGS;
 
     @Inject
-    public RandomTeleportCommand(INucleusServiceCollection serviceCollection) {
+    public RandomTeleportCommand(final INucleusServiceCollection serviceCollection) {
         TIMINGS = Timings.of(serviceCollection.pluginContainer(), "RTP task");;
     }
 
-    @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, RTPPermissions.OTHERS_RTP),
                 GenericArguments.optionalWeak(NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection))
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player player = context.getPlayerFromArgs();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player player = context.getPlayerFromArgs();
         synchronized (this.cachedTasks) {
             this.cachedTasks.keySet().removeIf(task -> !Sponge.getScheduler().getTaskById(task.getUniqueId()).isPresent());
             if (this.cachedTasks.containsValue(player.getUniqueId())) {
@@ -101,7 +101,7 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
         }
 
         if (this.rc.isPerWorldPermissions()) {
-            String name = wp.getWorldName();
+            final String name = wp.getWorldName();
             if (!context.testPermission(RTPPermissions.RTP_WORLDS + "." + name.toLowerCase())) {
                 return context.errorResult("command.rtp.worldnoperm", name);
             }
@@ -114,8 +114,8 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
 
         context.sendMessage("command.rtp.searching");
 
-        RTPOptions options = new RTPOptions(this.rc, currentWorld.getName());
-        RTPTask rtask = new RTPTask(
+        final RTPOptions options = new RTPOptions(this.rc, currentWorld.getName());
+        final RTPTask rtask = new RTPTask(
                 context.getServiceCollection().pluginContainer(),
                 currentWorld,
                 context,
@@ -124,13 +124,13 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
                 options,
                 context.getServiceCollection().getServiceUnchecked(RTPService.class).getKernel(wp),
                 context.is(player) ? context.getCost() : 0);
-        Task task = Sponge.getScheduler().createTaskBuilder().execute(rtask).submit(context.getServiceCollection().pluginContainer());
+        final Task task = Sponge.getScheduler().createTaskBuilder().execute(rtask).submit(context.getServiceCollection().pluginContainer());
         this.cachedTasks.put(task, player.getUniqueId());
 
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.rc = serviceCollection.moduleDataProvider().getModuleConfig(RTPConfig.class);
     }
 
@@ -146,7 +146,7 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
         private final PluginContainer pluginContainer;
         private final Cause cause;
         private final World targetWorld;
-        private final ICommandContext<? extends CommandSource> source;
+        private final ICommandContext source;
         private final Player target;
         private final boolean isSelf;
         private final Logger logger;
@@ -156,14 +156,14 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
         private final RTPKernel kernel;
 
         private RTPTask(
-                PluginContainer pluginContainer,
-                World target,
-                ICommandContext<? extends CommandSource> source,
-                Player target1,
-                int maxCount,
-                NucleusRTPService.RTPOptions options,
-                RTPKernel kernel,
-                double cost) {
+                final PluginContainer pluginContainer,
+                final World target,
+                final ICommandContext source,
+                final Player target1,
+                final int maxCount,
+                final NucleusRTPService.RTPOptions options,
+                final RTPKernel kernel,
+                final double cost) {
             super(source.getServiceCollection(), target1, cost);
             this.logger = source.getServiceCollection().logger();
             this.pluginContainer = pluginContainer;
@@ -178,23 +178,23 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
             this.kernel = kernel;
         }
 
-        @Override public void accept(Task task) {
+        @Override public void accept(final Task task) {
             this.count--;
             if (!this.target.isOnline()) {
                 onCancel();
                 return;
             }
 
-            try (Timing dummy = TIMINGS.startTiming()) {
+            try (final Timing dummy = TIMINGS.startTiming()) {
                 this.logger.debug(String.format("RTP of %s, attempt %s of %s", this.target.getName(), this.maxCount - this.count, this.maxCount));
 
                 int counter = 0;
                 while (++counter <= 10) {
                     try {
-                        Optional<Location<World>> optionalLocation =
+                        final Optional<Location<World>> optionalLocation =
                                 this.kernel.getLocation(this.target.getLocation(), this.targetWorld, this.options);
                         if (optionalLocation.isPresent()) {
-                            Location<World> targetLocation = optionalLocation.get();
+                            final Location<World> targetLocation = optionalLocation.get();
                             if (Sponge.getEventManager().post(new RTPSelectedLocationEvent(
                                     targetLocation,
                                     this.target,
@@ -245,7 +245,7 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
                                 return;
                             }
                         }
-                    } catch (PositionOutOfBoundsException ignore) {
+                    } catch (final PositionOutOfBoundsException ignore) {
                         // treat as fail.
                     }
                 }
@@ -254,7 +254,7 @@ public class RandomTeleportCommand implements ICommandExecutor<CommandSource>, I
             }
         }
 
-        private void onUnsuccesfulAttempt(Task task) {
+        private void onUnsuccesfulAttempt(final Task task) {
             synchronized (RandomTeleportCommand.this.cachedTasks) {
                 if (this.count <= 0) {
                     this.source.getServiceCollection().logger()

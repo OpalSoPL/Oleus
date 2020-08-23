@@ -14,10 +14,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @EssentialsEquivalent({"deljail", "remjail", "rmjail"})
 @Command(
@@ -27,24 +27,24 @@ import javax.inject.Inject;
         commandDescriptionKey = "jails.delete",
         parentCommand = JailsCommand.class
 )
-public class DeleteJailCommand implements ICommandExecutor<CommandSource> {
+public class DeleteJailCommand implements ICommandExecutor {
 
     private final JailHandler handler;
 
     @Inject
-    public DeleteJailCommand(INucleusServiceCollection serviceCollection) {
+    public DeleteJailCommand(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 JailParameters.JAIL.get(serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        LocationData wl = context.requireOne(JailParameters.JAIL_KEY, LocationData.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final LocationData wl = context.requireOne(JailParameters.JAIL_KEY, LocationData.class);
         if (this.handler.removeJail(wl.getName())) {
             context.sendMessage("command.jails.del.success", wl.getName());
             return context.successResult();

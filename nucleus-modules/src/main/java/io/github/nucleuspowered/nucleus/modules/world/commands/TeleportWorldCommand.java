@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.Transform;
@@ -42,10 +42,10 @@ import org.spongepowered.api.world.storage.WorldProperties;
                 WorldPermissions.WORLDS_ACCESS_PERMISSION_PREFIX
         }
 )
-public class TeleportWorldCommand implements ICommandExecutor<CommandSource> {
+public class TeleportWorldCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection),
             serviceCollection.commandElementSupplier()
@@ -53,17 +53,17 @@ public class TeleportWorldCommand implements ICommandExecutor<CommandSource> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player player = context.getPlayerFromArgs(NucleusParameters.Keys.PLAYER, "command.world.player");
-        WorldProperties worldProperties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player player = context.getPlayerFromArgs(NucleusParameters.Keys.PLAYER, "command.world.player");
+        final WorldProperties worldProperties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
         if (!worldProperties.isEnabled()) {
             return context.errorResult("command.world.teleport.notenabled", worldProperties.getWorldName());
         }
 
-        World world = Sponge.getServer().loadWorld(worldProperties.getUniqueId())
+        final World world = Sponge.getServer().loadWorld(worldProperties.getUniqueId())
             .orElseThrow(() -> context.createException("command.world.teleport.failed", worldProperties.getWorldName()));
 
-        Vector3d pos = worldProperties.getSpawnPosition().toDouble();
+        final Vector3d pos = worldProperties.getSpawnPosition().toDouble();
         if (!player.transferToWorld(world, pos)) {
             return context.errorResult("command.world.teleport.failed", worldProperties.getWorldName());
         }

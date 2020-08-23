@@ -12,7 +12,7 @@ import org.spongepowered.api.world.World;
 
 public class CreateHomeEvent extends AbstractHomeEvent implements NucleusHomeEvent.Create {
 
-    public CreateHomeEvent(String name, User owner, Cause cause, Location<World> newLocation) {
+    public CreateHomeEvent(final String name, final User owner, final Cause cause, final Location<World> newLocation) {
         super(name, owner, cause, newLocation);
     }
 }

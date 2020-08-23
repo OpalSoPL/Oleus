@@ -23,16 +23,16 @@ public class BodyFixChatListener implements ListenerBase.Conditional, ListenerBa
     private static final Pattern colorCodeAdjustment = Pattern.compile("^((&[0-9a-fklmno])+)\\s+");
 
     @Listener(order = Order.LATE)
-    public void onChat(MessageChannelEvent.Chat event) {
+    public void onChat(final MessageChannelEvent.Chat event) {
         Util.onPlayerSimulatedOrPlayer(event, this::onChat);
     }
 
-    private void onChat(MessageChannelEvent.Chat event, Player player) {
+    private void onChat(final MessageChannelEvent.Chat event, final Player player) {
         if (bodyPattern.matcher(event.getFormatter().getBody().toText().toPlain()).find()) {
             String m = TextSerializers.FORMATTING_CODE.serialize(event.getFormatter().getBody().toText());
             m = m.replaceFirst("<" + player.getName() + ">", "").trim();
 
-            Matcher matcher = colorCodeAdjustment.matcher(m);
+            final Matcher matcher = colorCodeAdjustment.matcher(m);
             if (matcher.find()) {
                 m = m.replaceFirst(matcher.group(), matcher.group(1));
             }
@@ -41,7 +41,7 @@ public class BodyFixChatListener implements ListenerBase.Conditional, ListenerBa
         }
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class).isCheckBody();
     }
 

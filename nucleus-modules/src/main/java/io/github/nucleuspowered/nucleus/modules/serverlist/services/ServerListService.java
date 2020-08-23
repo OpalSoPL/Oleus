@@ -16,7 +16,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull"})
 public class ServerListService implements ServiceBase {
@@ -26,13 +26,13 @@ public class ServerListService implements ServiceBase {
     private final IStorageManager storageManager;
 
     @Inject
-    public ServerListService(INucleusServiceCollection serviceCollection) {
+    public ServerListService(final INucleusServiceCollection serviceCollection) {
         this.storageManager = serviceCollection.storageManager();
     }
 
 
     public void clearMessage() {
-        IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
+        final IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
         dataObject.remove(ServerListKeys.EXPIRY);
         dataObject.remove(ServerListKeys.LINE_ONE);
         dataObject.remove(ServerListKeys.LINE_TWO);
@@ -40,13 +40,13 @@ public class ServerListService implements ServiceBase {
         this.messageCache = null;
     }
 
-    public void updateLineOne(@Nullable String line1) {
+    public void updateLineOne(@Nullable final String line1) {
         if (checkMessage()) {
             this.storageManager.getGeneralService().getOrNew().thenAccept(x -> x.set(ServerListKeys.LINE_ONE, line1));
         }
     }
 
-    public void updateLineTwo(@Nullable String line2) {
+    public void updateLineTwo(@Nullable final String line2) {
         if (checkMessage()) {
             this.storageManager.getGeneralService().getOrNew().thenAccept(x -> x.set(ServerListKeys.LINE_TWO, line2));
         }
@@ -60,8 +60,8 @@ public class ServerListService implements ServiceBase {
         return this.messageCache.isPresent();
     }
 
-    public void setMessage(@Nullable String line1, @Nullable String line2, @Nullable Instant expiry) {
-        IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
+    public void setMessage(@Nullable final String line1, @Nullable final String line2, @Nullable final Instant expiry) {
+        final IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
         dataObject.set(ServerListKeys.EXPIRY, expiry);
         dataObject.set(ServerListKeys.LINE_ONE, line1);
         dataObject.set(ServerListKeys.LINE_TWO, line2);
@@ -70,14 +70,14 @@ public class ServerListService implements ServiceBase {
     }
 
     private void constructMessage() {
-        IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
+        final IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
         this.expiry = dataObject.get(ServerListKeys.EXPIRY).orElse(Instant.MAX);
         constructMessage(
                 dataObject.get(ServerListKeys.LINE_ONE).map(TextSerializers.FORMATTING_CODE::deserialize).orElse(null),
                 dataObject.get(ServerListKeys.LINE_TWO).map(TextSerializers.FORMATTING_CODE::deserialize).orElse(null));
     }
 
-    private void constructMessage(Text lineOne, Text lineTwo) {
+    private void constructMessage(final TextComponent lineOne, final TextComponent lineTwo) {
         if (lineOne != null || lineTwo != null) {
             this.messageCache =
                     Optional.of(Text.of(lineOne == null ? Text.EMPTY : lineOne,

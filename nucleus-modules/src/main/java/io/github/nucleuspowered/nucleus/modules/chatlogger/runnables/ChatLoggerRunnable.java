@@ -15,7 +15,7 @@ import org.spongepowered.api.scheduler.Task;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class ChatLoggerRunnable implements TaskBase, IReloadableService.Reloadable {
 
@@ -23,7 +23,7 @@ public class ChatLoggerRunnable implements TaskBase, IReloadableService.Reloadab
     private ChatLoggingConfig config = new ChatLoggingConfig();
 
     @Inject
-    public ChatLoggerRunnable(INucleusServiceCollection serviceCollection) {
+    public ChatLoggerRunnable(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(ChatLoggerHandler.class);
     }
 
@@ -39,7 +39,7 @@ public class ChatLoggerRunnable implements TaskBase, IReloadableService.Reloadab
 
 
     @Override
-    public void accept(Task task) {
+    public void accept(final Task task) {
         if (Sponge.getGame().getState() == GameState.SERVER_STOPPED) {
             return;
         }
@@ -49,7 +49,7 @@ public class ChatLoggerRunnable implements TaskBase, IReloadableService.Reloadab
         }
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(ChatLoggingConfig.class);
     }
 }

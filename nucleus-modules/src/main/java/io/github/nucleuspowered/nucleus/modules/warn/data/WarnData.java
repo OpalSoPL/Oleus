@@ -33,11 +33,11 @@ public class WarnData extends EndTimestamp implements Warning {
 
     public WarnData() { }
 
-    public WarnData(Instant date, UUID warner, String reason) {
+    public WarnData(final Instant date, final UUID warner, final String reason) {
         this(date, warner, reason, false);
     }
 
-    public WarnData(Instant date, UUID warner, String reason, boolean expired) {
+    public WarnData(final Instant date, final UUID warner, final String reason, final boolean expired) {
         this.warner = warner;
         this.reason = reason;
         this.expired = expired;
@@ -53,7 +53,7 @@ public class WarnData extends EndTimestamp implements Warning {
      * @param reason       The reason
      * @param date         The date
      */
-    public WarnData(Instant date, UUID warner, String reason, Instant endtimestamp) {
+    public WarnData(final Instant date, final UUID warner, final String reason, final Instant endtimestamp) {
         this(date, warner, reason);
         this.endtimestamp = endtimestamp.getEpochSecond();
         this.date = date.toEpochMilli();
@@ -67,7 +67,7 @@ public class WarnData extends EndTimestamp implements Warning {
      * @param timeFromNextLogin The time to warn for from next login.
      * @param date              The date
      */
-    public WarnData(Instant date, UUID warner, String reason, @Nullable Duration timeFromNextLogin) {
+    public WarnData(final Instant date, final UUID warner, final String reason, @Nullable final Duration timeFromNextLogin) {
         this(date, warner, reason);
         if (timeFromNextLogin == null) {
             this.timeFromNextLogin = null;
@@ -93,7 +93,7 @@ public class WarnData extends EndTimestamp implements Warning {
         return this.expired;
     }
 
-    @Override public boolean equals(Object o) {
+    @Override public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -101,7 +101,7 @@ public class WarnData extends EndTimestamp implements Warning {
             return false;
         }
 
-        WarnData warnData = (WarnData) o;
+        final WarnData warnData = (WarnData) o;
 
         if (this.date != warnData.date) {
             return false;

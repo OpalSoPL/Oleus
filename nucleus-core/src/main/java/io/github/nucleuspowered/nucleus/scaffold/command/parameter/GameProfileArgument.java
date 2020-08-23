@@ -29,7 +29,7 @@ public class GameProfileArgument extends CommandElement {
     private final Pattern p = Pattern.compile("[a-zA-Z0-9_]{1,16}");
     private final IMessageProviderService messageProviderService;
 
-    public GameProfileArgument(@Nullable final Text key, final INucleusServiceCollection nucleusServiceCollection) {
+    public GameProfileArgument(@Nullable final TextComponent key, final INucleusServiceCollection nucleusServiceCollection) {
         super(key);
         this.messageProviderService = nucleusServiceCollection.messageProvider();
     }

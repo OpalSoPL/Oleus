@@ -25,9 +25,9 @@ import java.util.function.Supplier;
         commandDescriptionKey = "nucleus.debug.refreshuniquevisitors",
         parentCommand = DebugCommand.class
 )
-public class RefreshUniqueVisitors implements ICommandExecutor<CommandSource> {
+public class RefreshUniqueVisitors implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(ICommandContext context) throws CommandException {
         UniqueUserService uus = context.getServiceCollection().getServiceUnchecked(UniqueUserService.class);
         context.sendMessage("command.nucleus.debug.refreshuniquevisitors.started", uus.getUniqueUserCount());
 

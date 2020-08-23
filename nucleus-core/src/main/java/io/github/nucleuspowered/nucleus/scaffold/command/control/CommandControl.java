@@ -78,7 +78,7 @@ public class CommandControl implements CommandCallable {
     private final INucleusServiceCollection serviceCollection;
     private final ImmutableList<String> basicPermission;
     private final CommandMetadata metadata;
-    @Nullable private final ICommandExecutor<? extends CommandSource> executor;
+    @Nullable private final ICommandExecutor executor;
     private final Class<? extends CommandSource> sourceType;
     private final UsageCommand usageCommand;
     private final boolean isAsync;
@@ -97,7 +97,7 @@ public class CommandControl implements CommandCallable {
     private boolean acceptingRegistration = true;
 
     public CommandControl(
-            @Nullable final ICommandExecutor<? extends CommandSource> executor,
+            @Nullable final ICommandExecutor executor,
             @Nullable final CommandControl parent,
             final CommandMetadata meta,
             final INucleusServiceCollection serviceCollection) {
@@ -235,7 +235,7 @@ public class CommandControl implements CommandCallable {
         // Create the ICommandContext
         // TODO: Abstract this away
         final Map<CommandModifier, ICommandModifier> modifiers = this.selectAppropriateModifiers(source);
-        final ICommandContext.Mutable<? extends CommandSource> contextSource = getContextFrom(source,
+        final ICommandContext contextSource = getContextFrom(source,
                 cause,
                 context,
                 modifiers,
@@ -309,7 +309,7 @@ public class CommandControl implements CommandCallable {
 
                 // execution
                 //noinspection unchecked
-                Optional<ICommandResult> result = this.executor.preExecute((ICommandContext.Mutable) contextSource);
+                Optional<ICommandResult> result = this.executor.preExecute((ICommandContext) contextSource);
                 if (result.isPresent()) {
                     // STOP.
                     this.onResult(source, contextSource, result.get());
@@ -337,11 +337,11 @@ public class CommandControl implements CommandCallable {
         }
     }
 
-    public Text getSubcommandTexts() {
+    public TextComponent getSubcommandTexts() {
         return this.getSubcommandTexts(null);
     }
 
-    public Text getSubcommandTexts(@Nullable final CommandSource source) {
+    public TextComponent getSubcommandTexts(@Nullable final CommandSource source) {
         return Text.joinWith(Text.of(", "), this.primarySubcommands.entrySet()
                 .stream()
                 .filter(x -> source == null || x.getValue().testPermission(source))
@@ -349,25 +349,20 @@ public class CommandControl implements CommandCallable {
                 .collect(Collectors.toList()));
     }
 
-    private <T extends CommandSource> void runFailActions(final ICommandContext<T> contextSource) {
+    private <T extends CommandSource> void runFailActions(final ICommandContext contextSource) {
         contextSource.failActions().forEach(x -> x.accept(contextSource));
     }
 
     // Entry point for warmups.
-    public void startExecute(@NonNull final ICommandContext<? extends CommandSource> contextSource) {
+    public void startExecute(@NonNull final ICommandContext contextSource) {
         final CommandSource source;
-        try {
-            source = contextSource.getCommandSource();
-        } catch (final CommandException ex) {
-            this.serviceCollection.logger().warn("Could not get command source, cancelling command execution (did the player disconnect?)", ex);
-            return;
-        }
+        source = contextSource.getCommandSourceRoot();
 
         try {
             this.execute(source, contextSource);
         } catch (final CommandException ex) {
             // If we are here, then we're handling the command ourselves.
-            final Text message = ex.getText() == null ? Text.of(TextColors.RED, "Unknown error!") : ex.getText();
+            final TextComponent message = ex.getText() == null ? Text.of(TextColors.RED, "Unknown error!") : ex.getText();
             this.onFail(contextSource, message);
             this.serviceCollection.logger().warn("Error executing command {}", this.command, ex);
         }
@@ -376,11 +371,11 @@ public class CommandControl implements CommandCallable {
     @SuppressWarnings("unchecked")
     private ICommandResult execute(
             final CommandSource source,
-            @NonNull final ICommandContext<? extends CommandSource> context) throws CommandException {
+            @NonNull final ICommandContext context) throws CommandException {
         Preconditions.checkState(this.executor != null, "executor");
         for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
             commandInterceptor.onPreCommand(
-                    (Class<ICommandExecutor<?>>) this.executor.getClass(),
+                    (Class<ICommandExecutor>) this.executor.getClass(),
                     this,
                     context
             );
@@ -396,7 +391,7 @@ public class CommandControl implements CommandCallable {
             this.onResult(source, context, result);
             for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
                 commandInterceptor.onPostCommand(
-                        (Class<ICommandExecutor<?>>) this.executor.getClass(),
+                        (Class<ICommandExecutor>) this.executor.getClass(),
                         this,
                         context,
                         result
@@ -407,7 +402,7 @@ public class CommandControl implements CommandCallable {
         return result;
     }
 
-    private void runAsync(final CommandSource source, final ICommandContext<? extends CommandSource> context) {
+    private void runAsync(final CommandSource source, final ICommandContext context) {
         Preconditions.checkState(this.executor != null, "executor");
         Task.builder().execute(task -> {
             ICommandResult result;
@@ -424,7 +419,7 @@ public class CommandControl implements CommandCallable {
                     this.onResult(source, context, fResult);
                     for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
                         commandInterceptor.onPostCommand(
-                                (Class<ICommandExecutor<?>>) this.executor.getClass(),
+                                (Class<ICommandExecutor>) this.executor.getClass(),
                                 this,
                                 context,
                                 fResult
@@ -437,7 +432,7 @@ public class CommandControl implements CommandCallable {
         }).async().submit(this.serviceCollection.pluginContainer());
     }
 
-    private void onResult(final CommandSource source, final ICommandContext<? extends CommandSource> contextSource, final ICommandResult result) throws CommandException {
+    private void onResult(final CommandSource source, final ICommandContext contextSource, final ICommandResult result) throws CommandException {
         if (result.isSuccess()) {
             this.onSuccess(contextSource);
         } else if (!result.isWillContinue()) {
@@ -447,7 +442,7 @@ public class CommandControl implements CommandCallable {
         // The command will continue later. Don't do anything.
     }
 
-    private void onSuccess(final ICommandContext<? extends CommandSource> source) throws CommandException {
+    private void onSuccess(final ICommandContext source) throws CommandException {
         for (final Map.Entry<CommandModifier, ICommandModifier> x : source.modifiers().entrySet()) {
             if (x.getKey().onCompletion()) {
                 x.getValue().onCompletion(source, this, this.serviceCollection, x.getKey());
@@ -455,11 +450,11 @@ public class CommandControl implements CommandCallable {
         }
     }
 
-    public void onFail(final ICommandContext<? extends CommandSource> source, @Nullable final Text errorMessage) {
+    public void onFail(final ICommandContext source, @Nullable final TextComponent errorMessage) {
         // Run any fail actions.
         this.runFailActions(source);
         if (errorMessage != null) {
-            source.getCommandSourceUnchecked().sendMessage(errorMessage);
+            source.getCommandSourceRoot().sendMessage(errorMessage);
         }
     }
 
@@ -564,7 +559,7 @@ public class CommandControl implements CommandCallable {
 
     @Override
     @NonNull
-    public Text getUsage(@NonNull final CommandSource source) {
+    public TextComponent getUsage(@NonNull final CommandSource source) {
         final Text.Builder builder = this.getUsageText(source).toBuilder();
         final Collection<Text> ct = this.getSubcommandText(source);
         if (!ct.isEmpty()) {
@@ -586,7 +581,7 @@ public class CommandControl implements CommandCallable {
         return texts;
     }
 
-    public Text getUsageText(@NonNull final CommandSource source) {
+    public TextComponent getUsageText(@NonNull final CommandSource source) {
         return this.serviceCollection.messageProvider().getMessageFor(source,
                 "command.usage.bl",
                 Text.of(this.command),
@@ -736,7 +731,7 @@ public class CommandControl implements CommandCallable {
         return modifiers.build();
     }
 
-    private static ICommandContext.Mutable<? extends CommandSource> getContextFrom(final CommandSource source,
+    private static ICommandContext getContextFrom(final CommandSource source,
             final Cause cause,
             final CommandContext context,
             final Map<CommandModifier, ICommandModifier> modifiers,

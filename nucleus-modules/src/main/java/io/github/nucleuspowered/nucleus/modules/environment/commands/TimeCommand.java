@@ -32,18 +32,18 @@ import org.spongepowered.api.world.storage.WorldProperties;
             @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = EnvironmentPermissions.EXEMPT_COST_TIME)
         }
 )
-public class TimeCommand implements ICommandExecutor<CommandSource> {
+public class TimeCommand implements ICommandExecutor {
 
     private final String world = "world";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] { GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.world(Text.of(this.world)))) };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) {
-        WorldProperties pr = context.getWorldPropertiesOrFromSelf(this.world).orElseGet(
+    public ICommandResult execute(final ICommandContext context) {
+        final WorldProperties pr = context.getWorldPropertiesOrFromSelf(this.world).orElseGet(
                 () -> Sponge.getServer().getDefaultWorld().get()
         );
 

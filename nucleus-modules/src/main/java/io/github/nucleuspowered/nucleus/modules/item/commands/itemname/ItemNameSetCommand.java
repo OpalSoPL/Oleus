@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.data.key.Keys;
@@ -32,26 +32,26 @@ import org.spongepowered.api.text.serializer.TextSerializers;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = ItemPermissions.EXEMPT_COST_ITEMNAME_SET)
         }
 )
-public class ItemNameSetCommand implements ICommandExecutor<Player> {
+public class ItemNameSetCommand implements ICommandExecutor {
 
     private final String nameKey = "name";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.remainingJoinedStrings(Text.of(this.nameKey))
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
         if (!src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
             return context.errorResult("command.itemname.set.noitem");
         }
 
-        ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).get();
-        Text name = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(this.nameKey, String.class));
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).get();
+        final TextComponent name = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(this.nameKey, String.class));
 
         if (stack.offer(Keys.DISPLAY_NAME, name).isSuccessful()) {
             src.setItemInHand(HandTypes.MAIN_HAND, stack);

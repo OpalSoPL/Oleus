@@ -71,7 +71,7 @@ public class WarpPermissions {
     @PermissionMetadata(descriptionKey = "permissions.warps", level = SuggestedLevel.ADMIN, isPrefix = true)
     public static final String PERMISSIONS_WARPS = "nucleus.warps";
 
-    public static String getWarpPermission(String warpName) {
+    public static String getWarpPermission(final String warpName) {
         return PERMISSIONS_WARPS + "." + warpName.toLowerCase();
     }
 

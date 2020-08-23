@@ -32,9 +32,10 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
     private MobConfig config = new MobConfig();
 
     @Listener
-    public void onConstruct(ConstructEntityEvent.Pre event, @Getter("getTransform") Transform<World> worldTransform, @Getter("getTargetType") EntityType type) {
+    public void onConstruct(final ConstructEntityEvent.Pre event, @Getter("getTransform") final Transform<World> worldTransform, @Getter("getTargetType")
+    final EntityType type) {
         // No, let's not prevent players from spawning...
-        Class<? extends Entity> entityType = type.getEntityClass();
+        final Class<? extends Entity> entityType = type.getEntityClass();
         if (!checkIsValid(entityType) && !isSpawnable(type, worldTransform.getExtent())) {
             event.setCancelled(true);
         }
@@ -42,42 +43,42 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
 
     // Most will be caught by the attempt above, but just in case, this catches them.
     @Listener
-    public void onSpawn(SpawnEntityEvent event) {
+    public void onSpawn(final SpawnEntityEvent event) {
         event.filterEntities(x -> {
-            Class<? extends Entity> entityType = x.getClass();
+            final Class<? extends Entity> entityType = x.getClass();
             return checkIsValid(entityType) || isSpawnable(x.getType(), x.getWorld());
         });
     }
 
     // Checks to see if the entity is of a type that should spawn regardless
-    private boolean checkIsValid(Class<? extends Entity> entityType) {
+    private boolean checkIsValid(final Class<? extends Entity> entityType) {
         return !Living.class.isAssignableFrom(entityType) || Player.class.isAssignableFrom(entityType) ||
                 ArmorStand.class.isAssignableFrom(entityType);
     }
 
-    private boolean isSpawnable(EntityType type, World world) {
-        Optional<BlockSpawnsConfig> bsco = this.config.getBlockSpawnsConfigForWorld(world);
+    private boolean isSpawnable(final EntityType type, final World world) {
+        final Optional<BlockSpawnsConfig> bsco = this.config.getBlockSpawnsConfigForWorld(world);
         if (!bsco.isPresent()) {
             return true;
         }
 
-        String id = type.getId().toLowerCase();
+        final String id = type.getId().toLowerCase();
         return !(bsco.get().isBlockVanillaMobs() && id.startsWith("minecraft:") || bsco.get().getIdsToBlock().contains(id));
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.moduleDataProvider().getModuleConfig(MobConfig.class);
     }
 
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
             if (Sponge.getGame().getState().ordinal() < GameState.SERVER_STARTING.ordinal()) {
                 return true;
             }
 
-            Map<String, BlockSpawnsConfig> conf = serviceCollection.moduleDataProvider().getModuleConfig(MobConfig.class).getBlockSpawnsConfig();
+            final Map<String, BlockSpawnsConfig> conf = serviceCollection.moduleDataProvider().getModuleConfig(MobConfig.class).getBlockSpawnsConfig();
             if (conf.entrySet().stream().anyMatch(x -> Sponge.getServer().getWorldProperties(x.getKey()).isPresent())) {
-                for (BlockSpawnsConfig s : conf.values()) {
-                    List<String> idsToBlock = s.getIdsToBlock();
+                for (final BlockSpawnsConfig s : conf.values()) {
+                    final List<String> idsToBlock = s.getIdsToBlock();
                     if (s.isBlockVanillaMobs() || Sponge.getRegistry().getAllOf(EntityType.class).stream()
                         .anyMatch(x -> idsToBlock.contains(x.getId()))) {
                         return true;

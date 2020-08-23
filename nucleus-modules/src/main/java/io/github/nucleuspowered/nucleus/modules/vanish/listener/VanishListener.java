@@ -30,7 +30,7 @@ import org.spongepowered.api.text.action.TextActions;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class VanishListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -43,7 +43,7 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
     private final IStorageManager storageManager;
 
     @Inject
-    public VanishListener(INucleusServiceCollection serviceCollection) {
+    public VanishListener(final INucleusServiceCollection serviceCollection) {
         this.pluginContainer = serviceCollection.pluginContainer();
         this.service = serviceCollection.getServiceUnchecked(VanishService.class);
         this.permissionService = serviceCollection.permissionService();
@@ -53,10 +53,10 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
     }
 
     @Listener
-    public void onAuth(ClientConnectionEvent.Auth auth) {
+    public void onAuth(final ClientConnectionEvent.Auth auth) {
         if (this.vanishConfig.isTryHidePlayers()) {
-            UUID uuid = auth.getProfile().getUniqueId();
-            CompletableFuture<Void> future = new CompletableFuture<>();
+            final UUID uuid = auth.getProfile().getUniqueId();
+            final CompletableFuture<Void> future = new CompletableFuture<>();
             Task.builder().execute(
                     () -> {
                         Sponge.getServiceManager()
@@ -73,10 +73,10 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
     }
 
     @Listener
-    public void onLogin(ClientConnectionEvent.Join event, @Getter("getTargetEntity") Player player) {
-        boolean persist = this.service.isVanished(player);
+    public void onLogin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
+        final boolean persist = this.service.isVanished(player);
 
-        boolean shouldVanish = (this.permissionService.hasPermission(player, VanishPermissions.VANISH_ONLOGIN)
+        final boolean shouldVanish = (this.permissionService.hasPermission(player, VanishPermissions.VANISH_ONLOGIN)
                 && this.userPreferenceService.get(player.getUniqueId(), NucleusKeysProvider.VANISH_ON_LOGIN).orElse(false))
                 || persist;
 
@@ -104,7 +104,7 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
     }
 
     @Listener
-    public void onQuit(ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") Player player) {
+    public void onQuit(final ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") final Player player) {
         if (player.get(Keys.VANISH).orElse(false)) {
             this.storageManager.getUserService().get(player.getUniqueId())
                     .thenAccept(x -> x.ifPresent(t -> t.set(VanishKeys.VANISH_STATUS, false)));
@@ -117,7 +117,7 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
     }
 
     @Override
-    public void onReload(INucleusServiceCollection serviceCollection) {
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.vanishConfig = serviceCollection.moduleDataProvider().getModuleConfig(VanishConfig.class);
     }
 }

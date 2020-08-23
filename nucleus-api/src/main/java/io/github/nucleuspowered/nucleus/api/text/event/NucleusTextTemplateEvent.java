@@ -89,7 +89,7 @@ public interface NucleusTextTemplateEvent extends Event, Cancellable {
      * @param source The source
      * @return The message for the specific source
      */
-    default Text getMessageFor(CommandSource source) {
+    default TextComponent getMessageFor(CommandSource source) {
         return getMessage().getForSource(source);
     }
 

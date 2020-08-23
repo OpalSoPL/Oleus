@@ -18,7 +18,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -48,14 +48,14 @@ import java.util.regex.Pattern;
                 )
         }
 )
-public class SetWarpCommand implements ICommandExecutor<Player> {
+public class SetWarpCommand implements ICommandExecutor {
 
 //    private final WarpService qs = getServiceUnchecked(WarpService.class);
     private final Pattern warpRegex = Pattern.compile("^[A-Za-z][A-Za-z0-9]{0,25}$");
     private final String overwriteKey = "overwrite";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags().valueFlag(
                         serviceCollection.commandElementSupplier().createPermissionParameter(
@@ -69,15 +69,15 @@ public class SetWarpCommand implements ICommandExecutor<Player> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        String warp = context.requireOne(WarpService.WARP_KEY, String.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String warp = context.requireOne(WarpService.WARP_KEY, String.class);
 
         // Needs to match the name...
         if (!this.warpRegex.matcher(warp).matches()) {
             return context.errorResult("command.warps.invalidname");
         }
 
-        WarpService warpService = context.getServiceCollection().getServiceUnchecked(WarpService.class);
+        final WarpService warpService = context.getServiceCollection().getServiceUnchecked(WarpService.class);
 
         // Get the service, does the warp exist?
         final Optional<Warp> exists = warpService.getWarp(warp);
@@ -104,9 +104,9 @@ public class SetWarpCommand implements ICommandExecutor<Player> {
         }
 
         final Player src = context.getIfPlayer();
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(src);
-            CreateWarpEvent event = new CreateWarpEvent(frame.getCurrentCause(), warp, src.getLocation());
+            final CreateWarpEvent event = new CreateWarpEvent(frame.getCurrentCause(), warp, src.getLocation());
             if (Sponge.getEventManager().post(event)) {
                 return event.getCancelMessage()
                         .map(context::errorResultLiteral)

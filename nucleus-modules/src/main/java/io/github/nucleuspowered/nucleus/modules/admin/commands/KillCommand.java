@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -33,33 +33,33 @@ import java.util.Collection;
     })
 @EssentialsEquivalent(value = { "kill", "remove", "butcher", "killall", "mobkill" },
         isExact = false, notes = "Nucleus supports killing entities using the Minecraft selectors.")
-public class KillCommand implements ICommandExecutor<CommandSource> {
+public class KillCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.MANY_ENTITY.get(serviceCollection)
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Collection<Entity> entities = context.getAll(NucleusParameters.Keys.SUBJECT, TypeTokens.ENTITY);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Collection<Entity> entities = context.getAll(NucleusParameters.Keys.SUBJECT, TypeTokens.ENTITY);
 
         int entityKillCount = 0;
         int playerKillCount = 0;
-        for (Entity x : entities) {
-            DataTransactionResult dtr = x.offer(Keys.HEALTH, 0d);
+        for (final Entity x : entities) {
+            final DataTransactionResult dtr = x.offer(Keys.HEALTH, 0d);
             if (!dtr.isSuccessful() && !(x instanceof Living)) {
                 x.remove();
             }
             entityKillCount++;
 
             if (x instanceof Player) {
-                Player pl = (Player) x;
+                final Player pl = (Player) x;
                 playerKillCount++;
                 context.sendMessage("command.kill.killed", pl.getName());
-                context.sendMessageTo(pl, "command.kill.killedby", context.getCommandSource().getName());
+                context.sendMessageTo(pl, "command.kill.killedby", context.getCommandSourceRoot().getName());
             }
         }
 

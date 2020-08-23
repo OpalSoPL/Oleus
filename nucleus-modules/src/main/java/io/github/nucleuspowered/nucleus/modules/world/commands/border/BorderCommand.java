@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
@@ -30,23 +30,23 @@ import java.util.List;
         commandDescriptionKey = "world.border",
         parentCommand = WorldCommand.class
 )
-public class BorderCommand implements ICommandExecutor<CommandSource> {
+public class BorderCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection)
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
-        List<Text> worldBorderInfo = Lists.newArrayList();
+        final List<Text> worldBorderInfo = Lists.newArrayList();
 
-        Vector3d centre = wp.getWorldBorderCenter();
-        int currentDiameter = (int)wp.getWorldBorderDiameter();
-        int targetDiameter = (int)wp.getWorldBorderTargetDiameter();
+        final Vector3d centre = wp.getWorldBorderCenter();
+        final int currentDiameter = (int)wp.getWorldBorderDiameter();
+        final int targetDiameter = (int)wp.getWorldBorderTargetDiameter();
 
         // Border centre
         worldBorderInfo.add(context.getMessage("command.world.border.centre", String.valueOf(centre.getFloorX()), String.valueOf(centre.getFloorZ())));
@@ -56,11 +56,11 @@ public class BorderCommand implements ICommandExecutor<CommandSource> {
             worldBorderInfo.add(context.getMessage("command.world.border.targetdiameter", String.valueOf(targetDiameter), String.valueOf(wp.getWorldBorderTimeRemaining() / 1000)));
         }
 
-        Util.getPaginationBuilder(context.getCommandSourceUnchecked())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
                 .contents(worldBorderInfo)
                 .title(context.getMessage("command.world.border.title", wp.getWorldName()))
                 .padding(Text.of(TextColors.GREEN, "="))
-                .sendTo(context.getCommandSourceUnchecked());
+                .sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 }

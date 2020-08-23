@@ -14,10 +14,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 @EssentialsEquivalent({"mail", "email"})
 @Command(
@@ -26,10 +25,10 @@ import org.spongepowered.api.text.Text;
         commandDescriptionKey = "mail",
         async = true
 )
-public class MailCommand implements ICommandExecutor<Player> {
+public class MailCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.optional(
                         GenericArguments.allOf(
@@ -39,7 +38,7 @@ public class MailCommand implements ICommandExecutor<Player> {
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         return MailReadBase.INSTANCE.executeCommand(
                 context,
                 context.getIfPlayer(),

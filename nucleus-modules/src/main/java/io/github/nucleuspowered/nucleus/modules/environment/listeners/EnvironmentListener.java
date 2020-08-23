@@ -10,19 +10,19 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class EnvironmentListener implements ListenerBase {
 
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
-    public EnvironmentListener(INucleusServiceCollection serviceCollection) {
+    public EnvironmentListener(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
     @Listener
-    public void onWeatherChange(ChangeWorldWeatherEvent event) {
+    public void onWeatherChange(final ChangeWorldWeatherEvent event) {
         event.setCancelled(this.serviceCollection
                 .storageManager()
                 .getWorldService()

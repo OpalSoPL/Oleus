@@ -15,7 +15,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = InfoModule.ID, name = "Info")
 public class InfoModule extends ConfigurableModule<InfoConfig, InfoConfigAdapter> {
@@ -24,7 +24,7 @@ public class InfoModule extends ConfigurableModule<InfoConfig, InfoConfigAdapter
     public static final String MOTD_KEY = "motd";
 
     @Inject
-    public InfoModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public InfoModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 
@@ -33,7 +33,7 @@ public class InfoModule extends ConfigurableModule<InfoConfig, InfoConfigAdapter
         return new InfoConfigAdapter();
     }
 
-    @Override public void performPreTasks(INucleusServiceCollection serviceCollection) throws Exception {
+    @Override public void performPreTasks(final INucleusServiceCollection serviceCollection) throws Exception {
         super.performPreTasks(serviceCollection);
 
         serviceCollection.textFileControllerCollection()

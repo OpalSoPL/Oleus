@@ -16,18 +16,18 @@ import org.spongepowered.api.event.filter.Getter;
 public class VanishSpongeWorkaroundListener implements ListenerBase.Conditional {
 
     @Listener
-    public void onRespawnPlayer(RespawnPlayerEvent event,
-            @Getter("getOriginalPlayer") Player originalPlayer,
-            @Getter("getTargetEntity") Player newPlayer) {
-        boolean o = originalPlayer.get(Keys.VANISH).orElse(false);
-        boolean n = newPlayer.get(Keys.VANISH).orElse(false);
+    public void onRespawnPlayer(final RespawnPlayerEvent event,
+            @Getter("getOriginalPlayer") final Player originalPlayer,
+            @Getter("getTargetEntity") final Player newPlayer) {
+        final boolean o = originalPlayer.get(Keys.VANISH).orElse(false);
+        final boolean n = newPlayer.get(Keys.VANISH).orElse(false);
         if (o != n) {
             newPlayer.offer(Keys.VANISH, o);
         }
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.moduleDataProvider().getModuleConfig(VanishConfig.class).isAttemptSpongeWorkaroundVanish();
     }
 }

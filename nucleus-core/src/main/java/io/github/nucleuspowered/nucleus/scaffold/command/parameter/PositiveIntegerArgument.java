@@ -23,11 +23,11 @@ public class PositiveIntegerArgument extends CommandElement {
     private final boolean allowZero;
     private final IMessageProviderService messageProvider;
 
-    public PositiveIntegerArgument(@Nullable final Text key, final INucleusServiceCollection serviceCollection) {
+    public PositiveIntegerArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
         this(key, true, serviceCollection);
     }
 
-    public PositiveIntegerArgument(@Nullable final Text key, final boolean allowZero, final INucleusServiceCollection serviceCollection) {
+    public PositiveIntegerArgument(@Nullable final TextComponent key, final boolean allowZero, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.allowZero = allowZero;
         this.messageProvider = serviceCollection.messageProvider();

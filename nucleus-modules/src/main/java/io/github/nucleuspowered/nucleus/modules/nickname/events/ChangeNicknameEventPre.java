@@ -19,11 +19,11 @@ public class ChangeNicknameEventPre extends AbstractEvent implements NucleusChan
 
     private final Cause cause;
     private final User target;
-    @Nullable private final Text previousNickname;
-    @Nullable private final Text newNickname;
+    @Nullable private final TextComponent previousNickname;
+    @Nullable private final TextComponent newNickname;
     private boolean cancel = false;
 
-    public ChangeNicknameEventPre(Cause cause, @Nullable Text previousNickname, @Nullable Text newNickname, User target) {
+    public ChangeNicknameEventPre(final Cause cause, @Nullable final TextComponent previousNickname, @Nullable final TextComponent newNickname, final User target) {
         this.cause = cause;
         this.previousNickname = previousNickname;
         this.newNickname = newNickname;
@@ -49,7 +49,7 @@ public class ChangeNicknameEventPre extends AbstractEvent implements NucleusChan
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.cancel = cancel;
     }
 

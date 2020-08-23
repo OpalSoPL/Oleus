@@ -31,20 +31,20 @@ public class UUIDArgument<T> extends CommandElement {
     @Nullable private final Function<UUID, Optional<T>> validator;
     private final IMessageProviderService messageProvider;
 
-    public static UUIDArgument<GameProfile> gameProfile(final Text key, final INucleusServiceCollection serviceCollection) {
+    public static UUIDArgument<GameProfile> gameProfile(final TextComponent key, final INucleusServiceCollection serviceCollection) {
         return new UUIDArgument<>(key, x -> Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll()
                 .stream().filter(y -> y.getUniqueId().equals(x)).findFirst(), serviceCollection);
     }
 
-    public static UUIDArgument<User> user(final Text key, final INucleusServiceCollection serviceCollection) {
+    public static UUIDArgument<User> user(final TextComponent key, final INucleusServiceCollection serviceCollection) {
         return new UUIDArgument<>(key, x -> Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(x), serviceCollection);
     }
 
-    public static UUIDArgument<Player> player(final Text key, final INucleusServiceCollection serviceCollection) {
+    public static UUIDArgument<Player> player(final TextComponent key, final INucleusServiceCollection serviceCollection) {
         return new UUIDArgument<>(key, x -> Sponge.getServer().getPlayer(x), serviceCollection);
     }
 
-    public UUIDArgument(@Nullable final Text key, @Nullable final Function<UUID, Optional<T>> validator, final INucleusServiceCollection serviceCollection) {
+    public UUIDArgument(@Nullable final TextComponent key, @Nullable final Function<UUID, Optional<T>> validator, final INucleusServiceCollection serviceCollection) {
         super(key);
         this.validator = validator;
         this.messageProvider = serviceCollection.messageProvider();

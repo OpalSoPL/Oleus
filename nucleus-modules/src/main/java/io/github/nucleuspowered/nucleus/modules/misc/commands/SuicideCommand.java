@@ -10,18 +10,18 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 @EssentialsEquivalent("suicide")
 @Command(aliases = { "suicide" }, basePermission = MiscPermissions.BASE_SUICIDE, commandDescriptionKey = "suicide")
-public class SuicideCommand implements ICommandExecutor<Player> {
+public class SuicideCommand implements ICommandExecutor {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
-        DataTransactionResult dtr = src.offer(Keys.HEALTH, 0d);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
+        final DataTransactionResult dtr = src.offer(Keys.HEALTH, 0d);
         if (!dtr.isSuccessful()) {
             return context.errorResult("command.suicide.error");
         }

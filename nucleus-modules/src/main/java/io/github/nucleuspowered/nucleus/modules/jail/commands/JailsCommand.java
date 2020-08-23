@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -35,34 +35,34 @@ import javax.annotation.Nullable;
         commandDescriptionKey = "jails",
         async = true
 )
-public class JailsCommand implements ICommandExecutor<CommandSource> {
+public class JailsCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final JailHandler handler = context.getServiceCollection().getServiceUnchecked(JailHandler.class);
-        Map<String, NamedLocation> mjs = handler.getJails();
+        final Map<String, NamedLocation> mjs = handler.getJails();
         if (mjs.isEmpty()) {
             return context.errorResult("command.jails.nojails");
         }
 
-        List<Text> lt = mjs.entrySet().stream()
+        final List<Text> lt = mjs.entrySet().stream()
                 .map(x -> createJail(context, x.getValue(), x.getKey()))
                 .collect(Collectors.toList());
 
-        CommandSource src = context.getCommandSource();
+        final CommandSource src = context.getCommandSourceRoot();
         Util.getPaginationBuilder(src)
             .title(context.getMessage("command.jails.list.header")).padding(Text.of(TextColors.GREEN, "-"))
             .contents(lt).sendTo(src);
         return context.successResult();
     }
 
-    private Text createJail(ICommandContext<? extends CommandSource> context, @Nullable NamedLocation data, String name) {
+    private TextComponent createJail(final ICommandContext context, @Nullable final NamedLocation data, final String name) {
         if (data == null || !data.getLocation().isPresent()) {
             return Text.builder(name).color(TextColors.RED)
                     .onHover(TextActions.showText(context.getMessage("command.jails.unavailable"))).build();
         }
 
-        Location<World> world = data.getLocation().get();
-        Text.Builder inner = Text.builder(name).color(TextColors.GREEN).style(TextStyles.ITALIC)
+        final Location<World> world = data.getLocation().get();
+        final Text.Builder inner = Text.builder(name).color(TextColors.GREEN).style(TextStyles.ITALIC)
                 .onClick(TextActions.runCommand("/jails tp " + name))
                 .onHover(TextActions.showText(context.getMessage("command.jails.warpprompt", name)));
 

@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
@@ -25,26 +25,26 @@ import org.spongepowered.api.text.Text;
         parentCommand = JailsCommand.class,
         async = true
 )
-public class SetJailCommand implements ICommandExecutor<Player> {
+public class SetJailCommand implements ICommandExecutor {
 
     private final String jailName = "jail";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.onlyOne(GenericArguments.string(Text.of(this.jailName)))
         };
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        String name = context.requireOne(this.jailName, String.class).toLowerCase();
-        JailHandler handler = context.getServiceCollection().getServiceUnchecked(JailHandler.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String name = context.requireOne(this.jailName, String.class).toLowerCase();
+        final JailHandler handler = context.getServiceCollection().getServiceUnchecked(JailHandler.class);
         if (handler.getJail(name).isPresent()) {
             return context.errorResult("command.jails.set.exists", name);
         }
 
-        Player src = context.getIfPlayer();
+        final Player src = context.getIfPlayer();
         if (handler.setJail(name, src.getLocation(), src.getRotation())) {
             context.sendMessage("command.jails.set.success", name);
             return context.successResult();

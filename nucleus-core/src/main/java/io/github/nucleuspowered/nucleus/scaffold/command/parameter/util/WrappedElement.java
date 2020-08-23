@@ -23,11 +23,11 @@ public abstract class WrappedElement extends CommandElement {
         return this.wrappedElement;
     }
 
-    @Nullable @Override public Text getKey() {
+    @Nullable @Override public TextComponent getKey() {
         return this.wrappedElement.getKey();
     }
 
-    @Override public Text getUsage(final CommandSource src) {
+    @Override public TextComponent getUsage(final CommandSource src) {
         return this.getWrappedElement().getUsage(src);
     }
 }

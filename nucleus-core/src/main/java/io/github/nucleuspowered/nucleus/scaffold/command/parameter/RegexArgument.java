@@ -28,11 +28,11 @@ public class RegexArgument extends CommandElement {
     private final TriFunction<CommandSource, CommandArgs, CommandContext, List<String>> function;
     private final IMessageProviderService messageProvider;
 
-    public RegexArgument(@Nullable final Text key, final String regex, final String errorKey, final INucleusServiceCollection serviceCollection) {
+    public RegexArgument(@Nullable final TextComponent key, final String regex, final String errorKey, final INucleusServiceCollection serviceCollection) {
         this(key, regex, errorKey, null, serviceCollection);
     }
 
-    public RegexArgument(@Nullable final Text key, final String regex, final String errorKey, @Nullable final TriFunction<CommandSource, CommandArgs, CommandContext,
+    public RegexArgument(@Nullable final TextComponent key, final String regex, final String errorKey, @Nullable final TriFunction<CommandSource, CommandArgs, CommandContext,
             List<String>> tabComplete, final INucleusServiceCollection serviceCollection) {
         super(key);
 

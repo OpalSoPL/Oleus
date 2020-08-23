@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.entity.living.player.Player;
 @EssentialsEquivalent("setspawn")
 @Command(
@@ -20,10 +20,10 @@ import org.spongepowered.api.entity.living.player.Player;
         basePermission = SpawnPermissions.BASE_SETSPAWN,
         commandDescriptionKey = "setspawn"
 )
-public class SetSpawnCommand implements ICommandExecutor<Player> {
+public class SetSpawnCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        Player src = context.getIfPlayer();
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player src = context.getIfPlayer();
         // Minecraft does not set the rotation of the player at the spawn point, so we'll do it for them!
         final Vector3d rotation = src.getRotation();
         context.getServiceCollection()

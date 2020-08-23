@@ -16,7 +16,7 @@ public abstract class ClearInventoryEvent extends AbstractEvent implements Targe
     private final Cause cause;
     private final boolean isClearingAll;
 
-    public ClearInventoryEvent(Cause cause, User target, boolean isClearingAll) {
+    public ClearInventoryEvent(final Cause cause, final User target, final boolean isClearingAll) {
         this.cause = cause;
         this.target = target;
         this.isClearingAll = isClearingAll;
@@ -40,7 +40,7 @@ public abstract class ClearInventoryEvent extends AbstractEvent implements Targe
 
         private boolean cancelled = false;
 
-        public Pre(Cause cause, User target, boolean isClearingAll) {
+        public Pre(final Cause cause, final User target, final boolean isClearingAll) {
             super(cause, target, isClearingAll);
         }
 
@@ -48,14 +48,14 @@ public abstract class ClearInventoryEvent extends AbstractEvent implements Targe
             return this.cancelled;
         }
 
-        @Override public void setCancelled(boolean cancel) {
+        @Override public void setCancelled(final boolean cancel) {
             this.cancelled = cancel;
         }
     }
 
     public static class Post extends ClearInventoryEvent implements NucleusClearInventoryEvent.Post {
 
-        public Post(Cause cause, User target, boolean isClearingAll) {
+        public Post(final Cause cause, final User target, final boolean isClearingAll) {
             super(cause, target, isClearingAll);
         }
     }

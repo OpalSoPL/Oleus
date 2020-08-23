@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -33,13 +33,13 @@ import org.spongepowered.api.text.Text;
         commandDescriptionKey = "kit.create",
         parentCommand = KitCommand.class
 )
-public class KitCreateCommand implements ICommandExecutor<CommandSource> {
+public class KitCreateCommand implements ICommandExecutor {
 
     private final String flag = "clone";
     private final String name = "name";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.flags().valueFlag(serviceCollection
                                 .commandElementSupplier()
@@ -50,9 +50,9 @@ public class KitCreateCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
-        String kitName = context.requireOne(this.name, String.class);
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
+        final String kitName = context.requireOne(this.name, String.class);
 
         if (service.getKitNames().stream().anyMatch(kitName::equalsIgnoreCase)) {
             return context.errorResult("command.kit.add.alreadyexists", kitName);
@@ -65,11 +65,11 @@ public class KitCreateCommand implements ICommandExecutor<CommandSource> {
                 context.sendMessage("command.kit.add.success", kitName);
             } else {
                 final Player player = context.getIfPlayer();
-                Inventory inventory = Util.getKitInventoryBuilder()
+                final Inventory inventory = Util.getKitInventoryBuilder()
                         .property(InventoryTitle.PROPERTY_NAME,
                                 InventoryTitle.of(context.getMessage("command.kit.create.title", kitName)))
                         .build(context.getServiceCollection().pluginContainer());
-                Container container = player.openInventory(inventory)
+                final Container container = player.openInventory(inventory)
                         .orElseThrow(() -> context.createException("command.kit.create.notcreated"));
                 Sponge.getEventManager().registerListeners(context.getServiceCollection().pluginContainer(), new TemporaryEventListener(
                         service,
@@ -82,7 +82,7 @@ public class KitCreateCommand implements ICommandExecutor<CommandSource> {
             try {
                 service.saveKit(service.createKit(kitName));
                 context.sendMessage("command.kit.addempty.success", kitName);
-            } catch (IllegalArgumentException ex) {
+            } catch (final IllegalArgumentException ex) {
                 return context.errorResult("command.kit.create.failed", kitName);
             }
         }
@@ -99,11 +99,11 @@ public class KitCreateCommand implements ICommandExecutor<CommandSource> {
         private final IMessageProviderService messageProviderService;
         private boolean run = false;
 
-        private TemporaryEventListener(KitService handler,
-                IMessageProviderService messageProviderService,
-                Inventory inventory,
-                Container container,
-                String kitName) {
+        private TemporaryEventListener(final KitService handler,
+                final IMessageProviderService messageProviderService,
+                final Inventory inventory,
+                final Container container,
+                final String kitName) {
             this.messageProviderService = messageProviderService;
             this.handler = handler;
             this.inventory = inventory;
@@ -112,7 +112,7 @@ public class KitCreateCommand implements ICommandExecutor<CommandSource> {
         }
 
         @Listener
-        public void onClose(InteractInventoryEvent.Close event, @Root Player player, @Getter("getTargetInventory") Container container) {
+        public void onClose(final InteractInventoryEvent.Close event, @Root final Player player, @Getter("getTargetInventory") final Container container) {
             if (!this.run && this.container.equals(container)) {
                 this.run = true;
                 Sponge.getEventManager().unregisterListeners(this);

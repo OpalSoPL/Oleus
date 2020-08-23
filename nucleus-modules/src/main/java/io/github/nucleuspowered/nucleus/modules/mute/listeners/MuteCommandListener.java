@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class MuteCommandListener implements ListenerBase.Conditional {
 
@@ -36,7 +36,7 @@ public class MuteCommandListener implements ListenerBase.Conditional {
     private final MuteHandler handler;
 
     @Inject
-    public MuteCommandListener(INucleusServiceCollection serviceCollection) {
+    public MuteCommandListener(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.handler = serviceCollection.getServiceUnchecked(MuteHandler.class);
     }
@@ -48,14 +48,14 @@ public class MuteCommandListener implements ListenerBase.Conditional {
      * @param player The {@link Player} who executed the command.
      */
     @Listener(order = Order.FIRST)
-    public void onPlayerSendCommand(SendCommandEvent event, @Root Player player) {
+    public void onPlayerSendCommand(final SendCommandEvent event, @Root final Player player) {
         if (!this.handler.isMutedCached(player)) {
             return;
         }
 
-        String command = event.getCommand().toLowerCase();
-        Optional<? extends CommandMapping> oc = Sponge.getCommandManager().get(command, player);
-        Set<String> cmd;
+        final String command = event.getCommand().toLowerCase();
+        final Optional<? extends CommandMapping> oc = Sponge.getCommandManager().get(command, player);
+        final Set<String> cmd;
 
         // If the command exists, then get all aliases.
         cmd = oc.map(commandMapping -> commandMapping.getAllAliases().stream().map(String::toLowerCase).collect(Collectors.toSet()))
@@ -63,7 +63,7 @@ public class MuteCommandListener implements ListenerBase.Conditional {
 
         // If the command is in the list, block it.
         if (this.blockedCommands.stream().map(String::toLowerCase).anyMatch(cmd::contains)) {
-            MuteData muteData = this.handler.getPlayerMuteData(player).orElse(null);
+            final MuteData muteData = this.handler.getPlayerMuteData(player).orElse(null);
             if (muteData == null || muteData.expired()) {
                 this.handler.unmutePlayer(player);
             } else {
@@ -77,7 +77,7 @@ public class MuteCommandListener implements ListenerBase.Conditional {
     }
 
     // will also act as the reloadable.
-    @Override public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
+    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         this.blockedCommands.clear();
         this.blockedCommands.addAll(serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class).getBlockedCommands());
         return !this.blockedCommands.isEmpty();

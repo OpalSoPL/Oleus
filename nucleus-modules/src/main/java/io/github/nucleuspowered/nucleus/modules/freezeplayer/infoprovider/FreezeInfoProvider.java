@@ -20,8 +20,8 @@ public class FreezeInfoProvider implements NucleusProvider {
         return NucleusProvider.PUNISHMENT;
     }
 
-    @Override public Optional<Text> get(User user, CommandSource source,
-            INucleusServiceCollection serviceCollection) {
+    @Override public Optional<Text> get(final User user, final CommandSource source,
+            final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, FreezePlayerPermissions.OTHERS_FREEZEPLAYER)) {
             if (serviceCollection.getServiceUnchecked(FreezePlayerService.class).getFromUUID(user.getUniqueId())) {
                 return Optional.of(serviceCollection.messageProvider().getMessageFor(source, "seen.frozen"));

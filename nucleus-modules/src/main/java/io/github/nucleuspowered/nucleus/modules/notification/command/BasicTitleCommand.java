@@ -24,7 +24,7 @@ public class BasicTitleCommand extends TitleBase {
     }
 
     @Override
-    protected Title.Builder applyToBuilder(Title.Builder builder, Text text) {
+    protected Title.Builder applyToBuilder(final Title.Builder builder, final TextComponent text) {
         return builder.title(text);
     }
 

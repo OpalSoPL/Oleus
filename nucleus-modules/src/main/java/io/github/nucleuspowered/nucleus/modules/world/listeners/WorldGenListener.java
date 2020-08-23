@@ -21,31 +21,31 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class WorldGenListener implements ListenerBase {
 
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
-    public WorldGenListener(INucleusServiceCollection serviceCollection) {
+    public WorldGenListener(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
     @Listener
-    public void onStart(GameStartedServerEvent event) {
+    public void onStart(final GameStartedServerEvent event) {
         Task.builder().execute(() -> Sponge.getServer().getWorlds().forEach(this::onWorldLoad)).delay(1, TimeUnit.SECONDS).submit(this.serviceCollection.pluginContainer());
     }
 
     @Listener
-    public void onWorldLoad(LoadWorldEvent event) {
+    public void onWorldLoad(final LoadWorldEvent event) {
         if (Sponge.getGame().getState() == GameState.SERVER_STARTED) {
             Task.builder().execute(() -> onWorldLoad(event.getTargetWorld())).delay(1, TimeUnit.SECONDS).submit(this.serviceCollection.pluginContainer());
         }
     }
 
     private void onWorldLoad(final World world) {
-        WorldHelper worldHelper = this.serviceCollection.getServiceUnchecked(WorldHelper.class);
+        final WorldHelper worldHelper = this.serviceCollection.getServiceUnchecked(WorldHelper.class);
         final CompletableFuture<Optional<IWorldDataObject>> cfo =
                 this.serviceCollection.storageManager().getWorldService().get(world.getUniqueId());
 
@@ -59,10 +59,10 @@ public class WorldGenListener implements ListenerBase {
                             task.cancel();
                             if (!cfo.isCompletedExceptionally()) {
                                 // We know there isn't an exception.
-                                Optional<IWorldDataObject> optionalWorldDataObject = cfo.join();
+                                final Optional<IWorldDataObject> optionalWorldDataObject = cfo.join();
                                 if (optionalWorldDataObject.isPresent()) {
-                                    IWorldDataObject worldDataObject = optionalWorldDataObject.get();
-                                    boolean act = worldDataObject.get(WorldKeys.WORLD_PREGEN_START).orElse(false);
+                                    final IWorldDataObject worldDataObject = optionalWorldDataObject.get();
+                                    final boolean act = worldDataObject.get(WorldKeys.WORLD_PREGEN_START).orElse(false);
                                     if (act && worldHelper.startPregenningForWorld(
                                             world,
                                             worldDataObject.getOrDefault(WorldKeys.WORLD_PREGEN_AGGRESSIVE),
@@ -77,7 +77,7 @@ public class WorldGenListener implements ListenerBase {
                                 }
                             }
                         }
-                    } catch (IllegalStateException e) {
+                    } catch (final IllegalStateException e) {
                         this.serviceCollection.logger().error(
                                 "Could not determine World Generation restart status for world {}, WorldProperties could not be loaded from the Sponge "
                                         + "World Manager (Sponge.getServer().getWorldProperties({}) returned empty.)", world.getName(), world.getUniqueId());

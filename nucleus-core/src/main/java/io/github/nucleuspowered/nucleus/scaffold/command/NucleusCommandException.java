@@ -37,7 +37,7 @@ public class NucleusCommandException extends CommandException {
         return this.exceptions;
     }
 
-    @Nullable @Override public Text getText() {
+    @Nullable @Override public TextComponent getText() {
         if (this.exceptions.isEmpty()) {
             // Unable to get the error.
             return this.messageProvider.getMessage("command.exception.nomoreinfo");
@@ -78,8 +78,8 @@ public class NucleusCommandException extends CommandException {
         return this.print(lce);
     }
 
-    private Text print(final List<Tuple<String, CommandException>> lce) {
-        final Text sept = this.messageProvider.getMessage("command.exception.separator");
+    private TextComponent print(final List<Tuple<String, CommandException>> lce) {
+        final TextComponent sept = this.messageProvider.getMessage("command.exception.separator");
         final Text.Builder builder = this.messageProvider.getMessage("command.exception.multiple")
                 .toBuilder();
         lce.forEach(x -> builder.append(Text.NEW_LINE).append(sept)

@@ -16,7 +16,7 @@ public class DeleteWarpEvent extends AbstractWarpEvent implements NucleusWarpEve
 
     private final Warp warp;
 
-    public DeleteWarpEvent(Cause cause, Warp warp) {
+    public DeleteWarpEvent(final Cause cause, final Warp warp) {
         super(cause, warp.getName());
         this.warp = warp;
     }

@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.parameter.RegexArgument
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -28,23 +28,23 @@ import org.spongepowered.api.text.Text;
 import java.util.stream.Collectors;
 
 @Command(aliases = "nameban", basePermission = NameBanPermissions.BASE_NAMEBAN, commandDescriptionKey = "nameban", async = true)
-public class NameBanCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class NameBanCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final String nameKey = "name";
 
     private String defaultReason = "Your name is inappropriate";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
             new RegexArgument(Text.of(this.nameKey),
                     Util.usernameRegexPattern, "command.nameban.notvalid", ((commandSource, commandArgs, commandContext) -> {
                 try {
-                    String arg = commandArgs.peek().toLowerCase();
+                    final String arg = commandArgs.peek().toLowerCase();
                     return Sponge.getServer().getOnlinePlayers().stream().filter(x -> x.getName().toLowerCase().startsWith(arg))
                         .map(User::getName)
                         .collect(Collectors.toList());
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     return Lists.newArrayList();
                 }
             }), serviceCollection),
@@ -52,24 +52,24 @@ public class NameBanCommand implements ICommandExecutor<CommandSource>, IReloada
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        String name = context.requireOne(this.nameKey, String.class).toLowerCase();
-        String reason = context.getOne(NucleusParameters.Keys.REASON, String.class).orElse(this.defaultReason);
-        NameBanHandler handler = context.getServiceCollection().getServiceUnchecked(NameBanHandler.class);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String name = context.requireOne(this.nameKey, String.class).toLowerCase();
+        final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class).orElse(this.defaultReason);
+        final NameBanHandler handler = context.getServiceCollection().getServiceUnchecked(NameBanHandler.class);
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
                 handler.addName(name, reason, frame.getCurrentCause());
                 context.sendMessage("command.nameban.success", name);
                 return context.successResult();
-        } catch (NameBanException ex) {
+        } catch (final NameBanException ex) {
             ex.printStackTrace();
             return context.errorResult("command.nameban.failed", name);
         }
     }
 
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.defaultReason = serviceCollection.moduleDataProvider().getModuleConfig(NameBanConfig.class).getDefaultReason();
     }
 }

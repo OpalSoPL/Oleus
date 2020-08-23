@@ -11,13 +11,15 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = "crafting-gui", name = "Crafting GUIs")
 public class CraftingGuiModule extends StandardModule {
 
+    public static final String ID = "crafting-gui";
+
     @Inject
-    public CraftingGuiModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public CraftingGuiModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class IgnoreService implements ServiceBase {
 
@@ -24,21 +24,21 @@ public class IgnoreService implements ServiceBase {
     private final Map<UUID, List<UUID>> ignoredBy = new HashMap<>();
 
     @Inject
-    public IgnoreService(INucleusServiceCollection serviceCollection) {
+    public IgnoreService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
     }
 
-    private void addPlayer(UUID player, List<UUID> ignored) {
+    private void addPlayer(final UUID player, final List<UUID> ignored) {
         removePlayer(player);
         this.ignoredBy.put(player, new ArrayList<>(ignored));
     }
 
-    private void removePlayer(UUID player) {
+    private void removePlayer(final UUID player) {
         this.ignoredBy.remove(player);
     }
 
-    public void ignore(UUID ignorer, UUID ignoree) {
-        List<UUID> uuid = get(ignorer);
+    public void ignore(final UUID ignorer, final UUID ignoree) {
+        final List<UUID> uuid = get(ignorer);
         if (!uuid.contains(ignoree)) {
             uuid.add(ignoree);
             this.serviceCollection.storageManager().getUserService()
@@ -47,8 +47,8 @@ public class IgnoreService implements ServiceBase {
         }
     }
 
-    public void unignore(UUID ignorer, UUID ignoree) {
-        List<UUID> uuid = get(ignorer);
+    public void unignore(final UUID ignorer, final UUID ignoree) {
+        final List<UUID> uuid = get(ignorer);
         if (uuid.contains(ignoree)) {
             uuid.remove(ignoree);
             this.serviceCollection.storageManager().getUserService()
@@ -57,15 +57,15 @@ public class IgnoreService implements ServiceBase {
         }
     }
 
-    public boolean isIgnored(UUID ignorer, UUID ignoree) {
+    public boolean isIgnored(final UUID ignorer, final UUID ignoree) {
         return get(ignorer).contains(ignoree);
     }
 
-    public List<UUID> getAllIgnored(UUID ignorer) {
+    public List<UUID> getAllIgnored(final UUID ignorer) {
         return ImmutableList.copyOf(get(ignorer));
     }
 
-    private List<UUID> get(UUID player) {
+    private List<UUID> get(final UUID player) {
         if (!this.ignoredBy.containsKey(player)) {
             addPlayer(player,
                     this.serviceCollection.storageManager().getUserService()

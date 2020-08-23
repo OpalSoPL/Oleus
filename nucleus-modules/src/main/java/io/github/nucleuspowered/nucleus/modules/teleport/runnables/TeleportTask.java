@@ -12,19 +12,19 @@ import org.spongepowered.api.scheduler.Task;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class TeleportTask implements TaskBase {
 
     private final PlayerTeleporterService teleporterService;
 
     @Inject
-    public TeleportTask(INucleusServiceCollection serviceCollection) {
+    public TeleportTask(final INucleusServiceCollection serviceCollection) {
         this.teleporterService = serviceCollection.getServiceUnchecked(PlayerTeleporterService.class);
     }
 
     @Override
-    public void accept(Task task) {
+    public void accept(final Task task) {
         teleporterService.removeExpired();
     }
 

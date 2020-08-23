@@ -14,23 +14,23 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class AFKFullMoveListener extends AbstractAFKListener implements ListenerBase.Conditional {
 
     @Inject
-    public AFKFullMoveListener(INucleusServiceCollection collection) {
+    public AFKFullMoveListener(final INucleusServiceCollection collection) {
         super(collection.getServiceUnchecked(AFKHandler.class));
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerMove(final MoveEntityEvent event, @Root Player player) {
+    public void onPlayerMove(final MoveEntityEvent event, @Root final Player player) {
         update(player);
     }
 
     @Override
-    public boolean shouldEnable(INucleusServiceCollection serviceCollection) {
-        AFKConfig.Triggers triggers = serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
+        final AFKConfig.Triggers triggers = serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
                 .getTriggers();
         return triggers.isOnMovement() && triggers.isOnRotation();
     }

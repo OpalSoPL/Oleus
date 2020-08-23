@@ -11,9 +11,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 @Command(
         aliases = {"gmc", "creative"},
         basePermission = {AdminPermissions.BASE_GAMEMODE, AdminPermissions.GAMEMODE_MODES_CREATIVE},
@@ -29,10 +30,10 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
                 }
 )
 @EssentialsEquivalent({"gmc", "creative"})
-public class CreativeGamemodeCommand extends GamemodeBase<Player> {
+public class CreativeGamemodeCommand extends GamemodeBase<ServerPlayer> {
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends Player> src) throws CommandException {
+    public ICommandResult execute(final ICommandContext src) throws CommandException {
         return baseCommand(src, src.getIfPlayer(), GameModes.CREATIVE);
     }
 }

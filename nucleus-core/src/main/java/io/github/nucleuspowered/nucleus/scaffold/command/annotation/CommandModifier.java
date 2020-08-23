@@ -39,7 +39,7 @@ public @interface CommandModifier {
     boolean generateConfig() default true;
 
     /**
-     * If true, runs the {@link ICommandModifier#preExecute(ICommandContext.Mutable, CommandControl, INucleusServiceCollection, CommandModifier)}
+     * If true, runs the {@link ICommandModifier#preExecute(ICommandContext, CommandControl, INucleusServiceCollection, CommandModifier)}
      * before the command executes.
      *
      * @return true by default

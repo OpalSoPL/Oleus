@@ -27,7 +27,7 @@ public class BoundedIntegerArgument extends CommandElement {
     private final int max;
     private final IMessageProviderService messageProviderService;
 
-    public BoundedIntegerArgument(@Nullable final Text key, final int min, final int max,
+    public BoundedIntegerArgument(@Nullable final TextComponent key, final int min, final int max,
             final INucleusServiceCollection serviceCollection) {
         super(key);
         this.min = Math.min(min, max);
@@ -59,7 +59,7 @@ public class BoundedIntegerArgument extends CommandElement {
     }
 
     @Override
-    public Text getUsage(final CommandSource src) {
+    public TextComponent getUsage(final CommandSource src) {
         return Text.of(this.getKey(), String.format("(%s to %s)", this.min, this.max));
     }
 }

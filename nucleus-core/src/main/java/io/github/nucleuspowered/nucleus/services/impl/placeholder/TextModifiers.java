@@ -12,13 +12,13 @@ public enum TextModifiers implements Function<Text, Text> {
 
     SPACE_AFTER("s") {
         @Override
-        public Text apply(final Text text) {
+        public TextComponent apply(final TextComponent text) {
             return Text.of(text, " ");
         }
     },
     SPACE_BEFORE("p") {
         @Override
-        public Text apply(final Text text) {
+        public TextComponent apply(final TextComponent text) {
             return Text.of(" ", text);
         }
     };

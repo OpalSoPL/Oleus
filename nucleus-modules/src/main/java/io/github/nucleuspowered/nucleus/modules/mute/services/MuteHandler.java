@@ -40,7 +40,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @APIService(NucleusMuteService.class)
 public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteService, ServiceBase {
@@ -55,17 +55,17 @@ public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteServi
     private final List<UUID> voicedUsers = Lists.newArrayList();
 
     @Inject
-    public MuteHandler(INucleusServiceCollection serviceCollection) {
+    public MuteHandler(final INucleusServiceCollection serviceCollection) {
         this.messageProviderService = serviceCollection.messageProvider();
         this.storageManager = serviceCollection.storageManager();
         this.pluginContainer = serviceCollection.pluginContainer();
     }
 
-    public void onMute(Player user) {
+    public void onMute(final Player user) {
         this.getPlayerMuteData(user).ifPresent(x -> onMute(x, user));
     }
 
-    public void onMute(MuteData md, Player user) {
+    public void onMute(final MuteData md, final Player user) {
         if (md.getRemainingTime().isPresent()) {
             this.messageProviderService.sendMessageTo(user, "mute.playernotify.time",
                     this.messageProviderService.getTimeString(user.getLocale(), md.getRemainingTime().get().getSeconds()));
@@ -74,41 +74,41 @@ public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteServi
         }
     }
 
-    @Override public boolean isMuted(User user) {
+    @Override public boolean isMuted(final User user) {
         return getPlayerMuteData(user).isPresent();
     }
 
-    @Override public Optional<Mute> getPlayerMuteInfo(User user) {
+    @Override public Optional<Mute> getPlayerMuteInfo(final User user) {
         return getPlayerMuteData(user).map(x -> x);
     }
 
     // Internal
-    public Optional<MuteData> getPlayerMuteData(User user) {
-        Optional<MuteData> nu = this.storageManager.getOrCreateUserOnThread(user.getUniqueId()).get(MuteKeys.MUTE_DATA);
+    public Optional<MuteData> getPlayerMuteData(final User user) {
+        final Optional<MuteData> nu = this.storageManager.getOrCreateUserOnThread(user.getUniqueId()).get(MuteKeys.MUTE_DATA);
         this.muteContextCache.put(user.getUniqueId(), nu.isPresent());
         return nu;
     }
 
-    @Override public boolean mutePlayer(User user, String reason, @Nullable Duration duration, Cause cause) {
-        UUID first = cause.first(User.class).map(Identifiable::getUniqueId).orElse(Util.CONSOLE_FAKE_UUID);
+    @Override public boolean mutePlayer(final User user, final String reason, @Nullable final Duration duration, final Cause cause) {
+        final UUID first = cause.first(User.class).map(Identifiable::getUniqueId).orElse(Util.CONSOLE_FAKE_UUID);
         return mutePlayer(user, new MuteData(first, reason, duration), cause);
     }
 
-    public boolean mutePlayer(User user, MuteData data) {
+    public boolean mutePlayer(final User user, final MuteData data) {
         return mutePlayer(user, data, CauseStackHelper.createCause((Util.getObjectFromUUID(data.getMuterInternal()))));
     }
 
-    public boolean mutePlayer(User user, MuteData data, Cause cause) {
+    public boolean mutePlayer(final User user, final MuteData data, final Cause cause) {
         Preconditions.checkNotNull(user);
         Preconditions.checkNotNull(data);
 
-        Optional<IUserDataObject> nu = this.storageManager.getUserOnThread(user.getUniqueId());
+        final Optional<IUserDataObject> nu = this.storageManager.getUserOnThread(user.getUniqueId());
         if (!nu.isPresent()) {
             return false;
         }
 
-        Instant time = Instant.now();
-        IUserDataObject u = nu.get();
+        final Instant time = Instant.now();
+        final IUserDataObject u = nu.get();
         final Duration d = data.getRemainingTime().orElse(null);
         if (user.isOnline() && data.getTimeFromNextLogin().isPresent() && !data.getEndTimestamp().isPresent()) {
             data.setEndtimestamp(time.plus(data.getTimeFromNextLogin().get()));
@@ -125,19 +125,19 @@ public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteServi
         return true;
     }
 
-    public boolean unmutePlayer(User user) {
+    public boolean unmutePlayer(final User user) {
         return unmutePlayer(user, CauseStackHelper.createCause(this.pluginContainer), true);
     }
 
-    @Override public boolean unmutePlayer(User user, Cause cause) {
+    @Override public boolean unmutePlayer(final User user, final Cause cause) {
         return unmutePlayer(user, cause, false);
     }
 
-    public boolean unmutePlayer(User user, Cause cause, boolean expired) {
+    public boolean unmutePlayer(final User user, final Cause cause, final boolean expired) {
         if (isMuted(user)) {
-            Optional<IUserDataObject> o = this.storageManager.getUserOnThread(user.getUniqueId());
+            final Optional<IUserDataObject> o = this.storageManager.getUserOnThread(user.getUniqueId());
             if (o.isPresent()) {
-                IUserDataObject udo = o.get();
+                final IUserDataObject udo = o.get();
                 udo.remove(MuteKeys.MUTE_DATA);
                 this.storageManager.saveUser(user.getUniqueId(), udo);
                 this.muteContextCache.put(user.getUniqueId(), false);
@@ -159,7 +159,7 @@ public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteServi
         return this.globalMuteEnabled;
     }
 
-    public void setGlobalMuteEnabled(boolean globalMuteEnabled) {
+    public void setGlobalMuteEnabled(final boolean globalMuteEnabled) {
         if (this.globalMuteEnabled != globalMuteEnabled) {
             this.voicedUsers.clear();
         }
@@ -167,33 +167,33 @@ public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteServi
         this.globalMuteEnabled = globalMuteEnabled;
     }
 
-    public boolean isVoiced(UUID uuid) {
+    public boolean isVoiced(final UUID uuid) {
         return this.voicedUsers.contains(uuid);
     }
 
-    public void addVoice(UUID uuid) {
+    public void addVoice(final UUID uuid) {
         this.voicedUsers.add(uuid);
     }
 
-    public void removeVoice(UUID uuid) {
+    public void removeVoice(final UUID uuid) {
         this.voicedUsers.remove(uuid);
     }
 
-    @Override public void accumulateContexts(Subject calculable, Set<Context> accumulator) {
+    @Override public void accumulateContexts(final Subject calculable, final Set<Context> accumulator) {
         if (calculable instanceof User) {
-            UUID u = ((User) calculable).getUniqueId();
+            final UUID u = ((User) calculable).getUniqueId();
             if (this.muteContextCache.computeIfAbsent(u, k -> isMuted((User) calculable))) {
                 accumulator.add(this.mutedContext);
             }
         }
     }
 
-    @Override public boolean matches(Context context, Subject subject) {
+    @Override public boolean matches(final Context context, final Subject subject) {
         return context.getKey().equals(NucleusMuteService.MUTED_CONTEXT) && subject instanceof User &&
                 this.muteContextCache.computeIfAbsent(((User) subject).getUniqueId(), k -> isMuted((User) subject));
     }
 
-    public boolean isMutedCached(User x) {
+    public boolean isMutedCached(final User x) {
         return this.muteContextCache.containsKey(x.getUniqueId());
     }
 }

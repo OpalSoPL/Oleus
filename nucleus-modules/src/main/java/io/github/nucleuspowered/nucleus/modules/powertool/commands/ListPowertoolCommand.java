@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.Text;
@@ -33,57 +33,57 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "powertool.list",
         parentCommand = PowertoolCommand.class
 )
-public class ListPowertoolCommand implements ICommandExecutor<Player> {
+public class ListPowertoolCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
-        UUID uuid = context.getUniqueId().get();
-        boolean toggle = context.getServiceCollection().userPreferenceService()
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final UUID uuid = context.getUniqueId().get();
+        final boolean toggle = context.getServiceCollection().userPreferenceService()
                 .getUnwrapped(uuid, NucleusKeysProvider.POWERTOOL_ENABLED);
 
-        PowertoolService service = context.getServiceCollection().getServiceUnchecked(PowertoolService.class);
-        Map<String, List<String>> powertools = service.getPowertools(uuid);
+        final PowertoolService service = context.getServiceCollection().getServiceUnchecked(PowertoolService.class);
+        final Map<String, List<String>> powertools = service.getPowertools(uuid);
 
         if (powertools.isEmpty()) {
             return context.errorResult("command.powertool.list.none");
         }
 
         // Generate powertools.
-        List<Text> mesl = powertools.entrySet().stream().sorted((a, b) -> a.getKey()
+        final List<Text> mesl = powertools.entrySet().stream().sorted((a, b) -> a.getKey()
                 .compareToIgnoreCase(b.getKey()))
                 .map(k -> from(service, context, k.getKey(), k.getValue())).collect(Collectors.toList());
 
         // Paginate the tools.
-        Util.getPaginationBuilder(context.getCommandSource()).title(
+        Util.getPaginationBuilder(context.getCommandSourceRoot()).title(
                 context.getMessage("command.powertool.list.header", toggle ? "&aenabled" : "&cdisabled"))
                 .padding(Text.of(TextColors.YELLOW, "-")).contents(mesl)
-                .sendTo(context.getCommandSource());
+                .sendTo(context.getCommandSourceRoot());
 
         return context.successResult();
     }
 
-    private Text from(
-            PowertoolService service,
-            ICommandContext<? extends Player> context,
-            String powertool,
-            List<String> commands) {
+    private TextComponent from(
+            final PowertoolService service,
+            final ICommandContext context,
+            final String powertool,
+            final List<String> commands) {
 
-        Optional<ItemType> oit = Sponge.getRegistry().getType(ItemType.class, powertool);
+        final Optional<ItemType> oit = Sponge.getRegistry().getType(ItemType.class, powertool);
 
-        Player src = context.getCommandSourceUnchecked();
-        UUID uuid = src.getUniqueId();
+        final Player src = context.getCommandSourceRoot();
+        final UUID uuid = src.getUniqueId();
 
         // Create the click actions.
-        ClickAction viewAction = TextActions.executeCallback(pl -> Util.getPaginationBuilder(src)
+        final ClickAction viewAction = TextActions.executeCallback(pl -> Util.getPaginationBuilder(src)
                 .title(context.getMessage("command.powertool.ind.header", powertool))
                 .padding(Text.of(TextColors.GREEN, "-"))
                 .contents(commands.stream().map(x -> Text.of(TextColors.YELLOW, x)).collect(Collectors.toList())).sendTo(src));
 
-        ClickAction deleteAction = TextActions.executeCallback(pl -> {
+        final ClickAction deleteAction = TextActions.executeCallback(pl -> {
             service.clearPowertool(uuid, powertool);
             context.sendMessage("command.powertool.removed", powertool);
         });
 
-        TextColor tc = oit.map(itemType -> TextColors.YELLOW).orElse(TextColors.GRAY);
+        final TextColor tc = oit.map(itemType -> TextColors.YELLOW).orElse(TextColors.GRAY);
 
         // id - [View] - [Delete]
         return Text.builder().append(Text.of(tc, powertool)).append(Text.of(" - "))

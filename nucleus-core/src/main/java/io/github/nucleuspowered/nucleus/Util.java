@@ -88,29 +88,16 @@ public class Util {
         return cause.first(CommandSource.class).orElseGet(Sponge.getServer()::getConsole);
     }
 
-    public static Text applyChatTemplate(final MessageEvent.MessageFormatter formatter) {
+    public static TextComponent applyChatTemplate(final MessageEvent.MessageFormatter formatter) {
         return applyChatTemplate(formatter.getHeader(), formatter.getBody(), formatter.getFooter());
     }
 
-    public static Text applyChatTemplate(final TextRepresentable header, final TextRepresentable body, final TextRepresentable footer) {
+    public static TextComponent applyChatTemplate(final TextRepresentable header, final TextRepresentable body, final TextRepresentable footer) {
         return CHAT_TEMPLATE.apply(
                 ImmutableMap.of(
                 MessageEvent.PARAM_MESSAGE_HEADER, header,
                 MessageEvent.PARAM_MESSAGE_BODY, body,
                 MessageEvent.PARAM_MESSAGE_FOOTER, footer)).build();
-    }
-
-    public static UUID getUUID(final CommandSource src) {
-        if (src instanceof Identifiable) {
-            return ((Identifiable) src).getUniqueId();
-        }
-
-        return CONSOLE_FAKE_UUID;
-    }
-
-    public static Optional<User> getUserFromUUID(final UUID uuid) {
-        return Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
-                .get(uuid).map(x -> x.isOnline() ? ((User)x.getPlayer().get()) : x);
     }
 
     public static Object getObjectFromUUID(final UUID uuid) {
@@ -120,8 +107,7 @@ public class Util {
 
     }
 
-
-    public static String getNameOrUnkown(final ICommandContext<? extends CommandSource> context, final GameProfile profile) {
+    public static String getNameOrUnkown(final ICommandContext context, final GameProfile profile) {
         return profile.getName().orElse(
                 context.getServiceCollection().messageProvider().getMessageString(context.getCommandKey(), "standard.unknown"));
     }

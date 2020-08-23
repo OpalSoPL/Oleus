@@ -22,7 +22,7 @@ public class InternalNucleusSendMailEvent extends AbstractEvent implements Nucle
     private final Cause cause;
     private boolean cancelled = false;
 
-    public InternalNucleusSendMailEvent(@Nullable User from, User to, String message) {
+    public InternalNucleusSendMailEvent(@Nullable final User from, final User to, final String message) {
         this.cause = CauseStackHelper.createCause(from == null ? Sponge.getServer().getConsole() : from);
         this.from = from;
         this.to = to;
@@ -35,7 +35,7 @@ public class InternalNucleusSendMailEvent extends AbstractEvent implements Nucle
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
+    public void setCancelled(final boolean cancel) {
         this.cancelled = cancel;
     }
 

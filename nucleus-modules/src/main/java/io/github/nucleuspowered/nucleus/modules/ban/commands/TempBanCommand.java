@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
@@ -41,16 +41,16 @@ import java.time.temporal.ChronoUnit;
         associatedPermissionLevelKeys = BanPermissions.BAN_LEVEL_KEY
 )
 @EssentialsEquivalent("tempban")
-public class TempBanCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class TempBanCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private BanConfig banConfig = new BanConfig();
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.banConfig = serviceCollection.moduleDataProvider().getModuleConfig(BanConfig.class);
     }
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 NucleusParameters.ONE_USER.get(serviceCollection),
                 NucleusParameters.DURATION.get(serviceCollection),
@@ -58,11 +58,11 @@ public class TempBanCommand implements ICommandExecutor<CommandSource>, IReloada
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        User u = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        long time = context.requireOne(NucleusParameters.Keys.DURATION, long.class);
-        String reason = context.getOne(NucleusParameters.Keys.REASON, String.class)
-                .orElseGet(() -> context.getServiceCollection().messageProvider().getMessageString(context.getCommandSourceUnchecked(), "ban.defaultreason"));
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User u = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final long time = context.requireOne(NucleusParameters.Keys.DURATION, long.class);
+        final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class)
+                .orElseGet(() -> context.getServiceCollection().messageProvider().getMessageString(context.getCommandSourceRoot(), "ban.defaultreason"));
 
         if (!(context.isConsoleAndBypass() || context.testPermissionFor(u, BanPermissions.TEMPBAN_EXEMPT_TARGET))) {
             return context.errorResult("command.tempban.exempt", u.getName());
@@ -79,7 +79,7 @@ public class TempBanCommand implements ICommandExecutor<CommandSource>, IReloada
                     context.getTimeString(this.banConfig.getMaximumTempBanLength()));
         }
 
-        BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        final BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
 
         if (service.isBanned(u.getProfile())) {
             return context.errorResult("command.ban.alreadyset", u.getName());
@@ -95,17 +95,17 @@ public class TempBanCommand implements ICommandExecutor<CommandSource>, IReloada
         }
 
         // Expiration date
-        Instant date = Instant.now().plus(time, ChronoUnit.SECONDS);
+        final Instant date = Instant.now().plus(time, ChronoUnit.SECONDS);
 
         // Create the ban.
-        CommandSource src = context.getCommandSource();
-        Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u.getProfile()).source(src).expirationDate(date).reason(TextSerializers.FORMATTING_CODE.deserialize(reason)).build();
+        final CommandSource src = context.getCommandSourceRoot();
+        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u.getProfile()).source(src).expirationDate(date).reason(TextSerializers.FORMATTING_CODE.deserialize(reason)).build();
         service.addBan(bp);
 
-        MutableMessageChannel send =
+        final MutableMessageChannel send =
                 context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY).asMutable();
         send.addMember(src);
-        for (MessageReceiver messageReceiver : send.getMembers()) {
+        for (final MessageReceiver messageReceiver : send.getMembers()) {
             if (messageReceiver instanceof CommandSource) {
                 context.sendMessageTo(messageReceiver,
                         "command.tempban.applied",

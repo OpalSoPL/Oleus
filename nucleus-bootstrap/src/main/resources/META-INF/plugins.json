@@ -1,6 +1,7 @@
 {
     "plugins": [
         {
+            "loader": "java_plain",
             "id": "nucleus",
             "name": "Nucleus",
             "version": "3.0.0-SNAPSHOT",

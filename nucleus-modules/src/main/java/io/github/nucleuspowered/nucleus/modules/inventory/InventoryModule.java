@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = InventoryModule.ID, name = "Inventory")
 public class InventoryModule extends ConfigurableModule<InventoryConfig, InventoryConfigAdapter> {
@@ -21,7 +21,7 @@ public class InventoryModule extends ConfigurableModule<InventoryConfig, Invento
     public static final String ID = "inventory";
 
     @Inject
-    public InventoryModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, INucleusServiceCollection collection) {
+    public InventoryModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 

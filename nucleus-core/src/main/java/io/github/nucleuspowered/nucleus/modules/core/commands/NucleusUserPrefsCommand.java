@@ -37,9 +37,9 @@ import javax.annotation.Nullable;
         async = true,
         associatedPermissions = CorePermissions.OTHERS_NUSERPREFS
 )
-public class NucleusUserPrefsCommand implements ICommandExecutor<CommandSource> {
+public class NucleusUserPrefsCommand implements ICommandExecutor {
 
-    private static final Text SEPARATOR = Text.of(": ");
+    private static final TextComponent SEPARATOR = Text.of(": ");
     private final IUserPreferenceService userPreferenceService;
 
     @Inject
@@ -56,7 +56,7 @@ public class NucleusUserPrefsCommand implements ICommandExecutor<CommandSource> 
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         User target = context.getUserFromArgs();
         if (context.hasAny(UserPreferenceService.PREFERENCE_ARG.toPlain())) {
             // do we get or set?
@@ -74,7 +74,7 @@ public class NucleusUserPrefsCommand implements ICommandExecutor<CommandSource> 
     }
 
     private <T> ICommandResult set(
-            ICommandContext<? extends CommandSource> context,
+            ICommandContext context,
             User target,
             boolean isSelf,
             PreferenceKeyImpl<T> key,
@@ -88,7 +88,7 @@ public class NucleusUserPrefsCommand implements ICommandExecutor<CommandSource> 
         return context.successResult();
     }
 
-    private <T> ICommandResult get(ICommandContext<? extends CommandSource> context, User target, PreferenceKeyImpl<T> key) throws CommandException {
+    private <T> ICommandResult get(ICommandContext context, User target, PreferenceKeyImpl<T> key) throws CommandException {
         context.sendMessageText(
                 get(context, context.getServiceCollection().userPreferenceService(),
                         key,
@@ -96,7 +96,7 @@ public class NucleusUserPrefsCommand implements ICommandExecutor<CommandSource> 
         return context.successResult();
     }
 
-    private ICommandResult list(ICommandContext<? extends CommandSource> context, User target) throws CommandException {
+    private ICommandResult list(ICommandContext context, User target) throws CommandException {
         Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> ret = this.userPreferenceService.get(target);
 
         List<Text> entry = new ArrayList<>();
@@ -106,21 +106,21 @@ public class NucleusUserPrefsCommand implements ICommandExecutor<CommandSource> 
             entry.add(get(context, this.userPreferenceService, key, value));
         }
 
-        Util.getPaginationBuilder(context.getCommandSource())
+        Util.getPaginationBuilder(context.getCommandSourceRoot())
                 .title(context.getServiceCollection().messageProvider().getMessageFor(
-                        context.getCommandSource(), "command.userprefs.title", target.getName()))
-            .contents(entry).build().sendTo(context.getCommandSource());
+                        context.getCommandSourceRoot(), "command.userprefs.title", target.getName()))
+            .contents(entry).build().sendTo(context.getCommandSourceRoot());
         return context.successResult();
     }
 
-    private Text get(ICommandContext<? extends CommandSource> context,
+    private TextComponent get(ICommandContext context,
             IUserPreferenceService userPreferenceService,
             NucleusUserPreferenceService.PreferenceKey<?> key,
             @Nullable Object value) throws CommandException {
         Text.Builder tb = Text.builder(key.getID().replaceAll("^nucleus:", ""));
         tb.append(SEPARATOR);
-        Text result;
-        CommandSource commandSource = context.getCommandSource();
+        TextComponent result;
+        CommandSource commandSource = context.getCommandSourceRoot();
         if (value == null) {
             result = context.getServiceCollection().messageProvider().getMessageFor(commandSource, "standard.unset");
         } else if (value instanceof Boolean) {

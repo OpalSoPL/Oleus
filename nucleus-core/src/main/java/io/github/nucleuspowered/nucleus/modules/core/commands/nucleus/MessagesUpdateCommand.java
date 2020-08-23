@@ -28,7 +28,7 @@ import java.util.List;
         commandDescriptionKey = "nucleus.update-messages",
         async = true
 )
-public class MessagesUpdateCommand implements ICommandExecutor<CommandSource> {
+public class MessagesUpdateCommand implements ICommandExecutor {
 
     @Override public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
@@ -37,7 +37,7 @@ public class MessagesUpdateCommand implements ICommandExecutor<CommandSource> {
     }
 
     @Override
-    public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    public ICommandResult execute(ICommandContext context) throws CommandException {
         // First, reload the messages.
         IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         boolean reload = messageProviderService.reloadMessageFile(); //Nucleus.getNucleus().reloadMessages();
@@ -60,7 +60,7 @@ public class MessagesUpdateCommand implements ICommandExecutor<CommandSource> {
             context.sendMessage("command.nucleus.messageupdate.sometoupdate", String.valueOf(mismatched.size()));
             mismatched.forEach(x -> context.sendMessageText(Text.of(TextColors.YELLOW, x)));
             messageProviderService
-                    .getMessageFor(context.getCommandSource().getLocale(),
+                    .getMessageFor(context.getCommandSourceRoot().getLocale(),
                             "command.nucleus.messageupdate.confirm",
                             "/nucleus update-messages -y").toBuilder()
                             .onClick(TextActions.runCommand("/nucleus update-messages -y")).build();

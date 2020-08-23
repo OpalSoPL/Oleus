@@ -12,7 +12,7 @@ public class AbstractWarpEvent extends AbstractCancelMessageEvent implements Nuc
 
     private final String name;
 
-    AbstractWarpEvent(Cause cause, String name) {
+    AbstractWarpEvent(final Cause cause, final String name) {
         super(cause);
         this.name = name;
     }

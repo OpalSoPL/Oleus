@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -47,13 +47,13 @@ import java.util.Optional;
         }
 )
 @EssentialsEquivalent("ban")
-public class BanCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class BanCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
     private final String name = "name";
 
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.firstParsing(
                         NucleusParameters.ONE_GAME_PROFILE_UUID.get(serviceCollection),
@@ -64,7 +64,7 @@ public class BanCommand implements ICommandExecutor<CommandSource>, IReloadableS
         };
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final String r = context.getOne(NucleusParameters.Keys.REASON, String.class).orElseGet(() ->
                 context.getMessageString("ban.defaultreason"));
 
@@ -75,7 +75,7 @@ public class BanCommand implements ICommandExecutor<CommandSource>, IReloadableS
 
         if (ou.isPresent()) {
             // power check
-            Optional<User> optionalUser = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(ou.get());
+            final Optional<User> optionalUser = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(ou.get());
             if ((!optionalUser.isPresent() || !optionalUser.get().isOnline()) && !context.testPermission(BanPermissions.BAN_OFFLINE)) {
                 return context.errorResult("command.ban.offline.noperms");
             }
@@ -96,24 +96,24 @@ public class BanCommand implements ICommandExecutor<CommandSource>, IReloadableS
 
         // Get the profile async.
         Sponge.getScheduler().createAsyncExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
-            GameProfileManager gpm = Sponge.getServer().getGameProfileManager();
+            final GameProfileManager gpm = Sponge.getServer().getGameProfileManager();
             try {
-                GameProfile gp = gpm.get(userToFind).get();
+                final GameProfile gp = gpm.get(userToFind).get();
 
                 // Ban the user sync.
                 Sponge.getScheduler().createSyncExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
                     // Create the user.
-                    UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-                    User user = uss.getOrCreate(gp);
+                    final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+                    final User user = uss.getOrCreate(gp);
                     context.sendMessage("gameprofile.new", user.getName());
 
                     try {
                         executeBan(context, gp, r);
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         e.printStackTrace();
                     }
                 });
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace();
                 context.sendMessage("command.ban.profileerror", userToFind);
             }
@@ -122,12 +122,12 @@ public class BanCommand implements ICommandExecutor<CommandSource>, IReloadableS
         return context.successResult();
     }
 
-    private ICommandResult executeBan(ICommandContext<? extends CommandSource> context, GameProfile u, String r) {
-        BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
-        CommandSource src = context.getCommandSourceUnchecked();
+    private ICommandResult executeBan(final ICommandContext context, final GameProfile u, final String r) {
+        final BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        final CommandSource src = context.getCommandSourceRoot();
 
-        UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-        User user = uss.get(u).get();
+        final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        final User user = uss.get(u).get();
         if (!user.isOnline() && !context.testPermission(BanPermissions.BAN_OFFLINE)) {
             return context.errorResult("command.ban.offline.noperms");
         }
@@ -150,13 +150,13 @@ public class BanCommand implements ICommandExecutor<CommandSource>, IReloadableS
         }
 
         // Create the ban.
-        Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u)
+        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u)
                 .source(src)
                 .reason(TextSerializers.FORMATTING_CODE.deserialize(r)).build();
         service.addBan(bp);
 
         // Get the permission, "quickstart.ban.notify"
-        MutableMessageChannel send = context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY).asMutable();
+        final MutableMessageChannel send = context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY).asMutable();
         send.addMember(src);
         send.send(context.getMessage("command.ban.applied",
                 u.getName().orElse(context.getMessageString("standard.unknown")),
@@ -170,7 +170,7 @@ public class BanCommand implements ICommandExecutor<CommandSource>, IReloadableS
         return context.successResult();
     }
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(BanConfig.class).getLevelConfig();
     }
 }

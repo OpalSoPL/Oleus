@@ -20,19 +20,19 @@ public class WarpData implements Warp {
 
     private final String category;
     private final Double cost;
-    private final Text description;
+    private final TextComponent description;
     private final UUID worldPropertiesUUID;
     private final Vector3d position;
     private final Vector3d rotation;
     private final String name;
 
-    public WarpData(String category,
-                    double cost,
-                    Text description,
-                    UUID worldPropertiesUUID,
-                    Vector3d position,
-                    Vector3d rotation,
-                    String name) {
+    public WarpData(final String category,
+                    final double cost,
+                    final TextComponent description,
+                    final UUID worldPropertiesUUID,
+                    final Vector3d position,
+                    final Vector3d rotation,
+                    final String name) {
         this.category = category;
         this.cost = cost == 0 ? null : cost;
         this.description = description;

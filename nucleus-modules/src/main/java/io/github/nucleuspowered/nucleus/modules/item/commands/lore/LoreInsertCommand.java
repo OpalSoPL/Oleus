@@ -11,8 +11,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;;
+
 @Command(
         aliases = { "insert" },
         basePermission = ItemPermissions.BASE_LORE_SET,
@@ -26,7 +26,7 @@ import org.spongepowered.api.entity.living.player.Player;
 )
 public class LoreInsertCommand extends LoreModifyBaseCommand {
 
-    @Override public ICommandResult execute(ICommandContext<? extends Player> context) throws CommandException {
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         return setLore(context, context.requireOne(NucleusParameters.Keys.LORE, String.class),
                 context.requireOne(this.loreLine, Integer.class), false);
     }

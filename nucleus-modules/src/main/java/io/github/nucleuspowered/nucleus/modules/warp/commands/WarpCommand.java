@@ -24,7 +24,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvi
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -56,20 +56,20 @@ import java.util.Optional;
                 WarpPermissions.OTHERS_WARP
         }
 )
-public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadableService.Reloadable {
+public class WarpCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private boolean isSafeTeleport = true;
     private double defaultCost = 0;
 
-    @Override public void onReload(INucleusServiceCollection serviceCollection) {
-        WarpConfig wc = serviceCollection.moduleDataProvider().getModuleConfig(WarpConfig.class);
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+        final WarpConfig wc = serviceCollection.moduleDataProvider().getModuleConfig(WarpConfig.class);
         this.defaultCost = wc.getDefaultWarpCost();
         this.isSafeTeleport = wc.isSafeTeleport();
     }
 
     // flag,
     @Override
-    public CommandElement[] parameters(INucleusServiceCollection serviceCollection) {
+    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
         return new CommandElement[] {
                 GenericArguments.onlyOne(GenericArguments
                         .optionalWeak(GenericArguments.flags()
@@ -87,9 +87,9 @@ public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadable
         };
     }
 
-    @Override public Optional<ICommandResult> preExecute(ICommandContext.Mutable<? extends CommandSource> context) throws CommandException {
-        Player target = context.getPlayerFromArgs();
-        IEconomyServiceProvider economyServiceProvider = context.getServiceCollection().economyServiceProvider();
+    @Override public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
+        final Player target = context.getPlayerFromArgs();
+        final IEconomyServiceProvider economyServiceProvider = context.getServiceCollection().economyServiceProvider();
         if (!context.is(target)) {
             // Don't cooldown
             context.removeModifier(CommandModifiers.HAS_COOLDOWN);
@@ -102,17 +102,17 @@ public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadable
             return Optional.empty();
         }
 
-        Warp wd = context.requireOne(WarpService.WARP_KEY, Warp.class);
-        Optional<Double> i = wd.getCost();
-        double cost = i.orElse(this.defaultCost);
+        final Warp wd = context.requireOne(WarpService.WARP_KEY, Warp.class);
+        final Optional<Double> i = wd.getCost();
+        final double cost = i.orElse(this.defaultCost);
 
         if (cost <= 0) {
             return Optional.empty();
         }
 
-        String costWithUnit = economyServiceProvider.getCurrencySymbol(cost);
+        final String costWithUnit = economyServiceProvider.getCurrencySymbol(cost);
         if (economyServiceProvider.hasBalance(target, cost)) {
-            String command = String.format("/warp -y %s", wd.getName());
+            final String command = String.format("/warp -y %s", wd.getName());
             context.sendMessage("command.warp.cost.details", wd.getName(), costWithUnit);
             context.sendMessageText(
                     context.getMessage("command.warp.cost.clickaccept").toBuilder()
@@ -126,13 +126,13 @@ public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadable
         return Optional.of(context.failResult());
     }
 
-    @Override public ICommandResult execute(ICommandContext<? extends CommandSource> context) throws CommandException {
-        Player player = context.getPlayerFromArgs();
-        boolean isOther = !context.is(player);
+    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Player player = context.getPlayerFromArgs();
+        final boolean isOther = !context.is(player);
 
         // Permission checks are done by the parser.
-        Warp wd = context.requireOne(WarpService.WARP_KEY, Warp.class);
-        WorldProperties worldProperties = wd.getWorldProperties().orElseThrow(() -> context.createException(
+        final Warp wd = context.requireOne(WarpService.WARP_KEY, Warp.class);
+        final WorldProperties worldProperties = wd.getWorldProperties().orElseThrow(() -> context.createException(
                 "command.warp.worlddoesnotexist"
         ));
 
@@ -142,19 +142,19 @@ public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadable
                 .orElseThrow(() -> context.createException("command.warp.worldnotloaded"));
         }
 
-        try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSource());
-            UseWarpEvent event = new UseWarpEvent(frame.getCurrentCause(), player, wd);
+        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(context.getCommandSourceRoot());
+            final UseWarpEvent event = new UseWarpEvent(frame.getCurrentCause(), player, wd);
             if (Sponge.getEventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
             }
 
-            Optional<Double> i = wd.getCost();
-            double cost = i.orElse(this.defaultCost);
+            final Optional<Double> i = wd.getCost();
+            final double cost = i.orElse(this.defaultCost);
 
             boolean charge = false;
-            IEconomyServiceProvider economyServiceProvider = context.getServiceCollection().economyServiceProvider();
+            final IEconomyServiceProvider economyServiceProvider = context.getServiceCollection().economyServiceProvider();
             if (!isOther && economyServiceProvider.serviceExists() && cost > 0 &&
                     !context.testPermission(WarpPermissions.EXEMPT_COST_WARP)) {
                 if (economyServiceProvider.withdrawFromPlayer(player, cost, false)) {
@@ -175,12 +175,12 @@ public class WarpCommand implements ICommandExecutor<CommandSource>, IReloadable
             }
 
             // Warp them.
-            boolean isSafe = !context.hasAny("f") && this.isSafeTeleport;
+            final boolean isSafe = !context.hasAny("f") && this.isSafeTeleport;
 
-            INucleusTeleportService safeLocationService = context.getServiceCollection().teleportService();
-            TeleportHelperFilter filter = safeLocationService.getAppropriateFilter(player, isSafe);
+            final INucleusTeleportService safeLocationService = context.getServiceCollection().teleportService();
+            final TeleportHelperFilter filter = safeLocationService.getAppropriateFilter(player, isSafe);
 
-            TeleportResult result = safeLocationService.teleportPlayer(
+            final TeleportResult result = safeLocationService.teleportPlayer(
                     player,
                     wd.getLocation().get(),
                     wd.getRotation(),

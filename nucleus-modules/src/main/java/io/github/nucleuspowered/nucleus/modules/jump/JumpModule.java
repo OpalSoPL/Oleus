@@ -13,7 +13,7 @@ import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @ModuleData(id = JumpModule.ID, name = "Jump")
 public class JumpModule extends ConfigurableModule<JumpConfig, JumpConfigAdapter> {
@@ -21,8 +21,8 @@ public class JumpModule extends ConfigurableModule<JumpConfig, JumpConfigAdapter
     public final static String ID = "jump";
 
     @Inject
-    public JumpModule(Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            INucleusServiceCollection collection) {
+    public JumpModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
+            final INucleusServiceCollection collection) {
         super(moduleHolder, collection);
     }
 
