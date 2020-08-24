@@ -35,7 +35,9 @@ import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -256,12 +258,14 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
                 // Additions
                 orderedAliases.addAll(aliasesToAdd);
                 final String first = orderedAliases.get(0);
-                final Collection<String> others = orderedAliases.subList(1, orderedAliases.size());
+                final Collection<String> others = orderedAliases.size() > 1 ? orderedAliases.subList(1, orderedAliases.size()) :
+                        Collections.emptyList();
                 this.registeredAliases.addAll(event.register(
                         collection.pluginContainer(),
-                        aliases.getKey(),
+                        this.createCommand(aliases.getKey()),
                         first,
-                        others).getAllAliases());
+                        others.toArray(new String[0])
+                ).getAllAliases());
             }
 
             commands.values().forEach(x -> x.completeRegistration(collection));
@@ -385,4 +389,8 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         }
     }
 
+    private org.spongepowered.api.command.Command.Parameterized createCommand(final CommandControl control) {
+        // TODO: THIS MUST BE DONE BEFORE EVEN THINKING ABOUT TRYING IT
+        return null;
+    }
 }

@@ -28,7 +28,7 @@ public abstract class CostCancellableTask implements CancellableTask {
             this.hasRun = true;
             if (this.target instanceof Player && this.cost > 0) {
                 Task.builder()
-                        .execute(task -> this.serviceCollection.economyServiceProvider().depositInPlayer((Player) target, cost))
+                        .execute(task -> this.serviceCollection.economyServiceProvider().depositInPlayer((Player) this.target, this.cost))
                         .submit(this.serviceCollection.pluginContainer());
             }
         }

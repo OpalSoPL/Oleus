@@ -4,7 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl;
 
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.guice.DataDirectory;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
@@ -18,7 +20,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenera
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
@@ -34,8 +36,8 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IUserCacheService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
 import io.github.nucleuspowered.nucleus.util.LazyLoad;
-import org.slf4j.Logger;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -44,44 +46,40 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
 @Singleton
 public class NucleusServiceCollection implements INucleusServiceCollection {
 
     private final Map<Class<?>, Object> instances = new HashMap<>();
     private final Map<Class<?>, Supplier<?>> suppliers = new HashMap<>();
 
-    private final Provider<IMessageProviderService> messageProviderService;
-    private final Provider<IEconomyServiceProvider> economyServiceProvider;
-    private final Provider<IWarmupService> warmupService;
-    private final Provider<ICooldownService> cooldownService;
-    private final Provider<IPermissionService> permissionCheckService;
-    private final Provider<IReloadableService> reloadableService;
-    private final Provider<IPlayerOnlineService> playerOnlineService;
-    private final Provider<IStorageManager> storageManager;
-    private final Provider<IUserPreferenceService> userPreferenceService;
-    private final Provider<ICommandMetadataService> commandMetadataService;
-    private final Provider<IPlayerDisplayNameService> playerDisplayNameService;
-    private final Provider<IModuleDataProvider> moduleConfigProvider;
-    private final Provider<INucleusTeleportService> nucleusTeleportServiceProvider;
-    private final Provider<ICommandElementSupplier> commandElementSupplierProvider;
-    private final Provider<INucleusTextTemplateFactory> nucleusTextTemplateFactoryProvider;
-    private final Provider<ITextFileControllerCollection> textFileControllerCollectionProvider;
-    private final Provider<IUserCacheService> userCacheServiceProvider;
-    private final Provider<IPlayerInformationService> playerInformationServiceProvider;
-    private final Provider<IConfigurateHelper> configurateHelperProvider;
-    private final Provider<IPlatformService> platformServiceProvider;
-    private final Provider<ICompatibilityService> compatibilityServiceProvider;
-    private final Provider<IChatMessageFormatterService> chatMessageFormatterProvider;
-    private final Provider<IPlaceholderService> placeholderServiceProvider;
-    private final Provider<IDocumentationGenerationService> documentationGenerationServiceProvider;
+    private final Supplier<IMessageProviderService> messageProviderService;
+    private final Supplier<IEconomyServiceProvider> economyServiceProvider;
+    private final Supplier<IWarmupService> warmupService;
+    private final Supplier<ICooldownService> cooldownService;
+    private final Supplier<IPermissionService> permissionCheckService;
+    private final Supplier<IReloadableService> reloadableService;
+    private final Supplier<IPlayerOnlineService> playerOnlineService;
+    private final Supplier<IStorageManager> storageManager;
+    private final Supplier<IUserPreferenceService> userPreferenceService;
+    private final Supplier<ICommandMetadataService> commandMetadataService;
+    private final Supplier<IPlayerDisplayNameService> playerDisplayNameService;
+    private final Supplier<IModuleDataProvider> moduleConfigProvider;
+    private final Supplier<INucleusLocationService> nucleusTeleportServiceProvider;
+    private final Supplier<ICommandElementSupplier> commandElementSupplierProvider;
+    private final Supplier<INucleusTextTemplateFactory> nucleusTextTemplateFactoryProvider;
+    private final Supplier<ITextFileControllerCollection> textFileControllerCollectionProvider;
+    private final Supplier<IUserCacheService> userCacheServiceProvider;
+    private final Supplier<IPlayerInformationService> playerInformationServiceProvider;
+    private final Supplier<IConfigurateHelper> configurateHelperProvider;
+    private final Supplier<IPlatformService> platformServiceProvider;
+    private final Supplier<ICompatibilityService> compatibilityServiceProvider;
+    private final Supplier<IChatMessageFormatterService> chatMessageFormatterProvider;
+    private final Supplier<IPlaceholderService> placeholderServiceProvider;
+    private final Supplier<IDocumentationGenerationService> documentationGenerationServiceProvider;
+    private final Supplier<ITextStyleService> textStyleServiceProvider;
     private final Injector injector;
     private final PluginContainer pluginContainer;
     private final Logger logger;
-    private final Provider<ITextStyleService> textStyleServiceProvider;
     private final Supplier<Path> dataDir;
     private final Path configPath;
 
@@ -104,7 +102,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         this.commandMetadataService = new LazyLoad<>(this, injector, ICommandMetadataService.class);
         this.playerDisplayNameService = new LazyLoad<>(this, injector, IPlayerDisplayNameService.class);
         this.moduleConfigProvider = new LazyLoad<>(this, injector, IModuleDataProvider.class);
-        this.nucleusTeleportServiceProvider = new LazyLoad<>(this, injector, INucleusTeleportService.class);
+        this.nucleusTeleportServiceProvider = new LazyLoad<>(this, injector, INucleusLocationService.class);
         this.textStyleServiceProvider = new LazyLoad<>(this, injector, ITextStyleService.class);
         this.commandElementSupplierProvider = new LazyLoad<>(this, injector, ICommandElementSupplier.class);
         this.nucleusTextTemplateFactoryProvider = new LazyLoad<>(this, injector, INucleusTextTemplateFactory.class);
@@ -179,7 +177,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         return this.moduleConfigProvider.get();
     }
 
-    @Override public INucleusTeleportService teleportService() {
+    @Override public INucleusLocationService teleportService() {
         return this.nucleusTeleportServiceProvider.get();
     }
 

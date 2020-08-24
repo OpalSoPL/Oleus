@@ -27,7 +27,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.util.CauseStackHelper;
 import org.spongepowered.api.Sponge;
@@ -64,7 +64,7 @@ public class JailHandler implements NucleusJailService, ContextCalculator<Subjec
 
     @Nullable private Map<String, NamedLocation> jailLocations = null;
     private final IStorageManager storageManager;
-    private final INucleusTeleportService teleportService;
+    private final INucleusLocationService teleportService;
     private final IMessageProviderService messageProviderService;
 
     // Used for the context calculator

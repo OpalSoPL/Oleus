@@ -10,14 +10,12 @@ import io.github.nucleuspowered.nucleus.api.core.exception.NoModuleException;
 import io.github.nucleuspowered.nucleus.api.core.exception.UnremovableModuleException;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.slf4j.Logger;
-import org.spongepowered.api.plugin.PluginContainer;
 import uk.co.drnaylor.quickstart.ModuleHolder;
 import uk.co.drnaylor.quickstart.enums.ConstructionPhase;
 import uk.co.drnaylor.quickstart.exceptions.QuickStartModuleLoaderException;
 import uk.co.drnaylor.quickstart.exceptions.UndisableableModuleException;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 public class ModuleRegistrationProxyService {
 

@@ -7,11 +7,11 @@ package io.github.nucleuspowered.nucleus.api.text;
 public interface NucleusTextTemplateFactory {
 
     /**
-     * Creates a {@link NucleusTextTemplate} from a string, which could be either Json or Ampersand formatted.
+     * Creates a {@link NucleusTextTemplate} from an ampersand formatted string.
      *
      * @param string The string to register.
      * @return The {@link NucleusTextTemplate} that can be parsed.
      */
-    NucleusTextTemplate createFromString(String string);
+    NucleusTextTemplate createFromAmpersandString(String string);
 
 }

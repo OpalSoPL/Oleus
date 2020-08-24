@@ -6,14 +6,14 @@ package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplateFactory;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateFactoryImpl;
+import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.TemplateParser;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.TextComponent;
 
-@ImplementedBy(NucleusTextTemplateFactoryImpl.class)
+@ImplementedBy(TemplateParser.class)
 public interface INucleusTextTemplateFactory extends NucleusTextTemplateFactory {
 
-    NucleusTextTemplateImpl createFromString(String string);
+    NucleusTextTemplateImpl empty();
 
     NucleusTextTemplateImpl createFromAmpersandString(String string);
 

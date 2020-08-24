@@ -7,12 +7,14 @@ package io.github.nucleuspowered.nucleus.api.text.event;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
-import org.spongepowered.api.command.CommandSource;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
+import net.kyori.adventure.text.TextComponent;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.text.Text;
-
-import java.util.Collection;
 
 /**
  * Event when messages are sent using {@link NucleusTextTemplate}s.
@@ -36,7 +38,7 @@ public interface NucleusTextTemplateEvent extends Event, Cancellable {
     NucleusTextTemplate getOriginalMessage();
 
     /**
-     * Sets the message to send to the users {@link #getRecipients()}
+     * Sets the message to send to the users {@link #getAudience()}
      *
      * @param message The message to send.
      */
@@ -45,33 +47,34 @@ public interface NucleusTextTemplateEvent extends Event, Cancellable {
     /**
      * Attempts to set the NucleusTextTemplate message using a string.
      *
-     * <p>See {@link NucleusTextTemplateFactory#createFromString(String)} for
-     * creating the tokens. Also see {@link #setMessage(NucleusTextTemplate)}.</p>
+     * <p>See {@link NucleusTextTemplateFactory#createFromAmpersandString(String)}
+     * for creating the tokens. Also see {@link #setMessage(NucleusTextTemplate)}.
+     * </p>
      *
      * @param message The message to send.
      */
     void setMessage(String message);
 
     /**
-     * Get the original recipients to send the message to.
+     * Get the original {@link Audience} to send the message to.
      *
-     * @return The original recipients of the message.
+     * @return The original {@link Audience} of the message.
      */
-    Collection<CommandSource> getOriginalRecipients();
+    Audience getOriginalAudience();
 
     /**
-     * Get the recipients to send the message to.
+     * Get the {@link Audience} to send the message to.
      *
      * @return The recipients.
      */
-    Collection<CommandSource> getRecipients();
+    Audience getAudience();
 
     /**
-     * Set the recipients to send the message to.
+     * Set the {@link Audience} to send the message to.
      *
-     * @param recipients The recipients.
+     * @param audience The audience.
      */
-    void setRecipients(Collection<? extends CommandSource> recipients);
+    void setAudience(Audience audience);
 
     /**
      * Whether the message contains tokens that may be replaced.
@@ -79,18 +82,23 @@ public interface NucleusTextTemplateEvent extends Event, Cancellable {
      * @return true if so.
      */
     default boolean containsTokens() {
-        return getMessage().containsTokens();
+        return this.getMessage().containsTokens();
     }
 
     /**
      * Gets the message that would be sent to the specified
-     * {@link CommandSource}.
+     * {@link Audience}.
+     *
+     * <p>It is recommended that you use an {@link Audience} that is either a
+     * {@link ServerPlayer} or {@link SystemSubject} to see the effect on a
+     * specific member. Using a {@link ForwardingAudience} will result in a
+     * generic message.</p>
      *
      * @param source The source
      * @return The message for the specific source
      */
-    default TextComponent getMessageFor(CommandSource source) {
-        return getMessage().getForSource(source);
+    default TextComponent getMessageFor(final Audience source) {
+        return TextComponent.builder().append(this.getMessage().getForObject(source)).build();
     }
 
     /**
@@ -102,7 +110,7 @@ public interface NucleusTextTemplateEvent extends Event, Cancellable {
          * Resets the the broadcast to the original recipients - all players
          */
         default void sendToAll() {
-            setRecipients(getOriginalRecipients());
+            this.setAudience(Sponge.getServer());
         }
     }
 }

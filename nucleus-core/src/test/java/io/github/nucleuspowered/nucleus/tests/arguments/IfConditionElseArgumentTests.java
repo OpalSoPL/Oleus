@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.tests.arguments;
 
 import com.google.common.collect.Lists;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.IfConditionElseArgument;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.tests.TestBase;
 import org.junit.Assert;

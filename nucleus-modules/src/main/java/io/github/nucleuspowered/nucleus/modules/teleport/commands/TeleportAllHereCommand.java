@@ -19,6 +19,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector3d;
 
 @EssentialsEquivalent("tpall")
 @Command(aliases = {"tpall", "tpallhere"}, basePermission = TeleportPermissions.BASE_TPALL, commandDescriptionKey = "tpall")
@@ -42,7 +43,7 @@ public class TeleportAllHereCommand implements ICommandExecutor {
                         .teleportService()
                         .teleportPlayerSmart(x,
                             toTransform,
-                            false,
+                                Vector3d.ZERO, false,
                             !context.getOne("f", Boolean.class).orElse(false),
                             TeleportScanners.NO_SCAN.get()
                 );

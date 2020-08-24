@@ -73,7 +73,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
     public class ValueImpl<V, B extends T> implements IKeyedDataObject.Value<V> {
 
         @Nullable private V value;
-        private DataKey<V, B> dataKey;
+        private final DataKey<V, B> dataKey;
 
         private ValueImpl(@Nullable final V value, final DataKey<V, B> dataKey) {
             this.value = value;

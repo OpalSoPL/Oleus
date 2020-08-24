@@ -9,7 +9,6 @@ import io.github.nucleuspowered.nucleus.modules.serverlist.config.ServerListConf
 import io.github.nucleuspowered.nucleus.modules.serverlist.services.ServerListService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;

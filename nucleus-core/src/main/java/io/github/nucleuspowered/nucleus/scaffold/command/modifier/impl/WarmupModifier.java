@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl;
 
-import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
-import io.github.nucleuspowered.nucleus.modules.core.config.WarmupConfig;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
+import io.github.nucleuspowered.nucleus.core.config.WarmupConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;

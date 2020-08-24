@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.placeholder;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.service.permission.Subject;
@@ -13,7 +14,7 @@ import org.spongepowered.api.service.permission.Subject;
  */
 public interface NucleusPlaceholderService {
 
-    ComponentLike parse(@Nullable Object sender, String input);
+    Component parse(@Nullable Object sender, String input);
 
     /**
      * Gets the parser associated with the provided token name, if any,

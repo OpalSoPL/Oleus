@@ -15,7 +15,6 @@ import io.github.nucleuspowered.nucleus.modules.message.events.InternalNucleusMe
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
@@ -390,7 +389,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
 
     private TextComponent constructMessage(final CommandSource sender, final TextComponent message, final NucleusTextTemplateImpl template,
             final Map<String, Function<CommandSource, Optional<Text>>> tokens, final Map<String, Object> variables) {
-        return this.serviceCollection.textStyleService().joinTextsWithColoursFlowing(template.getForCommandSource(sender, tokens), message);
+        return this.serviceCollection.textStyleService().joinTextsWithColoursFlowing(template.getForObject(sender, tokens), message);
     }
 
     private TextComponent useMessage(final CommandSource player, final String m) {

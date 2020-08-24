@@ -70,7 +70,7 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
                     .collect(Collectors.toList());
 
                 if (!playerList.isEmpty()) {
-                    final TextComponent prefix = this.config.getTemplate().getForSource(player);
+                    final TextComponent prefix = this.config.getTemplate().getForObject(player);
                     final ITextStyleService.TextFormat st = this.textStyleService.getLastColourAndStyle(prefix, null);
                     final TextComponent messageToSend = prefix
                             .toBuilder()

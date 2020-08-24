@@ -17,7 +17,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.args.CommandElement;
@@ -25,6 +25,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
 
@@ -70,12 +71,12 @@ public class BackCommand implements ICommandExecutor, IReloadableService.Reloada
             }
         }
 
-        final INucleusTeleportService service = context.getServiceCollection().teleportService();
-        try (final INucleusTeleportService.BorderDisableSession ac = service.temporarilyDisableBorder(border, loc.getExtent())) {
+        final INucleusLocationService service = context.getServiceCollection().teleportService();
+        try (final INucleusLocationService.BorderDisableSession ac = service.temporarilyDisableBorder(border, loc.getExtent())) {
             final TeleportResult result = service.teleportPlayerSmart(
                             src,
                             loc,
-                            false,
+                    Vector3d.ZERO, false,
                             !context.hasAny("f"),
                             TeleportScanners.NO_SCAN.get()
                     );

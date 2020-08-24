@@ -8,9 +8,9 @@ import com.google.inject.Injector;
 import io.github.nucleuspowered.nucleus.services.IInitService;
 import io.github.nucleuspowered.nucleus.services.impl.NucleusServiceCollection;
 
-import javax.inject.Provider;
+import java.util.function.Supplier;
 
-public class LazyLoad<T> implements Provider<T> {
+public class LazyLoad<T> implements Supplier<T> {
 
     private final NucleusServiceCollection nucleusServiceCollection;
     private final Class<T> clazz;

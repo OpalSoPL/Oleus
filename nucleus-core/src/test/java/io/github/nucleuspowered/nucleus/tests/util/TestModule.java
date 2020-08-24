@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.tests.util;
 
 import com.google.inject.AbstractModule;
-import io.github.nucleuspowered.nucleus.NucleusCore;
-import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
-import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfigAdapter;
+import io.github.nucleuspowered.nucleus.OldNucleusCore;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfigAdapter;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;
@@ -44,14 +44,14 @@ public class TestModule extends AbstractModule {
         this.bind(CoreConfigAdapter.class).toInstance(mock);
 
         try {
-            NucleusCore plugin = getMockPlugin();
-            this.bind(NucleusCore.class).toInstance(plugin);
+            OldNucleusCore plugin = getMockPlugin();
+            this.bind(OldNucleusCore.class).toInstance(plugin);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private NucleusCore getMockPlugin() {
-        return Mockito.mock(NucleusCore.class);
+    private OldNucleusCore getMockPlugin() {
+        return Mockito.mock(OldNucleusCore.class);
     }
 }

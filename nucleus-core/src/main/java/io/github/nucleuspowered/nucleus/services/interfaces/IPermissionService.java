@@ -10,11 +10,8 @@ import io.github.nucleuspowered.nucleus.services.impl.permission.NucleusPermissi
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
@@ -32,11 +29,7 @@ public interface IPermissionService {
 
     void assignRoleToGroup(SuggestedLevel role, Subject subject);
 
-    boolean isOpOnly();
-
     void registerContextCalculator(ContextCalculator<Subject> calculator);
-
-    void checkServiceChange(ProviderRegistration<PermissionService> service);
 
     boolean hasPermission(Subject subject, String permission);
 
@@ -49,8 +42,6 @@ public interface IPermissionService {
     void registerDescriptions();
 
     void register(String permission, PermissionMetadata metadata, String moduleid);
-
-    CommandElement createOtherUserPermissionElement(String permission);
 
     OptionalDouble getDoubleOptionFromSubject(Subject player, String... options);
 

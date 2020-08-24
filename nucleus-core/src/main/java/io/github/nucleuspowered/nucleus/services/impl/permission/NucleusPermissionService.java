@@ -7,10 +7,10 @@ package io.github.nucleuspowered.nucleus.services.impl.permission;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
-import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.NucleusRequirePermissionArgument;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
@@ -20,19 +20,17 @@ import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
 import io.github.nucleuspowered.nucleus.util.PrettyPrinter;
 import io.github.nucleuspowered.nucleus.util.ThrownFunction;
-import org.slf4j.event.Level;
+import net.kyori.adventure.text.TextComponent;
+import org.apache.logging.log4j.Level;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.source.CommandBlockSource;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.service.ProviderRegistration;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.block.entity.CommandBlock;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.util.Tristate;
 
@@ -49,8 +47,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class NucleusPermissionService implements IPermissionService, IReloadableService.Reloadable, ContextCalculator<Subject> {
@@ -59,9 +55,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     private final INucleusServiceCollection serviceCollection;
     private boolean init = false;
     private boolean useRole = false;
-    private boolean isOpOnly = true;
     private boolean consoleOverride = false;
-    private final Set<ContextCalculator<Subject>> contextCalculators = new HashSet<>();
     private final Set<String> failedChecks = new HashSet<>();
     private final Map<String, IPermissionService.Metadata> metadataMap = new HashMap<>();
     private final Map<String, IPermissionService.Metadata> prefixMetadataMap = new HashMap<>();
@@ -75,15 +69,12 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
             final IReloadableService service) {
         this.messageProviderService = serviceCollection.messageProvider();
         this.serviceCollection = serviceCollection;
-
-        // Register the context calculators.
-        Sponge.getServiceManager().provide(PermissionService.class).ifPresent(x -> x.registerContextCalculator(this));
         service.registerReloadable(this);
     }
 
     @Override
     public void assignUserRoleToDefault() {
-        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.getServiceManager().provideUnchecked(PermissionService.class).getDefaults());
+        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.getServiceProvider().permissionService().getDefaults());
     }
 
     @Override
@@ -100,21 +91,9 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         }
     }
 
-    @Override public boolean isOpOnly() {
-        return this.isOpOnly;
-    }
-
-    @Override public void registerContextCalculator(final ContextCalculator<Subject> calculator) {
-        this.contextCalculators.add(calculator);
-        Sponge.getServiceManager().provide(PermissionService.class).ifPresent(x -> x.registerContextCalculator(calculator));
-    }
-
-    @Override public void checkServiceChange(final ProviderRegistration<PermissionService> service) {
-        this.contextCalculators.forEach(x -> service.getProvider().registerContextCalculator(x));
-        service.getProvider().registerContextCalculator(this);
-
-        // don't know if there is a better way to do this.
-        this.isOpOnly = service.getPlugin().getId().equals("sponge");
+    @Override
+    public void registerContextCalculator(final ContextCalculator<Subject> calculator) {
+        Sponge.getServiceProvider().permissionService().registerContextCalculator(calculator);
     }
 
     @Override public boolean hasPermission(final Subject permissionSubject, final String permission) {
@@ -126,7 +105,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     @Override public boolean hasPermissionWithConsoleOverride(final Subject subject, final String permission, final boolean permissionIfConsoleAndOverridden) {
-        if (this.consoleOverride && subject instanceof ConsoleSource) {
+        if (this.consoleOverride && subject instanceof SystemSubject) {
             return permissionIfConsoleAndOverridden;
         }
 
@@ -134,7 +113,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     @Override public boolean isConsoleOverride(final Subject subject) {
-        return this.consoleOverride && subject instanceof ConsoleSource;
+        return this.consoleOverride && subject instanceof SystemSubject;
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
@@ -146,15 +125,13 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override public void registerDescriptions() {
         Preconditions.checkState(!this.init);
         this.init = true;
-        final PermissionService ps = Sponge.getServiceManager().provide(PermissionService.class).orElse(null);
-        final boolean isPresent = ps != null;
-
+        final PermissionService ps = Sponge.getServiceProvider().permissionService();
         for (final Map.Entry<String, IPermissionService.Metadata> entry : this.metadataMap.entrySet()) {
             final SuggestedLevel level = entry.getValue().getSuggestedLevel();
-            if (isPresent && level.getRole() != null) {
+            if (level.getRole() != null) {
                 ps.newDescriptionBuilder(this.serviceCollection.pluginContainer())
                         .assign(level.getRole(), true)
-                        .description(Text.of(entry.getValue().getDescription(this.messageProviderService)))
+                        .description(TextComponent.of(entry.getValue().getDescription(this.messageProviderService)))
                         .id(entry.getKey()).register();
             }
         }
@@ -167,14 +144,6 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         } else {
             this.metadataMap.put(permission.toLowerCase(), m);
         }
-    }
-
-    @Override public CommandElement createOtherUserPermissionElement(final String permission) {
-        return GenericArguments.optionalWeak(
-                new NucleusRequirePermissionArgument(NucleusParameters.ONE_USER.get(this.serviceCollection),
-                this,
-                permission,
-                false));
     }
 
     @Override public OptionalDouble getDoubleOptionFromSubject(final Subject player, final String... options) {
@@ -386,7 +355,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     private int getDefaultLevel(final Subject subject) {
-        if (subject instanceof ConsoleSource || subject instanceof CommandBlockSource) {
+        if (subject instanceof SystemSubject || subject instanceof Server || subject instanceof CommandBlock) {
             return Integer.MAX_VALUE;
         }
 

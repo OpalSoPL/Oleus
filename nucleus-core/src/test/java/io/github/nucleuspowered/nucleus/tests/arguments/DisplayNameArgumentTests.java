@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.tests.arguments;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.DisplayNameArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;

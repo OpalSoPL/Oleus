@@ -9,7 +9,6 @@ import io.github.nucleuspowered.nucleus.api.module.staffchat.NucleusStaffChatCha
 import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.chatmessageformatter.AbstractNucleusChatChannel;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
@@ -84,7 +83,7 @@ public class StaffChatMessageChannel implements
 
     @Override
     public void formatMessageEvent(final CommandSource source, final MessageEvent.MessageFormatter formatters) {
-        final TextComponent prefix = this.template.getForCommandSource(source);
+        final TextComponent prefix = this.template.getForObject(source);
         if (TextSerializers.PLAIN.serialize(formatters.getHeader().toText()).contains("<" + source.getName() + ">")) {
             // Remove it.
             final TextComponent p = formatters.getHeader().toText().replace("<" + source.getName() + ">", Text.of(), true);

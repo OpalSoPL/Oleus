@@ -29,6 +29,7 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 @Command(
         aliases = "other",
@@ -87,7 +88,7 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
                     .teleportPlayerSmart(
                             player,
                             event.getTransformTo(),
-                            true,
+                            Vector3d.ZERO, true,
                             this.safeTeleport,
                             TeleportScanners.NO_SCAN.get()
                     );

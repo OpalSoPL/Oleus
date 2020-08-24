@@ -76,7 +76,7 @@ public class MeCommand implements ICommandExecutor, IReloadableService.Reloadabl
                 context.getCommandSourceRoot(),
                 context.requireOne(NucleusParameters.Keys.MESSAGE, String.class));
 
-        final TextComponent header = this.config.getMePrefix().getForCommandSource(context.getCommandSourceRoot());
+        final TextComponent header = this.config.getMePrefix().getForObject(context.getCommandSourceRoot());
         final ITextStyleService.TextFormat t = textStyleService.getLastColourAndStyle(header, null);
         final TextComponent originalMessage = TextSerializers.FORMATTING_CODE.deserialize(message);
         final MessageEvent.MessageFormatter formatter = new MessageEvent.MessageFormatter(

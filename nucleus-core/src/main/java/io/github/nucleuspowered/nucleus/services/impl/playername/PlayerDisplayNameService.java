@@ -8,7 +8,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
@@ -178,6 +178,16 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         }
 
         return name.build();
+    }
+
+    @Override
+    public TextComponent getName(final Object cs) {
+        if (cs instanceof Nameable) {
+            return this.getName((Nameable) cs);
+        } else if (cs instanceof Audience) {
+            return this.getName((Audience) cs);
+        }
+        return TextComponent.empty();
     }
 
     private TextComponent addCommandToNameInternal(final TextComponent.Builder name, final String user) {

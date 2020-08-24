@@ -21,13 +21,13 @@ public class NucleusTextTemplateTypeSerialiser implements TypeSerializer<Nucleus
 
     @Override public NucleusTextTemplateImpl deserialize(final TypeToken<?> type, final ConfigurationNode value) throws ObjectMappingException {
         try {
-            return this.factory.createFromString(value.getString());
+            return this.factory.createFromAmpersandString(value.getString());
         } catch (final Throwable throwable) {
             throw new ObjectMappingException(throwable);
         }
     }
 
     @Override public void serialize(final TypeToken<?> type, final NucleusTextTemplateImpl obj, final ConfigurationNode value) {
-        value.setValue(obj.getRepresentation());
+        value.setValue(obj.asComponent());
     }
 }

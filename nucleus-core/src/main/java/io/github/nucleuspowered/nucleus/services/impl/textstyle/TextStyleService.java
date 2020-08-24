@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
@@ -136,6 +136,11 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             sb.decoration(decoration, false);
         }
         this.resetStyle = sb.build();
+    }
+
+    @Override
+    public Style getResetStyle() {
+        return this.resetStyle;
     }
 
     @Override
@@ -529,7 +534,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         @Nullable private final TextColor colour;
         private final Style style;
 
-        TextFormatImpl(final TextColor colour, final Style style) {
+        public TextFormatImpl(final TextColor colour, final Style style) {
             this.colour = colour;
             this.style = style;
         }

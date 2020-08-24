@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.quickstart.event;
 
-import io.github.nucleuspowered.nucleus.NucleusCore;
+import io.github.nucleuspowered.nucleus.OldNucleusCore;
 import io.github.nucleuspowered.nucleus.api.core.event.NucleusModuleEvent;
 import io.github.nucleuspowered.nucleus.api.core.exception.ModulesLoadedException;
 import io.github.nucleuspowered.nucleus.api.core.exception.NoModuleException;
@@ -21,11 +21,11 @@ import java.util.stream.Collectors;
 
 public abstract class BaseModuleEvent extends AbstractEvent implements NucleusModuleEvent {
 
-    private final NucleusCore plugin;
+    private final OldNucleusCore plugin;
     private final Cause cause;
     private final Map<String, ModuleEnableState> state;
 
-    private BaseModuleEvent(final NucleusCore plugin) {
+    private BaseModuleEvent(final OldNucleusCore plugin) {
         this.cause = Sponge.getCauseStackManager().getCurrentCause();
         this.plugin = plugin;
         this.state = this.getState();
@@ -57,7 +57,7 @@ public abstract class BaseModuleEvent extends AbstractEvent implements NucleusMo
     }
 
     public static class AboutToConstructEvent extends BaseModuleEvent implements NucleusModuleEvent.AboutToConstruct {
-        public AboutToConstructEvent(final NucleusCore plugin) {
+        public AboutToConstructEvent(final OldNucleusCore plugin) {
             super(plugin);
         }
 
@@ -80,28 +80,28 @@ public abstract class BaseModuleEvent extends AbstractEvent implements NucleusMo
 
     public static class AboutToEnable extends BaseModuleEvent implements NucleusModuleEvent.AboutToEnable {
 
-        public AboutToEnable(final NucleusCore plugin) {
+        public AboutToEnable(final OldNucleusCore plugin) {
             super(plugin);
         }
     }
 
     public static class Complete extends BaseModuleEvent implements NucleusModuleEvent.Complete {
 
-        public Complete(final NucleusCore plugin) {
+        public Complete(final OldNucleusCore plugin) {
             super(plugin);
         }
     }
 
     public static class PreEnable extends BaseModuleEvent implements NucleusModuleEvent.PreEnable {
 
-        public PreEnable(final NucleusCore plugin) {
+        public PreEnable(final OldNucleusCore plugin) {
             super(plugin);
         }
     }
 
     public static class Enabled extends BaseModuleEvent implements NucleusModuleEvent.Enabled {
 
-        public Enabled(final NucleusCore plugin) {
+        public Enabled(final OldNucleusCore plugin) {
             super(plugin);
         }
     }

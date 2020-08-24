@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.datatypes;
 
-import io.github.nucleuspowered.nucleus.modules.core.CoreKeys;
+import io.github.nucleuspowered.nucleus.core.CoreKeys;
 import io.github.nucleuspowered.nucleus.modules.jail.JailKeys;
 import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.modules.mute.MuteKeys;

@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.scaffold.task.CancellableTask;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;
@@ -81,7 +81,7 @@ public class TeleportTask implements CancellableTask {
         final CommandSource receiver = source != null && source.isOnline() ? source.getPlayer().get() : Sponge.getServer().getConsole();
         if (teleportingPlayer != null && targetPlayer != null) {
             // If safe, get the teleport mode
-            final INucleusTeleportService tpHandler = this.serviceCollection.teleportService();
+            final INucleusLocationService tpHandler = this.serviceCollection.teleportService();
             try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 if (source == null) {
                     frame.pushCause(Sponge.getServer().getConsole());

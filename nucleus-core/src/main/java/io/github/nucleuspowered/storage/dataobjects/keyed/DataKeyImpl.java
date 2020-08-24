@@ -13,7 +13,7 @@ public class DataKeyImpl<R, O extends IKeyedDataObject<?>> implements DataKey<R,
     private final String[] key;
     private final TypeToken<R> type;
     private final R def;
-    private Class<O> target;
+    private final Class<O> target;
 
     public DataKeyImpl(final String[] key, final TypeToken<R> type, final Class<O> target, @Nullable final R def) {
         this.key = key;

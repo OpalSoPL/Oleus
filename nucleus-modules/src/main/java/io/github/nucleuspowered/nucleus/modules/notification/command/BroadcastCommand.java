@@ -38,8 +38,8 @@ public class BroadcastCommand implements ICommandExecutor, IReloadableService.Re
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final String m = context.requireOne(NucleusParameters.Keys.MESSAGE, TypeTokens.STRING_TOKEN);
 
-        final TextComponent p = this.bc.getPrefix().getForCommandSource(context.getCommandSourceRoot());
-        final TextComponent s = this.bc.getSuffix().getForCommandSource(context.getCommandSourceRoot());
+        final TextComponent p = this.bc.getPrefix().getForObject(context.getCommandSourceRoot());
+        final TextComponent s = this.bc.getSuffix().getForObject(context.getCommandSourceRoot());
 
         final NucleusTextTemplate textTemplate =
                 context.getServiceCollection().textTemplateFactory()

@@ -5,8 +5,10 @@
 package io.github.nucleuspowered.nucleus.guice;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import io.github.nucleuspowered.nucleus.NucleusCore;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
 import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
@@ -19,39 +21,21 @@ import java.util.function.Supplier;
  */
 public class NucleusInjectorModule extends AbstractModule {
 
-    private final Supplier<INucleusServiceCollection> serviceCollection;
-    private final Supplier<Path> dataDirectory;
-    private final Path configDirectory;
-    private final IModuleDataProvider moduleDataProvider;
-    private final Supplier<DiscoveryModuleHolder<?, ?>> discoveryModuleHolderSupplier;
+    private final Supplier<NucleusCore> coreSupplier;
 
-    public NucleusInjectorModule(
-            final Supplier<INucleusServiceCollection> serviceCollection,
-            final Supplier<Path> dataDirectory,
-            final Supplier<DiscoveryModuleHolder<?, ?>> discoveryModuleHolderSupplier,
-            final Path configDirectory,
-            final IModuleDataProvider moduleDataProvider) {
-        this.dataDirectory = dataDirectory;
-        this.configDirectory = configDirectory;
-        this.moduleDataProvider = moduleDataProvider;
-        this.serviceCollection = serviceCollection;
-        this.discoveryModuleHolderSupplier = discoveryModuleHolderSupplier;
+    public NucleusInjectorModule(final Supplier<NucleusCore> core) {
+        this.coreSupplier = core;
     }
 
-    @Override protected void configure() {
-        this.bind(new TypeLiteral<Supplier<Path>>() {}).annotatedWith(DataDirectory.class).toInstance(this.dataDirectory);
-        this.bind(Path.class).annotatedWith(ConfigDirectory.class).toInstance(this.configDirectory);
-        this.bind(IModuleDataProvider.class).toInstance(this.moduleDataProvider);
+    @Override
+    protected void configure() {
+        this.bind(new TypeLiteral<Supplier<Path>>() {}).annotatedWith(DataDirectory.class).toProvider(() -> this.coreSupplier.get()::getDataDirectory);
+        this.bind(Path.class).annotatedWith(ConfigDirectory.class).toProvider(() -> this.coreSupplier.get().getConfigDirectory());
     }
 
     @Provides
     private INucleusServiceCollection provideServiceCollection() {
-        return this.serviceCollection.get();
-    }
-
-    @Provides
-    private Supplier<DiscoveryModuleHolder<? ,?>> getModuleHolder() {
-        return this.discoveryModuleHolderSupplier;
+        return this.coreSupplier.get().getServiceCollection();
     }
 
 }

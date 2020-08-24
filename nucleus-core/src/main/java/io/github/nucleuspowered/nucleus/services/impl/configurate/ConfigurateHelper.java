@@ -95,25 +95,25 @@ public class ConfigurateHelper implements IConfigurateHelper {
         final TypeSerializerCollection typeSerializerCollection = ConfigurationOptions.defaults().getSerializers().newChild();
 
         // Custom type serialisers for Nucleus
-        typeSerializerCollection.registerType(TypeToken.of(Vector3d.class), new Vector3dTypeSerialiser());
-        typeSerializerCollection.registerType(TypeToken.of(Pattern.class), new PatternTypeSerialiser());
-        typeSerializerCollection.registerType(TypeToken.of(NucleusTextTemplateImpl.class), new NucleusTextTemplateTypeSerialiser(serviceCollection.textTemplateFactory()));
-        typeSerializerCollection.registerPredicate(
+        typeSerializerCollection.register(TypeToken.of(Vector3d.class), new Vector3dTypeSerialiser());
+        typeSerializerCollection.register(TypeToken.of(Pattern.class), new PatternTypeSerialiser());
+        typeSerializerCollection.register(TypeToken.of(NucleusTextTemplateImpl.class), new NucleusTextTemplateTypeSerialiser(serviceCollection.textTemplateFactory()));
+        typeSerializerCollection.register(
                 typeToken -> Set.class.isAssignableFrom(typeToken.getRawType()),
                 new SetTypeSerialiser()
         );
 
-        typeSerializerCollection.registerType(new TypeToken<byte[]>(){}, new ByteArrayTypeSerialiser());
-        typeSerializerCollection.registerType(new TypeToken<short[]>(){}, new ShortArrayTypeSerialiser());
-        typeSerializerCollection.registerType(new TypeToken<int[]>(){}, new IntArrayTypeSerialiser());
-        typeSerializerCollection.registerType(TypeToken.of(Instant.class), new InstantTypeSerialiser());
+        typeSerializerCollection.register(new TypeToken<byte[]>(){}, new ByteArrayTypeSerialiser());
+        typeSerializerCollection.register(new TypeToken<short[]>(){}, new ShortArrayTypeSerialiser());
+        typeSerializerCollection.register(new TypeToken<int[]>(){}, new IntArrayTypeSerialiser());
+        typeSerializerCollection.register(TypeToken.of(Instant.class), new InstantTypeSerialiser());
 
-        typeSerializerCollection.registerPredicate(x -> x.isSubtypeOf(ABSTRACT_DATA_OBJECT_TYPE_TOKEN), DataObjectTranslator.INSTANCE);
-        typeSerializerCollection.registerType(TypeTokens.WARP, WarpSerialiser.INSTANCE);
-        typeSerializerCollection.registerType(TypeTokens.WARP_CATEGORY, new WarpCategorySerialiser());
-        typeSerializerCollection.registerType(TypeTokens.NAMEDLOCATION, new NamedLocationSerialiser());
-        typeSerializerCollection.registerType(TypeTokens.MAIL_MESSAGE, new MailMessageSerialiser());
-        typeSerializerCollection.registerType(TypeTokens.LOCALE, new LocaleSerialiser());
+        typeSerializerCollection.register(x -> x.isSubtypeOf(ABSTRACT_DATA_OBJECT_TYPE_TOKEN), DataObjectTranslator.INSTANCE);
+        typeSerializerCollection.register(TypeTokens.WARP, WarpSerialiser.INSTANCE);
+        typeSerializerCollection.register(TypeTokens.WARP_CATEGORY, new WarpCategorySerialiser());
+        typeSerializerCollection.register(TypeTokens.NAMEDLOCATION, new NamedLocationSerialiser());
+        typeSerializerCollection.register(TypeTokens.MAIL_MESSAGE, new MailMessageSerialiser());
+        typeSerializerCollection.register(TypeTokens.LOCALE, new LocaleSerialiser());
 
         return typeSerializerCollection;
     }

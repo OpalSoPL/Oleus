@@ -8,7 +8,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextComponent;
@@ -138,7 +137,7 @@ public final class TextFileController {
     }
 
     public List<TextComponent> getTextFromNucleusTextTemplates(final Audience source) {
-        return this.getFileContentsAsText().stream().map(x -> x.getForCommandSource(source)).collect(Collectors.toList());
+        return this.getFileContentsAsText().stream().map(x -> x.getForObject(source)).collect(Collectors.toList());
     }
 
     public void sendToPlayer(final CommandSource src, final TextComponent title) {

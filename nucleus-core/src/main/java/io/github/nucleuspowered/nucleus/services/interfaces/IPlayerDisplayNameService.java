@@ -57,6 +57,8 @@ public interface IPlayerDisplayNameService {
 
     TextComponent addCommandToDisplayName(Nameable p);
 
+    TextComponent getName(Object cs);
+
     @FunctionalInterface
     interface DisplayNameResolver {
 

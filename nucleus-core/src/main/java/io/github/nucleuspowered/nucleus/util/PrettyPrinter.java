@@ -33,8 +33,8 @@ package io.github.nucleuspowered.nucleus.util;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
-import org.slf4j.Logger;
-import org.slf4j.event.Level;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -68,7 +68,7 @@ public class PrettyPrinter {
          *
          * @param printer printer to append to
          */
-        public abstract void print(PrettyPrinter printer);
+        void print(PrettyPrinter printer);
 
     }
 
@@ -77,7 +77,7 @@ public class PrettyPrinter {
      */
     interface IVariableWidthEntry {
 
-        public abstract int getWidth();
+        int getWidth();
 
     }
 
@@ -135,7 +135,7 @@ public class PrettyPrinter {
     /**
      * Centred text
      */
-    class CentredTextComponent {
+    class CentredText {
 
         private final Object centred;
 
@@ -154,7 +154,7 @@ public class PrettyPrinter {
     /**
      * Table column alignment
      */
-    public static enum Alignment {
+    public enum Alignment {
         LEFT,
         RIGHT
     }

@@ -47,6 +47,8 @@ public interface ITextStyleService {
 
     List<String> getPermissionsFor(String prefix, Style colour);
 
+    Style getResetStyle();
+
     Optional<String> getPermissionFor(String prefix, TextColor colour);
 
     List<String> getPermissionsFor(String prefix, TextDecoration style);

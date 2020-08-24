@@ -4,9 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.economy;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.util.CauseStackHelper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -17,9 +18,6 @@ import org.spongepowered.api.service.economy.transaction.TransactionResult;
 
 import java.math.BigDecimal;
 import java.util.Optional;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class EconomyServiceProvider implements IEconomyServiceProvider {
@@ -33,18 +31,18 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
 
     @Override
     public boolean serviceExists() {
-        return Sponge.getServiceManager().provide(EconomyService.class).isPresent();
+        return Sponge.getServiceProvider().economyService().isPresent();
     }
 
     @Override public String getCurrencySymbol(final double cost) {
-        final Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
-        return oes.map(economyService -> economyService.getDefaultCurrency().format(BigDecimal.valueOf(cost)).toPlain())
+        final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
+        return oes.map(economyService -> economyService.getDefaultCurrency().format(BigDecimal.valueOf(cost)).toString())
                 .orElseGet(() -> String.valueOf(cost));
 
     }
 
     @Override public boolean hasBalance(final Player src, final double balance) {
-        final Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
+        final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
@@ -61,7 +59,7 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
     }
 
     @Override public boolean withdrawFromPlayer(final Player src, final double cost, final boolean message) {
-        final Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
+        final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
@@ -71,7 +69,8 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
                 return false;
             }
 
-            final TransactionResult tr = a.get().withdraw(es.getDefaultCurrency(), BigDecimal.valueOf(cost), CauseStackHelper.createCause(src));
+            // TODO: try (final CauseStackManager.StackFrame frame = )
+            final TransactionResult tr = a.get().withdraw(es.getDefaultCurrency(), BigDecimal.valueOf(cost));
             if (tr.getResult() == ResultType.ACCOUNT_NO_FUNDS) {
                 if (message) {
                     this.messageProviderService.sendMessageTo(src, "cost.nofunds", this.getCurrencySymbol(cost));
@@ -96,7 +95,7 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
     }
 
     @Override public boolean depositInPlayer(final User src, final double cost, final boolean message) {
-        final Optional<EconomyService> oes = Sponge.getServiceManager().provide(EconomyService.class);
+        final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
@@ -107,7 +106,7 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
                 return false;
             }
 
-            final TransactionResult tr = a.get().deposit(es.getDefaultCurrency(), BigDecimal.valueOf(cost), CauseStackHelper.createCause(src));
+            final TransactionResult tr = a.get().deposit(es.getDefaultCurrency(), BigDecimal.valueOf(cost));
             if (tr.getResult() != ResultType.SUCCESS && src.isOnline()) {
                 src.getPlayer().ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.error"));

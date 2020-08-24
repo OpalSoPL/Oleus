@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
@@ -96,12 +96,12 @@ public class TeleportPositionCommand implements ICommandExecutor {
 
         // Create the location
         final Location<World> loc = new Location<>(world, xx, yy, zz);
-        final INucleusTeleportService teleportHandler = context.getServiceCollection().teleportService();
+        final INucleusLocationService teleportHandler = context.getServiceCollection().teleportService();
 
         final boolean safe = context.getOne("f", Boolean.class).orElse(false);
         final boolean border = context.hasAny("b");
 
-        try (final INucleusTeleportService.BorderDisableSession ac =
+        try (final INucleusLocationService.BorderDisableSession ac =
                 teleportHandler.temporarilyDisableBorder(!safe && border, loc.getExtent())) {
             final TeleportResult result = teleportHandler.teleportPlayerSmart(
                     pl,

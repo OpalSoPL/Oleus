@@ -21,6 +21,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
 
@@ -55,7 +56,7 @@ public class FirstSpawnCommand implements ICommandExecutor, IReloadableService.R
                 .teleportPlayerSmart(
                         context.getIfPlayer(),
                         olwr.get(),
-                        true,
+                        Vector3d.ZERO, true,
                         this.isSafeTeleport,
                         TeleportScanners.NO_SCAN.get()
                 );

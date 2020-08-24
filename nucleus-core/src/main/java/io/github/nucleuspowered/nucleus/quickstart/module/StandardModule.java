@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
 @Store(isRoot = true)
 public abstract class StandardModule implements Module {
@@ -211,7 +211,7 @@ public abstract class StandardModule implements Module {
             cmds = this.getClassesFromList(Constants.COMMAND);
         } else {
             cmds = this.performFilter(this.getStreamForModule(ICommandExecutor.class)
-                    .map(x -> (Class<? extends ICommandExecutor>) x))
+                    .map(x -> x))
                     .collect(Collectors.toSet());
         }
 

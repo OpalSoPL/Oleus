@@ -109,11 +109,7 @@ public class ConfigurationNodeJsonTranslator {
             final long l = primitive.getAsLong();
             if (d == l) {
                 final int i = primitive.getAsInt();
-                if (i == l) {
-                    node.setValue(i);
-                } else {
-                    node.setValue(l);
-                }
+                node.setValue(l);
             } else {
                 node.setValue(d);
             }

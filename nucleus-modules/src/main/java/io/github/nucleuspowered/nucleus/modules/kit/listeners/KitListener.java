@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.kit.listeners;
 
 import io.github.nucleuspowered.nucleus.api.core.event.NucleusFirstJoinEvent;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
-import io.github.nucleuspowered.nucleus.modules.core.events.UserDataLoadedEvent;
+import io.github.nucleuspowered.nucleus.core.events.UserDataLoadedEvent;
 import io.github.nucleuspowered.nucleus.modules.kit.KitKeys;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;

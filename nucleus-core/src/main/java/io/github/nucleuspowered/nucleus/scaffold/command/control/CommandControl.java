@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
-import io.github.nucleuspowered.nucleus.modules.core.config.CoreConfig;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandInterceptor;
@@ -197,14 +197,14 @@ public class CommandControl implements CommandCallable {
                     // If the Exception is _not_ of right type, wrap it and add it. This shouldn't happen though.
                     if (callable instanceof CommandControl) {
                         final CommandControl control = (CommandControl) callable;
-                        thrown.add(Tuple.of(command + " " + next, NucleusArgumentParseException.from(
+                        thrown.add(Tuple.of(this.command + " " + next, NucleusArgumentParseException.from(
                                 this.serviceCollection.messageProvider(),
                                 e,
                                 control.getUsage(source),
                                 control.getSubcommandTexts()
                         )));
                     } else {
-                        thrown.add(Tuple.of(command + " " + next, NucleusArgumentParseException.from(
+                        thrown.add(Tuple.of(this.command + " " + next, NucleusArgumentParseException.from(
                                 this.serviceCollection.messageProvider(),
                                 e,
                                 callable.getUsage(source),
@@ -260,7 +260,7 @@ public class CommandControl implements CommandCallable {
             if (this.executor == null) {
                 if (thrown.isEmpty()) {
                     // OK, we just process the usage command instead.
-                    this.usageCommand.process(contextSource, command, args.nextIfPresent().map(String::toLowerCase).orElse(null));
+                    this.usageCommand.process(contextSource, this.command, args.nextIfPresent().map(String::toLowerCase).orElse(null));
                     return contextSource.successResult();
                 } else {
                     throw new NucleusCommandException(thrown, false, this.serviceCollection.messageProvider());
@@ -272,7 +272,7 @@ public class CommandControl implements CommandCallable {
                     // Okay, parse this.
                     this.element.parse(source, args, context);
                     if (args.hasNext()) {
-                        thrown.add(Tuple.of(command, new NucleusArgumentParseException(
+                        thrown.add(Tuple.of(this.command, new NucleusArgumentParseException(
                                 this.serviceCollection.messageProvider(),
                                 Text.of(TextColors.RED, "Too many arguments"),
                                 args.getRaw(),
@@ -309,7 +309,7 @@ public class CommandControl implements CommandCallable {
 
                 // execution
                 //noinspection unchecked
-                Optional<ICommandResult> result = this.executor.preExecute((ICommandContext) contextSource);
+                Optional<ICommandResult> result = this.executor.preExecute(contextSource);
                 if (result.isPresent()) {
                     // STOP.
                     this.onResult(source, contextSource, result.get());
@@ -375,7 +375,7 @@ public class CommandControl implements CommandCallable {
         Preconditions.checkState(this.executor != null, "executor");
         for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
             commandInterceptor.onPreCommand(
-                    (Class<ICommandExecutor>) this.executor.getClass(),
+                    this.executor.getClass(),
                     this,
                     context
             );
@@ -387,11 +387,11 @@ public class CommandControl implements CommandCallable {
             result = context.successResult();
         } else {
             // Anything else to go here?
-            result = this.executor.execute((ICommandContext) context);
+            result = this.executor.execute(context);
             this.onResult(source, context, result);
             for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
                 commandInterceptor.onPostCommand(
-                        (Class<ICommandExecutor>) this.executor.getClass(),
+                        this.executor.getClass(),
                         this,
                         context,
                         result
@@ -408,7 +408,7 @@ public class CommandControl implements CommandCallable {
             ICommandResult result;
             try {
                 //noinspection unchecked
-                result = this.executor.execute((ICommandContext) context);
+                result = this.executor.execute(context);
             } catch (final CommandException e) {
                 result = context.errorResultLiteral(e.getText());
             }
@@ -419,7 +419,7 @@ public class CommandControl implements CommandCallable {
                     this.onResult(source, context, fResult);
                     for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
                         commandInterceptor.onPostCommand(
-                                (Class<ICommandExecutor>) this.executor.getClass(),
+                                this.executor.getClass(),
                                 this,
                                 context,
                                 fResult

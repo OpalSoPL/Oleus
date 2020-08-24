@@ -11,10 +11,10 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 public class CommonPermissionLevelConfig {
 
     @Setting(value = "use-permission-level", comment = "config.common.permission-level")
-    private boolean useLevels = false;
+    private final boolean useLevels = false;
 
     @Setting(value = "can-affect-same-level", comment = "config.common.same-level")
-    private boolean canAffectSameLevel = false;
+    private final boolean canAffectSameLevel = false;
 
     public boolean isUseLevels() {
         return this.useLevels;

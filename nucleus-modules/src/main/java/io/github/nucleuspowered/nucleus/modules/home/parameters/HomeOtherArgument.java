@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.home.parameters;
 
 import io.github.nucleuspowered.nucleus.modules.home.HomePermissions;
 import io.github.nucleuspowered.nucleus.modules.home.services.HomeService;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.DisplayNameArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.command.CommandSource;

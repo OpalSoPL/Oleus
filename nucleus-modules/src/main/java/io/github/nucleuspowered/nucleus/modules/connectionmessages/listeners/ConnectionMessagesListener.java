@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.api.core.event.NucleusFirstJoinEvent;
 import io.github.nucleuspowered.nucleus.modules.connectionmessages.ConnectionMessagesPermissions;
 import io.github.nucleuspowered.nucleus.modules.connectionmessages.config.ConnectionMessagesConfig;
-import io.github.nucleuspowered.nucleus.modules.core.CoreKeys;
+import io.github.nucleuspowered.nucleus.core.CoreKeys;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
@@ -57,7 +57,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
                     // Name change!
                     joinEvent.getChannel().orElse(MessageChannel.TO_ALL).send(this.pluginContainer,
                             this.cmc.getPriorNameMessage()
-                                    .getForCommandSource(pl,
+                                    .getForObjectWithTokens(pl,
                                             ImmutableMap.of("previousname", cs -> Optional.of(Text.of(lastKnown.get())))));
             }
         } catch (final Exception e) {
@@ -68,7 +68,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
             if (this.cmc.getLoginMessage().isEmpty()) {
                 joinEvent.setMessageCancelled(true);
             } else {
-                joinEvent.setMessage(this.cmc.getLoginMessage().getForSource(pl));
+                joinEvent.setMessage(this.cmc.getLoginMessage().getForObject(pl));
             }
         }
     }
@@ -76,7 +76,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
     @Listener
     public void onPlayerFirstJoin(final NucleusFirstJoinEvent event, @Getter("getTargetEntity") final Player pl) {
         if (this.cmc.isShowFirstTimeMessage() && !this.cmc.getFirstTimeMessage().isEmpty()) {
-            event.getChannel().orElse(MessageChannel.TO_ALL).send(this.pluginContainer, this.cmc.getFirstTimeMessage().getForSource(pl));
+            event.getChannel().orElse(MessageChannel.TO_ALL).send(this.pluginContainer, this.cmc.getFirstTimeMessage().getForObject(pl));
         }
     }
 
@@ -92,7 +92,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
             if (this.cmc.getLogoutMessage().isEmpty()) {
                 leaveEvent.setMessageCancelled(true);
             } else {
-                leaveEvent.setMessage(this.cmc.getLogoutMessage().getForSource(pl));
+                leaveEvent.setMessage(this.cmc.getLogoutMessage().getForObject(pl));
             }
         }
     }

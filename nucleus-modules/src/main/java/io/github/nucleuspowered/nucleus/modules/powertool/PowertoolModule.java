@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.powertool;
 
-import io.github.nucleuspowered.nucleus.modules.core.CoreModule;
+import io.github.nucleuspowered.nucleus.core.CoreModule;
 import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import uk.co.drnaylor.quickstart.annotations.ModuleData;

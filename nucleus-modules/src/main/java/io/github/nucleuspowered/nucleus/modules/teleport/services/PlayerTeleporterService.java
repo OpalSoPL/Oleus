@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
@@ -46,7 +46,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
     private boolean showAcceptDeny = true;
 
     private final INucleusServiceCollection serviceCollection;
-    private final INucleusTeleportService safeTeleportService;
+    private final INucleusLocationService safeTeleportService;
     private final IMessageProviderService messageProviderService;
     private final IUserPreferenceService userPreferenceService;
     private final IPermissionService permissionService;

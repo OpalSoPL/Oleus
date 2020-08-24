@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus;
 
-import io.github.nucleuspowered.nucleus.modules.core.teleport.filters.NoCheckFilter;
-import io.github.nucleuspowered.nucleus.modules.core.teleport.filters.WallCheckFilter;
+import io.github.nucleuspowered.nucleus.core.teleport.filters.NoCheckFilter;
+import io.github.nucleuspowered.nucleus.core.teleport.filters.WallCheckFilter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameRegistryEvent;

@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.services.impl.messageprovider.repositor
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.ArgumentElement;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.Template;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.TextElement;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
@@ -136,27 +137,6 @@ abstract class AbstractMessageRepository implements IMessageRepository {
         }
 
         return new Template(objects);
-    }
-
-    private static final class ArgumentElement implements TextElement {
-
-        final ITextStyleService.TextFormat format;
-        final String key;
-
-        private ArgumentElement(final ITextStyleService.TextFormat format, final String key) {
-            this.format = format;
-            this.key = key;
-        }
-
-        @Override
-        public TextComponent retrieve(final Map<String, Component> args) {
-            final Component component = args.get(this.key);
-            if (component == null) {
-                return TextComponent.empty();
-            }
-
-            return null;
-        }
     }
 
 }

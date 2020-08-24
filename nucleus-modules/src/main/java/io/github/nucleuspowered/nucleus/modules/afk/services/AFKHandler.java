@@ -132,13 +132,13 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
                         mc = new PermissionMessageChannel(serviceCollection.permissionService(), AFKPermissions.AFK_NOTIFY);
                     }
 
-                    final AFKEvents.Kick events = new AFKEvents.Kick(player, messageToServer.getForSource(player), mc);
+                    final AFKEvents.Kick events = new AFKEvents.Kick(player, messageToServer.getForObject(player), mc);
                     if (Sponge.getEventManager().post(events)) {
                         // Cancelled.
                         return;
                     }
 
-                    final TextComponent toSend = t instanceof NucleusTextTemplateImpl ? ((NucleusTextTemplateImpl) t).getForSource(player) : t.toText();
+                    final TextComponent toSend = t instanceof NucleusTextTemplateImpl ? ((NucleusTextTemplateImpl) t).getForObject(player) : t.toText();
                     Sponge.getScheduler().createSyncExecutor(this.serviceCollection.pluginContainer()).execute(() -> player.kick(toSend));
                     events.getMessage().ifPresent(m -> events.getChannel().send(player, m, ChatTypes.SYSTEM));
                 });
@@ -245,7 +245,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
     private Tuples.NullableTuple<Text, MessageChannel> getAFKMessage(final Player player, final boolean isAfk) {
         if (this.config.isBroadcastAfkOnVanish() || !player.get(Keys.VANISH).orElse(false)) {
             final NucleusTextTemplateImpl template = isAfk ? this.config.getMessages().getAfkMessage() : this.config.getMessages().getReturnAfkMessage();
-            return Tuples.ofNullable(template.getForSource(player), MessageChannel.TO_ALL);
+            return Tuples.ofNullable(template.getForObject(player), MessageChannel.TO_ALL);
         } else {
             return Tuples.ofNullable(null, MessageChannel.TO_NONE);
         }

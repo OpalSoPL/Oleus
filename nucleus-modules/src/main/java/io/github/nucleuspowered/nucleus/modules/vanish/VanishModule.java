@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.vanish;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.nucleuspowered.nucleus.modules.core.CoreModule;
+import io.github.nucleuspowered.nucleus.core.CoreModule;
 import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfig;
 import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfigAdapter;
 import io.github.nucleuspowered.nucleus.modules.vanish.services.VanishService;

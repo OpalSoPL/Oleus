@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.playerinfo.commands;
 import org.spongepowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.modules.core.CoreKeys;
+import io.github.nucleuspowered.nucleus.core.CoreKeys;
 import io.github.nucleuspowered.nucleus.modules.misc.commands.SpeedCommand;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.PlayerInfoPermissions;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.services.SeenHandler;

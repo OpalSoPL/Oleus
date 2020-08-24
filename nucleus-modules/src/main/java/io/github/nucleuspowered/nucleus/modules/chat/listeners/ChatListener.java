@@ -94,13 +94,13 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
 
         if (!ctc.getPrefix().isEmpty()) {
             final SimpleTextTemplateApplier headerApplier = new SimpleTextTemplateApplier();
-            headerApplier.setTemplate(TextTemplate.of(ctc.getPrefix().getForSource(player)));
+            headerApplier.setTemplate(TextTemplate.of(ctc.getPrefix().getForObject(player)));
             event.getFormatter().getHeader().add(headerApplier);
         }
 
         if (!ctc.getSuffix().isEmpty()) {
             final SimpleTextTemplateApplier footerApplier = new SimpleTextTemplateApplier();
-            footerApplier.setTemplate(TextTemplate.of(ctc.getSuffix().getForSource(player)));
+            footerApplier.setTemplate(TextTemplate.of(ctc.getSuffix().getForObject(player)));
             event.getFormatter().getFooter().add(footerApplier);
         }
 

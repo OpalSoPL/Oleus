@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.cooldown;
 
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICooldownService;
 import org.spongepowered.api.util.Identifiable;
 
@@ -16,8 +17,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import javax.inject.Singleton;
 
 @Singleton
 public class CooldownService implements ICooldownService {
@@ -56,7 +55,7 @@ public class CooldownService implements ICooldownService {
         this.cooldowns.remove(new DualKey(key, identifiable.getUniqueId()));
     }
 
-    private static class DualKey {
+    private final static class DualKey {
 
         private final String key;
         private final UUID uuid;
@@ -74,12 +73,12 @@ public class CooldownService implements ICooldownService {
                 return false;
             }
             final DualKey dualKey = (DualKey) o;
-            return Objects.equals(key, dualKey.key) &&
-                    Objects.equals(uuid, dualKey.uuid);
+            return Objects.equals(this.key, dualKey.key) &&
+                    Objects.equals(this.uuid, dualKey.uuid);
         }
 
         @Override public int hashCode() {
-            return Objects.hash(key, uuid.getLeastSignificantBits(), uuid.getMostSignificantBits());
+            return Objects.hash(this.key, this.uuid.getLeastSignificantBits(), this.uuid.getMostSignificantBits());
         }
     }
 }

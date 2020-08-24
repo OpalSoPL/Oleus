@@ -27,7 +27,7 @@ import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -207,7 +207,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
             postEvent(new UseHomeEvent(frame.getCurrentCause(), src, home));
         }
 
-        final INucleusTeleportService teleportService = this.serviceCollection.teleportService();
+        final INucleusLocationService teleportService = this.serviceCollection.teleportService();
         final TeleportHelperFilter filter = teleportService.getAppropriateFilter(src, safeTeleport);
 
         return teleportService.teleportPlayer(

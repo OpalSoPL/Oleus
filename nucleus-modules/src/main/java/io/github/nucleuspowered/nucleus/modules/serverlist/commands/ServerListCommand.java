@@ -14,7 +14,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;
@@ -97,7 +96,7 @@ public class ServerListCommand implements ICommandExecutor, IReloadableService.R
 
         final CommandSource source = context.getCommandSourceRoot();
         final List<Text> m = Lists.newArrayList();
-        messages.stream().map(x -> x.getForCommandSource(source)).forEach(x -> {
+        messages.stream().map(x -> x.getForObject(source)).forEach(x -> {
             if (!m.isEmpty()) {
                 m.add(Util.SPACE);
             }

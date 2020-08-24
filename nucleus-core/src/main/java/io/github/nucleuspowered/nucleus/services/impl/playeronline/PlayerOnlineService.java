@@ -6,8 +6,7 @@ package io.github.nucleuspowered.nucleus.services.impl.playeronline;
 
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.time.Instant;
@@ -15,28 +14,29 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 @Singleton
 public class PlayerOnlineService implements IPlayerOnlineService {
 
-    private static final BiPredicate<CommandSource, User> STANDARD_ONLINE =
+    private static final BiPredicate<ServerPlayer, User> STANDARD_ONLINE =
             (source, user) -> Sponge.getServer().getPlayer(user.getUniqueId()).isPresent();
-    private static final BiFunction<CommandSource, User, Optional<Instant>> STANDARD_LAST_PLAYED =
+    private static final BiFunction<ServerPlayer, User, Optional<Instant>> STANDARD_LAST_PLAYED =
             (source, user) -> user.get(Keys.LAST_DATE_PLAYED);
 
-    private BiPredicate<CommandSource, User> online = STANDARD_ONLINE;
-    private BiFunction<CommandSource, User, Optional<Instant>> lastPlayed = STANDARD_LAST_PLAYED;
+    private BiPredicate<ServerPlayer, User> online = STANDARD_ONLINE;
+    private BiFunction<ServerPlayer, User, Optional<Instant>> lastPlayed = STANDARD_LAST_PLAYED;
 
-    @Override public boolean isOnline(final CommandSource src, final User player) {
+    @Override public boolean isOnline(final ServerPlayer src, final User player) {
         return this.online.test(src, player);
     }
 
-    @Override public Optional<Instant> lastSeen(final CommandSource src, final User player) {
+    @Override public Optional<Instant> lastSeen(final ServerPlayer src, final User player) {
         return this.lastPlayed.apply(src, player);
     }
 
-    @Override public void set(final BiPredicate<CommandSource, User> isOnline, final BiFunction<CommandSource, User, Optional<Instant>> lastSeen) {
+    @Override public void set(final BiPredicate<ServerPlayer, User> isOnline, final BiFunction<ServerPlayer, User, Optional<Instant>> lastSeen) {
         this.online = isOnline == null ? STANDARD_ONLINE : isOnline;
         this.lastPlayed = lastSeen == null ? STANDARD_LAST_PLAYED : lastSeen;
     }

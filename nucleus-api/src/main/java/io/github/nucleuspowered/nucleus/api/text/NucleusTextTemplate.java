@@ -54,7 +54,7 @@ public interface NucleusTextTemplate extends ComponentLike {
      * @param source The {@link Object} that will influence what is displayed by the tokens.
      * @return The parsed {@link Component}
      */
-    Component getForSource(Object source);
+    Component getForObject(Object source);
 
     /**
      * Gets the {@link Component} where the tokens have been parsed from the viewpoint of the
@@ -64,7 +64,7 @@ public interface NucleusTextTemplate extends ComponentLike {
      * @param sender The {@link Object} that can be considered the <code>{{sender}}</code>
      * @return The parsed {@link Component}
      */
-    Component getForSource(Object source, Object sender);
+    Component getForObjectWithSenderToken(Object source, Object sender);
 
     /**
      * Gets the {@link Component} where the tokens have been parsed from the viewpoint of the supplied {@link Object}.
@@ -79,6 +79,6 @@ public interface NucleusTextTemplate extends ComponentLike {
      * @param tokensArray The extra tokens that can be used to parse a text.
      * @return The parsed {@link Component}
      */
-    Component getForSource(Object source, @Nullable Map<String, Function<Object, Optional<ComponentLike>>> tokensArray);
+    Component getForObjectWithTokens(Object source, @Nullable Map<String, Function<Object, Optional<ComponentLike>>> tokensArray);
 
 }

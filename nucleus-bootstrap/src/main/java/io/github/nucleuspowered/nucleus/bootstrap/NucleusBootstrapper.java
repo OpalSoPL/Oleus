@@ -2,7 +2,8 @@ package io.github.nucleuspowered.nucleus.bootstrap;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import io.github.nucleuspowered.nucleus.NucleusCore;
+import io.github.nucleuspowered.nucleus.OldNucleusCore;
+import io.github.nucleuspowered.nucleus.modules.NucleusModuleProvider;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
@@ -36,7 +37,7 @@ public class NucleusBootstrapper {
     @Listener
     public void startPlugin(final ConstructPluginEvent event) {
         this.logger.info("Nucleus is starting.");
-        final NucleusCore core = new NucleusCore(this.pluginContainer, this.configDirectory, this.logger, this.injector);
+        final OldNucleusCore core = new OldNucleusCore(this.pluginContainer, this.configDirectory, this.logger, this.injector, new NucleusModuleProvider());
         Sponge.getEventManager().registerListeners(this.pluginContainer, core);
     }
 

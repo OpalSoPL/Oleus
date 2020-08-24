@@ -8,6 +8,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICompatibilityService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
 import org.spongepowered.api.util.Tristate;
@@ -16,9 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class CompatibilityService implements ICompatibilityService {
@@ -51,7 +50,8 @@ public class CompatibilityService implements ICompatibilityService {
         return this.applicableMessages;
     }
 
-    @Override public void set(final JsonArray jsonArray) {
+    @Override
+    public void set(final JsonArray jsonArray) {
         if (this.messages.isEmpty()) {
             for (final JsonElement el : jsonArray) {
                 try {

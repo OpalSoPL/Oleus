@@ -5,10 +5,12 @@
 package io.github.nucleuspowered.nucleus.services.impl.docgen;
 
 import com.google.common.reflect.TypeToken;
-import io.github.nucleuspowered.nucleus.modules.core.docgen.CommandDoc;
-import io.github.nucleuspowered.nucleus.modules.core.docgen.EssentialsDoc;
-import io.github.nucleuspowered.nucleus.modules.core.docgen.PermissionDoc;
-import io.github.nucleuspowered.nucleus.modules.core.docgen.TokenDoc;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import io.github.nucleuspowered.nucleus.core.docgen.CommandDoc;
+import io.github.nucleuspowered.nucleus.core.docgen.EssentialsDoc;
+import io.github.nucleuspowered.nucleus.core.docgen.PermissionDoc;
+import io.github.nucleuspowered.nucleus.core.docgen.TokenDoc;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
@@ -22,6 +24,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.ICommandMetadataServ
 import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenerationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import net.kyori.adventure.text.TextComponent;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.SimpleConfigurationNode;
@@ -30,7 +33,6 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.Text;
 import org.yaml.snakeyaml.DumperOptions;
 
 import java.io.BufferedWriter;
@@ -48,9 +50,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class DocumentationGenerationService implements IDocumentationGenerationService {
@@ -159,14 +158,14 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     }
 
                     commandDoc.setDefaultLevel(level.getRole());
-                    commandDoc.setOneLineDescription(control.getShortDescription(Sponge.getServer().getConsole())
-                            .map(Text::toPlain).orElse("No description provided"));
-                    commandDoc.setExtendedDescription(control.getExtendedDescription(Sponge.getServer().getConsole())
-                            .map(Text::toPlain)
+                    commandDoc.setOneLineDescription(control.getShortDescription(Sponge.getSystemSubject())
+                            .map(TextComponent::toString).orElse("No description provided"));
+                    commandDoc.setExtendedDescription(control.getExtendedDescription(Sponge.getSystemSubject())
+                            .map(TextComponent::toString)
                             .orElse(null));
-                    commandDoc.setUsageString(control.getUsage(Sponge.getServer().getConsole()).toPlain());
+                    commandDoc.setUsageString(control.getUsage(Sponge.getSystemSubject()).toPlain());
                     commandDoc.setPermissions(new ArrayList<>(permissionDocs));
-                    commandDoc.setSimpleUsage(control.getUsageText(Sponge.getServer().getConsole()).toPlain());
+                    commandDoc.setSimpleUsage(control.getUsageText(Sponge.getSystemSubject()).toPlain());
                     commandDoc.setContext(control.getContext().getValue());
 
                     return commandDoc;
@@ -193,7 +192,7 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     return true;
                 })
                 .map(x -> new TokenDoc()
-                        .setId(x.getParser().getId())
+                        .setId(x.getParser().get())
                         .setName(x.getToken())
                         .setDescription(messageProviderService.getMessageString("nucleus.token." + x.getToken().toLowerCase())))
                 .collect(Collectors.toList());
@@ -216,19 +215,19 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
         final YAMLConfigurationLoader configurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("commands.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-        final ConfigurationNode commandConfigurationNode = SimpleConfigurationNode.root().setValue(COMMAND_DOC_LIST_TYPE_TOKEN, lcd);
+        final ConfigurationNode commandConfigurationNode = ConfigurationNode.root().setValue(COMMAND_DOC_LIST_TYPE_TOKEN, lcd);
         configurationLoader.save(commandConfigurationNode);
 
         final YAMLConfigurationLoader permissionsConfigurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("permissions.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-        final ConfigurationNode permissionConfiguationNode = SimpleConfigurationNode.root().setValue(PERMISSION_DOC_LIST_TYPE_TOKEN, permdocs);
+        final ConfigurationNode permissionConfiguationNode = ConfigurationNode.root().setValue(PERMISSION_DOC_LIST_TYPE_TOKEN, permdocs);
         permissionsConfigurationLoader.save(permissionConfiguationNode);
 
         final YAMLConfigurationLoader essentialsConfigurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("essentials.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-        final ConfigurationNode essentialsConfigurationNode = SimpleConfigurationNode.root().setValue(ESSENTIALS_DOC_LIST_TYPE_TOKEN, essentialsDocs);
+        final ConfigurationNode essentialsConfigurationNode = ConfigurationNode.root().setValue(ESSENTIALS_DOC_LIST_TYPE_TOKEN, essentialsDocs);
         essentialsConfigurationLoader.save(essentialsConfigurationNode);
 
         final YAMLConfigurationLoader configurationConfigurationLoader = YAMLConfigurationLoader.builder()
@@ -239,7 +238,7 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
         final YAMLConfigurationLoader tokensConfigurationLoader = YAMLConfigurationLoader.builder()
                 .setPath(directory.resolve("tokens.yml"))
                 .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-        final ConfigurationNode tokensConfigNode = SimpleConfigurationNode.root().setValue(TOKEN_DOC_LIST_TYPE_TOKEN, tokenDocs);
+        final ConfigurationNode tokensConfigNode = ConfigurationNode.root().setValue(TOKEN_DOC_LIST_TYPE_TOKEN, tokenDocs);
         tokensConfigurationLoader.save(tokensConfigNode);
 
     }

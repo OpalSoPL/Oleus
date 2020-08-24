@@ -21,7 +21,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;;
@@ -177,7 +177,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
             // Warp them.
             final boolean isSafe = !context.hasAny("f") && this.isSafeTeleport;
 
-            final INucleusTeleportService safeLocationService = context.getServiceCollection().teleportService();
+            final INucleusLocationService safeLocationService = context.getServiceCollection().teleportService();
             final TeleportHelperFilter filter = safeLocationService.getAppropriateFilter(player, isSafe);
 
             final TeleportResult result = safeLocationService.teleportPlayer(

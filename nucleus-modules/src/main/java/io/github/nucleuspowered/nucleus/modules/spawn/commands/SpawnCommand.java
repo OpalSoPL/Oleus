@@ -30,6 +30,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
 
@@ -111,7 +112,7 @@ public class SpawnCommand implements ICommandExecutor, IReloadableService.Reload
                     .teleportPlayerSmart(
                             src,
                             event.getTransformTo(),
-                            true,
+                            Vector3d.ZERO, true,
                             !force && this.sc.isSafeTeleport(),
                             TeleportScanners.NO_SCAN.get()
                     );

@@ -15,10 +15,10 @@ import java.util.UUID;
 public class UserCacheVersionNode {
 
     @Setting
-    private int version = 1;
+    private final int version = 1;
 
     @Setting
-    private Map<UUID, UserCacheDataNode> node = Maps.newHashMap();
+    private final Map<UUID, UserCacheDataNode> node = Maps.newHashMap();
 
     public int getVersion() {
         return this.version;

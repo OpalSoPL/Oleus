@@ -17,7 +17,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenera
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTeleportService;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
@@ -66,7 +66,7 @@ public interface INucleusServiceCollection {
 
     IModuleDataProvider moduleDataProvider();
 
-    INucleusTeleportService teleportService();
+    INucleusLocationService teleportService();
 
     ICommandElementSupplier commandElementSupplier();
 

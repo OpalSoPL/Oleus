@@ -41,8 +41,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 @Singleton
 public final class StorageManager implements IStorageManager, IReloadableService.Reloadable {
@@ -88,45 +88,45 @@ public final class StorageManager implements IStorageManager, IReloadableService
 
     private final IConfigurateBackedDataTranslator<IUserDataObject> userDataAccess = new IConfigurateBackedDataTranslator<IUserDataObject>() {
         @Override public ConfigurationNode createNewNode() {
-            return SimpleConfigurationNode.root(configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return SimpleConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
 
         @Override public IUserDataObject createNew() {
             final UserDataObject d = new UserDataObject();
-            d.setBackingNode(configurateHelper.createNode());
+            d.setBackingNode(StorageManager.this.configurateHelper.createNode());
             return d;
         }
     };
     private final IConfigurateBackedDataTranslator<IWorldDataObject> worldDataAccess = new IConfigurateBackedDataTranslator<IWorldDataObject>() {
         @Override public ConfigurationNode createNewNode() {
-            return SimpleConfigurationNode.root(configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return SimpleConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
 
         @Override public IWorldDataObject createNew() {
             final WorldDataObject d = new WorldDataObject();
-            d.setBackingNode(configurateHelper.createNode());
+            d.setBackingNode(StorageManager.this.configurateHelper.createNode());
             return d;
         }
     };
     private final IConfigurateBackedDataTranslator<IGeneralDataObject> generalDataAccess = new IConfigurateBackedDataTranslator<IGeneralDataObject>() {
         @Override public ConfigurationNode createNewNode() {
-            return SimpleConfigurationNode.root(configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return SimpleConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
 
         @Override public IGeneralDataObject createNew() {
             final GeneralDataObject d = new GeneralDataObject();
-            d.setBackingNode(configurateHelper.createNode());
+            d.setBackingNode(StorageManager.this.configurateHelper.createNode());
             return d;
         }
     };
     private final IConfigurateBackedDataTranslator<IKitDataObject> kitsDataAccess = new IConfigurateBackedDataTranslator<IKitDataObject>() {
         @Override public ConfigurationNode createNewNode() {
-            return SimpleConfigurationNode.root(configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return SimpleConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
 
         @Override public IKitDataObject createNew() {
             final KitDataObject d = new KitDataObject();
-            d.setBackingNode(configurateHelper.createNode());
+            d.setBackingNode(StorageManager.this.configurateHelper.createNode());
             return d;
         }
     };

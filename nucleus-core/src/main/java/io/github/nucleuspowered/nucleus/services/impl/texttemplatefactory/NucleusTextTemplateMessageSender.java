@@ -4,83 +4,76 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.api.text.event.NucleusTextTemplateEvent;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.text.Text;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.event.CauseStackManager;
 
 public class NucleusTextTemplateMessageSender {
 
     private final INucleusTextTemplateFactory textTemplateFactory;
-    private final IPlaceholderService placeholderService;
     private final NucleusTextTemplate textTemplate;
-    private final CommandSource sender;
+    private final Object sender;
 
     public NucleusTextTemplateMessageSender(
             final INucleusTextTemplateFactory textTemplateFactory,
             final NucleusTextTemplate textTemplate,
-            final IPlaceholderService placeholderService,
-            final CommandSource sender) {
+            final Object sender) {
         this.textTemplateFactory = textTemplateFactory;
         this.textTemplate = textTemplate;
-        this.placeholderService = placeholderService;
         this.sender = sender;
     }
 
-    public boolean send(final Cause cause) {
-        final List<CommandSource> members = Lists.newArrayList(Sponge.getServer().getConsole());
-        members.addAll(Sponge.getServer().getOnlinePlayers());
-        return this.send(members, true, cause);
+    public boolean send() {
+        return this.send(Sponge.getServer(), true);
     }
 
-    public boolean send(final Collection<CommandSource> source, final Cause cause) {
-        return this.send(source, false, cause);
+    public boolean send(final Audience audience) {
+        return this.send(audience, false);
     }
 
-    private boolean send(final Collection<CommandSource> source, final boolean isBroadcast, final Cause cause) {
+    private boolean send(final Audience source, final boolean isBroadcast) {
         final NucleusTextTemplateEvent event;
-        if (isBroadcast) {
-            event = new NucleusTextTemplateEventImpl.Broadcast(
-                    this.textTemplate,
-                    source,
-                    this.textTemplateFactory,
-                    cause
-            );
-        } else {
-            event = new NucleusTextTemplateEventImpl(
-                    this.textTemplate,
-                    source,
-                    this.textTemplateFactory,
-                    cause
-            );
-        }
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(this.sender);
+            final Cause cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
+            if (isBroadcast) {
+                event = new NucleusTextTemplateEventImpl.Broadcast(
+                        this.textTemplate,
+                        source,
+                        this.textTemplateFactory,
+                        cause
+                );
+            } else {
+                event = new NucleusTextTemplateEventImpl(
+                        this.textTemplate,
+                        source,
+                        this.textTemplateFactory,
+                        cause
+                );
+            }
 
-        if (Sponge.getEventManager().post(event)) {
-            return false;
-        }
+            if (Sponge.getEventManager().post(event)) {
+                return false;
+            }
 
-        final NucleusTextTemplate template = event.getMessage();
-        if (!template.containsTokens()) {
-            final TextComponent text = this.textTemplate.getForSource(Sponge.getServer().getConsole());
-            event.getRecipients().forEach(x -> x.sendMessage(text));
-        } else {
-            final Map<String, Function<CommandSource, Optional<Text>>> m = Maps.newHashMap();
-            final Optional<Text> sender = Optional.of(this.placeholderService.parse(this.sender, "displayname").toText());
-            m.put("sender", cs -> sender);
-            event.getRecipients().forEach(x -> x.sendMessage(this.textTemplate.getForCommandSource(x, m)));
+            final NucleusTextTemplate template = event.getMessage();
+            if (!template.containsTokens() || event.getAudience() instanceof ForwardingAudience) {
+                final Component text = this.textTemplate.getForObjectWithSenderToken(event.getAudience(), this.sender);
+                event.getAudience().sendMessage(text);
+            } else {
+                final ForwardingAudience forwardingAudience = (ForwardingAudience) event.getAudience();
+                forwardingAudience.audiences().forEach(x -> {
+                    x.sendMessage(this.textTemplate.getForObjectWithSenderToken(event.getAudience(), this.sender));
+                });
+            }
+            return true;
         }
-        return true;
     }
 }
