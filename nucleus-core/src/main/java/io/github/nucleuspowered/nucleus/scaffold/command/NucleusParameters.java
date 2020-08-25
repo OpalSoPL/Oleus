@@ -32,13 +32,12 @@ import javax.annotation.Nullable;
 /**
  * A selection of common parameters for making things consistent
  */
-public class NucleusParameters {
+public final class NucleusParameters {
 
-    public static class Keys {
+    public final static class Keys {
 
         private Keys() {
         }
-
 
         public static final String BOOL = "true|false";
         public static final String COMMAND = "command";

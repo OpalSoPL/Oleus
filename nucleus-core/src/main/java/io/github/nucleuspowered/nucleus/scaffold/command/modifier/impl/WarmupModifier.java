@@ -11,7 +11,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.config.CommandModifiersConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
-import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
@@ -19,9 +18,12 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 import java.time.Duration;
 import java.util.Optional;
 
@@ -30,14 +32,6 @@ public class WarmupModifier implements ICommandModifier, IReloadableService.Relo
     private static final String WARMUP = "warmup";
 
     private WarmupConfig warmupConfig = new WarmupConfig();
-
-    @Override public String getId() {
-        return CommandModifiers.HAS_WARMUP;
-    }
-
-    @Override public String getName() {
-        return "Warmup Modifier";
-    }
 
     @Override public void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) {
         final ConfigurationNode n = node.getNode(WARMUP);
@@ -55,9 +49,9 @@ public class WarmupModifier implements ICommandModifier, IReloadableService.Relo
         to.setWarmup(from.getWarmup());
     }
 
-    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandSource source) throws
+    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandContext source) throws
             CommandException {
-        return source instanceof Player;
+        return source.getCause().root() instanceof ServerPlayer;
     }
 
     @Override public Optional<ICommandResult> preExecute(final ICommandContext source, final CommandControl control,

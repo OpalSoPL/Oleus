@@ -8,31 +8,23 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.config.CommandModifiersConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
-import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import net.kyori.adventure.text.TextComponent;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.Optional;
 
 public class CostModifier implements ICommandModifier {
 
     private static final String COST = "cost";
-
-    @Override public String getId() {
-        return CommandModifiers.HAS_COST;
-    }
-
-    @Override public String getName() {
-        return "Cost Modifier";
-    }
 
     @Override public void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) {
         final ConfigurationNode n = node.getNode(COST);
@@ -50,26 +42,26 @@ public class CostModifier implements ICommandModifier {
         to.setCost(from.getCost());
     }
 
-    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandSource source) throws
+    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandContext source) throws
             CommandException {
-        return serviceCollection.economyServiceProvider().serviceExists() && source instanceof Player;
+        return serviceCollection.economyServiceProvider().serviceExists() && source.getCause().root() instanceof ServerPlayer;
     }
 
-    @Override public Optional<Text> testRequirement(final ICommandContext source, final CommandControl control,
+    @Override public Optional<TextComponent> testRequirement(final ICommandContext source, final CommandControl control,
             final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
         if (source.getCost() > 0) {
             final double cost = source.getCost();
             final IEconomyServiceProvider ies = serviceCollection.economyServiceProvider();
-            if (!ies.withdrawFromPlayer((Player) source.getCommandSourceRoot(), cost, false)) {
-                return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getCommandSourceRoot(), "cost.nofunds",
-                        ies.getCurrencySymbol(source.getCost())));
+            if (!ies.withdrawFromPlayer(source.getIfPlayer().getUniqueId(), cost, false)) {
+                return Optional.of(serviceCollection.messageProvider().getMessageFor(
+                        source.getCause().getAudience(), "cost.nofunds", ies.getCurrencySymbol(source.getCost())));
             }
 
             // Add a fail action
             source.addFailAction(s -> {
                 serviceCollection.economyServiceProvider();
                 try {
-                    ies.depositInPlayer(s.getIfPlayer(), source.getCost(), false);
+                    ies.depositInPlayer(s.getIfPlayer().getUniqueId(), source.getCost(), false);
                 } catch (final CommandException e) {
                     serviceCollection.logger().error("Could not return {} to {}.", cost, source.getName());
                 }
@@ -84,7 +76,7 @@ public class CostModifier implements ICommandModifier {
             final CommandModifier modifier) throws CommandException {
         if (source.getCost() > 0) {
             final IEconomyServiceProvider ies = serviceCollection.economyServiceProvider();
-            ies.depositInPlayer((Player) source.getCommandSourceRoot(), source.getCost(), false);
+            ies.depositInPlayer(source.getIfPlayer().getUniqueId(), source.getCost(), false);
         }
     }
 }

@@ -5,18 +5,19 @@
 package io.github.nucleuspowered.nucleus.scaffold.task;
 
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.scheduler.Task;
+
+import java.util.UUID;
 
 public abstract class CostCancellableTask implements CancellableTask {
 
     private final INucleusServiceCollection serviceCollection;
-    private final CommandSource target;
+    @Nullable private final UUID target;
     private final double cost;
     private boolean hasRun = false;
 
-    public CostCancellableTask(final INucleusServiceCollection serviceCollection, final CommandSource target, final double cost) {
+    public CostCancellableTask(final INucleusServiceCollection serviceCollection, @Nullable final UUID target, final double cost) {
         this.serviceCollection = serviceCollection;
         this.target = target;
         this.cost = cost;
@@ -26,10 +27,11 @@ public abstract class CostCancellableTask implements CancellableTask {
     public void onCancel() {
         if (!this.hasRun) {
             this.hasRun = true;
-            if (this.target instanceof Player && this.cost > 0) {
+            if (this.target != null && this.cost > 0) {
                 Task.builder()
-                        .execute(task -> this.serviceCollection.economyServiceProvider().depositInPlayer((Player) this.target, this.cost))
-                        .submit(this.serviceCollection.pluginContainer());
+                        .execute(task -> this.serviceCollection.economyServiceProvider().depositInPlayer(this.target, this.cost))
+                        .plugin(this.serviceCollection.pluginContainer())
+                        .build();
             }
         }
     }

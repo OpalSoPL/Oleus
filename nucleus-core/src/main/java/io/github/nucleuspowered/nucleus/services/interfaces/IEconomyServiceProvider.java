@@ -9,6 +9,8 @@ import io.github.nucleuspowered.nucleus.services.impl.economy.EconomyServiceProv
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 
+import java.util.UUID;
+
 @ImplementedBy(EconomyServiceProvider.class)
 public interface IEconomyServiceProvider {
 
@@ -16,13 +18,13 @@ public interface IEconomyServiceProvider {
 
     String getCurrencySymbol(double cost);
 
-    boolean hasBalance(Player src, double balance);
+    boolean hasBalance(UUID src, double balance);
 
-    boolean withdrawFromPlayer(Player src, double cost);
+    boolean withdrawFromPlayer(UUID src, double cost);
 
-    boolean withdrawFromPlayer(Player src, double cost, boolean message);
+    boolean withdrawFromPlayer(UUID src, double cost, boolean message);
 
-    boolean depositInPlayer(User src, double cost);
+    boolean depositInPlayer(UUID src, double cost);
 
-    boolean depositInPlayer(User src, double cost, boolean message);
+    boolean depositInPlayer(UUID src, double cost, boolean message);
 }

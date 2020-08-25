@@ -4,17 +4,17 @@
  */
 package io.github.nucleuspowered.nucleus.scaffold.command.parameter;
 
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.ArgumentParseException;
-import org.spongepowered.api.command.args.CommandArgs;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.ValueParameter;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * This parser was taken from
  * https://github.com/dualspiral/Hammer/blob/master/HammerCore/src/main/java/uk/co/drnaylor/minecraft/hammer/core/commands/parsers/TimespanParser.java
  */
-public class TimespanArgument extends CommandElement {
+public class TimespanArgument implements ValueParameter<Long> {
     private final Pattern minorTimeString = Pattern.compile("^\\d+$");
     private final Pattern timeString = Pattern.compile("^((\\d+)w)?((\\d+)d)?((\\d+)h)?((\\d+)m)?((\\d+)s)?$");
 
@@ -36,23 +36,30 @@ public class TimespanArgument extends CommandElement {
     private final int secondsInWeek = 7 * this.secondsInDay;
     private final IMessageProviderService messageProvider;
 
-    public TimespanArgument(@Nullable final TextComponent key, final INucleusServiceCollection serviceCollection) {
-        super(key);
+    public TimespanArgument(final INucleusServiceCollection serviceCollection) {
         this.messageProvider = serviceCollection.messageProvider();
     }
 
-    @Nullable
-    @Override
-    protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
-        if (!args.hasNext()) {
-            throw args.createError(this.messageProvider.getMessageFor(source, "args.timespan.notime"));
+    private long amount(@Nullable final String g, final int multipler) {
+        if (g != null && g.length() > 0) {
+            return multipler * Long.parseUnsignedLong(g);
         }
 
-        final String s = args.next();
+        return 0;
+    }
+
+    @Override public List<String> complete(final CommandContext context) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<? extends Long> getValue(final Parameter.Key<? super Long> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
+            throws ArgumentParseException {
+        final String s = reader.parseString();
 
         // First, if just digits, return the number in seconds.
         if (this.minorTimeString.matcher(s).matches()) {
-            return Long.parseUnsignedLong(s);
+            return Optional.of(Long.parseUnsignedLong(s));
         }
 
         final Matcher m = this.timeString.matcher(s);
@@ -64,23 +71,10 @@ public class TimespanArgument extends CommandElement {
             time += this.amount(m.group(10), 1);
 
             if (time > 0) {
-                return time;
+                return Optional.of(time);
             }
         }
 
-        throw args.createError(this.messageProvider.getMessageFor(source, "args.timespan.incorrectformat", s));
-    }
-
-    private long amount(@Nullable final String g, final int multipler) {
-        if (g != null && g.length() > 0) {
-            return multipler * Long.parseUnsignedLong(g);
-        }
-
-        return 0;
-    }
-
-    @Override
-    public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
-        return Lists.newArrayList();
+        throw reader.createException(this.messageProvider.getMessageFor(context.getCause().getAudience(), "args.timespan.incorrectformat", s));
     }
 }

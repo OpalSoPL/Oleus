@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 public @interface CommandModifier {
 
@@ -29,7 +29,7 @@ public @interface CommandModifier {
      *
      * @return The entity type.
      */
-    Class<? extends CommandSource> target() default CommandSource.class;
+    Class<?> target() default Object.class;
 
     /**
      * If false, don't generate configuration

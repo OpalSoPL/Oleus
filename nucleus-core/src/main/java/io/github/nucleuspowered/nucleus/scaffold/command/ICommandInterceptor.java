@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.scaffold.command;
 import io.github.nucleuspowered.nucleus.Constants;
 import io.github.nucleuspowered.nucleus.annotationprocessor.Store;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
-import org.spongepowered.api.command.CommandSource;
 
 @Store(Constants.INTERCEPTOR)
 public interface ICommandInterceptor {

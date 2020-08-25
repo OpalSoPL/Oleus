@@ -9,8 +9,6 @@ import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.ResultType;
@@ -18,6 +16,7 @@ import org.spongepowered.api.service.economy.transaction.TransactionResult;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 @Singleton
 public class EconomyServiceProvider implements IEconomyServiceProvider {
@@ -41,12 +40,12 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
 
     }
 
-    @Override public boolean hasBalance(final Player src, final double balance) {
+    @Override public boolean hasBalance(final UUID src, final double balance) {
         final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
-            final Optional<UniqueAccount> ua = es.getOrCreateAccount(src.getUniqueId());
+            final Optional<UniqueAccount> ua = es.getOrCreateAccount(src);
             return ua.isPresent() && ua.get().getBalance(es.getDefaultCurrency()).doubleValue() >= balance;
         }
 
@@ -54,18 +53,19 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
         return true;
     }
 
-    @Override public boolean withdrawFromPlayer(final Player src, final double cost) {
+    @Override public boolean withdrawFromPlayer(final UUID src, final double cost) {
         return this.withdrawFromPlayer(src, cost, true);
     }
 
-    @Override public boolean withdrawFromPlayer(final Player src, final double cost, final boolean message) {
+    @Override public boolean withdrawFromPlayer(final UUID src, final double cost, final boolean message) {
         final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
-            final Optional<UniqueAccount> a = es.getOrCreateAccount(src.getUniqueId());
+            final Optional<UniqueAccount> a = es.getOrCreateAccount(src);
             if (!a.isPresent()) {
-                this.messageProviderService.sendMessageTo(src, "cost.noaccount");
+                Sponge.getServer().getPlayer(src).ifPresent(x ->
+                        this.messageProviderService.sendMessageTo(x, "cost.noaccount"));
                 return false;
             }
 
@@ -73,48 +73,51 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
             final TransactionResult tr = a.get().withdraw(es.getDefaultCurrency(), BigDecimal.valueOf(cost));
             if (tr.getResult() == ResultType.ACCOUNT_NO_FUNDS) {
                 if (message) {
-                    this.messageProviderService.sendMessageTo(src, "cost.nofunds", this.getCurrencySymbol(cost));
+                    Sponge.getServer().getPlayer(src).ifPresent(x ->
+                            this.messageProviderService.sendMessageTo(x, "cost.nofunds", this.getCurrencySymbol(cost)));
                 }
 
                 return false;
             } else if (tr.getResult() != ResultType.SUCCESS) {
-                this.messageProviderService.sendMessageTo(src, "cost.error");
+                Sponge.getServer().getPlayer(src).ifPresent(x ->
+                        this.messageProviderService.sendMessageTo(x, "cost.error"));
                 return false;
             }
 
             if (message) {
-                this.messageProviderService.sendMessageTo(src, "cost.complete", this.getCurrencySymbol(cost));
+                Sponge.getServer().getPlayer(src).ifPresent(x ->
+                        this.messageProviderService.sendMessageTo(x, "cost.complete", this.getCurrencySymbol(cost)));
             }
         }
 
         return true;
     }
 
-    @Override public boolean depositInPlayer(final User src, final double cost) {
+    @Override public boolean depositInPlayer(final UUID src, final double cost) {
         return this.depositInPlayer(src, cost, true);
     }
 
-    @Override public boolean depositInPlayer(final User src, final double cost, final boolean message) {
+    @Override public boolean depositInPlayer(final UUID src, final double cost, final boolean message) {
         final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
-            final Optional<UniqueAccount> a = es.getOrCreateAccount(src.getUniqueId());
+            final Optional<UniqueAccount> a = es.getOrCreateAccount(src);
             if (!a.isPresent()) {
-                src.getPlayer().ifPresent(x ->
+                Sponge.getServer().getPlayer(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.noaccount"));
                 return false;
             }
 
             final TransactionResult tr = a.get().deposit(es.getDefaultCurrency(), BigDecimal.valueOf(cost));
-            if (tr.getResult() != ResultType.SUCCESS && src.isOnline()) {
-                src.getPlayer().ifPresent(x ->
+            if (tr.getResult() != ResultType.SUCCESS) {
+                Sponge.getServer().getPlayer(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.error"));
                 return false;
             }
 
-            if (message && src.isOnline()) {
-                src.getPlayer().ifPresent(x ->
+            if (message) {
+                Sponge.getServer().getPlayer(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.refund", this.getCurrencySymbol(cost)));
             }
         }

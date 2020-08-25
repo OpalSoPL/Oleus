@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.scaffold.command;
 
 import io.github.nucleuspowered.nucleus.scaffold.command.impl.CommandResultImpl;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.TextComponent;
+import org.spongepowered.api.command.CommandResult;
 
 import java.util.Optional;
 
@@ -28,6 +28,8 @@ public interface ICommandResult {
 
     boolean isWillContinue();
 
-    Optional<Text> getErrorMessage(CommandSource source);
+    Optional<TextComponent> getErrorMessage(ICommandContext source);
+
+    CommandResult getResult();
 
 }

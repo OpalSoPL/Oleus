@@ -5,11 +5,11 @@
 package io.github.nucleuspowered.nucleus.scaffold.command.impl;
 
 import com.google.common.base.Preconditions;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import net.kyori.adventure.text.TextComponent;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.CommandResult;
 
 import java.util.Optional;
 
@@ -25,17 +25,15 @@ public class CommandResultImpl implements ICommandResult {
     @Nullable private final Object[] args;
     private final boolean success;
     private final boolean willContinue;
-    private final IMessageProviderService messageProviderService;
 
     private CommandResultImpl(final boolean success, final boolean willContinue) {
-        this(success, willContinue, null, null, null);
+        this(success, willContinue, null, null);
     }
 
-    public CommandResultImpl(final IMessageProviderService messageProviderService, final String key, final Object[] args) {
+    public CommandResultImpl(final String key, final Object[] args) {
         this(
                 false,
                 false,
-                Preconditions.checkNotNull(messageProviderService),
                 Preconditions.checkNotNull(key),
                 Preconditions.checkNotNull(args)
         );
@@ -44,12 +42,10 @@ public class CommandResultImpl implements ICommandResult {
     private CommandResultImpl(
             final boolean success,
             final boolean willContinue,
-            @Nullable final IMessageProviderService messageProviderService,
             @Nullable final String key,
             @Nullable final Object[] args) {
         this.key = key;
         this.args = args;
-        this.messageProviderService = messageProviderService;
         this.success = success;
         this.willContinue = willContinue;
     }
@@ -65,12 +61,13 @@ public class CommandResultImpl implements ICommandResult {
     }
 
     @Override
-    public Optional<Text> getErrorMessage(final CommandSource source) {
-        if (this.messageProviderService == null) {
-            return Optional.empty();
-        }
+    public Optional<TextComponent> getErrorMessage(final ICommandContext source) {
+        return Optional.of(source.getMessage(this.key, this.args));
+    }
 
-        return Optional.of(this.messageProviderService.getMessageFor(source, this.key, this.args));
+    @Override
+    public CommandResult getResult() {
+        return null;
     }
 
     public static class Literal extends CommandResultImpl {
@@ -82,7 +79,8 @@ public class CommandResultImpl implements ICommandResult {
             this.literal = literal;
         }
 
-        @Override public Optional<Text> getErrorMessage(final CommandSource source) {
+        @Override
+        public Optional<TextComponent> getErrorMessage(final ICommandContext source) {
             return Optional.of(this.literal);
         }
     }

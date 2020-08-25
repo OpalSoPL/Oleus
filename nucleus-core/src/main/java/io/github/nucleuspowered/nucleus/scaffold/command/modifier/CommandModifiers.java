@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.scaffold.command.modifier;
 
-public class CommandModifiers {
+public final class CommandModifiers {
 
     private CommandModifiers() {}
 

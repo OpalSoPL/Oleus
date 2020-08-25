@@ -45,9 +45,9 @@ public final class CommandContextImpl implements ICommandContext {
     private final INucleusServiceCollection serviceCollection;
     private final String commandkey;
     private final String stringName;
-    private double cost = 0;
-    private int cooldown = 0;
-    private int warmup = 0;
+    private double cost;
+    private int cooldown;
+    private int warmup;
     private final boolean isBypass;
     private final CommandCause cause;
     private final CommandContext context;
@@ -62,7 +62,7 @@ public final class CommandContextImpl implements ICommandContext {
         return "Server";
     }
 
-    CommandContextImpl(
+    public CommandContextImpl(
             final CommandCause cause,
             final CommandContext context,
             final INucleusServiceCollection serviceCollection,
@@ -212,7 +212,7 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public ICommandResult errorResult(final String key, final Object... args) {
-        return new CommandResultImpl(this.serviceCollection.messageProvider(), key, args);
+        return new CommandResultImpl(key, args);
     }
 
     @Override
@@ -343,7 +343,7 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public TextComponent getDisplayName() {
-        return this.getServiceCollection().playerDisplayNameService().getDisplayName(this.getCommandSourceRoot());
+        return this.getServiceCollection().playerDisplayNameService().getDisplayName(this.cause.getAudience());
     }
 
     @Override

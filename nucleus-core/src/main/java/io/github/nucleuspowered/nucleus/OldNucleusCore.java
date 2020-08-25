@@ -26,7 +26,6 @@ import io.github.nucleuspowered.nucleus.quickstart.QuickStartModuleConstructor;
 import io.github.nucleuspowered.nucleus.quickstart.event.BaseModuleEvent;
 import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
 import io.github.nucleuspowered.nucleus.registry.TeleportScannerRegistryModule;
-import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModiferRegistry;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.NucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.commandmetadata.CommandMetadataService;

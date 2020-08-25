@@ -11,15 +11,14 @@ import io.github.nucleuspowered.nucleus.scaffold.command.config.CommandModifiers
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import net.kyori.adventure.text.TextComponent;
 import ninja.leaping.configurate.ConfigurationNode;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommandContext;
 
 import java.util.Optional;
 
-public interface ICommandModifier extends CatalogType {
+public interface ICommandModifier {
 
     /**
      * Validates the information returned in the annotation.
@@ -39,7 +38,7 @@ public interface ICommandModifier extends CatalogType {
      *
      * @return if so.
      */
-    default boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandSource source) throws CommandException {
+    default boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandContext source) throws CommandException {
         return true;
     }
 
@@ -47,9 +46,9 @@ public interface ICommandModifier extends CatalogType {
      * Tests to see if the state fulfills this requirement.
      *
      * <p>This will return an empty optional if the requirement is met, or
-     * a {@link Text} object otherwise, explaining the problem.</p>
+     * a {@link TextComponent} object otherwise, explaining the problem.</p>
      */
-    default Optional<Text> testRequirement(final ICommandContext source,
+    default Optional<TextComponent> testRequirement(final ICommandContext source,
             final CommandControl control,
             final INucleusServiceCollection serviceCollection,
             final CommandModifier modifier) throws CommandException {

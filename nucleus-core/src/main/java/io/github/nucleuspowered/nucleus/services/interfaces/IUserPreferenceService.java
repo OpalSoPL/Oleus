@@ -9,7 +9,6 @@ import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.UserPreferenceService;
-import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Map;
@@ -22,8 +21,6 @@ import javax.annotation.Nullable;
 public interface IUserPreferenceService extends NucleusUserPreferenceService {
 
     void postInit();
-
-    CommandElement getElement();
 
     void register(PreferenceKeyImpl<?> key);
 

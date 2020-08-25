@@ -33,6 +33,6 @@ public class AdventureGamemodeCommand extends GamemodeBase<Player> {
 
     @Override
     public ICommandResult execute(final ICommandContext src) throws CommandException {
-        return baseCommand(src, src.getIfPlayer(), GameModes.ADVENTURE);
+        return this.baseCommand(src, src.getIfPlayer(), GameModes.ADVENTURE.get());
     }
 }

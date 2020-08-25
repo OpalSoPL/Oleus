@@ -4,14 +4,22 @@ import com.google.inject.Injector;
 import io.github.nucleuspowered.nucleus.guice.NucleusInjectorModule;
 import io.github.nucleuspowered.nucleus.module.IModuleProvider;
 import io.github.nucleuspowered.nucleus.module.ModuleContainer;
+import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifierFactory;
+import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.CooldownModifier;
+import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.CostModifier;
+import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.RequiresEconomyModifier;
+import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.WarmupModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.NucleusServiceCollection;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogRegistryEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
@@ -68,6 +76,19 @@ public final class NucleusCore {
 
     public Path getConfigDirectory() {
         return this.configDirectory;
+    }
+
+    @Listener
+    public void establishNewRegistries(final RegisterCatalogRegistryEvent event) {
+        event.register(CommandModifierFactory.class, ResourceKey.of("nucleus", "command_modifier_factory"));
+    }
+
+    @Listener
+    public void registerCommandModifierFactories(final RegisterCatalogEvent<CommandModifierFactory> event) {
+        event.register(new CommandModifierFactory.Simple(new CooldownModifier()));
+        event.register(new CommandModifierFactory.Simple(new CostModifier()));
+        event.register(new CommandModifierFactory.Simple(new WarmupModifier()));
+        event.register(new CommandModifierFactory.Simple(new RequiresEconomyModifier()));
     }
 
     @Listener

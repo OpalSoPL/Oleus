@@ -5,9 +5,10 @@
 package io.github.nucleuspowered.nucleus.scaffold.event;
 
 import io.github.nucleuspowered.nucleus.api.util.CancelMessageEvent;
-import org.spongepowered.api.event.cause.Cause;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.text.Text;
+
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -15,18 +16,18 @@ import javax.annotation.Nullable;
 public abstract class AbstractCancelMessageEvent extends AbstractEvent implements CancelMessageEvent {
 
     private final Cause cause;
-    @Nullable private TextComponent cancelMessage = null;
+    @Nullable private Component cancelMessage = null;
     private boolean cancelled = false;
 
     protected AbstractCancelMessageEvent(final Cause cause) {
         this.cause = cause;
     }
 
-    @Override public Optional<Text> getCancelMessage() {
+    @Override public Optional<Component> getCancelMessage() {
         return Optional.ofNullable(this.cancelMessage);
     }
 
-    @Override public void setCancelMessage(@Nullable final TextComponent message) {
+    @Override public void setCancelMessage(@Nullable final Component message) {
         this.cancelMessage = message;
     }
 
