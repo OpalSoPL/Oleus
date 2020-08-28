@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.util.TriConsumer;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKeyImpl;
 import org.spongepowered.api.entity.living.player.User;
@@ -114,7 +114,7 @@ public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implem
         this.onSet.accept(serviceCollection, uuid, value);
     }
 
-    public Optional<NucleusUserPreferenceService.PreferenceKey<T>> getIfLoaded(final IModuleDataProvider provider) {
+    public Optional<NucleusUserPreferenceService.PreferenceKey<T>> getIfLoaded(final IConfigProvider provider) {
         if (provider.isLoaded(this.module)) {
             return Optional.of(this);
         }

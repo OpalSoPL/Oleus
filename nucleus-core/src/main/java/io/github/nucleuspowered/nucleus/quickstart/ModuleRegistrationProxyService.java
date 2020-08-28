@@ -10,6 +10,8 @@ import io.github.nucleuspowered.nucleus.api.core.exception.NoModuleException;
 import io.github.nucleuspowered.nucleus.api.core.exception.UnremovableModuleException;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.plugin.PluginContainer;
 import uk.co.drnaylor.quickstart.ModuleHolder;
 import uk.co.drnaylor.quickstart.enums.ConstructionPhase;
 import uk.co.drnaylor.quickstart.exceptions.QuickStartModuleLoaderException;
@@ -44,15 +46,15 @@ public class ModuleRegistrationProxyService {
         try {
             this.moduleHolder.disableModule(module);
             logger.info(messageProviderService.getMessageString("nucleus.module.disabled.modulerequest",
-                    plugin.getName(), plugin.getId(), module));
+                    plugin.getMetadata().getName(), plugin.getMetadata().getId(), module));
         } catch (final IllegalStateException e) {
             throw new ModulesLoadedException();
         } catch (final UndisableableModuleException e) {
             logger.warn(messageProviderService.getMessageString("nucleus.module.disabled.forceload",
-                    plugin.getName(),
-                    plugin.getId(),
+                    plugin.getMetadata().getName(),
+                    plugin.getMetadata().getId(),
                     module));
-            logger.warn(messageProviderService.getMessageString("nucleus.module.disabled.forceloadtwo", plugin.getName()));
+            logger.warn(messageProviderService.getMessageString("nucleus.module.disabled.forceloadtwo", plugin.getMetadata().getName()));
             throw new UnremovableModuleException();
         } catch (final uk.co.drnaylor.quickstart.exceptions.NoModuleException e) {
             throw new NoModuleException();

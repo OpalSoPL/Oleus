@@ -4,31 +4,33 @@
  */
 package io.github.nucleuspowered.nucleus.core.teleport.scanners;
 
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.teleport.TeleportHelper;
 import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.TeleportHelper;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
-import org.spongepowered.plugin.meta.util.NonnullByDefault;
 
 import java.util.Optional;
 
 public class NoTeleportScanner implements TeleportScanner {
 
+    private final ResourceKey key = ResourceKey.of("nucleus", "no_scan");
+
     @Override
-    public Optional<Location<World>> scanFrom(
-            final World world,
+    public Optional<ServerLocation> scanFrom(
+            final ServerWorld world,
             final Vector3i position,
             final int height,
             final int width,
             final int floor,
             final TeleportHelperFilter filter,
             final TeleportHelperFilter... filters) {
-        final TeleportHelper teleportHelper = Sponge.getTeleportHelper();
+        final TeleportHelper teleportHelper = Sponge.getServer().getTeleportHelper();
         return teleportHelper.getSafeLocation(
-                new Location<>(world, position),
+                ServerLocation.of(world, position),
                 height,
                 width,
                 floor,
@@ -38,13 +40,8 @@ public class NoTeleportScanner implements TeleportScanner {
     }
 
     @Override
-    public String getId() {
-        return "nucleus:no_scan";
-    }
-
-    @Override
-    public String getName() {
-        return "Nucleus No Scan";
+    public ResourceKey getKey() {
+        return this.key;
     }
 
 }

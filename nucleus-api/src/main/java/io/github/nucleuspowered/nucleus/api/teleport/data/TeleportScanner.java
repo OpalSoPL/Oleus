@@ -24,7 +24,7 @@ public interface TeleportScanner extends CatalogType {
             final Vector3i position,
             final TeleportHelperFilter filter,
             final TeleportHelperFilter... filters) {
-        return scanFrom(
+        return this.scanFrom(
                 world,
                 position,
                 TeleportHelper.DEFAULT_HEIGHT,

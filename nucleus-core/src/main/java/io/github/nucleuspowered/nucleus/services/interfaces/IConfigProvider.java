@@ -4,28 +4,25 @@
  */
 package io.github.nucleuspowered.nucleus.services.interfaces;
 
-import org.spongepowered.api.util.Tristate;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 
-import java.util.Collection;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * Provides config objects.
  */
-public interface IModuleDataProvider {
+public interface IConfigProvider {
 
-    boolean isLoaded(String id);
+    CoreConfig getCoreConfig();
 
     /**
      * Registers how to obtain a config object.
      *
      * @param moduleId The module ID of the config.
      * @param typeOfConfig The type of configuration object.
-     * @param configGetter The {@link Supplier} that grabs the config.
      * @param <T> The type of config
      */
-    <T> void registerModuleConfig(String moduleId, Class<T> typeOfConfig, Supplier<T> configGetter);
+    <T> void registerModuleConfig(String moduleId, Class<T> typeOfConfig);
 
     /**
      * Gets the configuration of the given type.
@@ -40,14 +37,5 @@ public interface IModuleDataProvider {
     Map<String, Class<?>> getModuleToConfigType();
 
     <T> T getDefaultModuleConfig(Class<T> configType) throws IllegalArgumentException;
-
-    /**
-     * Gets a collection of IDs representing modules that are known about.
-     *
-     * @param isEnabled {@link Tristate#TRUE} for enabled, {@link Tristate#FALSE} for
-     *                  disabled, {@link Tristate#UNDEFINED} for all.
-     * @return The list of modules.
-     */
-    Collection<String> getModules(Tristate isEnabled);
 
 }

@@ -11,7 +11,7 @@ import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICompatibilityService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.ArrayList;
@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
 @Singleton
 public class CompatibilityService implements ICompatibilityService {
 
-    private final IModuleDataProvider moduleDataProvider;
+    private final IConfigProvider moduleDataProvider;
 
     private final List<CompatibilityMessages> messages = new ArrayList<>();
     private List<CompatibilityMessages> applicableMessages = null;
 
     @Inject
-    public CompatibilityService(final IModuleDataProvider moduleDataProvider) {
+    public CompatibilityService(final IConfigProvider moduleDataProvider) {
         this.moduleDataProvider = moduleDataProvider;
     }
 

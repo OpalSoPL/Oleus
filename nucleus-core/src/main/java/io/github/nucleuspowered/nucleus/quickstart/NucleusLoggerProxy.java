@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.quickstart;
 
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 import uk.co.drnaylor.quickstart.LoggerProxy;
 
 public class NucleusLoggerProxy implements LoggerProxy {

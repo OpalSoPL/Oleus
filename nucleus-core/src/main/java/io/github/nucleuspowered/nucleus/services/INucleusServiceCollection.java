@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.ICooldownService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenerationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
@@ -64,7 +64,7 @@ public interface INucleusServiceCollection {
 
     IPlayerDisplayNameService playerDisplayNameService();
 
-    IModuleDataProvider moduleDataProvider();
+    IConfigProvider moduleDataProvider();
 
     INucleusLocationService teleportService();
 

@@ -73,6 +73,8 @@ public interface IPermissionService {
 
     void removePlayerContexts(UUID uuid);
 
+    void register(String id, Class<?> permissions);
+
     interface Metadata {
 
         boolean isPrefix();

@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
@@ -40,7 +40,7 @@ public class NucleusCommand implements ICommandExecutor {
             final Text.Builder tb = Text.builder("Modules: ").color(TextColors.GREEN);
 
             boolean addComma = false;
-            final IModuleDataProvider dataProvider = context.getServiceCollection().moduleDataProvider();
+            final IConfigProvider dataProvider = context.getServiceCollection().moduleDataProvider();
             final Collection<String> enabled = dataProvider.getModules(Tristate.TRUE);
             for (final String module : dataProvider.getModules(Tristate.UNDEFINED)) {
                 if (addComma) {

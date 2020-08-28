@@ -34,6 +34,8 @@ import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.util.Tristate;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -330,6 +332,21 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override
     public void removePlayerContexts(final UUID uuid) {
         this.standardContexts.remove(uuid);
+    }
+
+    @Override
+    public void register(final String id, final Class<?> permissions) {
+        for (final Field field : permissions.getDeclaredFields()) {
+            final PermissionMetadata metadata = field.getAnnotation(PermissionMetadata.class);
+            if (metadata != null && field.getType().equals(String.class)) {
+                try {
+                    field.setAccessible(true);
+                    this.register((String) field.get(null), metadata, id);
+                } catch (final IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override

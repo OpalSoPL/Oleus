@@ -4,21 +4,32 @@
  */
 package io.github.nucleuspowered.nucleus.core.teleport.scanners;
 
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
-import org.spongepowered.plugin.meta.util.NonnullByDefault;
 
 import java.util.Optional;
 
 public abstract class VerticalTeleportScanner implements TeleportScanner {
 
+    private final ResourceKey key;
+
+    protected VerticalTeleportScanner(final ResourceKey key) {
+        this.key = key;
+    }
+
     @Override
-    public Optional<Location<World>> scanFrom(
-            final World world,
+    public ResourceKey getKey() {
+        return this.key;
+    }
+
+    @Override
+    public Optional<ServerLocation> scanFrom(
+            final ServerWorld world,
             Vector3i position,
             final int width,
             final int height,
@@ -29,9 +40,9 @@ public abstract class VerticalTeleportScanner implements TeleportScanner {
         final int jumps = (height * 2) - 1;
 
         do {
-            final Optional<Location<World>> result = Sponge.getTeleportHelper()
+            final Optional<ServerLocation> result = Sponge.getServer().getTeleportHelper()
                     .getSafeLocation(
-                            new Location<>(world, position),
+                            ServerLocation.of(world, position),
                             height,
                             width,
                             floorDistance,
@@ -50,28 +61,16 @@ public abstract class VerticalTeleportScanner implements TeleportScanner {
 
     public static class Ascending extends VerticalTeleportScanner {
 
-        @Override
-        public String getId() {
-            return "nucleus:ascending_scan";
-        }
-
-        @Override
-        public String getName() {
-            return "Nucleus Ascending Scan";
+        public Ascending() {
+            super(ResourceKey.of("nucleus", "ascending_scan"));
         }
 
     }
 
     public static class Descending extends VerticalTeleportScanner {
 
-        @Override
-        public String getId() {
-            return "nucleus:descending_scan";
-        }
-
-        @Override
-        public String getName() {
-            return "Nucleus Descending Scan";
+        public Descending() {
+            super(ResourceKey.of("nucleus", "descending_scan"));
         }
 
     }

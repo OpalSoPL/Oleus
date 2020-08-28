@@ -29,10 +29,10 @@ import io.github.nucleuspowered.nucleus.registry.TeleportScannerRegistryModule;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.NucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.commandmetadata.CommandMetadataService;
-import io.github.nucleuspowered.nucleus.services.impl.moduledata.ModuleDataProvider;
+import io.github.nucleuspowered.nucleus.services.impl.configprovider.ConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import net.kyori.adventure.text.Component;
@@ -182,7 +182,7 @@ public class OldNucleusCore {
         this.configDir = configDir.resolve(NucleusPluginInfo.ID);
         this.dataDir = () -> Sponge.getGame().getSavesDirectory().resolve("nucleus");
         this.pluginContainer = pluginContainer;
-        final IModuleDataProvider moduleDataProvider = new ModuleDataProvider(() -> this.moduleContainer);
+        final IConfigProvider moduleDataProvider = new ConfigProvider(() -> this.moduleContainer);
         final Injector baseInjector = injector.createChildInjector(
                 new NucleusInjectorModule(
                         this::getServiceCollection,

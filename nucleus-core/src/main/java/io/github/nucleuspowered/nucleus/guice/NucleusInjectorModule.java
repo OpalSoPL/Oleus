@@ -5,13 +5,10 @@
 package io.github.nucleuspowered.nucleus.guice;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import io.github.nucleuspowered.nucleus.NucleusCore;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;

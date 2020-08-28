@@ -232,10 +232,6 @@ public abstract class StandardModule implements Module {
         // Construction happens later in a pre step in QSML
     }
 
-    public final void prepareAliasedCommands() {
-        this.serviceCollection.commandMetadataService().addMapping(this.remapCommand());
-    }
-
     private Stream<Class<? extends ICommandExecutor>> performFilter(final Stream<Class<? extends ICommandExecutor>> stream) {
         return stream.filter(x -> x.isAnnotationPresent(Command.class));
     }

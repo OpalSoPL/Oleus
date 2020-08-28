@@ -9,6 +9,7 @@ import io.github.nucleuspowered.nucleus.services.impl.configurate.ConfigurateHel
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
 
 @ImplementedBy(ConfigurateHelper.class)
 public interface IConfigurateHelper {
@@ -17,5 +18,9 @@ public interface IConfigurateHelper {
 
     default CommentedConfigurationNode createNode() {
         return CommentedConfigurationNode.root(this.setOptions(ConfigurationOptions.defaults()));
+    }
+
+    default ConfigurationOptions getOptions() {
+        return this.setOptions(ConfigurationOptions.defaults());
     }
 }

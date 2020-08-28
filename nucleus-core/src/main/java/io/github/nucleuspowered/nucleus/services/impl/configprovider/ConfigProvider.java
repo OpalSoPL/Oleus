@@ -2,16 +2,23 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.services.impl.moduledata;
+package io.github.nucleuspowered.nucleus.services.impl.configprovider;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
+import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
+import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.spongepowered.api.util.Tristate;
 import uk.co.drnaylor.quickstart.ModuleHolder;
 import uk.co.drnaylor.quickstart.exceptions.NoModuleException;
 import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,35 +26,32 @@ import java.util.function.Supplier;
 
 import com.google.inject.Singleton;
 
+// TODO
 @Singleton
-public class ModuleDataProvider implements IModuleDataProvider {
+public class ConfigProvider implements IConfigProvider, IReloadableService.Reloadable {
 
-    private final Supplier<DiscoveryModuleHolder<StandardModule, StandardModule>> moduleHolderSupplier;
+    private final Path configPath;
 
-    public ModuleDataProvider(final Supplier<DiscoveryModuleHolder<StandardModule, StandardModule>> moduleHolderSupplier) {
-        this.moduleHolderSupplier = moduleHolderSupplier;
+    @Inject
+    public ConfigProvider(@ConfigDirectory final Path configPath) {
+        this.configPath = configPath;
     }
 
     private final Map<String, Class<?>> moduleConfigs = new HashMap<>();
     private final Map<Class<?>, Supplier<?>> providers = new HashMap<>();
 
-    @Override public boolean isLoaded(final String id) {
-        try {
-            return this.moduleHolderSupplier.get().isModuleLoaded(id);
-        } catch (final NoModuleException e) {
-            throw new IllegalArgumentException("The module " + id + " does not exist.");
-        }
+    @Override
+    public CoreConfig getCoreConfig() {
+        return null;
     }
 
     @Override public <T> void registerModuleConfig(final String moduleId,
-            final Class<T> typeOfConfig,
-            final Supplier<T> configGetter) {
+            final Class<T> typeOfConfig) {
         if (this.providers.containsKey(typeOfConfig) || this.moduleConfigs.containsKey(moduleId)) {
             throw new IllegalStateException("Cannot register type or module more than once!");
         }
 
         this.moduleConfigs.put(moduleId, typeOfConfig);
-        this.providers.put(typeOfConfig, configGetter);
     }
 
     @SuppressWarnings("unchecked")
@@ -76,19 +80,7 @@ public class ModuleDataProvider implements IModuleDataProvider {
         throw new IllegalArgumentException(configType.getSimpleName() + " does not exist");
     }
 
-    @Override public Collection<String> getModules(final Tristate isEnabled) {
-        final ModuleHolder.ModuleStatusTristate tristate;
-        switch (isEnabled) {
-            case TRUE:
-                tristate = ModuleHolder.ModuleStatusTristate.ENABLE;
-                break;
-            case FALSE:
-                tristate = ModuleHolder.ModuleStatusTristate.DISABLE;
-                break;
-            default:
-                tristate = ModuleHolder.ModuleStatusTristate.ALL;
-                break;
-        }
-        return this.moduleHolderSupplier.get().getModules(tristate);
+    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+
     }
 }

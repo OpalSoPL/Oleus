@@ -35,7 +35,6 @@ import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,6 +57,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     private final Path commandsFile;
     private final IConfigurateHelper configurateHelper;
     private final IMessageProviderService messageProviderService;
+    private final IReloadableService reloadableService;
     private final Map<String, CommandMetadata> commandMetadataMap = new HashMap<>();
     private final Map<CommandControl, List<String>> controlToAliases = new HashMap<>();
     private final BiMap<Class<? extends ICommandExecutor>, CommandControl> controlToExecutorClass = HashBiMap.create();
@@ -66,6 +66,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     private boolean registrationComplete = false;
     private final List<ICommandInterceptor> interceptors = new ArrayList<>();
     private final List<String> registeredAliases = new ArrayList<>();
+    private final Map<CommandMetadata, CommandControl> registeredCommands = new HashMap<>();
 
     @Inject
     public CommandMetadataService(@ConfigDirectory final Path configDirectory,
@@ -75,6 +76,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         reloadableService.registerReloadable(this);
         this.configurateHelper = helper;
         this.messageProviderService = messageProviderService;
+        this.reloadableService = reloadableService;
         this.commandsFile = configDirectory.resolve("commands.conf");
     }
 
@@ -103,12 +105,25 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     @Override
+    public void registerCommands(
+            final String id,
+            final String name,
+            final Collection<? extends Class<? extends ICommandExecutor>> associatedContext) {
+        for (final Class<? extends ICommandExecutor> c : associatedContext) {
+            this.registerCommand(id, name, c);
+        }
+    }
+
+    @Override
     public void registerCommand(
             final String id,
             final String name,
-            final Command command,
             final Class<? extends ICommandExecutor> associatedContext) {
         Preconditions.checkState(!this.registrationComplete, "Registration has completed.");
+        final Command command = associatedContext.getAnnotation(Command.class);
+        if (command == null) {
+            throw new NullPointerException("Command annotation is missing");
+        }
         final String key = this.getKey(command);
         this.commandMetadataMap.put(key, new CommandMetadata(
                 id,
@@ -133,7 +148,10 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     @Override
     public void completeRegistrationPhase(final INucleusServiceCollection serviceCollection,
             final RegisterCommandEvent<org.spongepowered.api.command.Command.Parameterized> event) {
-        Preconditions.checkState(!this.registrationComplete, "Registration has completed.");
+        if (this.registrationComplete) {
+            this.registeredCommands.values().forEach(x -> x.completeRegistration(serviceCollection));
+            return;
+        }
         this.registrationComplete = true;
         this.load();
 
@@ -268,7 +286,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
                 ).getAllAliases());
             }
 
-            commands.values().forEach(x -> x.completeRegistration(collection));
+            this.registeredCommands.putAll(commands);
         }
     }
 
@@ -349,7 +367,16 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         return this.controlToAliases.keySet();
     }
 
+    @Override public void registerInterceptors(final Collection<ICommandInterceptor> commandInterceptors) {
+        for (final ICommandInterceptor interceptor : commandInterceptors) {
+            this.registerInterceptor(interceptor);
+        }
+    }
+
     @Override public void registerInterceptor(final ICommandInterceptor impl) {
+        if (impl instanceof IReloadableService.Reloadable) {
+            this.reloadableService.registerReloadable((IReloadableService.Reloadable) impl);
+        }
         this.interceptors.add(impl);
     }
 

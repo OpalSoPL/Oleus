@@ -21,7 +21,7 @@ import io.github.nucleuspowered.nucleus.modules.teleport.TeleportPermissions;
 import io.github.nucleuspowered.nucleus.modules.vanish.VanishModule;
 import io.github.nucleuspowered.nucleus.modules.vanish.VanishPermissions;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleDataProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -29,7 +29,7 @@ import java.util.Optional;
 
 public class NucleusKeysProvider implements NucleusUserPreferenceService.Keys {
 
-    private final IModuleDataProvider moduleDataProvider;
+    private final IConfigProvider moduleDataProvider;
     public NucleusKeysProvider(final INucleusServiceCollection serviceCollection) {
         this.moduleDataProvider = serviceCollection.moduleDataProvider();
     }
