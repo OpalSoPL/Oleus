@@ -26,19 +26,13 @@ public class CoreTask implements TaskBase, IReloadableService.Reloadable {
         this.serviceCollection = serviceCollection;
     }
 
-
-    @Override
-    public boolean isAsync() {
-        return true;
-    }
-
     @Override
     public Duration interval() {
         return Duration.of(5, ChronoUnit.MINUTES);
     }
 
     @Override
-    public void accept(final Task task) {
+    public void run() {
         this.serviceCollection.storageManager().getUserService().clearCache();
 
         if (this.printSave) {
@@ -54,7 +48,7 @@ public class CoreTask implements TaskBase, IReloadableService.Reloadable {
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.printSave = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class).isPrintOnAutosave();
+        this.printSave = serviceCollection.configProvider().getModuleConfig(CoreConfig.class).isPrintOnAutosave();
     }
 
 }

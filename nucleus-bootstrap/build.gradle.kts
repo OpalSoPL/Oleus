@@ -1,15 +1,11 @@
 plugins {
     java
     eclipse
-    id("com.github.hierynomus.license")
 }
 
 repositories {
     jcenter()
     maven("https://repo-new.spongepowered.org/repository/maven-public")
-   // maven("https://repo.spongepowered.org/maven")
-    maven("https://oss.sonatype.org/content/repositories/snapshots/")
-    // maven("https://jitpack.io")
 }
 
 sourceSets {
@@ -31,7 +27,7 @@ dependencies {
     implementation(project(":nucleus-core"))
     implementation(project(":nucleus-modules"))
 
-    val dep = "org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]
+    val dep = "org.spongepowered:spongeapi:${rootProject.properties["spongeApiVersion"]}"
     annotationProcessor(dep)
     implementation(dep)
 

@@ -84,7 +84,7 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final ConnectionConfig connectionConfig = serviceCollection.moduleDataProvider().getModuleConfig(ConnectionConfig.class);
+        final ConnectionConfig connectionConfig = serviceCollection.configProvider().getModuleConfig(ConnectionConfig.class);
         this.reservedSlots = connectionConfig.getReservedSlots();
         this.whitelistMessage = connectionConfig.getWhitelistMessage().orElse(null);
         this.fullMessage = connectionConfig.getServerFullMessage().orElse(null);

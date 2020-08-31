@@ -89,4 +89,8 @@ public interface IStorageManager {
     }
 
     CompletableFuture<Void> saveAll();
+
+    void attachAll();
+
+    void detachAll();
 }

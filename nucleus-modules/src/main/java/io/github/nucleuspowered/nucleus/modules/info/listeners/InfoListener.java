@@ -60,7 +60,7 @@ public class InfoListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final InfoConfig config = serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class);
+        final InfoConfig config = serviceCollection.configProvider().getModuleConfig(InfoConfig.class);
         this.delay = (int)(config.getMotdDelay() * 1000);
         this.usePagination = config.isMotdUsePagination();
 
@@ -74,6 +74,6 @@ public class InfoListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class).isShowMotdOnJoin();
+        return serviceCollection.configProvider().getModuleConfig(InfoConfig.class).isShowMotdOnJoin();
     }
 }

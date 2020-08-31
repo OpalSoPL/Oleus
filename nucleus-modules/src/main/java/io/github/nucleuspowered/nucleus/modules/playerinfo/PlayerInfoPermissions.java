@@ -4,11 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.modules.playerinfo;
 
-import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-@RegisterPermissions
 public class    PlayerInfoPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "getfromip" }, level = SuggestedLevel.ADMIN)

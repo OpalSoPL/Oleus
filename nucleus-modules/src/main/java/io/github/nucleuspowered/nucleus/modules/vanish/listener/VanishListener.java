@@ -118,6 +118,6 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.vanishConfig = serviceCollection.moduleDataProvider().getModuleConfig(VanishConfig.class);
+        this.vanishConfig = serviceCollection.configProvider().getModuleConfig(VanishConfig.class);
     }
 }

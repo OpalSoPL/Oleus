@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.core.config;
 
 import io.github.nucleuspowered.neutrino.annotations.DoNotGenerate;
+import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -42,9 +43,6 @@ public class CoreConfig {
     @Setting(value = "check-for-wildcard", comment = "config.core.wildcard")
     private final boolean checkForWildcard = true;
 
-    @Setting(value = "show-warning-on-startup", comment = "config.core.warning-on-startup")
-    private final boolean warningOnStartup = true;
-
     @Setting(value = "more-accurate-visitor-count", comment = "config.core.accurate")
     private final boolean moreAccurate = false;
 
@@ -68,6 +66,10 @@ public class CoreConfig {
 
     @Setting(value = "give-default-group-user-permissions", comment = "config.core.defaultperms")
     private final boolean giveDefaultsUserPermissions = false;
+
+    public String getDataFileLocation() {
+        return this.dataFileLocation;
+    }
 
     public boolean isDebugmode() {
         return this.debugmode;
@@ -111,10 +113,6 @@ public class CoreConfig {
 
     public boolean isCheckForWildcard() {
         return this.checkForWildcard;
-    }
-
-    public boolean isWarningOnStartup() {
-        return this.warningOnStartup;
     }
 
     public boolean isMoreAccurate() {

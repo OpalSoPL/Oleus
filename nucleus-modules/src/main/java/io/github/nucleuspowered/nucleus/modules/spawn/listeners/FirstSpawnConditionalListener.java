@@ -46,7 +46,7 @@ public class FirstSpawnConditionalListener implements ListenerBase.Conditional {
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class).isForceFirstSpawn();
+        return serviceCollection.configProvider().getModuleConfig(SpawnConfig.class).isForceFirstSpawn();
     }
 
 }

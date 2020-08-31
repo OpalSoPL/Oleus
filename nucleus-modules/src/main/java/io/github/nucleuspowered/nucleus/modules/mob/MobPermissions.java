@@ -4,12 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mob;
 
-import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import org.spongepowered.api.entity.EntityType;
 
-@RegisterPermissions
 public class MobPermissions {
     private MobPermissions() {
         throw new AssertionError("Nope");

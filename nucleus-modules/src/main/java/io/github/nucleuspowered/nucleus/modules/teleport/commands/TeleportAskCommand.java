@@ -136,7 +136,7 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.isCooldownOnAsk = serviceCollection.moduleDataProvider()
+        this.isCooldownOnAsk = serviceCollection.configProvider()
                 .getModuleConfig(TeleportConfig.class)
                 .isCooldownOnAsk();
     }

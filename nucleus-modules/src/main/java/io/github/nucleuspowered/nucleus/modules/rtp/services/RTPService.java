@@ -100,6 +100,6 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
         // create the new RTPOptions
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(RTPConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(RTPConfig.class);
     }
 }

@@ -1,10 +1,13 @@
+/*
+ * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
+ * at the root of this project for more details.
+ */
 package io.github.nucleuspowered.nucleus.module;
 
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandInterceptor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
 
 import java.util.Collection;
@@ -23,9 +26,9 @@ public interface IModule {
 
     Optional<Class<?>> getPermissions();
 
-    Collection<ListenerBase> getListeners();
+    Collection<Class<? extends ListenerBase>> getListeners();
 
-    Collection<TaskBase> getTasks();
+    Collection<Class<? extends TaskBase>> getTasks();
 
     default Optional<NucleusProvider> getInfoProvider() {
         return Optional.empty();

@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.services.impl.storage;
 
 import com.google.gson.JsonObject;
+import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.guice.DataDirectory;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataaccess.IConfigurateBackedDataTranslator;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.GeneralDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
@@ -23,6 +23,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.registry.IStorageR
 import io.github.nucleuspowered.nucleus.services.impl.storage.services.SingleCachedService;
 import io.github.nucleuspowered.nucleus.services.impl.storage.services.UserService;
 import io.github.nucleuspowered.nucleus.services.impl.storage.services.WorldService;
+import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
@@ -32,8 +33,6 @@ import io.github.nucleuspowered.storage.services.IStorageService;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.SimpleConfigurationNode;
-import org.slf4j.Logger;
-import org.spongepowered.api.plugin.PluginContainer;
 
 import java.nio.file.Path;
 import java.util.UUID;
@@ -43,12 +42,15 @@ import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.plugin.PluginContainer;
 
 @Singleton
-public final class StorageManager implements IStorageManager, IReloadableService.Reloadable {
+public final class StorageManager implements IStorageManager {
 
     private final FlatFileStorageRepositoryFactory flatFileStorageRepositoryFactory;
     private final IConfigurateHelper configurateHelper;
+    private final IConfigProvider configProvider;
     private final IStorageService.SingleCached<IGeneralDataObject> generalService;
     private final UserService userService;
     private final WorldService worldService;
@@ -58,10 +60,12 @@ public final class StorageManager implements IStorageManager, IReloadableService
     public StorageManager(@DataDirectory final Supplier<Path> dataDirectory,
             final Logger logger,
             final IConfigurateHelper configurateHelper,
+            final IConfigProvider configProvider,
             final PluginContainer pluginContainer) {
         this.flatFileStorageRepositoryFactory = new FlatFileStorageRepositoryFactory(dataDirectory, logger);
         new IStorageRepositoryFactoryRegistryModule(this.flatFileStorageRepositoryFactory);
         this.configurateHelper = configurateHelper;
+        this.configProvider = configProvider;
         this.userService = new UserService(this, pluginContainer);
         this.worldService = new WorldService(this, pluginContainer);
         this.generalService = new SingleCachedService<>(
@@ -220,31 +224,41 @@ public final class StorageManager implements IStorageManager, IReloadableService
     }
 
     @Override
-    public void onReload(final INucleusServiceCollection serviceCollection) {
+    public void attachAll() {
+        this.detachAll();
+        // TODO: attach based on core config
+        final CoreConfig config = this.configProvider.getCoreConfig();
+    }
+
+    @Override
+    public void detachAll() {
         // TODO: Data registry
         if (this.generalRepository != null) {
             this.generalRepository.shutdown();
         }
 
-        this.generalRepository = null; // TODO: config
+        this.generalRepository = null;
 
         if (this.worldRepository != null) {
             this.worldRepository.shutdown();
         }
 
-        this.worldRepository = null; // TODO: config
+        this.worldRepository = null;
 
         if (this.userRepository != null) {
             this.userRepository.shutdown();
         }
 
-        this.userRepository = null; // TODO: config
+        this.userRepository = null;
 
         if (this.kitsRepository != null) {
             this.kitsRepository.shutdown();
         }
 
-        this.kitsRepository = null; // TODO: config
+        this.kitsRepository = null;
     }
 
+
+
 }
+

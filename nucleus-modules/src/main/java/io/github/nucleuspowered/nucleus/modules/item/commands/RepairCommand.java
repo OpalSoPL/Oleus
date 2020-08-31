@@ -57,7 +57,7 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final RepairConfig config = serviceCollection.moduleDataProvider().getModuleConfig(ItemConfig.class).getRepairConfig();
+        final RepairConfig config = serviceCollection.configProvider().getModuleConfig(ItemConfig.class).getRepairConfig();
         this.whitelist = config.isWhitelist();
         this.restrictions = config.getRestrictions();
     }

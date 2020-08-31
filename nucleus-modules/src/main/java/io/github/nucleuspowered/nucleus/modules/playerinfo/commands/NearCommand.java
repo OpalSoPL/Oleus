@@ -130,7 +130,7 @@ public class NearCommand implements ICommandExecutor, IReloadableService.Reloada
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
         final PlayerInfoConfig configAdapter = serviceCollection
-                .moduleDataProvider()
+                .configProvider()
                 .getModuleConfig(PlayerInfoConfig.class);
         this.maxRadius = configAdapter.getNear().getMaxRadius();
     }

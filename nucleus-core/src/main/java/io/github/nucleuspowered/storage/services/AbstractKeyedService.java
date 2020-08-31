@@ -19,7 +19,7 @@ import io.github.nucleuspowered.storage.util.KeyedObject;
 import io.github.nucleuspowered.storage.util.ThrownBiConsumer;
 import io.github.nucleuspowered.storage.util.ThrownFunction;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.HashSet;
 import java.util.Map;

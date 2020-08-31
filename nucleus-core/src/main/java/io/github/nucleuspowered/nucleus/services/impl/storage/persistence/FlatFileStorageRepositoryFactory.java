@@ -12,7 +12,6 @@ import io.github.nucleuspowered.storage.exceptions.DataQueryException;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
-import org.slf4j.Logger;
 
 import java.nio.file.Path;
 import java.util.Collection;
@@ -21,9 +20,13 @@ import java.util.function.Supplier;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.ResourceKey;
 
 @Singleton
-public final class FlatFileStorageRepositoryFactory implements IStorageRepositoryFactory<JsonObject> {
+public final class FlatFileStorageRepositoryFactory implements IStorageRepositoryFactory {
+
+    private final ResourceKey key = ResourceKey.of("nucleus", "flat_file");
 
     private static final String WORLD_DATA_DIRECTORY = "worlddata";
     private static final String USER_DATA_DIRECTORY = "userdata";
@@ -72,11 +75,8 @@ public final class FlatFileStorageRepositoryFactory implements IStorageRepositor
         return new FlatFileStorageRepository.Single(this.logger, () -> this.dataPath.get().resolve(KITS_FILE));
     }
 
-    @Override public String getId() {
-        return "nucleus:flatfile";
-    }
-
-    @Override public String getName() {
-        return "Flat File";
+    @Override
+    public ResourceKey getKey() {
+        return this.key;
     }
 }

@@ -108,7 +108,7 @@ public class KitGiveCommand implements ICommandExecutor, IReloadableService.Relo
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final KitConfig kca = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
+        final KitConfig kca = serviceCollection.configProvider().getModuleConfig(KitConfig.class);
         this.isDrop = kca.isDropKitIfFull();
         this.mustGetAll = kca.isMustGetAll();
     }

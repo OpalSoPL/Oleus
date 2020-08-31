@@ -25,7 +25,7 @@ public class CommandLoggerHandler extends AbstractLoggingHandler implements IRel
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(CommandLoggerConfig.class);
         try {
             if (this.config.isLogToFile() && this.logger == null) {
                 this.createLogger();

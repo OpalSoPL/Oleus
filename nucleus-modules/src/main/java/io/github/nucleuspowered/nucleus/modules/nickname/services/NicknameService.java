@@ -325,7 +325,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final NicknameConfig nc = serviceCollection.moduleDataProvider().getModuleConfig(NicknameConfig.class);
+        final NicknameConfig nc = serviceCollection.configProvider().getModuleConfig(NicknameConfig.class);
         this.pattern = nc.getPattern();
         this.min = nc.getMinNicknameLength();
         this.max = nc.getMaxNicknameLength();

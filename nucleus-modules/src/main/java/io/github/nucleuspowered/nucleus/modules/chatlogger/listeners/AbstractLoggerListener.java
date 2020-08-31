@@ -24,7 +24,7 @@ abstract class AbstractLoggerListener implements ListenerBase.Conditional {
     }
 
     ChatLoggingConfig getConfig(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(ChatLoggingConfig.class);
+        return serviceCollection.configProvider().getModuleConfig(ChatLoggingConfig.class);
     }
 
 }

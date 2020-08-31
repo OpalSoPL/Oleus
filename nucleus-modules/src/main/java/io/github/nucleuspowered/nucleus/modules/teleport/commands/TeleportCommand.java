@@ -71,7 +71,7 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
     private boolean isDefaultQuiet = false;
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.isDefaultQuiet = serviceCollection.moduleDataProvider().getModuleConfig(TeleportConfig.class).isDefaultQuiet();
+        this.isDefaultQuiet = serviceCollection.configProvider().getModuleConfig(TeleportConfig.class).isDefaultQuiet();
     }
 
     @Override

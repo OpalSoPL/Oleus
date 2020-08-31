@@ -28,7 +28,7 @@ public class AFKChatListener extends AbstractAFKListener implements ListenerBase
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
+        return serviceCollection.configProvider().getModuleConfig(AFKConfig.class)
                 .getTriggers()
                 .isOnChat();
     }

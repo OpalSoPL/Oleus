@@ -61,7 +61,7 @@ public class RespawnConditionalListener implements ListenerBase.Conditional {
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class).isRespawnAtHome();
+        return serviceCollection.configProvider().getModuleConfig(HomeConfig.class).isRespawnAtHome();
     }
 
 }

@@ -329,7 +329,7 @@ public class CreateWorldCommand implements ICommandExecutor, IReloadableService.
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.worldBorderDefault = serviceCollection
-                .moduleDataProvider()
+                .configProvider()
                 .getModuleConfig(WorldConfig.class)
                 .getWorldBorderDefault()
                 .orElse(null);

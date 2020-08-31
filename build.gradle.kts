@@ -24,7 +24,7 @@ plugins {
     idea
     eclipse
     `maven-publish`
-    id("com.github.hierynomus.license") version "0.15.0"
+    id("com.github.hierynomus.license") version "0.15.0" apply false
     id("ninja.miserable.blossom") version "1.0.1"
     id("com.github.johnrengelman.shadow") version "5.2.0"
     id("org.spongepowered.gradle.plugin") version "0.11.0-SNAPSHOT"
@@ -48,6 +48,32 @@ fun getGitCommit() : String {
         // ignore
         "unknown"
     }
+}
+
+allprojects {
+
+    apply(plugin = "com.github.hierynomus.license")
+
+    configure<nl.javadude.gradle.plugins.license.LicenseExtension> {
+        // ext.name = project.name
+
+        exclude("**/*.info")
+        exclude("assets/**")
+        exclude("*.kts")
+        exclude("*.json")
+        exclude("*.properties")
+        exclude("*.txt")
+
+        header = rootProject.projectDir.resolve("HEADER.txt") //File("HEADER.txt")
+
+        // sourceSets.addLater(ProviderFactory.provider(() -> project(":nucleus-core").sourceSets))
+
+        ignoreFailures = false
+        strictCheck = true
+
+        mapping("java", "SLASHSTAR_STYLE")
+    }
+
 }
 
 extra["gitHash"] = getGitCommit()
@@ -86,7 +112,6 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":nucleus-ap"))
     implementation(project(":nucleus-api"))
     implementation(project(":nucleus-core"))
 
@@ -254,10 +279,6 @@ tasks {
         dependsOn(cleanOutput)
     }
 
-    compileJava {
-        dependsOn(":nucleus-ap:build")
-    }
-
     blossomSourceReplacementJava {
         dependsOn(gitHash)
     }
@@ -289,21 +310,3 @@ publishing {
     }
 }
 
-
-license {
-    // ext.name = project.name
-
-    exclude("**/*.info")
-    exclude("assets/**")
-    exclude("*.properties")
-    exclude("*.txt")
-
-    header = File("HEADER.txt")
-
-    // sourceSets.addLater(ProviderFactory.provider(() -> project(":nucleus-core").sourceSets))
-
-    ignoreFailures = false
-    strictCheck = true
-
-    mapping("java", "SLASHSTAR_STYLE")
-}

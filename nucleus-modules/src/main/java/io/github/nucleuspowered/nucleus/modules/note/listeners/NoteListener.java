@@ -66,7 +66,7 @@ public class NoteListener implements ListenerBase.Conditional {
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(NoteConfig.class).isShowOnLogin();
+        return serviceCollection.configProvider().getModuleConfig(NoteConfig.class).isShowOnLogin();
     }
 
 }

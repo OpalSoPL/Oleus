@@ -152,7 +152,7 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final boolean requireUnjailPermission = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).isRequireUnjailPermission();
-        this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).getCommonPermissionLevelConfig();
+        final boolean requireUnjailPermission = serviceCollection.configProvider().getModuleConfig(JailConfig.class).isRequireUnjailPermission();
+        this.levelConfig = serviceCollection.configProvider().getModuleConfig(JailConfig.class).getCommonPermissionLevelConfig();
     }
 }

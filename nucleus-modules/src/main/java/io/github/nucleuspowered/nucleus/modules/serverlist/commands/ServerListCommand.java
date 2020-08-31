@@ -108,6 +108,6 @@ public class ServerListCommand implements ICommandExecutor, IReloadableService.R
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.slc = serviceCollection.moduleDataProvider().getModuleConfig(ServerListConfig.class);
+        this.slc = serviceCollection.configProvider().getModuleConfig(ServerListConfig.class);
     }
 }

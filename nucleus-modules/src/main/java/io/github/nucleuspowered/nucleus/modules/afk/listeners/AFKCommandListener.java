@@ -37,7 +37,7 @@ public class AFKCommandListener extends AbstractAFKListener implements ListenerB
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
+        return serviceCollection.configProvider().getModuleConfig(AFKConfig.class)
                 .getTriggers()
                 .isOnCommand();
     }

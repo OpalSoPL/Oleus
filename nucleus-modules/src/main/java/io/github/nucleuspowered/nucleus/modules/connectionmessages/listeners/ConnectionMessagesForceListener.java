@@ -24,6 +24,6 @@ public class ConnectionMessagesForceListener implements ListenerBase.Conditional
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(ConnectionMessagesConfig.class).isForceForAll();
+        return serviceCollection.configProvider().getModuleConfig(ConnectionMessagesConfig.class).isForceForAll();
     }
 }

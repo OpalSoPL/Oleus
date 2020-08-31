@@ -562,7 +562,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final KitConfig kitConfig = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
+        final KitConfig kitConfig = serviceCollection.configProvider().getModuleConfig(KitConfig.class);
         this.isMustGetAll = kitConfig.isMustGetAll();
         this.isProcessTokens = kitConfig.isProcessTokens();
     }

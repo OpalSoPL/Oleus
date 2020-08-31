@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.playerinformation;
 
-import io.github.nucleuspowered.nucleus.Constants;
-import io.github.nucleuspowered.nucleus.annotationprocessor.Store;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerInformationService;
 import net.kyori.adventure.text.Component;
@@ -16,14 +14,12 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@Store(Constants.PLAYER_INFO)
 public interface NucleusProvider extends IPlayerInformationService.Provider {
 
     String PUNISHMENT = "punishment";
 
     String getCategory();
 
-    @Store(Constants.PLAYER_INFO)
     interface Permission extends NucleusProvider {
 
         String permission();

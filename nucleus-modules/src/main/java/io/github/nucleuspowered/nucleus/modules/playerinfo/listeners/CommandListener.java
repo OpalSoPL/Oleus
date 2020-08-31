@@ -43,7 +43,7 @@ public class CommandListener implements ListenerBase.Conditional {
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(PlayerInfoConfig.class).getList().isPanelCompatibility();
+        return serviceCollection.configProvider().getModuleConfig(PlayerInfoConfig.class).getList().isPanelCompatibility();
     }
 
 }

@@ -146,7 +146,7 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.listConfig = serviceCollection.moduleDataProvider().getModuleConfig(PlayerInfoConfig.class).getList();
+        this.listConfig = serviceCollection.configProvider().getModuleConfig(PlayerInfoConfig.class).getList();
     }
 
     private void getList(final Collection<Player> player, final boolean showVanished, final List<Text> messages, final String groupName,

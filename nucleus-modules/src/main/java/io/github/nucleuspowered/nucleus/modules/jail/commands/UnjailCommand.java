@@ -72,6 +72,6 @@ public class UnjailCommand implements ICommandExecutor, IReloadableService.Reloa
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).getCommonPermissionLevelConfig();
+        this.levelConfig = serviceCollection.configProvider().getModuleConfig(JailConfig.class).getCommonPermissionLevelConfig();
     }
 }

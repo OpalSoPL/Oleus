@@ -124,7 +124,7 @@ public class StaffChatMessageChannel implements
     }
 
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final StaffChatConfig sc = serviceCollection.moduleDataProvider().getModuleConfig(StaffChatConfig.class);
+        final StaffChatConfig sc = serviceCollection.configProvider().getModuleConfig(StaffChatConfig.class);
         this.formatting = sc.isIncludeStandardChatFormatting();
         this.template = sc.getMessageTemplate();
         this.colour = serviceCollection.textStyleService().getColourFromString(sc.getMessageColour());

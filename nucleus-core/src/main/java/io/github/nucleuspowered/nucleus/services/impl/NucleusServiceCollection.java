@@ -173,7 +173,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         return this.playerDisplayNameService.get();
     }
 
-    @Override public IConfigProvider moduleDataProvider() {
+    @Override public IConfigProvider configProvider() {
         return this.moduleConfigProvider.get();
     }
 

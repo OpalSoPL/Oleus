@@ -9,7 +9,6 @@ import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.teleport.data.NucleusTeleportHelperFilters;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
-import io.github.nucleuspowered.nucleus.core.config.CoreConfigAdapter;
 import io.github.nucleuspowered.nucleus.core.config.SafeTeleportConfig;
 import io.github.nucleuspowered.nucleus.core.events.AboutToTeleportEvent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;

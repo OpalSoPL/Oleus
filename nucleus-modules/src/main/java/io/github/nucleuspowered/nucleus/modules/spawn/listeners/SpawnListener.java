@@ -205,7 +205,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.spawnConfig = serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class);
+        this.spawnConfig = serviceCollection.configProvider().getModuleConfig(SpawnConfig.class);
     }
 
     private static Location<World> process(final Location<World> v3d) {

@@ -1,7 +1,6 @@
 plugins {
     java
     eclipse
-    id("com.github.hierynomus.license")
 }
 
 group = "io.github.nucleuspowered"
@@ -9,10 +8,8 @@ group = "io.github.nucleuspowered"
 repositories {
     jcenter()
     maven("https://repo-new.spongepowered.org/repository/maven-public")
-    maven("https://repo.spongepowered.org/maven")
     maven("https://repo.drnaylor.co.uk/artifactory/list/minecraft")
     maven("https://repo.drnaylor.co.uk/artifactory/list/quickstart")
-    maven("https://oss.sonatype.org/content/repositories/snapshots/")
     // maven("https://jitpack.io")
 }
 
@@ -33,16 +30,13 @@ java {
 }
 
 dependencies {
-    annotationProcessor(project(":nucleus-ap"))
-    implementation(project(":nucleus-ap"))
     implementation(project(":nucleus-api"))
     implementation(project(":nucleus-core"))
 
-    val dep = "org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]
+    val dep = "org.spongepowered:spongeapi:${rootProject.properties["spongeApiVersion"]}"
     annotationProcessor(dep)
     implementation(dep)
 
-    implementation(rootProject.properties["qsmlDep"]?.toString()!!)
     implementation(rootProject.properties["neutrinoDep"]?.toString()!!) {
         exclude("org.spongepowered", "configurate-core")
     }
@@ -52,19 +46,4 @@ dependencies {
     testCompile("org.powermock:powermock-api-mockito:1.6.4")
     testCompile("org.hamcrest:hamcrest-junit:2.0.0.0")
     testCompile("junit", "junit", "4.12")
-}
-
-configure<nl.javadude.gradle.plugins.license.LicenseExtension> {
-    exclude("**/*.info")
-    exclude("assets/**")
-    exclude("*.properties")
-    exclude("*.txt")
-
-    header = file("../HEADER.txt")
-    sourceSets = project.sourceSets
-
-    ignoreFailures = false
-    strictCheck = true
-
-    mapping("java", "SLASHSTAR_STYLE")
 }

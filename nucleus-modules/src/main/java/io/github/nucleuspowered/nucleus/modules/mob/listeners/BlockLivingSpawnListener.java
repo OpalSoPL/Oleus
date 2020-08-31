@@ -67,7 +67,7 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(MobConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(MobConfig.class);
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
@@ -75,7 +75,7 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
                 return true;
             }
 
-            final Map<String, BlockSpawnsConfig> conf = serviceCollection.moduleDataProvider().getModuleConfig(MobConfig.class).getBlockSpawnsConfig();
+            final Map<String, BlockSpawnsConfig> conf = serviceCollection.configProvider().getModuleConfig(MobConfig.class).getBlockSpawnsConfig();
             if (conf.entrySet().stream().anyMatch(x -> Sponge.getServer().getWorldProperties(x.getKey()).isPresent())) {
                 for (final BlockSpawnsConfig s : conf.values()) {
                     final List<String> idsToBlock = s.getIdsToBlock();

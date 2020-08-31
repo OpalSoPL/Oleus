@@ -59,12 +59,12 @@ public class AdminModule implements IModule.Configurable<AdminConfig> {
     }
 
     @Override
-    public Collection<ListenerBase> getListeners() {
+    public Collection<Class<? extends ListenerBase>> getListeners() {
         return Collections.emptyList();
     }
 
     @Override
-    public Collection<TaskBase> getTasks() {
+    public Collection<Class<? extends TaskBase>> getTasks() {
         return Collections.emptyList();
     }
 

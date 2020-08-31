@@ -39,7 +39,7 @@ public class LogoutJailListener implements ListenerBase.Conditional {
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).isJailOnlineOnly();
+        return serviceCollection.configProvider().getModuleConfig(JailConfig.class).isJailOnlineOnly();
     }
 
 }

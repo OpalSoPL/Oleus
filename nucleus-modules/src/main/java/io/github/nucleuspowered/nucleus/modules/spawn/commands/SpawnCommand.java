@@ -55,7 +55,7 @@ public class SpawnCommand implements ICommandExecutor, IReloadableService.Reload
     private SpawnConfig sc = new SpawnConfig();
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.sc = serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class);
+        this.sc = serviceCollection.configProvider().getModuleConfig(SpawnConfig.class);
     }
 
     @Override

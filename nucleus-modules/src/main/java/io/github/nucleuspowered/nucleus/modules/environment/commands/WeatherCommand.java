@@ -50,7 +50,7 @@ public class WeatherCommand implements ICommandExecutor, IReloadableService.Relo
     private long max = Long.MAX_VALUE;
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.max = serviceCollection.moduleDataProvider().getModuleConfig(EnvironmentConfig.class).getMaximumWeatherTimespan();
+        this.max = serviceCollection.configProvider().getModuleConfig(EnvironmentConfig.class).getMaximumWeatherTimespan();
     }
 
     @Override

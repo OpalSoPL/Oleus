@@ -47,7 +47,7 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
     public ChatListener(final INucleusServiceCollection serviceCollection) {
         this.chatService = serviceCollection.getServiceUnchecked(ChatService.class);
         this.textStyleService = serviceCollection.textStyleService();
-        this.chatConfig = serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class);
+        this.chatConfig = serviceCollection.configProvider().getModuleConfig(ChatConfig.class);
         this.permissionService = serviceCollection.permissionService();
         this.chatMessageFormatterService = serviceCollection.chatMessageFormatter();
     }
@@ -109,7 +109,7 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class).isModifychat();
+        return serviceCollection.configProvider().getModuleConfig(ChatConfig.class).isModifychat();
     }
 
     private TextComponent useMessage(final Player player, final TextComponent rawMessage, final ChatTemplateConfig chatTemplateConfig) {
@@ -135,6 +135,6 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.chatConfig = serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class);
+        this.chatConfig = serviceCollection.configProvider().getModuleConfig(ChatConfig.class);
     }
 }

@@ -58,7 +58,7 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final SkullConfig config = serviceCollection.moduleDataProvider().getModuleConfig(ItemConfig.class).getSkullConfig();
+        final SkullConfig config = serviceCollection.configProvider().getModuleConfig(ItemConfig.class).getSkullConfig();
         this.isUseMinecraftCommand = config.isUseMinecraftCommand();
         this.amountLimit = config.getSkullLimit();
     }

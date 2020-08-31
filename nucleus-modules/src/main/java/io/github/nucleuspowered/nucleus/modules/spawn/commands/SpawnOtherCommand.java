@@ -53,7 +53,7 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final SpawnConfig sc = serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class);
+        final SpawnConfig sc = serviceCollection.configProvider().getModuleConfig(SpawnConfig.class);
         this.gsc = sc.getGlobalSpawn();
         this.safeTeleport = sc.isSafeTeleport();
     }

@@ -64,7 +64,7 @@ public class AFKCommandInterceptor implements ICommandInterceptor, IReloadableSe
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
         final AFKConfig config =
-                serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class);
+                serviceCollection.configProvider().getModuleConfig(AFKConfig.class);
         if (config.isAlertSenderOnAfk()) {
             final NucleusTextTemplate textTemplate = config.getMessages().getOnCommand();
             if (textTemplate == null || textTemplate.isEmpty()) { // NPE has occurred here in the past due to an empty message.

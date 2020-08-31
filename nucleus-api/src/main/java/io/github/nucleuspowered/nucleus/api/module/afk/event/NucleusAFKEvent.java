@@ -6,57 +6,11 @@ package io.github.nucleuspowered.nucleus.api.module.afk.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.entity.living.humanoid.player.TargetPlayerEvent;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.event.message.MessageEvent;
 
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
-public interface NucleusAFKEvent extends TargetPlayerEvent {
-
-    /**
-     * Gets the original message that would have been sent to players, if any.
-     *
-     * @return The message, if any
-     */
-    Optional<Text> getOriginalMessage();
-
-    /**
-     * Gets the message to send to players
-     *
-     * @return The message, if any.
-     */
-    Optional<Text> getMessage();
-
-    /**
-     * Sets the message to send to players, if any.
-     *
-     * @param message The message. A null message suppresses the message.
-     */
-    void setMessage(@Nullable TextComponent message);
-
-    /**
-     * Gets the original message channel to send the message to
-     *
-     * @return The {@link MessageChannel}
-     */
-    MessageChannel getOriginalChannel();
-
-    /**
-     * Gets the channel to send the message to
-     *
-     * @return The {@link MessageChannel}
-     */
-    MessageChannel getChannel();
-
-    /**
-     * Sets the message channel to send the message to
-     *
-     * @param channel The {@link MessageChannel}
-     */
-    void setChannel(MessageChannel channel);
+public interface NucleusAFKEvent extends MessageEvent, MessageChannelEvent, Event {
 
     /**
      * Fired when a player goes AFK.
@@ -82,7 +36,8 @@ public interface NucleusAFKEvent extends TargetPlayerEvent {
      * Fired when a player is about to be kicked due to inactivity.
      *
      * <p>
-     *     If this event is cancelled, the player will not be kicked for inactivity until the player comes back from AFK and goes AFK again.
+     *     If this event is cancelled, the player will not be kicked for
+     *     inactivity until the player comes back from AFK and goes AFK again.
      * </p>
      * <p>
      *     <strong>This event might fire async!</strong>
@@ -96,27 +51,7 @@ public interface NucleusAFKEvent extends TargetPlayerEvent {
      * as one that should notify the sender.
      */
     @MightOccurAsync
-    interface NotifyCommand extends TargetPlayerEvent {
+    interface NotifyCommand extends MessageEvent, Event {
 
-        /**
-         * Gets the original message that would have been sent to players, if any.
-         *
-         * @return The message, if any
-         */
-        Optional<Text> getOriginalMessage();
-
-        /**
-         * Gets the message to send to the command invoker
-         *
-         * @return The message, if any.
-         */
-        Optional<Text> getMessage();
-
-        /**
-         * Sets the message to send to the command invoker, if any.
-         *
-         * @param message The message. A null message suppresses the message.
-         */
-        void setMessage(@Nullable TextComponent message);
     }
 }

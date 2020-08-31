@@ -202,7 +202,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(AFKConfig.class);
     }
 
     private AFKData updateActivity(final UUID uuid, final AFKData data) {

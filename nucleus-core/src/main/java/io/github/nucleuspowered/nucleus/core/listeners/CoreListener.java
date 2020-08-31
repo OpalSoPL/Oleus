@@ -208,7 +208,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final CoreConfig c = this.serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
+        final CoreConfig c = this.serviceCollection.configProvider().getModuleConfig(CoreConfig.class);
         this.getKickOnStopMessage = c.isKickOnStop() ? c.getKickOnStopMessage() : null;
         this.warnOnWildcard = c.isCheckForWildcard();
     }

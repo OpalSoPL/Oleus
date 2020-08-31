@@ -148,7 +148,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final MuteConfig config = serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class);
+        final MuteConfig config = serviceCollection.configProvider().getModuleConfig(MuteConfig.class);
         this.maxMute = config.getMaximumMuteLength();
         this.levelConfig = config.getLevelConfig();
     }

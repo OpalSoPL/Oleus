@@ -117,7 +117,7 @@ public class MeCommand implements ICommandExecutor, IReloadableService.Reloadabl
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(ChatConfig.class);
     }
 
     public static class MeChannel implements IChatMessageFormatterService.Channel {

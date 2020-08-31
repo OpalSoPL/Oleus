@@ -107,6 +107,6 @@ public class JumpCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.maxJump = serviceCollection.moduleDataProvider().getModuleConfig(JumpConfig.class).getMaxJump();
+        this.maxJump = serviceCollection.configProvider().getModuleConfig(JumpConfig.class).getMaxJump();
     }
 }

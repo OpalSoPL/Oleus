@@ -25,7 +25,7 @@ public class DisableDeathMessagesListener implements ListenerBase.Conditional {
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(DeathMessageConfig.class).isEnableDeathMessages();
+        return serviceCollection.configProvider().getModuleConfig(DeathMessageConfig.class).isEnableDeathMessages();
     }
 
 }

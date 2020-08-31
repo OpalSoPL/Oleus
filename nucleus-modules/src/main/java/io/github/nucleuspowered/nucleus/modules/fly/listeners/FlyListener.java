@@ -34,7 +34,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
 
     public FlyListener(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
-        this.flyConfig = serviceCollection.moduleDataProvider().getDefaultModuleConfig(FlyConfig.class);
+        this.flyConfig = serviceCollection.configProvider().getDefaultModuleConfig(FlyConfig.class);
     }
 
     // Do it first, so other plugins can have a say.
@@ -134,7 +134,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.flyConfig = this.serviceCollection.moduleDataProvider().getModuleConfig(FlyConfig.class);
+        this.flyConfig = this.serviceCollection.configProvider().getModuleConfig(FlyConfig.class);
     }
 
     private void safeTeleport(final Player pl) {

@@ -79,7 +79,7 @@ public class MuteCommandListener implements ListenerBase.Conditional {
     // will also act as the reloadable.
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         this.blockedCommands.clear();
-        this.blockedCommands.addAll(serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class).getBlockedCommands());
+        this.blockedCommands.addAll(serviceCollection.configProvider().getModuleConfig(MuteConfig.class).getBlockedCommands());
         return !this.blockedCommands.isEmpty();
     }
 }

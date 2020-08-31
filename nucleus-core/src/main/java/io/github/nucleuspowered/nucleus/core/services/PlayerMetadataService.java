@@ -4,6 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.core.services;
 
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.core.NucleusPlayerMetadataService;
@@ -40,7 +42,7 @@ public class PlayerMetadataService implements NucleusPlayerMetadataService, Serv
         return this.storageManager.getUserService().get(uuid).join().map(x -> new ResultImpl(uuid, x));
     }
 
-    public static class ResultImpl implements Result {
+    public static final class ResultImpl implements Result {
 
         // private final User user;
 
@@ -71,11 +73,11 @@ public class PlayerMetadataService implements NucleusPlayerMetadataService, Serv
         }
 
         @Override public Optional<Tuple<WorldProperties, Vector3d>> getLastLocation() {
-            final Optional<Player> pl = Sponge.getServer().getPlayer(this.uuid);
+            final Optional<ServerPlayer> pl = Sponge.getServer().getPlayer(this.uuid);
             if (pl.isPresent()) {
-                final Location<World> l = pl.get().getLocation();
+                final ServerLocation l = pl.get().getServerLocation();
                 return Optional.of(Tuple.of(
-                    l.getExtent().getProperties(),
+                    l.getWorld().getProperties(),
                     l.getPosition()
                 ));
             }

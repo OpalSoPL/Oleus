@@ -52,7 +52,7 @@ public class MuteLogoutConditionalListener implements ListenerBase.Conditional {
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class).isMuteOnlineOnly();
+        return serviceCollection.configProvider().getModuleConfig(MuteConfig.class).isMuteOnlineOnly();
     }
 
 }

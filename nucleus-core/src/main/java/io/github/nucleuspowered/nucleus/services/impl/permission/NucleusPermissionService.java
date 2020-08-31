@@ -35,7 +35,6 @@ import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.util.Tristate;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -119,7 +118,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final CoreConfig coreConfig = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
+        final CoreConfig coreConfig = serviceCollection.configProvider().getModuleConfig(CoreConfig.class);
         this.useRole = coreConfig.isUseParentPerms();
         this.consoleOverride = coreConfig.isConsoleOverride();
     }

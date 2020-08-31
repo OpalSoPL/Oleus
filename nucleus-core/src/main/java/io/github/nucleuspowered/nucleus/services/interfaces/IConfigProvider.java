@@ -5,7 +5,9 @@
 package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -38,4 +40,13 @@ public interface IConfigProvider {
 
     <T> T getDefaultModuleConfig(Class<T> configType) throws IllegalArgumentException;
 
+    void mergeCoreDefaults() throws IOException, ObjectMappingException;
+
+    void mergeModuleDefaults() throws IOException, ObjectMappingException;
+
+    String getCoreConfigFileName();
+
+    String getModuleConfigFileName();
+
+    void reload();
 }

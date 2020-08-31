@@ -93,6 +93,6 @@ public class BackCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.sameDimensionCheck = serviceCollection.moduleDataProvider().getModuleConfig(BackConfig.class).isOnlySameDimension();
+        this.sameDimensionCheck = serviceCollection.configProvider().getModuleConfig(BackConfig.class).isOnlySameDimension();
     }
 }

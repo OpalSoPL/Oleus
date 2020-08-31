@@ -34,7 +34,7 @@ public class RulesCommand implements ICommandExecutor, IReloadableService.Reload
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final RulesConfig config = serviceCollection.moduleDataProvider().getModuleConfig(RulesConfig.class);
+        final RulesConfig config = serviceCollection.configProvider().getModuleConfig(RulesConfig.class);
         final String title = config.getRulesTitle();
         if (title.isEmpty()) {
             this.title = Text.EMPTY;

@@ -4,13 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.modules.home;
 
-import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
 import io.github.nucleuspowered.nucleus.api.module.home.NucleusHomeService;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.OptionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-@RegisterPermissions
 public class HomePermissions {
     private HomePermissions() {
         throw new AssertionError("Nope");

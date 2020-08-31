@@ -58,7 +58,7 @@ public class SetHomeCommand implements ICommandExecutor, IReloadableService.Relo
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.preventOverhang = serviceCollection.moduleDataProvider()
+        this.preventOverhang = serviceCollection.configProvider()
                 .getModuleConfig(HomeConfig.class)
                 .isPreventHomeCountOverhang();
     }

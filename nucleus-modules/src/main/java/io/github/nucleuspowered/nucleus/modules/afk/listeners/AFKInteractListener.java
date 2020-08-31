@@ -30,7 +30,7 @@ public class AFKInteractListener extends AbstractAFKListener implements Listener
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        final AFKConfig.Triggers triggers = serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class)
+        final AFKConfig.Triggers triggers = serviceCollection.configProvider().getModuleConfig(AFKConfig.class)
                 .getTriggers();
         return triggers.isOnInteract();
     }

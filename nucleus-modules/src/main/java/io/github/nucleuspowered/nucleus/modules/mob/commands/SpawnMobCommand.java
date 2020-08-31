@@ -120,7 +120,7 @@ public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Rel
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.mobConfig = serviceCollection.moduleDataProvider().getModuleConfig(MobConfig.class);
+        this.mobConfig = serviceCollection.configProvider().getModuleConfig(MobConfig.class);
     }
 
 

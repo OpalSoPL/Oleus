@@ -50,6 +50,6 @@ public class ChatLoggerRunnable implements TaskBase, IReloadableService.Reloadab
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(ChatLoggingConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(ChatLoggingConfig.class);
     }
 }

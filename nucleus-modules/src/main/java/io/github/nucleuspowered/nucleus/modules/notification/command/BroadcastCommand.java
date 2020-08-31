@@ -56,7 +56,7 @@ public class BroadcastCommand implements ICommandExecutor, IReloadableService.Re
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.bc = serviceCollection
-                .moduleDataProvider()
+                .configProvider()
                 .getModuleConfig(NotificationConfig.class)
                 .getBroadcastMessage();
     }

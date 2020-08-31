@@ -40,7 +40,7 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
     @Inject
     public CommandLoggingListener(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(CommandLoggerHandler.class);
-        this.c = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
+        this.c = serviceCollection.configProvider().getModuleConfig(CommandLoggerConfig.class);
         this.messageProvider = serviceCollection.messageProvider();
         this.logger = serviceCollection.logger();
     }
@@ -86,7 +86,7 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.c = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
+        this.c = serviceCollection.configProvider().getModuleConfig(CommandLoggerConfig.class);
         this.commandsToFilter = this.c.getCommandsToFilter().stream().map(String::toLowerCase).collect(ImmutableSet.toImmutableSet());
     }
 }

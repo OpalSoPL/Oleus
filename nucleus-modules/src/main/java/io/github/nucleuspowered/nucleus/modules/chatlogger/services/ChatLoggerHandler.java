@@ -24,7 +24,7 @@ public class ChatLoggerHandler extends AbstractLoggingHandler implements Service
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final ChatLoggingConfig clca = serviceCollection.moduleDataProvider().getModuleConfig(ChatLoggingConfig.class);
+        final ChatLoggingConfig clca = serviceCollection.configProvider().getModuleConfig(ChatLoggingConfig.class);
         this.enabled = clca.isEnableLog();
         try {
             if (this.enabled && this.logger == null) {

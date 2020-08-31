@@ -84,6 +84,6 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(AdminConfig.class).getLevelConfig();
+        this.levelConfig = serviceCollection.configProvider().getModuleConfig(AdminConfig.class).getLevelConfig();
     }
 }

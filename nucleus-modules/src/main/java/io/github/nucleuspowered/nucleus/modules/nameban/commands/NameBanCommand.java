@@ -69,6 +69,6 @@ public class NameBanCommand implements ICommandExecutor, IReloadableService.Relo
 
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.defaultReason = serviceCollection.moduleDataProvider().getModuleConfig(NameBanConfig.class).getDefaultReason();
+        this.defaultReason = serviceCollection.configProvider().getModuleConfig(NameBanConfig.class).getDefaultReason();
     }
 }

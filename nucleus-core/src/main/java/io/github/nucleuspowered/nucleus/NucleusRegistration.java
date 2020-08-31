@@ -20,11 +20,6 @@ public class NucleusRegistration {
         this.serviceCollection = serviceCollection;
     }
 
-    @Listener
-    public void onRegisterTeleportHelperFilters(final GameRegistryEvent.Register<TeleportHelperFilter> event) {
-        event.register(new NoCheckFilter());
-        event.register(new WallCheckFilter());
-    }
 
     @Listener
     public void onRegisterPlaceholders(final GameRegistryEvent.Register<PlaceholderParser> event) {

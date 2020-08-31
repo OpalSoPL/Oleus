@@ -56,7 +56,7 @@ public class InfoCommand implements ICommandExecutor, IReloadableService.Reloada
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.infoConfig = serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class);
+        this.infoConfig = serviceCollection.configProvider().getModuleConfig(InfoConfig.class);
     }
 
     @Override

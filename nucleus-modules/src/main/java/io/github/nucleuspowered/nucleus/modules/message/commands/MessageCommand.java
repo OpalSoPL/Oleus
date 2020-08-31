@@ -73,7 +73,7 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.canMessageSelf = serviceCollection.moduleDataProvider().getModuleConfig(MessageConfig.class).isCanMessageSelf();
+        this.canMessageSelf = serviceCollection.configProvider().getModuleConfig(MessageConfig.class).isCanMessageSelf();
     }
 
 }

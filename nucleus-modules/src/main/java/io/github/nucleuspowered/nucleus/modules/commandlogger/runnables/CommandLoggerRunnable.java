@@ -25,7 +25,7 @@ public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloa
     @Inject
     public CommandLoggerRunnable(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(CommandLoggerHandler.class);
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(CommandLoggerConfig.class);
     }
 
     @Override
@@ -51,6 +51,6 @@ public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloa
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(CommandLoggerConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(CommandLoggerConfig.class);
     }
 }

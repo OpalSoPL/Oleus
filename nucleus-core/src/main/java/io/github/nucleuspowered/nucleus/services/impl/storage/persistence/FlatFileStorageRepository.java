@@ -18,7 +18,7 @@ import io.github.nucleuspowered.storage.exceptions.DataSaveException;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 import io.github.nucleuspowered.storage.util.KeyedObject;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

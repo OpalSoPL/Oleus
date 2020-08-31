@@ -48,7 +48,7 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
         final String property = System.getProperty("nucleus.vanish.tablist.enable");
-        final VanishConfig vanishConfig = serviceCollection.moduleDataProvider().getModuleConfig(VanishConfig.class);
+        final VanishConfig vanishConfig = serviceCollection.configProvider().getModuleConfig(VanishConfig.class);
         this.isAlter = property != null && !property.isEmpty() &&
                 vanishConfig.isAlterTabList();
         if (!vanishConfig.isTryHidePlayers()) {

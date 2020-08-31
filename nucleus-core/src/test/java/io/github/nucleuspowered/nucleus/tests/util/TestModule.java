@@ -5,9 +5,7 @@
 package io.github.nucleuspowered.nucleus.tests.util;
 
 import com.google.inject.AbstractModule;
-import io.github.nucleuspowered.nucleus.OldNucleusCore;
 import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
-import io.github.nucleuspowered.nucleus.core.config.CoreConfigAdapter;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.slf4j.Logger;

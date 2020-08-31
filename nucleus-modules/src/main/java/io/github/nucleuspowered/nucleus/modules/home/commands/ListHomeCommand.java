@@ -129,7 +129,7 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final HomeConfig hc = serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class);
+        final HomeConfig hc = serviceCollection.configProvider().getModuleConfig(HomeConfig.class);
         this.isOnlySameDimension = hc.isOnlySameDimension();
     }
 }

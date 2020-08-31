@@ -67,7 +67,7 @@ public class EnforceGamemodeListener implements ListenerBase.Conditional {
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(WorldConfig.class).isEnforceGamemodeOnWorldChange();
+        return serviceCollection.configProvider().getModuleConfig(WorldConfig.class).isEnforceGamemodeOnWorldChange();
     }
 
 }

@@ -4,11 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.modules.sign;
 
-import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-@RegisterPermissions
 public class SignPermissions {
     private SignPermissions() {
         throw new AssertionError("Nope");

@@ -4,11 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.modules.experience;
 
-import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-@RegisterPermissions
 public class ExperiencePermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "exp" }, level = SuggestedLevel.ADMIN)

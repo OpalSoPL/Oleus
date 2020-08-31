@@ -130,7 +130,7 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final HomeConfig hc = serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class);
+        final HomeConfig hc = serviceCollection.configProvider().getModuleConfig(HomeConfig.class);
         this.isSafeTeleport = hc.isSafeTeleport();
         this.isPreventOverhang = hc.isPreventHomeCountOverhang();
         this.isOnlySameDimension = hc.isOnlySameDimension();

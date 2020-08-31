@@ -200,7 +200,7 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
         // Now do all the saving
         // Config files
         final Map<String, Class<?>> configs = this.serviceCollection
-                .moduleDataProvider()
+                .configProvider()
                 .getModuleToConfigType();
         final ConfigurationNode configNode = SimpleConfigurationNode.root();
         for (final Map.Entry<String, Class<?>> entry : configs.entrySet()) {

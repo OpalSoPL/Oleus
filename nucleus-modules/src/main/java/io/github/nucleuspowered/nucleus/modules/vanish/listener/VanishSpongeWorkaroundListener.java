@@ -28,6 +28,6 @@ public class VanishSpongeWorkaroundListener implements ListenerBase.Conditional 
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(VanishConfig.class).isAttemptSpongeWorkaroundVanish();
+        return serviceCollection.configProvider().getModuleConfig(VanishConfig.class).isAttemptSpongeWorkaroundVanish();
     }
 }

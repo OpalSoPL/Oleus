@@ -82,7 +82,7 @@ public class InvSeeCommand implements ICommandExecutor, IReloadableService.Reloa
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.self = serviceCollection.moduleDataProvider()
+        this.self = serviceCollection.configProvider()
                 .getModuleConfig(InventoryConfig.class)
                 .isAllowInvseeOnSelf();
     }

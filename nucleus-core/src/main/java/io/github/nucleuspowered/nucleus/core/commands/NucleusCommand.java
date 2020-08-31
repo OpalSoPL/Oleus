@@ -40,7 +40,7 @@ public class NucleusCommand implements ICommandExecutor {
             final Text.Builder tb = Text.builder("Modules: ").color(TextColors.GREEN);
 
             boolean addComma = false;
-            final IConfigProvider dataProvider = context.getServiceCollection().moduleDataProvider();
+            final IConfigProvider dataProvider = context.getServiceCollection().configProvider();
             final Collection<String> enabled = dataProvider.getModules(Tristate.TRUE);
             for (final String module : dataProvider.getModules(Tristate.UNDEFINED)) {
                 if (addComma) {

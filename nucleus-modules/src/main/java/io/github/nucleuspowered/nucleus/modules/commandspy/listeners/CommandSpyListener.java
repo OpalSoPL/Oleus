@@ -83,7 +83,7 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(CommandSpyConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(CommandSpyConfig.class);
         this.listIsEmpty = this.config.getCommands().isEmpty();
         this.toSpy = this.config.getCommands().stream().map(String::toLowerCase).collect(ImmutableSet.toImmutableSet());
     }

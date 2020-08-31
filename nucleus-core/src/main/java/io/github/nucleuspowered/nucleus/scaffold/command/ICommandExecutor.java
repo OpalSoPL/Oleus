@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.scaffold.command;
 
-import io.github.nucleuspowered.nucleus.Constants;
-import io.github.nucleuspowered.nucleus.annotationprocessor.Store;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
@@ -21,7 +19,6 @@ import java.util.Optional;
  *
  * @param <C> The type of {@link Object} that can run this command.
  */
-@Store(Constants.COMMAND)
 public interface ICommandExecutor {
 
     /**

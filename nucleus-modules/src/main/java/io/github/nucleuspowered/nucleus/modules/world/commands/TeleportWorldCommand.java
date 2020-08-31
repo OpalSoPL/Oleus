@@ -69,7 +69,7 @@ public class TeleportWorldCommand implements ICommandExecutor {
         }
 
         // Rotate.
-        if (context.getServiceCollection().moduleDataProvider().isLoaded(SpawnModule.ID)) {
+        if (context.getServiceCollection().configProvider().isLoaded(SpawnModule.ID)) {
             context.getServiceCollection()
                     .storageManager()
                     .getWorldService()

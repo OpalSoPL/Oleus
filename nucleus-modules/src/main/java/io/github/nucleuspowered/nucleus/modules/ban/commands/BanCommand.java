@@ -171,6 +171,6 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(BanConfig.class).getLevelConfig();
+        this.levelConfig = serviceCollection.configProvider().getModuleConfig(BanConfig.class).getLevelConfig();
     }
 }

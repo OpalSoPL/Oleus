@@ -59,6 +59,6 @@ public class KitAutoRedeemCommand implements ICommandExecutor, IReloadableServic
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.autoRedeemEnabled = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class).isEnableAutoredeem();
+        this.autoRedeemEnabled = serviceCollection.configProvider().getModuleConfig(KitConfig.class).isEnableAutoredeem();
     }
 }

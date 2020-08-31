@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IUserQueryObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.storage.services.AbstractKeyedService;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 public class UserService extends AbstractKeyedService<IUserQueryObject, IUserDataObject> {
 

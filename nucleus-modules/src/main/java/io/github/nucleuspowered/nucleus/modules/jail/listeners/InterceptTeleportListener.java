@@ -55,6 +55,6 @@ public class InterceptTeleportListener implements ListenerBase.Conditional {
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).aggressivelyDisableTeleportsForJailed();
+        return serviceCollection.configProvider().getModuleConfig(JailConfig.class).aggressivelyDisableTeleportsForJailed();
     }
 }

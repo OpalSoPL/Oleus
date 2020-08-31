@@ -38,13 +38,13 @@ public class CropTrampleListener implements IReloadableService.Reloadable, Liste
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final ProtectionConfig protectionConfig = serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class);
+        final ProtectionConfig protectionConfig = serviceCollection.configProvider().getModuleConfig(ProtectionConfig.class);
         this.cropentity = protectionConfig.isDisableMobCropTrample();
         this.cropplayer = protectionConfig.isDisablePlayerCropTrample();
     }
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class).isDisableAnyCropTrample();
+        return serviceCollection.configProvider().getModuleConfig(ProtectionConfig.class).isDisableAnyCropTrample();
     }
 }

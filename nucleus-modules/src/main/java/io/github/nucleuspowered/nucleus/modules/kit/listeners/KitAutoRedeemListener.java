@@ -63,7 +63,7 @@ public class KitAutoRedeemListener implements ListenerBase.Conditional, IReloada
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class).isEnableAutoredeem();
+        return serviceCollection.configProvider().getModuleConfig(KitConfig.class).isEnableAutoredeem();
     }
 
     private void log(final String message) {
@@ -73,7 +73,7 @@ public class KitAutoRedeemListener implements ListenerBase.Conditional, IReloada
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final KitConfig kca = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class);
+        final KitConfig kca = serviceCollection.configProvider().getModuleConfig(KitConfig.class);
         this.mustGetAll = kca.isMustGetAll();
         this.logAutoRedeem = kca.isLogAutoredeem();
     }

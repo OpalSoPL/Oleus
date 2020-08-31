@@ -204,7 +204,7 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final WarpConfig warpConfig = serviceCollection.moduleDataProvider().getModuleConfig(WarpConfig.class);
+        final WarpConfig warpConfig = serviceCollection.configProvider().getModuleConfig(WarpConfig.class);
         this.defaultName = warpConfig.getDefaultName();
         this.defaultCost = warpConfig.getDefaultWarpCost();
         this.isDescriptionInList = warpConfig.isDescriptionInList();

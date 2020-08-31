@@ -31,7 +31,7 @@ public class NucleusKeysProvider implements NucleusUserPreferenceService.Keys {
 
     private final IConfigProvider moduleDataProvider;
     public NucleusKeysProvider(final INucleusServiceCollection serviceCollection) {
-        this.moduleDataProvider = serviceCollection.moduleDataProvider();
+        this.moduleDataProvider = serviceCollection.configProvider();
     }
 
     public final static String COMMAND_SPY_KEY = "nucleus:command-spy";

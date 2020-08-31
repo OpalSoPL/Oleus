@@ -50,6 +50,6 @@ public class AFKSpectatorListener implements ListenerBase.Conditional {
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(AFKConfig.class).isDisableInSpectatorMode();
+        return serviceCollection.configProvider().getModuleConfig(AFKConfig.class).isDisableInSpectatorMode();
     }
 }

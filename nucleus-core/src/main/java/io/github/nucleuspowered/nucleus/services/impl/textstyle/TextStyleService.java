@@ -514,7 +514,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
 
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final String commandNameOnClick = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
+        final String commandNameOnClick = serviceCollection.configProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
     }
 
     private static TextComponent.Builder create(@Nullable final String string, final TextFormat format) {

@@ -18,7 +18,6 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.entity.living.player.Player;
@@ -91,6 +90,6 @@ public class WarmupModifier implements ICommandModifier, IReloadableService.Relo
 
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.warmupConfig = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class).getWarmupConfig();
+        this.warmupConfig = serviceCollection.configProvider().getModuleConfig(CoreConfig.class).getWarmupConfig();
     }
 }

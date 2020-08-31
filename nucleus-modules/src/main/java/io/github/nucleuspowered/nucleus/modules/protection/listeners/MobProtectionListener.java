@@ -35,11 +35,11 @@ public class MobProtectionListener implements IReloadableService.Reloadable, Lis
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.whitelistedTypes = serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class).getWhitelistedEntities();
+        this.whitelistedTypes = serviceCollection.configProvider().getModuleConfig(ProtectionConfig.class).getWhitelistedEntities();
     }
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(ProtectionConfig.class).isEnableProtection();
+        return serviceCollection.configProvider().getModuleConfig(ProtectionConfig.class).isEnableProtection();
     }
 }

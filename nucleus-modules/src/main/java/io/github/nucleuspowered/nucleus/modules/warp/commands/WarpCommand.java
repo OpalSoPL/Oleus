@@ -62,7 +62,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
     private double defaultCost = 0;
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final WarpConfig wc = serviceCollection.moduleDataProvider().getModuleConfig(WarpConfig.class);
+        final WarpConfig wc = serviceCollection.configProvider().getModuleConfig(WarpConfig.class);
         this.defaultCost = wc.getDefaultWarpCost();
         this.isSafeTeleport = wc.isSafeTeleport();
     }

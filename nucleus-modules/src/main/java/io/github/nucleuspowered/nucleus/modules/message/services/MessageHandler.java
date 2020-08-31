@@ -65,7 +65,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.messageConfig = serviceCollection.moduleDataProvider().getModuleConfig(MessageConfig.class);
+        this.messageConfig = serviceCollection.configProvider().getModuleConfig(MessageConfig.class);
         this.useLevels = this.messageConfig.isSocialSpyLevels();
         this.sameLevel = this.messageConfig.isSocialSpySameLevel();
         this.serverLevel = this.messageConfig.getServerLevel();

@@ -69,6 +69,6 @@ public class FirstSpawnCommand implements ICommandExecutor, IReloadableService.R
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.isSafeTeleport = serviceCollection.moduleDataProvider().getModuleConfig(SpawnConfig.class).isSafeTeleport();
+        this.isSafeTeleport = serviceCollection.configProvider().getModuleConfig(SpawnConfig.class).isSafeTeleport();
     }
 }

@@ -28,6 +28,6 @@ public class ChatService implements IReloadableService.Reloadable, ServiceBase {
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(ChatConfig.class);
     }
 }

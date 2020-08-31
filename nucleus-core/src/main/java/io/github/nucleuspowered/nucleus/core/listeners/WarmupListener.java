@@ -60,6 +60,6 @@ public class WarmupListener implements IReloadableService.Reloadable, ListenerBa
     }
 
     public void onReload(final INucleusServiceCollection collection) {
-        this.warmupConfig = collection.moduleDataProvider().getModuleConfig(CoreConfig.class).getWarmupConfig();
+        this.warmupConfig = collection.configProvider().getModuleConfig(CoreConfig.class).getWarmupConfig();
     }
 }

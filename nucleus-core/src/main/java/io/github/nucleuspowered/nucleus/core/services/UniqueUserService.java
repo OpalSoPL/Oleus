@@ -12,10 +12,9 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IUser
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.storage.services.IStorageService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.user.UserStorageService;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -25,6 +24,7 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.spongepowered.api.user.UserManager;
 
 @Singleton
 public class UniqueUserService implements ServiceBase, IReloadableService.Reloadable {
@@ -73,7 +73,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
     }
 
     private void doTask(@Nullable final Consumer<Long> resultConsumer) {
-        final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        final UserManager uss = Sponge.getServer().getUserManager();
         final IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> service =
                 this.serviceCollection.storageManager().getUserService();
 
@@ -85,8 +85,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
                         final boolean ret = x.get().getPlayer().isPresent() || service.exists(x.get().getUniqueId()).join(); // already async
                         if (!ret) {
                             try {
-                                // Temporary until Data is hooked up properly, I hope.
-                                return x.get().get(JoinData.class).map(y -> y.firstPlayed().getDirect().isPresent()).orElse(false);
+                                return x.get().get(Keys.FIRST_DATE_JOINED).isPresent();
                             } catch (final IllegalStateException e) {
                                 if (!ERROR_REPORTED) {
                                     ERROR_REPORTED = true;
@@ -114,7 +113,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.isMoreAccurate = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class)
+        this.isMoreAccurate = serviceCollection.configProvider().getCoreConfig()
                 .isMoreAccurate();
     }
 }

@@ -225,6 +225,6 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.allowedCommands = serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).getAllowedCommands();
+        this.allowedCommands = serviceCollection.configProvider().getModuleConfig(JailConfig.class).getAllowedCommands();
     }
 }

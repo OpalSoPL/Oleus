@@ -116,9 +116,9 @@ public class InfoCommand implements ICommandExecutor {
         information.add("Nucleus: Enabled Modules");
         information.add(separator);
 
-        context.getServiceCollection().moduleDataProvider().getModules(Tristate.TRUE).stream().sorted().forEach(information::add);
+        context.getServiceCollection().configProvider().getModules(Tristate.TRUE).stream().sorted().forEach(information::add);
 
-        final Collection<String> disabled = context.getServiceCollection().moduleDataProvider().getModules(Tristate.FALSE);
+        final Collection<String> disabled = context.getServiceCollection().configProvider().getModules(Tristate.FALSE);
         if (!disabled.isEmpty()) {
             information.add(separator);
             information.add("Nucleus: Disabled Modules");

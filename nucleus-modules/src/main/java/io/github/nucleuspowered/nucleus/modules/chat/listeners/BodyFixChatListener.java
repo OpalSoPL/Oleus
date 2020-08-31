@@ -42,7 +42,7 @@ public class BodyFixChatListener implements ListenerBase.Conditional, ListenerBa
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(ChatConfig.class).isCheckBody();
+        return serviceCollection.configProvider().getModuleConfig(ChatConfig.class).isCheckBody();
     }
 
 }

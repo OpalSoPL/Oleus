@@ -85,7 +85,7 @@ public class ThruCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.maxThru = serviceCollection.moduleDataProvider().getModuleConfig(JumpConfig.class).getMaxThru();
+        this.maxThru = serviceCollection.configProvider().getModuleConfig(JumpConfig.class).getMaxThru();
     }
 
 }

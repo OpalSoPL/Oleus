@@ -64,7 +64,7 @@ public interface INucleusServiceCollection {
 
     IPlayerDisplayNameService playerDisplayNameService();
 
-    IConfigProvider moduleDataProvider();
+    IConfigProvider configProvider();
 
     INucleusLocationService teleportService();
 

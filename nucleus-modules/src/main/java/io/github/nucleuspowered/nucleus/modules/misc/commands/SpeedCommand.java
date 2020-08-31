@@ -132,7 +132,7 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.maxSpeed = serviceCollection.moduleDataProvider().getModuleConfig(MiscConfig.class).getMaxSpeed();
+        this.maxSpeed = serviceCollection.configProvider().getModuleConfig(MiscConfig.class).getMaxSpeed();
     }
 
     private enum SpeedType {

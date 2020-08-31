@@ -4,11 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nickname;
 
-import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-@RegisterPermissions
 public class NicknamePermissions {
     private NicknamePermissions() {
         throw new AssertionError("Nope");

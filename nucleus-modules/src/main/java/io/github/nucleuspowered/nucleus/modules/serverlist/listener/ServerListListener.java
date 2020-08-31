@@ -77,11 +77,11 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.moduleDataProvider().getModuleConfig(ServerListConfig.class);
+        this.config = serviceCollection.configProvider().getModuleConfig(ServerListConfig.class);
     }
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(ServerListConfig.class).enableListener();
+        return serviceCollection.configProvider().getModuleConfig(ServerListConfig.class).enableListener();
     }
 }

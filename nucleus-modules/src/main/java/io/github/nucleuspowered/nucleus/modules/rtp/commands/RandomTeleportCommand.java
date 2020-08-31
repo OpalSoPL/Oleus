@@ -131,7 +131,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.rc = serviceCollection.moduleDataProvider().getModuleConfig(RTPConfig.class);
+        this.rc = serviceCollection.configProvider().getModuleConfig(RTPConfig.class);
     }
 
     /*

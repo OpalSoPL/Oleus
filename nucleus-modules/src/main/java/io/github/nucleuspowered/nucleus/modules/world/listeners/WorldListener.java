@@ -63,7 +63,7 @@ public class WorldListener implements ListenerBase.Conditional {
 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return this.serviceCollection.moduleDataProvider().getModuleConfig(WorldConfig.class).isSeparatePermissions();
+        return this.serviceCollection.configProvider().getModuleConfig(WorldConfig.class).isSeparatePermissions();
     }
 
     private Consumer<Task> relocate(final Player player) {

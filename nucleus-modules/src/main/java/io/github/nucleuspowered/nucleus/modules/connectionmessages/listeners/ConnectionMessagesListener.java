@@ -98,6 +98,6 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.cmc = serviceCollection.moduleDataProvider().getModuleConfig(ConnectionMessagesConfig.class);
+        this.cmc = serviceCollection.configProvider().getModuleConfig(ConnectionMessagesConfig.class);
     }
 }

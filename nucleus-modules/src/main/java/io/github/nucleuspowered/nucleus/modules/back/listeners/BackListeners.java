@@ -40,7 +40,7 @@ public class BackListeners implements IReloadableService.Reloadable, ListenerBas
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.backConfig = serviceCollection.moduleDataProvider().getModuleConfig(BackConfig.class);
+        this.backConfig = serviceCollection.configProvider().getModuleConfig(BackConfig.class);
     }
 
     @Listener

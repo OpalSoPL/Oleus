@@ -55,7 +55,7 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final WorldConfig config = serviceCollection.moduleDataProvider().getModuleConfig(WorldConfig.class);
+        final WorldConfig config = serviceCollection.configProvider().getModuleConfig(WorldConfig.class);
         this.notify = config.isDisplayAfterEachGen();
         this.display = config.isDisplayWarningGeneration();
         this.timeToNotify = config.getNotificationInterval() * 1000L;

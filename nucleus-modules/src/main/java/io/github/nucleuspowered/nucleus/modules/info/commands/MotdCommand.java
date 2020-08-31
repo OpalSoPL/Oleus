@@ -50,7 +50,7 @@ public class MotdCommand implements ICommandExecutor, IReloadableService.Reloada
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final InfoConfig config = serviceCollection.moduleDataProvider().getModuleConfig(InfoConfig.class);
+        final InfoConfig config = serviceCollection.configProvider().getModuleConfig(InfoConfig.class);
         final String title = config.getMotdTitle();
         if (title.isEmpty()) {
             this.title = Text.EMPTY;

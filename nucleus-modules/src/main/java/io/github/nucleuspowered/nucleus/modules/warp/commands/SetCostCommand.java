@@ -59,7 +59,7 @@ public class SetCostCommand implements ICommandExecutor, IReloadableService.Relo
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.defaultCost = serviceCollection.moduleDataProvider()
+        this.defaultCost = serviceCollection.configProvider()
                 .getModuleConfig(WarpConfig.class)
                 .getDefaultWarpCost();
     }

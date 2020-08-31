@@ -43,7 +43,7 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.isDefaultQuiet =
-                serviceCollection.moduleDataProvider()
+                serviceCollection.configProvider()
                         .getModuleConfig(TeleportConfig.class)
                         .isDefaultQuiet();
     }

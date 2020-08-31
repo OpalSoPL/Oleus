@@ -4,11 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nameban;
 
-import io.github.nucleuspowered.nucleus.annotationprocessor.RegisterPermissions;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-@RegisterPermissions
 public class NameBanPermissions {
     private NameBanPermissions() {
         throw new AssertionError("Nope");

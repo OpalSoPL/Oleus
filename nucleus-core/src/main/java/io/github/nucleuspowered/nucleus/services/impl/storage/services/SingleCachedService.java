@@ -10,7 +10,7 @@ import io.github.nucleuspowered.storage.dataobjects.IDataObject;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.services.IStorageService;
 import io.github.nucleuspowered.storage.services.ServicesUtil;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;

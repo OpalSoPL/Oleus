@@ -158,7 +158,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.muteConfig = serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class);
+        this.muteConfig = serviceCollection.configProvider().getModuleConfig(MuteConfig.class);
     }
 
     private boolean isMuted(final Player player) {

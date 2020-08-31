@@ -46,7 +46,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
     private BanConfig banConfig = new BanConfig();
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.banConfig = serviceCollection.moduleDataProvider().getModuleConfig(BanConfig.class);
+        this.banConfig = serviceCollection.configProvider().getModuleConfig(BanConfig.class);
     }
 
     @Override

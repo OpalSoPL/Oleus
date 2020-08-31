@@ -206,7 +206,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.commandNameOnClick = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
+        this.commandNameOnClick = serviceCollection.configProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
         if (this.commandNameOnClick == null || this.commandNameOnClick.isEmpty()) {
             return;
         }

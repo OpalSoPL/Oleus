@@ -91,7 +91,7 @@ public class HelpOpCommand implements ICommandExecutor, IReloadableService.Reloa
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.channel = new HelpOpMessageChannel(
-                serviceCollection.moduleDataProvider().getModuleConfig(MessageConfig.class).getHelpOpPrefix(serviceCollection.textTemplateFactory()),
+                serviceCollection.configProvider().getModuleConfig(MessageConfig.class).getHelpOpPrefix(serviceCollection.textTemplateFactory()),
                 serviceCollection.permissionService(),
                 serviceCollection.textStyleService()
         );

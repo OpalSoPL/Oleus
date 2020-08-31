@@ -41,7 +41,7 @@ public class ChatJailListener implements ListenerBase.Conditional {
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return serviceCollection.moduleDataProvider().getModuleConfig(JailConfig.class).isMuteOnJail();
+        return serviceCollection.configProvider().getModuleConfig(JailConfig.class).isMuteOnJail();
     }
 
 }

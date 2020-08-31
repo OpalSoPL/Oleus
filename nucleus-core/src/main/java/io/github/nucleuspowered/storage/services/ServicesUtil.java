@@ -6,18 +6,17 @@ package io.github.nucleuspowered.storage.services;
 
 import io.github.nucleuspowered.nucleus.util.ThrownSupplier;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.concurrent.CompletableFuture;
 
-public class ServicesUtil {
+public final class ServicesUtil {
 
     public static <R> CompletableFuture<R> run(final ThrownSupplier<R, Exception> taskConsumer, final PluginContainer pluginContainer) {
         final CompletableFuture<R> future = new CompletableFuture<>();
 
-        if (Sponge.getServer().isMainThread()) {
-            Task.builder().async().execute(t -> runInternal(future, taskConsumer)).submit(pluginContainer);
+        if (Sponge.isServerAvailable() && Sponge.getServer().onMainThread()) {
+            Sponge.getAsyncScheduler().createExecutor(pluginContainer).submit(() -> runInternal(future, taskConsumer));
         } else {
             runInternal(future, taskConsumer);
         }

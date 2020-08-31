@@ -40,7 +40,7 @@ public class HomeOtherCommand implements ICommandExecutor, IReloadableService.Re
     private boolean isSafeTeleport = true;
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.isSafeTeleport = serviceCollection.moduleDataProvider().getModuleConfig(HomeConfig.class).isSafeTeleport();
+        this.isSafeTeleport = serviceCollection.configProvider().getModuleConfig(HomeConfig.class).isSafeTeleport();
     }
 
     @Override

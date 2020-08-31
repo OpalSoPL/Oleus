@@ -93,7 +93,7 @@ public abstract class TitleBase implements ICommandExecutor, IReloadableService.
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.titleConfig = serviceCollection.moduleDataProvider().getModuleConfig(NotificationConfig.class).getTitleDefaults();
+        this.titleConfig = serviceCollection.configProvider().getModuleConfig(NotificationConfig.class).getTitleDefaults();
     }
 
     private int toTicks(final ICommandContext source, final TextComponent key, final Supplier<Double> supplier) {

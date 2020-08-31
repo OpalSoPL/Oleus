@@ -62,7 +62,7 @@ public class UnstuckCommand implements ICommandExecutor, IReloadableService.Relo
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final JumpConfig c = serviceCollection.moduleDataProvider().getModuleConfig(JumpConfig.class);
+        final JumpConfig c = serviceCollection.configProvider().getModuleConfig(JumpConfig.class);
         this.radius = c.getMaxUnstuckRadius();
         this.height = c.getMaxUnstuckHeight();
     }

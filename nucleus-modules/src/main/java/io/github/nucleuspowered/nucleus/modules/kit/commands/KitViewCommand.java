@@ -69,6 +69,6 @@ public class KitViewCommand implements ICommandExecutor, IReloadableService.Relo
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.processTokens = serviceCollection.moduleDataProvider().getModuleConfig(KitConfig.class).isProcessTokens();
+        this.processTokens = serviceCollection.configProvider().getModuleConfig(KitConfig.class).isProcessTokens();
     }
 }

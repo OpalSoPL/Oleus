@@ -339,7 +339,7 @@ public class PlayerTeleporterService implements ServiceBase, IReloadableService.
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final TeleportConfig config = serviceCollection.moduleDataProvider().getModuleConfig(TeleportConfig.class);
+        final TeleportConfig config = serviceCollection.configProvider().getModuleConfig(TeleportConfig.class);
         this.useCommandsOnClickAcceptDeny = config.isUseCommandsOnClickAcceptOrDeny();
         this.showAcceptDeny = config.isShowClickableAcceptDeny();
         this.refundOnDeny = config.isRefundOnDeny();

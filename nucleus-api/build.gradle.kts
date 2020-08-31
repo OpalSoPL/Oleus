@@ -4,7 +4,6 @@ plugins {
     eclipse
     maven
     `maven-publish`
-    id("com.github.hierynomus.license")
     id("ninja.miserable.blossom")
 }
 
@@ -18,30 +17,10 @@ defaultTasks.add("build")
 repositories {
     jcenter()
     maven("https://repo-new.spongepowered.org/repository/maven-public")
-    maven("http://repo.spongepowered.org/maven")
-    maven("https://oss.sonatype.org/content/repositories/snapshots/")
-
 }
 
 dependencies {
     implementation("org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"])
-}
-
-configure<nl.javadude.gradle.plugins.license.LicenseExtension> {
-    val name: String = rootProject.name
-
-    exclude("**/*.info")
-    exclude("assets/**")
-    exclude("*.properties")
-    exclude("*.txt")
-
-    header = file("../HEADER.txt")
-    sourceSets = project.sourceSets
-
-    ignoreFailures = false
-    strictCheck = true
-
-    mapping("java", "SLASHSTAR_STYLE")
 }
 
 val filenameSuffix = "SpongeAPI${rootProject.properties["declaredApiVersion"]}"

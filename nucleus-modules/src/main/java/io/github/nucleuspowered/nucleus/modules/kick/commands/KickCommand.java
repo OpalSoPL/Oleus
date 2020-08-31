@@ -73,6 +73,6 @@ public class KickCommand implements ICommandExecutor, IReloadableService.Reloada
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.levelConfig = serviceCollection.moduleDataProvider().getModuleConfig(KickConfig.class).getLevelConfig();
+        this.levelConfig = serviceCollection.configProvider().getModuleConfig(KickConfig.class).getLevelConfig();
     }
 }

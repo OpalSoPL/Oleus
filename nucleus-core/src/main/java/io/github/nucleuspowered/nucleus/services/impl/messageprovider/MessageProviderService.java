@@ -195,7 +195,7 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final CoreConfig coreConfig = serviceCollection.moduleDataProvider().getModuleConfig(CoreConfig.class);
+        final CoreConfig coreConfig = serviceCollection.configProvider().getModuleConfig(CoreConfig.class);
         this.useMessagesFile = coreConfig.isCustommessages();
         this.useClientLocalesWhenPossible = coreConfig.isClientLocaleWhenPossible();
         this.defaultLocale = Locale.forLanguageTag(coreConfig.getServerLocale().replace("_", "-"));

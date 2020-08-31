@@ -66,7 +66,7 @@ public class UnmuteCommand implements ICommandExecutor, IReloadableService.Reloa
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final MuteConfig config = serviceCollection.moduleDataProvider().getModuleConfig(MuteConfig.class);
+        final MuteConfig config = serviceCollection.configProvider().getModuleConfig(MuteConfig.class);
         this.levelConfig = config.getLevelConfig();
     }
 }
