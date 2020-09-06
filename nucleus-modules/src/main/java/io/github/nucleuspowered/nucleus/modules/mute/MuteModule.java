@@ -5,6 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.mute;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.jail.JailKeys;
+import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfigAdapter;
 import io.github.nucleuspowered.nucleus.modules.mute.services.MuteHandler;
@@ -23,13 +26,13 @@ import java.util.function.Supplier;
 import com.google.inject.Inject;
 
 @ModuleData(id = MuteModule.ID, name = "Mute")
-public class MuteModule extends ConfigurableModule<MuteConfig, MuteConfigAdapter> {
+public class MuteModule implements IModule.Configurable<MuteConfig> { // ConfigurableModule<MuteConfig, MuteConfigAdapter> {
 
     public static final String ID = "mute";
 
-    @Inject
-    public MuteModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.userCacheService().setMutedProcessor(x -> x.get(MuteKeys.MUTE_DATA).isPresent());
     }
 
     @Override

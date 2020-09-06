@@ -23,29 +23,25 @@ import java.util.stream.Collectors;
 public class MobTypeSettingProcessor implements SettingProcessor {
 
     private final static TypeToken<String> stringTypeToken = TypeToken.of(String.class);
-    private final static TypeToken<List<EntityType>> entityTypeToken =
-            new TypeToken<List<EntityType>>() {};
+    private final static TypeToken<List<EntityType<?>>> entityTypeToken =
+            new TypeToken<List<EntityType<?>>>() {};
 
     @Override
     public void process(final ConfigurationNode cn) throws ObjectMappingException {
-        final List<EntityType> types = Sponge.getRegistry().getAllOf(EntityType.class).stream()
-                .filter(x -> Living.class.isAssignableFrom(x.getEntityClass()))
+        final List<EntityType<?>> types = Sponge.getRegistry().getCatalogRegistry()
+                .streamAllOf(EntityType.class)
+                .filter(x -> Living.class.isAssignableFrom(x.getClass()))
                 .collect(Collectors.toList());
-        final List<EntityType> whitelist = Lists.newArrayList();
+        final List<EntityType<?>> whitelist = Lists.newArrayList();
         cn.getList(stringTypeToken).forEach(x -> {
             if (x.contains(":")) {
-                types.stream().filter(y -> y.getId().equalsIgnoreCase(x)).findFirst()
+                types.stream().filter(y -> y.getKey().getFormatted().equalsIgnoreCase(x)).findFirst()
                         .ifPresent(whitelist::add);
             } else {
                 final String potentialId = "minecraft:" + x.toLowerCase();
-                final Optional<EntityType> typeOptional =
-                        types.stream().filter(y -> y.getId().equalsIgnoreCase(potentialId)).findFirst();
-                if (typeOptional.isPresent()) {
-                    whitelist.add(typeOptional.get());
-                } else {
-                    types.stream().filter(y -> y.getName().equalsIgnoreCase(x)).findFirst()
-                        .ifPresent(whitelist::add);
-                }
+                final Optional<EntityType<?>> typeOptional =
+                        types.stream().filter(y -> y.getKey().getFormatted().equalsIgnoreCase(potentialId)).findFirst();
+                typeOptional.ifPresent(whitelist::add);
             }
         });
 

@@ -5,16 +5,19 @@
 package io.github.nucleuspowered.nucleus.services.impl.placeholder.standard;
 
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.placeholder.PlaceholderContext;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.placeholder.PlaceholderContext;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.Optional;
 
 public class OptionPlaceholder implements PlaceholderParser {
 
+    private final ResourceKey key = ResourceKey.resolve("nucleus:option");
     private final IPermissionService permissionService;
 
     public OptionPlaceholder(final IPermissionService permissionService) {
@@ -22,25 +25,21 @@ public class OptionPlaceholder implements PlaceholderParser {
     }
 
     @Override
-    public TextComponent parse(final PlaceholderContext placeholderContext) {
-        final Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject().filter(x -> x instanceof Subject).map(x -> (Subject) x);
+    public Component parse(final PlaceholderContext placeholderContext) {
+        final Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject()
+                .filter(x -> x instanceof Subject)
+                .map(x -> (Subject) x);
         if (subjectOptional.isPresent() && placeholderContext.getArgumentString().isPresent()) {
             return this.permissionService
                     .getOptionFromSubject(subjectOptional.get(), placeholderContext.getArgumentString().get())
-                    .map(TextSerializers.FORMATTING_CODE::deserialize)
-                    .orElse(Text.EMPTY);
+                    .map(LegacyComponentSerializer.legacyAmpersand()::deserialize)
+                    .orElse(TextComponent.empty());
         }
-        return Text.EMPTY;
+        return TextComponent.empty();
     }
 
     @Override
-    public String getId() {
-        return "nucleus:option";
+    public ResourceKey getKey() {
+        return this.key;
     }
-
-    @Override
-    public String getName() {
-        return "Nucleus Permission Option Placeholder";
-    }
-
 }

@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.configurate.datatypes;
 import net.kyori.adventure.text.Component;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -33,7 +34,8 @@ public class WarpNode extends LocationNode {
         super();
     }
 
-    public WarpNode(final UUID world, final Vector3d length, final Vector3d rotation, final double cost, final String category, final Component description) {
+    public WarpNode(final ResourceKey world, final Vector3d length, final Vector3d rotation, final double cost, final String category,
+            final Component description) {
         super(world, length, rotation);
         this.cost = cost;
         this.category = category;

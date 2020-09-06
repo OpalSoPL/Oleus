@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.services.impl.placeholder;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.core.services.UniqueUserService;
@@ -17,17 +18,30 @@ import io.github.nucleuspowered.nucleus.services.impl.placeholder.standard.Optio
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.TextComponent;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.placeholder.PlaceholderComponent;
+import org.spongepowered.api.placeholder.PlaceholderContext;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.util.Nameable;
+import org.spongepowered.api.util.TemporalUnits;
 import org.spongepowered.api.world.Locatable;
-import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -59,32 +73,35 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     public PlaceholderService(final INucleusServiceCollection serviceCollection) {
         this.pluginContainer = serviceCollection.pluginContainer();
         this.optionParser = new OptionPlaceholder(serviceCollection.permissionService());
-        this.emptyParser = PlaceholderParser.builder().plugin(this.pluginContainer).id("empty").parser(p -> Text.EMPTY).name("Empty parser").build();
+        this.emptyParser =
+                PlaceholderParser.builder().key(ResourceKey.resolve("nucleus:empty")).parser(p -> TextComponent.empty()).build();
     }
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
         // player, variables, map?
         this.registerToken("empty", this.emptyParser, false);
-        final NamePlaceholder normalName = new NamePlaceholder(
+        final NamePlaceholder<Nameable> normalName = new NamePlaceholder<>(
+                Nameable.class,
                 serviceCollection.playerDisplayNameService(),
                 IPlayerDisplayNameService::addCommandToName,
-                "nucleus:name",
-                "Nucleus Name placeholder");
+                "nucleus:name"
+        );
         this.registerToken("name", normalName);
         this.registerToken("playername", normalName);
-        this.registerToken("subject", new NamePlaceholder(
+        this.registerToken("subject", new NamePlaceholder<>(
+                Nameable.class,
                 serviceCollection.playerDisplayNameService(),
                 IPlayerDisplayNameService::addCommandToName,
                 "nucleus:subject",
-                "Nucleus subject (including console) placeholder",
                 true));
 
-        final NamePlaceholder displayName = new NamePlaceholder(
+        final NamePlaceholder<ServerPlayer> displayName = new NamePlaceholder<>(
+                ServerPlayer.class,
                 serviceCollection.playerDisplayNameService(),
                 IPlayerDisplayNameService::getDisplayName,
-                "nucleus:displayname",
-                "Nucleus subject (including console) placeholder");
+                "nucleus:displayname"
+        );
         this.registerToken("player", displayName);
         this.registerToken("playerdisplayname", displayName);
         this.registerToken("displayname", displayName);
@@ -95,47 +112,37 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         this.registerToken("suffix", new NamedOptionPlaceholder(permissionService, "suffix"));
 
         this.registerToken("maxplayers", PlaceholderParser.builder()
-                .plugin(this.pluginContainer)
-                .id("maxplayers")
-                .name("Nucleus Max Players parser")
-                .parser(p -> Text.of(Sponge.getServer().getMaxPlayers()))
+                .key(ResourceKey.resolve("nucleus:maxplayers"))
+                .parser(p -> TextComponent.of(Sponge.getServer().getMaxPlayers()))
                 .build());
         this.registerToken("onlineplayers", PlaceholderParser.builder()
-                        .plugin(this.pluginContainer)
-                        .id("onlineplayers")
-                        .name("Nucleus Online Player Count parser")
-                        .parser(p -> Text.of(Sponge.getServer().getOnlinePlayers().size()))
+                        .key(ResourceKey.resolve("nucleus:onlineplayers"))
+                        .parser(p -> TextComponent.of(Sponge.getServer().getOnlinePlayers().size()))
                         .build());
         this.registerToken("currentworld", PlaceholderParser.builder()
-                .plugin(this.pluginContainer)
-                .id("currentworld")
-                .name("Nucleus Current World parser")
-                .parser(placeholder -> Text.of(getWorld(placeholder)))
+                .key(ResourceKey.resolve("nucleus:currentworld"))
+                .parser(placeholder -> TextComponent.of(PlaceholderService.getWorld(placeholder).getKey().getFormatted()))
                 .build());
         this.registerToken("time",
                 PlaceholderParser.builder()
-                        .plugin(this.pluginContainer)
-                        .id("time")
-                        .name("Nucleus world time parser")
+                        .key(ResourceKey.resolve("nucleus:time"))
                         .parser(placeholder ->
-                                Text.of(Util.getTimeFromTicks(serviceCollection.messageProvider(), getWorld(placeholder).getProperties().getWorldTime())))
+                                TextComponent.of(
+                                        Util.getTimeFromTicks(serviceCollection.messageProvider(),
+                                                PlaceholderService.getWorld(placeholder).getDayTime().get(TemporalUnits.MINECRAFT_TICKS))))
                         .build());
 
         this.registerToken("uniquevisitor",
                 PlaceholderParser.builder()
-                        .plugin(this.pluginContainer)
-                        .id("uniquevisitor")
-                        .name("Nucleus unique visitor parser")
-                        .parser(placeholder -> Text.of(serviceCollection.getServiceUnchecked(UniqueUserService.class).getUniqueUserCount()))
+                        .key(ResourceKey.resolve("nucleus:uniquevisitor"))
+                        .parser(placeholder -> TextComponent.of(serviceCollection.getServiceUnchecked(UniqueUserService.class).getUniqueUserCount()))
                         .build());
         this.registerToken("ipaddress",
                 PlaceholderParser.builder()
-                        .plugin(this.pluginContainer)
-                        .id("ipaddress")
-                        .name("Nucleus IP Address parser")
-                        .parser(placeholder -> placeholder.getAssociatedObject().filter(x -> x instanceof RemoteSource)
-                                .map(x -> Text.of(((RemoteSource) x).getConnection().getAddress().getAddress().toString()))
-                                .orElse(Text.of("localhost")))
+                        .key(ResourceKey.resolve("nucleus:ipaddress"))
+                        .parser(placeholder -> placeholder.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
+                                .map(x -> TextComponent.of(((ServerPlayer) x).getConnection().getAddress().getAddress().toString()))
+                                .orElse(TextComponent.of("localhost")))
                         .build());
     }
 
@@ -145,10 +152,10 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     @Override
-    public TextRepresentable parse(@Nullable final CommandSource commandSource, final String input) {
+    public ComponentLike parse(@Nullable final Object commandSource, final String input) {
         String token = input.toLowerCase().trim().replace("{{", "").replace("}}", "");
         final Matcher m = SUFFIX_PATTERN.matcher(token);
-        final List<Function<Text, Text>> modifiersCollection;
+        final List<Function<Component, Component>> modifiersCollection;
         if (m.find(0)) {
             final String match = m.group(1).toLowerCase();
             modifiersCollection = new ArrayList<>();
@@ -166,12 +173,13 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         final PlaceholderParser parser;
         final PlaceholderContext context;
         if (token.startsWith("o:")) {
-            if (commandSource == null) {
-                return Text.EMPTY;
+            if (commandSource instanceof Subject) {
+                // option
+                parser = this.optionParser;
+                context = this.contextForSubjectAndOption((Subject) commandSource, token.substring(2));
+            } else {
+                return TextComponent.empty();
             }
-            // option
-            parser = this.optionParser;
-            context = this.contextForSubjectAndOption(commandSource, token.substring(2));
         } else {
             final String[] s = token.split("\\|", 2);
             final String tokenIn = s[0].toLowerCase();
@@ -208,7 +216,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     @Override
     public Optional<PlaceholderParser> getParser(final String token) {
         if (token.contains(":")) {
-            return Sponge.getRegistry().getType(PlaceholderParser.class, token);
+            return Sponge.getRegistry().getCatalogRegistry().get(PlaceholderParser.class, ResourceKey.resolve(token));
         }
         final PlaceholderMetadata placeholderMetadata = this.parsers.get(SEPARATOR.split(token.toLowerCase(), 2)[0]);
         if (placeholderMetadata == null) {
@@ -227,8 +235,8 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     @Override
-    public PlaceholderTextComponent textForSubjectAndOption(final Subject subject, final String option) {
-        return PlaceholderText.builder()
+    public PlaceholderComponent textForSubjectAndOption(final Subject subject, final String option) {
+        return PlaceholderComponent.builder()
                 .setParser(this.optionParser)
                 .setContext(this.contextForSubjectAndOption(subject, option))
                 .build();
@@ -240,18 +248,11 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
 
     // --
 
-    private static ServerWorld getWorld(final PlaceholderContext placeholder) {
-        final CommandSource p = placeholder.getAssociatedObject()
-                .filter(x -> x instanceof Locatable).map(x -> (Locatable) x)
-                .orElseGet(Sponge.getServer()::getConsole);
-        final ServerWorld world;
-        if (p instanceof Locatable) {
-            world = ((Locatable) p).getWorld();
-        } else {
-            world = Sponge.getServer().getWorld(Sponge.getServer().getDefaultWorldName()).get();
-        }
-
-        return world;
+    private static WorldProperties getWorld(final PlaceholderContext placeholder) {
+        return placeholder.getAssociatedObject()
+                .filter(x -> x instanceof Locatable)
+                .map(x -> ((Locatable) x).getServerLocation().getWorld().getProperties())
+                .orElseGet(Sponge.getServer().getWorldManager().getDefaultProperties()::get);
     }
 
 }

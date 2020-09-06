@@ -20,7 +20,6 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.util.Identifiable;
 
 import java.io.IOException;
@@ -28,6 +27,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,9 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
     private final Supplier<Path> dataDirectory;
     private final Object lockingObject = new Object();
     private final IStorageManager storageManager;
+
+    private Function<IUserDataObject, String> jailProcessor = x -> null;
+    private Predicate<IUserDataObject> mutedProcessor = x -> false;
 
     private UserCacheVersionNode data;
 
@@ -108,11 +112,12 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         final IUserQueryObject iuq = new UserQueryObject();
         iuq.addAllKeys(Sponge.getServer().getOnlinePlayers().stream().map(Identifiable::getUniqueId).collect(Collectors.toList()));
         this.storageManager.getUserService().getAll(iuq).thenAccept(result ->
-                result.forEach((uuid, obj) -> this.data.getNode().computeIfAbsent(uuid, x -> new UserCacheDataNode()).set(obj)));
+                result.forEach((uuid, obj) -> this.data.getNode().computeIfAbsent(uuid, x -> new UserCacheDataNode()).set(obj, this.mutedProcessor,
+                        this.jailProcessor)));
     }
 
     @Override public void updateCacheForPlayer(final UUID uuid, final IUserDataObject u) {
-        this.data.getNode().computeIfAbsent(uuid, x -> new UserCacheDataNode()).set(u);
+        this.data.getNode().computeIfAbsent(uuid, x -> new UserCacheDataNode()).set(u, this.mutedProcessor, this.jailProcessor);
     }
 
     @Override public void updateCacheForPlayer(final UUID uuid) {
@@ -140,14 +145,14 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
 
         try {
             final Map<UUID, UserCacheDataNode> data = Maps.newHashMap();
-            final List<UUID> knownUsers = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll().stream()
+            final List<UUID> knownUsers = Sponge.getServer().getUserManager().streamAll()
                     .map(Identifiable::getUniqueId).collect(Collectors.toList());
 
             int count = 0;
             final IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> manager = this.storageManager.getUserService();
             for (final UUID user : knownUsers) {
                 if (manager.exists(user).join()) {
-                    manager.get(user).join().ifPresent(x -> data.put(user, new UserCacheDataNode(x)));
+                    manager.get(user).join().ifPresent(x -> data.put(user, new UserCacheDataNode().set(x, this.mutedProcessor, this.jailProcessor)));
                     if (++count >= 10) {
                         manager.clearCache();
                         count = 0;
@@ -163,6 +168,16 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         }
 
         return true;
+    }
+
+    @Override
+    public void setJailProcessor(final Function<IUserDataObject, String> func) {
+        this.jailProcessor = func;
+    }
+
+    @Override
+    public void setMutedProcessor(final Predicate<IUserDataObject> func) {
+        this.mutedProcessor = func;
     }
 
     private GsonConfigurationLoader configurationLoader() {

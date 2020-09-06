@@ -4,21 +4,22 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.placeholder;
 
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.placeholder.PlaceholderContext;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import org.spongepowered.api.text.placeholder.PlaceholderText;
+import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.api.placeholder.PlaceholderComponent;
+import org.spongepowered.api.placeholder.PlaceholderContext;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 
 import java.util.Collection;
 import java.util.function.Function;
 
-public class NucleusPlaceholderTextComponent implements PlaceholderTextComponent {
+public class NucleusPlaceholderText implements PlaceholderComponent {
 
     private final PlaceholderContext context;
     private final PlaceholderParser parser;
-    private final Collection<Function<Text, Text>> modifiers;
+    private final Collection<Function<Component, Component>> modifiers;
 
-    public NucleusPlaceholderText(final PlaceholderContext context, final PlaceholderParser parser, final Collection<Function<Text, Text>> modifiers) {
+    public NucleusPlaceholderText(final PlaceholderContext context, final PlaceholderParser parser, final Collection<Function<Component, Component>> modifiers) {
         this.context = context;
         this.parser = parser;
         this.modifiers = modifiers;
@@ -35,14 +36,13 @@ public class NucleusPlaceholderTextComponent implements PlaceholderTextComponent
     }
 
     @Override
-    public TextComponent toText() {
-        TextComponent result = this.parser.parse(this.context);
-        if (!result.isEmpty()) {
-            for (final Function<Text, Text> modifier : this.modifiers) {
+    public @NonNull Component asComponent() {
+        Component result = this.parser.parse(this.context);
+        if (!result.toString().isEmpty()) {
+            for (final Function<Component, Component> modifier : this.modifiers) {
                 result = modifier.apply(result);
             }
         }
         return result;
     }
-
 }

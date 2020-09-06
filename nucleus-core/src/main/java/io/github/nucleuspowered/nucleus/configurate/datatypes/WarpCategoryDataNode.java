@@ -4,10 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.datatypes;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.Optional;
 
@@ -32,25 +33,25 @@ public class WarpCategoryDataNode {
     @Nullable
     private String description = null;
 
-    public Optional<Text> getDisplayName() {
+    public Optional<Component> getDisplayName() {
         if (this.displayName == null) {
             return Optional.empty();
         }
-        return Optional.of(TextSerializers.JSON.deserialize(this.displayName));
+        return Optional.of(GsonComponentSerializer.gson().deserialize(this.displayName));
     }
 
     public void setDisplayName(@Nullable final TextComponent displayName) {
-        this.displayName = displayName == null ? null : TextSerializers.JSON.serialize(displayName);
+        this.displayName = displayName == null ? null : GsonComponentSerializer.gson().serialize(displayName);
     }
 
-    public Optional<Text> getDescription() {
+    public Optional<Component> getDescription() {
         if (this.description == null) {
             return Optional.empty();
         }
-        return Optional.of(TextSerializers.JSON.deserialize(this.description));
+        return Optional.of(GsonComponentSerializer.gson().deserialize(this.description));
     }
 
     public void setDescription(@Nullable final TextComponent description) {
-        this.description = description == null ? null : TextSerializers.JSON.serialize(description);
+        this.description = description == null ? null : GsonComponentSerializer.gson().serialize(description);
     }
 }

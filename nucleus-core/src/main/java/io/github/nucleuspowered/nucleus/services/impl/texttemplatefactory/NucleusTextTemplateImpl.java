@@ -66,7 +66,7 @@ public class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
     @Override
     public Component getForObjectWithSenderToken(final Object source, final Object sender) {
-        final Optional<Component> s =
+        final Optional<ComponentLike> s =
                 Optional.of(this.serviceCollection.placeholderService().parse(sender, "displayname"));
         return this.getForObjectWithSenderToken(source,
                 ImmutableMap.<String, Function<Object, Optional<Component>>>builder()

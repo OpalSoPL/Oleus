@@ -59,6 +59,7 @@ import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.plugin.PluginContainer;
@@ -282,7 +283,7 @@ public final class NucleusCore {
                 continue;
             }
 
-            module.init();
+            module.init(this.serviceCollection);
             if (module instanceof IModule.Configurable) {
                 this.serviceCollection.configProvider().registerModuleConfig(container.getId(), ((IModule.Configurable<?>) module).getConfigClass());
             }

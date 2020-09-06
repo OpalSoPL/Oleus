@@ -10,6 +10,8 @@ import io.github.nucleuspowered.nucleus.services.impl.usercache.UserCacheService
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @ImplementedBy(UserCacheService.class)
 public interface IUserCacheService {
@@ -37,4 +39,8 @@ public interface IUserCacheService {
     boolean isCorrectVersion();
 
     boolean fileWalk();
+
+    void setJailProcessor(Function<IUserDataObject, String> func);
+
+    void setMutedProcessor(Predicate<IUserDataObject> func);
 }

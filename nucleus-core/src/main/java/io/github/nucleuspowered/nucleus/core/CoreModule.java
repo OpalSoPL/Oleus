@@ -33,6 +33,7 @@ import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,7 +45,7 @@ public class CoreModule implements IModule.Configurable<CoreConfig> {
     public static final String ID = "core";
 
     @Override
-    public void init() {
+    public void init(INucleusServiceCollection serviceCollection) {
 
     }
 

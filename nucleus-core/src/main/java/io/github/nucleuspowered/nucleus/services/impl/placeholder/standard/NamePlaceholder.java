@@ -5,63 +5,64 @@
 package io.github.nucleuspowered.nucleus.services.impl.placeholder.standard;
 
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.placeholder.PlaceholderContext;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.placeholder.PlaceholderContext;
+import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.util.Nameable;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-public class NamePlaceholder implements PlaceholderParser {
+public class NamePlaceholder<T> implements PlaceholderParser {
 
-    private static final TextComponent CONSOLE = Text.of("-");
+    private static final TextComponent CONSOLE = TextComponent.of("-");
     private final IPlayerDisplayNameService playerDisplayNameService;
     private final boolean consoleFilter;
-    private final BiFunction<IPlayerDisplayNameService, CommandSource, Text> parser;
-    private final String id;
-    private final String name;
+    private final BiFunction<IPlayerDisplayNameService, T, Component> parser;
+    private final ResourceKey resourceKey;
+    private final Class<T> clazz;
 
-    public NamePlaceholder(final IPlayerDisplayNameService playerDisplayNameService,
-            final BiFunction<IPlayerDisplayNameService, CommandSource, Text> parser,
-            final String id,
-            final String name) {
-        this(playerDisplayNameService, parser, id, name, false);
+    public NamePlaceholder(
+            final Class<T> clazz,
+            final IPlayerDisplayNameService playerDisplayNameService,
+            final BiFunction<IPlayerDisplayNameService, T, Component> parser,
+            final String id) {
+        this(clazz, playerDisplayNameService, parser, id, false);
     }
 
-    public NamePlaceholder(final IPlayerDisplayNameService playerDisplayNameService,
-            final BiFunction<IPlayerDisplayNameService, CommandSource, Text> parser,
+    public NamePlaceholder(
+            final Class<T> clazz,
+            final IPlayerDisplayNameService playerDisplayNameService,
+            final BiFunction<IPlayerDisplayNameService, T, Component> parser,
             final String id,
-            final String name,
             final boolean consoleFilter) {
+        this.clazz = clazz;
         this.playerDisplayNameService = playerDisplayNameService;
         this.parser = parser;
         this.consoleFilter = consoleFilter;
-        this.id = id;
-        this.name = name;
+        this.resourceKey = ResourceKey.resolve(id);
     }
 
     @Override
-    public TextComponent parse(final PlaceholderContext placeholder) {
-        final Optional<CommandSource> commandSource = placeholder.getAssociatedObject().filter(x -> x instanceof CommandSource).map(x -> (CommandSource) x);
-        if (commandSource.isPresent()) {
-            if (this.consoleFilter && placeholder.getAssociatedObject().map(x -> x instanceof ConsoleSource).isPresent()) {
+    public Component parse(final PlaceholderContext placeholder) {
+        final Optional<Object> associated = placeholder.getAssociatedObject();
+        if (associated.isPresent()) {
+            if (this.consoleFilter && associated.get() instanceof SystemSubject || associated.get() instanceof Server) {
                 return CONSOLE;
-            } else {
-                return this.parser.apply(this.playerDisplayNameService, commandSource.get());
+            } else if (this.clazz.isInstance(associated.get())) {
+                return this.parser.apply(this.playerDisplayNameService, this.clazz.cast(associated.get()));
             }
         }
-        return Text.EMPTY;
+        return TextComponent.empty();
     }
 
     @Override
-    public String getId() {
-        return this.id;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
+    public ResourceKey getKey() {
+        return this.resourceKey;
     }
 }

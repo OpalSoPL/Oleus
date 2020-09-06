@@ -5,8 +5,10 @@
 package io.github.nucleuspowered.nucleus.modules.jail;
 
 import com.google.common.collect.ImmutableMap;
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfigAdapter;
+import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
 import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
@@ -19,18 +21,15 @@ import uk.co.drnaylor.quickstart.annotations.ModuleData;
 import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.Map;
-import java.util.function.Supplier;
-
-import com.google.inject.Inject;
 
 @ModuleData(id = JailModule.ID, name = "Jail")
-public class JailModule extends ConfigurableModule<JailConfig, JailConfigAdapter> {
+public class JailModule implements IModule.Configurable<JailConfig> { //extends ConfigurableModule<JailConfig, JailConfigAdapter> {
 
     public static final String ID = "jail";
 
-    @Inject
-    public JailModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.userCacheService().setJailProcessor(x -> x.get(JailKeys.JAIL_DATA).map(JailData::getJailName).orElse(null));
     }
 
     @Override

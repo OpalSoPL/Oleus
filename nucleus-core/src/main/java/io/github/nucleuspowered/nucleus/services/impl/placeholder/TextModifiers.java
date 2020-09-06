@@ -4,22 +4,23 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.placeholder;
 
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 import java.util.function.Function;
 
-public enum TextModifiers implements Function<Text, Text> {
+public enum TextModifiers implements Function<Component, Component> {
 
     SPACE_AFTER("s") {
         @Override
-        public TextComponent apply(final TextComponent text) {
-            return Text.of(text, " ");
+        public Component apply(final Component text) {
+            return TextComponent.builder().append(text).append(TextComponent.space()).build();
         }
     },
     SPACE_BEFORE("p") {
         @Override
-        public TextComponent apply(final TextComponent text) {
-            return Text.of(" ", text);
+        public Component apply(final Component text) {
+            return TextComponent.builder().append(TextComponent.space()).append(text).build();
         }
     };
 

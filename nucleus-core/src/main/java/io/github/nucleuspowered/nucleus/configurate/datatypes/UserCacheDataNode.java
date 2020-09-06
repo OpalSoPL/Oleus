@@ -5,19 +5,18 @@
 package io.github.nucleuspowered.nucleus.configurate.datatypes;
 
 import io.github.nucleuspowered.nucleus.core.CoreKeys;
-import io.github.nucleuspowered.nucleus.modules.jail.JailKeys;
-import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
-import io.github.nucleuspowered.nucleus.modules.mute.MuteKeys;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
 @ConfigSerializable
-public class UserCacheDataNode {
+public final class UserCacheDataNode {
 
     @Setting
     @Nullable
@@ -34,14 +33,13 @@ public class UserCacheDataNode {
         // ignored - for Configurate
     }
 
-    public UserCacheDataNode(final IUserDataObject x) {
-        this.set(x);
-    }
-
-    public void set(final IUserDataObject x) {
+    public UserCacheDataNode set(final IUserDataObject x,
+            final Predicate<IUserDataObject> mutedProcessor,
+            final Function<IUserDataObject, String> jailProcessor) {
         this.ipAddress = x.get(CoreKeys.IP_ADDRESS).map(y -> y.replace("/", "")).orElse(null);
-        this.jail = x.get(JailKeys.JAIL_DATA).map(JailData::getJailName).orElse(null);
-        this.isMuted = x.get(MuteKeys.MUTE_DATA).isPresent();
+        this.jail = jailProcessor.apply(x);
+        this.isMuted = mutedProcessor.test(x);
+        return this;
     }
 
     public Optional<String> getIpAddress() {

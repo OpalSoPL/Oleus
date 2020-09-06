@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.placeholder;
 
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 
 public class PlaceholderMetadata {
     private final String token;

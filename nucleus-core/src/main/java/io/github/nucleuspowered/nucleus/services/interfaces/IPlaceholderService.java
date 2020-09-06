@@ -8,7 +8,7 @@ import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.api.placeholder.NucleusPlaceholderService;
 import io.github.nucleuspowered.nucleus.services.impl.placeholder.PlaceholderMetadata;
 import io.github.nucleuspowered.nucleus.services.impl.placeholder.PlaceholderService;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 
 import java.util.Map;
 import java.util.Set;
