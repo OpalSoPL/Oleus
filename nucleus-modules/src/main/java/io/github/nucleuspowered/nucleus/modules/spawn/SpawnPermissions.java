@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.spawn;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class SpawnPermissions {
+public final class SpawnPermissions {
     private SpawnPermissions() {
         throw new AssertionError("Nope");
     }

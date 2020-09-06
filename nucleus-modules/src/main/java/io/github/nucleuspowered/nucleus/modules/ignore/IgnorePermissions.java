@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.ignore;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class IgnorePermissions {
+public final class IgnorePermissions {
     private IgnorePermissions() {
         throw new AssertionError("Nope");
     }

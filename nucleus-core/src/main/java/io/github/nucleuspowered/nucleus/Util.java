@@ -66,7 +66,7 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.annotation.Nullable;
 
-public class Util {
+public final class Util {
 
     private Util() {
     }

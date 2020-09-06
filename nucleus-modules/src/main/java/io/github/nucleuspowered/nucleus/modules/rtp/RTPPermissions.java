@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.rtp;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class RTPPermissions {
+public final class RTPPermissions {
     private RTPPermissions() {
         throw new AssertionError("Nope");
     }

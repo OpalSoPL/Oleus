@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOpti
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class MutePermissions {
+public final class MutePermissions {
 
     private MutePermissions() {
         throw new AssertionError("Nope");

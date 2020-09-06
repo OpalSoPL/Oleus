@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.message.events;
 
 import io.github.nucleuspowered.nucleus.api.module.message.event.NucleusMessageEvent;
-import io.github.nucleuspowered.nucleus.util.CauseStackHelper;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;

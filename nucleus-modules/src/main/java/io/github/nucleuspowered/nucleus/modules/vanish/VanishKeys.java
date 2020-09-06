@@ -8,7 +8,7 @@ import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class VanishKeys {
+public final class VanishKeys {
 
     public static DataKey<Boolean, IUserDataObject> VANISH_STATUS = DataKey.of(
             false,

@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.sign;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class SignPermissions {
+public final class SignPermissions {
     private SignPermissions() {
         throw new AssertionError("Nope");
     }

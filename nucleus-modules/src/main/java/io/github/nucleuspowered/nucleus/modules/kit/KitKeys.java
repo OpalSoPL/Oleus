@@ -10,7 +10,7 @@ import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 import java.time.Instant;
 
-public class KitKeys {
+public final class KitKeys {
 
     public static final DataKey.MapKey<String, Instant, IUserDataObject> REDEEMED_KITS
             = DataKey.ofMap(TypeTokens.STRING, TypeTokens.INSTANT, IUserDataObject.class, "usedKits");

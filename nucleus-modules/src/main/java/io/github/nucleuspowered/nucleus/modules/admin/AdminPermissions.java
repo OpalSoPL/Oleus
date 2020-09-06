@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.admin;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class AdminPermissions {
+public final class AdminPermissions {
 
     private AdminPermissions() {
         throw new AssertionError("Nope");

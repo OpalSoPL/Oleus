@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.connectionmessages;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class ConnectionMessagesPermissions {
+public final class ConnectionMessagesPermissions {
     private ConnectionMessagesPermissions() {
         throw new AssertionError("Nope");
     }

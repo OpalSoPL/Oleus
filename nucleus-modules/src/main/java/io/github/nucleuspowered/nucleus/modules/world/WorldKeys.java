@@ -8,7 +8,7 @@ import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IWorldDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class WorldKeys {
+public final class WorldKeys {
 
     public static DataKey<Boolean, IWorldDataObject> WORLD_PREGEN_START = DataKey.of(
             false,

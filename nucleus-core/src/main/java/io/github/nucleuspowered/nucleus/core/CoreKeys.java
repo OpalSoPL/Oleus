@@ -13,7 +13,7 @@ import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
 import java.time.Instant;
 
 @SuppressWarnings("UnstableApiUsage")
-public class CoreKeys {
+public final class CoreKeys {
 
     @SuppressWarnings("unchecked")
     private static final Class<IKeyedDataObject<?>> keyedDataObjectClass = (Class<IKeyedDataObject<?>>) new TypeToken<IKeyedDataObject<?>>() {}.getRawType();

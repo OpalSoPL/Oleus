@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class PowertoolKeys {
+public final class PowertoolKeys {
 
     public final static DataKey.MapListKey<String, String, IUserDataObject> POWERTOOLS
             = DataKey.ofMapList(

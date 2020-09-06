@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.notification;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class NotificationPermissions {
+public final class NotificationPermissions {
 
     private NotificationPermissions() {}
 

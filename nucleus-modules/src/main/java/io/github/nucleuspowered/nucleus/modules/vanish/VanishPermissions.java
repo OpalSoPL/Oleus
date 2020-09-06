@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.vanish;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class VanishPermissions {
+public final class VanishPermissions {
     private VanishPermissions() {
         throw new AssertionError("Nope");
     }

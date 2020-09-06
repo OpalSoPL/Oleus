@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class WarnKeys {
+public final class WarnKeys {
 
     public static final DataKey.ListKey<WarnData, IUserDataObject> WARNINGS
             = DataKey.ofList(TypeTokens.WARN_DATA, IUserDataObject.class, "warnings");

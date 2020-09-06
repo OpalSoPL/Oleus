@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.nickname;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class NicknamePermissions {
+public final class NicknamePermissions {
     private NicknamePermissions() {
         throw new AssertionError("Nope");
     }

@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.jump;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class JumpPermissions {
+public final class JumpPermissions {
     private JumpPermissions() {
         throw new AssertionError("Nope");
     }

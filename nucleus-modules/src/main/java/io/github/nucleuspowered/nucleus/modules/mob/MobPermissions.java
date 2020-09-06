@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.annotation.Permissio
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import org.spongepowered.api.entity.EntityType;
 
-public class MobPermissions {
+public final class MobPermissions {
     private MobPermissions() {
         throw new AssertionError("Nope");
     }

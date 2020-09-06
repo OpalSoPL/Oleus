@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOpti
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class BanPermissions {
+public final class BanPermissions {
 
     private BanPermissions() {
         throw new AssertionError("Nope");

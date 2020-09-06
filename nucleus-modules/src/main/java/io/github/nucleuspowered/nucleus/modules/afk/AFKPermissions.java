@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.afk;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class AFKPermissions {
+public final class AFKPermissions {
     private AFKPermissions() {
         throw new AssertionError("Nope");
     }

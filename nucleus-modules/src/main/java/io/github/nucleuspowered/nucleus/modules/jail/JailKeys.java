@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail;
 
+import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
@@ -11,10 +12,12 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class JailKeys {
+public final class JailKeys {
+
+    public static final TypeToken<JailData> JAIL_DATA_KEY = TypeToken.of(JailData.class);
 
     public static final DataKey<JailData, IUserDataObject> JAIL_DATA =
-            DataKey.of(TypeTokens.JAIL_DATA, IUserDataObject.class, "jailData");
+            DataKey.of(JailKeys.JAIL_DATA_KEY, IUserDataObject.class, "jailData");
 
     public static final DataKey<Boolean, IUserDataObject> JAIL_ON_NEXT_LOGIN =
             DataKey.of(false, TypeTokens.BOOLEAN, IUserDataObject.class, "jailOnNextLogin");

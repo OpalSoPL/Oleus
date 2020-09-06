@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.mail.events;
 
 import io.github.nucleuspowered.nucleus.api.module.mail.event.NucleusSendMailEvent;
-import io.github.nucleuspowered.nucleus.util.CauseStackHelper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;

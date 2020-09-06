@@ -19,7 +19,6 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
-import io.github.nucleuspowered.nucleus.util.CauseStackHelper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;

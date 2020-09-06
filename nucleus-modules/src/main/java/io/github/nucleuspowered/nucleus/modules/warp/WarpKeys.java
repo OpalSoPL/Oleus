@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class WarpKeys {
+public final class WarpKeys {
 
     public static final DataKey.MapKey<String, Warp, IGeneralDataObject> WARP_NODES
             = DataKey.ofMap(TypeTokens.STRING, TypeTokens.WARP, IGeneralDataObject.class, "warps");

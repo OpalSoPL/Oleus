@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOpti
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class KickPermissions {
+public final class KickPermissions {
 
     private KickPermissions() {
         throw new AssertionError("Nope");

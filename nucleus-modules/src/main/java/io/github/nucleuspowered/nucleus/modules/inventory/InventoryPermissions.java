@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.inventory;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class InventoryPermissions {
+public final class InventoryPermissions {
     private InventoryPermissions() {
         throw new AssertionError("Nope");
     }

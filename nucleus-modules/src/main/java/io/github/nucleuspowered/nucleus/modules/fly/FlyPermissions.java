@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.fly;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class FlyPermissions {
+public final class FlyPermissions {
     private FlyPermissions() {
         throw new AssertionError("Nope");
     }

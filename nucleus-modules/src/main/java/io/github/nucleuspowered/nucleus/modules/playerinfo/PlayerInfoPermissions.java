@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.playerinfo;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class    PlayerInfoPermissions {
+public final class    PlayerInfoPermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "getfromip" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_GETFROMIP = "nucleus.getfromip.base";

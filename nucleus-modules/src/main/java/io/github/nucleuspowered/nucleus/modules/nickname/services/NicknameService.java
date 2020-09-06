@@ -25,7 +25,6 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameSe
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
-import io.github.nucleuspowered.nucleus.util.CauseStackHelper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;

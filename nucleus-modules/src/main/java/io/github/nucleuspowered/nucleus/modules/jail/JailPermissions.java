@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.annotation.LevelOpti
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class JailPermissions {
+public final class JailPermissions {
 
     private JailPermissions() {
         throw new AssertionError("Nope");

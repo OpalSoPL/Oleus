@@ -10,7 +10,7 @@ import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 import java.time.Instant;
 
-public class ServerListKeys {
+public final class ServerListKeys {
 
     public static DataKey<String, IGeneralDataObject> LINE_ONE = DataKey.of(
             null,

@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.back;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class BackPermissions {
+public final class BackPermissions {
     private BackPermissions() {
         throw new AssertionError("Nope");
     }

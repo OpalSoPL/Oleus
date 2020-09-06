@@ -21,7 +21,6 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import io.github.nucleuspowered.nucleus.util.CauseStackHelper;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
 import io.github.nucleuspowered.nucleus.util.Tuples;
 import org.spongepowered.api.Sponge;

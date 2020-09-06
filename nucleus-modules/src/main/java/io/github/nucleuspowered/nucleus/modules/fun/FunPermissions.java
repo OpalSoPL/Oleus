@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.fun;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class FunPermissions {
+public final class FunPermissions {
     private FunPermissions() {
         throw new AssertionError("Nope");
     }

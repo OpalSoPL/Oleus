@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.mail;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class MailPermissions {
+public final class MailPermissions {
     private MailPermissions() {
         throw new AssertionError("Nope");
     }

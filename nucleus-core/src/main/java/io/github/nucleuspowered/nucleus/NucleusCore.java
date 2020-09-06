@@ -208,9 +208,7 @@ public final class NucleusCore {
         final IStorageManager manager = this.serviceCollection.storageManager();
 
         // in case.
-        manager.saveAndInvalidateAllCaches().whenComplete((v, t) -> {
-            manager.detachAll();
-        }).join();
+        manager.saveAndInvalidateAllCaches().whenComplete((v, t) -> manager.detachAll()).join();
         manager.detachAll();
         this.dataDirectory = null;
 
@@ -413,7 +411,7 @@ public final class NucleusCore {
             this.logger.info(this.serviceCollection.messageProvider().getMessageString("nucleus.custompath.info",
                     currentDataDir.toAbsolutePath().toString()));
         } catch (final IOException e) {
-            this.logger.fatal("Could not create directory '" + this.dataDirectory.toAbsolutePath() + "', using default data directory.", e);
+            this.logger.fatal("Could not create directory '{}', using default data directory.", currentDataDir.toAbsolutePath(), e);
         }
 
     }

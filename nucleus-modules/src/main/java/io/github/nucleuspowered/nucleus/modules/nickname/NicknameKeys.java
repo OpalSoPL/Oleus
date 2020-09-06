@@ -8,7 +8,7 @@ import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class NicknameKeys {
+public final class NicknameKeys {
 
     public static final DataKey<String, IUserDataObject> USER_NICKNAME_JSON = DataKey.of(
             TypeToken.of(String.class),

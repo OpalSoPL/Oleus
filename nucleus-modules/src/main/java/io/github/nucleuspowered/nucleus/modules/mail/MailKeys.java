@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class MailKeys {
+public final class MailKeys {
 
     public static final DataKey.ListKey<MailMessage, IUserDataObject> MAIL_DATA =
             DataKey.ofList(TypeTokens.MAIL_MESSAGE, IUserDataObject.class, "mailData");

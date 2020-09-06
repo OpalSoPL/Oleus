@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.commandspy;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class CommandSpyPermissions {
+public final class CommandSpyPermissions {
 
     private CommandSpyPermissions() {
         throw new AssertionError("Nope");

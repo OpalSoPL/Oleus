@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.annotation.OptionMet
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class HomePermissions {
+public final class HomePermissions {
     private HomePermissions() {
         throw new AssertionError("Nope");
     }

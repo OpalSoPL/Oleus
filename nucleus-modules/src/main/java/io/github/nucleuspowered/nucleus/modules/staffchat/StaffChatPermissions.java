@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.staffchat;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class StaffChatPermissions {
+public final class StaffChatPermissions {
 
     private StaffChatPermissions() {
         throw new AssertionError("Nope");

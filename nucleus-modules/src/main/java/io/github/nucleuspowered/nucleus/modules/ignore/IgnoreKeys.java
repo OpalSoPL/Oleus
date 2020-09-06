@@ -11,7 +11,7 @@ import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 import java.util.List;
 import java.util.UUID;
 
-public class IgnoreKeys {
+public final class IgnoreKeys {
 
     public static DataKey<List<UUID>, IUserDataObject> IGNORED = DataKey.of(TypeTokens.UUID_LIST, IUserDataObject.class, "ignoreList");
 

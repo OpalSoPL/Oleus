@@ -5,14 +5,16 @@
 package io.github.nucleuspowered.nucleus.util;
 
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-public class PermissionMessageChannel implements MessageChannel {
+import java.util.ArrayList;
+import java.util.List;
+
+public class PermissionMessageChannel implements ForwardingAudience {
 
     private final String permission;
     private final IPermissionService permissionService;
@@ -22,10 +24,17 @@ public class PermissionMessageChannel implements MessageChannel {
         this.permissionService = service;
     }
 
-    public Collection<MessageReceiver> getMembers() {
-        final List<MessageReceiver> lmr = Sponge.getServer().getOnlinePlayers()
-                .stream().filter(x -> this.permissionService.hasPermission(x, this.permission)).collect(Collectors.toList());
-        lmr.add(Sponge.getServer().getConsole());
-        return lmr;
+    @Override
+    public @NonNull Iterable<? extends Audience> audiences() {
+        final List<Audience> audiences = new ArrayList<>();
+        audiences.add(Sponge.getSystemSubject());
+        for (final ServerPlayer pl : Sponge.getServer().getOnlinePlayers()) {
+            if (this.permissionService.hasPermission(pl, this.permission)) {
+                audiences.add(pl);
+            }
+        }
+
+        return audiences;
     }
+
 }

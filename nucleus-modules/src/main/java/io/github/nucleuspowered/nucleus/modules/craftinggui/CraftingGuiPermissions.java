@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.craftinggui;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class CraftingGuiPermissions {
+public final class CraftingGuiPermissions {
 
     private CraftingGuiPermissions() {
         throw new AssertionError("Nope");

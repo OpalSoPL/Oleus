@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.misc;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class MiscPermissions {
+public final class MiscPermissions {
     private MiscPermissions() {
         throw new AssertionError("Nope");
     }

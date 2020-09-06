@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.teleport;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class TeleportPermissions {
+public final class TeleportPermissions {
     private TeleportPermissions() {
         throw new AssertionError("Nope");
     }

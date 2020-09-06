@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.serverlist;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class ServerListPermissions {
+public final class ServerListPermissions {
 
     private ServerListPermissions() {
         throw new AssertionError("Nope");

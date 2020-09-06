@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.powertool;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class PowertoolPermissions {
+public final class PowertoolPermissions {
     private PowertoolPermissions() {
         throw new AssertionError("Nope");
     }

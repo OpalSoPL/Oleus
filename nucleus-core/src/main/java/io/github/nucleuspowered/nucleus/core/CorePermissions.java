@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.core;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class CorePermissions {
+public final class CorePermissions {
 
     private CorePermissions() {
         throw new AssertionError("Nope");

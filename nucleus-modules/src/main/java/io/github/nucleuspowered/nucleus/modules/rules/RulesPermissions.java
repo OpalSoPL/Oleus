@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.rules;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class RulesPermissions {
+public final class RulesPermissions {
     private RulesPermissions() {
         throw new AssertionError("Nope");
     }

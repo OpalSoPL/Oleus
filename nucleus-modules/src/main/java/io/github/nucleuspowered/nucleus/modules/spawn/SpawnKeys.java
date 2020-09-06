@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
-public class SpawnKeys {
+public final class SpawnKeys {
 
     public static DataKey<LocationNode, IGeneralDataObject> FIRST_SPAWN_LOCATION = DataKey.of(
             TypeTokens.LOCATION_NODE,

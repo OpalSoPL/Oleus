@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.experience;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
-public class ExperiencePermissions {
+public final class ExperiencePermissions {
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "exp" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_EXP = "nucleus.exp.base";
