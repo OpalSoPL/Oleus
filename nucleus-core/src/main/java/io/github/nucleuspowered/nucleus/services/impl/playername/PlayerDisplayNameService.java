@@ -25,8 +25,6 @@ import net.kyori.adventure.text.format.TextColor;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
-import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
-import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.permission.Subject;
@@ -49,15 +47,30 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
     private final IMessageProviderService messageProviderService;
     private final IPermissionService permissionService;
+    private final INucleusServiceCollection serviceCollection;
     private final ITextStyleService textStyleService;
 
     private String commandNameOnClick = null;
+
+    private Function<Subject, String> colourFromTemplateSupplier = subject -> "";
+    private Function<Subject, String> styleFromTemplateSupplier = subject -> "";
 
     @Inject
     public PlayerDisplayNameService(final INucleusServiceCollection serviceCollection) {
         this.messageProviderService = serviceCollection.messageProvider();
         this.permissionService = serviceCollection.permissionService();
         this.textStyleService = serviceCollection.textStyleService();
+        this.serviceCollection = serviceCollection;
+    }
+
+    @Override
+    public void supplyColourFromTemplateSupplier(final Function<Subject, String> colourFromTemplateSupplier) {
+        this.colourFromTemplateSupplier = colourFromTemplateSupplier;
+    }
+
+    @Override
+    public void supplyStyleFromTemplateSupplier(final Function<Subject, String> styleFromTemplateSupplier) {
+        this.styleFromTemplateSupplier = styleFromTemplateSupplier;
     }
 
     @Override
@@ -139,21 +152,23 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         return builder.build();
     }
 
-    private void applyStyle(final Subject subject, final TextComponent.Builder builder) {
-        builder.color(this.getColour(subject).orElse(null)).style(this.getStyle(subject));
-    }
-
     private Optional<TextColor> getColour(final Subject player) {
-        final Optional<TextColor> os = this.permissionService.getOptionFromSubject(player, "namecolour", "namecolor")
+        final Optional<TextColor> os = this.permissionService
+                .getOptionFromSubject(player, Constants.NAMECOLOUR, Constants.NAMECOLOR)
                 .flatMap(this.textStyleService::getColourFromString);
-        // TODO: Get from chat config - need a pluggable system
+        if (!os.isPresent() && this.colourFromTemplateSupplier != null) {
+            return this.textStyleService.getColourFromString(this.colourFromTemplateSupplier.apply(player));
+        }
         return os;
     }
 
     private Style getStyle(final Subject player) {
-        final Optional<Style> style = this.permissionService.getOptionFromSubject(player, "namecolour", "namecolor")
+        final Optional<Style> style = this.permissionService.getOptionFromSubject(player, Constants.NAMESTYLE)
                 .map(this.textStyleService::getTextStyleFromString);
-        // TODO: Get from chat config - need a pluggable system
+        if (!style.isPresent() && this.styleFromTemplateSupplier != null) {
+            return this.textStyleService.getTextStyleFromString(this.styleFromTemplateSupplier.apply(player));
+        }
+
         return style.orElseGet(Style::empty);
     }
 
@@ -186,8 +201,11 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     public TextComponent getName(final Nameable user) {
         final String name = user.getName();
         final TextComponent.Builder builder = TextComponent.builder(name);
-        if (user instanceof User || user instanceof ServerPlayer) {
-            this.addCommandToNameInternal(builder, name);
+        if (user instanceof Subject) {
+            this.applyStyle((Subject) user, builder);
+            if (user instanceof User || user instanceof ServerPlayer) {
+                this.addCommandToNameInternal(builder, name);
+            }
         }
 
 
@@ -202,6 +220,12 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         }
 
         return text.build();
+    }
+
+    private void applyStyle(final Subject subject, final TextComponent.Builder builder) {
+        final TextColor textColour = this.getColour(subject).orElse(null);
+        final Style style = this.getStyle(subject);
+        builder.color(textColour).style(style);
     }
 
     @Override

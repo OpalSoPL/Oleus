@@ -30,10 +30,10 @@ public final class NicknamePermissions {
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "realname" }, level = SuggestedLevel.USER)
     public static final String BASE_REALNAME = "nucleus.realname.base";
 
-    @PermissionMetadata(descriptionKey = "permission.nick.colour", level = SuggestedLevel.ADMIN)
+    @PermissionMetadata(descriptionKey = "permission.nick.colour", level = SuggestedLevel.ADMIN, isPrefix = true)
     public static final String NICKNAME_COLOUR = "nucleus.nick.colour";
 
-    @PermissionMetadata(descriptionKey = "permission.nick.style", level = SuggestedLevel.ADMIN)
+    @PermissionMetadata(descriptionKey = "permission.nick.style", level = SuggestedLevel.ADMIN, isPrefix = true)
     public static final String NICKNAME_STYLE = "nucleus.nick.style";
 
 }

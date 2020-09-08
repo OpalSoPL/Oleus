@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import com.google.inject.Inject;
 
+// TODO: Add template suppliers to IPlayerDisplayNameService
 @ModuleData(id = ChatModule.ID, name = "Chat")
 public class ChatModule extends ConfigurableModule<ChatConfig, ChatConfigAdapter> {
 

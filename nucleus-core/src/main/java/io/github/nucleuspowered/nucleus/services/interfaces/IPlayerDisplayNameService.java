@@ -10,15 +10,21 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Nameable;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 @ImplementedBy(PlayerDisplayNameService.class)
 public interface IPlayerDisplayNameService {
+
+    void supplyColourFromTemplateSupplier(Function<Subject, String> colourFromTemplateSupplier);
+
+    void supplyStyleFromTemplateSupplier(Function<Subject, String> styleFromTemplateSupplier);
 
     void provideDisplayNameResolver(DisplayNameResolver resolver);
 

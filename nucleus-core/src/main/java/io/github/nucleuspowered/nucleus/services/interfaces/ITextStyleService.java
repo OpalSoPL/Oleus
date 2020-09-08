@@ -12,13 +12,12 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.service.permission.Subject;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 /**
  * Provides methods for resolving text colour and style permissions.
@@ -79,6 +78,10 @@ public interface ITextStyleService {
             Style defaultStyle);
 
     Optional<TextColor> getColourFromString(@Nullable String s);
+
+    @Nullable default TextColor getNullableColourFromString(@Nullable String s) {
+        return this.getColourFromString(s).orElse(null);
+    }
 
     Style getTextStyleFromString(@Nullable String s);
 
