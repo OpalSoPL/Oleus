@@ -7,22 +7,29 @@ package io.github.nucleuspowered.nucleus.services.impl.playername;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.github.nucleuspowered.nucleus.Constants;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextColor;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Nameable;
 
 import java.util.ArrayList;
@@ -32,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Singleton
 public class PlayerDisplayNameService implements IPlayerDisplayNameService, IReloadableService.Reloadable {
@@ -40,12 +48,16 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     private final LinkedHashSet<DisplayNameQuery> queries = new LinkedHashSet<>();
 
     private final IMessageProviderService messageProviderService;
+    private final IPermissionService permissionService;
+    private final ITextStyleService textStyleService;
 
     private String commandNameOnClick = null;
 
     @Inject
     public PlayerDisplayNameService(final INucleusServiceCollection serviceCollection) {
         this.messageProviderService = serviceCollection.messageProvider();
+        this.permissionService = serviceCollection.permissionService();
+        this.textStyleService = serviceCollection.textStyleService();
     }
 
     @Override
@@ -98,27 +110,51 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
     @Override
     public TextComponent getDisplayName(final UUID playerUUID) {
+        final TextComponent.Builder builder;
         if (playerUUID == Util.CONSOLE_FAKE_UUID) {
-            return this.getDisplayName(Sponge.getSystemSubject());
+            return this.getName(Sponge.getSystemSubject());
         }
-
-        final User user = Sponge.getServer()
+       final User user = Sponge.getServer()
                 .getUserManager()
                 .get(playerUUID)
                 .orElseThrow(() -> new IllegalArgumentException("UUID does not map to a player"));
+        TextComponent userName = null;
         for (final DisplayNameResolver resolver : this.resolvers) {
-            final Optional<TextComponent> userName = resolver.resolve(playerUUID);
-            if (userName.isPresent()) {
-                return userName
-                        .map(x -> this.addHover(x, user.getName()))
-                        .get();
+            final Optional<TextComponent> optionalUserName = resolver.resolve(playerUUID);
+            if (optionalUserName.isPresent()) {
+                userName = optionalUserName.get();
+                break;
             }
         }
 
-        // Set name colours
+        if (userName == null) {
+            builder = TextComponent.builder(user.getName());
+        } else {
+            builder = TextComponent.builder().append(userName);
+        }
 
-        return this.addHover(user.get(Keys.DISPLAY_NAME).map(x -> TextComponent.builder().append(x).build())
-                .orElseGet(() -> TextComponent.of(user.getName())), user.getName());
+        // Set name colours
+        this.addCommandToNameInternal(builder, user.getName());
+        this.applyStyle(user, builder);
+        return builder.build();
+    }
+
+    private void applyStyle(final Subject subject, final TextComponent.Builder builder) {
+        builder.color(this.getColour(subject).orElse(null)).style(this.getStyle(subject));
+    }
+
+    private Optional<TextColor> getColour(final Subject player) {
+        final Optional<TextColor> os = this.permissionService.getOptionFromSubject(player, "namecolour", "namecolor")
+                .flatMap(this.textStyleService::getColourFromString);
+        // TODO: Get from chat config - need a pluggable system
+        return os;
+    }
+
+    private Style getStyle(final Subject player) {
+        final Optional<Style> style = this.permissionService.getOptionFromSubject(player, "namecolour", "namecolor")
+                .map(this.textStyleService::getTextStyleFromString);
+        // TODO: Get from chat config - need a pluggable system
+        return style.orElseGet(Style::empty);
     }
 
     @Override
@@ -149,22 +185,20 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     @Override
     public TextComponent getName(final Nameable user) {
         final String name = user.getName();
+        final TextComponent.Builder builder = TextComponent.builder(name);
         if (user instanceof User || user instanceof ServerPlayer) {
-            return this.addHover(TextComponent.of(name), user.getName());
+            this.addCommandToNameInternal(builder, name);
         }
 
-        return TextComponent.of(name);
-    }
 
-    public TextComponent addHover(final TextComponent text, final String user) {
-        return this.addCommandToNameInternal(text.toBuilder(), user);
+        return TextComponent.of(name);
     }
 
     @Override
     public TextComponent addCommandToName(final Nameable p) {
         final TextComponent.Builder text = TextComponent.builder(p.getName());
         if (p instanceof User || p instanceof ServerPlayer) {
-            return this.addCommandToNameInternal(text, p.getName());
+            this.addCommandToNameInternal(text, p.getName());
         }
 
         return text.build();
@@ -174,7 +208,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     public TextComponent addCommandToDisplayName(final Nameable p) {
         final TextComponent.Builder name = this.getName(p).toBuilder();
         if (p instanceof User || p instanceof ServerPlayer) {
-            return this.addCommandToNameInternal(name, p.getName());
+            this.addCommandToNameInternal(name, p.getName());
         }
 
         return name.build();
@@ -190,9 +224,10 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         return TextComponent.empty();
     }
 
-    private TextComponent addCommandToNameInternal(final TextComponent.Builder name, final String user) {
+    private void addCommandToNameInternal(final TextComponent.Builder name, final String user) {
         if (this.commandNameOnClick == null) {
-            return name.hoverEvent(HoverEvent.showText(this.messageProviderService.getMessage("name.hover.ign", user))).build();
+            name.hoverEvent(HoverEvent.showText(this.messageProviderService.getMessage("name.hover.ign", user))).build();
+            return;
         }
 
         final String commandToRun = this.commandNameOnClick.replace("{{subject}}", user).replace("{{player}}", user);
@@ -201,7 +236,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
                     .append(this.messageProviderService.getMessage("name.hover.ign", user))
                     .append(TextComponent.newline())
                     .append(this.messageProviderService.getMessage("name.hover.command", commandToRun));
-        return name.clickEvent(ClickEvent.suggestCommand(commandToRun)).hoverEvent(HoverEvent.showText(hoverAction.build())).build();
+        name.clickEvent(ClickEvent.suggestCommand(commandToRun)).hoverEvent(HoverEvent.showText(hoverAction.build())).build();
     }
 
     @Override
