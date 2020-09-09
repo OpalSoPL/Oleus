@@ -14,12 +14,12 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatte
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.event.message.MessageChannelEvent;
 
 import java.util.Collection;
+import java.util.UUID;
 
 import com.google.inject.Inject;
 
@@ -38,6 +38,25 @@ public class StaffChatService implements NucleusStaffChatService, ServiceBase {
     @Override
     public void sendMessageFrom(final Audience source, final Component message) {
         StaffChatMessageChannel.getInstance().sendMessageFrom(source, message);
+    }
+
+    @Override
+    public boolean isDirectedToStaffChat(final MessageChannelEvent event) {
+        final Object root = event.getCause().root();
+        if (root instanceof Audience) {
+            return this.isCurrentlyChattingInStaffChat((Audience) root);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isCurrentlyChattingInStaffChat(final Audience source) {
+        return this.chatMessageFormatService.getNucleusChannel(source).filter(x -> x instanceof StaffChatMessageChannel).isPresent();
+    }
+
+    @Override
+    public boolean isCurrentlyChattingInStaffChat(final UUID uuid) {
+        return Sponge.getServer().getPlayer(uuid).map(this::isToggledChat).orElse(false);
     }
 
     @Override

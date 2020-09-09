@@ -25,9 +25,13 @@ import java.util.UUID;
 @ImplementedBy(ChatMessageFormatterService.class)
 public interface IChatMessageFormatterService {
 
+    Optional<Channel> getNucleusChannel(Audience source);
+
     Optional<Channel> getNucleusChannel(UUID uuid);
 
     void setPlayerNucleusChannel(UUID uuid, @Nullable Channel channel);
+
+    NoExceptionAutoClosable setAudienceNucleusChannelTemporarily(Audience source, Channel channel);
 
     NoExceptionAutoClosable setPlayerNucleusChannelTemporarily(UUID uuid, Channel channel);
 
@@ -36,10 +40,6 @@ public interface IChatMessageFormatterService {
         default boolean willFormat() {
             return false;
         }
-
-        default void formatMessageEvent(final Player source, final MessageEvent.MessageFormatter formatters) {}
-
-        default void formatMessageEvent(final SystemSubject source, final MessageEvent.MessageFormatter formatters) {}
 
         default Audience receivers() {
             return Sponge.getServer();

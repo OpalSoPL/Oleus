@@ -4,10 +4,20 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.staffchat;
 
+<<<<<<< HEAD
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+=======
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.ConsoleSource;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.message.MessageChannelEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
+>>>>>>> 232bd2c4... Add way to get if someone is currently toggled into staff chat
 
 import java.util.Collection;
+import java.util.UUID;
 
 /**
  * Provides a way to get the Staff Chat message channel instance.
@@ -15,7 +25,34 @@ import java.util.Collection;
 public interface NucleusStaffChatService {
 
     /**
-     * Gets the memebers of the Staff Chat channel.
+     * Gets if the provided {@link MessageChannelEvent} is going to be
+     * sent to the staff chat channel.
+     *
+     * @param event The {@link MessageChannelEvent}
+     * @return true if so
+     */
+    boolean isDirectedToStaffChat(MessageChannelEvent event);
+
+    /**
+     * Gets if the given {@link Audience} is currently talking
+     * in staff chat.
+     *
+     * @param source The {@link Audience}
+     * @return true if so
+     */
+    boolean isCurrentlyChattingInStaffChat(Audience source);
+
+    /**
+     * Gets if a player with the given {@link UUID} is currently talking
+     * in staff chat.
+     *
+     * @param uuid The {@link UUID} of the {@link User}
+     * @return true if so
+     */
+    boolean isCurrentlyChattingInStaffChat(UUID uuid);
+
+    /**
+     * Gets the members of the Staff Chat channel.
      *
      * @return The {@link Audience}s who are members of the channel.
      */
