@@ -12,9 +12,14 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
+
+import java.util.Collection;
 
 import com.google.inject.Inject;
 
@@ -31,8 +36,13 @@ public class StaffChatService implements NucleusStaffChatService, ServiceBase {
     }
 
     @Override
-    public void sendMessageFrom(final CommandSource source, final TextComponent message) {
+    public void sendMessageFrom(final Audience source, final Component message) {
         StaffChatMessageChannel.getInstance().sendMessageFrom(source, message);
+    }
+
+    @Override
+    public Collection<Audience> getStaffChannelMembers() {
+        return StaffChatMessageChannel.getInstance().receivers();
     }
 
     public boolean isToggledChat(final Player player) {

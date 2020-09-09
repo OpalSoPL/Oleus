@@ -5,13 +5,21 @@
 package io.github.nucleuspowered.nucleus.api.module.staffchat;
 
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 
-import java.awt.Component;
+import java.util.Collection;
 
 /**
  * Provides a way to get the Staff Chat message channel instance.
  */
 public interface NucleusStaffChatService {
+
+    /**
+     * Gets the memebers of the Staff Chat channel.
+     *
+     * @return The {@link Audience}s who are members of the channel.
+     */
+    Collection<Audience> getStaffChannelMembers();
 
     /**
      * Sends a message to the Staff Chat channel.
