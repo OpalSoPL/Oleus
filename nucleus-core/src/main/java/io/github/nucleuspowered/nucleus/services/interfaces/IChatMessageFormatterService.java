@@ -11,14 +11,7 @@ import io.github.nucleuspowered.nucleus.services.impl.chatmessageformatter.ChatM
 import net.kyori.adventure.audience.Audience;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.SystemSubject;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.message.MessageEvent;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.channel.MessageReceiver;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 

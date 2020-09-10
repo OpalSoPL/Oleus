@@ -4,17 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.staffchat;
 
-<<<<<<< HEAD
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-=======
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageReceiver;
->>>>>>> 232bd2c4... Add way to get if someone is currently toggled into staff chat
 
 import java.util.Collection;
 import java.util.UUID;
