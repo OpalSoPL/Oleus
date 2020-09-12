@@ -8,6 +8,10 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.github.nucleuspowered.nucleus.core.config.WarmupConfig;
+import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -21,11 +25,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 @Singleton
-public class WarmupService implements IWarmupService {
+public class WarmupService implements IWarmupService, IReloadableService.Reloadable {
 
     private final Object lockingObject = new Object();
 
     private final PluginContainer pluginContainer;
+    private final IMessageProviderService messageProviderService;
+    private WarmupConfig warmupConfig = new WarmupConfig();
 
     // player to task
     private final BiMap<UUID, UUID> tasks = HashBiMap.create();
@@ -34,14 +40,32 @@ public class WarmupService implements IWarmupService {
     private final BiMap<UUID, WarmupTask> uuidToWarmup = HashBiMap.create();
 
     @Inject
-    public WarmupService(final PluginContainer pluginContainer) {
+    public WarmupService(final PluginContainer pluginContainer, final IMessageProviderService messageProviderService, final IReloadableService reloadableService) {
         this.pluginContainer = pluginContainer;
+        this.messageProviderService = messageProviderService;
+        reloadableService.registerReloadable(this);
     }
 
     @Override
     public void executeAfter(final Player target, final Duration duration, final WarmupTask runnable) {
-        synchronized (this.lockingObject) {
+        this.executeAfter(target, duration, runnable, false);
+    }
+
+    @Override public void executeAfter(final Player target, final Duration duration, final WarmupTask runnable, final boolean sendMessage) {
+         synchronized (this.lockingObject) {
             this.cancelInternal(target);
+
+            if (sendMessage) {
+                this.messageProviderService.sendMessageTo(target, "warmup.start",
+                        this.messageProviderService.getTimeString(target.getLocale(), duration));
+                if (this.warmupConfig.isOnCommand() && this.warmupConfig.isOnMove()) {
+                    this.messageProviderService.sendMessageTo(target, "warmup.both");
+                } else if (this.warmupConfig.isOnCommand()) {
+                    this.messageProviderService.sendMessageTo(target, "warmup.onCommand");
+                } else if (this.warmupConfig.isOnMove()) {
+                    this.messageProviderService.sendMessageTo(target, "warmup.onMove");
+                }
+            }
 
             // build the task
             final UUID playerTarget = target.getUniqueId();
@@ -103,5 +127,10 @@ public class WarmupService implements IWarmupService {
             this.tasks.remove(player.getUniqueId());
             return false;
         }
+    }
+
+    @Override
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        this.warmupConfig = serviceCollection.configProvider().getCoreConfig().getWarmupConfig();
     }
 }
