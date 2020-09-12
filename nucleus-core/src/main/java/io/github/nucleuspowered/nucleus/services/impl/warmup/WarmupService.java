@@ -11,8 +11,9 @@ import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.time.Duration;
 import java.util.UUID;
@@ -37,40 +38,32 @@ public class WarmupService implements IWarmupService {
         this.pluginContainer = pluginContainer;
     }
 
-    @Override public void executeAfter(final Player target, final Duration duration, final WarmupTask runnable) {
-        this.execute(target, duration, runnable, false);
-    }
-
-    @Override public void executeAfterAsync(final Player target, final Duration duration, final WarmupTask runnable) {
-        this.execute(target, duration, runnable, true);
-    }
-
-    private void execute(final Player target, final Duration duration, final WarmupTask runnable, final boolean async) {
+    @Override
+    public void executeAfter(final Player target, final Duration duration, final WarmupTask runnable) {
         synchronized (this.lockingObject) {
             this.cancelInternal(target);
 
             // build the task
             final UUID playerTarget = target.getUniqueId();
-            final Consumer<Task> taskToSubmit = task -> {
+            final Consumer<ScheduledTask> taskToSubmit = (ScheduledTask task) -> {
+                this.tasks.remove(playerTarget);
+                this.uuidToWarmup.remove(task.getUniqueId());
+
                 if (Sponge.getServer().getPlayer(playerTarget).isPresent()) {
                     // Only run if the player is still on the server.
                     runnable.run();
                 }
-
-                this.tasks.remove(playerTarget);
-                this.uuidToWarmup.remove(task.getUniqueId());
             };
 
-            final Task.Builder builder = Task.builder()
-                    .execute(taskToSubmit)
+            final Task t = Task.builder()
                     .delay(duration.toMillis(), TimeUnit.MILLISECONDS)
-                    .name("Nucleus Warmup task: " + playerTarget.toString());
-            if (async) {
-                builder.async();
-            }
-            final Task t = builder.submit(this.pluginContainer);
-            this.tasks.put(playerTarget, t.getUniqueId());
-            this.uuidToWarmup.put(t.getUniqueId(), runnable);
+                    .name("Nucleus Warmup task: " + playerTarget.toString())
+                    .execute(taskToSubmit)
+                    .plugin(this.pluginContainer)
+                    .build();
+            final ScheduledTask scheduledTask = Sponge.getServer().getScheduler().submit(t);
+            this.tasks.put(playerTarget, scheduledTask.getUniqueId());
+            this.uuidToWarmup.put(scheduledTask.getUniqueId(), runnable);
         }
     }
 
@@ -83,7 +76,7 @@ public class WarmupService implements IWarmupService {
     private boolean cancelInternal(final Player player) {
         final UUID taskUUID = this.tasks.get(player.getUniqueId());
         if (taskUUID != null) {
-            Sponge.getScheduler().getTaskById(taskUUID).ifPresent(Task::cancel);
+            Sponge.getServer().getScheduler().getTaskById(taskUUID).ifPresent(ScheduledTask::cancel);
             final WarmupTask task = this.uuidToWarmup.get(taskUUID);
             if (task != null) {
                 // if we get here, it was never cancelled.
@@ -100,7 +93,7 @@ public class WarmupService implements IWarmupService {
         synchronized (this.lockingObject) {
             final UUID taskUUID = this.tasks.get(player.getUniqueId());
             if (taskUUID != null) {
-                if (Sponge.getScheduler().getTaskById(taskUUID).isPresent()) {
+                if (Sponge.getServer().getScheduler().getTaskById(taskUUID).isPresent()) {
                     // remove entries
                     return true;
                 } else {
