@@ -22,7 +22,6 @@ import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.permission.Subject;
@@ -373,7 +372,7 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public @NonNull ServerPlayer getIfPlayer(final String errorKey) throws CommandException {
-        if (this.getCommandSourceRoot() instanceof Player) {
+        if (this.getCommandSourceRoot() instanceof ServerPlayer) {
             return (ServerPlayer) this.getCommandSourceRoot();
         }
 
