@@ -67,6 +67,8 @@ public interface ITextStyleService {
 
     Collection<String> wouldStrip(String permissionPrefixColour, String permissionPrefixStyle, Subject source, String text);
 
+    Collection<String> wouldStrip(Collection<String> permissionPrefixColour, String permissionPrefixStyle, Subject source, String text);
+
     default TextFormat getLastColourAndStyle(final Component text, @Nullable final TextFormat current) {
         return this.getLastColourAndStyle(text, current, null, Style.empty());
     }

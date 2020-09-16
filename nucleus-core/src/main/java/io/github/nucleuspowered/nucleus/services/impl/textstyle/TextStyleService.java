@@ -32,6 +32,7 @@ import org.spongepowered.api.service.permission.Subject;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -121,6 +122,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             );
 
     private final Style resetStyle;
+    private String commandNameOnClick;
 
     @Inject
     public TextStyleService(
@@ -209,8 +211,15 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         return message;
     }
 
-    @Override public Collection<String> wouldStrip(final String permissionPrefixColour, final String permissionPrefixStyle, final Subject source, final String text) {
+    @Override
+    public Collection<String> wouldStrip(final String permissionPrefixColour, final String permissionPrefixStyle, final Subject source, final String text) {
         return this.wouldStrip(Collections.singletonList(permissionPrefixColour), permissionPrefixStyle, source, text);
+    }
+
+    @Override
+    public Collection<String> wouldStrip(final Collection<String> permissionPrefixColour, final String permissionPrefixStyle, final Subject source,
+            final String text) {
+        return this.wouldStrip(new ArrayList<>(permissionPrefixColour), permissionPrefixStyle, source, text);
     }
 
     private Collection<String> wouldStrip(final List<String> permissionPrefixColour,
@@ -219,25 +228,34 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
     final String oldMessage) {
         if (oldMessage.contains("&")) {
             // Find the next
-            final String p = this.getKeys(source, permissionPrefixColour, permissionPrefixStyle);
+            final String p = this.getRegexForPermissionless(source, permissionPrefixColour, permissionPrefixStyle);
             if (p != null) {
-                final ImmutableList.Builder<String> name = ImmutableList.builder();
-                // We don't support these.
-                for (final char a : p.toCharArray()) {
-                    final TextColor textColor = this.idToColour.get(a);
-                    if (textColor != null) {
-                        name.add(textColor.asHexString());
-                    } else {
-                        //noinspection ConstantConditions
-                        name.add(this.styleToPerms.get(this.idToStyle.get(a)));
+                // Scan the message for any of these tokens.
+                final Pattern pattern = Pattern.compile(p);
+                if (pattern.matcher(oldMessage).find()) {
+                    final ImmutableList.Builder<String> name = ImmutableList.builder();
+                    // We don't support these.
+                    for (final char a : p.toCharArray()) {
+                        if (a == '&' || a == '[' || a == ']') {
+                            continue;
+                        }
+                        final TextColor textColor = this.idToColour.get(a);
+                        if (textColor != null) {
+                            name.add(textColor.toString());
+                        } else {
+                            final String nullableName = this.styleToPerms.get(this.idToStyle.get(a));
+                            if (nullableName != null) {
+                                name.add(nullableName);
+                            }
+                        }
                     }
-                }
 
-                return name.build();
+                    return name.build();
+                }
             }
         }
 
-        return ImmutableList.of();
+        return Collections.emptyList();
     }
 
     @Nullable
@@ -523,8 +541,9 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
     }
 
 
-    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        final String commandNameOnClick = serviceCollection.configProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
+    @Override
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        this.commandNameOnClick = serviceCollection.configProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
     }
 
     private static TextComponent.Builder create(@Nullable final String string, final TextFormat format) {
