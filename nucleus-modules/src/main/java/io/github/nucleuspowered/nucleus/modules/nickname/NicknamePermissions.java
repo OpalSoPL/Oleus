@@ -35,7 +35,7 @@ public final class NicknamePermissions {
     public static final String NICKNAME_COLOUR = "nucleus.nick.colour";
 
     @PermissionMetadata(descriptionKey = "permission.nick.colour", level = SuggestedLevel.ADMIN, isPrefix = true)
-    public static final String NICKNAME_COLOR = "nucleus.nick.colour";
+    public static final String NICKNAME_COLOR = "nucleus.nick.color";
 
     @PermissionMetadata(descriptionKey = "permission.nick.style", level = SuggestedLevel.ADMIN, isPrefix = true)
     public static final String NICKNAME_STYLE = "nucleus.nick.style";
