@@ -8,15 +8,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
+import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.asset.Asset;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -123,28 +123,28 @@ public final class TextFileController {
         this.textTemplates.clear();
     }
 
-    public Optional<TextComponent> getTitle(final Audience source) {
+    public Optional<Component> getTitle(final Audience source) {
         if (this.getTitle && this.textTemplates.isEmpty() && !this.fileContents.isEmpty()) {
             // Initialisation!
             this.getFileContentsAsText();
         }
 
         if (this.title != null) {
-            return Optional.of(this.title.getForSource(source));
+            return Optional.of(this.title.getForObject(source));
         }
 
         return Optional.empty();
     }
 
-    public List<TextComponent> getTextFromNucleusTextTemplates(final Audience source) {
+    public List<Component> getTextFromNucleusTextTemplates(final Audience source) {
         return this.getFileContentsAsText().stream().map(x -> x.getForObject(source)).collect(Collectors.toList());
     }
 
-    public void sendToPlayer(final CommandSource src, final TextComponent title) {
+    public void sendToPlayer(final ServerPlayer src, final TextComponent title) {
 
         final PaginationList.Builder pb = Util.getPaginationBuilder(src).contents(this.getTextFromNucleusTextTemplates(src));
 
-        if (title != null && !title.isEmpty()) {
+        if (title != null && !title.content().isEmpty()) {
             pb.title(title).padding(padding);
         } else {
             pb.padding(Util.SPACE);

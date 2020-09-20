@@ -4,9 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.core.teleport.filters;
 
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
@@ -19,7 +19,7 @@ abstract class FilterBase implements TeleportHelperFilter {
             return false;
         }
 
-        return block.getProperty(PassableProperty.class).map(x -> x.getValue()).orElse(false);
+        return block.get(Keys.IS_PASSABLE).orElse(false);
     }
 
 }

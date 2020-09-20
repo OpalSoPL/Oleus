@@ -6,16 +6,16 @@ package io.github.nucleuspowered.nucleus.core.config;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.world.TeleportHelper;
+import org.spongepowered.api.world.teleport.TeleportHelper;
 
 @ConfigSerializable
 public class SafeTeleportConfig {
 
     @Setting
-    private final int width = TeleportHelper.DEFAULT_WIDTH;
+    private int width = TeleportHelper.DEFAULT_WIDTH;
 
     @Setting
-    private final int height = TeleportHelper.DEFAULT_HEIGHT;
+    private int height = TeleportHelper.DEFAULT_HEIGHT;
 
     public int getWidth() {
         return Math.max(1, this.width);

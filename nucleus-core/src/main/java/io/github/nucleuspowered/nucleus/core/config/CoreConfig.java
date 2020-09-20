@@ -13,59 +13,59 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 public class CoreConfig {
 
     @Setting(value = "debug-mode", comment = "config.debugmode")
-    private final boolean debugmode = false;
+    private boolean debugmode = false;
 
     @Setting(value = "print-on-autosave", comment = "config.printonautosave")
-    private final boolean printOnAutosave = false;
+    private boolean printOnAutosave = false;
 
     @Setting(value = "use-custom-message-file", comment = "config.custommessages")
-    private final boolean custommessages = false;
+    private boolean custommessages = false;
 
     @Setting(value = "warmup-canceling", comment = "config.core.warmup.info")
-    private final WarmupConfig warmupConfig = new WarmupConfig();
+    private WarmupConfig warmupConfig = new WarmupConfig();
 
     @Setting(value = "command-on-name-click", comment = "config.core.commandonname")
-    private final String commandOnNameClick = "/msg {{subject}}";
+    private String commandOnNameClick = "/msg {{subject}}";
 
     @Setting(value = "kick-on-stop")
-    private final KickOnStopConfig kickOnStop = new KickOnStopConfig();
+    private KickOnStopConfig kickOnStop = new KickOnStopConfig();
 
     @DoNotGenerate
     @Setting(value = "simulate-error-on-startup")
-    private final boolean errorOnStartup = false;
+    private boolean errorOnStartup = false;
 
     @Setting(value = "safe-teleport-check", comment = "config.core.safeteleport")
-    private final SafeTeleportConfig safeTeleportConfig = new SafeTeleportConfig();
+    private SafeTeleportConfig safeTeleportConfig = new SafeTeleportConfig();
 
     @Setting(value = "console-overrides-exemptions", comment = "config.core.consoleoverrides")
-    private final boolean consoleOverride = true;
+    private boolean consoleOverride = true;
 
     @Setting(value = "check-for-wildcard", comment = "config.core.wildcard")
-    private final boolean checkForWildcard = true;
+    private boolean checkForWildcard = true;
 
     @Setting(value = "more-accurate-visitor-count", comment = "config.core.accurate")
-    private final boolean moreAccurate = false;
+    private boolean moreAccurate = false;
 
     @Setting(value = "override-language", comment = "config.core.language")
-    private final String serverLocale = "default";
+    private String serverLocale = "default";
 
     @Setting(value = "data-file-location", comment = "config.core.datafilelocation")
-    private final String dataFileLocation = "default";
+    private String dataFileLocation = "default";
 
     @Setting(value = "offline-user-tab-limit", comment = "config.core.offlineusertablimit")
-    private final int nicknameArgOfflineLimit = 20;
+    private int nicknameArgOfflineLimit = 20;
 
     @Setting(value = "enable-parent-perms", comment = "config.core.parentperms")
-    private final boolean useParentPerms = true;
+    private boolean useParentPerms = true;
 
     @Setting(value = "enable-partial-name-matching", comment = "config.core.partialname")
-    private final boolean partialMatch = true;
+    private boolean partialMatch = true;
 
     @Setting(value = "use-client-locale-where-possible", comment = "config.core.clientlocale")
-    private final boolean clientLocale = false;
+    private boolean clientLocale = false;
 
     @Setting(value = "give-default-group-user-permissions", comment = "config.core.defaultperms")
-    private final boolean giveDefaultsUserPermissions = false;
+    private boolean giveDefaultsUserPermissions = false;
 
     public String getDataFileLocation() {
         return this.dataFileLocation;

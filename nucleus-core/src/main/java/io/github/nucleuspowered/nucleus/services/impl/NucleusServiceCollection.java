@@ -20,6 +20,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenera
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IModuleReporter;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
@@ -77,6 +78,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     private final Supplier<IPlaceholderService> placeholderServiceProvider;
     private final Supplier<IDocumentationGenerationService> documentationGenerationServiceProvider;
     private final Supplier<ITextStyleService> textStyleServiceProvider;
+    private final Supplier<IModuleReporter> moduleReporterSupplier;
     private final Injector injector;
     private final PluginContainer pluginContainer;
     private final Logger logger;
@@ -115,6 +117,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         this.chatMessageFormatterProvider = new LazyLoad<>(this, injector, IChatMessageFormatterService.class);
         this.placeholderServiceProvider = new LazyLoad<>(this, injector, IPlaceholderService.class);
         this.documentationGenerationServiceProvider = new LazyLoad<>(this, injector, IDocumentationGenerationService.class);
+        this.moduleReporterSupplier = new LazyLoad<>(this, injector, IModuleReporter.class);
         this.injector = injector;
         this.pluginContainer = pluginContainer;
         this.logger = logger;
@@ -227,6 +230,10 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
 
     @Override public IDocumentationGenerationService documentationGenerationService() {
         return this.documentationGenerationServiceProvider.get();
+    }
+
+    @Override public IModuleReporter moduleReporter() {
+        return this.moduleReporterSupplier.get();
     }
 
     @Override

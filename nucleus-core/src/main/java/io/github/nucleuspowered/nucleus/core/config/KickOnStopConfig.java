@@ -12,7 +12,7 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 @ConfigSerializable
 public class KickOnStopConfig {
     @Setting(value = "enabled", comment = "config.core.kickonstop.flag")
-    private final boolean kickOnStop = false;
+    private boolean kickOnStop = false;
 
     @Default("Server closed")
     @Setting(value = "message", comment = "config.core.kickonstop.message")

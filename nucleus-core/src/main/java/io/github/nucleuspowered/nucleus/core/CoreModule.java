@@ -8,7 +8,6 @@ import io.github.nucleuspowered.nucleus.core.commands.CommandInfoCommand;
 import io.github.nucleuspowered.nucleus.core.commands.NucleusCommand;
 import io.github.nucleuspowered.nucleus.core.commands.NucleusUserPrefsCommand;
 import io.github.nucleuspowered.nucleus.core.commands.SetNucleusLanguageCommand;
-import io.github.nucleuspowered.nucleus.core.commands.SetupPermissionsCommand;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.ClearCacheCommand;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.CompatibilityCommand;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.DebugCommand;
@@ -70,8 +69,7 @@ public class CoreModule implements IModule.Configurable<CoreConfig> {
                 CommandInfoCommand.class,
                 NucleusCommand.class,
                 NucleusUserPrefsCommand.class,
-                SetNucleusLanguageCommand.class,
-                SetupPermissionsCommand.class
+                SetNucleusLanguageCommand.class
         );
     }
 

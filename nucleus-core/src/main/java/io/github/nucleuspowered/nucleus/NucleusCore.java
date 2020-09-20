@@ -339,6 +339,9 @@ public final class NucleusCore {
         for (final ModuleContainer moduleContainer : moduleContainers) {
             defaults.getNode(moduleContainer.getId()).setValue(ModuleState.TRUE);
         }
+        final Collection<String> modules = moduleContainers.stream().map(ModuleContainer::getId).collect(Collectors.toList());
+        modules.add("core");
+        this.serviceCollection.moduleReporter().provideDiscoveredModules(modules);
 
         final ConfigurationLoader<CommentedConfigurationNode> moduleConfig = HoconConfigurationLoader.builder()
                 .setPath(this.configDirectory.resolve("modules.conf"))
@@ -367,12 +370,12 @@ public final class NucleusCore {
                             }
                         }).collect(Collectors.toSet()));
         Sponge.getEventManager().post(event);
-
         final ArrayList<ModuleContainer> containersToReturn = new ArrayList<>();
         containersToReturn.add(new ModuleContainer("core", "Core", true, CoreModule.class));
         for (final ModuleContainer moduleContainer : moduleContainers) {
             if (event.shouldLoad(moduleContainer.getId())) {
                 containersToReturn.add(moduleContainer);
+                this.serviceCollection.moduleReporter().provideEnabledModule(moduleContainer);
             }
         }
         return containersToReturn;

@@ -4,16 +4,18 @@
  */
 package io.github.nucleuspowered.nucleus.core.teleport.filters;
 
-import org.spongepowered.math.vector.Vector3i;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.world.World;
-import org.spongepowered.plugin.meta.util.NonnullByDefault;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3i;
 
-public class WallCheckFilter extends FilterBase {
+public final class WallCheckFilter extends FilterBase {
+
+    private final ResourceKey key = ResourceKey.resolve("nucleus:wall_check");
 
     @Override
-    public Tristate isValidLocation(final World world, final Vector3i position) {
+    public Tristate isValidLocation(final ServerWorld world, final Vector3i position) {
         // Check that the block is not solid.
         if (this.isPassable(world, position, false) && this.isPassable(world, position.add(0, 1, 0), false)) {
             return Tristate.TRUE;
@@ -33,13 +35,8 @@ public class WallCheckFilter extends FilterBase {
     }
 
     @Override
-    public String getId() {
-        return "nucleus:wall_check";
-    }
-
-    @Override
-    public String getName() {
-        return "Nucleus Wall Check filter";
+    public ResourceKey getKey() {
+        return this.key;
     }
 
 }

@@ -6,20 +6,8 @@ package io.github.nucleuspowered.nucleus.services.impl.userprefs;
 
 import com.google.common.collect.ImmutableSet;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
-import io.github.nucleuspowered.nucleus.modules.commandspy.CommandSpyModule;
-import io.github.nucleuspowered.nucleus.modules.commandspy.CommandSpyPermissions;
 import io.github.nucleuspowered.nucleus.core.CoreModule;
 import io.github.nucleuspowered.nucleus.core.CorePermissions;
-import io.github.nucleuspowered.nucleus.modules.message.MessageModule;
-import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
-import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolModule;
-import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolPermissions;
-import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatModule;
-import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatPermissions;
-import io.github.nucleuspowered.nucleus.modules.teleport.TeleportModule;
-import io.github.nucleuspowered.nucleus.modules.teleport.TeleportPermissions;
-import io.github.nucleuspowered.nucleus.modules.vanish.VanishModule;
-import io.github.nucleuspowered.nucleus.modules.vanish.VanishPermissions;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 

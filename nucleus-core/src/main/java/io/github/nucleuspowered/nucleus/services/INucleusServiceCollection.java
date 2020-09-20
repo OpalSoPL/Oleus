@@ -17,6 +17,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenera
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IModuleReporter;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
@@ -79,6 +80,8 @@ public interface INucleusServiceCollection {
     IPlatformService platformService();
 
     IDocumentationGenerationService documentationGenerationService();
+
+    IModuleReporter moduleReporter();
 
     Injector injector();
 

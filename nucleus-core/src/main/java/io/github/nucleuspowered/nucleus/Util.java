@@ -4,46 +4,27 @@
  */
 package io.github.nucleuspowered.nucleus;
 
-import org.spongepowered.math.vector.Vector3d;
-import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
-import org.spongepowered.api.item.inventory.InventoryTransformations;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
-import org.spongepowered.api.item.inventory.property.InventoryDimension;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.item.inventory.query.QueryTypes;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextRepresentable;
-import org.spongepowered.api.text.TextTemplate;
-import org.spongepowered.api.text.translation.Translatable;
-import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -59,12 +40,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
-
-import javax.annotation.Nullable;
 
 public final class Util {
 
@@ -76,36 +53,10 @@ public final class Util {
 
     public static final Component SPACE = TextComponent.space();
 
-    private static final TextTemplate CHAT_TEMPLATE = TextTemplate.of(TextTemplate.arg(MessageEvent.PARAM_MESSAGE_HEADER).build(),
-            TextTemplate.arg(MessageEvent.PARAM_MESSAGE_BODY).build(), TextTemplate.arg(MessageEvent.PARAM_MESSAGE_FOOTER).build());
-
     public static final String usernameRegexPattern = "[0-9a-zA-Z_]{3,16}";
     public static final Pattern usernameRegex = Pattern.compile(usernameRegexPattern);
 
     public static final UUID CONSOLE_FAKE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
-
-    public static CommandSource getSourceFromCause(final Cause cause) {
-        return cause.first(CommandSource.class).orElseGet(Sponge.getServer()::getConsole);
-    }
-
-    public static TextComponent applyChatTemplate(final MessageEvent.MessageFormatter formatter) {
-        return applyChatTemplate(formatter.getHeader(), formatter.getBody(), formatter.getFooter());
-    }
-
-    public static TextComponent applyChatTemplate(final TextRepresentable header, final TextRepresentable body, final TextRepresentable footer) {
-        return CHAT_TEMPLATE.apply(
-                ImmutableMap.of(
-                MessageEvent.PARAM_MESSAGE_HEADER, header,
-                MessageEvent.PARAM_MESSAGE_BODY, body,
-                MessageEvent.PARAM_MESSAGE_FOOTER, footer)).build();
-    }
-
-    public static Object getObjectFromUUID(final UUID uuid) {
-        final Optional<Object> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
-                .get(uuid).map(x -> x.isOnline() ? x.getPlayer().get() : x);
-        return user.orElseGet(() -> Sponge.getServer().getConsole());
-
-    }
 
     public static String getNameOrUnkown(final ICommandContext context, final GameProfile profile) {
         return profile.getName().orElse(
@@ -132,28 +83,6 @@ public final class Util {
             final long ahours = hours == 0 ? 12 : hours;
             return messageProviderService.getMessageString("standard.time.pm", ahours, hours, m.format(mins));
         }
-    }
-
-    /**
-     * As some {@link Translatable#getTranslation()} methods have not been implemented yet, this allows us to try to use
-     * the method in a safer manner for {@link CatalogType}s.
-     *
-     * @param translatable The {@link Translatable} to get the translation from, if appropriate.
-     * @param <T> The {@link CatalogType} that is also a {@link Translatable}
-     * @return A {@link String} that represents the item.
-     */
-    public static <T extends Translatable & CatalogType> String getTranslatableIfPresent(final T translatable) {
-        try {
-            final String result = translatable.getTranslation().get();
-
-            if (!result.isEmpty()) {
-                return result;
-            }
-        } catch (final AbstractMethodError e) {
-            //
-        }
-
-        return translatable.getName();
     }
 
     /**
@@ -197,19 +126,19 @@ public final class Util {
      * @param location The {@link Location} to test.
      * @return <code>true</code> if the location is within the border.
      */
-    public static boolean isLocationInWorldBorder(final Location<World> location) {
-        return isLocationInWorldBorder(location.getPosition(), location.getExtent());
+    public static boolean isLocationInWorldBorder(final ServerLocation location) {
+        return isLocationInWorldBorder(location.getPosition(), location.getWorld());
     }
 
-    public static boolean isLocationInWorldBorder(final Vector3d location, final World world) {
+    public static boolean isLocationInWorldBorder(final Vector3d location, final ServerWorld world) {
 
         // Diameter, not radius - we'll want the radius later. We use long, we want the floor!
-        final long radius = (long)Math.floor(world.getWorldBorder().getDiameter() / 2.0);
+        final long radius = (long)Math.floor(world.getProperties().getWorldBorder().getDiameter() / 2.0);
 
         // We get the current position and subtract the border centre. This gives us an effective distance from the
         // centre in all three dimensions. We just care about the magnitude in the x and z directions, so we get the
         // positive amount.
-        final Vector3d displacement = location.sub(world.getWorldBorder().getCenter()).abs();
+        final Vector3d displacement = location.sub(world.getProperties().getWorldBorder().getCenter()).abs();
 
         // Check that we're not too far out.
         return !(displacement.getX() > radius || displacement.getZ() > radius);
@@ -229,12 +158,12 @@ public final class Util {
 
     }
 
-    public static PaginationList.Builder getPaginationBuilder(final CommandSource source) {
-        return getPaginationBuilder(source instanceof Player);
+    public static PaginationList.Builder getPaginationBuilder(final Audience source) {
+        return getPaginationBuilder(source instanceof ServerPlayer);
     }
 
     public static PaginationList.Builder getPaginationBuilder(final boolean isPlayer) {
-        final PaginationList.Builder plb = Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder();
+        final PaginationList.Builder plb = Sponge.getServiceProvider().paginationService().builder();
         if (!isPlayer) {
             plb.linesPerPage(-1);
         }
@@ -242,76 +171,26 @@ public final class Util {
         return plb;
     }
 
-    public static Inventory.Builder getKitInventoryBuilder() {
-        return Inventory.builder().of(InventoryArchetypes.CHEST).property(InventoryDimension.PROPERTY_NAME, new InventoryDimension(9, 4));
+    public static Inventory.Builder.EndStep getKitInventoryBuilder() {
+        return Inventory.builder().grid(9, 4).completeStructure();
     }
 
-    public static Optional<CatalogType> getTypeFromItemInHand(final Player src) {
-        // If subject, get the item in hand, otherwise, we can't continue.
-        if (src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
-            return Optional.of(getTypeFromItem(src.getItemInHand(HandTypes.MAIN_HAND).get()));
-        } else {
-            return Optional.empty();
-        }
+    public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final ServerLocation location) {
+        return dropItemOnFloorAtLocation(itemStackSnapshotToDrop, location.getWorld(), location.getPosition());
     }
 
-    public static CatalogType getTypeFromItem(final ItemStack is) {
-        try {
-            final Optional<BlockState> blockState = is.get(Keys.ITEM_BLOCKSTATE);
-            if (blockState.isPresent()) {
-                return blockState.get();
-            }
-        } catch (final Exception e) {
-            e.printStackTrace();
-        }
-
-        return is.getType();
-    }
-
-    public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final Location<World> location) {
-        return dropItemOnFloorAtLocation(itemStackSnapshotToDrop, location.getExtent(), location.getPosition());
-    }
-
-    public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final World world, final Vector3d position) {
-        final Entity entityToDrop = world.createEntity(EntityTypes.ITEM, position);
-        entityToDrop.offer(Keys.REPRESENTED_ITEM, itemStackSnapshotToDrop);
+    public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final ServerWorld world,
+            final Vector3d position) {
+        final Entity entityToDrop = world.createEntity(EntityTypes.ITEM.get(), position);
+        entityToDrop.offer(Keys.ITEM_STACK_SNAPSHOT, itemStackSnapshotToDrop);
         world.spawnEntity(entityToDrop);
         return itemStackSnapshotToDrop.createStack();
     }
 
     public static Inventory getStandardInventory(final Carrier player) {
         return player.getInventory()
-                .query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class))
-                .transform(InventoryTransformations.PLAYER_MAIN_HOTBAR_FIRST);
+                .query(QueryTypes.PLAYER_PRIMARY_HOTBAR_FIRST.get().toQuery());
     }
 
-    public static <T extends Event> void onPlayerSimulatedOrPlayer(final T event, final BiConsumer<T, Player> eventConsumer) {
-        // If we're simulating a player, we should use them instead.
-        @Nullable final Player cs = checkSimulated(event).orElseGet(() -> {
-            final Object root = event.getCause().root();
-            if (root instanceof Player) {
-                return (Player) root;
-            }
 
-            return null;
-        });
-
-        if (cs != null) {
-            eventConsumer.accept(event, cs);
-        }
-
-    }
-
-    public static <T extends Event> void onSourceSimulatedOr(final T event, final Function<T, Optional<CommandSource>> orElse,
-            final BiConsumer<T, CommandSource> eventConsumer) {
-        // If we're simulating a player, we should use them instead.
-        @Nullable final CommandSource cs = checkSimulated(event).map(x -> (CommandSource) x).orElseGet(() -> orElse.apply(event).orElse(null));
-        if (cs != null) {
-            eventConsumer.accept(event, cs);
-        }
-    }
-
-    private static Optional<Player> checkSimulated(final Event event) {
-        return event.getContext().get(EventContextKeys.PLAYER_SIMULATED).map(x -> Sponge.getServer().getPlayer(x.getUniqueId()).orElse(null));
-    }
 }

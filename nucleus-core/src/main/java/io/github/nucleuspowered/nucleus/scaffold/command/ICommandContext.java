@@ -79,6 +79,14 @@ public interface ICommandContext {
 
     User getUserFromArgs(String key, String errorKey) throws CommandException;
 
+    default User getUserFromArgs(final Parameter.Value<? extends User> key) throws CommandException {
+        return this.getUserFromArgs(key, "command.playeronly");
+    }
+
+    User getUserFromArgs(Parameter.Value<? extends User> key, String errorKey) throws CommandException;
+
+    User getUserFromArgs(Parameter.Key<? extends User> key, String errorKey) throws CommandException;
+
     boolean hasAny(Parameter.Key<?> name);
 
     <T> Optional<? extends T> getOne(Parameter.Key<T> name);
@@ -233,4 +241,5 @@ public interface ICommandContext {
 
     void addFailAction(Consumer<ICommandContext> action);
 
+    Audience getAudience();
 }

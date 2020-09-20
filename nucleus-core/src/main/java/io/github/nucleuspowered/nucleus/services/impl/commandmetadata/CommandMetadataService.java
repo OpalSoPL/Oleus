@@ -421,7 +421,8 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     private org.spongepowered.api.command.Command.Parameterized createCommand(final CommandControl control) {
-        // TODO: THIS MUST BE DONE BEFORE EVEN THINKING ABOUT TRYING IT
-        return null;
+        final org.spongepowered.api.command.Command.Parameterized parameterized = control.createCommand();
+        // TODO: Store
+        return parameterized;
     }
 }

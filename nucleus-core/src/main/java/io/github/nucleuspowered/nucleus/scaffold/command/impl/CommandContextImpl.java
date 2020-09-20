@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.scaffold.command.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
@@ -160,7 +161,17 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public User getUserFromArgs(final String key, final String errorKey) throws CommandException {
-        final Optional<? extends User> user = this.getOne(key, User.class);
+        return this.getUserFromArgs(Parameter.key(key, TypeToken.of(User.class)), errorKey);
+    }
+
+    @Override
+    public User getUserFromArgs(final Parameter.Value<? extends User> key, final String errorKey) throws CommandException {
+        return this.getUserFromArgs(key.getKey(), errorKey);
+    }
+
+    @Override
+    public User getUserFromArgs(final Parameter.Key<? extends User> key, final String errorKey) throws CommandException {
+        final Optional<? extends User> user = this.context.getOne(key);
         if (user.isPresent()) {
             return user.get();
         } else {
@@ -255,6 +266,10 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override public void addFailAction(final Consumer<ICommandContext> action) {
         this.failActions.add(action);
+    }
+
+    @Override public Audience getAudience() {
+        return this.cause.getAudience();
     }
 
     @Override public int getWarmup() {

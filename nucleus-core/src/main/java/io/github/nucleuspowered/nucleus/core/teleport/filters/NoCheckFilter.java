@@ -4,17 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.core.teleport.filters;
 
-import org.spongepowered.math.vector.Vector3i;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
-import org.spongepowered.plugin.meta.util.NonnullByDefault;
+import org.spongepowered.math.vector.Vector3i;
 
-public class NoCheckFilter implements TeleportHelperFilter {
+public final class NoCheckFilter implements TeleportHelperFilter {
+
+    private final ResourceKey key = ResourceKey.resolve("nucleus:no_check");
 
     @Override
-    public Tristate isValidLocation(final World world, final Vector3i position) {
+    public Tristate isValidLocation(final ServerWorld world, final Vector3i position) {
         return Tristate.TRUE;
     }
 
@@ -29,12 +31,7 @@ public class NoCheckFilter implements TeleportHelperFilter {
     }
 
     @Override
-    public String getId() {
-        return "nucleus:no_check";
-    }
-
-    @Override
-    public String getName() {
-        return "Nucleus No Check filter";
+    public ResourceKey getKey() {
+        return this.key;
     }
 }
