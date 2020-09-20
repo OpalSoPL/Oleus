@@ -76,7 +76,7 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
             );
             return result.isSuccessful() ? context.successResult() : context.failResult();
         } else {
-            if (context.testPermission(TeleportPermissions.TPHERE_OFFLINE)) {
+            if (!context.testPermission(TeleportPermissions.TPHERE_OFFLINE)) {
                 return context.errorResult("command.tphere.noofflineperms");
             }
 
