@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.api;
 
 import io.github.nucleuspowered.nucleus.api.module.spawn.event.NucleusSendToSpawnEvent;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.EventContextKey;
 import org.spongepowered.api.event.EventContextKeys;
@@ -26,8 +27,7 @@ public final class EventContexts {
     public static final EventContextKey<Boolean> SHOULD_FORMAT_CHANNEL =
             EventContextKey.builder()
                     .type(Boolean.class)
-                    .id(Identifiers.SHOULD_FORMAT_CHANNEL)
-                    .name("Nucleus - Context to indicate whether a chat message should be formatted.")
+                    .key(Identifiers.SHOULD_FORMAT_CHANNEL)
                     .build();
 
     /**
@@ -40,8 +40,7 @@ public final class EventContexts {
     public static final EventContextKey<NucleusSendToSpawnEvent.Type> SPAWN_EVENT_TYPE =
             EventContextKey.builder()
                     .type(NucleusSendToSpawnEvent.Type.class)
-                    .id(Identifiers.SPAWN_EVENT_TYPE)
-                    .name("SPAWN_EVENT_TYPE")
+                    .key(Identifiers.SPAWN_EVENT_TYPE)
                     .build();
 
     /**
@@ -54,8 +53,7 @@ public final class EventContexts {
     public static final EventContextKey<Boolean> IS_JAILING_ACTION =
             EventContextKey.builder()
                     .type(Boolean.class)
-                    .id("nucleus:is_jailing_action")
-                    .name("Nucleus - Context to indicate whether a teleport is a jailing teleport.")
+                    .key(Identifiers.IS_JAILING_ACTION)
                     .build();
 
     /**
@@ -68,8 +66,7 @@ public final class EventContexts {
     public static final EventContextKey<Boolean> BYPASS_JAILING_RESTRICTION =
             EventContextKey.builder()
                     .type(Boolean.class)
-                    .id("nucleus:bypass_jailing_restriction")
-                    .name("Nucleus - Context to indicate whether the Nucleus system should ignore jailed status when teleporting a player.")
+                    .key(Identifiers.BYPASS_JAILING_RESTRICTION)
                     .build();
 
     public final static class Identifiers {
@@ -79,22 +76,22 @@ public final class EventContexts {
         /**
          * ID for {@link EventContexts#SHOULD_FORMAT_CHANNEL}
          */
-        public static final String SHOULD_FORMAT_CHANNEL = "nucleus:should_format_channel";
+        public static final ResourceKey SHOULD_FORMAT_CHANNEL = ResourceKey.resolve("nucleus:should_format_channel");
 
         /**
          * ID for {@link EventContexts#SPAWN_EVENT_TYPE}
          */
-        public static final String SPAWN_EVENT_TYPE = "nucleus:spawn_event_type";
+        public static final ResourceKey SPAWN_EVENT_TYPE = ResourceKey.resolve("nucleus:spawn_event_type");
 
         /**
          * ID for {@link EventContexts#IS_JAILING_ACTION}
          */
-        public static final String IS_JAILING_ACTION = "nucleus:is_jailing_action";
+        public static final ResourceKey IS_JAILING_ACTION = ResourceKey.resolve("nucleus:is_jailing_action");
 
         /**
          * ID for {@link EventContexts#BYPASS_JAILING_RESTRICTION}
          */
-        public static final String BYPASS_JAILING_RESTRICTION = "nucleus:bypass_jailing_restriction";
+        public static final ResourceKey BYPASS_JAILING_RESTRICTION = ResourceKey.resolve("nucleus:bypass_jailing_restriction");
 
     }
 

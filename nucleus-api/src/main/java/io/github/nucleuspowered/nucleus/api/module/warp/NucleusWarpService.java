@@ -4,20 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.warp;
 
-import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.TextComponent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
 
 /**
  * Gets a service that allows users to warp about using defined warp.
@@ -48,7 +47,7 @@ public interface NucleusWarpService {
      * @param rotation The rotation of the warp.
      * @return <code>true</code> if set, <code>false</code> otherwise.
      */
-    boolean setWarp(String warpName, Location<World> location, Vector3d rotation);
+    boolean setWarp(String warpName, ServerLocation location, Vector3d rotation);
 
     /**
      * Gets all the warps available.
