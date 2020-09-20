@@ -17,4 +17,5 @@ public interface IModuleReporter {
 
     void provideEnabledModule(ModuleContainer moduleContainer);
 
+    boolean isLoaded(String module);
 }

@@ -14,27 +14,22 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import net.kyori.adventure.text.TextComponent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandCallable;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandMapping;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.ArgumentParseException;
-import org.spongepowered.api.command.args.ChildCommandElementExecutor;
-import org.spongepowered.api.command.args.CommandArgs;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.spec.CommandExecutor;
-import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.manager.CommandMapping;
+import org.spongepowered.api.command.parameter.ArgumentReader;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.ValueParameter;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 @Command(
         aliases = "commandinfo",
@@ -44,21 +39,27 @@ import javax.annotation.Nullable;
 )
 public class CommandInfoCommand implements ICommandExecutor {
 
-    private final String commandKey = "command";
+    private final Parameter.Value<CommandMapping> commandParameter;
+
+    public CommandInfoCommand(final IMessageProviderService messageProviderService) {
+        this.commandParameter = Parameter.builder(CommandMapping.class)
+                .setKey("command")
+                .parser(new CommandChoicesArgument(messageProviderService))
+                .build();
+    }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                new CommandChoicesArgument(serviceCollection.messageProvider())
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.commandParameter
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         // we have the command, get the mapping
-        final CommandMapping mapping = context.requireOne(this.commandKey, CommandMapping.class);
+        final CommandMapping mapping = context.requireOne(this.commandParameter);
 
-        final CommandSource source = context.getCommandSourceRoot();
         final IMessageProviderService provider = context.getServiceCollection().messageProvider();
         final TextComponent header = provider.getMessageFor(source, "command.commandinfo.title", mapping.getPrimaryAlias());
 
@@ -164,33 +165,30 @@ public class CommandInfoCommand implements ICommandExecutor {
         content.add(Text.of("/", alias, " ", callable.getUsage(src)));
     }
 
-    private class CommandChoicesArgument extends CommandElement {
+    private static class CommandChoicesArgument implements ValueParameter<CommandMapping> {
 
         private final IMessageProviderService messageProviderService;
 
         CommandChoicesArgument(final IMessageProviderService messageProviderService) {
-            super(Text.of(CommandInfoCommand.this.commandKey));
             this.messageProviderService = messageProviderService;
         }
 
-        @Nullable
         @Override
-        protected Object parseValue(@NonNull final CommandSource source, final CommandArgs args) throws ArgumentParseException {
-            final String next = args.next();
-            return Sponge.getCommandManager().get(next).orElseThrow(() -> args.createError(
-                    this.messageProviderService.getMessageFor(source, "command.commandinfo.nocommand", next)
-            ));
+        public List<String> complete(final CommandContext context) {
+            return new ArrayList<>(Sponge.getCommandManager().suggest(context.getSubject(), context.getCause().getAudience(), ""));
         }
 
         @Override
-        @NonNull
-        public List<String> complete(@NonNull final CommandSource src, @NonNull final CommandArgs args, @NonNull final CommandContext context) {
-            try {
-                final String s = args.peek().toLowerCase();
-                return Sponge.getCommandManager().getAliases().stream().filter(x -> x.toLowerCase().startsWith(s)).collect(Collectors.toList());
-            } catch (final ArgumentParseException e) {
-                return Lists.newArrayList(Sponge.getCommandManager().getAliases());
+        public Optional<? extends CommandMapping> getValue(
+                final Parameter.@NonNull Key<? super CommandMapping> parameterKey,
+                final ArgumentReader.@NonNull Mutable reader,
+                final CommandContext.@NonNull Builder context) throws ArgumentParseException {
+            final String next = reader.parseString();
+            final Optional<CommandMapping> commandMapping = Sponge.getCommandManager().getCommandMapping(next);
+            if (commandMapping.filter(x -> x.getRegistrar().canExecute(context.getCause(), x)).isPresent()) {
+                return commandMapping;
             }
+            throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "command.commandinfo.nocommand", next));
         }
     }
 }

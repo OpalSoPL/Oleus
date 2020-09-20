@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.core.CoreModule;
 import io.github.nucleuspowered.nucleus.core.CorePermissions;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IModuleReporter;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -17,11 +17,11 @@ import java.util.Optional;
 
 public class NucleusKeysProvider implements NucleusUserPreferenceService.Keys {
 
-    private final IConfigProvider moduleDataProvider;
     public NucleusKeysProvider(final INucleusServiceCollection serviceCollection) {
-        this.moduleDataProvider = serviceCollection.configProvider();
+        this.moduleDataProvider = serviceCollection.moduleReporter();
     }
 
+    private final IModuleReporter moduleDataProvider;
     public final static String COMMAND_SPY_KEY = "nucleus:command-spy";
     public final static String MESSAGE_TOGGLE_KEY = "nucleus:message-receiving-enabled";
     public static final String PLAYER_LOCALE_KEY = "nucleus:player-locale";

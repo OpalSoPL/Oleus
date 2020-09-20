@@ -12,6 +12,7 @@ public final class ModuleReporter implements IModuleReporter {
 
     private final Collection<String> discoveredModules = new ArrayList<>();
     private final Collection<ModuleContainer> enabledModules = new HashSet<>();
+    private final Collection<String> enabledModulesNames = new ArrayList<>();
 
     @Override
     public Collection<String> discoveredModules() {
@@ -33,6 +34,11 @@ public final class ModuleReporter implements IModuleReporter {
     @Override
     public void provideEnabledModule(final ModuleContainer moduleContainer) {
         this.enabledModules.add(moduleContainer);
+        this.enabledModulesNames.add(moduleContainer.getId());
     }
 
+    @Override
+    public boolean isLoaded(final String module) {
+        return this.enabledModulesNames.contains(module);
+    }
 }
