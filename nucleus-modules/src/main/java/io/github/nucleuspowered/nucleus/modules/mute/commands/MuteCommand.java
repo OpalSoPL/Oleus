@@ -70,7 +70,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
         final Optional<MuteData> omd = handler.getPlayerMuteData(user);
         final Optional<String> reas = context.getOne(NucleusParameters.Keys.REASON, String.class);
 
-        if (!context.isConsoleAndBypass() && context.testPermission(MutePermissions.MUTE_EXEMPT_TARGET)) {
+        if (!context.isConsoleAndBypass() && context.testPermissionFor(user, MutePermissions.MUTE_EXEMPT_TARGET)) {
             return context.errorResult("command.mute.exempt", user.getName());
         }
 

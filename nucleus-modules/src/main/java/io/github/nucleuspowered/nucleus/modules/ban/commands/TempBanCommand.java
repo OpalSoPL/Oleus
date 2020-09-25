@@ -64,7 +64,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
         final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class)
                 .orElseGet(() -> context.getServiceCollection().messageProvider().getMessageString(context.getCommandSourceRoot(), "ban.defaultreason"));
 
-        if (!(context.isConsoleAndBypass() || context.testPermissionFor(u, BanPermissions.TEMPBAN_EXEMPT_TARGET))) {
+        if (!context.isConsoleAndBypass() && context.testPermissionFor(u, BanPermissions.TEMPBAN_EXEMPT_TARGET)) {
             return context.errorResult("command.tempban.exempt", u.getName());
         }
 
