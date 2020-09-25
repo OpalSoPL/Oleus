@@ -81,7 +81,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
             }
 
             if (optionalUser.isPresent() &&
-                    (!context.isConsoleAndBypass() || context.testPermissionFor(optionalUser.get(), BanPermissions.BAN_EXEMPT_TARGET))) {
+                    (!context.isConsoleAndBypass() && context.testPermissionFor(optionalUser.get(), BanPermissions.BAN_EXEMPT_TARGET))) {
                 return context.errorResult("command.ban.exempt", optionalUser.get().getName());
             }
 
