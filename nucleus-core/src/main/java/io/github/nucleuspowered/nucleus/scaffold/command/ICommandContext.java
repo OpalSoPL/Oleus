@@ -77,6 +77,10 @@ public interface ICommandContext {
         return this.getUserFromArgs(NucleusParameters.Keys.USER, "command.playeronly");
     }
 
+    default User getUserFromArgs(String key) throws CommandException {
+        return this.getUserFromArgs(key, "command.playeronly");
+    }
+
     User getUserFromArgs(String key, String errorKey) throws CommandException;
 
     default User getUserFromArgs(final Parameter.Value<? extends User> key) throws CommandException {
