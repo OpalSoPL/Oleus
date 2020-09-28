@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.api.module.warp;
 
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
@@ -124,7 +124,7 @@ public interface NucleusWarpService {
      * @param description The description, or <code>null</code> to clear.
      * @return {@code true} if successful
      */
-    boolean setWarpDescription(String warpName, @Nullable TextComponent description);
+    boolean setWarpDescription(String warpName, @Nullable Component description);
 
     /**
      * Gets the names of all the warp that are available.
@@ -139,8 +139,8 @@ public interface NucleusWarpService {
      * @param name The name to check for.
      * @return <code>true</code> if it exists, <code>false</code> otherwise.
      */
-    default boolean warpExists(String name) {
-        return getWarp(name).isPresent();
+    default boolean warpExists(final String name) {
+        return this.getWarp(name).isPresent();
     }
 
     /**
@@ -158,7 +158,7 @@ public interface NucleusWarpService {
      * @param displayName The display name. Set to null to revert to the category name.
      * @return <code>true</code> if the category exists and this is successful.
      */
-    boolean setWarpCategoryDisplayName(String category, @Nullable TextComponent displayName);
+    boolean setWarpCategoryDisplayName(String category, @Nullable Component displayName);
 
     /**
      * Sets the description of a warp category.
@@ -167,5 +167,5 @@ public interface NucleusWarpService {
      * @param description The description. Set to null to remove the description.
      * @return <code>true</code> if the category exists and this is successful.
      */
-    boolean setWarpCategoryDescription(String category, @Nullable TextComponent description);
+    boolean setWarpCategoryDescription(String category, @Nullable Component description);
 }

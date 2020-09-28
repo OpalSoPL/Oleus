@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.services.impl.placeholder;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 
 import java.util.function.Function;
 
@@ -14,13 +13,13 @@ public enum TextModifiers implements Function<Component, Component> {
     SPACE_AFTER("s") {
         @Override
         public Component apply(final Component text) {
-            return TextComponent.builder().append(text).append(TextComponent.space()).build();
+            return Component.text().append(text).append(Component.space()).build();
         }
     },
     SPACE_BEFORE("p") {
         @Override
         public Component apply(final Component text) {
-            return TextComponent.builder().append(TextComponent.space()).append(text).build();
+            return Component.text().append(Component.space()).append(text).build();
         }
     };
 

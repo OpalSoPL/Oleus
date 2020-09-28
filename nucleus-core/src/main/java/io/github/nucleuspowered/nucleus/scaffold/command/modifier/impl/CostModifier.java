@@ -12,12 +12,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifi
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.CommandContext;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.Optional;
@@ -47,7 +46,7 @@ public class CostModifier implements ICommandModifier {
         return serviceCollection.economyServiceProvider().serviceExists() && source.getCause().root() instanceof ServerPlayer;
     }
 
-    @Override public Optional<TextComponent> testRequirement(final ICommandContext source, final CommandControl control,
+    @Override public Optional<Component> testRequirement(final ICommandContext source, final CommandControl control,
             final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
         if (source.getCost() > 0) {
             final double cost = source.getCost();

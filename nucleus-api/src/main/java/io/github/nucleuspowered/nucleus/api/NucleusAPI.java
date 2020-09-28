@@ -84,7 +84,7 @@ public final class NucleusAPI {
      */
     public static NucleusTextTemplateFactory getTextTemplateFactory() {
         return getService(NucleusTextTemplateFactory.class)
-                .orElseThrow(() -> new IllegalStateException("Nucleus TextComponent Template Factory has not been registered"));
+                .orElseThrow(() -> new IllegalStateException("Nucleus Text Template Factory has not been registered"));
     }
 
     /**

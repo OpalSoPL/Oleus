@@ -63,7 +63,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         this.textStyleService = serviceCollection.textStyleService();
     }
 
-    private TextComponent prefix = TextComponent.empty();
+    private Component prefix = Component.empty();
     private Pattern pattern;
     private int min = 3;
     private int max = 16;
@@ -114,7 +114,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         return Maps.newHashMap(this.cache.inverse());
     }
 
-    public Map<Player, TextComponent> getFromSubstring(final String search) {
+    public Map<Player, Component> getFromSubstring(final String search) {
         final String prefix = search.toLowerCase();
         final Collection<UUID> uuidCollection;
         if (prefix.length() > 0) {
@@ -125,12 +125,12 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
             uuidCollection = this.reverseLowerCaseCache.values();
         }
 
-        final ImmutableMap.Builder<Player, TextComponent> mapToReturn = ImmutableMap.builder();
+        final ImmutableMap.Builder<Player, Component> mapToReturn = ImmutableMap.builder();
         Sponge.getServer().getOnlinePlayers().stream()
                 .filter(x -> !this.cache.containsKey(x.getUniqueId()))
                 .filter(x -> x.getName().toLowerCase().startsWith(prefix))
                 .forEach(player -> mapToReturn.put(player, player.get(Keys.DISPLAY_NAME).orElseGet(
-                        () -> TextComponent.of(player.getName() + "*"))));
+                        () -> Component.text(player.getName() + "*"))));
 
         for (final UUID uuid : uuidCollection) {
             final Optional<ServerPlayer> op = Sponge.getServer().getPlayer(uuid);

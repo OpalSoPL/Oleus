@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -97,8 +97,8 @@ public interface NucleusTextTemplateEvent extends Event, Cancellable {
      * @param source The source
      * @return The message for the specific source
      */
-    default TextComponent getMessageFor(final Audience source) {
-        return TextComponent.builder().append(this.getMessage().getForObject(source)).build();
+    default Component getMessageFor(final Audience source) {
+        return Component.text().append(this.getMessage().getForObject(source)).build();
     }
 
     /**

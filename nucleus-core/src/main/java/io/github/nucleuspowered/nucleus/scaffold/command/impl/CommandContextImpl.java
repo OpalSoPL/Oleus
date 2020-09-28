@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
@@ -87,7 +87,7 @@ public final class CommandContextImpl implements ICommandContext {
         if (root instanceof ServerPlayer) {
             return (ServerPlayer) root;
         }
-        throw new CommandException(TextComponent.of("This command must be executed by a player!", NamedTextColor.RED));
+        throw new CommandException(Component.text("This command must be executed by a player!", NamedTextColor.RED));
     }
 
     @Override
@@ -98,6 +98,11 @@ public final class CommandContextImpl implements ICommandContext {
     @Override
     public String getCommandKey() {
         return this.commandkey;
+    }
+
+    @Override
+    public boolean hasFlag(final String name) {
+        return this.context.hasFlag(name);
     }
 
     @Override
@@ -216,7 +221,7 @@ public final class CommandContextImpl implements ICommandContext {
         return this.failResult();
     }
 
-    public ICommandResult errorResultLiteral(final TextComponent message) {
+    public ICommandResult errorResultLiteral(final Component message) {
         return new CommandResultImpl.Literal(message);
     }
 
@@ -304,12 +309,12 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public TextComponent getMessageFor(final Audience to, final String key, final Object... replacements) {
+    public Component getMessageFor(final Audience to, final String key, final Object... replacements) {
         return this.serviceCollection.messageProvider().getMessageFor(to, key, replacements);
     }
 
     @Override
-    public TextComponent getMessage(final String key, final Object... replacements) {
+    public Component getMessage(final String key, final Object... replacements) {
         return this.getMessageFor(this.cause.getAudience(), key, replacements);
     }
 
@@ -324,7 +329,7 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public void sendMessageText(final TextComponent message) {
+    public void sendMessageText(final Component message) {
         this.context.sendMessage(message);
     }
 
@@ -356,12 +361,12 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public TextComponent getDisplayName() {
+    public Component getDisplayName() {
         return this.getServiceCollection().playerDisplayNameService().getDisplayName(this.cause.getAudience());
     }
 
     @Override
-    public TextComponent getDisplayName(final UUID uuid) {
+    public Component getDisplayName(final UUID uuid) {
         return this.getServiceCollection().playerDisplayNameService().getDisplayName(uuid);
     }
 

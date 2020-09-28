@@ -6,16 +6,15 @@ package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
-import io.github.nucleuspowered.nucleus.modules.warp.data.WarpData;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
-public class WarpSerialiser implements TypeSerializer<Warp> {
+public final class WarpSerialiser implements TypeSerializer<Warp> {
 
     public static final WarpSerialiser INSTANCE = new WarpSerialiser();
 
@@ -25,9 +24,9 @@ public class WarpSerialiser implements TypeSerializer<Warp> {
     @Override
     public Warp deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
         final String desc = value.getNode("description").getString();
-        TextComponent res = null;
+        Component res = null;
         if (desc != null) {
-            res = TextSerializers.JSON.deserialize(desc);
+            res = GsonComponentSerializer.gson().deserialize(desc);
         }
 
         return new WarpData(

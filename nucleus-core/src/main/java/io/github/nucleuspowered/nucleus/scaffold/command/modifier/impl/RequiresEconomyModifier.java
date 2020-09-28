@@ -9,6 +9,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.command.exception.CommandException;
 
@@ -17,8 +18,8 @@ import java.util.Optional;
 public class RequiresEconomyModifier implements ICommandModifier {
 
     @Override
-    public Optional<TextComponent> testRequirement(final ICommandContext source, final CommandControl control,
-            final INucleusServiceCollection serviceCollection, final CommandModifier modifier) throws CommandException {
+    public Optional<Component> testRequirement(final ICommandContext source, final CommandControl control,
+            final INucleusServiceCollection serviceCollection, final CommandModifier modifier) {
         if (!serviceCollection.economyServiceProvider().serviceExists()) {
             return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getCause().getAudience(), "command.economyrequired"));
         }

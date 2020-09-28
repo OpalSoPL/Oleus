@@ -6,21 +6,18 @@ package io.github.nucleuspowered.nucleus.services.impl.placeholder.standard;
 
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.SystemSubject;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.placeholder.PlaceholderContext;
 import org.spongepowered.api.placeholder.PlaceholderParser;
-import org.spongepowered.api.util.Nameable;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
 
 public class NamePlaceholder<T> implements PlaceholderParser {
 
-    private static final TextComponent CONSOLE = TextComponent.of("-");
+    private static final Component CONSOLE = Component.text("-");
     private final IPlayerDisplayNameService playerDisplayNameService;
     private final boolean consoleFilter;
     private final BiFunction<IPlayerDisplayNameService, T, Component> parser;
@@ -58,7 +55,7 @@ public class NamePlaceholder<T> implements PlaceholderParser {
                 return this.parser.apply(this.playerDisplayNameService, this.clazz.cast(associated.get()));
             }
         }
-        return TextComponent.empty();
+        return Component.empty();
     }
 
     @Override

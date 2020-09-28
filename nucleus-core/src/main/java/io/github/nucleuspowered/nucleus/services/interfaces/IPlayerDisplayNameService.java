@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.services.interfaces;
 import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.services.impl.playername.PlayerDisplayNameService;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
@@ -30,7 +30,7 @@ public interface IPlayerDisplayNameService {
 
     void provideDisplayNameQuery(DisplayNameQuery resolver);
 
-    Optional<User> getUser(TextComponent displayName);
+    Optional<User> getUser(Component displayName);
 
     Optional<User> getUser(String displayName);
 
@@ -43,32 +43,32 @@ public interface IPlayerDisplayNameService {
      */
     Map<UUID, List<String>> startsWith(String displayName);
 
-    TextComponent getDisplayName(UUID playerUUID);
+    Component getDisplayName(UUID playerUUID);
 
-    default TextComponent getDisplayName(final Player player) {
+    default Component getDisplayName(final Player player) {
         return this.getDisplayName(player.getUniqueId());
     }
 
-    default TextComponent getDisplayName(final User user) {
+    default Component getDisplayName(final User user) {
         return this.getDisplayName(user.getUniqueId());
     }
 
-    TextComponent getDisplayName(Audience source);
+    Component getDisplayName(Audience source);
 
-    TextComponent getName(Audience user);
+    Component getName(Audience user);
 
-    TextComponent getName(Nameable user);
+    Component getName(Nameable user);
 
-    TextComponent addCommandToName(Nameable p);
+    Component addCommandToName(Nameable p);
 
-    TextComponent addCommandToDisplayName(Nameable p);
+    Component addCommandToDisplayName(Nameable p);
 
-    TextComponent getName(Object cs);
+    Component getName(Object cs);
 
     @FunctionalInterface
     interface DisplayNameResolver {
 
-        Optional<TextComponent> resolve(UUID userUUID);
+        Optional<Component> resolve(UUID userUUID);
 
     }
 

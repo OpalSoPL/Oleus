@@ -18,29 +18,28 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.game.GameReloadEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.lifecycle.RefreshGameEvent;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -66,7 +65,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener(order = Order.POST)
-    public void onPlayerAuth(final ClientConnectionEvent.Auth event) {
+    public void onPlayerAuth(final ServerSideConnectionEvent.Auth event) {
         final UUID userId = event.getProfile().getUniqueId();
         if (userId == null) { // it could be, I guess?
             return;
@@ -94,7 +93,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
      * We do this last to avoid interfering with other modules.
      */
     @Listener(order = Order.LATE)
-    public void onPlayerLoginLast(final ClientConnectionEvent.Login event, @Getter("getProfile") final GameProfile profile,
+    public void onPlayerLoginLast(final ServerSideConnectionEvent.Login event, @Getter("getProfile") final GameProfile profile,
         @Getter("getTargetUser") final User user) {
 
         final IUserDataObject udo = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(user.getUniqueId());
@@ -119,7 +118,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
      * We do this first to try to get the first play status as quick as possible.
      */
     @Listener(order = Order.FIRST)
-    public void onPlayerJoinFirst(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
+    public void onPlayerJoinFirst(final ServerSideConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
         try {
             final IUserDataObject qsu = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(player.getUniqueId());
             qsu.set(CoreKeys.LAST_LOGIN, Instant.now());
@@ -136,7 +135,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onPlayerJoinLast(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
+    public void onPlayerJoinLast(final ServerSideConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
         // created before
         if (!this.serviceCollection.storageManager().getUserService().getOnThread(player.getUniqueId())
                 .map(x -> x.get(CoreKeys.FIRST_JOIN)).isPresent()) {
@@ -183,7 +182,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerQuit(final ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") final Player player) {
+    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getTargetEntity") final Player player) {
         // There is an issue in Sponge where the connection may not even exist, because they were disconnected before the connection was
         // completely established.
         //noinspection ConstantConditions
@@ -214,14 +213,14 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onServerAboutToStop(final GameStoppingServerEvent event) {
+    public void onServerAboutToStop(final StoppingEngineEvent<Server> event) {
         for (final Player player : Sponge.getServer().getOnlinePlayers()) {
             this.serviceCollection.storageManager().getUserOnThread(player.getUniqueId()).ifPresent(x -> this.onPlayerQuit(player, x));
         }
 
         if (this.getKickOnStopMessage != null) {
             for (final Player p : Sponge.getServer().getOnlinePlayers()) {
-                final TextComponent msg = this.getKickOnStopMessage.getForSource(p);
+                final Component msg = this.getKickOnStopMessage.getForSource(p);
                 if (msg.isEmpty()) {
                     p.kick();
                 } else {
@@ -233,19 +232,23 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onGameReload(final GameReloadEvent event) {
-        final CommandSource requester = event.getCause().first(CommandSource.class).orElse(Sponge.getServer().getConsole());
+    public void onGameReload(final RefreshGameEvent event) {
+        final Audience requester = event.getCause().first(Audience.class).orElse(Sponge.getSystemSubject());
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         try {
             this.serviceCollection.reloadableService().fireReloadables(this.serviceCollection);
-            requester.sendMessage(Text.of(TextColors.YELLOW, "[Nucleus] ",
-                    messageProviderService.getMessageFor(requester, "command.reload.one")));
-            requester.sendMessage(Text.of(TextColors.YELLOW, "[Nucleus] ",
-                    messageProviderService.getMessageFor(requester, "command.reload.two")));
+            requester.sendMessage(Component.text().content("[Nucleus] ")
+                            .color(NamedTextColor.YELLOW)
+                            .append(messageProviderService.getMessageFor(requester, "command.reload.one")).build());
+            requester.sendMessage(Component.text().content("[Nucleus] ")
+                    .color(NamedTextColor.YELLOW)
+                    .append(messageProviderService.getMessageFor(requester, "command.reload.two")).build());
         } catch (final Exception e) {
             e.printStackTrace();
-            requester.sendMessage(Text.of(TextColors.RED, "[Nucleus] ",
-                    messageProviderService.getMessageFor(requester, "command.reload.errorone")));
+            requester.sendMessage(
+                    Component.text().content("[Nucleus] ")
+                            .color(NamedTextColor.RED)
+                            .append(messageProviderService.getMessageFor(requester, "command.reload.errorone")).build());
         }
     }
 }

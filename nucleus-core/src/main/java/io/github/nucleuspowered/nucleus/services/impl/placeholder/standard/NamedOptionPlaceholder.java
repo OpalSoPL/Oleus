@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.services.impl.placeholder.standard;
 
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.placeholder.PlaceholderContext;
@@ -33,7 +32,7 @@ public class NamedOptionPlaceholder implements PlaceholderParser {
         return subjectOptional.flatMap(subject -> this.permissionService
                 .getOptionFromSubject(subject, this.namedOption)
                 .map(LegacyComponentSerializer.legacyAmpersand()::deserialize))
-                .orElse(TextComponent.empty());
+                .orElse(Component.empty());
     }
 
     @Override

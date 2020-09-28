@@ -20,7 +20,6 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
-import net.kyori.adventure.text.TextComponent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
@@ -33,7 +32,6 @@ import org.spongepowered.api.util.Nameable;
 import org.spongepowered.api.util.TemporalUnits;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.storage.WorldProperties;
-import org.spongepowered.plugin.PluginContainer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +52,6 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     private final PlaceholderParser optionParser;
     private final PlaceholderParser emptyParser;
     private final Map<String, PlaceholderMetadata> parsers = new HashMap<>();
-    private final PluginContainer pluginContainer;
 
     static {
         SEPARATOR = buildModifiers();
@@ -71,10 +68,9 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
 
     @Inject
     public PlaceholderService(final INucleusServiceCollection serviceCollection) {
-        this.pluginContainer = serviceCollection.pluginContainer();
         this.optionParser = new OptionPlaceholder(serviceCollection.permissionService());
         this.emptyParser =
-                PlaceholderParser.builder().key(ResourceKey.resolve("nucleus:empty")).parser(p -> TextComponent.empty()).build();
+                PlaceholderParser.builder().key(ResourceKey.resolve("nucleus:empty")).parser(p -> Component.empty()).build();
     }
 
     @Override
@@ -113,21 +109,21 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
 
         this.registerToken("maxplayers", PlaceholderParser.builder()
                 .key(ResourceKey.resolve("nucleus:maxplayers"))
-                .parser(p -> TextComponent.of(Sponge.getServer().getMaxPlayers()))
+                .parser(p -> Component.text(Sponge.getServer().getMaxPlayers()))
                 .build());
         this.registerToken("onlineplayers", PlaceholderParser.builder()
                         .key(ResourceKey.resolve("nucleus:onlineplayers"))
-                        .parser(p -> TextComponent.of(Sponge.getServer().getOnlinePlayers().size()))
+                        .parser(p -> Component.text(Sponge.getServer().getOnlinePlayers().size()))
                         .build());
         this.registerToken("currentworld", PlaceholderParser.builder()
                 .key(ResourceKey.resolve("nucleus:currentworld"))
-                .parser(placeholder -> TextComponent.of(PlaceholderService.getWorld(placeholder).getKey().getFormatted()))
+                .parser(placeholder -> Component.text(PlaceholderService.getWorld(placeholder).getKey().getFormatted()))
                 .build());
         this.registerToken("time",
                 PlaceholderParser.builder()
                         .key(ResourceKey.resolve("nucleus:time"))
                         .parser(placeholder ->
-                                TextComponent.of(
+                                Component.text(
                                         Util.getTimeFromTicks(serviceCollection.messageProvider(),
                                                 PlaceholderService.getWorld(placeholder).getDayTime().get(TemporalUnits.MINECRAFT_TICKS))))
                         .build());
@@ -135,14 +131,14 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         this.registerToken("uniquevisitor",
                 PlaceholderParser.builder()
                         .key(ResourceKey.resolve("nucleus:uniquevisitor"))
-                        .parser(placeholder -> TextComponent.of(serviceCollection.getServiceUnchecked(UniqueUserService.class).getUniqueUserCount()))
+                        .parser(placeholder -> Component.text(serviceCollection.getServiceUnchecked(UniqueUserService.class).getUniqueUserCount()))
                         .build());
         this.registerToken("ipaddress",
                 PlaceholderParser.builder()
                         .key(ResourceKey.resolve("nucleus:ipaddress"))
                         .parser(placeholder -> placeholder.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
-                                .map(x -> TextComponent.of(((ServerPlayer) x).getConnection().getAddress().getAddress().toString()))
-                                .orElse(TextComponent.of("localhost")))
+                                .map(x -> Component.text(((ServerPlayer) x).getConnection().getAddress().getAddress().toString()))
+                                .orElse(Component.text("localhost")))
                         .build());
     }
 
@@ -178,7 +174,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
                 parser = this.optionParser;
                 context = this.contextForSubjectAndOption((Subject) commandSource, token.substring(2));
             } else {
-                return TextComponent.empty();
+                return Component.empty();
             }
         } else {
             final String[] s = token.split("\\|", 2);

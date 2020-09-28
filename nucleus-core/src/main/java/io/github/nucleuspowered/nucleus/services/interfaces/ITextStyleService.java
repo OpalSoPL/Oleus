@@ -8,7 +8,6 @@ import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.services.impl.textstyle.TextStyleService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -35,12 +34,12 @@ public interface ITextStyleService {
             return Style.empty();
         }
 
-        @Override public TextComponent textOf() {
-            return TextComponent.empty();
+        @Override public Component textOf() {
+            return Component.empty();
         }
 
         @Override public TextComponent.Builder apply(final Component component) {
-            return TextComponent.builder().append(component);
+            return Component.text().append(component);
         }
     };
 
@@ -81,21 +80,21 @@ public interface ITextStyleService {
 
     Optional<TextColor> getColourFromString(@Nullable String s);
 
-    @Nullable default TextColor getNullableColourFromString(@Nullable String s) {
+    @Nullable default TextColor getNullableColourFromString(@Nullable final String s) {
         return this.getColourFromString(s).orElse(null);
     }
 
     Style getTextStyleFromString(@Nullable String s);
 
-    TextComponent addUrls(String message);
+    Component addUrls(String message);
 
-    TextComponent addUrls(String message, boolean replaceBlueUnderline);
+    Component addUrls(String message, boolean replaceBlueUnderline);
 
-    TextComponent getTextForUrl(String url, String msg, String whiteSpace, TextFormat st, @Nullable String optionString);
+    Component getTextForUrl(String url, String msg, String whiteSpace, TextFormat st, @Nullable String optionString);
 
-    TextComponent oldLegacy(String message);
+    Component oldLegacy(String message);
 
-    TextComponent joinTextsWithColoursFlowing(TextComponent... texts);
+    Component joinTextsWithColoursFlowing(TextComponent... texts);
 
     interface TextFormat {
 
@@ -103,7 +102,7 @@ public interface ITextStyleService {
 
         Style style();
 
-        TextComponent textOf();
+        Component textOf();
 
         TextComponent.Builder apply(Component component);
 

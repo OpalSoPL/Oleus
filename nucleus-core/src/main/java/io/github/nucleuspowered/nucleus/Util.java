@@ -8,7 +8,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -51,7 +50,7 @@ public final class Util {
     public static final DateTimeFormatter FULL_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)
             .withZone(ZoneId.systemDefault());
 
-    public static final Component SPACE = TextComponent.space();
+    public static final Component SPACE = Component.space();
 
     public static final String usernameRegexPattern = "[0-9a-zA-Z_]{3,16}";
     public static final Pattern usernameRegex = Pattern.compile(usernameRegexPattern);

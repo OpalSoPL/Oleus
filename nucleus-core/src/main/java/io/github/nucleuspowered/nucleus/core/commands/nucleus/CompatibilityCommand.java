@@ -12,8 +12,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICompatibilityService;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -37,14 +37,14 @@ public class CompatibilityCommand implements ICommandExecutor {
         }
 
         // Create pagination
-        final TextComponent text = messages.stream()
+        final Component text = messages.stream()
                 .sorted(Comparator.comparing(x -> -x.getSeverity().getIndex()))
                 .map(x -> {
-                    final TextComponent modulesAffected =
+                    final Component modulesAffected =
                             x.getModules().isEmpty() ?
                                     context.getMessage("command.nucleus.compat.all") :
-                                    Text.of(String.join(" ,", x.getModules()));
-                    return Text.joinWith(Text.NEW_LINE,
+                                    Component.text(String.join(" ,", x.getModules()));
+                    return TextComponent.join(Component.newline(),
                         context.getMessage("command.nucleus.compat.severity.base",
                             "loc:command.nucleus.compat.severity." + x.getSeverity().name().toLowerCase()),
                             context.getMessage("command.nucleus.compat.modulesaffected", modulesAffected),
@@ -54,12 +54,17 @@ public class CompatibilityCommand implements ICommandExecutor {
                             context.getMessage("command.nucleus.compat.resolution", x.getResolution())
                     );
                 })
-                .reduce((text1, text2) -> Text.of(text1, Text.NEW_LINE, Text.NEW_LINE, text2))
-                .orElse(Text.EMPTY);
-        Util.getPaginationBuilder(context.getCommandSourceRoot())
+                .reduce((text1, text2) -> Component.text()
+                        .append(text1)
+                        .append(Component.newline())
+                        .append(Component.newline())
+                        .append(text2)
+                        .build())
+                .orElse(Component.empty());
+        Util.getPaginationBuilder(context.getAudience())
                 .header(context.getMessage("command.nucleus.compat.header"))
                 .contents(text)
-                .sendTo(context.getCommandSourceRoot());
+                .sendTo(context.getAudience());
         return context.successResult();
     }
 }

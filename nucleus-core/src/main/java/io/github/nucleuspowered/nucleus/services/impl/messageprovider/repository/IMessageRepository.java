@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository;
 
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 
 public interface IMessageRepository {
 
@@ -15,9 +15,9 @@ public interface IMessageRepository {
 
     boolean hasEntry(String key);
 
-    TextComponent getText(String key);
+    Component getText(String key);
 
-    TextComponent getText(String key, Object[] args);
+    Component getText(String key, Object[] args);
 
     String getString(String key);
 

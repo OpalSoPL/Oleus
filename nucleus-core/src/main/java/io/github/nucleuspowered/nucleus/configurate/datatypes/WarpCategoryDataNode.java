@@ -40,7 +40,7 @@ public class WarpCategoryDataNode {
         return Optional.of(GsonComponentSerializer.gson().deserialize(this.displayName));
     }
 
-    public void setDisplayName(@Nullable final TextComponent displayName) {
+    public void setDisplayName(@Nullable final Component displayName) {
         this.displayName = displayName == null ? null : GsonComponentSerializer.gson().serialize(displayName);
     }
 
@@ -51,7 +51,7 @@ public class WarpCategoryDataNode {
         return Optional.of(GsonComponentSerializer.gson().deserialize(this.description));
     }
 
-    public void setDescription(@Nullable final TextComponent description) {
+    public void setDescription(@Nullable final Component description) {
         this.description = description == null ? null : GsonComponentSerializer.gson().serialize(description);
     }
 }

@@ -28,12 +28,12 @@ public final class Template implements ComponentLike {
                 .collect(Collectors.toMap(x -> x.key, x -> x));
     }
 
-    public TextComponent create() {
+    public Component create() {
         return this.create(Collections.emptyMap());
     }
 
-    public TextComponent create(final Map<String, Component> replacements) {
-        final TextComponent.Builder builder = TextComponent.builder();
+    public Component create(final Map<String, Component> replacements) {
+        final TextComponent.Builder builder = Component.text();
         for (final TextElement element : this.elements) {
             builder.append(element.retrieve(replacements));
         }

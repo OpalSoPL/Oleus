@@ -25,7 +25,6 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenera
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.SimpleConfigurationNode;

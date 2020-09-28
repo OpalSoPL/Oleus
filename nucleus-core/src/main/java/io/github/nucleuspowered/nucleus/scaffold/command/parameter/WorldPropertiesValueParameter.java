@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.scaffold.command.parameter;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
@@ -26,16 +27,17 @@ import java.util.stream.Collectors;
 public class WorldPropertiesValueParameter implements ValueParameter<WorldProperties> {
 
     private final Predicate<WorldProperties> filter;
-    private final Function<ResourceKey, TextComponent> errorMessageGenerator;
+    private final Function<ResourceKey, Component> errorMessageGenerator;
 
-    public WorldPropertiesValueParameter(final Predicate<WorldProperties> filter, final Function<ResourceKey, TextComponent> errorMessageGenerator) {
+    public WorldPropertiesValueParameter(final Predicate<WorldProperties> filter, final Function<ResourceKey, Component> errorMessageGenerator) {
         this.filter = filter;
         this.errorMessageGenerator = errorMessageGenerator;
     }
 
     @Override
-    public List<String> complete(final CommandContext context) {
+    public List<String> complete(final CommandContext context, final String input) {
         return Sponge.getServer().getWorldManager().getAllProperties().stream()
+                .filter(x -> x.getKey().getFormatted().startsWith(input))
                 .filter(this.filter)
                 .map(y -> y.getKey().toString())
                 .collect(Collectors.toList());

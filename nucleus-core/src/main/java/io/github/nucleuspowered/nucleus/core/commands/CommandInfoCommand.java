@@ -14,7 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.ArgumentParseException;
@@ -61,9 +61,9 @@ public class CommandInfoCommand implements ICommandExecutor {
         final CommandMapping mapping = context.requireOne(this.commandParameter);
 
         final IMessageProviderService provider = context.getServiceCollection().messageProvider();
-        final TextComponent header = provider.getMessageFor(source, "command.commandinfo.title", mapping.getPrimaryAlias());
+        final Component header = provider.getMessageFor(source, "command.commandinfo.title", mapping.getPrimaryAlias());
 
-        final List<Text> content = Lists.newArrayList();
+        final List<Component> content = new ArrayList<>();
 
         // Owner
         content.add(provider.getMessageFor(source, "command.commandinfo.owner", Sponge.getCommandManager().getOwner(mapping)
@@ -94,7 +94,7 @@ public class CommandInfoCommand implements ICommandExecutor {
         final CommandSource source = context.getCommandSourceRoot();
         content.add(provider.getMessageFor(source, "command.commandinfo.type", "loc:command.commandinfo.nucleus"));
         content.add(Text.EMPTY);
-        final TextComponent text = abstractCommand.getUsageText(source);
+        final Component text = abstractCommand.getUsageText(source);
         if (text.isEmpty()) {
             content.add(provider.getMessageFor(source, "command.commandinfo.noinfo"));
         } else {

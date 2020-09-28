@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.exception.CommandException;
@@ -91,6 +91,8 @@ public interface ICommandContext {
 
     User getUserFromArgs(Parameter.Key<? extends User> key, String errorKey) throws CommandException;
 
+    boolean hasFlag(String name);
+
     boolean hasAny(Parameter.Key<?> name);
 
     <T> Optional<? extends T> getOne(Parameter.Key<T> name);
@@ -135,7 +137,7 @@ public interface ICommandContext {
 
     ICommandResult failResult();
 
-    ICommandResult errorResultLiteral(TextComponent message);
+    ICommandResult errorResultLiteral(Component message);
 
     ICommandResult errorResult(String key, Object... args);
 
@@ -165,9 +167,9 @@ public interface ICommandContext {
 
     String getMessageStringFor(Audience to, String key, Object... replacements);
 
-    TextComponent getMessage(String key, Object... replacements);
+    Component getMessage(String key, Object... replacements);
 
-    TextComponent getMessageFor(Audience to, String key, Object... replacements);
+    Component getMessageFor(Audience to, String key, Object... replacements);
 
     default String getTimeString(final Duration duration) {
         return this.getTimeString(duration.getSeconds());
@@ -183,7 +185,7 @@ public interface ICommandContext {
      */
     void sendMessage(String key, Object... replacements);
 
-    void sendMessageText(TextComponent message);
+    void sendMessageText(Component message);
 
     void sendMessageTo(Audience to, String key, Object... replacements);
 
@@ -205,9 +207,9 @@ public interface ICommandContext {
 
     String getName();
 
-    TextComponent getDisplayName();
+    Component getDisplayName();
 
-    TextComponent getDisplayName(UUID uuid);
+    Component getDisplayName(UUID uuid);
 
     default String getTimeToNowString(final Instant endTime) {
         return this.getTimeString(Duration.between(Instant.now(), endTime).abs());

@@ -20,7 +20,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
 import io.github.nucleuspowered.nucleus.util.PrettyPrinter;
 import io.github.nucleuspowered.nucleus.util.ThrownFunction;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
@@ -75,7 +75,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     @Override
     public void assignUserRoleToDefault() {
-        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.getServiceProvider().permissionService().getDefaults());
+        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.getServer().getServiceProvider().permissionService().getDefaults());
     }
 
     @Override
@@ -94,7 +94,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     @Override
     public void registerContextCalculator(final ContextCalculator<Subject> calculator) {
-        Sponge.getServiceProvider().permissionService().registerContextCalculator(calculator);
+        Sponge.getServer().getServiceProvider().permissionService().registerContextCalculator(calculator);
     }
 
     @Override public boolean hasPermission(final Subject permissionSubject, final String permission) {
@@ -126,13 +126,13 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override public void registerDescriptions() {
         Preconditions.checkState(!this.init);
         this.init = true;
-        final PermissionService ps = Sponge.getServiceProvider().permissionService();
+        final PermissionService ps = Sponge.getServer().getServiceProvider().permissionService();
         for (final Map.Entry<String, IPermissionService.Metadata> entry : this.metadataMap.entrySet()) {
             final SuggestedLevel level = entry.getValue().getSuggestedLevel();
             if (level.getRole() != null) {
                 ps.newDescriptionBuilder(this.serviceCollection.pluginContainer())
                         .assign(level.getRole(), true)
-                        .description(TextComponent.of(entry.getValue().getDescription(this.messageProviderService)))
+                        .description(Component.text(entry.getValue().getDescription(this.messageProviderService)))
                         .id(entry.getKey()).register();
             }
         }

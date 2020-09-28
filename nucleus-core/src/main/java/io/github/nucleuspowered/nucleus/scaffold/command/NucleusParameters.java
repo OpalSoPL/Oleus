@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.scaffold.command;
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.WorldPropertiesValueParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.parameter.CommonParameters;
@@ -132,8 +132,8 @@ public final class NucleusParameters {
             Parameter.builder(WorldProperties.class)
                     .setKey(Keys.WORLD)
                     .parser(new WorldPropertiesValueParameter(
-                            x -> x.isEnabled(),
-                            key -> TextComponent.of(key.getFormatted() + " is not a disabled world properties.")))
+                            WorldProperties::isEnabled,
+                            key -> Component.text(key.getFormatted() + " is not a disabled world properties.")))
                     .build();
 
     public static final Parameter.Value<WorldProperties> OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY =
@@ -144,7 +144,7 @@ public final class NucleusParameters {
                     .setKey(Keys.WORLD)
                     .parser(new WorldPropertiesValueParameter(
                             x -> !x.isEnabled(),
-                            key -> TextComponent.of(key.getFormatted() + " is not a disabled world properties.")))
+                            key -> Component.text(key.getFormatted() + " is not a disabled world properties.")))
                     .build();
 
     public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_ALL = CommonParameters.ALL_WORLD_PROPERTIES;
@@ -157,7 +157,7 @@ public final class NucleusParameters {
                     .setKey(Keys.WORLD)
                     .parser(new WorldPropertiesValueParameter(
                             x -> !x.getWorld().isPresent(),
-                            key -> TextComponent.of(key.getFormatted() + " is not an unloaded world properties.")))
+                            key -> Component.text(key.getFormatted() + " is not an unloaded world properties.")))
                     .build();
 
     public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_LOADED_ONLY = CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY;

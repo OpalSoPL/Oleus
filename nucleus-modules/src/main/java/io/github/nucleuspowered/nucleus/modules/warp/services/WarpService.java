@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.services;
 
+import net.kyori.adventure.text.Component;
 import org.spongepowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -307,7 +308,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean setWarpDescription(final String warpName, @Nullable final TextComponent description) {
+    public boolean setWarpDescription(final String warpName, @Nullable final Component description) {
         final Optional<Warp> warp = getWarp(warpName);
         if (warp.isPresent()) {
             final Warp w = warp.get();
@@ -338,7 +339,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean setWarpCategoryDisplayName(final String category, @Nullable final TextComponent displayName) {
+    public boolean setWarpCategoryDisplayName(final String category, @Nullable final Component displayName) {
         final Optional<WarpCategory> c = getWarpCategory(category);
         if (c.isPresent()) {
             final WarpCategory cat = c.get();
@@ -356,7 +357,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     }
 
     @Override
-    public boolean setWarpCategoryDescription(final String category, @Nullable final TextComponent description) {
+    public boolean setWarpCategoryDescription(final String category, @Nullable final Component description) {
         final Optional<WarpCategory> c = getWarpCategory(Objects.requireNonNull(category));
         if (c.isPresent()) {
             final WarpCategory cat = c.get();

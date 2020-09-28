@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.scaffold.command.impl;
 import com.google.common.base.Preconditions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.CommandResult;
 
@@ -61,7 +61,7 @@ public class CommandResultImpl implements ICommandResult {
     }
 
     @Override
-    public Optional<TextComponent> getErrorMessage(final ICommandContext source) {
+    public Optional<Component> getErrorMessage(final ICommandContext source) {
         return Optional.of(source.getMessage(this.key, this.args));
     }
 
@@ -70,17 +70,17 @@ public class CommandResultImpl implements ICommandResult {
         return null;
     }
 
-    public static class Literal extends CommandResultImpl {
+    public static final class Literal extends CommandResultImpl {
 
-        private final TextComponent literal;
+        private final Component literal;
 
-        public Literal(final TextComponent literal) {
+        public Literal(final Component literal) {
             super(false, false);
             this.literal = literal;
         }
 
         @Override
-        public Optional<TextComponent> getErrorMessage(final ICommandContext source) {
+        public Optional<Component> getErrorMessage(final ICommandContext source) {
             return Optional.of(this.literal);
         }
     }

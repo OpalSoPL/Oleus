@@ -23,7 +23,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderServ
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.util.locale.LocaleSource;
 import org.spongepowered.api.util.locale.Locales;
@@ -155,22 +155,22 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     }
 
     @Override
-    public TextComponent getMessageFor(final Locale locale, final String key) {
+    public Component getMessageFor(final Locale locale, final String key) {
         return this.getMessagesRepository(locale).getText(key);
     }
 
     @Override
-    public TextComponent getMessageFor(final Locale locale, final String key, final TextComponent... args) {
+    public Component getMessageFor(final Locale locale, final String key, final Component... args) {
         return this.getMessagesRepository(locale).getText(key, args);
     }
 
     @Override
-    public TextComponent getMessageFor(final Locale locale, final String key, final Object... replacements) {
+    public Component getMessageFor(final Locale locale, final String key, final Object... replacements) {
         return this.getMessagesRepository(locale).getText(key, replacements);
     }
 
     @Override
-    public TextComponent getMessageFor(final Locale locale, final String key, final String... replacements) {
+    public Component getMessageFor(final Locale locale, final String key, final String... replacements) {
         return this.getMessagesRepository(locale).getText(key, replacements);
     }
 

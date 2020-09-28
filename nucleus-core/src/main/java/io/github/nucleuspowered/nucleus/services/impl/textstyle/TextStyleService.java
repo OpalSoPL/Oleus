@@ -11,11 +11,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -44,7 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Singleton
-public class TextStyleService implements ITextStyleService, IReloadableService.Reloadable {
+public class TextStyleService implements ITextStyleService {
 
     private final Pattern colours = Pattern.compile(".*?(?<colour>(&[0-9a-flmnrok])+)$");
     private final Pattern urlParser =
@@ -122,7 +119,6 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             );
 
     private final Style resetStyle;
-    private String commandNameOnClick;
 
     @Inject
     public TextStyleService(
@@ -165,7 +161,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
 
     @Override
     public List<String> getPermissionsFor(final String prefix, final TextDecoration style) {
-        return this.getPermissionsFor(prefix, Style.of(style));
+        return this.getPermissionsFor(prefix, Style.style(style));
     }
 
     @Override
@@ -385,13 +381,13 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         return ts.build();
     }
 
-    @Override public TextComponent addUrls(final String message) {
+    @Override public Component addUrls(final String message) {
         return this.addUrls(message, false);
     }
 
-    @Override public TextComponent addUrls(final String message, final boolean replaceBlueUnderline) {
+    @Override public Component addUrls(final String message, final boolean replaceBlueUnderline) {
         if (message == null || message.isEmpty()) {
-            return TextComponent.empty();
+            return Component.empty();
         }
 
         final Matcher m = this.urlParser.matcher(message);
@@ -405,7 +401,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         do {
             // We found a URL. We split on the URL that we have.
             final String[] textArray = remaining.split(this.urlParser.pattern(), 2);
-            final TextComponent.Builder firstB = TextComponent.builder().style(st.style());
+            final TextComponent.Builder firstB = Component.text().style(st.style());
             if (st.colour().isPresent()) {
                 firstB.color(st.colour().get());
             }
@@ -422,7 +418,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             // Get the last colour & styles
             final String colourMatch = m.group("colour");
             if (replaceBlueUnderline) {
-                st = new TextFormatImpl(NamedTextColor.BLUE, Style.of(TextDecoration.UNDERLINED));
+                st = new TextFormatImpl(NamedTextColor.BLUE, Style.style(TextDecoration.UNDERLINED));
             } else if (colourMatch != null && !colourMatch.isEmpty()) {
 
                 // If there is a reset, explicitly do it.
@@ -432,7 +428,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
                 }
 
                 st = this.getLastColourAndStyle(
-                        TextComponent.builder().style(reset).append(
+                        Component.text().style(reset).append(
                                 LegacyComponentSerializer.legacyAmpersand().deserialize(m.group("colour") + " ")).build(),
                         st);
             } else {
@@ -442,7 +438,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             // Build the URL
             final String whiteSpace = m.group("first");
             if (replaceBlueUnderline) {
-                st = new TextFormatImpl(NamedTextColor.BLUE, Style.of(TextDecoration.UNDERLINED));
+                st = new TextFormatImpl(NamedTextColor.BLUE, Style.style(TextDecoration.UNDERLINED));
             } else {
                 st = this.getLastColourAndStyle(first, st);
             }
@@ -465,13 +461,13 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
         }
 
         // Join it all together.
-        final TextComponent.Builder finalcomponent = TextComponent.builder();
+        final TextComponent.Builder finalcomponent = Component.text();
         texts.forEach(finalcomponent::append);
         return finalcomponent.build();
     }
 
     @Override
-    public TextComponent getTextForUrl(
+    public Component getTextForUrl(
             final String toParse, final String msg, final String whiteSpace, final ITextStyleService.TextFormat st,
             @Nullable final String optionString) {
         try {
@@ -488,7 +484,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             }
 
             if (!whiteSpace.isEmpty()) {
-                return TextComponent.builder(whiteSpace).append(textBuilder.build()).build();
+                return Component.text().content(whiteSpace).append(textBuilder.build()).build();
             }
 
             return textBuilder.build();
@@ -498,7 +494,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             e.printStackTrace();
             final TextComponent ret = TextStyleService.create(toParse, st).build();
             if (!whiteSpace.isEmpty()) {
-                return TextComponent.builder(whiteSpace).append(ret).build();
+                return Component.text().content(whiteSpace).append(ret).build();
             }
 
             return ret;
@@ -506,7 +502,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
     }
 
     @Override
-    public TextComponent oldLegacy(final String message) {
+    public Component oldLegacy(final String message) {
         final Matcher colourMatcher = this.colours.matcher(message);
         if (colourMatcher.matches()) {
             final TextComponent first = LegacyComponentSerializer.legacyAmpersand()
@@ -520,7 +516,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
     }
 
     @Override
-    public TextComponent joinTextsWithColoursFlowing(final TextComponent... texts) {
+    public Component joinTextsWithColoursFlowing(final TextComponent... texts) {
         final List<TextComponent> result = Lists.newArrayList();
         TextComponent last = null;
         for (final TextComponent n : texts) {
@@ -537,21 +533,15 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             last = n;
         }
 
-        return TextComponent.join(TextComponent.empty(), result);
-    }
-
-
-    @Override
-    public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.commandNameOnClick = serviceCollection.configProvider().getModuleConfig(CoreConfig.class).getCommandOnNameClick();
+        return TextComponent.join(Component.empty(), result);
     }
 
     private static TextComponent.Builder create(@Nullable final String string, final TextFormat format) {
         final TextComponent.Builder builder;
         if (string == null) {
-            builder = TextComponent.builder();
+            builder = Component.text();
         } else {
-            builder = TextComponent.builder(string);
+            builder = Component.text().content(string);
         }
         builder.style(format.style());
         format.colour().ifPresent(builder::color);
@@ -576,8 +566,8 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
             return this.style;
         }
 
-        @Override public TextComponent textOf() {
-            final TextComponent.Builder builder = TextComponent.builder("");
+        @Override public Component textOf() {
+            final TextComponent.Builder builder = Component.text().content("");
             if (this.colour != null) {
                 builder.color(this.colour);
             }
@@ -587,7 +577,7 @@ public class TextStyleService implements ITextStyleService, IReloadableService.R
 
         @Override
         public TextComponent.Builder apply(final Component component) {
-            final TextComponent.Builder builder = TextComponent.builder();
+            final TextComponent.Builder builder = Component.text();
             if (this.colour != null) {
                 builder.color(this.colour);
             }

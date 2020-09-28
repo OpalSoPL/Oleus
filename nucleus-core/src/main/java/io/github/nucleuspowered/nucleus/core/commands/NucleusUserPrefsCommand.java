@@ -16,13 +16,12 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.UserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,7 @@ import javax.annotation.Nullable;
 )
 public class NucleusUserPrefsCommand implements ICommandExecutor {
 
-    private static final TextComponent SEPARATOR = Text.of(": ");
+    private static final Component SEPARATOR = Component.text(": ");
     private final IUserPreferenceService userPreferenceService;
 
     @Inject
@@ -99,44 +98,44 @@ public class NucleusUserPrefsCommand implements ICommandExecutor {
     private ICommandResult list(final ICommandContext context, final User target) throws CommandException {
         final Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> ret = this.userPreferenceService.get(target);
 
-        final List<Text> entry = new ArrayList<>();
+        final List<Component> entry = new ArrayList<>();
         for (final Map.Entry<NucleusUserPreferenceService.PreferenceKey<?>, Object> e : ret.entrySet()) {
             final NucleusUserPreferenceService.PreferenceKey<?> key = e.getKey();
             final Object value = e.getValue();
             entry.add(this.get(context, this.userPreferenceService, key, value));
         }
 
-        Util.getPaginationBuilder(context.getCommandSourceRoot())
+        Util.getPaginationBuilder(context.getAudience())
                 .title(context.getServiceCollection().messageProvider().getMessageFor(
-                        context.getCommandSourceRoot(), "command.userprefs.title", target.getName()))
-            .contents(entry).build().sendTo(context.getCommandSourceRoot());
+                        context.getAudience(), "command.userprefs.title", target.getName()))
+                .contents(entry)
+                .build().sendTo(context.getAudience());
         return context.successResult();
     }
 
-    private TextComponent get(final ICommandContext context,
+    private Component get(final ICommandContext context,
             final IUserPreferenceService userPreferenceService,
             final NucleusUserPreferenceService.PreferenceKey<?> key,
             @Nullable final Object value) throws CommandException {
-        final Text.Builder tb = Text.builder(key.getID().replaceAll("^nucleus:", ""));
+        final TextComponent.Builder tb = Component.text().content(key.getID().replaceAll("^nucleus:", ""));
         tb.append(SEPARATOR);
-        final TextComponent result;
-        final CommandSource commandSource = context.getCommandSourceRoot();
+        final Component result;
+        final Audience commandSource = context.getAudience();
         if (value == null) {
             result = context.getServiceCollection().messageProvider().getMessageFor(commandSource, "standard.unset");
         } else if (value instanceof Boolean) {
             result = context.getServiceCollection().messageProvider().getMessageFor(commandSource, "standard." + (boolean) value);
         } else {
-            result = Text.of(value);
+            result = Component.text(String.valueOf(value));
         }
 
         tb.append(result);
         final String desc = userPreferenceService.getDescription(key);
         if (desc != null && !desc.isEmpty()) {
-            tb.onHover(TextActions.showText(
-                    key instanceof PreferenceKeyImpl ?
-                        context.getServiceCollection().messageProvider()
-                                .getMessageFor(commandSource, ((PreferenceKeyImpl<?>) key).getDescriptionKey()) :
-                        Text.of(desc)));
+            tb.hoverEvent(HoverEvent.showText(key instanceof PreferenceKeyImpl ?
+                    context.getServiceCollection().messageProvider()
+                            .getMessageFor(commandSource, ((PreferenceKeyImpl<?>) key).getDescriptionKey()) :
+                    Component.text(desc)));
         }
         return tb.build();
     }

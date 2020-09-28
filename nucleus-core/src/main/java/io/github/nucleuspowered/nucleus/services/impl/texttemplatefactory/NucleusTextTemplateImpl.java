@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory;
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.TextComponent;
@@ -69,18 +68,16 @@ public class NucleusTextTemplateImpl implements NucleusTextTemplate {
         final Optional<ComponentLike> s =
                 Optional.of(this.serviceCollection.placeholderService().parse(sender, "displayname"));
         return this.getForObjectWithSenderToken(source,
-                ImmutableMap.<String, Function<Object, Optional<Component>>>builder()
+                ImmutableMap.<String, Function<Object, Optional<? extends ComponentLike>>>builder()
                         .put("sender", se -> s)
                         .build());
     }
 
     @Override
     public Component getForObjectWithTokens(final Object source, @Nullable final Map<String, Function<Object, Optional<ComponentLike>>> tokensArray) {
-        final TextComponent.Builder builder = TextComponent.builder();
-        ITextStyleService.TextFormat st = null;
+        final TextComponent.Builder builder = Component.text();
         if (this.prefix != null) {
             builder.append(this.prefix);
-            st = this.serviceCollection.textStyleService().getLastColourAndStyle(this.prefix, null);
         }
 
         for (final BiFunction<Object, Map<String, Function<Object, Optional<ComponentLike>>>, Component> textComponent : this.texts) {

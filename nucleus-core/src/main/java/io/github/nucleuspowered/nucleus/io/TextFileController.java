@@ -12,7 +12,6 @@ import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.Nucleu
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -36,7 +35,7 @@ import javax.annotation.Nullable;
  */
 public final class TextFileController {
 
-    private static final TextComponent padding = TextComponent.of("-", NamedTextColor.GOLD);
+    private static final Component padding = Component.text("-", NamedTextColor.GOLD);
 
     private static final List<Charset> characterSetsToTest = Lists.newArrayList(
         StandardCharsets.UTF_8,
@@ -140,11 +139,11 @@ public final class TextFileController {
         return this.getFileContentsAsText().stream().map(x -> x.getForObject(source)).collect(Collectors.toList());
     }
 
-    public void sendToPlayer(final ServerPlayer src, final TextComponent title) {
+    public void sendToPlayer(final ServerPlayer src, final Component title) {
 
         final PaginationList.Builder pb = Util.getPaginationBuilder(src).contents(this.getTextFromNucleusTextTemplates(src));
 
-        if (title != null && !title.content().isEmpty()) {
+        if (title != null && !title.toString().isEmpty()) {
             pb.title(title).padding(padding);
         } else {
             pb.padding(Util.SPACE);

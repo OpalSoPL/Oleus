@@ -5,43 +5,25 @@
 package io.github.nucleuspowered.nucleus.services.impl.chatmessageformatter;
 
 import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
-import org.spongepowered.api.text.chat.ChatType;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
 
+import java.awt.Component;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public abstract class AbstractNucleusChatChannel<T extends Collection<MessageReceiver>> implements MessageChannel {
+public abstract class AbstractNucleusChatChannel<T extends Collection<Audience>> implements ForwardingAudience {
 
-    private final MessageChannel messageChannel;
+    private final ForwardingAudience messageChannel;
     final T messageReceiverList;
 
-    public AbstractNucleusChatChannel(final MessageChannel messageChannel, final T receivers) {
+    public AbstractNucleusChatChannel(final ForwardingAudience messageChannel, final T receivers) {
         this.messageChannel = messageChannel;
         this.messageReceiverList = receivers;
-    }
-
-    @Override
-    public void send(@Nullable final Object sender, final TextComponent original, final ChatType type) {
-        this.messageChannel.send(sender, original, type);
-    }
-
-    @Override
-    public Collection<MessageReceiver> getMembers() {
-        final Collection<MessageReceiver> delegated = this.messageChannel.getMembers();
-        return this.messageReceiverList.stream().filter(delegated::contains).collect(Collectors.toList());
-    }
-
-    MessageChannel getDelegated() {
-        return this.messageChannel;
     }
 
     public abstract static class Immutable<I extends Immutable<I, M>, M extends Mutable> extends AbstractNucleusChatChannel<ImmutableList<MessageReceiver>> {

@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class CommandControl {
+public final class CommandControl {
 
     private static final String CONTEXT_KEY = "nucleus_command";
 
@@ -135,7 +135,7 @@ public class CommandControl {
     @NonNull
     public CommandResult process(@NonNull final CommandContext context) throws CommandException {
         if (this.executor == null) {
-            throw new CommandException(TextComponent.of("This should not be executed"));
+            throw new CommandException(Component.text("This should not be executed"));
         }
          // Create the ICommandContext
         final Map<CommandModifier, ICommandModifier> modifiers = this.selectAppropriateModifiers(context);
@@ -156,7 +156,7 @@ public class CommandControl {
 
             // Can we run this command? Exception will be thrown if not.
             for (final Map.Entry<CommandModifier, ICommandModifier> x : modifiers.entrySet()) {
-                final Optional<TextComponent> req = x.getValue().testRequirement(contextSource, this, this.serviceCollection, x.getKey());
+                final Optional<? extends Component> req = x.getValue().testRequirement(contextSource, this, this.serviceCollection, x.getKey());
                 if (req.isPresent()) {
                     // Nope, we're out
                     throw new CommandException(req.get());
@@ -193,15 +193,15 @@ public class CommandControl {
         }
     }
 
-    public TextComponent getSubcommandTexts() {
+    public Component getSubcommandTexts() {
         return this.getSubcommandTexts(null);
     }
 
-    public TextComponent getSubcommandTexts(@Nullable final CommandContext source) {
-        return TextComponent.join(TextComponent.of(", "), this.primarySubcommands.entrySet()
+    public Component getSubcommandTexts(@Nullable final CommandContext source) {
+        return TextComponent.join(Component.text(", "), this.primarySubcommands.entrySet()
                 .stream()
                 .filter(x -> source == null || x.getValue().testPermission(source))
-                .map(x -> TextComponent.of(x.getKey()))
+                .map(x -> Component.text(x.getKey()))
                 .collect(Collectors.toList()));
     }
 
@@ -215,7 +215,7 @@ public class CommandControl {
             this.execute(contextSource);
         } catch (final CommandException ex) {
             // If we are here, then we're handling the command ourselves.
-            final Component message = ex.getText() == null ? TextComponent.of("Unknown error!", NamedTextColor.RED) : ex.getText();
+            final Component message = ex.getText() == null ? Component.text("Unknown error!", NamedTextColor.RED) : ex.getText();
             this.onFail(contextSource, message);
             this.serviceCollection.logger().warn("Error executing command {}", this.command, ex);
         }
@@ -269,7 +269,7 @@ public class CommandControl {
         // Run any fail actions.
         this.runFailActions(source);
         if (errorMessage != null) {
-            source.sendMessageText(TextComponent.builder().append(errorMessage).build());
+            source.sendMessageText(errorMessage);
         }
     }
 

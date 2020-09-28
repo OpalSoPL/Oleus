@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.config.CommandModifiers
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.Component;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -46,9 +46,9 @@ public interface ICommandModifier {
      * Tests to see if the state fulfills this requirement.
      *
      * <p>This will return an empty optional if the requirement is met, or
-     * a {@link TextComponent} object otherwise, explaining the problem.</p>
+     * a {@link Component} object otherwise, explaining the problem.</p>
      */
-    default Optional<TextComponent> testRequirement(final ICommandContext source,
+    default Optional<Component> testRequirement(final ICommandContext source,
             final CommandControl control,
             final INucleusServiceCollection serviceCollection,
             final CommandModifier modifier) throws CommandException {

@@ -12,7 +12,6 @@ import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.T
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
@@ -55,12 +54,12 @@ abstract class AbstractMessageRepository implements IMessageRepository {
     }
 
     @Override
-    public TextComponent getText(final String key) {
+    public Component getText(final String key) {
         return this.cachedMessages.computeIfAbsent(key, this::getTextTemplate).create();
     }
 
     @Override
-    public TextComponent getText(final String key, final Object[] args) {
+    public Component getText(final String key, final Object[] args) {
         return this.getTextMessageWithTextFormat(key,
                 Arrays.stream(args).map(x -> {
                     final Component component;
@@ -77,9 +76,9 @@ abstract class AbstractMessageRepository implements IMessageRepository {
                              return this.getText(matcher.group(1));
                         }
 
-                        component = TextComponent.of(s);
+                        component = Component.text(s);
                     } else {
-                        component = TextComponent.of(x.toString());
+                        component = Component.text(x.toString());
                     }
                     return component;
                 }).collect(Collectors.toList()));
@@ -95,7 +94,7 @@ abstract class AbstractMessageRepository implements IMessageRepository {
         return MessageFormat.format(this.getString(key), args);
     }
 
-    private TextComponent getTextMessageWithTextFormat(final String key, final List<? extends Component> textList) {
+    private Component getTextMessageWithTextFormat(final String key, final List<? extends Component> textList) {
         final Template template = this.getTextTemplate(key);
         if (textList.isEmpty()) {
             return template.create();
@@ -121,14 +120,14 @@ abstract class AbstractMessageRepository implements IMessageRepository {
         final String[] s = string.split("\\{([\\d]+)}");
 
         final List<TextElement> objects = Lists.newArrayList();
-        final TextComponent t = this.textStyleService.oldLegacy(s[0]);
+        final Component t = this.textStyleService.oldLegacy(s[0]);
         ITextStyleService.TextFormat tuple = this.textStyleService.getLastColourAndStyle(t, null);
         objects.add(input -> t);
         int count = 1;
         for (final Integer x : map) {
             objects.add(new ArgumentElement(tuple, String.valueOf(x)));
             if (s.length > count) {
-                final TextComponent r = tuple.apply(this.textStyleService.oldLegacy(s[count])).build();
+                final Component r = tuple.apply(this.textStyleService.oldLegacy(s[count])).build();
                 tuple = this.textStyleService.getLastColourAndStyle(t, null);
                 objects.add(element -> r);
             }

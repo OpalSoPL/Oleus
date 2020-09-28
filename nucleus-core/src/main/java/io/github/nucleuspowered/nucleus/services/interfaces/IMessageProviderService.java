@@ -10,7 +10,6 @@ import io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository.IMessageRepository;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.time.Duration;
@@ -35,48 +34,48 @@ public interface IMessageProviderService {
 
     Locale getLocaleFor(Audience commandSource);
 
-    TextComponent getMessageFor(Locale locale, String key);
+    Component getMessageFor(Locale locale, String key);
 
-    TextComponent getMessageFor(Locale locale, String key, TextComponent... args);
+    Component getMessageFor(Locale locale, String key, Component... args);
 
-    TextComponent getMessageFor(Locale locale, String key, Object... replacements);
+    Component getMessageFor(Locale locale, String key, Object... replacements);
 
-    TextComponent getMessageFor(Locale locale, String key, String... replacements);
+    Component getMessageFor(Locale locale, String key, String... replacements);
 
     String getMessageString(Locale locale, String key, String... replacements);
 
     String getMessageString(Locale locale, String key, Object... replacements);
 
-    default TextComponent getMessageForDefault(final String key, final Component... args) {
-        return this.getMessageFor(this.getDefaultLocale(), key, args);
+    default Component getMessageForDefault(final String key, final Component... args) {
+        return this.getMessageFor(this.getDefaultLocale(), key, (Object[]) args);
     }
 
-    default TextComponent getMessageFor(final Audience source, final String key) {
+    default Component getMessageFor(final Audience source, final String key) {
         return this.getMessageFor(this.getLocaleFor(source), key);
     }
 
-    default TextComponent getMessageFor(final Audience source, final String key, final Component... args) {
-        return this.getMessageFor(this.getLocaleFor(source), key, args);
+    default Component getMessageFor(final Audience source, final String key, final Component... args) {
+        return this.getMessageFor(this.getLocaleFor(source), key, (Object[]) args);
     }
 
-    default TextComponent getMessageFor(final Audience source, final String key, final String... args) {
-        final TextComponent[] t = Arrays.stream(args).map(LegacyComponentSerializer.legacyAmpersand()::deserialize).toArray(TextComponent[]::new);
-        return this.getMessageFor(this.getLocaleFor(source), key, t);
+    default Component getMessageFor(final Audience source, final String key, final String... args) {
+        final Component[] t = Arrays.stream(args).map(LegacyComponentSerializer.legacyAmpersand()::deserialize).toArray(Component[]::new);
+        return this.getMessageFor(this.getLocaleFor(source), key, (Object[]) t);
     }
 
-    default TextComponent getMessage(final String key) {
+    default Component getMessage(final String key) {
         return this.getMessageForDefault(key);
     }
 
-    default TextComponent getMessage(final String key, final String... replacements) {
+    default Component getMessage(final String key, final String... replacements) {
         return this.getMessageFor(this.getDefaultLocale(), key, replacements);
     }
 
-    default TextComponent getMessage(final String key, final Component... replacements) {
-        return this.getMessageFor(this.getDefaultLocale(), key, replacements);
+    default Component getMessage(final String key, final Component... replacements) {
+        return this.getMessageFor(this.getDefaultLocale(), key, (Object[]) replacements);
     }
 
-    default TextComponent getMessage(final String key, final Object... replacements) {
+    default Component getMessage(final String key, final Object... replacements) {
         return this.getMessageFor(this.getDefaultLocale(), key, replacements);
     }
 
@@ -88,7 +87,7 @@ public interface IMessageProviderService {
         return this.getMessageString(this.getLocaleFor(source), key, replacements);
     }
 
-    default TextComponent getMessageFor(final Audience source, final String key, final Object... replacements) {
+    default Component getMessageFor(final Audience source, final String key, final Object... replacements) {
         return this.getMessageFor(this.getLocaleFor(source), key, replacements);
     }
 

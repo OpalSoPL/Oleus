@@ -70,7 +70,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
     }
 
     @Override
-    public NucleusTextTemplateImpl createFromAmpersandString(final String string, @Nullable final TextComponent prefix, @Nullable final TextComponent suffix) {
+    public NucleusTextTemplateImpl createFromAmpersandString(final String string, final Component prefix, final Component suffix) {
         final Matcher mat = pattern.matcher(string);
         final List<String> map = Lists.newArrayList();
 
@@ -138,7 +138,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         final Matcher m = this.enhancedUrlParser.matcher(message);
         final ITextStyleService textStyleService = this.serviceCollection.textStyleService();
         if (!m.find()) {
-            final TextComponent component = textStyleService.oldLegacy(message);
+            final Component component = textStyleService.oldLegacy(message);
             elements.add((a, b) -> component);
             return Optional.of(textStyleService.getLastColourAndStyle(component, format));
         }
@@ -148,7 +148,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         do {
             // We found a URL. We split on the URL that we have.
             final String[] textArray = remaining.split(this.enhancedUrlParser.pattern(), 2);
-            final TextComponent first = TextComponent.builder().color(st.colour().orElse(null)).style(st.style())
+            final Component first = Component.text().color(st.colour().orElse(null)).style(st.style())
                     .append(textStyleService.oldLegacy(textArray[0])).build();
 
             // Add this text to the list regardless.
@@ -215,7 +215,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
                     final Style s = st.style();
                     final @Nullable TextColor c = st.colour().orElse(null);
                     elements.add(
-                            (a, b) -> TextComponent.builder().color(c).style(s).append(this.getCmd(msg, cmd, optionList, whiteSpace)).build());
+                            (a, b) -> Component.text().color(c).style(s).append(this.getCmd(msg, cmd, optionList, whiteSpace)).build());
                 }
             }
         } while (remaining != null && m.find());
@@ -223,7 +223,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         // Add the last bit.
         if (remaining != null) {
             final TextComponent.Builder tb =
-                    TextComponent.builder().color(st.colour().orElse(null)).style(st.style()).append(LegacyComponentSerializer.legacyAmpersand().deserialize(remaining));
+                    Component.text().color(st.colour().orElse(null)).style(st.style()).append(LegacyComponentSerializer.legacyAmpersand().deserialize(remaining));
             if (remaining.matches("^\\s+&r.*")) {
                 tb.style(this.serviceCollection.textStyleService().getResetStyle());
             }
@@ -235,7 +235,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         return Optional.of(st);
     }
 
-    private TextComponent getTextForUrl(
+    private Component getTextForUrl(
             final String toParse, final String msg, final String whiteSpace, final ITextStyleService.TextFormat st, @Nullable final String optionString) {
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
 
@@ -248,7 +248,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
             }
 
             final TextComponent.Builder textBuilder =
-                    TextComponent.builder(msg).color(st.colour().orElse(null))
+                    Component.text().content(msg).color(st.colour().orElse(null))
                             .style(st.style())
                             .clickEvent(ClickEvent.openUrl(urlObj.toString()));
             if (optionString == null || !optionString.contains("h")) {
@@ -256,7 +256,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
             }
 
             if (!whiteSpace.isEmpty()) {
-                return TextComponent.builder(whiteSpace).append(textBuilder.build()).build();
+                return Component.text().content(whiteSpace).append(textBuilder.build()).build();
             }
 
             return textBuilder.build();
@@ -265,26 +265,26 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
             this.serviceCollection.logger().warn(messageProviderService.getMessageString("chat.url.malformed", toParse));
             e.printStackTrace();
 
-            final TextComponent ret = TextComponent.builder(toParse).color(st.colour().orElse(null)).style(st.style()).build();
+            final Component ret = Component.text().content(toParse).color(st.colour().orElse(null)).style(st.style()).build();
             if (!whiteSpace.isEmpty()) {
-                return TextComponent.builder(whiteSpace).append(ret).build();
+                return Component.text().content(whiteSpace).append(ret).build();
             }
 
             return ret;
         }
     }
 
-    private TextComponent getCmd(final String msg, final String cmd, @Nullable final String optionList, final String whiteSpace) {
-        final TextComponent.Builder textBuilder = TextComponent.builder(msg)
+    private Component getCmd(final String msg, final String cmd, @Nullable final String optionList, final String whiteSpace) {
+        final TextComponent.Builder textBuilder = Component.text().content(msg)
                 .clickEvent(ClickEvent.runCommand(cmd))
                 .hoverEvent(this.setupHoverOnCmd(cmd, optionList));
         if (optionList != null && optionList.contains("s")) {
             textBuilder.clickEvent(ClickEvent.suggestCommand(cmd));
         }
 
-        TextComponent toAdd = textBuilder.build();
+        Component toAdd = textBuilder.build();
         if (!whiteSpace.isEmpty()) {
-            toAdd = TextComponent.join(TextComponent.of(whiteSpace), toAdd);
+            toAdd = TextComponent.join(Component.text(whiteSpace), toAdd);
         }
 
         return toAdd;
@@ -324,7 +324,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         }
 
         @Override
-        public TextComponent apply(final Object cs, final Map<String, Function<Object, Optional<ComponentLike>>> tokens) {
+        public Component apply(final Object cs, final Map<String, Function<Object, Optional<ComponentLike>>> tokens) {
             final String name;
             if (cs instanceof Nameable) {
                 name = ((Nameable) cs).getName();
@@ -332,7 +332,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
                 name = "";
             }
             final String command = this.cmd.replace("{{subject}}", name);
-            return TextComponent.builder().color(this.colour).style(this.style)
+            return Component.text().color(this.colour).style(this.style)
                     .append(TemplateParser.this.getCmd(this.message, command, this.optionList, this.whiteSpace)).build();
         }
 
@@ -351,15 +351,15 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         }
 
         @Override
-        public TextComponent apply(final Object cs, final Map<String, Function<Object, Optional<ComponentLike>>> tokens) {
+        public Component apply(final Object cs, final Map<String, Function<Object, Optional<ComponentLike>>> tokens) {
             final ComponentLike t;
             if (tokens != null && tokens.containsKey(this.key)) {
-                t = tokens.get(this.key).apply(cs).orElse(TextComponent.empty());
+                t = tokens.get(this.key).apply(cs).orElse(Component.empty());
             } else {
                 t = TemplateParser.this.serviceCollection.placeholderService().parse(cs, this.key);
             }
 
-            return TextComponent.builder().color(this.colour).style(this.style).append(t).build();
+            return Component.text().color(this.colour).style(this.style).append(t).build();
         }
 
     }
