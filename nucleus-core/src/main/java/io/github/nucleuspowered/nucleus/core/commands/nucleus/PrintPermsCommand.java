@@ -12,9 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -93,7 +93,7 @@ public class PrintPermsCommand implements ICommandExecutor {
             user.stream().sorted().forEach(permWriter);
             f.flush();
         } catch (final IOException e) {
-            throw new CommandException(Text.of("File write failed"), e);
+            throw new CommandException(Component.text("File write failed"), e);
         }
 
         context.sendMessage("command.printperms", file);

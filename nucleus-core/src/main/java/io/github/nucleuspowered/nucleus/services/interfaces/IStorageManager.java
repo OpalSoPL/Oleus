@@ -10,11 +10,13 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.StorageManager;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IWorldDataObject;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.standard.IKitDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IUserQueryObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IWorldQueryObject;
+import io.github.nucleuspowered.storage.IStorageModule;
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
+import io.github.nucleuspowered.storage.dataobjects.IDataObject;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
+import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
 import io.github.nucleuspowered.storage.services.IStorageService;
 
 import java.util.Optional;
@@ -24,9 +26,15 @@ import java.util.concurrent.CompletableFuture;
 @ImplementedBy(StorageManager.class)
 public interface IStorageManager {
 
+    IStorageRepositoryFactory getFlatFileRepositoryFactory();
+
+    // ugh
+    <T extends IDataObject> void register(Class<T> clazz, IStorageModule<T, ? extends IStorageService<T>,
+            ? extends IStorageRepository, ? extends IDataTranslator<T, JsonObject>> module);
+
     IStorageService.SingleCached<IGeneralDataObject> getGeneralService();
 
-    IStorageService.SingleCached<IKitDataObject> getKitsService();
+    <T extends IDataObject> Optional<IStorageService<T>> getAdditionalStorageServiceForDataObject(Class<T> clazz);
 
     IStorageService.Keyed.KeyedData<UUID, IUserQueryObject, IUserDataObject> getUserService();
 
@@ -38,15 +46,11 @@ public interface IStorageManager {
 
     IDataTranslator<IGeneralDataObject, JsonObject> getGeneralDataAccess();
 
-    IDataTranslator<IKitDataObject, JsonObject> getKitsDataAccess();
-
     IStorageRepository.Keyed<UUID, IUserQueryObject, JsonObject> getUserRepository();
 
     IStorageRepository.Keyed<UUID, IWorldQueryObject, JsonObject> getWorldRepository();
 
     IStorageRepository.Single<JsonObject> getGeneralRepository();
-
-    IStorageRepository.Single<JsonObject> getKitsRepository();
 
     CompletableFuture<Void> saveAndInvalidateAllCaches();
 
@@ -80,11 +84,6 @@ public interface IStorageManager {
 
     default IGeneralDataObject getGeneral() {
         final IStorageService.SingleCached<IGeneralDataObject> gs = this.getGeneralService();
-        return gs.getCached().orElseGet(() -> gs.getOrNew().join());
-    }
-
-    default IKitDataObject getKits() {
-        final IStorageService.SingleCached<IKitDataObject> gs = this.getKitsService();
         return gs.getCached().orElseGet(() -> gs.getOrNew().join());
     }
 

@@ -6,11 +6,13 @@ package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
-import io.github.nucleuspowered.nucleus.services.impl.chatmessageformatter.AbstractNucleusChatChannel;
 import io.github.nucleuspowered.nucleus.services.impl.chatmessageformatter.ChatMessageFormatterService;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.PlayerChatRouter;
+import org.spongepowered.api.event.message.PlayerChatEvent;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -42,10 +44,11 @@ public interface IChatMessageFormatterService {
             return false;
         }
 
-        interface External<T extends AbstractNucleusChatChannel<?>> extends Channel {
+        Component formatMessage(Audience source, Component body);
 
-            T createChannel(Audience delegate);
-
+        default void formatMessageEvent(final Audience audience, final PlayerChatEvent event) {
+            event.setChatRouter(PlayerChatRouter.toAudience(this.receivers()));
+            event.setMessage(this.formatMessage(audience, event.getMessage()));
         }
 
     }

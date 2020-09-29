@@ -5,35 +5,30 @@
 package io.github.nucleuspowered.nucleus.modules.staffchat;
 
 import com.google.common.base.Preconditions;
-import io.github.nucleuspowered.nucleus.api.module.staffchat.NucleusStaffChatChannel;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.chatmessageformatter.AbstractNucleusChatChannel;
+import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.format.TextColor;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.message.MessageEvent;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.entity.living.player.PlayerChatRouter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.message.PlayerChatEvent;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import com.google.inject.Inject;
-
-public class StaffChatMessageChannel implements
-        IChatMessageFormatterService.Channel.External<StaffChatMessageChannel.APIChannel>,
-        IReloadableService.Reloadable {
+public class StaffChatMessageChannel implements IChatMessageFormatterService.Channel, IReloadableService.Reloadable {
 
     private static StaffChatMessageChannel INSTANCE = null;
 
@@ -63,49 +58,42 @@ public class StaffChatMessageChannel implements
         return true;
     }
 
-    public APIChannel createChannel(final MessageChannel delegated) {
-        return new APIChannel(
-                delegated,
-                receivers().stream().filter(x -> delegated.getMembers().contains(x)).collect(Collectors.toList())
-        );
-    }
-
     public boolean formatMessages() {
         return this.formatting;
     }
 
-    public void sendMessageFrom(final CommandSource source, final TextComponent text) {
-        final MessageEvent.MessageFormatter formatters = new MessageEvent.MessageFormatter();
-        formatters.setBody(text);
-        formatMessageEvent(source, formatters);
-        MessageChannel.fixed(receivers()).send(source, formatters.format(), ChatTypes.CHAT);
+    public void sendMessageFrom(final Audience source, final Component text) {
+        final Component res = this.formatMessage(source, text);
+        this.receivers().sendMessage(res, MessageType.CHAT);
     }
 
     @Override
-    public void formatMessageEvent(final CommandSource source, final MessageEvent.MessageFormatter formatters) {
-        final TextComponent prefix = this.template.getForObject(source);
-        if (TextSerializers.PLAIN.serialize(formatters.getHeader().toText()).contains("<" + source.getName() + ">")) {
-            // Remove it.
-            final TextComponent p = formatters.getHeader().toText().replace("<" + source.getName() + ">", Text.of(), true);
-            if (p.toPlain().trim().isEmpty()) {
-                formatters.setHeader(prefix);
-            } else {
-                formatters.setHeader(Text.of(p, prefix));
-            }
-        } else {
-            formatters.setHeader(Text.of(formatters.getHeader(), prefix));
+    public Component formatMessage(final Audience source, final Component body) {
+        final Component prefix = this.template.getForObject(source);
+        if (this.colour != null) {
+            return LinearComponents.linear(
+                    prefix,
+                    this.colour,
+                    body
+            );
         }
-        formatters.setBody(Text.of(this.colour, formatters.getBody()));
+        return LinearComponents.linear(prefix, body);
     }
 
     @Override
-    public Collection<MessageReceiver> receivers() {
-        final List<MessageReceiver> c =
-                Sponge.getServer().getOnlinePlayers().stream()
-                        .filter(this::test)
-                        .collect(Collectors.toList());
-        c.add(Sponge.getServer().getConsole());
-        return c;
+    public void formatMessageEvent(final Audience audience, final PlayerChatEvent event) {
+        event.setChatRouter(PlayerChatRouter.toAudience(this.receivers()));
+        event.setMessage(this.formatMessage(audience, event.getMessage()));
+    }
+
+    @Override
+    public ForwardingAudience receivers() {
+        final List<Audience> audienceList = new ArrayList<>();
+        Sponge.getServer().getOnlinePlayers().stream()
+                .filter(this::test)
+                .forEach(audienceList::add);
+        audienceList.add(Sponge.getSystemSubject());
+        return Audience.audience(audienceList);
     }
 
     @Override
@@ -113,10 +101,10 @@ public class StaffChatMessageChannel implements
         return true;
     }
 
-    private boolean test(final Player player) {
+    private boolean test(final ServerPlayer player) {
         if (this.permissionService.hasPermission(player, StaffChatPermissions.BASE_STAFFCHAT)) {
             return this.userPreferenceService
-                    .getPreferenceFor(player, NucleusKeysProvider.VIEW_STAFF_CHAT)
+                    .getPreferenceFor(player.getUser(), NucleusKeysProvider.VIEW_STAFF_CHAT)
                     .orElse(true);
         }
 
@@ -127,15 +115,7 @@ public class StaffChatMessageChannel implements
         final StaffChatConfig sc = serviceCollection.configProvider().getModuleConfig(StaffChatConfig.class);
         this.formatting = sc.isIncludeStandardChatFormatting();
         this.template = sc.getMessageTemplate();
-        this.colour = serviceCollection.textStyleService().getColourFromString(sc.getMessageColour());
-    }
-
-    public static class APIChannel extends AbstractNucleusChatChannel.Mutable<APIChannel>
-            implements NucleusStaffChatChannel {
-
-        public APIChannel(final MessageChannel messageChannel, final Collection<MessageReceiver> messageReceivers) {
-            super(messageChannel, messageReceivers);
-        }
+        this.colour = serviceCollection.textStyleService().getColourFromString(sc.getMessageColour()).orElse(null);
     }
 
 }

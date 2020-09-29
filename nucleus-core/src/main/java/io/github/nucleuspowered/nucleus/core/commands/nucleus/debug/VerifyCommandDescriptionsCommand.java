@@ -12,9 +12,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICommandMetadataService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,20 +29,20 @@ public class VerifyCommandDescriptionsCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ICommandMetadataService commandMetadataService = context.getServiceCollection().commandMetadataService();
         final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
-        final List<Text> messages = commandMetadataService.getCommands()
+        final List<Component> messages = commandMetadataService.getCommands()
                 .stream()
                 .filter(x -> {
                     final String key = x.getMetadata().getCommandAnnotation().commandDescriptionKey() + ".desc";
                     return !messageProviderService.hasKey(key);
                 })
-                .map(x -> Text.of("Command /", x.getCommand(),
-                        " missing key \"" + x.getMetadata().getCommandAnnotation().commandDescriptionKey() + ".desc\""))
+                .map(x -> Component.text().content("Command /" + x.getCommand() +
+                        " missing key \"" + x.getMetadata().getCommandAnnotation().commandDescriptionKey() + ".desc\"").build())
                 .collect(Collectors.toList());
 
         if (messages.isEmpty()) {
-            context.sendMessageText(Text.of("All commands have valid description keys."));
+            context.sendMessageText(Component.text("All commands have valid description keys."));
         } else {
-            context.sendMessageText(Text.of("Some commands do not have valid description keys:"));
+            context.sendMessageText(Component.text("Some commands do not have valid description keys:"));
             messages.forEach(context::sendMessageText);
         }
 

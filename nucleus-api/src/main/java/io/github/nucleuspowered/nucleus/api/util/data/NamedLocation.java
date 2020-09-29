@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.util.data;
 
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -18,11 +19,11 @@ import java.util.UUID;
 public interface NamedLocation {
 
     /**
-     * Gets the world {@link UUID} that this location targets
+     * Gets the world {@link ResourceKey} that this location targets
      *
-     * @return The world UUID
+     * @return The world identifer
      */
-    UUID getWorldUUID();
+    ResourceKey getResourceKey();
 
     /**
      * Gets the {@link WorldProperties} that this location points to, if the world exists.

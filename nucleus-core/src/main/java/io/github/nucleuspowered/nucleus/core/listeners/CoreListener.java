@@ -20,11 +20,13 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderServ
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -40,6 +42,9 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -94,19 +99,19 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
      */
     @Listener(order = Order.LATE)
     public void onPlayerLoginLast(final ServerSideConnectionEvent.Login event, @Getter("getProfile") final GameProfile profile,
-        @Getter("getTargetUser") final User user) {
+        @Getter("getUser") final User user) {
 
         final IUserDataObject udo = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(user.getUniqueId());
 
-        if (event.getFromTransform().equals(event.getToTransform())) {
-            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        if (event.getFromLocation().equals(event.getToLocation())) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
                 frame.pushCause(profile);
                 // Check this
-                final NucleusOnLoginEvent onLoginEvent = new NucleusOnLoginEvent(frame.getCurrentCause(), user, udo, event.getFromTransform());
+                final NucleusOnLoginEvent onLoginEvent = new NucleusOnLoginEvent(frame.getCurrentCause(), user, udo, event.getFromLocation());
 
                 Sponge.getEventManager().post(onLoginEvent);
                 if (onLoginEvent.getTo().isPresent()) {
-                    event.setToTransform(onLoginEvent.getTo().get());
+                    event.setToLocation(onLoginEvent.getTo().get());
                 }
             }
         }
@@ -118,7 +123,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
      * We do this first to try to get the first play status as quick as possible.
      */
     @Listener(order = Order.FIRST)
-    public void onPlayerJoinFirst(final ServerSideConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
+    public void onPlayerJoinFirst(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
         try {
             final IUserDataObject qsu = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(player.getUniqueId());
             qsu.set(CoreKeys.LAST_LOGIN, Instant.now());
@@ -128,25 +133,28 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
             // We'll do this bit shortly - after the login events have resolved.
             final String name = player.getName();
-            Task.builder().execute(() -> qsu.set(CoreKeys.LAST_KNOWN_NAME, name)).delayTicks(20L).submit(this.serviceCollection.pluginContainer());
+            Task.builder().execute(() -> qsu.set(CoreKeys.LAST_KNOWN_NAME, name)).delayTicks(20L).plugin(this.serviceCollection.pluginContainer()).build();
         } catch (final Exception e) {
             e.printStackTrace();
         }
     }
 
     @Listener
-    public void onPlayerJoinLast(final ServerSideConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
+    public void onPlayerJoinLast(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
         // created before
+        // TODO: Fix this
         if (!this.serviceCollection.storageManager().getUserService().getOnThread(player.getUniqueId())
                 .map(x -> x.get(CoreKeys.FIRST_JOIN)).isPresent()) {
             this.serviceCollection.getServiceUnchecked(UniqueUserService.class).resetUniqueUserCount();
 
             final NucleusFirstJoinEvent firstJoinEvent = new OnFirstLoginEvent(
-                event.getCause(), player, event.getOriginalChannel(), event.getChannel().orElse(null), event.getOriginalMessage(),
-                    event.isMessageCancelled(), event.getFormatter());
+                event.getCause(), player, event.getOriginalAudience(),
+                    event.getAudience().orElseGet(Sponge::getSystemSubject),
+                    event.getOriginalMessage(),
+                    event.isMessageCancelled());
 
             Sponge.getEventManager().post(firstJoinEvent);
-            event.setChannel(firstJoinEvent.getChannel().get());
+            firstJoinEvent.getAudience().ifPresent(event::setAudience);
             event.setMessageCancelled(firstJoinEvent.isMessageCancelled());
             this.serviceCollection.storageManager().getUserService()
                     .getOrNew(player.getUniqueId())
@@ -154,47 +162,39 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
         }
 
         // Warn about wildcard.
-        if (!this.serviceCollection.permissionService().isOpOnly() && player.hasPermission("nucleus")) {
+        if (player.hasPermission("nucleus")) {
             final IMessageProviderService provider = this.serviceCollection.messageProvider();
             this.serviceCollection.logger().warn("The player " + player.getName() + " has got either the nucleus wildcard or the * wildcard "
                     + "permission. This may cause unintended side effects.");
 
             if (this.warnOnWildcard) {
                 // warn
-                final List<Text> text = Lists.newArrayList();
+                final List<Component> text = new ArrayList<>();
                 text.add(provider.getMessageFor(player, "core.permission.wildcard2"));
                 text.add(provider.getMessageFor(player, "core.permission.wildcard3"));
                 if (this.url != null) {
                     text.add(
-                            provider.getMessageFor(player, "core.permission.wildcard4").toBuilder()
-                                    .onClick(TextActions.openUrl(this.url)).build()
+                            Component.text().append(provider.getMessageFor(player, "core.permission.wildcard4"))
+                                    .clickEvent(ClickEvent.openUrl(this.url)).build()
                     );
                 }
                 text.add(provider.getMessageFor(player, "core.permission.wildcard5"));
-                Sponge.getServiceManager().provideUnchecked(PaginationService.class)
+                Sponge.getServiceProvider().paginationService()
                         .builder()
                         .title(provider.getMessageFor(player, "core.permission.wildcard"))
                         .contents(text)
-                        .padding(Text.of(TextColors.GOLD, "-"))
+                        .padding(Component.text("-", NamedTextColor.GOLD))
                         .sendTo(player);
             }
         }
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getTargetEntity") final Player player) {
-        // There is an issue in Sponge where the connection may not even exist, because they were disconnected before the connection was
-        // completely established.
-        //noinspection ConstantConditions
-        if (player.getConnection() == null || player.getConnection().getAddress() == null) {
-            return;
-        }
-
+    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer player) {
         this.serviceCollection.storageManager().getUser(player.getUniqueId()).thenAccept(x -> x.ifPresent(y -> this.onPlayerQuit(player, y)));
-
     }
 
-    private void onPlayerQuit(final Player player, final IUserDataObject udo) {
+    private void onPlayerQuit(final ServerPlayer player, final IUserDataObject udo) {
         final InetAddress address = player.getConnection().getAddress().getAddress();
 
         try {
@@ -214,14 +214,14 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onServerAboutToStop(final StoppingEngineEvent<Server> event) {
-        for (final Player player : Sponge.getServer().getOnlinePlayers()) {
+        for (final ServerPlayer player : Sponge.getServer().getOnlinePlayers()) {
             this.serviceCollection.storageManager().getUserOnThread(player.getUniqueId()).ifPresent(x -> this.onPlayerQuit(player, x));
         }
 
         if (this.getKickOnStopMessage != null) {
-            for (final Player p : Sponge.getServer().getOnlinePlayers()) {
-                final Component msg = this.getKickOnStopMessage.getForSource(p);
-                if (msg.isEmpty()) {
+            for (final ServerPlayer p : Sponge.getServer().getOnlinePlayers()) {
+                final Component msg = this.getKickOnStopMessage.getForObject(p);
+                if (msg.toString().isEmpty()) {
                     p.kick();
                 } else {
                     p.kick(msg);

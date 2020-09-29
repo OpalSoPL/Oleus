@@ -14,7 +14,7 @@ import ninja.leaping.configurate.ValueType;
 import java.util.List;
 import java.util.Map;
 
-public class ConfigurationNodeJsonTranslator {
+public final class ConfigurationNodeJsonTranslator {
 
     public static ConfigurationNodeJsonTranslator INSTANCE = new ConfigurationNodeJsonTranslator();
 

@@ -22,4 +22,5 @@ public interface NucleusFirstJoinEvent extends MessageChannelEvent {
 
     ServerPlayer getPlayer();
 
+    boolean isMessageCancelled();
 }

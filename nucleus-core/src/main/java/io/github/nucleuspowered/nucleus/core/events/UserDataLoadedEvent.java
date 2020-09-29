@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.core.events;
 
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.profile.GameProfile;
 

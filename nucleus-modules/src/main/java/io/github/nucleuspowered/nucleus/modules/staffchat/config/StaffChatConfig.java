@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.staffchat.config;
 
 import io.github.nucleuspowered.neutrino.annotations.Default;
+import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 

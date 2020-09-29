@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
 import org.spongepowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
-import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import io.github.nucleuspowered.nucleus.datatypes.LocationData;
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
@@ -16,15 +15,27 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
 
+    private static final Map<TypeToken<? extends NamedLocation>, TypeSerializer<? extends NamedLocation>> providers = new HashMap<>();
+
+    public static <T extends NamedLocation> void register(final TypeToken<T> clazz, final TypeSerializer<T> typeSerializer) {
+        if (!NamedLocationSerialiser.providers.containsKey(clazz)) {
+            NamedLocationSerialiser.providers.put(clazz, typeSerializer);
+        }
+    }
+
     @Nullable
     @Override
     public NamedLocation deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
-        if (type.isSubtypeOf(TypeTokens.WARP)) {
-            return WarpSerialiser.INSTANCE.deserialize(type, value);
+        for (final TypeToken<?> t : NamedLocationSerialiser.providers.keySet()) {
+            if (type.isSubtypeOf(t)) {
+                return NamedLocationSerialiser.providers.get(t).deserialize(type, value);
+            }
         }
 
         final Vector3d pos = getPosition(value);
@@ -44,23 +55,26 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
             return;
         }
 
-        if (obj instanceof Warp) {
-            WarpSerialiser.INSTANCE.serialize(type, (Warp) obj, value);
-            return;
+        for (final TypeToken<?> t : NamedLocationSerialiser.providers.keySet()) {
+            if (type.isSubtypeOf(t)) {
+                // Generic abuse.
+                ((TypeSerializer) NamedLocationSerialiser.providers.get(t)).serialize(type, obj, value);
+                return;
+            }
         }
 
         serializeLocation(obj, value);
     }
 
-    static String getName(final ConfigurationNode value) {
+    public static String getName(final ConfigurationNode value) {
         return value.getNode("name").getString(String.valueOf(value.getKey()));
     }
 
-    static UUID getWorldUUID(final ConfigurationNode value) throws ObjectMappingException {
+    public static UUID getWorldUUID(final ConfigurationNode value) throws ObjectMappingException {
         return value.getNode("world").getValue(TypeTokens.UUID);
     }
 
-    static Vector3d getPosition(final ConfigurationNode value) {
+    public static Vector3d getPosition(final ConfigurationNode value) {
         return new Vector3d(
                 value.getNode("x").getDouble(),
                 value.getNode("y").getDouble(),
@@ -68,7 +82,7 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
         );
     }
 
-    static Vector3d getRotation(final ConfigurationNode value) {
+    public static Vector3d getRotation(final ConfigurationNode value) {
         return new Vector3d(
                 value.getNode("rotx").getDouble(),
                 value.getNode("roty").getDouble(),
@@ -76,8 +90,8 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
         );
     }
 
-    static void serializeLocation(final NamedLocation obj, final ConfigurationNode value) throws ObjectMappingException {
-        value.getNode("world").setValue(TypeTokens.UUID, obj.getWorldUUID());
+    public static void serializeLocation(final NamedLocation obj, final ConfigurationNode value) throws ObjectMappingException {
+        value.getNode("world").setValue(TypeTokens.UUID, obj.getResourceKey());
 
         value.getNode("x").setValue(obj.getPosition().getX());
         value.getNode("y").setValue(obj.getPosition().getY());

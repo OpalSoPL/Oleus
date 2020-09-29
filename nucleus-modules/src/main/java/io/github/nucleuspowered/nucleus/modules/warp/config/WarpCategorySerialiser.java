@@ -2,7 +2,7 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
+package io.github.nucleuspowered.nucleus.modules.warp.config;
 
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;

@@ -43,7 +43,8 @@ public class WorldPropertiesValueParameter implements ValueParameter<WorldProper
                 .collect(Collectors.toList());
     }
 
-    @Override public Optional<? extends WorldProperties> getValue(final Parameter.Key<? super WorldProperties> parameterKey,
+    @Override
+    public Optional<? extends WorldProperties> getValue(final Parameter.Key<? super WorldProperties> parameterKey,
             final ArgumentReader.Mutable reader, final CommandContext.Builder context) throws ArgumentParseException {
         final ResourceKey key = reader.parseResourceKey();
         final Optional<WorldProperties> ow =
@@ -55,7 +56,8 @@ public class WorldPropertiesValueParameter implements ValueParameter<WorldProper
         throw reader.createException(this.errorMessageGenerator.apply(key));
     }
 
-    @Override public List<ClientCompletionType> getClientCompletionType() {
+    @Override
+    public List<ClientCompletionType> getClientCompletionType() {
         return Collections.singletonList(ClientCompletionTypes.RESOURCE_KEY.get());
     }
 

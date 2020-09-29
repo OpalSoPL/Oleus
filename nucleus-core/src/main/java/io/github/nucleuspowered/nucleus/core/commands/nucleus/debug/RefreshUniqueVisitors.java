@@ -11,9 +11,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.exception.CommandException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -27,17 +27,18 @@ import java.util.function.Supplier;
 )
 public class RefreshUniqueVisitors implements ICommandExecutor {
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final UniqueUserService uus = context.getServiceCollection().getServiceUnchecked(UniqueUserService.class);
         context.sendMessage("command.nucleus.debug.refreshuniquevisitors.started", uus.getUniqueUserCount());
 
         final Optional<UUID> optionalUUID = context.getUniqueId();
-        final Supplier<CommandSource> scs;
+        final Supplier<Audience> scs;
         if (optionalUUID.isPresent()) {
             final UUID uuid = optionalUUID.get();
-            scs = () -> Sponge.getServer().getPlayer(uuid).map(x -> (CommandSource) x).orElseGet(Sponge.getServer()::getConsole);
+            scs = () -> Sponge.getServer().getPlayer(uuid).map(x -> (Audience) x).orElseGet(Sponge::getSystemSubject);
         } else {
-            scs = Sponge.getServer()::getConsole;
+            scs = Sponge::getSystemSubject;
         }
 
         uus.resetUniqueUserCount(l -> context.sendMessageTo(scs.get(), "command.nucleus.debug.refreshuniquevisitors.done", l));

@@ -11,15 +11,15 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.command.SendCommandEvent;
+import org.spongepowered.api.event.command.ExecuteCommandEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 public class WarmupListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -34,27 +34,27 @@ public class WarmupListener implements IReloadableService.Reloadable, ListenerBa
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerMovement(final MoveEntityEvent event, @Root final Player player) {
+    public void onPlayerMovement(final MoveEntityEvent event, @Root final ServerPlayer player) {
         // Rotating is OK!
-        if (this.warmupConfig.isOnMove() && !event.getFromTransform().getLocation().equals(event.getToTransform().getLocation())) {
+        if (this.warmupConfig.isOnMove() && !event.getOriginalDestinationPosition().equals(event.getDestinationPosition())) {
             this.cancelWarmup(player);
         }
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerCommand(final SendCommandEvent event, @Root final Player player) {
+    public void onPlayerCommand(final ExecuteCommandEvent.Pre event, @Root final ServerPlayer player) {
         if (this.warmupConfig.isOnCommand()) {
             this.cancelWarmup(player);
         }
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerQuit(final ClientConnectionEvent.Disconnect event) {
-        this.cancelWarmup(event.getTargetEntity());
+    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event) {
+        this.cancelWarmup(event.getPlayer());
     }
 
-    private void cancelWarmup(final Player player) {
-        if (this.warmupService.cancel(player) && player.isOnline()) {
+    private void cancelWarmup(final ServerPlayer player) {
+        if (this.warmupService.cancel(player)) {
             this.messageProviderService.sendMessageTo(player, "warmup.cancel");
         }
     }

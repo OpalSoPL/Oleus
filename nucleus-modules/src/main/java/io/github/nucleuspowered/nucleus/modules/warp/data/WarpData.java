@@ -4,6 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.data;
 
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import org.spongepowered.api.Sponge;
@@ -20,7 +22,7 @@ public class WarpData implements Warp {
 
     private final String category;
     private final Double cost;
-    private final TextComponent description;
+    private final Component description;
     private final UUID worldPropertiesUUID;
     private final Vector3d position;
     private final Vector3d rotation;
@@ -28,7 +30,7 @@ public class WarpData implements Warp {
 
     public WarpData(final String category,
                     final double cost,
-                    final TextComponent description,
+                    final Component description,
                     final UUID worldPropertiesUUID,
                     final Vector3d position,
                     final Vector3d rotation,
@@ -53,12 +55,12 @@ public class WarpData implements Warp {
     }
 
     @Override
-    public Optional<Text> getDescription() {
+    public Optional<Component> getDescription() {
         return Optional.ofNullable(this.description);
     }
 
     @Override
-    public UUID getWorldUUID() {
+    public UUID getResourceKey() {
         return this.worldPropertiesUUID;
     }
 
@@ -78,14 +80,8 @@ public class WarpData implements Warp {
     }
 
     @Override
-    public Optional<Location<World>> getLocation() {
+    public Optional<ServerLocation> getLocation() {
         return Sponge.getServer().getWorld(this.worldPropertiesUUID).map(x -> new Location<>(x, this.position));
-    }
-
-    @Override
-    public Optional<Transform<World>> getTransform() {
-        return Sponge.getServer().getWorld(this.worldPropertiesUUID)
-                .map(x -> new Transform<>(x, this.position, this.rotation));
     }
 
     @Override

@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.back.services;
 
 import io.github.nucleuspowered.nucleus.api.module.back.NucleusBackService;
-import io.github.nucleuspowered.nucleus.datatypes.UUIDTransform;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import org.spongepowered.api.entity.Transform;

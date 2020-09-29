@@ -4,30 +4,25 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kit;
 
-import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
-import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
-
-import java.util.function.Supplier;
-
 import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
+import io.github.nucleuspowered.nucleus.modules.kit.storage.KitStorageModule;
+import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.modules.kit.storage.IKitDataObject;
 
 @ModuleData(id = KitModule.ID, name = "Kit")
-public class KitModule extends ConfigurableModule<KitConfig, KitConfigAdapter> {
+public class KitModule implements IModule.Configurable<KitConfig> {
 
     public static final String ID = "kit";
 
     @Inject
-    public KitModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    public KitModule(final INucleusServiceCollection collection) {
+        collection.storageManager().register(IKitDataObject.class, new KitStorageModule(collection));
     }
 
     @Override
-    public KitConfigAdapter createAdapter() {
-        return new KitConfigAdapter();
+    public Class<KitConfig> getConfigClass() {
+        return KitConfig.class;
     }
-
 }

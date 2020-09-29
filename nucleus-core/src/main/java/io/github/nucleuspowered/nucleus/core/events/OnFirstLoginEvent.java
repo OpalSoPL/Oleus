@@ -57,14 +57,19 @@ public class OnFirstLoginEvent extends AbstractEvent implements NucleusFirstJoin
     }
 
     @Override public Audience getOriginalAudience() {
-        return null;
+        return this.originalChannel;
     }
 
     @Override public Optional<Audience> getAudience() {
-        return Optional.empty();
+        return Optional.ofNullable(this.currentChannel);
     }
 
     @Override public void setAudience(@Nullable final Audience audience) {
+        this.currentChannel = audience;
+    }
 
+    @Override
+    public boolean isMessageCancelled() {
+        return this.cancelled;
     }
 }

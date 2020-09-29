@@ -14,10 +14,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.exception.CommandException;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -25,7 +25,6 @@ import java.util.function.Supplier;
 /**
  * Intended as a local command.
  */
-@SuppressWarnings("UnstableApiUsage")
 @Command(
         aliases = "docgen",
         basePermission = CorePermissions.BASE_DOCGEN,
@@ -42,7 +41,7 @@ public class DocGenCommand implements ICommandExecutor {
         try {
             serviceCollection.documentationGenerationService().generate(dataPath);
         } catch (final IOException | ObjectMappingException e) {
-            throw new CommandException(Text.of("Could not generate docs"), e);
+            throw new CommandException(Component.text("Could not generate docs"), e);
         }
         context.sendMessage("command.nucleus.docgen.complete");
         return context.successResult();

@@ -12,13 +12,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository.ConfigFileMessagesRepository;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.managed.Flag;
 
 import java.util.List;
 
@@ -30,9 +28,10 @@ import java.util.List;
 )
 public class MessagesUpdateCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-            GenericArguments.flags().flag("y").buildWith(GenericArguments.none())
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("y")
         };
     }
 
@@ -53,17 +52,17 @@ public class MessagesUpdateCommand implements ICommandExecutor {
             return context.successResult();
         }
 
-        if (context.hasAny("y")) {
+        if (context.hasFlag("y")) {
             messagesRepository.fixMismatched(mismatched);
             context.sendMessage("command.nucleus.messageupdate.reset");
         } else {
             context.sendMessage("command.nucleus.messageupdate.sometoupdate", String.valueOf(mismatched.size()));
-            mismatched.forEach(x -> context.sendMessageText(Text.of(TextColors.YELLOW, x)));
+            mismatched.forEach(x -> context.sendMessageText(Component.text(x, NamedTextColor.YELLOW)));
             messageProviderService
-                    .getMessageFor(context.getCommandSourceRoot().getLocale(),
+                    .getMessageFor(context.getAudience(),
                             "command.nucleus.messageupdate.confirm",
-                            "/nucleus update-messages -y").toBuilder()
-                            .onClick(TextActions.runCommand("/nucleus update-messages -y")).build();
+                            Component.text().content("/nucleus update-messages -y")
+                            .clickEvent(ClickEvent.runCommand("/nucleus update-messages -y")).build());
         }
 
         return context.successResult();

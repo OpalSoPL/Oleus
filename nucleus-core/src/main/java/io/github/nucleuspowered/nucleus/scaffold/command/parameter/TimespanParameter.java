@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * This parser was taken from
  * https://github.com/dualspiral/Hammer/blob/master/HammerCore/src/main/java/uk/co/drnaylor/minecraft/hammer/core/commands/parsers/TimespanParser.java
  */
-public class TimespanArgument implements ValueParameter<Long> {
+public final class TimespanParameter implements ValueParameter<Long> {
     private final Pattern minorTimeString = Pattern.compile("^\\d+$");
     private final Pattern timeString = Pattern.compile("^((\\d+)w)?((\\d+)d)?((\\d+)h)?((\\d+)m)?((\\d+)s)?$");
 
@@ -36,7 +36,7 @@ public class TimespanArgument implements ValueParameter<Long> {
     private final int secondsInWeek = 7 * this.secondsInDay;
     private final IMessageProviderService messageProvider;
 
-    public TimespanArgument(final INucleusServiceCollection serviceCollection) {
+    public TimespanParameter(final INucleusServiceCollection serviceCollection) {
         this.messageProvider = serviceCollection.messageProvider();
     }
 
@@ -48,7 +48,8 @@ public class TimespanArgument implements ValueParameter<Long> {
         return 0;
     }
 
-    @Override public List<String> complete(final CommandContext context) {
+    @Override
+    public List<String> complete(final CommandContext contex, final String string) {
         return Collections.emptyList();
     }
 

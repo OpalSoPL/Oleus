@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.core;
 
 import io.github.nucleuspowered.nucleus.core.commands.CommandInfoCommand;
 import io.github.nucleuspowered.nucleus.core.commands.NucleusCommand;
-import io.github.nucleuspowered.nucleus.core.commands.NucleusUserPrefsCommand;
 import io.github.nucleuspowered.nucleus.core.commands.SetNucleusLanguageCommand;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.ClearCacheCommand;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.CompatibilityCommand;
@@ -20,7 +19,6 @@ import io.github.nucleuspowered.nucleus.core.commands.nucleus.RebuildUserCacheCo
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.ReloadCommand;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.ResetUserCommand;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.SaveCommand;
-import io.github.nucleuspowered.nucleus.core.commands.nucleus.debug.GetUUIDSCommand;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.debug.RefreshUniqueVisitors;
 import io.github.nucleuspowered.nucleus.core.commands.nucleus.debug.VerifyCommandDescriptionsCommand;
 import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
@@ -44,14 +42,13 @@ public class CoreModule implements IModule.Configurable<CoreConfig> {
     public static final String ID = "core";
 
     @Override
-    public void init(INucleusServiceCollection serviceCollection) {
+    public void init(final INucleusServiceCollection serviceCollection) {
 
     }
 
     @Override
     public Collection<Class<? extends ICommandExecutor>> getCommands() {
         return Arrays.asList(
-                GetUUIDSCommand.class,
                 RefreshUniqueVisitors.class,
                 VerifyCommandDescriptionsCommand.class,
                 ClearCacheCommand.class,
@@ -68,7 +65,6 @@ public class CoreModule implements IModule.Configurable<CoreConfig> {
                 SaveCommand.class,
                 CommandInfoCommand.class,
                 NucleusCommand.class,
-                NucleusUserPrefsCommand.class,
                 SetNucleusLanguageCommand.class
         );
     }

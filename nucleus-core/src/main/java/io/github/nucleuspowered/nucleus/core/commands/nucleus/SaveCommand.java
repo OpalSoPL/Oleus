@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandSource;
+
 @Command(
         aliases = "save",
         basePermission = CorePermissions.BASE_NUCLEUS_SAVE,
@@ -23,8 +23,10 @@ public class SaveCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) {
         context.sendMessage("command.nucleus.save.start");
-        context.getServiceCollection().storageManager().saveAll().join();
-        context.sendMessage("command.nucleus.save.complete");
+        context.getServiceCollection().storageManager().saveAll().thenApply(x -> {
+            context.sendMessage("command.nucleus.save.complete");
+            return null;
+        });
         return context.successResult();
     }
 }

@@ -44,4 +44,6 @@ public interface ICommandMetadataService {
     Collection<ICommandInterceptor> interceptors();
 
     void registerInterceptors(Collection<ICommandInterceptor> commandInterceptors);
+
+    CommandControl getControl(String primaryAlias);
 }

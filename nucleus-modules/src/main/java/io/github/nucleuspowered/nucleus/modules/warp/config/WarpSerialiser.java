@@ -2,10 +2,12 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
+package io.github.nucleuspowered.nucleus.modules.warp.config;
 
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
+import io.github.nucleuspowered.nucleus.configurate.typeserialisers.NamedLocationSerialiser;
+import io.github.nucleuspowered.nucleus.modules.warp.data.WarpData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -18,7 +20,9 @@ public final class WarpSerialiser implements TypeSerializer<Warp> {
 
     public static final WarpSerialiser INSTANCE = new WarpSerialiser();
 
-    private WarpSerialiser() {}
+    private WarpSerialiser() {
+        NamedLocationSerialiser.register(TypeToken.of(Warp.class), this);
+    }
 
     @Nullable
     @Override

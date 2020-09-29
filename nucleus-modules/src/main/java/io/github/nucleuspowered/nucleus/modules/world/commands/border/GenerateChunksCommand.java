@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.BoundedIntegerArgument;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.TimespanArgument;
+import io.github.nucleuspowered.nucleus.scaffold.command.parameter.TimespanParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;;
@@ -42,7 +42,7 @@ public class GenerateChunksCommand implements ICommandExecutor {
                 GenericArguments.flags()
                     .flag("a")
                     .flag("r")
-                    .valueFlag(new TimespanArgument(Text.of(saveTimeKey), serviceCollection), "-save")
+                    .valueFlag(new TimespanParameter(Text.of(saveTimeKey), serviceCollection), "-save")
                     .valueFlag(new BoundedIntegerArgument(Text.of(ticksKey), 0, 100, serviceCollection), "t", "-tickpercent")
                     .valueFlag(new BoundedIntegerArgument(Text.of(tickFrequency), 1, 100, serviceCollection), "f", "-frequency")
                     .buildWith(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection))

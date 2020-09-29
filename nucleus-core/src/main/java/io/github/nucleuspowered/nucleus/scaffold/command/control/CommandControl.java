@@ -425,4 +425,7 @@ public final class CommandControl {
         return modifiers.build();
     }
 
+    public Component getUsage(final ICommandContext context) {
+        return Component.empty();
+    }
 }

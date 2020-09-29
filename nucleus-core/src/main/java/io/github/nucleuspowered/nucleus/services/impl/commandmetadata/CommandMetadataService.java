@@ -377,6 +377,11 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         }
     }
 
+    @Override
+    public CommandControl getControl(final String primaryAlias) {
+        return this.registeredCommands.get(this.commandMetadataMap.get(primaryAlias));
+    }
+
     @Override public void registerInterceptor(final ICommandInterceptor impl) {
         if (impl instanceof IReloadableService.Reloadable) {
             this.reloadableService.registerReloadable((IReloadableService.Reloadable) impl);

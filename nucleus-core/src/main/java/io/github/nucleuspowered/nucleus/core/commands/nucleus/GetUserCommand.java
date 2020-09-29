@@ -10,18 +10,19 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.scaffold.command.parameter.RegexParameter;
+import io.github.nucleuspowered.nucleus.scaffold.command.parameter.UUIDParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileManager;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
+
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 
 @Command(
         aliases = "getuser",
@@ -31,14 +32,15 @@ import java.util.concurrent.CompletableFuture;
 )
 public class GetUserCommand implements ICommandExecutor {
 
-    private final String uuidKey = "UUID";
-    private final String playerKey = "name";
+    private final Parameter.Key<UUID> uuidKey = Parameter.key("UUID", TypeTokens.UUID);
+    private final Parameter.Key<String> playerKey = Parameter.key("name", TypeTokens.STRING);
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-            GenericArguments.firstParsing(
-                new UUIDArgument<>(Text.of(this.uuidKey), Optional::ofNullable, serviceCollection),
-                new RegexArgument(Text.of(this.playerKey), "^[A-Za-z0-9_]{3,16}$", "command.nucleus.getuser.regex", serviceCollection)
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                Parameter.firstOf(
+                        Parameter.builder(UUID.class).parser(new UUIDParameter<>(Optional::ofNullable, serviceCollection.messageProvider())).setKey(this.uuidKey).build(),
+                        Parameter.builder(String.class).parser(new RegexParameter(Pattern.compile("^[.]{1,16}$"), "command.nucleus.getuser.regex",
+                                serviceCollection.messageProvider())).build()
             )
         };
     }
@@ -48,11 +50,11 @@ public class GetUserCommand implements ICommandExecutor {
         final String toGet;
         final GameProfileManager manager = Sponge.getServer().getGameProfileManager();
         if (context.hasAny(this.uuidKey)) {
-            final UUID u = context.requireOne(this.uuidKey, UUID.class);
+            final UUID u = context.requireOne(this.uuidKey);
             toGet = u.toString();
             profile = manager.get(u, false);
         } else {
-            toGet = context.requireOne(this.playerKey, String.class);
+            toGet = context.requireOne(this.playerKey);
             profile = manager.get(toGet, false);
         }
 
@@ -69,7 +71,7 @@ public class GetUserCommand implements ICommandExecutor {
             }
 
             // We have a game profile, it's been added to the cache. Create the user too, just in case.
-            Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gp);
+            Sponge.getServer().getUserManager().getOrCreate(gp);
             context.sendMessage("command.nucleus.getuser.success", gp.getUniqueId().toString(), gp.getName().orElse("unknown"));
 
             return 0;

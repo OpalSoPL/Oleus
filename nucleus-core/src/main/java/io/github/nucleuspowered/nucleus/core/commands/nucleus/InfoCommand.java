@@ -13,14 +13,13 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.services.interfaces.IModuleReporter;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandManager;
-import org.spongepowered.api.command.CommandMapping;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.manager.CommandManager;
+import org.spongepowered.plugin.PluginContainer;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
@@ -29,8 +28,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Command(
         aliases = "info",
@@ -62,16 +62,18 @@ public class InfoCommand implements ICommandExecutor {
         final PluginContainer implementation = platform.getContainer(Platform.Component.IMPLEMENTATION);
         final PluginContainer api = platform.getContainer(Platform.Component.API);
 
-        information.add(String.format("Minecraft Version: %s %s", game.getName(), game.getVersion().orElse("unknown")));
-        information.add(String.format("Sponge Version: %s %s", implementation.getName(), implementation.getVersion().orElse("unknown")));
-        information.add(String.format("Sponge API Version: %s %s", api.getName(), api.getVersion().orElse("unknown")));
+        information.add(String.format("Minecraft Version: %s %s", game.getMetadata().getName().orElse("unknown"), game.getMetadata().getVersion()));
+        information.add(String.format("Sponge Version: %s %s", implementation.getMetadata().getName().orElse("unknown"),
+                implementation.getMetadata().getVersion()));
+        information.add(String.format("Sponge API Version: %s %s", api.getMetadata().getName().orElse("unknown"), api.getMetadata().getVersion()));
         information.add("Nucleus Version: " + NucleusPluginInfo.VERSION + " (Git: " + NucleusPluginInfo.GIT_HASH + ")");
 
         information.add(separator);
         information.add("Plugins");
         information.add(separator);
 
-        Sponge.getPluginManager().getPlugins().forEach(x -> information.add(x.getName() + " (" + x.getId() + ") version " + x.getVersion().orElse("unknown")));
+        Sponge.getPluginManager().getPlugins().forEach(x -> information.add(x.getMetadata().getName().orElse("unknown") + " (" + x.getMetadata().getId() + ") "
+                + "version " + x.getMetadata().getVersion()));
 
         information.add(separator);
         information.add("Registered Commands");
@@ -80,15 +82,15 @@ public class InfoCommand implements ICommandExecutor {
         final Map<String, String> commands = Maps.newHashMap();
         final Map<String, String> plcmds = Maps.newHashMap();
         final CommandManager manager = Sponge.getCommandManager();
-        manager.getPrimaryAliases().forEach(x -> {
-            final Optional<? extends CommandMapping> ocm = manager.get(x);
-            if (ocm.isPresent()) {
-                final Set<String> a = ocm.get().getAllAliases();
-                final Optional<PluginContainer> optionalPC = manager.getOwner(ocm.get());
-                if (optionalPC.isPresent()) {
-                    final PluginContainer container = optionalPC.get();
-                    final String id = container.getId();
-                    final String info = " - " + container.getName() + " (" + id + ") version " + container.getVersion().orElse("unknown");
+        manager.getKnownAliases().stream()
+                .map(x -> manager.getCommandMapping(x).orElse(null))
+                .filter(Objects::nonNull)
+                .distinct()
+                .forEach(x -> {
+                    final Set<String> a = x.getAllAliases();
+                    final PluginContainer container = x.getPlugin();
+                    final String id = container.getMetadata().getId();
+                    final String info = " - " + container.getMetadata().getName() + " (" + id + ") version " + container.getMetadata().getVersion();
                     a.forEach(y -> {
                         if (y.startsWith(id + ":")) {
                             // /nucleus:<blah>
@@ -97,14 +99,7 @@ public class InfoCommand implements ICommandExecutor {
                             commands.put(y, "/" + y + info);
                         }
                     });
-                } else {
-                    final String info = " - unknown (plugin container not present)";
-                    a.forEach(y -> commands.put(y, "/" + y + info));
-                }
-            } else {
-                commands.put(x, "/" + x + " - unknown (mapping not present)");
-            }
-        });
+                });
 
         commands.entrySet().stream().sorted(Comparator.comparing(x -> x.getKey().toLowerCase())).forEachOrdered(x -> information.add(x.getValue()));
         information.add(separator);
@@ -116,15 +111,17 @@ public class InfoCommand implements ICommandExecutor {
         information.add("Nucleus: Enabled Modules");
         information.add(separator);
 
-        context.getServiceCollection().configProvider().getModules(Tristate.TRUE).stream().sorted().forEach(information::add);
+        final IModuleReporter moduleReporter = context.getServiceCollection().moduleReporter();
+        moduleReporter.enabledModules().stream().sorted().forEach(x -> information.add(x.getName() + " (" + x.getId() + ")"));
 
-        final Collection<String> disabled = context.getServiceCollection().configProvider().getModules(Tristate.FALSE);
+        final Collection<String> disabled =
+                moduleReporter.discoveredModules().stream().filter(x -> !moduleReporter.isLoaded(x)).sorted().collect(Collectors.toList());
         if (!disabled.isEmpty()) {
             information.add(separator);
             information.add("Nucleus: Disabled Modules");
             information.add(separator);
 
-            disabled.stream().sorted().forEach(information::add);
+            information.addAll(disabled);
         }
 
 

@@ -233,7 +233,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
                     w.getCategory().orElse(null),
                     0,
                     w.getDescription().orElse(null),
-                    w.getWorldUUID(),
+                    w.getResourceKey(),
                     w.getPosition(),
                     w.getRotation(),
                     w.getName()
@@ -258,7 +258,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
                     w.getCategory().orElse(null),
                     cost,
                     w.getDescription().orElse(null),
-                    w.getWorldUUID(),
+                    w.getResourceKey(),
                     w.getPosition(),
                     w.getRotation(),
                     w.getName()
@@ -296,7 +296,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
                     category,
                     w.getCost().orElse(0d),
                     w.getDescription().orElse(null),
-                    w.getWorldUUID(),
+                    w.getResourceKey(),
                     w.getPosition(),
                     w.getRotation(),
                     w.getName()
@@ -317,7 +317,7 @@ public class WarpService implements NucleusWarpService, ServiceBase {
                     w.getCategory().orElse(null),
                     w.getCost().orElse(0d),
                     description,
-                    w.getWorldUUID(),
+                    w.getResourceKey(),
                     w.getPosition(),
                     w.getRotation(),
                     w.getName()

@@ -186,7 +186,7 @@ public final class NucleusCore {
 
     @Listener
     public void registerStorageRepositoryFactories(final RegisterCatalogEvent<IStorageRepositoryFactory> event) {
-        event.register(new FlatFileStorageRepositoryFactory(this::getDataDirectory, this.logger));
+        event.register(this.serviceCollection.storageManager().getFlatFileRepositoryFactory());
     }
 
     @Listener
