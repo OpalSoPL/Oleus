@@ -42,27 +42,33 @@ public final class FlatFileStorageRepositoryFactory implements IStorageRepositor
     }
 
     @Override
-    public IStorageRepository.Keyed<UUID, IUserQueryObject, JsonObject> userRepository() {
-        return this.repository(USER_DATA_DIRECTORY);
-    }
-
-    @Override
-    public IStorageRepository.Keyed<UUID, IWorldQueryObject, JsonObject> worldRepository() {
-        return this.repository(WORLD_DATA_DIRECTORY);
-    }
-
-    private <R extends IQueryObject<UUID, R>> IStorageRepository.Keyed<UUID, R, JsonObject> repository(final String p) {
-        return new FlatFileStorageRepository.UUIDKeyed<>(this.logger, query -> {
+    public IStorageRepository.Keyed<ResourceKey, IWorldQueryObject, JsonObject> worldRepository() {
+        return new FlatFileStorageRepository.ResourceKeyed<>(this.logger, query -> {
             if (query.keys().size() == 1) {
-                final Collection<UUID> uuids = query.keys();
-                final String uuid = uuids.iterator().next().toString();
-                return this.dataPath.get().resolve(p).resolve(uuid.substring(0, 2)).resolve(uuid  + ".json");
+                final Collection<ResourceKey> keys = query.keys();
+                final ResourceKey key = keys.iterator().next();
+                return this.dataPath.get().resolve(WORLD_DATA_DIRECTORY).resolve(key.getNamespace()).resolve(key.value()  + ".json");
             }
 
             throw new DataQueryException("There must only a key", query);
         },
-        uuid -> this.dataPath.get().resolve(p).resolve(uuid.toString().substring(0, 2)).resolve(uuid.toString() + ".json"),
-        () -> this.dataPath.get().resolve(p));
+        key -> this.dataPath.get().resolve(WORLD_DATA_DIRECTORY).resolve(key.getNamespace()).resolve(key.value() + ".json"),
+        () -> this.dataPath.get().resolve(WORLD_DATA_DIRECTORY));
+    }
+
+    @Override
+    public IStorageRepository.Keyed<UUID, IUserQueryObject, JsonObject> userRepository() {
+        return new FlatFileStorageRepository.UUIDKeyed<>(this.logger, query -> {
+            if (query.keys().size() == 1) {
+                final Collection<UUID> uuids = query.keys();
+                final String uuid = uuids.iterator().next().toString();
+                return this.dataPath.get().resolve(USER_DATA_DIRECTORY).resolve(uuid.substring(0, 2)).resolve(uuid  + ".json");
+            }
+
+            throw new DataQueryException("There must only a key", query);
+        },
+        uuid -> this.dataPath.get().resolve(USER_DATA_DIRECTORY).resolve(uuid.toString().substring(0, 2)).resolve(uuid.toString() + ".json"),
+        () -> this.dataPath.get().resolve(USER_DATA_DIRECTORY));
     }
 
     @Override

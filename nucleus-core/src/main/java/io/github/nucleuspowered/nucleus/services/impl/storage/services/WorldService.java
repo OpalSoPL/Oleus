@@ -8,9 +8,10 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IWorldQueryObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.storage.services.AbstractKeyedService;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.plugin.PluginContainer;
 
-public class WorldService extends AbstractKeyedService<IWorldQueryObject, IWorldDataObject> {
+public class WorldService extends AbstractKeyedService<ResourceKey, IWorldQueryObject, IWorldDataObject> {
 
     public WorldService(final IStorageManager repository, final PluginContainer pluginContainer) {
         super(repository::getWorldDataAccess, repository::getWorldRepository, pluginContainer);

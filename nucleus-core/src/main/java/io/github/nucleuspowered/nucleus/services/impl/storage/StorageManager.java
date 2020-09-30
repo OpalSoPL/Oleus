@@ -35,6 +35,8 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.SimpleConfigurationNode;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.nio.file.Path;
@@ -46,8 +48,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
 
 @Singleton
 public final class StorageManager implements IStorageManager {
@@ -93,14 +93,11 @@ public final class StorageManager implements IStorageManager {
         this.additionalStorageServices.put(clazz, module);
     }
 
-    @Nullable
-    private IStorageRepository.Keyed<UUID, IUserQueryObject, JsonObject> userRepository;
+    private IStorageRepository.@Nullable Keyed<UUID, IUserQueryObject, JsonObject> userRepository;
 
-    @Nullable
-    private IStorageRepository.Keyed<UUID, IWorldQueryObject, JsonObject> worldRepository;
+    private IStorageRepository.@Nullable Keyed<ResourceKey, IWorldQueryObject, JsonObject> worldRepository;
 
-    @Nullable
-    private IStorageRepository.Single<JsonObject> generalRepository;
+    private IStorageRepository.@Nullable Single<JsonObject> generalRepository;
 
     private final IConfigurateBackedDataTranslator<IUserDataObject> userDataAccess = new IConfigurateBackedDataTranslator<IUserDataObject>() {
         @Override public ConfigurationNode createNewNode() {
@@ -179,7 +176,7 @@ public final class StorageManager implements IStorageManager {
     }
 
     @Override
-    public IStorageRepository.Keyed<UUID, IWorldQueryObject, JsonObject> getWorldRepository() {
+    public IStorageRepository.Keyed<ResourceKey, IWorldQueryObject, JsonObject> getWorldRepository() {
         if (this.worldRepository== null) {
             // fallback to flat file
             this.worldRepository = this.flatFileStorageRepositoryFactory.worldRepository();

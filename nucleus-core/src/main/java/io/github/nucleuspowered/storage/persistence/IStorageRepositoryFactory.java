@@ -9,6 +9,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IUser
 import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IWorldQueryObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.ResourceKey;
 
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ public interface IStorageRepositoryFactory extends CatalogType {
      *
      * @return The storage system, if offered.
      */
-    IStorageRepository.@Nullable Keyed<UUID, IWorldQueryObject, JsonObject> worldRepository();
+    IStorageRepository.@Nullable Keyed<ResourceKey, IWorldQueryObject, JsonObject> worldRepository();
 
     /**
      * Gets a storage system for general data

@@ -18,6 +18,7 @@ import io.github.nucleuspowered.storage.dataobjects.IDataObject;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
 import io.github.nucleuspowered.storage.services.IStorageService;
+import org.spongepowered.api.ResourceKey;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -38,7 +39,7 @@ public interface IStorageManager {
 
     IStorageService.Keyed.KeyedData<UUID, IUserQueryObject, IUserDataObject> getUserService();
 
-    IStorageService.Keyed.KeyedData<UUID, IWorldQueryObject, IWorldDataObject> getWorldService();
+    IStorageService.Keyed.KeyedData<ResourceKey, IWorldQueryObject, IWorldDataObject> getWorldService();
 
     IDataTranslator<IUserDataObject, JsonObject> getUserDataAccess();
 
@@ -48,7 +49,7 @@ public interface IStorageManager {
 
     IStorageRepository.Keyed<UUID, IUserQueryObject, JsonObject> getUserRepository();
 
-    IStorageRepository.Keyed<UUID, IWorldQueryObject, JsonObject> getWorldRepository();
+    IStorageRepository.Keyed<ResourceKey, IWorldQueryObject, JsonObject> getWorldRepository();
 
     IStorageRepository.Single<JsonObject> getGeneralRepository();
 
@@ -74,12 +75,12 @@ public interface IStorageManager {
         return this.getUserService().save(uuid, object);
     }
 
-    default Optional<IWorldDataObject> getWorldOnThread(final UUID uuid) {
-        return this.getWorldService().getOnThread(uuid);
+    default Optional<IWorldDataObject> getWorldOnThread(final ResourceKey key) {
+        return this.getWorldService().getOnThread(key);
     }
 
-    default IWorldDataObject getOrCreateWorldOnThread(final UUID uuid) {
-        return this.getWorldService().getOrNewOnThread(uuid);
+    default IWorldDataObject getOrCreateWorldOnThread(final ResourceKey key) {
+        return this.getWorldService().getOrNewOnThread(key);
     }
 
     default IGeneralDataObject getGeneral() {

@@ -19,6 +19,7 @@ import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 import io.github.nucleuspowered.storage.util.KeyedObject;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.ResourceKey;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -129,22 +130,22 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
 
     }
 
-    static class UUIDKeyed<Q extends IQueryObject<UUID, Q>>
+    abstract static class AbstractKeyed<K, Q extends IQueryObject<K, Q>>
             extends FlatFileStorageRepository
-            implements Keyed<UUID, Q, JsonObject> {
+            implements Keyed<K, Q, JsonObject> {
 
         private final ThrownFunction<Q, Path, DataQueryException> FILENAME_RESOLVER;
-        private final Supplier<Path> BASE_PATH;
-        private final Function<UUID, Path> UUID_FILENAME_RESOLVER;
+        protected final Supplier<Path> BASE_PATH;
+        private final Function<K, Path> KEY_FILENAME_RESOLVER;
 
-        UUIDKeyed(
+        AbstractKeyed(
                 final Logger logger,
                 final ThrownFunction<Q, Path, DataQueryException> filename_resolver,
-                final Function<UUID, Path> uuid_filename_resolver,
+                final Function<K, Path> uuid_filename_resolver,
                 final Supplier<Path> basePath) {
             super(logger);
             this.FILENAME_RESOLVER = filename_resolver;
-            this.UUID_FILENAME_RESOLVER = uuid_filename_resolver;
+            this.KEY_FILENAME_RESOLVER = uuid_filename_resolver;
             this.BASE_PATH = basePath;
         }
 
@@ -159,7 +160,7 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         }
 
         @Override
-        public Optional<KeyedObject<UUID, JsonObject>> get(final Q query) throws DataLoadException {
+        public Optional<KeyedObject<K, JsonObject>> get(final Q query) throws DataLoadException {
             final Path path;
             try {
                 path = this.existsInternal(query);
@@ -171,24 +172,24 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         }
 
         @Override
-        public boolean exists(final UUID uuid) {
+        public boolean exists(final K uuid) {
             return this.existsInternal(uuid) != null;
         }
 
         @Override
-        public Optional<JsonObject> get(final UUID uuid) throws DataLoadException {
+        public Optional<JsonObject> get(final K uuid) throws DataLoadException {
             return this.get(this.existsInternal(uuid));
         }
 
         @Override
-        public Collection<UUID> getAllKeys() throws DataLoadException {
+        public Collection<K> getAllKeys() throws DataLoadException {
             return ImmutableSet.copyOf(this.getAllKeysInternal());
         }
 
         @Override
-        public Map<UUID, JsonObject> getAll(final Q query) throws DataLoadException, DataQueryException {
-            final ImmutableMap.Builder<UUID, JsonObject> j = ImmutableMap.builder();
-            for (final UUID key : this.getAllKeys(query)) {
+        public Map<K, JsonObject> getAll(final Q query) throws DataLoadException, DataQueryException {
+            final ImmutableMap.Builder<K, JsonObject> j = ImmutableMap.builder();
+            for (final K key : this.getAllKeys(query)) {
                 j.put(key, this.get(key).get()); // should be there
             }
 
@@ -196,7 +197,7 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         }
 
         @Override
-        public Collection<UUID> getAllKeys(final Q query) throws DataLoadException, DataQueryException {
+        public Collection<K> getAllKeys(final Q query) throws DataLoadException, DataQueryException {
             if (query.restrictedToKeys()) {
                 this.getAllKeysInternal().retainAll(query.keys());
             }
@@ -204,20 +205,12 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
             throw new DataQueryException("There must only a key", query);
         }
 
-        private Set<UUID> getAllKeysInternal() throws DataLoadException {
-            final UUIDFileWalker u = new UUIDFileWalker();
-            try {
-                Files.walkFileTree(this.BASE_PATH.get(), u);
-                return u.uuidSet;
-            } catch (final IOException e) {
-                throw new DataLoadException("Could not walk the file tree", e);
-            }
-        }
+        protected abstract Set<K> getAllKeysInternal() throws DataLoadException;
 
         @Nullable
-        private Path existsInternal(final UUID uuid) {
-            final Path path = this.UUID_FILENAME_RESOLVER.apply(uuid);
-            if (Files.exists(this.UUID_FILENAME_RESOLVER.apply(uuid))) {
+        private Path existsInternal(final K uuid) {
+            final Path path = this.KEY_FILENAME_RESOLVER.apply(uuid);
+            if (Files.exists(this.KEY_FILENAME_RESOLVER.apply(uuid))) {
                 return path;
             }
 
@@ -231,14 +224,14 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         }
 
         @Override
-        public void save(final UUID key, final JsonObject object) throws DataSaveException {
-            final Path file = this.UUID_FILENAME_RESOLVER.apply(key);
+        public void save(final K key, final JsonObject object) throws DataSaveException {
+            final Path file = this.KEY_FILENAME_RESOLVER.apply(key);
             this.save(file, object);
         }
 
         @Override
-        public void delete(final UUID key) throws DataDeleteException {
-            final Path filename = this.UUID_FILENAME_RESOLVER.apply(key);
+        public void delete(final K key) throws DataDeleteException {
+            final Path filename = this.KEY_FILENAME_RESOLVER.apply(key);
 
             try {
                 Files.delete(filename);
@@ -255,6 +248,94 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
             }
 
             return null;
+        }
+    }
+
+    // ** WORLD
+
+    final static class ResourceKeyed<Q extends IQueryObject<ResourceKey, Q>> extends AbstractKeyed<ResourceKey, Q> {
+
+        ResourceKeyed(final Logger logger,
+                final ThrownFunction<Q, Path, DataQueryException> filename_resolver,
+                final Function<ResourceKey, Path> uuid_filename_resolver, final Supplier<Path> basePath) {
+            super(logger, filename_resolver, uuid_filename_resolver, basePath);
+        }
+
+        @Override
+        protected Set<ResourceKey> getAllKeysInternal() throws DataLoadException {
+            final FileWalker u = new FileWalker();
+            try {
+                Files.walkFileTree(this.BASE_PATH.get(), u);
+                return u.keys;
+            } catch (final IOException e) {
+                throw new DataLoadException("Could not walk the file tree", e);
+            }
+        }
+
+        private static class FileWalker extends SimpleFileVisitor<Path> {
+
+            private final Set<ResourceKey> keys = new HashSet<>();
+            @Nullable private String inDirectory;
+
+            @Override
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+                if (this.inDirectory == null) {
+                    final FileVisitResult result = super.preVisitDirectory(dir, attrs);
+                    if (result == FileVisitResult.CONTINUE) {
+                        this.inDirectory = dir.getFileName().toString();
+                    }
+                    return result;
+                }
+
+                return FileVisitResult.SKIP_SUBTREE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+                this.inDirectory = null;
+                return super.postVisitDirectory(dir, exc);
+            }
+
+            // Print information about
+            // each type of file.
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attr) {
+                if (attr.isRegularFile()) {
+                    if (file.endsWith(".json")) {
+                        final String f = file.getFileName().toString();
+                        try {
+                            this.keys.add(ResourceKey.of(this.inDirectory, f.replace(".json", "")));
+                        } catch (final Exception e) {
+                            // ignored
+                        }
+                    }
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+        }
+
+    }
+
+    // ** USER
+
+    final static class UUIDKeyed<Q extends IQueryObject<UUID, Q>> extends AbstractKeyed<UUID, Q> {
+
+        UUIDKeyed(final Logger logger,
+                final ThrownFunction<Q, Path, DataQueryException> filename_resolver,
+                final Function<UUID, Path> uuid_filename_resolver, final Supplier<Path> basePath) {
+            super(logger, filename_resolver, uuid_filename_resolver, basePath);
+        }
+
+        @Override
+        protected Set<UUID> getAllKeysInternal() throws DataLoadException {
+            final UUIDFileWalker u = new UUIDFileWalker();
+            try {
+                Files.walkFileTree(this.BASE_PATH.get(), u);
+                return u.uuidSet;
+            } catch (final IOException e) {
+                throw new DataLoadException("Could not walk the file tree", e);
+            }
         }
 
         private static class UUIDFileWalker extends SimpleFileVisitor<Path> {

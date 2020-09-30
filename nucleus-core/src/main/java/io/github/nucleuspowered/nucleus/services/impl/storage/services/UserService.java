@@ -10,7 +10,9 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.storage.services.AbstractKeyedService;
 import org.spongepowered.plugin.PluginContainer;
 
-public class UserService extends AbstractKeyedService<IUserQueryObject, IUserDataObject> {
+import java.util.UUID;
+
+public class UserService extends AbstractKeyedService<UUID, IUserQueryObject, IUserDataObject> {
 
     public UserService(final IStorageManager repository, final PluginContainer pluginContainer) {
         super(repository::getUserDataAccess, repository::getUserRepository, pluginContainer);

@@ -4,6 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.tests;
 
+import org.junit.Ignore;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.Util;
 import org.junit.Assert;
@@ -11,11 +14,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
-import org.spongepowered.api.world.ChunkPreGenerate;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 public class UtilTests {
@@ -67,100 +68,83 @@ public class UtilTests {
 
         private WorldBorder getBorder() {
             return new WorldBorder() {
-                @Override
-                public double getNewDiameter() {
-                    return WorldBorderTests.this.dia;
-                }
 
-                @Override
-                public double getDiameter() {
-                    return WorldBorderTests.this.dia;
-                }
-
-                @Override
-                public void setDiameter(double diameter) {
-
-                }
-
-                @Override
-                public void setDiameter(double diameter, long time) {
-
-                }
-
-                @Override
-                public void setDiameter(double startDiameter, double endDiameter, long time) {
-
-                }
-
-                @Override
-                public long getTimeRemaining() {
+                @Override public double getNewDiameter() {
                     return 0;
                 }
 
-                @Override
-                public void setCenter(double x, double z) {
-
-                }
-
-                @Override
-                public Vector3d getCenter() {
-                    return new Vector3d(WorldBorderTests.this.borderX, WorldBorderTests.this.borderY, WorldBorderTests.this.borderZ);
-                }
-
-                @Override
-                public int getWarningTime() {
+                @Override public double getDiameter() {
                     return 0;
                 }
 
-                @Override
-                public void setWarningTime(int time) {
+                @Override public void setDiameter(final double diameter) {
 
                 }
 
-                @Override
-                public int getWarningDistance() {
-                    return 0;
-                }
-
-                @Override
-                public void setWarningDistance(int distance) {
+                @Override public void setDiameter(final double diameter, final Duration duration) {
 
                 }
 
-                @Override
-                public double getDamageThreshold() {
-                    return 0;
-                }
-
-                @Override
-                public void setDamageThreshold(double distance) {
+                @Override public void setDiameter(final double startDiameter, final double endDiameter, final Duration duration) {
 
                 }
 
-                @Override
-                public double getDamageAmount() {
-                    return 0;
-                }
-
-                @Override
-                public void setDamageAmount(double damage) {
-
-                }
-
-                @Override
-                public ChunkPreGenerate.Builder newChunkPreGenerate(World world) {
+                @Override public Duration getTimeRemaining() {
                     return null;
+                }
+
+                @Override public void setCenter(final double x, final double z) {
+
+                }
+
+                @Override public Vector3d getCenter() {
+                    return null;
+                }
+
+                @Override public Duration getWarningTime() {
+                    return null;
+                }
+
+                @Override public void setWarningTime(final Duration time) {
+
+                }
+
+                @Override public double getWarningDistance() {
+                    return 0;
+                }
+
+                @Override public void setWarningDistance(final double distance) {
+
+                }
+
+                @Override public double getDamageThreshold() {
+                    return 0;
+                }
+
+                @Override public void setDamageThreshold(final double distance) {
+
+                }
+
+                @Override public double getDamageAmount() {
+                    return 0;
+                }
+
+                @Override public void setDamageAmount(final double damage) {
+
                 }
             };
         }
 
         @Test
+        @Ignore
         public void testInWorldBorder() {
-            WorldBorder wb = getBorder();
-            World world = Mockito.mock(World.class);
-            Mockito.when(world.getWorldBorder()).thenReturn(wb);
+            final WorldBorder wb = this.getBorder();
+            final ServerWorld world = Mockito.mock(ServerWorld.class);
+            Mockito.when(world.getProperties().getWorldBorder()).thenReturn(wb);
 
-            Location<World> lw = new Location<>(world, new Vector3d(this.x, this.y, this.z));
+            final ServerLocation lw = Mockito.mock(ServerLocation.class);
+            Mockito.when(lw.getWorld()).thenReturn(world);
+            Mockito.when(lw.getPosition()).thenReturn(new Vector3d(this.x, this.y, this.z));
             Assert.assertEquals(this.result, Util.isLocationInWorldBorder(lw));
         }
     }

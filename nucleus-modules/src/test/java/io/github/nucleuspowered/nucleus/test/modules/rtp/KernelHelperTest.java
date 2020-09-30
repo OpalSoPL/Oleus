@@ -2,12 +2,12 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.tests.test;
+package io.github.nucleuspowered.nucleus.test.modules.rtp;
 
+import io.github.nucleuspowered.nucleus.modules.rtp.kernels.KernelHelper;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
-import io.github.nucleuspowered.nucleus.modules.rtp.kernels.KernelHelper;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,8 +64,8 @@ public class KernelHelperTest {
     @Test
     public void TestRTPreturnsRightAnswer() {
         final Vector3i centre = new Vector3i(this.xc, 0, this.zc);
-        KernelHelperTestingClass testingClass = new KernelHelperTestingClass(this.x, this.z, this.signx, this.signz);
-        Vector3d result = testingClass.getLocationWithOffset(centre, DUMMY);
+        final KernelHelperTestingClass testingClass = new KernelHelperTestingClass(this.x, this.z, this.signx, this.signz);
+        final Vector3d result = testingClass.getLocationWithOffset(centre, DUMMY);
         Assert.assertEquals("x is incorrect", this.expectedx, result.getFloorX());
         Assert.assertEquals("z is incorrect", this.expectedz, result.getFloorZ());
     }
@@ -98,7 +98,7 @@ public class KernelHelperTest {
         }
     }
 
-    private static class KernelHelperTestingClass extends KernelHelper {
+    private static final class KernelHelperTestingClass extends KernelHelper {
 
         private final int x;
         private final int z;
@@ -106,7 +106,7 @@ public class KernelHelperTest {
         private final int signz;
         private int count = -1;
 
-        private KernelHelperTestingClass(int x, int z, int signx, int signz) {
+        private KernelHelperTestingClass(final int x, final int z, final int signx, final int signz) {
             this.x = x;
             this.z = z;
             this.signx = signx;
@@ -114,7 +114,7 @@ public class KernelHelperTest {
         }
 
         @Override
-        public int getRandomBetween(int min, int max) {
+        public int getRandomBetween(final int min, final int max) {
             ++this.count;
             if (this.count == 0) {
                 return this.x;
@@ -127,7 +127,7 @@ public class KernelHelperTest {
         }
 
         @Override
-        public int randomSign(int in) {
+        public int randomSign(final int in) {
             if (this.count == 0) {
                 return this.signx  * in;
             }
