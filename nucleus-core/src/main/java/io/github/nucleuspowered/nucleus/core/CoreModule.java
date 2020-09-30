@@ -26,11 +26,14 @@ import io.github.nucleuspowered.nucleus.core.listeners.ChatChannelListener;
 import io.github.nucleuspowered.nucleus.core.listeners.CoreListener;
 import io.github.nucleuspowered.nucleus.core.listeners.WarmupListener;
 import io.github.nucleuspowered.nucleus.core.runnables.CoreTask;
+import io.github.nucleuspowered.nucleus.core.services.PlayerMetadataService;
+import io.github.nucleuspowered.nucleus.core.services.UniqueUserService;
 import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import org.spongepowered.api.Sponge;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,7 +46,8 @@ public class CoreModule implements IModule.Configurable<CoreConfig> {
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
-
+        serviceCollection.registerService(UniqueUserService.class, new UniqueUserService(serviceCollection), false);
+        serviceCollection.registerService(PlayerMetadataService.class, new PlayerMetadataService(serviceCollection), false);
     }
 
     @Override

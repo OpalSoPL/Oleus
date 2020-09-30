@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.util;
 
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
@@ -63,4 +64,5 @@ public final class TypeTokens {
 
     public static final TypeToken<Locale> LOCALE = TypeToken.of(Locale.class);
 
+    public static final TypeToken<ResourceKey> RESOURCE_KEY = TypeToken.of(ResourceKey.class);
 }

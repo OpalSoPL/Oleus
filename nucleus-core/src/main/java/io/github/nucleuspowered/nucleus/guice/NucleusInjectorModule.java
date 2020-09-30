@@ -26,8 +26,8 @@ public class NucleusInjectorModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        this.bind(new TypeLiteral<Supplier<Path>>() {}).annotatedWith(DataDirectory.class).toProvider(() -> this.coreSupplier.get()::getDataDirectory);
-        this.bind(Path.class).annotatedWith(ConfigDirectory.class).toProvider(() -> this.coreSupplier.get().getConfigDirectory());
+        this.bind(new TypeLiteral<Supplier<Path>>() {}).annotatedWith(DataDirectory.class).toInstance(this.coreSupplier.get()::getDataDirectory);
+        this.bind(Path.class).annotatedWith(ConfigDirectory.class).toInstance(this.coreSupplier.get().getConfigDirectory());
     }
 
     @Provides

@@ -53,7 +53,7 @@ public interface DataKey<R, O extends IKeyedDataObject<?>> {
      *
      * @return The key
      */
-    String[] getKey();
+    String[] getDataPath();
 
     /**
      * The {@link Class} of the data

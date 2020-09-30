@@ -14,6 +14,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IModuleReporter;
 import io.github.nucleuspowered.nucleus.util.TriConsumer;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKeyImpl;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Locale;
@@ -25,70 +26,64 @@ import javax.annotation.Nullable;
 
 public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implements NucleusUserPreferenceService.PreferenceKey<T> {
 
-    private final String key;
+    private final ResourceKey key;
     @Nullable private final T def;
     private final Class<T> clazz;
     private final BiPredicate<INucleusServiceCollection, User> canAccess;
     private final String descriptionKey;
-    private final String module;
     private final TriConsumer<INucleusServiceCollection, UUID, T> onSet;
 
     PreferenceKeyImpl(
-            final String key,
+            final ResourceKey key,
             @Nullable final T def,
             final Class<T> clazz,
             final String permission,
-            final String descriptionKey,
-            final String module) {
-        this(key, def, clazz, permission, descriptionKey, module, (s, u, t) -> {});
+            final String descriptionKey) {
+        this(key, def, clazz, permission, descriptionKey, (s, u, t) -> {});
     }
 
     PreferenceKeyImpl(
-            final String key,
+            final ResourceKey key,
             @Nullable final T def,
             final Class<T> clazz,
             final String permission,
             final String descriptionKey,
-            final String module,
             final TriConsumer<INucleusServiceCollection, UUID, T> onSet) {
         this(key,
                 def,
                 clazz,
                 (serviceCollection, user) -> serviceCollection.permissionService().hasPermission(user, permission),
                 descriptionKey,
-                module,
                 onSet);
     }
 
     PreferenceKeyImpl(
-            final String key,
+            final ResourceKey key,
             @Nullable final T def,
             final Class<T> clazz,
             final BiPredicate<INucleusServiceCollection, User> canAccess,
-            final String descriptionKey,
-            final String module) {
-        this(key, def, clazz, canAccess, descriptionKey, module, (s, u, t) -> {});
+            final String descriptionKey) {
+        this(key, def, clazz, canAccess, descriptionKey, (s, u, t) -> {});
     }
 
     PreferenceKeyImpl(
-            final String key,
+            final ResourceKey key,
             @Nullable final T def,
             final Class<T> clazz,
             final BiPredicate<INucleusServiceCollection, User> canAccess,
             final String descriptionKey,
-            final String module,
             final TriConsumer<INucleusServiceCollection, UUID, T> onSet) {
-        super(new String[] { "user-prefs", key }, TypeToken.of(clazz), IUserDataObject.class, def);
+        super(new String[] { "user-prefs", key.asString() }, TypeToken.of(clazz), IUserDataObject.class, def);
         this.key = key;
         this.def = def;
         this.clazz = clazz;
         this.canAccess = canAccess;
         this.descriptionKey = descriptionKey;
-        this.module = module;
         this.onSet = onSet;
     }
 
-    public String getID() {
+    @Override
+    public ResourceKey getKey() {
         return this.key;
     }
 
@@ -116,34 +111,25 @@ public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implem
         this.onSet.accept(serviceCollection, uuid, value);
     }
 
-    public Optional<NucleusUserPreferenceService.PreferenceKey<T>> getIfLoaded(final IModuleReporter reporter) {
-        if (reporter.isLoaded(this.module)) {
-            return Optional.of(this);
-        }
-
-        return Optional.empty();
-    }
-
     public static class BooleanKey extends PreferenceKeyImpl<Boolean> {
 
-        public BooleanKey(final String key, @Nullable final Boolean def, final String permission, final String descriptionKey, final String module) {
-            super(key, def, Boolean.class, permission, descriptionKey, module);
+        public BooleanKey(final ResourceKey key, @Nullable final Boolean def, final String permission, final String descriptionKey) {
+            super(key, def, Boolean.class, permission, descriptionKey);
         }
 
-        public BooleanKey(final String key, @Nullable final Boolean def, final BiPredicate<INucleusServiceCollection, User> canAccess, final String descriptionKey, final String module) {
-            super(key, def, Boolean.class, canAccess, descriptionKey, module);
+        public BooleanKey(final ResourceKey key, @Nullable final Boolean def, final BiPredicate<INucleusServiceCollection, User> canAccess, final String descriptionKey) {
+            super(key, def, Boolean.class, canAccess, descriptionKey);
         }
     }
 
     public static class LocaleKey extends PreferenceKeyImpl<Locale> {
 
-        public LocaleKey(final String key,
+        public LocaleKey(final ResourceKey key,
                 @Nullable final Locale def,
                 final String permission,
                 final String descriptionKey,
-                final String module,
                 final TriConsumer<INucleusServiceCollection, UUID, Locale> serviceCollectionConsumer) {
-            super(key, def, Locale.class, permission, descriptionKey, module, serviceCollectionConsumer);
+            super(key, def, Locale.class, permission, descriptionKey, serviceCollectionConsumer);
         }
 
     }

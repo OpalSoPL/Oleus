@@ -5,6 +5,8 @@
 package io.github.nucleuspowered.nucleus.api.core;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Locale;
@@ -140,14 +142,7 @@ public interface NucleusUserPreferenceService {
      *
      * @param <T> The type of key.
      */
-    interface PreferenceKey<T> {
-
-        /**
-         * The ID of the key. Must be unique amongst all keys.
-         *
-         * @return The ID
-         */
-        String getID();
+    interface PreferenceKey<T> extends CatalogType {
 
         /**
          * The default value for a preference, if any.

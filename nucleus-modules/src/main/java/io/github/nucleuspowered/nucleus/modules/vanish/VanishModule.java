@@ -4,56 +4,80 @@
  */
 package io.github.nucleuspowered.nucleus.modules.vanish;
 
-import com.google.common.collect.ImmutableMap;
-import io.github.nucleuspowered.nucleus.core.CoreModule;
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfig;
-import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfigAdapter;
 import io.github.nucleuspowered.nucleus.modules.vanish.services.VanishService;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.util.Identifiable;
 
-import java.util.Map;
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = VanishModule.ID, name = "Vanish", dependencies = CoreModule.ID)
-public class VanishModule extends ConfigurableModule<VanishConfig, VanishConfigAdapter> {
+public final class VanishModule implements IModule.Configurable<VanishConfig> {
 
     public static final String ID = "vanish";
 
-    @Inject
-    public VanishModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
-    }
-
     @Override
-    public VanishConfigAdapter createAdapter() {
-        return new VanishConfigAdapter();
-    }
-
-    @Override
-    protected Map<String, PlaceholderParser> tokensToRegister() {
-        return ImmutableMap.<String, PlaceholderParser>builder()
-                .put("vanished",
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.placeholderService()
+                .registerToken(
+                        "vanished",
                         PlaceholderParser.builder()
-                                .plugin(this.serviceCollection.pluginContainer())
-                                .id("vanished")
-                                .name("Nucleus Vanished Indicator Token")
+                                .key(ResourceKey.of("nucleus", "vanished"))
                                 .parser(p -> {
-                                    if (p.getAssociatedObject().filter(x -> x instanceof User)
-                                            .map(x -> this.serviceCollection.getServiceUnchecked(VanishService.class).isVanished((User) x))
+                                    if (p.getAssociatedObject()
+                                            .filter(x -> x instanceof Identifiable)
+                                            .map(x -> serviceCollection.getServiceUnchecked(VanishService.class).isVanished(((Identifiable) x).getUniqueId()))
                                             .orElse(false)) {
-                                        return Text.of(TextColors.GRAY, "[Vanished]");
+                                        return Component.text("[Vanished]", NamedTextColor.GRAY);
                                     }
-                                    return Text.EMPTY;
-                                }).build()).build();
+                                    return Component.empty();
+                                }).build()
+                );
+    }
+
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
+    }
+
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override public Collection<Class<? extends TaskBase>> getTasks() {
+        return null;
+    }
+
+    @Override public Class<VanishConfig> getConfigClass() {
+        return null;
+    }
+
+    @Listener
+    public void onRegisterNucleusPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+        event.register(
+                new PreferenceKeyImpl.BooleanKey(
+                        NucleusKeysProvider.VANISH_ON_LOGIN_KEY,
+                        false,
+                        VanishPermissions.VANISH_ONLOGIN,
+                        "userpref.vanishonlogin"
+                )
+        );
     }
 
 }

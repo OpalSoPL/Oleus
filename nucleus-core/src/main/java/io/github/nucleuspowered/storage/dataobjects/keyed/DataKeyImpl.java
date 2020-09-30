@@ -26,7 +26,7 @@ public class DataKeyImpl<R, O extends IKeyedDataObject<?>> implements DataKey<R,
         return this.target;
     }
 
-    @Override public String[] getKey() {
+    @Override public String[] getDataPath() {
         return this.key;
     }
 

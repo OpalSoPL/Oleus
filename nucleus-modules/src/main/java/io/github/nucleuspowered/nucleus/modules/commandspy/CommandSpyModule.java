@@ -4,30 +4,57 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandspy;
 
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.commandspy.config.CommandSpyConfig;
-import io.github.nucleuspowered.nucleus.modules.commandspy.config.CommandSpyConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = CommandSpyModule.ID, name = "Command Spy")
-public class CommandSpyModule extends ConfigurableModule<CommandSpyConfig, CommandSpyConfigAdapter> {
+public final class CommandSpyModule implements IModule.Configurable<CommandSpyConfig> {
 
     public final static String ID = "command-spy";
 
-    @Inject
-    public CommandSpyModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+
     }
 
-    @Override public CommandSpyConfigAdapter createAdapter() {
-        return new CommandSpyConfigAdapter();
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
     }
 
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override public Collection<Class<? extends TaskBase>> getTasks() {
+        return null;
+    }
+
+    @Override public Class<CommandSpyConfig> getConfigClass() {
+        return CommandSpyConfig.class;
+    }
+
+    @Listener
+    public void registerUserPreferenceKey(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+        event.register(new PreferenceKeyImpl.BooleanKey(
+                NucleusKeysProvider.COMMAND_SPY_KEY,
+                true,
+                CommandSpyPermissions.BASE_COMMANDSPY,
+                "userpref.commandspy"
+        ));
+    }
 }

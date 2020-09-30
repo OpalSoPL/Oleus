@@ -10,8 +10,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.github.nucleuspowered.nucleus.module.ModuleContainer;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICompatibilityService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
+import io.github.nucleuspowered.nucleus.services.interfaces.IModuleReporter;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.ArrayList;
@@ -22,14 +24,14 @@ import java.util.stream.Collectors;
 @Singleton
 public class CompatibilityService implements ICompatibilityService {
 
-    private final IConfigProvider moduleDataProvider;
+    private final IModuleReporter moduleReporter;
 
     private final List<CompatibilityMessages> messages = new ArrayList<>();
     private List<CompatibilityMessages> applicableMessages = null;
 
     @Inject
-    public CompatibilityService(final IConfigProvider moduleDataProvider) {
-        this.moduleDataProvider = moduleDataProvider;
+    public CompatibilityService(final IModuleReporter moduleReporter) {
+        this.moduleReporter = moduleReporter;
     }
 
     @Override
@@ -81,7 +83,7 @@ public class CompatibilityService implements ICompatibilityService {
     }
 
     private List<CompatibilityMessages> applyMessages() {
-        final Collection<String> id = this.moduleDataProvider.getModules(Tristate.TRUE);
+        final Collection<String> id = this.moduleReporter.enabledModules().stream().map(ModuleContainer::getId).collect(Collectors.toList());
         return this.messages
                 .stream()
                 .filter(x -> id.contains(x.getModId()))

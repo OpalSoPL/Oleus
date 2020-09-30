@@ -79,15 +79,15 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
 
     }
 
-    public boolean isVanished(final User player) {
+    public boolean isVanished(final UUID uuid) {
         return this.storageManager.getUserService()
-                .getOnThread(player.getUniqueId())
+                .getOnThread(uuid)
                 .flatMap(x -> x.get(VanishKeys.VANISH_STATUS))
                 .orElse(false);
     }
 
     public void vanishPlayer(final User player) {
-        vanishPlayer(player, false);
+        this.vanishPlayer(player, false);
     }
 
     public void vanishPlayer(final User player, final boolean delay) {

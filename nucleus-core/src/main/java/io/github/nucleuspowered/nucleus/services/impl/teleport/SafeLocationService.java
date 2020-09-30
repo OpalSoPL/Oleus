@@ -155,8 +155,7 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.getServiceUnchecked(CoreConfigAdapter.class)
-                .getNodeOrDefault().getSafeTeleportConfig();
+        this.config = serviceCollection.configProvider().getCoreConfig().getSafeTeleportConfig();
     }
 
     @Override public BorderDisableSession temporarilyDisableBorder(final boolean reset, final ServerWorld world) {

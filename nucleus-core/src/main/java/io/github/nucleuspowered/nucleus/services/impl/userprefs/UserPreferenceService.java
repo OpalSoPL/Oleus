@@ -9,6 +9,7 @@ import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 
@@ -25,13 +26,13 @@ public class UserPreferenceService implements IUserPreferenceService {
 
     private final NucleusKeysProvider provider;
 
-    private final Map<String, NucleusUserPreferenceService.PreferenceKey<?>> registered = new HashMap<>();
+    private final Map<ResourceKey, NucleusUserPreferenceService.PreferenceKey<?>> registered = new HashMap<>();
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
     public UserPreferenceService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
-        this.provider = new NucleusKeysProvider(serviceCollection);
+        this.provider = new NucleusKeysProvider();
     }
 
     @Override
@@ -40,10 +41,10 @@ public class UserPreferenceService implements IUserPreferenceService {
     }
 
     @Override public void register(final PreferenceKeyImpl<?> key) {
-        if (this.registered.containsKey(key.getID())) {
+        if (this.registered.containsKey(key.getKey())) {
             throw new IllegalArgumentException("ID already registered");
         }
-        this.registered.put(key.getID(), key);
+        this.registered.put(key.getKey(), key);
     }
 
     @SuppressWarnings("rawtypes")
@@ -133,10 +134,6 @@ public class UserPreferenceService implements IUserPreferenceService {
 
     @Override public String getDescription(final PreferenceKey<?> key) {
         return ((PreferenceKeyImpl) key).getDescription(this.serviceCollection.messageProvider());
-    }
-
-    Map<String, NucleusUserPreferenceService.PreferenceKey<?>> getRegistered() {
-        return this.registered;
     }
 
 }

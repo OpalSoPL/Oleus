@@ -30,18 +30,18 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
 
     @Override
     public boolean serviceExists() {
-        return Sponge.getServiceProvider().economyService().isPresent();
+        return Sponge.getServer().getServiceProvider().economyService().isPresent();
     }
 
     @Override public String getCurrencySymbol(final double cost) {
-        final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
+        final Optional<EconomyService> oes = Sponge.getServer().getServiceProvider().economyService();
         return oes.map(economyService -> economyService.getDefaultCurrency().format(BigDecimal.valueOf(cost)).toString())
                 .orElseGet(() -> String.valueOf(cost));
 
     }
 
     @Override public boolean hasBalance(final UUID src, final double balance) {
-        final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
+        final Optional<EconomyService> oes = Sponge.getServer().getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
@@ -58,7 +58,7 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
     }
 
     @Override public boolean withdrawFromPlayer(final UUID src, final double cost, final boolean message) {
-        final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
+        final Optional<EconomyService> oes = Sponge.getServer().getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
@@ -98,7 +98,7 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
     }
 
     @Override public boolean depositInPlayer(final UUID src, final double cost, final boolean message) {
-        final Optional<EconomyService> oes = Sponge.getServiceProvider().economyService();
+        final Optional<EconomyService> oes = Sponge.getServer().getServiceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();

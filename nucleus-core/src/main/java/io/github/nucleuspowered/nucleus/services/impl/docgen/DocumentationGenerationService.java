@@ -11,6 +11,7 @@ import io.github.nucleuspowered.nucleus.core.docgen.CommandDoc;
 import io.github.nucleuspowered.nucleus.core.docgen.EssentialsDoc;
 import io.github.nucleuspowered.nucleus.core.docgen.PermissionDoc;
 import io.github.nucleuspowered.nucleus.core.docgen.TokenDoc;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
@@ -172,9 +173,9 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                                 .orElse(null));
 
                         // TODO: Usage
-                        commandDoc.setUsageString(control.getUsage(cause).toPlain());
+                        // commandDoc.setUsageString(control.getUsage().toPlain());
                         commandDoc.setPermissions(new ArrayList<>(permissionDocs));
-                        commandDoc.setSimpleUsage(control.getUsageText(cause).toPlain());
+                        // commandDoc.setSimpleUsage(control.getUsageText(cause).toPlain());
                         commandDoc.setContext(control.getContext().getValue());
 
                         return commandDoc;

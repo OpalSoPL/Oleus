@@ -27,8 +27,9 @@ public class MobTypeSettingProcessor implements SettingProcessor {
             new TypeToken<List<EntityType<?>>>() {};
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void process(final ConfigurationNode cn) throws ObjectMappingException {
-        final List<EntityType<?>> types = Sponge.getRegistry().getCatalogRegistry()
+        final List<EntityType<?>> types = (List) Sponge.getRegistry().getCatalogRegistry()
                 .streamAllOf(EntityType.class)
                 .filter(x -> Living.class.isAssignableFrom(x.getClass()))
                 .collect(Collectors.toList());

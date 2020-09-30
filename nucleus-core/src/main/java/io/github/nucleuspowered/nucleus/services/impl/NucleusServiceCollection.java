@@ -9,6 +9,7 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.guice.DataDirectory;
+import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICommandElementSupplier;
@@ -38,6 +39,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceServi
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
 import io.github.nucleuspowered.nucleus.util.LazyLoad;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.nio.file.Path;
@@ -52,6 +54,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
 
     private final Map<Class<?>, Object> instances = new HashMap<>();
     private final Map<Class<?>, Supplier<?>> suppliers = new HashMap<>();
+    private final Map<Class<?>, Object> apiFactories = new HashMap<>();
 
     private final Supplier<IMessageProviderService> messageProviderService;
     private final Supplier<IEconomyServiceProvider> economyServiceProvider;
@@ -259,6 +262,9 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
 
         this.suppliers.remove(key);
         this.instances.put(key, service);
+        if (service.getClass().isAnnotationPresent(APIService.class)) {
+            this.apiFactories.put(service.getClass().getAnnotation(APIService.class).value(), service);
+        }
     }
 
     @Override @SuppressWarnings("unchecked")
@@ -291,4 +297,13 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         return this.dataDir;
     }
 
+    @Override public void registerFactories(final RegisterFactoryEvent event) {
+        for (final Map.Entry<Class<?>, Object> entry : this.apiFactories.entrySet()) {
+            this.registerFactory(event, entry.getKey(), entry.getValue());
+        }
+    }
+
+    private <T> void registerFactory(final RegisterFactoryEvent event, final Class<T> c, final Object instance) {
+        event.register(c, c.cast(instance));
+    }
 }

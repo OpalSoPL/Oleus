@@ -4,6 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
@@ -43,7 +45,7 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
 
         return new LocationData(
                 getName(value),
-                getWorldUUID(value),
+                getWorldResourceKey(value),
                 pos,
                 rot
         );
@@ -70,8 +72,19 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
         return value.getNode("name").getString(String.valueOf(value.getKey()));
     }
 
-    public static UUID getWorldUUID(final ConfigurationNode value) throws ObjectMappingException {
-        return value.getNode("world").getValue(TypeTokens.UUID);
+    public static ResourceKey convertUUID(final UUID value, final ObjectMappingException ex) throws ObjectMappingException {
+        return Sponge.getServer().getWorldManager().getWorlds().stream().filter(x -> x.getUniqueId().equals(value)).findFirst()
+                .orElseThrow(() -> ex)
+                .getKey();
+    }
+
+    public static ResourceKey getWorldResourceKey(final ConfigurationNode value) throws ObjectMappingException {
+        try {
+            return value.getNode("world").getValue(TypeTokens.RESOURCE_KEY);
+        } catch (final ObjectMappingException e) {
+            final UUID uuid = value.getNode("world").getValue(TypeTokens.UUID);
+            return convertUUID(uuid, e);
+        }
     }
 
     public static Vector3d getPosition(final ConfigurationNode value) {
@@ -91,7 +104,7 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
     }
 
     public static void serializeLocation(final NamedLocation obj, final ConfigurationNode value) throws ObjectMappingException {
-        value.getNode("world").setValue(TypeTokens.UUID, obj.getResourceKey());
+        value.getNode("world").setValue(TypeTokens.RESOURCE_KEY, obj.getResourceKey());
 
         value.getNode("x").setValue(obj.getPosition().getX());
         value.getNode("y").setValue(obj.getPosition().getY());

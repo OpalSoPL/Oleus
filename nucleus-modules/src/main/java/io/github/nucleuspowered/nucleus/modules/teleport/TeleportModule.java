@@ -4,37 +4,58 @@
  */
 package io.github.nucleuspowered.nucleus.modules.teleport;
 
-import com.google.common.collect.ImmutableMap;
-import io.github.nucleuspowered.nucleus.core.CoreModule;
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.teleport.config.TeleportConfig;
-import io.github.nucleuspowered.nucleus.modules.teleport.config.TeleportConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = TeleportModule.ID, name = "Teleport", dependencies = CoreModule.ID)
-public class TeleportModule extends ConfigurableModule<TeleportConfig, TeleportConfigAdapter> {
+public final class TeleportModule implements IModule.Configurable<TeleportConfig> {
 
     public static final String ID = "teleport";
 
-    @Inject
-    public TeleportModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override public void init(final INucleusServiceCollection serviceCollection) {
+
     }
 
-    @Override
-    public TeleportConfigAdapter createAdapter() {
-        return new TeleportConfigAdapter();
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
     }
 
-    @Override protected ImmutableMap<String, String> remapCommand() {
-        return ImmutableMap.<String, String>builder()
-                .put("tpn", "minecraft:tp")
-                .build();
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override public Collection<Class<? extends TaskBase>> getTasks() {
+        return null;
+    }
+
+    @Override public Class<TeleportConfig> getConfigClass() {
+        return TeleportConfig.class;
+    }
+
+    @Listener
+    public void onRegisterNucleusPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+        event.register(
+            new PreferenceKeyImpl.BooleanKey(
+                NucleusKeysProvider.TELEPORT_TARGETABLE_KEY,
+                true,
+                TeleportPermissions.BASE_TPTOGGLE,
+                "userpref.teleporttarget"
+            )
+        );
     }
 }

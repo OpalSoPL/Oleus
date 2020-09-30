@@ -7,8 +7,10 @@ package io.github.nucleuspowered.nucleus;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Injector;
 import io.github.nucleuspowered.nucleus.api.core.NucleusPlayerMetadataService;
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import io.github.nucleuspowered.nucleus.core.CoreModule;
+import io.github.nucleuspowered.nucleus.core.CorePermissions;
 import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.core.services.PlayerMetadataService;
 import io.github.nucleuspowered.nucleus.core.services.UniqueUserService;
@@ -22,6 +24,7 @@ import io.github.nucleuspowered.nucleus.module.IModuleProvider;
 import io.github.nucleuspowered.nucleus.module.ModuleContainer;
 import io.github.nucleuspowered.nucleus.module.ModuleEvent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifierFactory;
+import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.CooldownModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.CostModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.RequiresEconomyModifier;
@@ -32,6 +35,8 @@ import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.NucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.persistence.FlatFileStorageRepositoryFactory;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
@@ -72,6 +77,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -155,14 +161,15 @@ public final class NucleusCore {
         event.register(CommandModifierFactory.class, ResourceKey.of("nucleus", "command_modifier_factory"));
         event.register(TeleportScanner.class, ResourceKey.of("nucleus", "teleport_scanner"));
         event.register(IStorageRepositoryFactory.class, ResourceKey.of("nucleus", "storage_repository_factory"));
+        event.register(NucleusUserPreferenceService.PreferenceKey.class, ResourceKey.of("nucleus", "user_preference_key"));
     }
 
     @Listener
     public void registerCommandModifierFactories(final RegisterCatalogEvent<CommandModifierFactory> event) {
-        event.register(new CommandModifierFactory.Simple(new CooldownModifier()));
-        event.register(new CommandModifierFactory.Simple(new CostModifier()));
-        event.register(new CommandModifierFactory.Simple(new WarmupModifier()));
-        event.register(new CommandModifierFactory.Simple(new RequiresEconomyModifier()));
+        event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COOLDOWN, new CooldownModifier()));
+        event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COST, new CostModifier()));
+        event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_WARMUP, new WarmupModifier()));
+        event.register(new CommandModifierFactory.Simple(CommandModifiers.REQUIRE_ECONOMY, new RequiresEconomyModifier()));
     }
 
     @Listener
@@ -190,10 +197,21 @@ public final class NucleusCore {
     }
 
     @Listener
+    public void registerCoreUserPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+        event.register(
+                new PreferenceKeyImpl.LocaleKey(
+                        NucleusKeysProvider.PLAYER_LOCALE_KEY,
+                        Locale.UK,
+                        CorePermissions.BASE_NUCLEUSLANGUAGE,
+                        "userpref.player_locale",
+                        (serviceCollection, uuid, value) -> serviceCollection.messageProvider().invalidateLocaleCacheFor(uuid)
+                )
+        );
+    }
+
+    @Listener
     public void establishFactories(final RegisterFactoryEvent event) {
-        final PlayerMetadataService metadataService = new PlayerMetadataService(this.serviceCollection);
-        this.serviceCollection.registerService(NucleusPlayerMetadataService.class, metadataService, false);
-        event.register(NucleusPlayerMetadataService.class, metadataService);
+        this.serviceCollection.registerFactories(event);
     }
 
     @Listener(order = Order.LAST)

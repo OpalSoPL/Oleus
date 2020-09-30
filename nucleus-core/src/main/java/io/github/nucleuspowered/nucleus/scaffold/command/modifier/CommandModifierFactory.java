@@ -17,8 +17,8 @@ public abstract class CommandModifierFactory implements CatalogType, Function<Co
         private final ResourceKey key;
         private final Function<CommandControl, ICommandModifier> modifierFunction;
 
-        public Simple(final ICommandModifier modifier) {
-            this(modifier.getKey(), control -> modifier);
+        public Simple(final String key, final ICommandModifier modifier) {
+            this(ResourceKey.resolve(key), control -> modifier);
         }
 
         public Simple(final ResourceKey key, final Function<CommandControl, ICommandModifier> modifierFunction) {

@@ -4,7 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.core.services;
 
-import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
@@ -14,7 +15,7 @@ import io.github.nucleuspowered.storage.services.IStorageService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.user.UserManager;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -22,9 +23,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.spongepowered.api.user.UserManager;
 
 @Singleton
 public class UniqueUserService implements ServiceBase, IReloadableService.Reloadable {
@@ -64,8 +62,9 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
             this.userCountIsDirty = true;
             ERROR_REPORTED = false;
 
-            if (Sponge.getServer().isMainThread()) {
-                Task.builder().async().execute(t -> this.doTask(resultConsumer)).submit(this.serviceCollection.pluginContainer());
+            if (Sponge.getServer().onMainThread()) {
+                Sponge.getAsyncScheduler().createExecutor(this.serviceCollection.pluginContainer())
+                        .submit(() -> this.doTask(resultConsumer));
             } else {
                 this.doTask(resultConsumer);
             }

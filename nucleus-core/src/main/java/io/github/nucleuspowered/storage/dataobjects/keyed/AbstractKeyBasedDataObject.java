@@ -16,7 +16,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
 
     @Override
     public boolean has(final DataKey<?, ? extends T> dataKey) {
-        return !this.getNode(dataKey.getKey()).isVirtual();
+        return !this.getNode(dataKey.getDataPath()).isVirtual();
     }
 
     public <V> Value<V> getAndSet(final DataKey<V, ? extends T> dataKey) {
@@ -26,7 +26,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
     @Nullable
     public <V> V getNullable(final DataKey<V, ? extends T> dataKey) {
         try {
-            return this.getNode(dataKey.getKey()).getValue(dataKey.getType());
+            return this.getNode(dataKey.getDataPath()).getValue(dataKey.getType());
         } catch (final ObjectMappingException e) {
             e.printStackTrace();
             return null;
@@ -49,7 +49,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
 
     public <V> boolean set(final DataKey<V, ? extends T> dataKey, final V data) {
         try {
-            this.getNode(dataKey.getKey()).setValue(dataKey.getType(), data);
+            this.getNode(dataKey.getDataPath()).setValue(dataKey.getType(), data);
             return true;
         } catch (final ObjectMappingException e) {
             e.printStackTrace();
@@ -58,7 +58,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
     }
 
     public void remove(final DataKey<?, ? extends T> dataKey) {
-        this.getNode(dataKey.getKey()).setValue(null);
+        this.getNode(dataKey.getDataPath()).setValue(null);
     }
 
     private ConfigurationNode getNode(final String[] key) {

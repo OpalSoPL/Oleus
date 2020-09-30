@@ -34,6 +34,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IUserCacheService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IWarmupService;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.nio.file.Path;
@@ -110,4 +111,6 @@ public interface INucleusServiceCollection {
     Supplier<Path> dataDir();
 
     IChatMessageFormatterService chatMessageFormatter();
+
+    void registerFactories(final RegisterFactoryEvent event);
 }

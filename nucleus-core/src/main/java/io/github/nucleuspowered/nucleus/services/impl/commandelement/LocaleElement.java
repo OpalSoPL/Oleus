@@ -14,6 +14,7 @@ import org.spongepowered.api.command.parameter.managed.ValueParameter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class LocaleElement implements ValueParameter<Locale> {
 
@@ -24,8 +25,8 @@ public final class LocaleElement implements ValueParameter<Locale> {
     }
 
     @Override
-    public List<String> complete(final CommandContext context) {
-        return this.serviceCollection.messageProvider().getAllLocaleNames();
+    public List<String> complete(final CommandContext context, final String string) {
+        return this.serviceCollection.messageProvider().getAllLocaleNames().stream().filter(x -> x.startsWith(string)).collect(Collectors.toList());
     }
 
     @Override

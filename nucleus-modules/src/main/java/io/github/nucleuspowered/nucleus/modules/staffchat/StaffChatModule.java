@@ -4,36 +4,58 @@
  */
 package io.github.nucleuspowered.nucleus.modules.staffchat;
 
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
-import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = StaffChatModule.ID, name = "Staff Chat")
-public class StaffChatModule extends ConfigurableModule<StaffChatConfig, StaffChatConfigAdapter> {
+public class StaffChatModule implements IModule.Configurable<StaffChatConfig> {
 
     public static final String ID = "staff-chat";
 
-    @Inject
-    public StaffChatModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
-    }
-
-    @Override
-    public StaffChatConfigAdapter createAdapter() {
-        return new StaffChatConfigAdapter();
-    }
-
-    @Override public void performPreTasks(final INucleusServiceCollection serviceCollection) throws Exception {
-        super.performPreTasks(serviceCollection);
-
-        // Registers itself.
+    @Override public void init(final INucleusServiceCollection serviceCollection) {
         new StaffChatMessageChannel(serviceCollection);
+    }
+
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
+    }
+
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override public Collection<Class<? extends TaskBase>> getTasks() {
+        return null;
+    }
+
+    @Override public Class<StaffChatConfig> getConfigClass() {
+        return StaffChatConfig.class;
+    }
+
+    @Listener
+    public void onRegisterNucleusPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+        event.register(
+                new PreferenceKeyImpl.BooleanKey(
+                        NucleusKeysProvider.VIEW_STAFF_CHAT_KEY,
+                        true,
+                        StaffChatPermissions.BASE_STAFFCHAT,
+                        "userpref.viewstaffchat"
+                )
+        );
     }
 }
