@@ -60,7 +60,7 @@ allprojects {
         exclude("**/*.info")
         exclude("assets/**")
         exclude("*.kts")
-        exclude("*.json")
+        exclude("**/*.json")
         exclude("*.properties")
         exclude("*.txt")
 
