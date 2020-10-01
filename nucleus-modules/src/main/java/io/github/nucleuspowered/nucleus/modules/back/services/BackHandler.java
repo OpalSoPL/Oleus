@@ -5,12 +5,12 @@
 package io.github.nucleuspowered.nucleus.modules.back.services;
 
 import io.github.nucleuspowered.nucleus.api.module.back.NucleusBackService;
+import io.github.nucleuspowered.nucleus.api.util.WorldPositionRotation;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.User;
+import io.github.nucleuspowered.nucleus.util.WorldPositionRotationImpl;
 import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.api.world.World;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,40 +22,35 @@ import java.util.UUID;
 @APIService(NucleusBackService.class)
 public class BackHandler implements NucleusBackService, ServiceBase {
 
-    private final Map<UUID, UUIDTransform> lastLocation = new HashMap<>();
+    private final Map<UUID, WorldPositionRotation> lastLocation = new HashMap<>();
     private final Set<UUID> preventLogLastLocation = new HashSet<>();
 
     @Override
-    public Optional<Transform<World>> getLastLocation(final User user) {
-        final UUIDTransform transform = this.lastLocation.get(user.getUniqueId());
-        if (transform != null) {
-            return transform.loadTransform();
-        }
-
-        return Optional.empty();
+    public Optional<WorldPositionRotation> getLastLocation(final UUID uuid) {
+        return Optional.ofNullable(this.lastLocation.get(uuid));
     }
 
     @Override
-    public void setLastLocation(final User user, final ServerLocation location) {
-        this.lastLocation.put(user.getUniqueId(), new UUIDTransform(location));
+    public void setLastLocation(final UUID user, final ServerLocation location, final Vector3d rotation) {
+        this.lastLocation.put(user, new WorldPositionRotationImpl(location.getPosition(), rotation, location.getWorldKey()));
     }
 
     @Override
-    public void removeLastLocation(final User user) {
-        this.lastLocation.remove(user.getUniqueId());
+    public void removeLastLocation(final UUID user) {
+        this.lastLocation.remove(user);
     }
 
     @Override
-    public boolean isLoggingLastLocation(final User user) {
-        return !this.preventLogLastLocation.contains(user.getUniqueId());
+    public boolean isLoggingLastLocation(final UUID user) {
+        return !this.preventLogLastLocation.contains(user);
     }
 
     @Override
-    public void setLoggingLastLocation(final User user, final boolean log) {
+    public void setLoggingLastLocation(final UUID user, final boolean log) {
         if (log) {
-            this.preventLogLastLocation.remove(user.getUniqueId());
+            this.preventLogLastLocation.remove(user);
         } else {
-            this.preventLogLastLocation.add(user.getUniqueId());
+            this.preventLogLastLocation.add(user);
         }
     }
 

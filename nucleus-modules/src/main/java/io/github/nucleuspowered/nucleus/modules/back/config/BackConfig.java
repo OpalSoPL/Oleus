@@ -35,6 +35,6 @@ public class BackConfig {
     }
 
     public boolean isOnlySameDimension() {
-        return onlySameDimension;
+        return this.onlySameDimension;
     }
 }

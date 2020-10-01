@@ -13,9 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 
 @Command(
@@ -25,9 +23,9 @@ import org.spongepowered.api.entity.living.player.User;
 )
 public class ClearBackCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.optionalWeak(NucleusParameters.ONE_USER.get(serviceCollection))
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.ONE_USER
         };
     }
 
@@ -41,7 +39,7 @@ public class ClearBackCommand implements ICommandExecutor {
             }
         }
 
-        context.getServiceCollection().getServiceUnchecked(BackHandler.class).removeLastLocation(target);
+        context.getServiceCollection().getServiceUnchecked(BackHandler.class).removeLastLocation(target.getUniqueId());
         context.sendMessage("command.clearback.success", target.getName());
         return context.successResult();
     }

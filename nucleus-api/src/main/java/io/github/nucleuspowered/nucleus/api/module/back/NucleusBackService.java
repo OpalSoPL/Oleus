@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.back;
 
+import io.github.nucleuspowered.nucleus.api.util.WorldPositionRotation;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
@@ -28,22 +29,15 @@ public interface NucleusBackService {
      * @param user The {@link UUID} of the user
      * @return If it exists, an {@link Optional} containing the {@link ServerLocation}
      */
-    Optional<ServerLocation> getLastLocation(UUID user);
-
-    /**
-     * Gets the rotation of the subject before they executed the last warp that was marked as Returnable.
-     *
-     * @param user The {@link UUID}
-     * @return If it exists, an {@link Optional} containing the {@link Vector3d rotation}
-     */
-    Optional<Vector3d> getLastRotation(UUID user);
+    Optional<WorldPositionRotation> getLastLocation(UUID user);
 
     /**
      * Sets the location that the subject will be warped to if they execute /back
      * @param uuid The {@link UUID}
-     * @param location The {@link Location} to set as the /back target.
+     * @param location The {@link ServerLocation} to set as the /back target.
+     * @param rotation The rotation to set as the /back target.
      */
-    void setLastLocation(UUID uuid, ServerLocation location);
+    void setLastLocation(UUID uuid, ServerLocation location, Vector3d rotation);
 
     /**
      * Removes the last location from the subject, so that /back will not work for them.

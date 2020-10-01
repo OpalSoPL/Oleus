@@ -5,17 +5,23 @@
 package io.github.nucleuspowered.nucleus.modules.back.listeners;
 
 import io.github.nucleuspowered.nucleus.api.module.jail.NucleusJailService;
+import io.github.nucleuspowered.nucleus.api.util.WorldPositionRotation;
 import io.github.nucleuspowered.nucleus.modules.back.BackPermissions;
 import io.github.nucleuspowered.nucleus.modules.back.config.BackConfig;
 import io.github.nucleuspowered.nucleus.modules.back.services.BackHandler;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.util.WorldPositionRotationImpl;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
@@ -23,6 +29,7 @@ import org.spongepowered.api.event.filter.type.Exclude;
 
 import javax.annotation.Nullable;
 import com.google.inject.Inject;
+import org.spongepowered.api.world.ServerLocation;
 
 public class BackListeners implements IReloadableService.Reloadable, ListenerBase {
 
@@ -33,7 +40,8 @@ public class BackListeners implements IReloadableService.Reloadable, ListenerBas
 
     @Inject
     public BackListeners(final INucleusServiceCollection serviceCollection) {
-        this.jailService = Sponge.getServiceManager().provide(NucleusJailService.class).orElse(null);
+        // TODO: Pluggable stuff.
+        this.jailService = serviceCollection.getService(JailHandler.class).orElse(null);
         this.handler = serviceCollection.getServiceUnchecked(BackHandler.class);
         this.permissionService = serviceCollection.permissionService();
     }
@@ -43,39 +51,35 @@ public class BackListeners implements IReloadableService.Reloadable, ListenerBas
         this.backConfig = serviceCollection.configProvider().getModuleConfig(BackConfig.class);
     }
 
-    @Listener
-    @Exclude(MoveEntityEvent.Teleport.Portal.class) // Don't set /back on a portal.
-    public void onTeleportPlayer(final MoveEntityEvent.Teleport event, @Getter("getTargetEntity") final Player pl) {
-        if (this.backConfig.isOnTeleport() && check(event) && getLogBack(pl) && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONTELEPORT)) {
-            this.handler.setLastLocation(pl, event.getFromTransform());
+    @Listener(order = Order.LAST)
+    @Exclude(ChangeEntityWorldEvent.Reposition.class)
+    public void onTeleportPlayer(final MoveEntityEvent event, @Getter("getEntity") final ServerPlayer pl) {
+        if (this.backConfig.isOnTeleport() && this.check(event) &&
+                this.getLogBack(pl) && this.permissionService.hasPermission(pl,
+                BackPermissions.BACK_ONTELEPORT)) {
+            this.handler.setLastLocation(pl.getUniqueId(), ServerLocation.of(pl.getWorld(), event.getOriginalPosition()), pl.getRotation());
+        }
+    }
+
+    @Listener(order = Order.LAST)
+    public void onWorldTransfer(final ChangeEntityWorldEvent.Reposition event, @Getter("getEntity") final ServerPlayer pl) {
+        if (this.backConfig.isOnPortal() && this.getLogBack(pl) && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONPORTAL)) {
+            this.handler.setLastLocation(pl.getUniqueId(), ServerLocation.of(event.getOriginalWorld(), event.getDestinationPosition()), pl.getRotation());
         }
     }
 
     @Listener
-    public void onPortalPlayer(final MoveEntityEvent.Teleport.Portal event, @Getter("getTargetEntity") final Player pl) {
-        if (this.backConfig.isOnPortal() && check(event) && getLogBack(pl)  && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONPORTAL)) {
-            this.handler.setLastLocation(pl, event.getFromTransform());
+    public void onDeathEvent(final DestructEntityEvent.Death event, @Getter("getEntity") final ServerPlayer pl) {
+        if (this.backConfig.isOnDeath() && this.getLogBack(pl) && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONDEATH)) {
+            this.handler.setLastLocation(pl.getUniqueId(), pl.getServerLocation(), pl.getRotation());
         }
     }
 
-    @Listener
-    public void onDeathEvent(final DestructEntityEvent.Death event) {
-        final Living e = event.getTargetEntity();
-        if (!(e instanceof Player)) {
-            return;
-        }
-
-        final Player pl = (Player)e;
-        if (this.backConfig.isOnDeath() && getLogBack(pl) && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONDEATH)) {
-            this.handler.setLastLocation(pl, event.getTargetEntity().getTransform());
-        }
+    private boolean check(final MoveEntityEvent event) {
+        return !event.getOriginalPosition().equals(event.getDestinationPosition());
     }
 
-    private boolean check(final MoveEntityEvent.Teleport event) {
-        return !event.getFromTransform().equals(event.getToTransform());
-    }
-
-    private boolean getLogBack(final Player player) {
-        return !(this.jailService != null && this.jailService.isPlayerJailed(player)) && this.handler.isLoggingLastLocation(player);
+    private boolean getLogBack(final ServerPlayer player) {
+        return !(this.jailService != null && this.jailService.isPlayerJailed(player.getUniqueId())) && this.handler.isLoggingLastLocation(player.getUniqueId());
     }
 }
