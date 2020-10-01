@@ -38,7 +38,7 @@ public class NucleusTextTemplateMessageSender {
         return this.send(audience, false);
     }
 
-    private boolean send(final Audience source, final boolean isBroadcast) {
+    public boolean send(final Audience originalMembers, final boolean isBroadcast) {
         final NucleusTextTemplateEvent event;
         try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(this.sender);
@@ -46,14 +46,14 @@ public class NucleusTextTemplateMessageSender {
             if (isBroadcast) {
                 event = new NucleusTextTemplateEventImpl.Broadcast(
                         this.textTemplate,
-                        source,
+                        originalMembers,
                         this.textTemplateFactory,
                         cause
                 );
             } else {
                 event = new NucleusTextTemplateEventImpl(
                         this.textTemplate,
-                        source,
+                        originalMembers,
                         this.textTemplateFactory,
                         cause
                 );

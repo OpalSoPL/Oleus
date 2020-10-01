@@ -12,10 +12,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+
 @Command(
         aliases = {"gmt"},
         parentCommand = GamemodeCommand.class,
@@ -34,17 +34,17 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
                 }
 )
 @EssentialsEquivalent("gmt")
-public class GamemodeToggleCommand extends GamemodeBase<Player> {
+public class GamemodeToggleCommand extends GamemodeBase {
 
     @Override
     public ICommandResult execute(final ICommandContext src) throws CommandException {
-        GameMode mode = src.getIfPlayer().get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL);
-        if (mode.equals(GameModes.SURVIVAL) || mode.equals(GameModes.NOT_SET)) {
-            mode = GameModes.CREATIVE;
+        GameMode mode = src.getIfPlayer().get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL);
+        if (mode.equals(GameModes.SURVIVAL.get()) || mode.equals(GameModes.NOT_SET.get())) {
+            mode = GameModes.CREATIVE.get();
         } else {
-            mode = GameModes.SURVIVAL;
+            mode = GameModes.SURVIVAL.get();
         }
 
-        return baseCommand(src, src.getIfPlayer(), mode);
+        return this.baseCommand(src, src.getIfPlayer(), mode);
     }
 }

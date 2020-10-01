@@ -12,7 +12,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 @Command(
         aliases = {"gms", "survival"},
@@ -29,10 +28,10 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
                 }
 )
 @EssentialsEquivalent({"gms", "survival"})
-public class SurvivalGamemodeCommand extends GamemodeBase<Player> {
+public class SurvivalGamemodeCommand extends GamemodeBase {
 
     @Override
     public ICommandResult execute(final ICommandContext src) throws CommandException {
-        return baseCommand(src, src.getIfPlayer(), GameModes.SURVIVAL);
+        return this.baseCommand(src, src.getIfPlayer(), GameModes.SURVIVAL);
     }
 }

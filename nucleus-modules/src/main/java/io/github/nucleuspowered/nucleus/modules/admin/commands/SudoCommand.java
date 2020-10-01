@@ -16,14 +16,15 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.event.EventContextKeys;
+
 @Command(aliases = {"sudo"},
         basePermission = AdminPermissions.BASE_SUDO,
         commandDescriptionKey = "sudo",
@@ -34,17 +35,17 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[]{
-                NucleusParameters.ONE_PLAYER.get(serviceCollection),
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[]{
+                NucleusParameters.ONE_PLAYER,
                 NucleusParameters.COMMAND
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player pl = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
-        final String cmd = context.requireOne(NucleusParameters.Keys.COMMAND, String.class);
+        final ServerPlayer pl = context.requireOne(NucleusParameters.ONE_PLAYER);
+        final String cmd = context.requireOne(NucleusParameters.COMMAND);
         if (context.is(pl) || (!context.isConsoleAndBypass() && context.testPermissionFor(pl, AdminPermissions.SUDO_EXEMPT))) {
             return context.errorResult("command.sudo.noperms");
         }
@@ -63,11 +64,11 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
                 return context.errorResult("command.sudo.chatfail");
             }
 
-            final TextComponent rawMessage = Text.of(cmd.split(":", 2)[1]);
-            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            final Component rawMessage = Component.text(cmd.split(":", 2)[1]);
+            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
                 frame.pushCause(context.getCommandSourceRoot());
                 frame.pushCause(pl); // on top
-                frame.addContext(EventContextKeys.PLAYER_SIMULATED, pl.getProfile());
+                frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.getProfile());
 
                 if (pl.simulateChat(rawMessage, frame.getCurrentCause()).isCancelled()) {
                     return context.errorResult("command.sudo.chatcancelled");

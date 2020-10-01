@@ -21,7 +21,7 @@ import io.github.nucleuspowered.nucleus.modules.admin.config.AdminConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
+import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@ModuleData(id = AdminModule.ID, name = "Admin")
 public class AdminModule implements IModule.Configurable<AdminConfig> {
 
     public final static String ID = "admin";
@@ -51,6 +50,11 @@ public class AdminModule implements IModule.Configurable<AdminConfig> {
         commands.add(SpectatorGamemodeCommand.class);
         commands.add(SurvivalGamemodeCommand.class);
         return Collections.unmodifiableCollection(commands);
+    }
+
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        // no-op
     }
 
     @Override

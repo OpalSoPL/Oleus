@@ -8,6 +8,7 @@ import io.github.nucleuspowered.nucleus.modules.afk.config.AFKConfig;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.function.Predicate;
 
@@ -19,7 +20,7 @@ abstract class AbstractAFKListener implements ListenerBase {
         this.handler = handler;
     }
 
-    final void update(final Player player) {
+    final void update(final ServerPlayer player) {
         this.handler.stageUserActivityUpdate(player);
     }
 

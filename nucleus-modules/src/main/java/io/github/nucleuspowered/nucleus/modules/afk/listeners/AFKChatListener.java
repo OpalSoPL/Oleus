@@ -9,10 +9,13 @@ import io.github.nucleuspowered.nucleus.modules.afk.config.AFKConfig;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.event.message.PlayerChatEvent;
 
 public class AFKChatListener extends AbstractAFKListener implements ListenerBase.Conditional {
 
@@ -22,8 +25,8 @@ public class AFKChatListener extends AbstractAFKListener implements ListenerBase
     }
 
     @Listener
-    public void onPlayerChat(final MessageChannelEvent.Chat event) {
-        Util.onPlayerSimulatedOrPlayer(event, (e, p) -> update(p));
+    public void onPlayerChat(final PlayerChatEvent event, @Root final ServerPlayer player) {
+        this.update(player);
     }
 
     @Override

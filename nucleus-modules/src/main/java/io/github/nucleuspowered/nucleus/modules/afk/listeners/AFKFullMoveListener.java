@@ -9,6 +9,7 @@ import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
@@ -24,8 +25,8 @@ public class AFKFullMoveListener extends AbstractAFKListener implements Listener
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerMove(final MoveEntityEvent event, @Root final Player player) {
-        update(player);
+    public void onPlayerMove(final MoveEntityEvent event, @Root final ServerPlayer player) {
+        this.update(player);
     }
 
     @Override

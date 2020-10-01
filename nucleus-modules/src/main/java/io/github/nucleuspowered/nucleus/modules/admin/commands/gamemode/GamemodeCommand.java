@@ -4,25 +4,27 @@
  */
 package io.github.nucleuspowered.nucleus.modules.admin.commands.gamemode;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.admin.AdminPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 import java.util.Optional;
+
+;
 
 @Command(aliases = {"gamemode", "gm"},
         basePermission = AdminPermissions.BASE_GAMEMODE,
@@ -36,39 +38,42 @@ import java.util.Optional;
         associatedPermissions = AdminPermissions.GAMEMODE_OTHER
 )
 @EssentialsEquivalent(value = {"gamemode", "gm"}, isExact = false, notes = "/gm does not toggle between survival and creative, use /gmt for that")
-public class GamemodeCommand extends GamemodeBase<CommandSource> {
+public class GamemodeCommand extends GamemodeBase {
 
-    private final String gamemodeKey = "gamemode";
-    private final String gamemodeself = "gamemode_self";
+    private final Parameter.Value<GameMode> gameModeParameter =
+            Parameter.builder(GameMode.class)
+                    .setKey("gamemode")
+                    .parser(VariableValueParameters.catalogedElementParameterBuilder(GameMode.class).build())
+                    .build();
+
+    final Parameter.Value<ServerPlayer> playerValue;
+
+    @Inject
+    public GamemodeCommand(final INucleusServiceCollection serviceCollection) {
+        this.playerValue = serviceCollection.commandElementSupplier().createOnlyOtherPlayerPermissionElement(AdminPermissions.GAMEMODE_OTHER);
+    }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.firstParsing(
-                        GenericArguments.requiringPermission(
-                                GenericArguments.seq(
-                                    NucleusParameters.ONE_PLAYER.get(serviceCollection),
-                                    GenericArguments.onlyOne(new ImprovedGameModeArgument(Text.of(this.gamemodeKey), serviceCollection))
-                        ), AdminPermissions.GAMEMODE_OTHER),
-                        GenericArguments.onlyOne(new ImprovedGameModeArgument(Text.of(this.gamemodeself), serviceCollection)),
-                        NoneThrowOnCompleteArgument.INSTANCE
-                )
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.playerValue,
+                this.gameModeParameter
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player user;
-        final Optional<GameMode> ogm;
-        if (context.hasAny(this.gamemodeself)) {
-            user = context.getIfPlayer();
-            ogm = context.getOne(this.gamemodeself, GameMode.class);
-        } else {
+        final Optional<? extends GameMode> ogm;
+        if (context.hasAny(this.playerValue)) {
             user = context.getPlayerFromArgs();
-            ogm = context.getOne(this.gamemodeKey, GameMode.class);
+        } else {
+            user = context.getIfPlayer();
         }
+        ogm = context.getOne(this.gameModeParameter);
 
         if (!ogm.isPresent()) {
-            final String mode = user.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL).getName();
+            final String mode = user.get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL).getKey().getFormatted();
             if (context.is(user)) {
                 context.sendMessage("command.gamemode.get.base", mode);
             } else {
@@ -79,6 +84,6 @@ public class GamemodeCommand extends GamemodeBase<CommandSource> {
         }
 
         final GameMode gm = ogm.get();
-        return baseCommand(context, user, gm);
+        return this.baseCommand(context, user, gm);
     }
 }

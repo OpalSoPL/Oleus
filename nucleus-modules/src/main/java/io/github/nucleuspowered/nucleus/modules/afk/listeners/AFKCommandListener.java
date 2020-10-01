@@ -5,18 +5,17 @@
 package io.github.nucleuspowered.nucleus.modules.afk.listeners;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.afk.config.AFKConfig;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.command.SendCommandEvent;
+import org.spongepowered.api.event.command.ExecuteCommandEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 
 import java.util.List;
-
-import com.google.inject.Inject;
 
 public class AFKCommandListener extends AbstractAFKListener implements ListenerBase.Conditional {
     private final List<String> commands = Lists.newArrayList("afk", "away");
@@ -27,11 +26,11 @@ public class AFKCommandListener extends AbstractAFKListener implements ListenerB
     }
 
     @Listener
-    public void onPlayerCommand(final SendCommandEvent event, @Root final Player player) {
+    public void onPlayerCommand(final ExecuteCommandEvent.Pre event, @Root final ServerPlayer player) {
         // Did the subject run /afk? Then don't do anything, we'll toggle it
         // anyway.
         if (!this.commands.contains(event.getCommand().toLowerCase())) {
-            update(player);
+            this.update(player);
         }
     }
 

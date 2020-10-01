@@ -5,12 +5,15 @@
 package io.github.nucleuspowered.nucleus.api.module.afk.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 
 public interface NucleusAFKEvent extends MessageEvent, MessageChannelEvent, Event {
+
+    ServerPlayer getPlayer();
 
     /**
      * Fired when a player goes AFK.
@@ -52,6 +55,8 @@ public interface NucleusAFKEvent extends MessageEvent, MessageChannelEvent, Even
      */
     @MightOccurAsync
     interface NotifyCommand extends MessageEvent, Event {
+
+        ServerPlayer getPlayer();
 
     }
 }

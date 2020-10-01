@@ -12,7 +12,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 @EssentialsEquivalent({"gma", "adventure"})
 @Command(
@@ -29,10 +28,10 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
                                 useFrom = GamemodeCommand.class)
                 }
 )
-public class AdventureGamemodeCommand extends GamemodeBase<Player> {
+public class AdventureGamemodeCommand extends GamemodeBase {
 
     @Override
     public ICommandResult execute(final ICommandContext src) throws CommandException {
-        return this.baseCommand(src, src.getIfPlayer(), GameModes.ADVENTURE.get());
+        return this.baseCommand(src, src.getIfPlayer(), GameModes.ADVENTURE);
     }
 }

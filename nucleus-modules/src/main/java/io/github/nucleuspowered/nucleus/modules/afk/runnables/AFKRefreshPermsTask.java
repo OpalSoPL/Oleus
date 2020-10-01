@@ -22,15 +22,14 @@ public class AFKRefreshPermsTask implements TaskBase {
         this.handler = serviceCollection.getServiceUnchecked(AFKHandler.class);
     }
 
-    @Override public boolean isAsync() {
-        return true;
-    }
-
-    @Override public Duration interval() {
+    @Override
+    public Duration interval() {
         return Duration.of(2, ChronoUnit.MINUTES);
     }
 
-    @Override public void accept(final Task task) {
+    @Override
+    public void run() {
         this.handler.invalidateAfkCache();
     }
+
 }

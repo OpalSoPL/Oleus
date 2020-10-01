@@ -5,8 +5,10 @@
 package io.github.nucleuspowered.nucleus.scaffold.command;
 
 import com.google.common.reflect.TypeToken;
+import io.github.nucleuspowered.nucleus.scaffold.command.parameter.AudienceValueParameter;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.WorldPropertiesValueParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
@@ -171,5 +173,10 @@ public final class NucleusParameters {
     public static final Parameter.Value<ServerLocation> LOCATION = Parameter.location().setKey(Keys.LOCATION).build();
 
     public static final Parameter.Value<ServerLocation> OPTIONAL_LOCATION = Parameter.location().setKey(Keys.LOCATION).optional().build();
+
+    public static final Parameter.Value<List<Audience>> MULTI_AUDIENCE = Parameter.builder(new TypeToken<List<Audience>>() {})
+            .setKey("audience")
+            .parser(new AudienceValueParameter())
+            .build();
 
 }

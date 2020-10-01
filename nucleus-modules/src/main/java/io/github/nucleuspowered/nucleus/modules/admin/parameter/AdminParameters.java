@@ -16,6 +16,7 @@ public final class AdminParameters {
             .builder(new TypeToken<Predicate<Entity>>() {})
             .parser(new EntityTypeValueParameter())
             .setKey("type")
+            .consumeAllRemaining()
             .build();
 
     private AdminParameters() { }

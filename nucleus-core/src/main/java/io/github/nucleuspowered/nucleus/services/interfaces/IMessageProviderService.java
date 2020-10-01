@@ -117,6 +117,10 @@ public interface IMessageProviderService {
 
     ConfigFileMessagesRepository getConfigFileMessageRepository();
 
+    default String getTimeToNow(final Audience audience, final Instant instant) {
+        return this.getTimeToNow(this.getLocaleFor(audience), instant);
+    }
+
     default String getTimeToNow(final Locale locale, final Instant instant) {
         return this.getTimeString(locale, Instant.now().getEpochSecond() - instant.getEpochSecond());
     }

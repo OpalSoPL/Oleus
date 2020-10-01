@@ -7,12 +7,13 @@ package io.github.nucleuspowered.nucleus.modules.afk.listeners;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 public class BasicAFKListener extends AbstractAFKListener {
 
@@ -22,8 +23,8 @@ public class BasicAFKListener extends AbstractAFKListener {
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
-        update(player);
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+        this.update(player);
     }
 
 }

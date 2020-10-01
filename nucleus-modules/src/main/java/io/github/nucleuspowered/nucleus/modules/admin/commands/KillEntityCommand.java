@@ -4,15 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.admin.commands;
 
-import io.github.nucleuspowered.nucleus.modules.admin.parameter.AdminParameters;
-import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.command.parameter.CommonParameters;
-import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.parameter.managed.Flag;
-import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
-import org.spongepowered.math.vector.Vector3d;
-import com.google.common.collect.Sets;
 import io.github.nucleuspowered.nucleus.modules.admin.AdminPermissions;
+import io.github.nucleuspowered.nucleus.modules.admin.parameter.AdminParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -20,24 +13,23 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.util.TypeTokens;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.CommonParameters;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.monster.Monster;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.storage.WorldProperties;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Command(aliases = "kill", basePermission = AdminPermissions.BASE_KILL, commandDescriptionKey = "kill",
+@Command(aliases = "killentity", basePermission = AdminPermissions.BASE_KILLENTITY, commandDescriptionKey = "killentity",
         modifiers = {
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = AdminPermissions.EXEMPT_WARMUP_KILLENTITY),
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = AdminPermissions.EXEMPT_COOLDOWN_KILLENTITY),
@@ -67,33 +59,35 @@ public class KillEntityCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final CommandCause src = context.getCause();
-        if (!(src.getLocation().isPresent()) && context.hasAny(radius)) {
+        if (!(src.getLocation().isPresent()) && context.hasAny(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY)) {
             // We can't do that.
             return context.errorResult("command.killentity.commandsourceradius");
         }
 
-        if (context.hasAny(radius) && context.hasAny(world)) {
+        if (context.hasAny(this.radius) && context.hasAny(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY)) {
             // Can't do that, either.
             return context.errorResult("command.killentity.radiusworld");
         }
 
-        final Set<Entity> currentEntities;
-        if (context.hasAny(radius)) {
+        final Set<Entity> currentEntities = new HashSet<>();
+        if (context.hasAny(this.radius)) {
             final Locatable l = ((Locatable) src);
-            final Vector3d locationTest = l.getLocation().getPosition();
-            final int r = context.requireOne(radius, int.class);
-            currentEntities = Sets.newHashSet(l.getWorld().getEntities(entity -> entity.getTransform().getPosition().distance(locationTest) <= r));
+            final int r = context.requireOne(this.radius);
+            l.getServerLocation().getWorld().getNearbyEntities(l.getServerLocation().getPosition(), r);
         } else {
             final WorldProperties worldProperties;
-            if (context.hasAny(world)) {
-                worldProperties = context.requireOne(world, WorldProperties.class);
+            if (context.hasAny(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY)) {
+                worldProperties = context.requireOne(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY);
             } else {
-                worldProperties = ((Locatable) src).getWorld().getProperties();
+                worldProperties = ((Locatable) src).getServerLocation().getWorld().getProperties();
             }
-            currentEntities = Sets.newHashSet(Sponge.getServer().getWorld(worldProperties.getUniqueId()).get().getEntities());
+            worldProperties.getWorld().ifPresent(x -> currentEntities.addAll(x.getEntities()));
         }
 
-        final Predicate<Entity> entityPredicate = context.getAll(type, TypeTokens.PREDICATE_ENTITY).stream().reduce(Predicate::or)
+        final Predicate<Entity> entityPredicate = context.getAll(AdminParameters.ENTITY_PARAMETER)
+                .stream()
+                .map(x -> (Predicate<Entity>) x)
+                .reduce(Predicate::or)
                 .orElseThrow(() -> context.createException("command.killentity.noselection"));
         final Set<Entity> toKill = currentEntities.stream().filter(entityPredicate).collect(Collectors.toSet());
         if (toKill.isEmpty()) {

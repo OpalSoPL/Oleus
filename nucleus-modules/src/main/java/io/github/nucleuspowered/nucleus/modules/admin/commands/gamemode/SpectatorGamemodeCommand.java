@@ -11,7 +11,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 @Command(
         aliases = {"gmsp", "spectator"},
@@ -27,10 +26,10 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
                                 useFrom = GamemodeCommand.class)
                 }
 )
-public class SpectatorGamemodeCommand extends GamemodeBase<Player> {
+public class SpectatorGamemodeCommand extends GamemodeBase {
 
     @Override
     public ICommandResult execute(final ICommandContext src) throws CommandException {
-        return baseCommand(src, src.getIfPlayer(), GameModes.SPECTATOR);
+        return this.baseCommand(src, src.getIfPlayer(), GameModes.SPECTATOR);
     }
 }

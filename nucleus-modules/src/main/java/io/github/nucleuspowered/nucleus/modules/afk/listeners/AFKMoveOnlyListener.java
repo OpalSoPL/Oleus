@@ -4,20 +4,18 @@
  */
 package io.github.nucleuspowered.nucleus.modules.afk.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.afk.config.AFKConfig;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.world.World;
-
-import com.google.inject.Inject;
+import org.spongepowered.math.vector.Vector3d;
 
 public class AFKMoveOnlyListener extends AbstractAFKListener implements ListenerBase.Conditional {
 
@@ -27,11 +25,11 @@ public class AFKMoveOnlyListener extends AbstractAFKListener implements Listener
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerMove(final MoveEntityEvent event, @Root final Player player,
-            @Getter("getFromTransform") final Transform<World> from,
-            @Getter("getToTransform") final Transform<World> to) {
-        if (!from.getPosition().equals(to.getPosition())) {
-            update(player);
+    public void onPlayerMove(final MoveEntityEvent event, @Root final ServerPlayer player,
+            @Getter("getOriginalPosition") final Vector3d from,
+            @Getter("getDestinationPosition") final Vector3d to) {
+        if (!from.equals(to)) {
+            this.update(player);
         }
     }
 

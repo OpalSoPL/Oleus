@@ -14,34 +14,35 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.Collection;
 import java.util.Optional;
+
+;
 
 @Command(aliases = {"afkkick", "kickafk"}, basePermission = AFKPermissions.BASE_AFKKICK, commandDescriptionKey = "afkkick")
 public class AFKKickCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.OPTIONAL_REASON
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Optional<Text> reason = context
+        final Optional<Component> reason = context
                 .getOne(NucleusParameters.Keys.REASON, TypeTokens.STRING)
-                .map(TextSerializers.FORMATTING_CODE::deserialize);
+                .map(LegacyComponentSerializer.legacyAmpersand()::deserialize);
 
-        final Collection<Player> playersToKick = context.getServiceCollection().getServiceUnchecked(AFKHandler.class).getAfk(x ->
-                !context.testPermissionFor(x, AFKPermissions.AFK_EXEMPT_KICK));
+        final Collection<ServerPlayer> playersToKick = context.getServiceCollection().getServiceUnchecked(AFKHandler.class)
+                .getAfk(x -> !context.testPermissionFor(x, AFKPermissions.AFK_EXEMPT_KICK));
         if (playersToKick.isEmpty()) {
             return context.errorResult("command.afkkick.nokick");
         }

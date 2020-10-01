@@ -11,10 +11,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.command.parameter.Parameter;
 import java.util.Optional;
 
 @Command(aliases = {"stop"},
@@ -23,17 +22,17 @@ import java.util.Optional;
 public class StopCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.OPTIONAL_MESSAGE
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) {
-        final Optional<String> opt = context.getOne(NucleusParameters.Keys.MESSAGE, String.class);
+        final Optional<? extends String> opt = context.getOne(NucleusParameters.OPTIONAL_MESSAGE);
         if (opt.isPresent()) {
-            Sponge.getServer().shutdown(TextSerializers.FORMATTING_CODE.deserialize(opt.get()));
+            Sponge.getServer().shutdown(LegacyComponentSerializer.legacyAmpersand().deserialize(opt.get()));
         } else {
             Sponge.getServer().shutdown();
         }

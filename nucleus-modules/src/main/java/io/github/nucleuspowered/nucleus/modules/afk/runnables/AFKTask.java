@@ -23,13 +23,8 @@ public class AFKTask implements TaskBase {
     }
 
     @Override
-    public void accept(final Task task) {
+    public void run() {
         this.handler.onTick();
-    }
-
-    @Override
-    public boolean isAsync() {
-        return true;
     }
 
     @Override

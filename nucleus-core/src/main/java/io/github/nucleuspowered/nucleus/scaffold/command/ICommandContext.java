@@ -95,6 +95,10 @@ public interface ICommandContext {
 
     boolean hasAny(Parameter.Key<?> name);
 
+    default boolean hasAny(Parameter.Value<?> name) {
+        return this.hasAny(name.getKey());
+    }
+
     <T> Optional<? extends T> getOne(Parameter.Key<T> name);
 
     <T> Optional<? extends T> getOne(Parameter.Value<T> name);

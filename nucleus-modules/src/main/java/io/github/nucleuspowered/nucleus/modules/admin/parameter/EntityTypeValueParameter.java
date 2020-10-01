@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class EntityTypeValueParameter implements ValueParameter<Predicate<Entity>> {
 
@@ -42,8 +43,8 @@ public class EntityTypeValueParameter implements ValueParameter<Predicate<Entity
     }};
 
     @Override
-    public List<String> complete(final CommandContext context) {
-        return new ArrayList<>(this.map.keySet());
+    public List<String> complete(final CommandContext context, final String input) {
+        return this.map.keySet().stream().filter(x -> x.startsWith(input)).collect(Collectors.toList());
     }
 
     @Override

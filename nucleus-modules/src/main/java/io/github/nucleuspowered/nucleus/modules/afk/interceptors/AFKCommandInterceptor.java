@@ -16,12 +16,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.NotifyIfAFK;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
-;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.text.Text;
 
 import java.util.Objects;
 
@@ -40,21 +38,21 @@ public class AFKCommandInterceptor implements ICommandInterceptor, IReloadableSe
         if (this.send && result.isSuccess() && commandClass.isAnnotationPresent(NotifyIfAFK.class)) {
             final NotifyIfAFK annotation = commandClass.getAnnotation(NotifyIfAFK.class);
             final AFKHandler handler = context.getServiceCollection().getServiceUnchecked(AFKHandler.class);
-            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
                 for (final String key : annotation.value()) {
                     context.getAll(key, Object.class)
                             .stream()
                             .filter(x -> x instanceof User)
                             .map(x -> ((User) x).getPlayer().orElse(null))
                             .filter(Objects::nonNull)
-                            .filter(handler::isAFK)
+                            .filter(x -> handler.isAFK(x.getUniqueId()))
                             .forEach(x -> {
-                                final TextComponent messageToSend = this.message == null ? null : this.message.getForSource(x);
-                                final AFKEvents.Notify event = new AFKEvents.Notify(x, messageToSend, context.getCause());
+                                final Component messageToSend = this.message == null ? null : this.message.getForObject(x);
+                                final AFKEvents.Notify event = new AFKEvents.Notify(x, messageToSend, context.getCause().getCause());
                                 Sponge.getEventManager().post(event);
-                                event.getMessage().ifPresent(message -> {
-                                    context.getCommandSourceRoot().sendMessage(message);
-                                });
+                                if (event.getMessage() != null && !event.getMessage().toString().isEmpty()) {
+                                    context.getAudience().sendMessage(this.message);
+                                }
                             });
                 }
             }

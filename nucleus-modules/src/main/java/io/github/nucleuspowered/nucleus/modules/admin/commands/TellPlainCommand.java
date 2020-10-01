@@ -12,17 +12,18 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateMessageSender;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import net.kyori.adventure.audience.Audience;
+import org.spongepowered.api.command.parameter.Parameter;
+
 @Command(aliases = {"tellplain", "plaintell", "ptell"},
         basePermission = AdminPermissions.BASE_TELLPLAIN,
         commandDescriptionKey = "tellplain")
 public class TellPlainCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                NucleusParameters.MANY_PLAYER_OR_CONSOLE.get(serviceCollection),
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.MULTI_AUDIENCE,
                 NucleusParameters.MESSAGE
         };
     }
@@ -32,11 +33,10 @@ public class TellPlainCommand implements ICommandExecutor {
         try {
             new NucleusTextTemplateMessageSender(
                     context.getServiceCollection().textTemplateFactory(),
-                    context.getServiceCollection().textTemplateFactory().createFromString(
-                        context.requireOne(NucleusParameters.Keys.MESSAGE, String.class)),
-                    context.getServiceCollection().placeholderService(),
+                    context.getServiceCollection().textTemplateFactory().createFromAmpersandString(
+                            context.requireOne(NucleusParameters.MESSAGE)),
                     context.getCommandSourceRoot())
-                    .send(context.getAll(NucleusParameters.Keys.PLAYER_OR_CONSOLE, CommandSource.class), context.getCause());
+                    .send(Audience.audience(context.requireOne(NucleusParameters.MULTI_AUDIENCE)), false);
         } catch (final Throwable throwable) {
             throwable.printStackTrace();
             return context.errorResult("command.tellplain.failed");

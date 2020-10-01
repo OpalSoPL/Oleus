@@ -4,22 +4,21 @@
  */
 package io.github.nucleuspowered.nucleus.modules.afk.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.afk.event.NucleusAFKEvent;
 import io.github.nucleuspowered.nucleus.modules.afk.AFKPermissions;
 import io.github.nucleuspowered.nucleus.modules.afk.config.AFKConfig;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import org.spongepowered.api.entity.living.player.Player;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.format.TextColors;
-
-import com.google.inject.Inject;
 
 public class AFKSpectatorListener implements ListenerBase.Conditional {
 
@@ -32,17 +31,17 @@ public class AFKSpectatorListener implements ListenerBase.Conditional {
 
 
     @Listener
-    public void onAfk(final NucleusAFKEvent event, @Getter("getTargetEntity") final Player player) {
+    public void onAfk(final NucleusAFKEvent event, @Getter("getPlayer") final ServerPlayer player) {
         if (player.gameMode().get().equals(GameModes.SPECTATOR)) {
-            if (event.getChannel() == MessageChannel.TO_ALL) {
-                event.setChannel(this.permissionService.permissionMessageChannel(AFKPermissions.AFK_NOTIFY));
-                event.setMessage(Text.of(TextColors.YELLOW, "[Spectator] ", event.getMessage()));
+            if (event.getAudience().filter(x -> Sponge.getSystemSubject().equals(x)).isPresent()) {
+                event.setAudience(this.permissionService.permissionMessageChannel(AFKPermissions.AFK_NOTIFY));
+                event.setMessage(Component.text("[Spectator] " + event.getMessage(), NamedTextColor.RED));
             }
         }
     }
 
     @Listener(order = Order.FIRST)
-    public void onAfk(final NucleusAFKEvent.Kick event, @Getter("getTargetEntity") final Player player) {
+    public void onAfk(final NucleusAFKEvent.Kick event, @Getter("getPlayer") final ServerPlayer player) {
         if (player.gameMode().get().equals(GameModes.SPECTATOR)) {
             event.setCancelled(true);
         }
