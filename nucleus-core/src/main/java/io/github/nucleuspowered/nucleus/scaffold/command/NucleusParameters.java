@@ -8,6 +8,7 @@ import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.AudienceValueParameter;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.WorldPropertiesValueParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
@@ -49,6 +50,7 @@ public final class NucleusParameters {
         public static final String LOCATION = "location";
         public static final String LORE = "lore";
         public static final String MESSAGE = "message";
+        public static final String NAME = "name";
         public static final String PLAYER = "player";
         public static final String PLAYER_OR_CONSOLE = "player|-";
         public static final String REASON = "reason";
@@ -178,5 +180,8 @@ public final class NucleusParameters {
             .setKey("audience")
             .parser(new AudienceValueParameter())
             .build();
+
+
+    public static final Parameter.Value<String> STRING_NAME = Parameter.string().setKey(Keys.NAME).build();
 
 }

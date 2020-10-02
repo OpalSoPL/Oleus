@@ -4,31 +4,68 @@
  */
 package io.github.nucleuspowered.nucleus.modules.ban;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.ban.commands.BanCommand;
+import io.github.nucleuspowered.nucleus.modules.ban.commands.CheckBanCommand;
+import io.github.nucleuspowered.nucleus.modules.ban.commands.TempBanCommand;
+import io.github.nucleuspowered.nucleus.modules.ban.commands.UnbanCommand;
 import io.github.nucleuspowered.nucleus.modules.ban.config.BanConfig;
-import io.github.nucleuspowered.nucleus.modules.ban.config.BanConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.ban.infoprovider.BackInfoProvider;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
 
-import java.util.function.Supplier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = "ban", name = "Bans")
-public class BanModule extends ConfigurableModule<BanConfig, BanConfigAdapter> {
+public class BanModule implements IModule.Configurable<BanConfig> {
 
     public static final String ID = "ban";
 
-    @Inject
-    public BanModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+
     }
 
     @Override
-    public BanConfigAdapter createAdapter() {
-        return new BanConfigAdapter();
+    public Optional<NucleusProvider> getInfoProvider() {
+        return Optional.of(new BackInfoProvider());
+    }
+
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                BanCommand.class,
+                CheckBanCommand.class,
+                TempBanCommand.class,
+                UnbanCommand.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(BanPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<BanConfig> getConfigClass() {
+        return BanConfig.class;
     }
 
 }

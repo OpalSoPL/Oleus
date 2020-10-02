@@ -15,21 +15,19 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileManager;
+import org.spongepowered.api.service.ban.Ban;
 import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
-import org.spongepowered.api.text.serializer.TextSerializers;
-import org.spongepowered.api.util.ban.Ban;
-import org.spongepowered.api.util.ban.BanTypes;
+import org.spongepowered.api.service.ban.BanTypes;
+import org.spongepowered.api.user.UserManager;
 
 import java.util.Optional;
 
@@ -50,65 +48,58 @@ import java.util.Optional;
 public class BanCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
-    private final String name = "name";
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.firstParsing(
-                        NucleusParameters.ONE_GAME_PROFILE_UUID.get(serviceCollection),
-                        NucleusParameters.ONE_GAME_PROFILE.get(serviceCollection),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of(this.name)))
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                Parameter.firstOf(
+                        NucleusParameters.ONE_USER,
+                        NucleusParameters.STRING_NAME
                 ),
-                GenericArguments.optionalWeak(NucleusParameters.REASON)
+                NucleusParameters.OPTIONAL_REASON
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final String r = context.getOne(NucleusParameters.Keys.REASON, String.class).orElseGet(() ->
-                context.getMessageString("ban.defaultreason"));
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String r = context.getOne(NucleusParameters.REASON)
+                .orElseGet(() -> context.getMessageString("ban.defaultreason"));
 
-        Optional<GameProfile> ou = context.getOne(NucleusParameters.Keys.USER_UUID, GameProfile.class);
-        if (!ou.isPresent()) {
-            ou = context.getOne(NucleusParameters.Keys.USER, GameProfile.class);
-        }
-
-        if (ou.isPresent()) {
+        final Optional<? extends User> optionalUser = context.getOne(NucleusParameters.ONE_USER);
+        if (optionalUser.isPresent()) {
             // power check
-            final Optional<User> optionalUser = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(ou.get());
-            if ((!optionalUser.isPresent() || !optionalUser.get().isOnline()) && !context.testPermission(BanPermissions.BAN_OFFLINE)) {
+            if (!optionalUser.get().isOnline() && !context.testPermission(BanPermissions.BAN_OFFLINE)) {
                 return context.errorResult("command.ban.offline.noperms");
             }
 
-            if (optionalUser.isPresent() &&
-                    (!context.isConsoleAndBypass() && context.testPermissionFor(optionalUser.get(), BanPermissions.BAN_EXEMPT_TARGET))) {
+            if (!context.isConsoleAndBypass() && context.testPermissionFor(optionalUser.get(), BanPermissions.BAN_EXEMPT_TARGET)) {
                 return context.errorResult("command.ban.exempt", optionalUser.get().getName());
             }
 
-            return executeBan(context, ou.get(), r);
+            return this.executeBan(context, optionalUser.get(), r);
         }
 
         if (!context.testPermission(BanPermissions.BAN_OFFLINE)) {
             return context.errorResult("command.ban.offline.noperms");
         }
 
-        final String userToFind = context.requireOne(this.name, String.class);
+        final String userToFind = context.requireOne(NucleusParameters.STRING_NAME);
 
         // Get the profile async.
-        Sponge.getScheduler().createAsyncExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
+        Sponge.getAsyncScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
             final GameProfileManager gpm = Sponge.getServer().getGameProfileManager();
             try {
                 final GameProfile gp = gpm.get(userToFind).get();
 
                 // Ban the user sync.
-                Sponge.getScheduler().createSyncExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
+                Sponge.getServer().getScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
                     // Create the user.
-                    final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+                    final UserManager uss = Sponge.getServer().getUserManager();
                     final User user = uss.getOrCreate(gp);
                     context.sendMessage("gameprofile.new", user.getName());
 
                     try {
-                        executeBan(context, gp, r);
+                        this.executeBan(context, user, r);
                     } catch (final Exception e) {
                         e.printStackTrace();
                     }
@@ -122,20 +113,16 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         return context.successResult();
     }
 
-    private ICommandResult executeBan(final ICommandContext context, final GameProfile u, final String r) {
-        final BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
-        final CommandSource src = context.getCommandSourceRoot();
+    private ICommandResult executeBan(final ICommandContext context, final User user, final String r) {
+        final BanService service = Sponge.getServer().getServiceProvider().banService();
 
-        final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-        final User user = uss.get(u).get();
         if (!user.isOnline() && !context.testPermission(BanPermissions.BAN_OFFLINE)) {
             return context.errorResult("command.ban.offline.noperms");
         }
 
-        if (service.isBanned(u)) {
+        if (service.isBanned(user.getProfile())) {
             return context.errorResult("command.ban.alreadyset",
-                    u.getName().orElse(context.getServiceCollection().messageProvider()
-                            .getMessageString(src,"standard.unknown")));
+                    context.getServiceCollection().playerDisplayNameService().getName(user));
         }
 
         if (this.levelConfig.isUseLevels() &&
@@ -145,32 +132,31 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
             return context.errorResult("command.modifiers.level.insufficient",
-                    u.getName().orElse(context.getServiceCollection().messageProvider()
-                            .getMessageString(src,"standard.unknown")));
+                    context.getServiceCollection().playerDisplayNameService().getName(user));
         }
 
         // Create the ban.
-        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u)
-                .source(src)
-                .reason(TextSerializers.FORMATTING_CODE.deserialize(r)).build();
+        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(user.getProfile())
+                .source(context.getDisplayName())
+                .reason(LegacyComponentSerializer.legacyAmpersand().deserialize(r)).build();
         service.addBan(bp);
 
         // Get the permission, "quickstart.ban.notify"
-        final MutableMessageChannel send = context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY).asMutable();
-        send.addMember(src);
-        send.send(context.getMessage("command.ban.applied",
-                u.getName().orElse(context.getMessageString("standard.unknown")),
-                src.getName()));
-        send.send(context.getMessage("standard.reasoncoloured", r));
+        final Audience audience = Audience.audience(
+                context.getAudience(),
+                context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY));
+        audience.sendMessage(context.getMessage("command.ban.applied",
+                context.getServiceCollection().playerDisplayNameService().getName(user),
+                context.getDisplayName()));
+        final Component reason = LegacyComponentSerializer.legacyAmpersand().deserialize(r);
+        audience.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
-        if (Sponge.getServer().getPlayer(u.getUniqueId()).isPresent()) {
-            Sponge.getServer().getPlayer(u.getUniqueId()).get().kick(TextSerializers.FORMATTING_CODE.deserialize(r));
-        }
-
+        Sponge.getServer().getPlayer(user.getUniqueId()).ifPresent(pl -> pl.kick(reason));
         return context.successResult();
     }
 
-    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+    @Override
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.levelConfig = serviceCollection.configProvider().getModuleConfig(BanConfig.class).getLevelConfig();
     }
 }

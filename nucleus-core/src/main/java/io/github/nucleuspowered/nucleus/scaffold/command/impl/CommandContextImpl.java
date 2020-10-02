@@ -116,12 +116,12 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public <T> Optional<? extends T> getOne(final Parameter.Key<T> name) {
+    public <T> Optional<T> getOne(final Parameter.Key<T> name) {
         return this.context.getOne(name);
     }
 
     @Override
-    public <T> Optional<? extends T> getOne(final Parameter.Value<T> name) {
+    public <T> Optional<T> getOne(final Parameter.Value<T> name) {
         return this.context.getOne(name);
     }
 

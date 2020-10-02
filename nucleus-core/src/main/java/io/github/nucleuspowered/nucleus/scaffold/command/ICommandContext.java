@@ -99,17 +99,17 @@ public interface ICommandContext {
         return this.hasAny(name.getKey());
     }
 
-    <T> Optional<? extends T> getOne(Parameter.Key<T> name);
+    <T> Optional<T> getOne(Parameter.Key<T> name);
 
-    <T> Optional<? extends T> getOne(Parameter.Value<T> name);
+    <T> Optional<T> getOne(Parameter.Value<T> name);
 
     <T> Collection<? extends T> getAll(Parameter.Key<T> name);
 
-    default <T> Optional<? extends T> getOne(final String name, final Class<T> clazz) {
+    default <T> Optional<T> getOne(final String name, final Class<T> clazz) {
         return this.getOne(Parameter.key(name, TypeToken.of(clazz)));
     }
 
-    default <T> Optional<? extends T> getOne(final String name, final TypeToken<T> clazz) {
+    default <T> Optional<T> getOne(final String name, final TypeToken<T> clazz) {
         return this.getOne(Parameter.key(name, clazz));
     }
 
