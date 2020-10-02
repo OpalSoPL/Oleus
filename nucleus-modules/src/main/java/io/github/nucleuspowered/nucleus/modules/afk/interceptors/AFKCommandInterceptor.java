@@ -16,6 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.NotifyIfAFK;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.util.AdventureUtils;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -50,7 +51,7 @@ public class AFKCommandInterceptor implements ICommandInterceptor, IReloadableSe
                                 final Component messageToSend = this.message == null ? null : this.message.getForObject(x);
                                 final AFKEvents.Notify event = new AFKEvents.Notify(x, messageToSend, context.getCause().getCause());
                                 Sponge.getEventManager().post(event);
-                                if (event.getMessage() != null && !event.getMessage().toString().isEmpty()) {
+                                if (event.getMessage() != null && !AdventureUtils.isEmpty(event.getMessage())) {
                                     context.getAudience().sendMessage(this.message);
                                 }
                             });

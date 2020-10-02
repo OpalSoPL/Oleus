@@ -20,6 +20,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.util.AdventureUtils;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
 import io.github.nucleuspowered.nucleus.util.Tuples;
 import net.kyori.adventure.audience.Audience;
@@ -139,7 +140,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
                     final Component toSend = t instanceof NucleusTextTemplateImpl ? ((NucleusTextTemplateImpl) t).getForObject(player) : t.asComponent();
                     Sponge.getServer().getScheduler().createExecutor(this.serviceCollection.pluginContainer()).execute(() -> player.kick(toSend));
                     final Component eventMessage = events.getMessage();
-                    if (!eventMessage.toString().isEmpty()) {
+                    if (!AdventureUtils.isEmpty(eventMessage)) {
                         events.getAudience().ifPresent(x -> x.sendMessage(eventMessage, MessageType.SYSTEM));
                     }
                 });
@@ -222,7 +223,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
 
     private void actionEvent(final AFKEvents event, final String key, @Nullable final String consoleKey) {
         final Component message = event.getMessage();
-        if (!message.toString().isEmpty() && message.toString().matches("^\\s*$")) {
+        if (AdventureUtils.getContent(message).matches("^\\s*$")) {
             event.getAudience().ifPresent(x -> x.sendMessage(message, MessageType.SYSTEM));
         } else {
             event.getAudience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, key));

@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.placeholder;
 
+import io.github.nucleuspowered.nucleus.util.AdventureUtils;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.placeholder.PlaceholderComponent;
@@ -38,7 +39,7 @@ public class NucleusPlaceholderText implements PlaceholderComponent {
     @Override
     public @NonNull Component asComponent() {
         Component result = this.parser.parse(this.context);
-        if (!result.toString().isEmpty()) {
+        if (!AdventureUtils.isEmpty(result)) {
             for (final Function<Component, Component> modifier : this.modifiers) {
                 result = modifier.apply(result);
             }

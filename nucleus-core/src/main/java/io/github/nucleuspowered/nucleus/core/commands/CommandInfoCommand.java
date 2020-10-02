@@ -13,6 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.util.AdventureUtils;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
@@ -92,7 +93,7 @@ public class CommandInfoCommand implements ICommandExecutor {
         content.add(Component.empty());
         final CommandControl control = context.getServiceCollection().commandMetadataService().getControl(mapping.getPrimaryAlias());
         final Component text = control.getUsage(context);
-        if (text.toString().isEmpty()) {
+        if (AdventureUtils.isEmpty(text)) {
             content.add(context.getMessage("command.commandinfo.noinfo"));
         } else {
             content.add(text);

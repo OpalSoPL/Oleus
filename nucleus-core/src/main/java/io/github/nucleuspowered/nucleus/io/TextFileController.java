@@ -10,6 +10,7 @@ import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
+import io.github.nucleuspowered.nucleus.util.AdventureUtils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -143,7 +144,7 @@ public final class TextFileController {
 
         final PaginationList.Builder pb = Util.getPaginationBuilder(src).contents(this.getTextFromNucleusTextTemplates(src));
 
-        if (title != null && !title.toString().isEmpty()) {
+        if (title != null && !AdventureUtils.isEmpty(title)) {
             pb.title(title).padding(padding);
         } else {
             pb.padding(Util.SPACE);

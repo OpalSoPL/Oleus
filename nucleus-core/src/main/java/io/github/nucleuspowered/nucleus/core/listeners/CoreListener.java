@@ -18,6 +18,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.util.AdventureUtils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -221,7 +222,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
         if (this.getKickOnStopMessage != null) {
             for (final ServerPlayer p : Sponge.getServer().getOnlinePlayers()) {
                 final Component msg = this.getKickOnStopMessage.getForObject(p);
-                if (msg.toString().isEmpty()) {
+                if (AdventureUtils.isEmpty(msg)) {
                     p.kick();
                 } else {
                     p.kick(msg);
