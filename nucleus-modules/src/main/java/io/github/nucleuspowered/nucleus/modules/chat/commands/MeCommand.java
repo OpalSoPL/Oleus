@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.chat.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
@@ -21,24 +22,15 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.event.message.MessageEvent;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.serializer.TextSerializers;
-
-import java.util.Collection;
-import java.util.Optional;
-
-import com.google.inject.Inject;
+import org.spongepowered.api.event.message.PlayerChatEvent;
 
 @Command(
         aliases = {"me", "action"},
@@ -62,69 +54,53 @@ public class MeCommand implements ICommandExecutor, IReloadableService.Reloadabl
     }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.MESSAGE
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer player = context.getIfPlayer();
         final ITextStyleService textStyleService = context.getServiceCollection().textStyleService();
         final String message = textStyleService.stripPermissionless(
                 ChatPermissions.CHAT_COLOR,
                 ChatPermissions.CHAT_STYLE,
-                context.getCommandSourceRoot(),
+                player,
                 context.requireOne(NucleusParameters.Keys.MESSAGE, String.class));
 
-        final TextComponent header = this.config.getMePrefix().getForObject(context.getCommandSourceRoot());
+        final Component header = this.config.getMePrefix().getForObject(context.getCommandSourceRoot());
         final ITextStyleService.TextFormat t = textStyleService.getLastColourAndStyle(header, null);
-        final TextComponent originalMessage = TextSerializers.FORMATTING_CODE.deserialize(message);
-        final MessageEvent.MessageFormatter formatter = new MessageEvent.MessageFormatter(
-                Text.builder().color(t.colour()).style(t.style())
-                        .append(TextSerializers.FORMATTING_CODE.deserialize(message)).toText()
-        );
-
-        // Doing this here rather than in the constructor removes the < > notation.
-        formatter.setHeader(Text.of());
+        final Component originalMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(message);
+        final Component messageToSend = Component.text().color(t.colour().orElse(null)).style(t.style()).append(originalMessage).build();
 
         // We create an event so that other plugins can provide transforms, such as Boop, and that we
         // can catch it in ignore and mutes, and so can other plugins.
-        final CommandSource src = context.getCommandSourceRoot();
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame();
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame();
                 final NoExceptionAutoClosable c =
                         this.chatMessageFormatterService.setPlayerNucleusChannelTemporarily(Util.CONSOLE_FAKE_UUID, new MeChannel(header))) {
             frame.addContext(EventContexts.SHOULD_FORMAT_CHANNEL, false);
-            if (frame.getCurrentCause().root() != src) {
-                frame.pushCause(src);
-            }
+            frame.pushCause(player);
 
-            final MessageChannelEvent.Chat event =
-                    SpongeEventFactory.createMessageChannelEventChat(
-                            frame.getCurrentCause(),
-                            src.getMessageChannel(),
-                            Optional.of(src.getMessageChannel()),
-                            formatter,
-                            originalMessage,
-                            false);
-
+            final PlayerChatEvent event = player.simulateChat(messageToSend, frame.getCurrentCause());
             if (Sponge.getEventManager().post(event)) {
                 return context.errorResult("command.me.cancel");
             }
-
-            event.getChannel().orElse(MessageChannel.TO_ALL).send(src, Util.applyChatTemplate(event.getFormatter()), ChatTypes.CHAT);
         }
         return context.successResult();
     }
 
-    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+    @Override
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.configProvider().getModuleConfig(ChatConfig.class);
     }
 
-    public static class MeChannel implements IChatMessageFormatterService.Channel {
+    public static final class MeChannel implements IChatMessageFormatterService.Channel {
 
-        private final TextComponent header;
+        private final Component header;
 
-        private MeChannel(final TextComponent header) {
+        private MeChannel(final Component header) {
             this.header = header;
         }
 
@@ -134,13 +110,8 @@ public class MeCommand implements ICommandExecutor, IReloadableService.Reloadabl
         }
 
         @Override
-        public void formatMessageEvent(final CommandSource source, final MessageEvent.MessageFormatter formatters) {
-            formatters.setHeader(Text.of(formatters.getHeader(), this.header));
-        }
-
-        @Override
-        public Collection<MessageReceiver> receivers() {
-            return MessageChannel.TO_ALL.getMembers();
+        public Component formatMessage(final Audience source, final Component body) {
+            return Component.text().append(this.header).append(body).build();
         }
 
     }

@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.chat.config;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import uk.co.drnaylor.quickstart.config.NoMergeIfPresent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +19,11 @@ public class TemplateConfig {
     @Setting(value = "default", comment = "config.chat.default-template")
     private ChatTemplateConfig defaultTemplate = new ChatTemplateConfig();
 
-    @NoMergeIfPresent
+    // NoMergeIfPresent
     @Setting(value = "group-templates", comment = "config.chat.group-templates")
     private Map<String, ChatTemplateConfig> groupTemplates = new HashMap<String, ChatTemplateConfig>() {{
         // We don't want this affecting the default group, but we need an example.
-        put("DefaultTemplate", new ChatTemplateConfig());
+        this.put("DefaultTemplate", new ChatTemplateConfig());
     }};
 
     public ChatTemplateConfig getDefaultTemplate() {

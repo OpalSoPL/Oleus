@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.chat.config;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.neutrino.annotations.Default;
+import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
@@ -20,34 +21,27 @@ public class ChatConfig {
     @Setting(value = "templates")
     private TemplateConfig templates = new TemplateConfig();
 
-    @Setting(value = "modify-main-message", comment = "config.chat.main")
-    private boolean modifyMainMessage = true;
-
-    @Setting(value = "overwrite-early-prefixes", comment = "config.chat.includeprefix")
-    private boolean overwriteEarlyPrefixes = false;
-
     @Setting(value = "try-to-remove-minecraft-prefix", comment = "config.chat.hardertoremove")
     private boolean tryRemoveMinecraftPrefix = true;
 
-    @Setting(value = "overwrite-early-suffixes", comment = "config.chat.includesuffix")
-    private boolean overwriteEarlySuffixes = false;
-
-    @Setting(value = "check-body-for-minecraft-prefix", comment = "config.chat.checkbody")
-    private boolean checkBody = false;
-
     @Setting(value = "remove-link-underlines", comment = "config.chat.removeunderlines")
     private boolean removeBlueUnderline = true;
+
+    @Setting(value = "aggressive-chat-formatting", comment = "config.chat.aggressive")
+    private boolean tryForceFormatting = false;
 
     @Setting(value = "me-prefix", comment = "config.chat.meprefix")
     @Default(value = "&7* {{displayName}} ", saveDefaultIfNull = true)
     private NucleusTextTemplateImpl mePrefix;
 
+    @Setting(value = "ignore-other-plugins-when-formatting", comment = "config.chat.removeother")
+    private boolean ignoreOtherPlugins = false;
+
+    @Setting(value = "modify-message", comment = "config.chat.modifymessage")
+    private boolean modifyMessage = true;
+
     public NucleusTextTemplateImpl getMePrefix() {
         return this.mePrefix;
-    }
-
-    public boolean isCheckBody() {
-        return this.checkBody;
     }
 
     public boolean isModifychat() {
@@ -66,24 +60,23 @@ public class ChatConfig {
         return ImmutableMap.copyOf(this.templates.getGroupTemplates());
     }
 
-    public boolean isModifyMainMessage() {
-        return this.modifyMainMessage;
-    }
-
-    public boolean isOverwriteEarlyPrefixes() {
-        return this.overwriteEarlyPrefixes;
-    }
-
-    public boolean isOverwriteEarlySuffixes() {
-        return this.overwriteEarlySuffixes;
-    }
-
     public boolean isRemoveBlueUnderline() {
         return this.removeBlueUnderline;
     }
 
     public boolean isTryRemoveMinecraftPrefix() {
-        return tryRemoveMinecraftPrefix;
+        return this.tryRemoveMinecraftPrefix;
     }
 
+    public boolean isTryForceFormatting() {
+        return this.tryForceFormatting;
+    }
+
+    public boolean isIgnoreOtherPlugins() {
+        return this.ignoreOtherPlugins;
+    }
+
+    public boolean isModifyMessage() {
+        return this.modifyMessage;
+    }
 }

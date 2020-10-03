@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.chat.listeners;
 
-import io.github.nucleuspowered.nucleus.Util;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.placeholder.NucleusPlaceholderService;
 import io.github.nucleuspowered.nucleus.modules.chat.ChatPermissions;
 import io.github.nucleuspowered.nucleus.modules.chat.config.ChatConfig;
@@ -16,18 +16,17 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatte
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
-import org.spongepowered.api.entity.living.player.Player;
+import io.github.nucleuspowered.nucleus.util.AdventureUtils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.event.message.MessageEvent;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextTemplate;
-import org.spongepowered.api.text.serializer.TextSerializers;
-import org.spongepowered.api.text.transform.SimpleTextFormatter;
-import org.spongepowered.api.text.transform.SimpleTextTemplateApplier;
+import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.message.PlayerChatEvent;
 
-import com.google.inject.Inject;
+import java.util.regex.Pattern;
 
 /**
  * A listener that modifies all chat messages. Uses the
@@ -54,35 +53,35 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
 
     // We do this first so that other plugins can alter it later if needs be.
     @Listener(order = Order.EARLY, beforeModifications = true)
-    public void onPlayerChat(final MessageChannelEvent.Chat event) {
-        Util.onPlayerSimulatedOrPlayer(event, this::onPlayerChatInternal);
+    public void onPlayerChatEventEarly(final PlayerChatEvent event, @Root final ServerPlayer player) {
+        if (!this.chatConfig.isTryForceFormatting()) {
+            this.onPlayerChatEvent(event, player);
+        }
     }
 
-    private void onPlayerChatInternal(final MessageChannelEvent.Chat event, final Player player) {
+    @Listener(order = Order.LATE)
+    public void onPlayerChatEventLate(final PlayerChatEvent event, @Root final ServerPlayer player) {
+        if (this.chatConfig.isTryForceFormatting()) {
+            this.onPlayerChatEvent(event, player);
+        }
+    }
+
+    private void onPlayerChatEvent(final PlayerChatEvent event, @Root final ServerPlayer player) {
         if (this.chatMessageFormatterService.getNucleusChannel(player.getUniqueId())
                 .map(IChatMessageFormatterService.Channel::willFormat).orElse(false)) {
             return;
         }
 
-        final MessageEvent.MessageFormatter eventFormatter = event.getFormatter();
-        final TextComponent rawMessage = eventFormatter.getBody().isEmpty() ? event.getRawMessage() : eventFormatter.getBody().toText();
-
-        final SimpleTextFormatter headerFormatter = eventFormatter.getHeader();
-        final SimpleTextFormatter footerFormatter = eventFormatter.getFooter();
-        if (this.chatConfig.isOverwriteEarlyPrefixes()) {
-            eventFormatter.setHeader(Text.EMPTY);
-            headerFormatter.clear();
-        } else if (this.chatConfig.isTryRemoveMinecraftPrefix()) { // Avoid adding <name>.
-            // We should remove the applier.
-            for (final SimpleTextTemplateApplier stta : eventFormatter.getHeader()) {
-                if (stta instanceof MessageEvent.DefaultHeaderApplier) {
-                    eventFormatter.getHeader().remove(stta); // the iterator is read only, so we have to do this...
-                }
-            }
+        Component baseMessage;
+        if (this.chatConfig.isIgnoreOtherPlugins()) {
+            baseMessage = event.getOriginalMessage();
+        } else {
+            baseMessage = event.getMessage();
         }
 
-        if (this.chatConfig.isOverwriteEarlySuffixes()) {
-            footerFormatter.clear();
+        if (this.chatConfig.isTryRemoveMinecraftPrefix()) {
+            final Pattern removal = Pattern.compile("<" + player.getName() + ">");
+            baseMessage = baseMessage.replaceText(removal, x -> Component.empty());
         }
 
         final ChatTemplateConfig ctc;
@@ -92,19 +91,17 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
             ctc = this.chatConfig.getDefaultTemplate();
         }
 
-        if (!ctc.getPrefix().isEmpty()) {
-            final SimpleTextTemplateApplier headerApplier = new SimpleTextTemplateApplier();
-            headerApplier.setTemplate(TextTemplate.of(ctc.getPrefix().getForObject(player)));
-            event.getFormatter().getHeader().add(headerApplier);
+        final TextComponent.Builder builder = Component.text();
+        final Component header = ctc.getPrefix().getForObject(player);
+        final Component footer = ctc.getSuffix().getForObject(player);
+        if (!AdventureUtils.isEmpty(header)) {
+            builder.append(header);
         }
-
-        if (!ctc.getSuffix().isEmpty()) {
-            final SimpleTextTemplateApplier footerApplier = new SimpleTextTemplateApplier();
-            footerApplier.setTemplate(TextTemplate.of(ctc.getSuffix().getForObject(player)));
-            event.getFormatter().getFooter().add(footerApplier);
+        builder.append(this.chatConfig.isModifyMessage() ? this.useMessage(player, baseMessage, ctc) : baseMessage);
+        if (!AdventureUtils.isEmpty(footer)) {
+            builder.append(footer);
         }
-
-        event.getFormatter().setBody(this.chatConfig.isModifyMainMessage() ? useMessage(player, rawMessage, ctc) : rawMessage);
+        event.setMessage(builder.asComponent());
     }
 
     @Override
@@ -112,25 +109,29 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
         return serviceCollection.configProvider().getModuleConfig(ChatConfig.class).isModifychat();
     }
 
-    private TextComponent useMessage(final Player player, final TextComponent rawMessage, final ChatTemplateConfig chatTemplateConfig) {
-        String m = TextSerializers.FORMATTING_CODE.serialize(rawMessage);
+    private TextComponent useMessage(final ServerPlayer player, final Component rawMessage, final ChatTemplateConfig chatTemplateConfig) {
+        String m = LegacyComponentSerializer.legacyAmpersand().serialize(rawMessage);
         if (this.chatConfig.isRemoveBlueUnderline()) {
             m = m.replaceAll("&9&n([A-Za-z0-9-.]+)(&r)?", "$1");
         }
 
         m = this.textStyleService.stripPermissionless(ChatPermissions.CHAT_COLOR, ChatPermissions.CHAT_STYLE, player, m);
 
-        final TextComponent result;
+        final Component result;
         if (this.permissionService.hasPermission(player, ChatPermissions.CHAT_URLS)) {
             result = this.textStyleService.addUrls(m, !this.chatConfig.isRemoveBlueUnderline());
         } else {
-            result = TextSerializers.FORMATTING_CODE.deserialize(m);
+            result = LegacyComponentSerializer.legacyAmpersand().deserialize(m);
         }
 
         final String chatcol = this.permissionService.getOptionFromSubject(player, "chatcolour", "chatcolor").orElseGet(chatTemplateConfig::getChatcolour);
         final String chatstyle = this.permissionService.getOptionFromSubject(player, "chatstyle").orElseGet(chatTemplateConfig::getChatstyle);
 
-        return Text.of(this.textStyleService.getColourFromString(chatcol), this.textStyleService.getTextStyleFromString(chatstyle), result);
+        return Component.text()
+                .color(this.textStyleService.getColourFromString(chatcol).orElse(null))
+                .style(this.textStyleService.getTextStyleFromString(chatstyle))
+                .append(result)
+                .build();
     }
 
     @Override

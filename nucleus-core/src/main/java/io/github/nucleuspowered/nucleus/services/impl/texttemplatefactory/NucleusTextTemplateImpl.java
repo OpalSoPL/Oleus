@@ -38,6 +38,10 @@ public class NucleusTextTemplateImpl implements NucleusTextTemplate {
         this.serviceCollection = serviceCollection;
     }
 
+    public static NucleusTextTemplateImpl empty() {
+        return null;
+    }
+
     @Override
     public boolean isEmpty() {
         return this.texts.isEmpty();

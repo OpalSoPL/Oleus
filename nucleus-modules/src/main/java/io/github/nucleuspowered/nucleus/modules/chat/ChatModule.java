@@ -4,31 +4,53 @@
  */
 package io.github.nucleuspowered.nucleus.modules.chat;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.chat.commands.MeCommand;
 import io.github.nucleuspowered.nucleus.modules.chat.config.ChatConfig;
-import io.github.nucleuspowered.nucleus.modules.chat.config.ChatConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.chat.listeners.ChatListener;
+import io.github.nucleuspowered.nucleus.modules.chat.services.ChatService;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
-
-import com.google.inject.Inject;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
 // TODO: Add template suppliers to IPlayerDisplayNameService
-@ModuleData(id = ChatModule.ID, name = "Chat")
-public class ChatModule extends ConfigurableModule<ChatConfig, ChatConfigAdapter> {
+public class ChatModule implements IModule.Configurable<ChatConfig> {
 
     public final static String ID = "chat";
 
-    @Inject
-    public ChatModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(ChatService.class, new ChatService(), false);
     }
 
     @Override
-    public ChatConfigAdapter createAdapter() {
-        return new ChatConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.singleton(MeCommand.class);
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(ChatPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(ChatListener.class);
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<ChatConfig> getConfigClass() {
+        return ChatConfig.class;
     }
 
 }
