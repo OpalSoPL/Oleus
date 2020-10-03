@@ -5,12 +5,13 @@
 package io.github.nucleuspowered.nucleus.modules.chatlogger.listeners;
 
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 
 import java.io.IOException;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 
 public class BaseLoggerListener extends AbstractLoggerListener {
 
@@ -20,7 +21,7 @@ public class BaseLoggerListener extends AbstractLoggerListener {
     }
 
     @Listener
-    public void onShutdown(final GameStoppedServerEvent event) {
+    public void onShutdown(final StoppingEngineEvent<Server> event) {
         try {
             this.handler.onServerShutdown();
         } catch (final IOException e) {
@@ -29,6 +30,6 @@ public class BaseLoggerListener extends AbstractLoggerListener {
     }
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return getConfig(serviceCollection).isEnableLog();
+        return this.getConfig(serviceCollection).isEnableLog();
     }
 }

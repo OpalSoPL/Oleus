@@ -4,38 +4,40 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandlogger.listeners;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.config.CommandLoggerConfig;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.services.CommandLoggerHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.util.CommandNameCache;
-import org.slf4j.Logger;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.CommandBlockSource;
-import org.spongepowered.api.command.source.ConsoleSource;
+import net.kyori.adventure.text.Component;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.block.entity.CommandBlock;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.vehicle.minecart.CommandBlockMinecart;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.command.SendCommandEvent;
-import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
+import org.spongepowered.api.event.command.ExecuteCommandEvent;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.google.inject.Inject;
+import java.util.stream.Collectors;
 
 public class CommandLoggingListener implements IReloadableService.Reloadable, ListenerBase {
 
     private final CommandLoggerHandler handler;
     private final IMessageProviderService messageProvider;
+    private final IPlayerDisplayNameService displayNameProvider;
+    private final Logger logger;
     private CommandLoggerConfig c;
     private Set<String> commandsToFilter = new HashSet<>();
-    private Logger logger;
 
     @Inject
     public CommandLoggingListener(final INucleusServiceCollection serviceCollection) {
@@ -43,17 +45,19 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
         this.c = serviceCollection.configProvider().getModuleConfig(CommandLoggerConfig.class);
         this.messageProvider = serviceCollection.messageProvider();
         this.logger = serviceCollection.logger();
+        this.displayNameProvider = serviceCollection.playerDisplayNameService();
     }
 
     @Listener(order = Order.LAST)
-    public void onCommand(final SendCommandEvent event, @First final CommandSource source) {
+    public void onCommand(final ExecuteCommandEvent.Post event) {
+        final Object source = event.getCause().root();
         // Check source.
         final boolean accept;
         if (source instanceof Player) {
             accept = this.c.getLoggerTarget().isLogPlayer();
-        } else if (source instanceof CommandBlockSource) {
+        } else if (source instanceof CommandBlock || source instanceof CommandBlockMinecart) {
             accept = this.c.getLoggerTarget().isLogCommandBlock();
-        } else if (source instanceof ConsoleSource) {
+        } else if (source instanceof SystemSubject) {
             accept = this.c.getLoggerTarget().isLogConsole();
         } else {
             accept = this.c.getLoggerTarget().isLogOther();
@@ -65,19 +69,22 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
         }
 
         final String command = event.getCommand().toLowerCase();
-        final Set<String> commands = CommandNameCache.INSTANCE.getFromCommandAndSource(command, source);
+        final Set<String> commands = CommandNameCache.INSTANCE.getFromCommandAndSource(command, event.getCommandCause());
         commands.retainAll(this.commandsToFilter);
 
         // If whitelist, and we have the command, or if not blacklist, and we do not have the command.
         if (this.c.isWhitelist() == !commands.isEmpty()) {
-            final String message = this.messageProvider.getMessageString("commandlog.message", source.getName(), event.getCommand(), event.getArguments());
+            final String message = this.messageProvider.getMessageString("commandlog.message",
+                    this.displayNameProvider.getName(source, Component.text("unknown")),
+                    event.getCommand(),
+                    event.getArguments());
             this.logger.info(message);
             this.handler.queueEntry(message);
         }
     }
 
     @Listener
-    public void onShutdown(final GameStoppedServerEvent event) {
+    public void onShutdown(final StoppingEngineEvent<Server> event) {
         try {
             this.handler.onServerShutdown();
         } catch (final IOException e) {
@@ -87,6 +94,6 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.c = serviceCollection.configProvider().getModuleConfig(CommandLoggerConfig.class);
-        this.commandsToFilter = this.c.getCommandsToFilter().stream().map(String::toLowerCase).collect(ImmutableSet.toImmutableSet());
+        this.commandsToFilter = this.c.getCommandsToFilter().stream().map(String::toLowerCase).collect(Collectors.toSet());
     }
 }

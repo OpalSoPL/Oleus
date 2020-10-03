@@ -212,6 +212,14 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     }
 
     @Override
+    public Component getName(final UUID uuid) {
+        if (uuid == Util.CONSOLE_FAKE_UUID) {
+            return Component.text("Server");
+        }
+        return Component.text(Sponge.getServer().getUserManager().get(uuid).map(User::getName).orElse("unknown"));
+    }
+
+    @Override
     public Component addCommandToName(final Nameable p) {
         final TextComponent.Builder text = Component.text().content(p.getName());
         if (p instanceof User || p instanceof ServerPlayer) {
@@ -238,13 +246,13 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     }
 
     @Override
-    public Component getName(final Object cs) {
+    public Component getName(final Object cs, final Component defaultName) {
         if (cs instanceof Nameable) {
             return this.getName((Nameable) cs);
         } else if (cs instanceof Audience) {
             return this.getName((Audience) cs);
         }
-        return Component.empty();
+        return defaultName;
     }
 
     private void addCommandToNameInternal(final TextComponent.Builder name, final String user) {

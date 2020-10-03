@@ -11,16 +11,19 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 
 import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 
 abstract class AbstractLoggerListener implements ListenerBase.Conditional {
 
     final ChatLoggerHandler handler;
     final IMessageProviderService messageProviderService;
+    final IPlayerDisplayNameService displayNameService;
 
     @Inject
     AbstractLoggerListener(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(ChatLoggerHandler.class);
         this.messageProviderService = serviceCollection.messageProvider();
+        this.displayNameService = serviceCollection.playerDisplayNameService();
     }
 
     ChatLoggingConfig getConfig(final INucleusServiceCollection serviceCollection) {

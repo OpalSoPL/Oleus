@@ -4,31 +4,60 @@
  */
 package io.github.nucleuspowered.nucleus.modules.chatlogger;
 
-import static io.github.nucleuspowered.nucleus.modules.chatlogger.ChatLoggerModule.ID;
-
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.config.ChatLoggingConfig;
-import io.github.nucleuspowered.nucleus.modules.chatlogger.config.ChatLoggingConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.chatlogger.listeners.BaseLoggerListener;
+import io.github.nucleuspowered.nucleus.modules.chatlogger.listeners.ChatLoggingListener;
+import io.github.nucleuspowered.nucleus.modules.chatlogger.listeners.MailLoggingListener;
+import io.github.nucleuspowered.nucleus.modules.chatlogger.listeners.MessageLoggingListener;
+import io.github.nucleuspowered.nucleus.modules.chatlogger.runnables.ChatLoggerRunnable;
+import io.github.nucleuspowered.nucleus.modules.chatlogger.services.ChatLoggerHandler;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = ID, name = "Chat Logger")
-public class ChatLoggerModule extends ConfigurableModule<ChatLoggingConfig, ChatLoggingConfigAdapter> {
+public class ChatLoggerModule implements IModule.Configurable<ChatLoggingConfig> {
 
     public static final String ID = "chat-logger";
 
-    @Inject
-    public ChatLoggerModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(ChatLoggerHandler.class, new ChatLoggerHandler(serviceCollection), false);
     }
 
-    @Override public ChatLoggingConfigAdapter createAdapter() {
-        return new ChatLoggingConfigAdapter();
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Arrays.asList(
+                BaseLoggerListener.class,
+                ChatLoggingListener.class,
+                MailLoggingListener.class,
+                MessageLoggingListener.class
+        );
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.singleton(ChatLoggerRunnable.class);
+    }
+
+    @Override
+    public Class<ChatLoggingConfig> getConfigClass() {
+        return null;
     }
 }

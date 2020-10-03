@@ -59,11 +59,17 @@ public interface IPlayerDisplayNameService {
 
     Component getName(Nameable user);
 
+    Component getName(UUID uuid);
+
     Component addCommandToName(Nameable p);
 
     Component addCommandToDisplayName(Nameable p);
 
-    Component getName(Object cs);
+    Component getName(Object cs, Component defaultName);
+
+    default Component getName(final Object cs) {
+        return this.getName(cs, Component.empty());
+    }
 
     @FunctionalInterface
     interface DisplayNameResolver {

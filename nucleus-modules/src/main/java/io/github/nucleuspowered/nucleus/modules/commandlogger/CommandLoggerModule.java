@@ -4,30 +4,51 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandlogger;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.config.CommandLoggerConfig;
-import io.github.nucleuspowered.nucleus.modules.commandlogger.config.CommandLoggerConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.commandlogger.listeners.CommandLoggingListener;
+import io.github.nucleuspowered.nucleus.modules.commandlogger.runnables.CommandLoggerRunnable;
+import io.github.nucleuspowered.nucleus.modules.commandlogger.services.CommandLoggerHandler;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = CommandLoggerModule.ID, name = "Command Logger")
-public class CommandLoggerModule extends ConfigurableModule<CommandLoggerConfig, CommandLoggerConfigAdapter> {
+public class CommandLoggerModule implements IModule.Configurable<CommandLoggerConfig> {
 
     public static final String ID = "command-logger";
 
-    @Inject
-    public CommandLoggerModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(CommandLoggerHandler.class, new CommandLoggerHandler(serviceCollection), false);
     }
 
     @Override
-    public CommandLoggerConfigAdapter createAdapter() {
-        return new CommandLoggerConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(CommandLoggingListener.class);
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.singleton(CommandLoggerRunnable.class);
+    }
+
+    @Override
+    public Class<CommandLoggerConfig> getConfigClass() {
+        return CommandLoggerConfig.class;
     }
 }

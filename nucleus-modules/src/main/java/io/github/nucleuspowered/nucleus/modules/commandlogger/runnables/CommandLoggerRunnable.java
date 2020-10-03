@@ -4,18 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandlogger.runnables;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.config.CommandLoggerConfig;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.services.CommandLoggerHandler;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.GameState;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.scheduler.Task;
+
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-
-import com.google.inject.Inject;
 
 public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloadable {
 
@@ -29,23 +27,20 @@ public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloa
     }
 
     @Override
-    public boolean isAsync() {
-        return true;
-    }
-
-    @Override
     public Duration interval() {
         return Duration.of(1, ChronoUnit.SECONDS);
     }
 
+    // TODO: Only run when server is running.
     @Override
-    public void accept(final Task task) {
-        if (Sponge.getGame().getState() == GameState.SERVER_STOPPED) {
-            return;
-        }
-
-        if (this.config.isLogToFile()) {
-            this.handler.onTick();
+    public void run() {
+        try {
+            Sponge.getServer();
+            if (this.config.isLogToFile()) {
+                this.handler.onTick();
+            }
+        } catch (final IllegalStateException e) {
+            // no-op
         }
     }
 
