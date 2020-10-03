@@ -104,7 +104,7 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
     private boolean test(final ServerPlayer player) {
         if (this.permissionService.hasPermission(player, StaffChatPermissions.BASE_STAFFCHAT)) {
             return this.userPreferenceService
-                    .getPreferenceFor(player.getUser(), NucleusKeysProvider.VIEW_STAFF_CHAT)
+                    .getPreferenceFor(player.getUniqueId(), NucleusKeysProvider.VIEW_STAFF_CHAT)
                     .orElse(true);
         }
 

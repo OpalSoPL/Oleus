@@ -31,6 +31,8 @@ public interface IPermissionService {
 
     void registerContextCalculator(ContextCalculator<Subject> calculator);
 
+    boolean hasPermission(UUID playerUUID, String permission);
+
     boolean hasPermission(Subject subject, String permission);
 
     Tristate hasPermissionTristate(Subject subject, String permission);

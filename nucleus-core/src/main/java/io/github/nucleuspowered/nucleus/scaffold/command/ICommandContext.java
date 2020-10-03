@@ -23,6 +23,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -252,4 +253,6 @@ public interface ICommandContext {
     void addFailAction(Consumer<ICommandContext> action);
 
     Audience getAudience();
+
+    Locale getLocale();
 }

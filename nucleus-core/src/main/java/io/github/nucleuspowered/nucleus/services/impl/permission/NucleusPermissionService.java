@@ -97,15 +97,24 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         Sponge.getServer().getServiceProvider().permissionService().registerContextCalculator(calculator);
     }
 
-    @Override public boolean hasPermission(final Subject permissionSubject, final String permission) {
+    @Override
+    public boolean hasPermission(final UUID playerUUID, final String permission) {
+        return this.hasPermission(Sponge.getServer().getUserManager().get(playerUUID)
+                .orElseThrow(() -> new IllegalArgumentException("The UUID " + playerUUID + " is not a valid player UUID")), permission);
+    }
+
+    @Override
+    public boolean hasPermission(final Subject permissionSubject, final String permission) {
         return this.hasPermission(permissionSubject, permission, this.useRole);
     }
 
-    @Override public Tristate hasPermissionTristate(final Subject subject, final String permission) {
+    @Override
+    public Tristate hasPermissionTristate(final Subject subject, final String permission) {
         return this.hasPermissionTristate(subject, permission, this.useRole);
     }
 
-    @Override public boolean hasPermissionWithConsoleOverride(final Subject subject, final String permission, final boolean permissionIfConsoleAndOverridden) {
+    @Override
+    public boolean hasPermissionWithConsoleOverride(final Subject subject, final String permission, final boolean permissionIfConsoleAndOverridden) {
         if (this.consoleOverride && subject instanceof SystemSubject) {
             return permissionIfConsoleAndOverridden;
         }

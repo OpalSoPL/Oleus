@@ -14,17 +14,16 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.ban.Ban;
 import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
-import org.spongepowered.api.text.serializer.TextSerializers;
-import org.spongepowered.api.util.ban.Ban;
-import org.spongepowered.api.util.ban.BanTypes;
+import org.spongepowered.api.service.ban.BanTypes;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -50,19 +49,20 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
     }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                NucleusParameters.ONE_USER.get(serviceCollection),
-                NucleusParameters.DURATION.get(serviceCollection),
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.ONE_USER,
+                NucleusParameters.DURATION,
                 NucleusParameters.OPTIONAL_REASON
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User u = context.requireOne(NucleusParameters.Keys.USER, User.class);
         final long time = context.requireOne(NucleusParameters.Keys.DURATION, long.class);
         final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class)
-                .orElseGet(() -> context.getServiceCollection().messageProvider().getMessageString(context.getCommandSourceRoot(), "ban.defaultreason"));
+                .orElseGet(() -> context.getMessageString("ban.defaultreason"));
 
         if (!context.isConsoleAndBypass() && context.testPermissionFor(u, BanPermissions.TEMPBAN_EXEMPT_TARGET)) {
             return context.errorResult("command.tempban.exempt", u.getName());
@@ -79,7 +79,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
                     context.getTimeString(this.banConfig.getMaximumTempBanLength()));
         }
 
-        final BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        final BanService service = Sponge.getServer().getServiceProvider().banService();
 
         if (service.isBanned(u.getProfile())) {
             return context.errorResult("command.ban.alreadyset", u.getName());
@@ -98,30 +98,22 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
         final Instant date = Instant.now().plus(time, ChronoUnit.SECONDS);
 
         // Create the ban.
-        final CommandSource src = context.getCommandSourceRoot();
-        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u.getProfile()).source(src).expirationDate(date).reason(TextSerializers.FORMATTING_CODE.deserialize(reason)).build();
+        final Component src = context.getDisplayName();
+        final Component r = LegacyComponentSerializer.legacyAmpersand().deserialize(reason);
+        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u.getProfile()).source(src).expirationDate(date).reason(r).build();
         service.addBan(bp);
 
-        final MutableMessageChannel send =
-                context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY).asMutable();
-        send.addMember(src);
-        for (final MessageReceiver messageReceiver : send.getMembers()) {
-            if (messageReceiver instanceof CommandSource) {
-                context.sendMessageTo(messageReceiver,
-                        "command.tempban.applied",
-                        u.getName(),
+        final Audience send = Audience.audience(
+                context.getAudience(),
+                context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY)
+        );
+        send.sendMessage(context.getMessage("command.tempban.applied",
+                        context.getDisplayName(u.getUniqueId()),
                         context.getTimeString(time),
-                        src.getName());
-                context.sendMessageTo(messageReceiver,
-                        "standard.reasoncoloured",
-                        reason);
-            }
-        }
+                        src));
+        send.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
-        if (Sponge.getServer().getPlayer(u.getUniqueId()).isPresent()) {
-            Sponge.getServer().getPlayer(u.getUniqueId()).get().kick(TextSerializers.FORMATTING_CODE.deserialize(reason));
-        }
-
+        Sponge.getServer().getPlayer(u.getUniqueId()).ifPresent(x -> x.kick(r));
         return context.successResult();
     }
 }

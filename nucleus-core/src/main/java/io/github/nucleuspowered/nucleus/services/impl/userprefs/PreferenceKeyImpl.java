@@ -29,7 +29,7 @@ public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implem
     private final ResourceKey key;
     @Nullable private final T def;
     private final Class<T> clazz;
-    private final BiPredicate<INucleusServiceCollection, User> canAccess;
+    private final BiPredicate<INucleusServiceCollection, UUID> canAccess;
     private final String descriptionKey;
     private final TriConsumer<INucleusServiceCollection, UUID, T> onSet;
 
@@ -61,7 +61,7 @@ public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implem
             final ResourceKey key,
             @Nullable final T def,
             final Class<T> clazz,
-            final BiPredicate<INucleusServiceCollection, User> canAccess,
+            final BiPredicate<INucleusServiceCollection, UUID> canAccess,
             final String descriptionKey) {
         this(key, def, clazz, canAccess, descriptionKey, (s, u, t) -> {});
     }
@@ -70,7 +70,7 @@ public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implem
             final ResourceKey key,
             @Nullable final T def,
             final Class<T> clazz,
-            final BiPredicate<INucleusServiceCollection, User> canAccess,
+            final BiPredicate<INucleusServiceCollection, UUID> canAccess,
             final String descriptionKey,
             final TriConsumer<INucleusServiceCollection, UUID, T> onSet) {
         super(new String[] { "user-prefs", key.asString() }, TypeToken.of(clazz), IUserDataObject.class, def);
@@ -95,7 +95,7 @@ public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implem
         return this.clazz;
     }
 
-    public boolean canAccess(final INucleusServiceCollection serviceCollection, final User user) {
+    public boolean canAccess(final INucleusServiceCollection serviceCollection, final UUID user) {
         return this.canAccess.test(serviceCollection, user);
     }
 
@@ -117,7 +117,8 @@ public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implem
             super(key, def, Boolean.class, permission, descriptionKey);
         }
 
-        public BooleanKey(final ResourceKey key, @Nullable final Boolean def, final BiPredicate<INucleusServiceCollection, User> canAccess, final String descriptionKey) {
+        public BooleanKey(final ResourceKey key, @Nullable final Boolean def, final BiPredicate<INucleusServiceCollection, UUID> canAccess,
+                final String descriptionKey) {
             super(key, def, Boolean.class, canAccess, descriptionKey);
         }
     }

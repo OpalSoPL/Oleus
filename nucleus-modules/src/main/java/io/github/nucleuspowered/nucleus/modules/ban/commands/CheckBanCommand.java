@@ -12,11 +12,17 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.ban.Ban;
 import org.spongepowered.api.service.ban.BanService;
+
+import java.util.Collection;
+import java.util.Optional;
 
 @Command(aliases = "checkban", basePermission = BanPermissions.BASE_CHECKBAN, commandDescriptionKey = "checkban")
 public class CheckBanCommand implements ICommandExecutor {
@@ -24,51 +30,46 @@ public class CheckBanCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                GenericArguments.firstParsing(
-                        NucleusParameters.ONE_GAME_PROFILE_UUID.get(serviceCollection),
-                        NucleusParameters.ONE_GAME_PROFILE.get(serviceCollection)
-                )
+                NucleusParameters.GAME_PROFILE
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final GameProfile gp;
-        if (context.hasAny(NucleusParameters.Keys.USER_UUID)) {
-            gp = context.requireOne(NucleusParameters.Keys.USER_UUID, GameProfile.class);
-        } else {
-            gp = context.requireOne(NucleusParameters.Keys.USER, GameProfile.class);
+        final Collection<GameProfile> user = context.requireOne(NucleusParameters.GAME_PROFILE);
+        if (user.size() != 1) {
+            return context.errorResult("command.checkban.multpleprofiles", user.size());
         }
+        final BanService service = Sponge.getServer().getServiceProvider().banService();
+        final GameProfile profile = user.iterator().next();
 
-        final BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
-
-        final Optional<Ban.Profile> obp = service.getBanFor(gp);
+        final Optional<Ban.Profile> obp = service.getBanFor(profile);
         if (!obp.isPresent()) {
-            return context.errorResult("command.checkban.notset", Util.getNameOrUnkown(context, gp));
+            return context.errorResult("command.checkban.notset", Util.getNameOrUnkown(context, profile));
         }
 
         final Ban.Profile bp = obp.get();
 
-        final String name;
+        final Component name;
         if (bp.getBanSource().isPresent()) {
-            name = bp.getBanSource().get().toPlain();
+            name = bp.getBanSource().get();
         } else {
-            name = context.getServiceCollection().messageProvider().getMessageString(context.getCommandSourceRoot(), "standard.unknown");
+            name = context.getMessage("standard.unknown");
         }
 
         if (bp.getExpirationDate().isPresent()) {
-            context.sendMessage("command.checkban.bannedfor", Util.getNameOrUnkown(context, gp), name,
+            context.sendMessage("command.checkban.bannedfor", Util.getNameOrUnkown(context, profile), name,
                     context.getTimeToNowString(bp.getExpirationDate().get()));
         } else {
-            context.sendMessage("command.checkban.bannedperm", Util.getNameOrUnkown(context, gp), name);
+            context.sendMessage("command.checkban.bannedperm", Util.getNameOrUnkown(context, profile), name);
         }
 
-        context.sendMessage("command.checkban.created", Util.FULL_TIME_FORMATTER.withLocale(context.getCommandSourceRoot().getLocale())
+        context.sendMessage("command.checkban.created", Util.FULL_TIME_FORMATTER.withLocale(context.getLocale())
                 .format(bp.getCreationDate()
         ));
-        context.sendMessage("standard.reasoncoloured", TextSerializers.FORMATTING_CODE.serialize(bp.getReason()
+        context.sendMessage("standard.reasoncoloured", LegacyComponentSerializer.legacyAmpersand().serialize(bp.getReason()
                         .orElse(
-                        context.getServiceCollection().messageProvider().getMessageFor(context.getCommandSourceRoot().getLocale(), "ban.defaultreason"))));
+                        context.getServiceCollection().messageProvider().getMessageFor(context.getAudience(), "ban.defaultreason"))));
         return context.successResult();
     }
 

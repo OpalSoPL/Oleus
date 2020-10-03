@@ -61,7 +61,8 @@ public class UserPreferenceService implements IUserPreferenceService {
         ((PreferenceKeyImpl<T>) key).onSet(this.serviceCollection, uuid, value);
     }
 
-    @Override public <T> void set(final UUID uuid, final PreferenceKeyImpl<T> key, @Nullable final T value) {
+    @Override
+    public <T> void set(final UUID uuid, final PreferenceKeyImpl<T> key, @Nullable final T value) {
         this.serviceCollection
                 .storageManager()
                 .getUserService()
@@ -69,18 +70,20 @@ public class UserPreferenceService implements IUserPreferenceService {
                 .thenAccept(x -> x.set(key, value));
     }
 
-    @Override public Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> get(final User user) {
+    @Override
+    public Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> get(final UUID user) {
         final Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> ret = new HashMap<>();
         for (final NucleusUserPreferenceService.PreferenceKey<?> key : this.registered.values()) {
             if (((PreferenceKeyImpl) key).canAccess(this.serviceCollection, user)) {
-                ret.put(key, this.get(user.getUniqueId(), key).orElse(null));
+                ret.put(key, this.get(user, key).orElse(null));
             }
         }
 
         return ret;
     }
 
-    @Override public <T> Optional<T> get(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key) {
+    @Override
+    public <T> Optional<T> get(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key) {
         if (!this.registered.containsValue(key)) {
             throw new IllegalArgumentException("Key is not registered.");
         }
@@ -104,7 +107,8 @@ public class UserPreferenceService implements IUserPreferenceService {
         return ot;
     }
 
-    @Override public <T> T getUnwrapped(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key) {
+    @Override
+    public <T> T getUnwrapped(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key) {
         return this.get(uuid, key).orElse(null);
     }
 
@@ -114,25 +118,27 @@ public class UserPreferenceService implements IUserPreferenceService {
     }
 
     @Override
-    public <T> Optional<T> getPreferenceFor(final User user, final NucleusUserPreferenceService.PreferenceKey<T> key) {
-        return this.get(user.getUniqueId(), key);
+    public <T> Optional<T> getPreferenceFor(final UUID user, final NucleusUserPreferenceService.PreferenceKey<T> key) {
+        return this.get(user, key);
     }
 
     @Override
-    public <T> void setPreferenceFor(final User user, final NucleusUserPreferenceService.PreferenceKey<T> key, final T value) {
-        this.set(user.getUniqueId(), key, value);
+    public <T> void setPreferenceFor(final UUID user, final NucleusUserPreferenceService.PreferenceKey<T> key, final T value) {
+        this.set(user, key, value);
     }
 
     @Override
-    public void removePreferenceFor(final User user, final NucleusUserPreferenceService.PreferenceKey<?> key) {
-        this.set(user.getUniqueId(), key, null);
+    public void removePreferenceFor(final UUID user, final NucleusUserPreferenceService.PreferenceKey<?> key) {
+        this.set(user, key, null);
     }
 
-    @Override public boolean canAccess(final User user, final PreferenceKey<?> key) {
+    @Override
+    public boolean canAccess(final UUID user, final PreferenceKey<?> key) {
         return ((PreferenceKeyImpl) key).canAccess(this.serviceCollection, user);
     }
 
-    @Override public String getDescription(final PreferenceKey<?> key) {
+    @Override
+    public String getDescription(final PreferenceKey<?> key) {
         return ((PreferenceKeyImpl) key).getDescription(this.serviceCollection.messageProvider());
     }
 

@@ -16,19 +16,16 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.ban.Ban;
 import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
-import org.spongepowered.api.util.ban.Ban;
 
+import java.util.Collection;
 import java.util.Optional;
 
 @Command(
@@ -43,33 +40,28 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-            GenericArguments.firstParsing(
-                    NucleusParameters.ONE_GAME_PROFILE_UUID.get(serviceCollection),
-                    NucleusParameters.ONE_GAME_PROFILE.get(serviceCollection)
-            )
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.GAME_PROFILE
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final GameProfile gp;
-        if (context.hasAny(NucleusParameters.Keys.USER_UUID)) {
-            gp = context.requireOne(NucleusParameters.Keys.USER_UUID, GameProfile.class);
-        } else {
-            gp = context.requireOne(NucleusParameters.Keys.USER, GameProfile.class);
+        final Collection<GameProfile> cgp = context.requireOne(NucleusParameters.GAME_PROFILE);
+        if (cgp.size() != 1) {
+            return context.errorResult("command.checkban.multpleprofiles", cgp.size());
         }
+        final BanService service = Sponge.getServer().getServiceProvider().banService();
+        final GameProfile profile = cgp.iterator().next();
 
-        final BanService service = Sponge.getServiceManager().provideUnchecked(BanService.class);
-
-        final Optional<Ban.Profile> obp = service.getBanFor(gp);
+        final Optional<Ban.Profile> obp = service.getBanFor(profile);
         if (!obp.isPresent()) {
             return context.errorResult(
-                    "command.checkban.notset", Util.getNameOrUnkown(context, gp));
+                    "command.checkban.notset", Util.getNameOrUnkown(context, profile));
         }
 
-        final User user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gp);
+        final User user = Sponge.getServer().getUserManager().getOrCreate(profile);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
                         BanPermissions.BAN_LEVEL_KEY,
@@ -81,11 +73,11 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
 
         service.removeBan(obp.get());
 
-        final MutableMessageChannel notify = context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY).asMutable();
-        notify.addMember(context.getCommandSourceRoot());
-        for (final MessageReceiver receiver : notify.getMembers()) {
-            context.sendMessageTo(receiver, "command.unban.success", Util.getNameOrUnkown(context, obp.get().getProfile()));
-        }
+        final Audience send = Audience.audience(
+                context.getAudience(),
+                context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY)
+        );
+        send.sendMessage(context.getMessage("command.unban.success", Util.getNameOrUnkown(context, obp.get().getProfile())));
         return context.successResult();
     }
 

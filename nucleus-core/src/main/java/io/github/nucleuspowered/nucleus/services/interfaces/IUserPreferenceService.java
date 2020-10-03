@@ -28,7 +28,7 @@ public interface IUserPreferenceService extends NucleusUserPreferenceService {
 
     <T> void set(UUID uuid, PreferenceKeyImpl<T> key, @Nullable T value);
 
-    Map<PreferenceKey<?>, Object> get(User user);
+    Map<PreferenceKey<?>, Object> get(UUID user);
 
     <T> Optional<T> get(UUID uuid, PreferenceKey<T> key);
 

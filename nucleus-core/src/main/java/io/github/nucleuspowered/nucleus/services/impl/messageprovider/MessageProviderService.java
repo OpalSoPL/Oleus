@@ -25,6 +25,8 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceServi
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.util.locale.LocaleSource;
 import org.spongepowered.api.util.locale.Locales;
 
@@ -146,6 +148,10 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     public Locale getLocaleFor(final Audience commandSource) {
         final Locale toUse;
         if (this.useClientLocalesWhenPossible && commandSource instanceof LocaleSource) {
+            if (commandSource instanceof ServerPlayer) {
+                return this.userPreferenceService.getPreferenceFor(((ServerPlayer) commandSource).getUniqueId(),
+                        this.userPreferenceService.keys().playerLocale().get()).orElseGet(((ServerPlayer) commandSource)::getLocale);
+            }
             toUse = ((LocaleSource) commandSource).getLocale();
         } else {
             toUse = this.defaultLocale;

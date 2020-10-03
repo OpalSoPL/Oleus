@@ -36,7 +36,7 @@ public class ToggleStaffChatCommand implements ICommandExecutor {
         final Player src = context.getIfPlayer();
         final boolean result =
                 context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElseGet(() ->
-                    ups.getPreferenceFor(src, NucleusKeysProvider.VIEW_STAFF_CHAT).orElse(true));
+                    ups.getPreferenceFor(src.getUniqueId(), NucleusKeysProvider.VIEW_STAFF_CHAT).orElse(true));
         ups.setPreferenceFor(src, NucleusKeysProvider.VIEW_STAFF_CHAT, !result);
         final StaffChatService service = context.getServiceCollection().getServiceUnchecked(StaffChatService.class);
 

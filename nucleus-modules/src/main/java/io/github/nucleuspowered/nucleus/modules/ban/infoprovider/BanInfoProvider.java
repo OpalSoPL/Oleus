@@ -21,7 +21,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
 
-public class BackInfoProvider implements NucleusProvider {
+public class BanInfoProvider implements NucleusProvider {
 
     @Override public String getCategory() {
         return "punishment";

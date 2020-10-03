@@ -11,6 +11,7 @@ import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface NucleusUserPreferenceService {
 
@@ -30,7 +31,7 @@ public interface NucleusUserPreferenceService {
      * @param <T> The type of preference this is
      * @return The value, if one is set.
      */
-    <T> Optional<T> getPreferenceFor(User user, PreferenceKey<T> key);
+    <T> Optional<T> getPreferenceFor(UUID user, PreferenceKey<T> key);
 
     /**
      * Sets the preference associated with the {@link PreferenceKey} for the
@@ -41,7 +42,7 @@ public interface NucleusUserPreferenceService {
      * @param value The value to set
      * @param <T> The type of preference this is
      */
-    <T> void setPreferenceFor(User user, PreferenceKey<T> key, @Nullable T value);
+    <T> void setPreferenceFor(UUID user, PreferenceKey<T> key, @Nullable T value);
 
     /**
      * Removes a preference associated with a user, reverting it to a default
@@ -52,7 +53,7 @@ public interface NucleusUserPreferenceService {
      * @param user The {@link User}
      * @param key The {@link PreferenceKey}
      */
-    void removePreferenceFor(User user, PreferenceKey<?> key);
+    void removePreferenceFor(UUID user, PreferenceKey<?> key);
 
     /**
      * Gets whether a {@link User} can use a given {@link PreferenceKey}
@@ -61,7 +62,7 @@ public interface NucleusUserPreferenceService {
      * @param key The key
      * @return true if so
      */
-    boolean canAccess(User user, PreferenceKey<?> key);
+    boolean canAccess(UUID user, PreferenceKey<?> key);
 
     /**
      * The description of the preference.

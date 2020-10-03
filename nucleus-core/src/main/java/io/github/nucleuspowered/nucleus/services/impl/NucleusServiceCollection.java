@@ -239,7 +239,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         return this.moduleReporterSupplier.get();
     }
 
-    @Override
+   @Override
     public Injector injector() {
         return this.injector;
     }

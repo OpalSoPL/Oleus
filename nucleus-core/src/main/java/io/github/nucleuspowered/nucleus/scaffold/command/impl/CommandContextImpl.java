@@ -277,6 +277,14 @@ public final class CommandContextImpl implements ICommandContext {
         return this.cause.getAudience();
     }
 
+    @Override
+    public Locale getLocale() {
+        if (this.cause.getAudience() instanceof ServerPlayer) {
+            return ((ServerPlayer) this.cause.getAudience()).getLocale();
+        }
+        return null;
+    }
+
     @Override public int getWarmup() {
         return this.warmup;
     }
