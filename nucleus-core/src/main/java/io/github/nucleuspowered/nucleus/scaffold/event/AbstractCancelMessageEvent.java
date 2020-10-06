@@ -11,7 +11,7 @@ import org.spongepowered.api.event.impl.AbstractEvent;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class AbstractCancelMessageEvent extends AbstractEvent implements CancelMessageEvent {
 

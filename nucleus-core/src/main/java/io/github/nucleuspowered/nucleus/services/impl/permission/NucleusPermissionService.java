@@ -47,7 +47,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Singleton
 public class NucleusPermissionService implements IPermissionService, IReloadableService.Reloadable, ContextCalculator<Subject> {
@@ -242,7 +242,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         if (checkRole && permission.startsWith("nucleus.")) {
             final Tristate tristate = subject.getPermissionValue(subject.getActiveContexts(), permission);
             if (tristate == Tristate.UNDEFINED) {
-                @Nullable final IPermissionService.Metadata result = this.metadataMap.get(permission);
+                final IPermissionService.@Nullable Metadata result = this.metadataMap.get(permission);
                 if (result != null) { // check the "parent" perm
                     final String perm = result.getSuggestedLevel().getPermission();
                     if (perm == null) {

@@ -30,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
-
 public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D extends IKeyedDataObject<D>>
         implements IStorageService.Keyed.KeyedData<K, Q, D> {
 
@@ -39,7 +37,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
             Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(new CacheLoader<K, ReentrantReadWriteLock>() {
                 @NonNull
                 @Override
-                public ReentrantReadWriteLock load(@Nonnull final K key) {
+                public ReentrantReadWriteLock load(@NonNull final K key) {
                     return new ReentrantReadWriteLock();
                 }
             });
@@ -115,7 +113,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-    public CompletableFuture<Optional<D>> get(@Nonnull final K key) {
+    public CompletableFuture<Optional<D>> get(@NonNull final K key) {
         final ReentrantReadWriteLock.ReadLock lock = this.dataLocks.get(key).readLock();
         try {
             lock.lock();
@@ -132,7 +130,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-    public Optional<D> getOnThread(@Nonnull final K key) {
+    public Optional<D> getOnThread(@NonNull final K key) {
         // Read lock for the cache
         final ReentrantReadWriteLock.ReadLock lock = this.dataLocks.get(key).readLock();
         try {
@@ -153,7 +151,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
         }
     }
 
-    private Optional<D> getFromRepo(@Nonnull final K key) throws Exception {
+    private Optional<D> getFromRepo(@NonNull final K key) throws Exception {
         // Write lock because of the cache
         final ReentrantReadWriteLock.WriteLock lock = this.dataLocks.get(key).writeLock();
         try {
@@ -167,7 +165,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-    public CompletableFuture<Optional<KeyedObject<K, D>>> get(@Nonnull final Q query) {
+    public CompletableFuture<Optional<KeyedObject<K, D>>> get(@NonNull final Q query) {
         return ServicesUtil.run(() -> {
             final Optional<KeyedObject<K, D>> r = this.getQuery.apply(query);
             r.ifPresent(d -> {
@@ -183,7 +181,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-    public CompletableFuture<Map<K, D>> getAll(@Nonnull final Q query) {
+    public CompletableFuture<Map<K, D>> getAll(@NonNull final Q query) {
         return ServicesUtil.run(() -> {
             final Map<K, D> res = this.getAll.apply(query);
             /* Map<K, D> res = r.entrySet().stream()
@@ -198,17 +196,17 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-    public CompletableFuture<Boolean> exists(@Nonnull final K key) {
+    public CompletableFuture<Boolean> exists(@NonNull final K key) {
         return ServicesUtil.run(() -> this.storageRepositorySupplier.get().exists(key), this.pluginContainer);
     }
 
     @Override
-    public CompletableFuture<Integer> count(@Nonnull final Q query) {
+    public CompletableFuture<Integer> count(@NonNull final Q query) {
         return ServicesUtil.run(() -> this.storageRepositorySupplier.get().count(query), this.pluginContainer);
     }
 
     @Override
-    public <T2> CompletableFuture<Void> setAndSave(@Nonnull final K key, final DataKey<T2, ? extends D> dataKey, final T2 data) {
+    public <T2> CompletableFuture<Void> setAndSave(@NonNull final K key, final DataKey<T2, ? extends D> dataKey, final T2 data) {
         return this.getOrNew(key).thenAccept(x -> {
             x.set(dataKey, data);
             this.save(key, x);
@@ -216,7 +214,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-    public CompletableFuture<Void> save(@Nonnull final K key, @Nonnull final D value) {
+    public CompletableFuture<Void> save(@NonNull final K key, @NonNull final D value) {
         return ServicesUtil.run(() -> {
             final ReentrantReadWriteLock reentrantReadWriteLock = this.dataLocks.get(key);
             final ReentrantReadWriteLock.WriteLock lock = reentrantReadWriteLock.writeLock();
@@ -233,7 +231,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-    public CompletableFuture<Void> delete(@Nonnull final K key) {
+    public CompletableFuture<Void> delete(@NonNull final K key) {
         return ServicesUtil.run(() -> {
             final ReentrantReadWriteLock reentrantReadWriteLock = this.dataLocks.get(key);
             final ReentrantReadWriteLock.WriteLock lock = reentrantReadWriteLock.writeLock();

@@ -6,13 +6,12 @@ package io.github.nucleuspowered.nucleus.services.impl.messageprovider.repositor
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.typesafe.config.ConfigException;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import org.apache.logging.log4j.Logger;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -22,8 +21,6 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
-
 public class ConfigFileMessagesRepository extends AbstractMessageRepository implements IMessageRepository {
 
     private static final Pattern KEYS = Pattern.compile("\\{(\\d+)}");
@@ -32,7 +29,7 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
     private final Path file;
     private final Logger logger;
     private final Supplier<PropertiesMessageRepository> messageRepositorySupplier;
-    private CommentedConfigurationNode node = SimpleCommentedConfigurationNode.root();
+    private CommentedConfigurationNode node = CommentedConfigurationNode.root();
 
     public ConfigFileMessagesRepository(
             final ITextStyleService textStyleService,
@@ -70,7 +67,7 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
     }
 
     protected CommentedConfigurationNode getDefaults() {
-        final CommentedConfigurationNode ccn = SimpleCommentedConfigurationNode.root();
+        final CommentedConfigurationNode ccn = CommentedConfigurationNode.root();
         final PropertiesMessageRepository repository = this.messageRepositorySupplier.get();
 
         repository.getKeys()
@@ -84,7 +81,7 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
         return HoconConfigurationLoader.builder().setPath(file).build();
     }
 
-    public Optional<String> getKey(@Nonnull final String key) {
+    public Optional<String> getKey(@NonNull final String key) {
         Preconditions.checkNotNull(key);
         final Object[] obj = key.split("\\.");
         return Optional.ofNullable(this.node.getNode(obj).getString());
@@ -137,19 +134,12 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
             this.isFailed = false;
         } catch (final IOException e) {
             this.isFailed = true;
-            // On error, fallback.
-            // Blegh, relocations
-            if (e.getCause().getClass().getName().contains(ConfigException.class.getSimpleName())) {
-                final Throwable exception = e.getCause();
-                this.logger.error("It appears that there is an error in your messages file! The error is: ");
-                this.logger.error(exception.getMessage());
-                this.logger.error("Please correct this then run /nucleus reload");
-                this.logger.error("Ignoring messages.conf for now.");
-                exception.printStackTrace();
-            } else {
-                this.logger.warn("Could not load custom messages file. Falling back.");
-                e.printStackTrace();
-            }
+            final Throwable exception = e.getCause();
+            this.logger.error("There might be an error in your messages file! The error is: ");
+            this.logger.error(exception.getMessage());
+            this.logger.error("If the error points to a line in the file, please correct this then run /nucleus reload");
+            this.logger.error("Ignoring messages.conf for now.");
+            exception.printStackTrace();
         }
 
         if (firstLoad) {

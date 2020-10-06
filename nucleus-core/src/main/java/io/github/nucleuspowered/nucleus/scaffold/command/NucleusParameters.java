@@ -8,9 +8,9 @@ import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.AudienceValueParameter;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.WorldPropertiesValueParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.parameter.CommonParameters;
@@ -29,8 +29,6 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 /**
  * A selection of common parameters for making things consistent
@@ -63,7 +61,7 @@ public final class NucleusParameters {
 
     public static abstract class LazyLoadedCommandElement<T> {
 
-        @Nullable private Parameter.Value<T> load;
+        private Parameter.@Nullable Value<T> load;
 
         public final Parameter.Value<T> get(final INucleusServiceCollection serviceCollection) {
             if (this.load == null) {

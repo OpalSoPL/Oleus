@@ -5,12 +5,12 @@
 package io.github.nucleuspowered.nucleus.configurate.datatypes;
 
 import io.github.nucleuspowered.nucleus.api.core.exception.NoSuchWorldException;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;

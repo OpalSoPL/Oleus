@@ -4,18 +4,21 @@
  */
 package io.github.nucleuspowered.nucleus.core.config;
 
-import io.github.nucleuspowered.neutrino.annotations.Default;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class KickOnStopConfig {
-    @Setting(value = "enabled", comment = "config.core.kickonstop.flag")
+
+    @Setting(value = "enabled")
+    @LocalisedComment("config.core.kickonstop.flag")
     private boolean kickOnStop = false;
 
-    @Default("Server closed")
-    @Setting(value = "message", comment = "config.core.kickonstop.message")
+    @DefaultValueSetting(key = "message", defaultValue = "Server closed")
+    @LocalisedComment("config.core.kickonstop.message")
     private NucleusTextTemplateImpl kickOnStopMessage;
 
     public boolean isKickOnStop() {

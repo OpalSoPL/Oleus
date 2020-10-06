@@ -4,9 +4,10 @@
  */
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
-import com.google.common.reflect.TypeParameter;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeFactory;
+import io.leangen.geantyref.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -23,12 +24,10 @@ public class MappedListDataKey<K, V, O extends IKeyedDataObject<?>> extends Data
     private final TypeToken<K> keyType;
     private final TypeToken<V> valueType;
 
-    private static <Key, Value> TypeToken<Map<Key, List<Value>>> createMapListToken(
+    private static <Key, Value> Type createMapListToken(
             final TypeToken<Key> keyToken,
             final TypeToken<Value> valueToken) {
-        return new TypeToken<Map<Key, List<Value>>>() {}
-                .where(new TypeParameter<Key>() {}, keyToken)
-                .where(new TypeParameter<Value>() {}, valueToken);
+        return TypeFactory.parameterizedClass(Map.class, keyToken.getType(), TypeFactory.parameterizedClass(List.class, valueToken.getType()));
     }
 
     public MappedListDataKey(final String[] key, final TypeToken<K> keyType, final TypeToken<V> valueType, final Class<O> target) {

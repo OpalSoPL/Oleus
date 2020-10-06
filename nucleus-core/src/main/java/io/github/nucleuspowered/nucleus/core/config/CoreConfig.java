@@ -4,67 +4,79 @@
  */
 package io.github.nucleuspowered.nucleus.core.config;
 
-import io.github.nucleuspowered.neutrino.annotations.DoNotGenerate;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class CoreConfig {
 
-    @Setting(value = "debug-mode", comment = "config.debugmode")
+    @Setting(value = "debug-mode")
+    @LocalisedComment("config.debugmode")
     private boolean debugmode = false;
 
-    @Setting(value = "print-on-autosave", comment = "config.printonautosave")
+    @Setting(value = "print-on-autosave")
+    @LocalisedComment("config.printonautosave")
     private boolean printOnAutosave = false;
 
-    @Setting(value = "use-custom-message-file", comment = "config.custommessages")
+    @Setting(value = "use-custom-message-file")
+    @LocalisedComment("config.custommessages")
     private boolean custommessages = false;
 
-    @Setting(value = "warmup-canceling", comment = "config.core.warmup.info")
+    @Setting(value = "warmup-canceling")
+    @LocalisedComment("config.core.warmup.info")
     private WarmupConfig warmupConfig = new WarmupConfig();
 
-    @Setting(value = "command-on-name-click", comment = "config.core.commandonname")
+    @Setting(value = "command-on-name-click")
+    @LocalisedComment("config.core.commandonname")
     private String commandOnNameClick = "/msg {{subject}}";
 
     @Setting(value = "kick-on-stop")
     private KickOnStopConfig kickOnStop = new KickOnStopConfig();
 
-    @DoNotGenerate
-    @Setting(value = "simulate-error-on-startup")
-    private boolean errorOnStartup = false;
-
-    @Setting(value = "safe-teleport-check", comment = "config.core.safeteleport")
+    @Setting(value = "safe-teleport-check")
+    @LocalisedComment("config.core.safeteleport")
     private SafeTeleportConfig safeTeleportConfig = new SafeTeleportConfig();
 
-    @Setting(value = "console-overrides-exemptions", comment = "config.core.consoleoverrides")
+    @Setting(value = "console-overrides-exemptions")
+    @LocalisedComment("config.core.consoleoverrides")
     private boolean consoleOverride = true;
 
-    @Setting(value = "check-for-wildcard", comment = "config.core.wildcard")
+    @Setting(value = "check-for-wildcard")
+    @LocalisedComment("config.core.wildcard")
     private boolean checkForWildcard = true;
 
-    @Setting(value = "more-accurate-visitor-count", comment = "config.core.accurate")
+    @Setting(value = "more-accurate-visitor-count")
+    @LocalisedComment("config.core.accurate")
     private boolean moreAccurate = false;
 
-    @Setting(value = "override-language", comment = "config.core.language")
+    @Setting(value = "override-language")
+    @LocalisedComment("config.core.language")
     private String serverLocale = "default";
 
-    @Setting(value = "data-file-location", comment = "config.core.datafilelocation")
+    @Setting(value = "data-file-location")
+    @LocalisedComment("config.core.datafilelocation")
     private String dataFileLocation = "default";
 
-    @Setting(value = "offline-user-tab-limit", comment = "config.core.offlineusertablimit")
+    @Setting(value = "offline-user-tab-limit")
+    @LocalisedComment("config.core.offlineusertablimit")
     private int nicknameArgOfflineLimit = 20;
 
-    @Setting(value = "enable-parent-perms", comment = "config.core.parentperms")
+    @Setting(value = "enable-parent-perms")
+    @LocalisedComment("config.core.parentperms")
     private boolean useParentPerms = true;
 
-    @Setting(value = "enable-partial-name-matching", comment = "config.core.partialname")
+    @Setting(value = "enable-partial-name-matching")
+    @LocalisedComment("config.core.partialname")
     private boolean partialMatch = true;
 
-    @Setting(value = "use-client-locale-where-possible", comment = "config.core.clientlocale")
+    @Setting(value = "use-client-locale-where-possible")
+    @LocalisedComment("config.core.clientlocale")
     private boolean clientLocale = false;
 
-    @Setting(value = "give-default-group-user-permissions", comment = "config.core.defaultperms")
+    @Setting(value = "give-default-group-user-permissions")
+    @LocalisedComment("config.core.defaultperms")
     private boolean giveDefaultsUserPermissions = false;
 
     public String getDataFileLocation() {
@@ -97,10 +109,6 @@ public class CoreConfig {
 
     public NucleusTextTemplateImpl getKickOnStopMessage() {
         return this.kickOnStop.getKickOnStopMessage();
-    }
-
-    public boolean isErrorOnStartup() {
-        return this.errorOnStartup;
     }
 
     public SafeTeleportConfig getSafeTeleportConfig() {

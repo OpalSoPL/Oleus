@@ -5,16 +5,14 @@
 package io.github.nucleuspowered.nucleus.configurate.datatypes;
 
 import net.kyori.adventure.text.Component;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 @ConfigSerializable
 public class WarpNode extends LocationNode {

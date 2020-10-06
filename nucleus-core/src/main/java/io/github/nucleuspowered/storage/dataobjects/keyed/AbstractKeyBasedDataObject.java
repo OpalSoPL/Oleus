@@ -5,12 +5,11 @@
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends AbstractConfigurateBackedDataObject implements IKeyedDataObject<T> {
 
@@ -24,9 +23,10 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
     }
 
     @Nullable
+    @SuppressWarnings("unchecked")
     public <V> V getNullable(final DataKey<V, ? extends T> dataKey) {
         try {
-            return this.getNode(dataKey.getDataPath()).getValue(dataKey.getType());
+            return (V) this.getNode(dataKey.getDataPath()).getValue(dataKey.getKeyType());
         } catch (final ObjectMappingException e) {
             e.printStackTrace();
             return null;
@@ -49,7 +49,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
 
     public <V> boolean set(final DataKey<V, ? extends T> dataKey, final V data) {
         try {
-            this.getNode(dataKey.getDataPath()).setValue(dataKey.getType(), data);
+            this.getNode(dataKey.getDataPath()).setValue(dataKey.getKeyType(), data);
             return true;
         } catch (final ObjectMappingException e) {
             e.printStackTrace();
@@ -70,7 +70,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
         return r;
     }
 
-    public class ValueImpl<V, B extends T> implements IKeyedDataObject.Value<V> {
+    public final class ValueImpl<V, B extends T> implements IKeyedDataObject.Value<V> {
 
         @Nullable private V value;
         private final DataKey<V, B> dataKey;

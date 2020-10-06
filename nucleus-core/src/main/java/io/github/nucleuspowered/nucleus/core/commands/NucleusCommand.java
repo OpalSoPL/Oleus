@@ -21,7 +21,7 @@ import org.spongepowered.api.command.exception.CommandException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Command(
         aliases = "nucleus",

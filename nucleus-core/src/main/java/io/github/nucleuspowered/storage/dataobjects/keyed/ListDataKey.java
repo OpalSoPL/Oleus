@@ -5,8 +5,11 @@
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
 import com.google.common.reflect.TypeParameter;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeFactory;
+import io.leangen.geantyref.TypeToken;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -20,12 +23,12 @@ public class ListDataKey<R, O extends IKeyedDataObject<?>> extends DataKeyImpl<L
 
     private final TypeToken<R> innerType;
 
-    private static <S> TypeToken<List<S>> createListToken(final TypeToken<S> innerToken) {
-        return new TypeToken<List<S>>() {}.where(new TypeParameter<S>() {}, innerToken);
+    private static <S> Type createListToken(final TypeToken<S> innerToken) {
+        return TypeFactory.parameterizedClass(List.class, innerToken.getType());
     }
 
     public ListDataKey(final String[] key, final TypeToken<R> type, final Class<O> target) {
-        super(key, createListToken(type), target, null);
+        super(key, ListDataKey.createListToken(type), target, null);
         this.innerType = type;
     }
 

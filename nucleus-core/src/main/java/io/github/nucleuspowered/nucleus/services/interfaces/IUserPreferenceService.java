@@ -9,13 +9,11 @@ import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.UserPreferenceService;
-import org.spongepowered.api.entity.living.player.User;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
-import javax.annotation.Nullable;
 
 @ImplementedBy(UserPreferenceService.class)
 public interface IUserPreferenceService extends NucleusUserPreferenceService {

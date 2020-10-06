@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.services.impl.usercache;
 
 import com.google.common.collect.Maps;
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.configurate.datatypes.UserCacheDataNode;
 import io.github.nucleuspowered.nucleus.configurate.datatypes.UserCacheVersionNode;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
@@ -16,9 +15,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserCacheService;
 import io.github.nucleuspowered.storage.services.IStorageService;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.gson.GsonConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.util.Identifiable;
 
@@ -34,6 +31,9 @@ import java.util.stream.Collectors;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.gson.GsonConfigurationLoader;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
 
 @Singleton
 public class UserCacheService implements IUserCacheService, IReloadableService.DataLocationReloadable {
@@ -62,7 +62,7 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         try {
             this.data = this.configurationLoader()
                     .load()
-                    .getValue(TypeToken.of(UserCacheVersionNode.class), (Supplier<UserCacheVersionNode>) UserCacheVersionNode::new);
+                    .getValue(TypeToken.get(UserCacheVersionNode.class), (Supplier<UserCacheVersionNode>) UserCacheVersionNode::new);
         } catch (final IOException | ObjectMappingException e) {
             e.printStackTrace();
             this.data = new UserCacheVersionNode();
@@ -72,8 +72,8 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
     @Override public void save() {
         try {
             final GsonConfigurationLoader gsonConfigurationLoader = this.configurationLoader();
-            final ConfigurationNode node = gsonConfigurationLoader.createEmptyNode();
-            node.setValue(TypeToken.of(UserCacheVersionNode.class), this.data);
+            final ConfigurationNode node = gsonConfigurationLoader.createNode();
+            node.setValue(TypeToken.get(UserCacheVersionNode.class), this.data);
             gsonConfigurationLoader.save(node);
         } catch (final ObjectMappingException | IOException e) {
             e.printStackTrace();

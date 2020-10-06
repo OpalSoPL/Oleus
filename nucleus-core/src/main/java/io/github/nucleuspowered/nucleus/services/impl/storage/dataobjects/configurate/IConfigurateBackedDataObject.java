@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate;
 
 import io.github.nucleuspowered.storage.dataobjects.IDataObject;
-import ninja.leaping.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
 
 public interface IConfigurateBackedDataObject extends IDataObject {
 

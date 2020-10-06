@@ -5,17 +5,19 @@
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
 import com.google.common.reflect.TypeToken;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
+import java.lang.reflect.Type;
+
 
 public class DataKeyImpl<R, O extends IKeyedDataObject<?>> implements DataKey<R, O> {
 
     private final String[] key;
-    private final TypeToken<R> type;
+    private final Type type;
     private final R def;
     private final Class<O> target;
 
-    public DataKeyImpl(final String[] key, final TypeToken<R> type, final Class<O> target, @Nullable final R def) {
+    public DataKeyImpl(final String[] key, final Type type, final Class<O> target, @Nullable final R def) {
         this.key = key;
         this.type = type;
         this.def = def;
@@ -30,7 +32,7 @@ public class DataKeyImpl<R, O extends IKeyedDataObject<?>> implements DataKey<R,
         return this.key;
     }
 
-    @Override public TypeToken<R> getType() {
+    @Override public Type getKeyType() {
         return this.type;
     }
 

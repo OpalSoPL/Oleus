@@ -8,8 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ValueType;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,7 @@ public final class ConfigurationNodeJsonTranslator {
     // The node has map
     public JsonObject jsonFrom(final ConfigurationNode node) {
         final JsonObject object = new JsonObject();
-        if (!node.hasMapChildren()) {
+        if (!node.isMap()) {
             // nope.
             return object;
         }
@@ -52,11 +51,11 @@ public final class ConfigurationNodeJsonTranslator {
 
     private JsonElement fromNode(final ConfigurationNode value) {
         JsonElement element = null;
-        if (value.getValueType() == ValueType.MAP) {
+        if (value.isMap()) {
             element = this.jsonFrom(value);
-        } else if (value.getValueType() == ValueType.LIST) {
+        } else if (value.isList()) {
             element = this.jsonFromList(value.getChildrenList());
-        } else if (value.getValueType() == ValueType.SCALAR) {
+        } else if (!value.isVirtual()){
             element = this.jsonFromScalar(value.getValue());
         }
 
@@ -87,7 +86,7 @@ public final class ConfigurationNodeJsonTranslator {
     private void parseArray(final JsonArray array, final ConfigurationNode node) {
         for (final JsonElement element : array) {
             if (!element.isJsonNull()) {
-                this.parseElement(element, node.getAppendedNode());
+                this.parseElement(element, node.appendListNode());
             }
         }
     }

@@ -57,10 +57,10 @@ public class SetNucleusLanguageCommand implements ICommandExecutor {
         final NucleusUserPreferenceService.PreferenceKey<Locale> preferenceKey = this.preferenceService.keys().playerLocale().get();
 
         if (locale.toString().isEmpty()) {
-            this.preferenceService.removePreferenceFor(target, preferenceKey);
+            this.preferenceService.removePreferenceFor(target.getUniqueId(), preferenceKey);
             locale = Locale.UK;
         } else {
-            this.preferenceService.setPreferenceFor(target, preferenceKey, locale);
+            this.preferenceService.setPreferenceFor(target.getUniqueId(), preferenceKey, locale);
         }
 
         if (!context.is(target)) {

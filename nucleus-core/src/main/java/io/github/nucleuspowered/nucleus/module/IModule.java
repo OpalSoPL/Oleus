@@ -10,6 +10,10 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.serialize.TypeSerializerCollection;
+import org.spongepowered.configurate.transformation.ConfigurationTransformation;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +42,15 @@ public interface IModule {
     interface Configurable<T> extends IModule {
 
         Class<T> getConfigClass();
+
+        default Collection<ConfigurationTransformation<CommentedConfigurationNode>> getTransformations() {
+            return Collections.emptyList();
+        }
+
+        @Nullable
+        default TypeSerializerCollection moduleTypeSerializers() {
+            return null;
+        }
 
     }
 

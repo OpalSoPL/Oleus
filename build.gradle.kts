@@ -118,9 +118,9 @@ dependencies {
     implementation(project.properties["qsmlDep"]?.toString()!!)  {
         exclude("org.spongepowered", "configurate-core")
     }
-    implementation(project.properties["neutrinoDep"]?.toString()!!)  {
+/*    implementation(project.properties["neutrinoDep"]?.toString()!!)  {
         exclude("org.spongepowered", "configurate-core")
-    }
+    } */
 }
 
 /**

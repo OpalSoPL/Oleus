@@ -9,12 +9,11 @@ import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 import io.github.nucleuspowered.storage.util.KeyedObject;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nonnull;
 
 /**
  * The entry point into the storage system. All storage checks are not dependent on the main thread,
@@ -94,7 +93,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param value The data to save.
          * @return A {@link CompletableFuture} that may contain an exception.
          */
-        CompletableFuture<Void> save(@Nonnull D value);
+        CompletableFuture<Void> save(@NonNull D value);
     }
 
     /**
@@ -155,7 +154,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param key The key
          * @return The object, if it exists
          */
-        CompletableFuture<Optional<D>> get(@Nonnull K key);
+        CompletableFuture<Optional<D>> get(@NonNull K key);
 
         /**
          * Gets the object based on the provided key, if it exists.
@@ -163,7 +162,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param key The key
          * @return The object, if it exists
          */
-        Optional<D> getOnThread(@Nonnull K key);
+        Optional<D> getOnThread(@NonNull K key);
 
         /**
          * Gets the data, or a new {@link D}.
@@ -171,7 +170,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param key The key
          * @return The {@link D}
          */
-        default CompletableFuture<D> getOrNew(@Nonnull final K key) {
+        default CompletableFuture<D> getOrNew(@NonNull final K key) {
             return this.get(key).thenApply(d -> d.orElseGet(() -> {
                 final D result = this.createNew();
                 this.save(key, result);
@@ -185,7 +184,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param key The key
          * @return The object, if it exists
          */
-        default D getOrNewOnThread(@Nonnull final K key) {
+        default D getOrNewOnThread(@NonNull final K key) {
             return this.getOnThread(key).orElseGet(() -> {
                 final D result = this.createNew();
                 this.save(key, result);
@@ -202,7 +201,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param query The query
          * @return The {@link CompletableFuture} containing the result, or an exception.
          */
-        CompletableFuture<Optional<KeyedObject<K, D>>> get(@Nonnull Q query);
+        CompletableFuture<Optional<KeyedObject<K, D>>> get(@NonNull Q query);
 
         /**
          * Gets all objects that match the specified query.
@@ -213,7 +212,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param query The query
          * @return The {@link CompletableFuture} containing the results, if any
          */
-        CompletableFuture<Map<K, D>> getAll(@Nonnull Q query);
+        CompletableFuture<Map<K, D>> getAll(@NonNull Q query);
 
         /**
          * Gets whether the object with the associated key exists.
@@ -221,7 +220,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param key The key
          * @return The {@link CompletableFuture} containing the whether the object exists
          */
-        CompletableFuture<Boolean> exists(@Nonnull K key);
+        CompletableFuture<Boolean> exists(@NonNull K key);
 
         /**
          * Gets whether at least one result can be returned by the associated query.
@@ -232,7 +231,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param query The query
          * @return The {@link CompletableFuture} containing the whether an object exists
          */
-        default CompletableFuture<Boolean> exists(@Nonnull final Q query) {
+        default CompletableFuture<Boolean> exists(@NonNull final Q query) {
             return this.count(query).thenApply(x -> x > 0);
         }
 
@@ -245,7 +244,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param query The query
          * @return The {@link CompletableFuture} containing the count
          */
-        CompletableFuture<Integer> count(@Nonnull Q query);
+        CompletableFuture<Integer> count(@NonNull Q query);
 
         /**
          * Saves an object of type {@link D} against the primary key of type {@link K}.
@@ -254,7 +253,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param value The value of the object
          * @return A {@link CompletableFuture} that will contain an exception if there was a failure
          */
-        CompletableFuture<Void> save(@Nonnull K key, @Nonnull D value);
+        CompletableFuture<Void> save(@NonNull K key, @NonNull D value);
 
         /**
          * Deletes the object associated with the key {@link K}.
@@ -262,7 +261,7 @@ public interface IStorageService<D extends IDataObject> {
          * @param key The key to delete the object for
          * @return A {@link CompletableFuture} that will contain an exception if there was a failure
          */
-        CompletableFuture<Void> delete(@Nonnull K key);
+        CompletableFuture<Void> delete(@NonNull K key);
 
         /**
          * Indicates the data is also keyed.
@@ -283,7 +282,7 @@ public interface IStorageService<D extends IDataObject> {
              * @param <T2> The type of data to save
              * @return A {@link CompletableFuture} that will contain an exception if there was a failure
              */
-            <T2> CompletableFuture<Void> setAndSave(@Nonnull K key, DataKey<T2, ? extends D> dataKey, T2 data);
+            <T2> CompletableFuture<Void> setAndSave(@NonNull K key, DataKey<T2, ? extends D> dataKey, T2 data);
         }
     }
 

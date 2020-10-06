@@ -35,10 +35,11 @@ dependencies {
 
     val dep = "org.spongepowered:spongeapi:${rootProject.properties["spongeApiVersion"]}"
     annotationProcessor(dep)
-    implementation(dep)
-
-    implementation(rootProject.properties["neutrinoDep"]?.toString()!!) {
+    implementation(dep) {
         exclude("org.spongepowered", "configurate-core")
+        exclude("org.spongepowered", "configurate-gson")
+        exclude("org.spongepowered", "configurate-hocon")
+        exclude("org.spongepowered", "configurate-yaml")
     }
 
     testCompile("org.mockito:mockito-all:1.10.19")

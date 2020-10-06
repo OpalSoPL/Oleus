@@ -20,7 +20,12 @@ repositories {
 }
 
 dependencies {
-    implementation("org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"])
+    implementation("org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]) {
+        exclude("org.spongepowered", "configurate-core")
+        exclude("org.spongepowered", "configurate-gson")
+        exclude("org.spongepowered", "configurate-hocon")
+        exclude("org.spongepowered", "configurate-yaml")
+    }
 }
 
 val filenameSuffix = "SpongeAPI${rootProject.properties["declaredApiVersion"]}"

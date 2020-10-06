@@ -5,9 +5,12 @@
 package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.transformation.ConfigurationTransformation;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -22,9 +25,11 @@ public interface IConfigProvider {
      *
      * @param moduleId The module ID of the config.
      * @param typeOfConfig The type of configuration object.
+     * @param transformationCollection The {@link ConfigurationTransformation}s to apply.
      * @param <T> The type of config
      */
-    <T> void registerModuleConfig(String moduleId, Class<T> typeOfConfig);
+    <T> void registerModuleConfig(String moduleId, Class<T> typeOfConfig,
+            Collection<ConfigurationTransformation<CommentedConfigurationNode>> transformationCollection);
 
     /**
      * Gets the configuration of the given type.
@@ -40,9 +45,9 @@ public interface IConfigProvider {
 
     <T> T getDefaultModuleConfig(Class<T> configType) throws IllegalArgumentException;
 
-    void mergeCoreDefaults() throws IOException, ObjectMappingException;
+    void prepareCoreConfig(Collection<ConfigurationTransformation<CommentedConfigurationNode>> coreConfigurationTransformations) throws IOException, ObjectMappingException;
 
-    void mergeModuleDefaults() throws IOException, ObjectMappingException;
+    void prepareModuleConfig() throws IOException, ObjectMappingException;
 
     String getCoreConfigFileName();
 

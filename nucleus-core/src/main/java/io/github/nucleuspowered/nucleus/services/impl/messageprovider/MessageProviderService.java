@@ -24,8 +24,8 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.util.locale.LocaleSource;
 import org.spongepowered.api.util.locale.Locales;
@@ -41,9 +41,6 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 @Singleton
 public class MessageProviderService implements IMessageProviderService, IReloadableService.Reloadable {
@@ -79,9 +76,8 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     private final Map<Locale, PropertiesMessageRepository> messagesMap = new HashMap<>();
     private final LoadingCache<UUID, Locale> localeCache = Caffeine.newBuilder()
             .build(new CacheLoader<UUID, Locale>() {
-                @CheckForNull
                 @Override
-                public Locale load(@Nonnull final UUID key) {
+                public Locale load(@NonNull final UUID key) {
                     final NucleusUserPreferenceService.PreferenceKey<Locale> l =
                             MessageProviderService.this.userPreferenceService.keys().playerLocale().get();
                     return MessageProviderService.this.userPreferenceService.get(key, l).orElse(new Locale(""));

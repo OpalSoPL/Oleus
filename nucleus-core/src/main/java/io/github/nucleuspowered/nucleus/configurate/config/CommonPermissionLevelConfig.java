@@ -4,17 +4,20 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class CommonPermissionLevelConfig {
 
-    @Setting(value = "use-permission-level", comment = "config.common.permission-level")
-private boolean useLevels = false;
+    @Setting(value = "use-permission-level")
+    @LocalisedComment("config.common.permission-level")
+    private boolean useLevels = false;
 
-    @Setting(value = "can-affect-same-level", comment = "config.common.same-level")
-private boolean canAffectSameLevel = false;
+    @Setting(value = "can-affect-same-level")
+    @LocalisedComment("config.common.same-level")
+    private boolean canAffectSameLevel = false;
 
     public boolean isUseLevels() {
         return this.useLevels;

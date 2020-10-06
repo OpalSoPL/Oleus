@@ -5,26 +5,27 @@
 package io.github.nucleuspowered.nucleus.services.impl.configprovider;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import io.leangen.geantyref.TypeToken;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.transformation.ConfigurationTransformation;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-// TODO
 @Singleton
 public class ConfigProvider implements IConfigProvider {
 
@@ -43,6 +44,7 @@ public class ConfigProvider implements IConfigProvider {
     @Nullable private CommentedConfigurationNode moduleNode = null;
     @Nullable private CoreConfig coreConfig = null;
     private final Map<String, Class<?>> moduleConfigs = new HashMap<>();
+    private final Map<Class<?>, Collection<ConfigurationTransformation<CommentedConfigurationNode>>> moduleTransformations = new HashMap<>();
     private final Map<Class<?>, Supplier<?>> providers = new HashMap<>();
     private final Map<Class<?>, Object> cachedConfig = new HashMap<>();
 
@@ -58,11 +60,13 @@ public class ConfigProvider implements IConfigProvider {
 
     @Override
     public CoreConfig getCoreConfig() {
-        return null;
+        return this.coreConfig;
     }
 
-    @Override public <T> void registerModuleConfig(final String moduleId,
-            final Class<T> typeOfConfig) {
+    @Override
+    public <T> void registerModuleConfig(final String moduleId,
+            final Class<T> typeOfConfig,
+            final Collection<ConfigurationTransformation<CommentedConfigurationNode>> configurationTransformationCollection) {
         if (this.providers.containsKey(typeOfConfig) || this.moduleConfigs.containsKey(moduleId)) {
             throw new IllegalStateException("Cannot register type or module more than once!");
         }
@@ -100,14 +104,14 @@ public class ConfigProvider implements IConfigProvider {
     }
 
     public void loadCore(final boolean actualLoad) throws IOException, ObjectMappingException {
-        if (actualLoad) {
+        if (this.coreNode == null || actualLoad) {
             this.coreNode = this.coreLoader.load();
         }
-        this.coreConfig = this.coreNode.getValue(TypeToken.of(CoreConfig.class), (Supplier<CoreConfig>) CoreConfig::new);
+        this.coreConfig = this.coreNode.getValue(io.leangen.geantyref.TypeToken.get(CoreConfig.class), (Supplier<CoreConfig>) CoreConfig::new);
     }
 
     public void loadModules(final boolean actualLoad) throws IOException {
-        if (actualLoad) {
+        if (this.moduleNode == null || actualLoad) {
             this.moduleNode = this.modulesLoader.load();
         }
         this.cachedConfig.clear();
@@ -121,17 +125,19 @@ public class ConfigProvider implements IConfigProvider {
         }
     }
 
-    @Override public void mergeCoreDefaults() throws IOException, ObjectMappingException {
+    @Override public void prepareCoreConfig(final Collection<ConfigurationTransformation<CommentedConfigurationNode>> coreConfigurationTransformations)
+            throws IOException, ObjectMappingException {
         final CommentedConfigurationNode coreToSave = this.coreLoader.load();
-        coreToSave.mergeValuesFrom(this.coreLoader.createEmptyNode().setValue(TypeToken.of(CoreConfig.class), new CoreConfig()));
+        coreConfigurationTransformations.forEach(x -> x.apply(coreToSave));
+        coreToSave.mergeValuesFrom(this.coreLoader.createNode().setValue(TypeToken.get(CoreConfig.class), new CoreConfig()));
         this.coreLoader.save(coreToSave);
         this.coreNode = coreToSave;
         this.loadCore(false);
     }
 
-    @Override public void mergeModuleDefaults() throws IOException, ObjectMappingException {
+    @Override public void prepareModuleConfig() throws IOException, ObjectMappingException {
         final CommentedConfigurationNode modulesToSave = this.modulesLoader.load();
-        final CommentedConfigurationNode defaults = this.modulesLoader.createEmptyNode();
+        final CommentedConfigurationNode defaults = this.modulesLoader.createNode();
         for (final Map.Entry<String, Class<?>> moduleClass : this.moduleConfigs.entrySet()) {
              this.set(defaults.getNode(moduleClass.getKey()), moduleClass.getValue());
         }
@@ -151,12 +157,12 @@ public class ConfigProvider implements IConfigProvider {
 
     @SuppressWarnings("unchecked")
     private <T> T get(final CommentedConfigurationNode node, final Class<T> clazz) throws ObjectMappingException {
-        return node.getValue(TypeToken.of(clazz), (Supplier<T>) () -> (T) this.providers.get(clazz).get());
+        return node.getValue(TypeToken.get(clazz), (Supplier<T>) () -> (T) this.providers.get(clazz).get());
     }
 
     @SuppressWarnings("unchecked")
     private <T> void set(final CommentedConfigurationNode node, final Class<T> clazz) throws ObjectMappingException {
-        node.setValue(TypeToken.of(clazz), (T) this.providers.get(clazz).get());
+        node.setValue(TypeToken.get(clazz), (T) this.providers.get(clazz).get());
     }
 
     @Override

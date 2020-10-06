@@ -4,17 +4,20 @@
  */
 package io.github.nucleuspowered.nucleus.core.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class WarmupConfig {
 
-    @Setting(value = "cancel-on-move", comment = "config.core.warmup.move")
-private boolean onMove = true;
+    @Setting(value = "cancel-on-move")
+    @LocalisedComment("config.core.warmup.move")
+    private boolean onMove = true;
 
-    @Setting(value = "cancel-on-command", comment = "config.core.warmup.command")
-private boolean onCommand = true;
+    @Setting(value = "cancel-on-command")
+    @LocalisedComment("config.core.warmup.command")
+    private boolean onCommand = true;
 
     public boolean isOnMove() {
         return this.onMove;

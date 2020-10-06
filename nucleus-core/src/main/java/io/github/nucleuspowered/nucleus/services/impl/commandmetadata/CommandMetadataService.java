@@ -8,7 +8,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
@@ -26,11 +25,12 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.util.Action;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -177,9 +177,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             if (commandNode.getNode(ENABLED).getBoolean(false)) {
                 // Get the aliases
                 try {
-                    final Map<String, Boolean> m = commandNode
-                            .getNode(ROOT_ALIASES)
-                            .getValue(MAP_TYPE_TOKEN);
+                    final Map<String, Boolean> m = commandNode.getNode(ROOT_ALIASES).getValue(MAP_TYPE_TOKEN);
                     if (m != null) {
                             m.entrySet()
                                 .stream()
@@ -401,8 +399,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
     private void load() {
         try {
-            this.commandsConfConfigNode = HoconConfigurationLoader
-                    .builder()
+            this.commandsConfConfigNode = HoconConfigurationLoader.builder()
                     .setPath(this.commandsFile)
                     .build()
                     .load();
@@ -414,8 +411,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
     private void save() {
         try {
-            HoconConfigurationLoader
-                    .builder()
+            HoconConfigurationLoader.builder()
                     .setPath(this.commandsFile)
                     .build()
                     .save(this.commandsConfConfigNode);

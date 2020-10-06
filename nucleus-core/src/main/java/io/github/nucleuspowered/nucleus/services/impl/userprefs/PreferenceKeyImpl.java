@@ -4,25 +4,20 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.userprefs;
 
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
-import io.github.nucleuspowered.nucleus.module.IModuleProvider;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.IModuleReporter;
 import io.github.nucleuspowered.nucleus.util.TriConsumer;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKeyImpl;
+import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiPredicate;
-
-import javax.annotation.Nullable;
 
 public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implements NucleusUserPreferenceService.PreferenceKey<T> {
 
@@ -73,7 +68,7 @@ public class PreferenceKeyImpl<T> extends DataKeyImpl<T, IUserDataObject> implem
             final BiPredicate<INucleusServiceCollection, UUID> canAccess,
             final String descriptionKey,
             final TriConsumer<INucleusServiceCollection, UUID, T> onSet) {
-        super(new String[] { "user-prefs", key.asString() }, TypeToken.of(clazz), IUserDataObject.class, def);
+        super(new String[] { "user-prefs", key.asString() }, TypeToken.get(clazz).getType(), IUserDataObject.class, def);
         this.key = key;
         this.def = def;
         this.clazz = clazz;

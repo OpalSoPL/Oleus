@@ -10,13 +10,12 @@ import io.github.nucleuspowered.storage.dataobjects.IDataObject;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.services.IStorageService;
 import io.github.nucleuspowered.storage.services.ServicesUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
-
-import javax.annotation.Nonnull;
 
 public class SingleCachedService<O extends IDataObject> implements IStorageService.SingleCached<O> {
 
@@ -106,7 +105,7 @@ public class SingleCachedService<O extends IDataObject> implements IStorageServi
     }
 
     @Override
-    public CompletableFuture<Void> save(@Nonnull final O value) {
+    public CompletableFuture<Void> save(@NonNull final O value) {
         return ServicesUtil.run(() -> {
             this.repositorySupplier.get().save(this.dataAccessSupplier.get().toDataAccessObject(value));
             this.cached = value;

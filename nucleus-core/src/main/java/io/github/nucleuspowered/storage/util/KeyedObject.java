@@ -4,10 +4,10 @@
  */
 package io.github.nucleuspowered.storage.util;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Optional;
 import java.util.function.Function;
-
-import javax.annotation.Nullable;
 
 public class KeyedObject<K, O> {
 

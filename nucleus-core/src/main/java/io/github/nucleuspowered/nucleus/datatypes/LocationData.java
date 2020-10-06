@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.datatypes;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
@@ -13,8 +14,6 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.text.MessageFormat;
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 public class LocationData implements NamedLocation {
 

@@ -12,11 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.text.Component;
-import ninja.leaping.configurate.ConfigurationNode;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.Optional;
 

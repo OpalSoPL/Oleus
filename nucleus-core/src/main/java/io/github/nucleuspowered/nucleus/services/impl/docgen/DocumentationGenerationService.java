@@ -4,14 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.docgen;
 
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.core.docgen.CommandDoc;
 import io.github.nucleuspowered.nucleus.core.docgen.EssentialsDoc;
 import io.github.nucleuspowered.nucleus.core.docgen.PermissionDoc;
 import io.github.nucleuspowered.nucleus.core.docgen.TokenDoc;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
@@ -19,24 +17,23 @@ import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandMetadata;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.services.impl.placeholder.PlaceholderMetadata;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICommandMetadataService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IDocumentationGenerationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
+import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.SimpleConfigurationNode;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.event.CauseStackManager;
-import org.yaml.snakeyaml.DumperOptions;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.yaml.NodeStyle;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -207,12 +204,17 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                             .setDescription(messageProviderService.getMessageString("nucleus.token." + x.getToken().toLowerCase())))
                     .collect(Collectors.toList());
 
+            final YamlConfigurationLoader configurationLoader = YamlConfigurationLoader.builder()
+                    .setPath(directory.resolve("commands.yml"))
+                    .setNodeStyle(NodeStyle.BLOCK)
+                    .build();
+
             // Now do all the saving
             // Config files
             final Map<String, Class<?>> configs = this.serviceCollection
                     .configProvider()
                     .getModuleToConfigType();
-            final ConfigurationNode configNode = SimpleConfigurationNode.root();
+            final ConfigurationNode configNode = configurationLoader.createNode();
             for (final Map.Entry<String, Class<?>> entry : configs.entrySet()) {
                 try {
                     configNode.getNode(entry.getKey()).setValue(this.createConfigString(entry.getValue().newInstance()));
@@ -222,33 +224,34 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
             }
 
             // Generate command file.
-            final YAMLConfigurationLoader configurationLoader = YAMLConfigurationLoader.builder()
-                    .setPath(directory.resolve("commands.yml"))
-                    .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-            final ConfigurationNode commandConfigurationNode = ConfigurationNode.root().setValue(COMMAND_DOC_LIST_TYPE_TOKEN, lcd);
+            final ConfigurationNode commandConfigurationNode = configurationLoader.createNode().setValue(COMMAND_DOC_LIST_TYPE_TOKEN, lcd);
             configurationLoader.save(commandConfigurationNode);
 
-            final YAMLConfigurationLoader permissionsConfigurationLoader = YAMLConfigurationLoader.builder()
+            final YamlConfigurationLoader permissionsConfigurationLoader = YamlConfigurationLoader.builder()
                     .setPath(directory.resolve("permissions.yml"))
-                    .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-            final ConfigurationNode permissionConfiguationNode = ConfigurationNode.root().setValue(PERMISSION_DOC_LIST_TYPE_TOKEN, permdocs);
+                    .setNodeStyle(NodeStyle.BLOCK)
+                    .build();
+            final ConfigurationNode permissionConfiguationNode = configurationLoader.createNode().setValue(PERMISSION_DOC_LIST_TYPE_TOKEN, permdocs);
             permissionsConfigurationLoader.save(permissionConfiguationNode);
 
-            final YAMLConfigurationLoader essentialsConfigurationLoader = YAMLConfigurationLoader.builder()
+            final YamlConfigurationLoader essentialsConfigurationLoader = YamlConfigurationLoader.builder()
                     .setPath(directory.resolve("essentials.yml"))
-                    .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-            final ConfigurationNode essentialsConfigurationNode = ConfigurationNode.root().setValue(ESSENTIALS_DOC_LIST_TYPE_TOKEN, essentialsDocs);
+                    .setNodeStyle(NodeStyle.BLOCK)
+                    .build();
+            final ConfigurationNode essentialsConfigurationNode = configurationLoader.createNode().setValue(ESSENTIALS_DOC_LIST_TYPE_TOKEN, essentialsDocs);
             essentialsConfigurationLoader.save(essentialsConfigurationNode);
 
-            final YAMLConfigurationLoader configurationConfigurationLoader = YAMLConfigurationLoader.builder()
+            final YamlConfigurationLoader configurationConfigurationLoader = YamlConfigurationLoader.builder()
                     .setPath(directory.resolve("conf.yml"))
-                    .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
+                    .setNodeStyle(NodeStyle.BLOCK)
+                    .build();
             configurationConfigurationLoader.save(configNode);
 
-            final YAMLConfigurationLoader tokensConfigurationLoader = YAMLConfigurationLoader.builder()
+            final YamlConfigurationLoader tokensConfigurationLoader = YamlConfigurationLoader.builder()
                     .setPath(directory.resolve("tokens.yml"))
-                    .setFlowStyle(DumperOptions.FlowStyle.BLOCK).build();
-            final ConfigurationNode tokensConfigNode = ConfigurationNode.root().setValue(TOKEN_DOC_LIST_TYPE_TOKEN, tokenDocs);
+                    .setNodeStyle(NodeStyle.BLOCK)
+                    .build();
+            final ConfigurationNode tokensConfigNode = configurationLoader.createNode().setValue(TOKEN_DOC_LIST_TYPE_TOKEN, tokenDocs);
             tokensConfigurationLoader.save(tokensConfigNode);
         }
     }
@@ -275,10 +278,10 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
     private String createConfigString(final Object obj) throws IOException {
         try (final StringWriter sw = new StringWriter(); final BufferedWriter writer = new BufferedWriter(sw)) {
             final HoconConfigurationLoader hcl = HoconConfigurationLoader.builder()
-                    .setDefaultOptions(this.serviceCollection.configurateHelper().setOptions(ConfigurationOptions.defaults()))
+                    .setDefaultOptions(this.serviceCollection.configurateHelper().getOptions())
                     .setSink(() -> writer)
                     .build();
-            final CommentedConfigurationNode cn = hcl.createEmptyNode(this.serviceCollection.configurateHelper().setOptions(hcl.getDefaultOptions()));
+            final CommentedConfigurationNode cn = hcl.createNode(this.serviceCollection.configurateHelper().getOptions());
             this.applyToNode(obj.getClass(), obj, cn);
             hcl.save(cn);
             return sw.toString();
@@ -287,7 +290,7 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
 
     private <T> void applyToNode(final Class<T> c, final Object object, final ConfigurationNode node) {
         try {
-            node.setValue(TypeToken.of(c), c.cast(object));
+            node.setValue(TypeToken.get(c), c.cast(object));
         } catch (final ObjectMappingException e) {
             e.printStackTrace();
         }

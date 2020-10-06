@@ -12,7 +12,7 @@ import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public interface NucleusProvider extends IPlayerInformationService.Provider {
 

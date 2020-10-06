@@ -4,15 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus;
 
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Injector;
-import io.github.nucleuspowered.nucleus.api.core.NucleusPlayerMetadataService;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import io.github.nucleuspowered.nucleus.core.CoreModule;
 import io.github.nucleuspowered.nucleus.core.CorePermissions;
 import io.github.nucleuspowered.nucleus.core.config.CoreConfig;
-import io.github.nucleuspowered.nucleus.core.services.PlayerMetadataService;
 import io.github.nucleuspowered.nucleus.core.services.UniqueUserService;
 import io.github.nucleuspowered.nucleus.core.teleport.filters.NoCheckFilter;
 import io.github.nucleuspowered.nucleus.core.teleport.filters.WallCheckFilter;
@@ -34,7 +31,6 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerReloadableWrap
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.NucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.storage.persistence.FlatFileStorageRepositoryFactory;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
@@ -42,10 +38,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.startuperror.ConfigErrorHandler;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import io.leangen.geantyref.TypeToken;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
@@ -67,6 +60,11 @@ import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.transformation.ConfigurationTransformation;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.io.IOException;
@@ -76,6 +74,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +95,8 @@ public final class NucleusCore {
 
     private final INucleusServiceCollection serviceCollection;
 
-    public NucleusCore(final PluginContainer pluginContainer,
+    public NucleusCore(
+            final PluginContainer pluginContainer,
             final Path configDirectory,
             final Logger logger,
             final Injector injector,
@@ -120,14 +120,15 @@ public final class NucleusCore {
      */
     public void init() {
         final Collection<Tuple<ModuleContainer, IModule>> tuple = this.startModuleLoading();
+        this.serviceCollection.configurateHelper().complete();
         final IConfigProvider provider = this.serviceCollection.configProvider();
         try {
-            provider.mergeCoreDefaults();
+            provider.prepareCoreConfig(this.coreConfigurationTransformations());
         } catch (final IOException | ObjectMappingException e) {
             new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getCoreConfigFileName());
         }
         try {
-            provider.mergeModuleDefaults();
+            provider.prepareModuleConfig();
         } catch (final IOException | ObjectMappingException e) {
             new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getModuleConfigFileName());
         }
@@ -301,7 +302,9 @@ public final class NucleusCore {
 
             module.init(this.serviceCollection);
             if (module instanceof IModule.Configurable) {
-                this.serviceCollection.configProvider().registerModuleConfig(container.getId(), ((IModule.Configurable<?>) module).getConfigClass());
+                final IModule.Configurable<?> configurable = (IModule.Configurable<?>) module;
+                this.serviceCollection.configurateHelper().addTypeSerialiser(configurable.moduleTypeSerializers());
+                this.serviceCollection.configProvider().registerModuleConfig(container.getId(), configurable.getConfigClass(), configurable.getTransformations());
             }
 
             modules.add(Tuple.of(container, module));
@@ -382,7 +385,7 @@ public final class NucleusCore {
                 moduleContainers.stream().map(ModuleContainer::getId)
                         .filter(x -> {
                             try {
-                                return finalNode.getNode(x).getValue(TypeToken.of(ModuleState.class), ModuleState.TRUE) == ModuleState.TRUE;
+                                return finalNode.getNode(x).getValue(TypeToken.get(ModuleState.class), ModuleState.TRUE) == ModuleState.TRUE;
                             } catch (final ObjectMappingException e) {
                                 return true;
                             }
@@ -435,6 +438,10 @@ public final class NucleusCore {
             this.logger.fatal("Could not create directory '{}', using default data directory.", currentDataDir.toAbsolutePath(), e);
         }
 
+    }
+
+    private Collection<ConfigurationTransformation<CommentedConfigurationNode>> coreConfigurationTransformations() {
+        return Collections.emptyList();
     }
 
     public enum ModuleState {

@@ -5,8 +5,10 @@
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
 import com.google.common.reflect.TypeParameter;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeFactory;
+import io.leangen.geantyref.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
@@ -22,14 +24,12 @@ public class MappedDataKey<K, V, O extends IKeyedDataObject<?>> extends DataKeyI
     private final TypeToken<K> keyType;
     private final TypeToken<V> valueType;
 
-    private static <Key, Value> TypeToken<Map<Key, Value>> createMapToken(final TypeToken<Key> keyToken, final TypeToken<Value> valueToken) {
-        return new TypeToken<Map<Key, Value>>() {}
-                .where(new TypeParameter<Key>() {}, keyToken)
-                .where(new TypeParameter<Value>() {}, valueToken);
+    private static <Key, Value> Type createMapType(final TypeToken<Key> keyToken, final TypeToken<Value> valueToken) {
+        return TypeFactory.parameterizedClass(Map.class, keyToken.getType(), valueToken.getType());
     }
 
     public MappedDataKey(final String[] key, final TypeToken<K> keyType, final TypeToken<V> valueType, final Class<O> target) {
-        super(key, createMapToken(keyType, valueType), target, null);
+        super(key, MappedDataKey.createMapType(keyType, valueType), target, null);
         this.keyType = keyType;
         this.valueType = valueType;
     }

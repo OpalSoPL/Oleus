@@ -31,12 +31,12 @@ import io.github.nucleuspowered.storage.dataobjects.IDataObject;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
 import io.github.nucleuspowered.storage.services.IStorageService;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.SimpleConfigurationNode;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.nio.file.Path;
@@ -101,7 +101,7 @@ public final class StorageManager implements IStorageManager {
 
     private final IConfigurateBackedDataTranslator<IUserDataObject> userDataAccess = new IConfigurateBackedDataTranslator<IUserDataObject>() {
         @Override public ConfigurationNode createNewNode() {
-            return SimpleConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
 
         @Override public IUserDataObject createNew() {
@@ -112,7 +112,7 @@ public final class StorageManager implements IStorageManager {
     };
     private final IConfigurateBackedDataTranslator<IWorldDataObject> worldDataAccess = new IConfigurateBackedDataTranslator<IWorldDataObject>() {
         @Override public ConfigurationNode createNewNode() {
-            return SimpleConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
 
         @Override public IWorldDataObject createNew() {
@@ -123,7 +123,7 @@ public final class StorageManager implements IStorageManager {
     };
     private final IConfigurateBackedDataTranslator<IGeneralDataObject> generalDataAccess = new IConfigurateBackedDataTranslator<IGeneralDataObject>() {
         @Override public ConfigurationNode createNewNode() {
-            return SimpleConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
 
         @Override public IGeneralDataObject createNew() {

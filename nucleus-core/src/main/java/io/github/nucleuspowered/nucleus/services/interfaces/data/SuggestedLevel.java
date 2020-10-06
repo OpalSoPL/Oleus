@@ -4,9 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.services.interfaces.data;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.service.permission.PermissionDescription;
-
-import javax.annotation.Nullable;
 
 public enum SuggestedLevel {
     USER(null, "nucleus.user", PermissionDescription.ROLE_USER),

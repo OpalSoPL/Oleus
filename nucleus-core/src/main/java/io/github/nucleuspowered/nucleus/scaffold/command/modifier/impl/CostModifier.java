@@ -13,11 +13,11 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.text.Component;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.Optional;
 
@@ -41,8 +41,7 @@ public class CostModifier implements ICommandModifier {
         to.setCost(from.getCost());
     }
 
-    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandContext source) throws
-            CommandException {
+    @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandContext source) {
         return serviceCollection.economyServiceProvider().serviceExists() && source.getCause().root() instanceof ServerPlayer;
     }
 

@@ -4,19 +4,24 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
-import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.TypeSerializer;
 
+import java.lang.reflect.Type;
 import java.time.Instant;
 
 public class InstantTypeSerialiser implements TypeSerializer<Instant> {
 
-    @Override public Instant deserialize(final TypeToken<?> type, final ConfigurationNode value) {
+    @Override
+    public Instant deserialize(final Type type, final ConfigurationNode value) {
         return Instant.ofEpochMilli(value.getLong());
     }
 
-    @Override public void serialize(final TypeToken<?> type, final Instant obj, final ConfigurationNode value) {
-        value.setValue(obj.toEpochMilli());
+    @Override
+    public void serialize(final Type type, final Instant obj, final ConfigurationNode value) {
+        if (obj != null) {
+            value.setValue(obj.toEpochMilli());
+        }
     }
+
 }

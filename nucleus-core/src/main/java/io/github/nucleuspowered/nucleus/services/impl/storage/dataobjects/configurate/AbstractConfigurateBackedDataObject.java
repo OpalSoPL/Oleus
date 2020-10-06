@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate;
 
-import ninja.leaping.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
 
 /**
  * Indicates that this is the basic object for saving data with

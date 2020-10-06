@@ -5,10 +5,9 @@
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
 import io.github.nucleuspowered.storage.dataobjects.IDataObject;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 public interface IKeyedDataObject<T extends IKeyedDataObject<T>> extends IDataObject {
 

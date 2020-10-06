@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.datatypes;
 
 import io.github.nucleuspowered.nucleus.api.util.data.TimedEntry;
-import ninja.leaping.configurate.objectmapping.Setting;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.time.Duration;
 import java.time.Instant;

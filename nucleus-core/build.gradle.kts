@@ -35,11 +35,17 @@ dependencies {
 
     val dep = "org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]
     annotationProcessor(dep)
-    implementation(dep)
-
-    implementation(rootProject.properties["neutrinoDep"]?.toString()!!) {
+    implementation(dep) {
         exclude("org.spongepowered", "configurate-core")
+        exclude("org.spongepowered", "configurate-gson")
+        exclude("org.spongepowered", "configurate-hocon")
+        exclude("org.spongepowered", "configurate-yaml")
     }
+
+    implementation("org.spongepowered:configurate-core:4.0.0-SNAPSHOT")
+    implementation("org.spongepowered:configurate-gson:4.0.0-SNAPSHOT")
+    implementation("org.spongepowered:configurate-hocon:4.0.0-SNAPSHOT")
+    implementation("org.spongepowered:configurate-yaml:4.0.0-SNAPSHOT")
 
     testCompile("org.mockito:mockito-all:1.10.19")
     testCompile("org.powermock:powermock-module-junit4:1.6.4")
@@ -49,7 +55,7 @@ dependencies {
 }
 
 val downloadCompat by tasks.registering(de.undercouch.gradle.tasks.download.Download::class) {
-    src("https://nucleuspowered.org/data/nca.json")
+    src("https://v2.nucleuspowered.org/data/nca.json")
     dest(File(buildDir, "resources/main/assets/nucleus/compat.json"))
     onlyIfModified(true)
 }

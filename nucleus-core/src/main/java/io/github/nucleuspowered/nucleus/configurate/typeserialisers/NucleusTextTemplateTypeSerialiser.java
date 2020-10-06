@@ -4,14 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
-import com.google.common.reflect.TypeToken;
+import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.serialize.TypeSerializer;
 
-public class NucleusTextTemplateTypeSerialiser implements TypeSerializer<NucleusTextTemplateImpl> {
+import java.lang.reflect.Type;
+
+public class NucleusTextTemplateTypeSerialiser implements TypeSerializer<NucleusTextTemplate> {
 
     private final INucleusTextTemplateFactory factory;
 
@@ -19,7 +21,8 @@ public class NucleusTextTemplateTypeSerialiser implements TypeSerializer<Nucleus
         this.factory = factory;
     }
 
-    @Override public NucleusTextTemplateImpl deserialize(final TypeToken<?> type, final ConfigurationNode value) throws ObjectMappingException {
+    @Override
+    public NucleusTextTemplateImpl deserialize(final Type type, final ConfigurationNode value) throws ObjectMappingException {
         try {
             return this.factory.createFromAmpersandString(value.getString());
         } catch (final Throwable throwable) {
@@ -27,7 +30,10 @@ public class NucleusTextTemplateTypeSerialiser implements TypeSerializer<Nucleus
         }
     }
 
-    @Override public void serialize(final TypeToken<?> type, final NucleusTextTemplateImpl obj, final ConfigurationNode value) {
-        value.setValue(obj.asComponent());
+    @Override
+    public void serialize(final Type type, final NucleusTextTemplate obj, final ConfigurationNode value) {
+        if (obj != null) {
+            value.setValue(obj.asComponent());
+        }
     }
 }

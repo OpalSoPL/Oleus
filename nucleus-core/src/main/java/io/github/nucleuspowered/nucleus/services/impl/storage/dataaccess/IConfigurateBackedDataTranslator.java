@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.services.impl.storage.dataaccess;
 import com.google.gson.JsonObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.IConfigurateBackedDataObject;
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
-import ninja.leaping.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
 
 public interface IConfigurateBackedDataTranslator<R extends IConfigurateBackedDataObject> extends IDataTranslator<R, JsonObject> {
 

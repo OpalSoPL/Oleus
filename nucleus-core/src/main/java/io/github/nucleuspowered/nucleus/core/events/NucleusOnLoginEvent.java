@@ -6,15 +6,13 @@ package io.github.nucleuspowered.nucleus.core.events;
 
 import com.google.common.base.Preconditions;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.api.world.World;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 /**
  * Internal only.

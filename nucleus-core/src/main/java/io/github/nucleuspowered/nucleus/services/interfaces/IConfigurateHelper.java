@@ -6,10 +6,10 @@ package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.services.impl.configurate.ConfigurateHelper;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationOptions;
+import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 
 @ImplementedBy(ConfigurateHelper.class)
 public interface IConfigurateHelper {
@@ -23,4 +23,8 @@ public interface IConfigurateHelper {
     default ConfigurationOptions getOptions() {
         return this.setOptions(ConfigurationOptions.defaults());
     }
+
+    void addTypeSerialiser(@Nullable TypeSerializerCollection collection);
+
+    TypeSerializerCollection complete();
 }

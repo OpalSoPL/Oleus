@@ -11,7 +11,7 @@ import io.github.nucleuspowered.storage.exceptions.DataQueryException;
 import io.github.nucleuspowered.storage.exceptions.DataSaveException;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 import io.github.nucleuspowered.storage.util.KeyedObject;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.objectmapping.ObjectMappingException;
 
 import java.util.Collection;
 import java.util.Map;

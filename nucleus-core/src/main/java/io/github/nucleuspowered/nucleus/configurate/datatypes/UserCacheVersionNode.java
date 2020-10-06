@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.configurate.datatypes;
 
 import com.google.common.collect.Maps;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.Map;
 import java.util.UUID;

@@ -4,22 +4,26 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.TypeSerializer;
 import org.spongepowered.math.vector.Vector3d;
-import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+
+import java.lang.reflect.Type;
 
 public class Vector3dTypeSerialiser implements TypeSerializer<Vector3d> {
 
     @Override
-    public Vector3d deserialize(final TypeToken<?> type, final ConfigurationNode value) {
+    public Vector3d deserialize(final Type type, final ConfigurationNode value) {
         return new Vector3d(value.getNode("rotx").getDouble(), value.getNode("roty").getDouble(), value.getNode("rotz").getDouble());
     }
 
     @Override
-    public void serialize(final TypeToken<?> type, final Vector3d obj, final ConfigurationNode value) {
-        value.getNode("rotx").setValue(obj.getX());
-        value.getNode("roty").setValue(obj.getY());
-        value.getNode("rotz").setValue(obj.getZ());
+    public void serialize(final Type type, final Vector3d obj, final ConfigurationNode value) {
+        if (obj != null) {
+            value.getNode("rotx").setValue(obj.getX());
+            value.getNode("roty").setValue(obj.getY());
+            value.getNode("rotz").setValue(obj.getZ());
+        }
     }
+
 }

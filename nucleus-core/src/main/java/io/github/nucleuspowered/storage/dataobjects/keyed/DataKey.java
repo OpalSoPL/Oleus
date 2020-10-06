@@ -4,12 +4,12 @@
  */
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 /**
  * Represents a data point in an {@link AbstractKeyBasedDataObject}
@@ -20,11 +20,11 @@ import javax.annotation.Nullable;
 public interface DataKey<R, O extends IKeyedDataObject<?>> {
 
     static <T, O extends IKeyedDataObject<?>> DataKey<T, O> of(final TypeToken<T> type, final Class<O> target, final String... key) {
-        return new DataKeyImpl<>(key, type, target,  null);
+        return new DataKeyImpl<>(key, type.getType(), target,  null);
     }
 
     static <T, O extends IKeyedDataObject<?>> DataKey<T, O> of(final T def, final TypeToken<T> type, final Class<O> target, final String... key) {
-        return new DataKeyImpl<>(key, type, target, def);
+        return new DataKeyImpl<>(key, type.getType(), target, def);
     }
 
     static <T, O extends IKeyedDataObject<?>> DataKey.ListKey<T, O> ofList(final TypeToken<T> type, final Class<O> target, final String... key) {
@@ -60,7 +60,7 @@ public interface DataKey<R, O extends IKeyedDataObject<?>> {
      *
      * @return The {@link TypeToken}
      */
-    TypeToken<R> getType();
+    Type getKeyType();
 
     /**
      * The default
