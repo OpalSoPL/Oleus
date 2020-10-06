@@ -5,8 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.commandlogger.config;
 
 import com.google.common.collect.ImmutableList;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,16 +15,20 @@ import java.util.List;
 @ConfigSerializable
 public class CommandLoggerConfig {
 
-    @Setting(value = "log-command-source", comment = "config.commandlogger.source.base")
+    @Setting(value = "log-command-source")
+    @LocalisedComment("config.commandlogger.source.base")
     private LoggerTargetConfig loggerTarget = new LoggerTargetConfig();
 
-    @Setting(value = "whitelist", comment = "config.commandlogger.whitelist")
+    @Setting(value = "whitelist")
+    @LocalisedComment("config.commandlogger.whitelist")
     private boolean isWhitelist = false;
 
-    @Setting(value = "command-filter", comment = "config.commandlogger.list")
+    @Setting(value = "command-filter")
+    @LocalisedComment("config.commandlogger.list")
     private List<String> commandsToFilter = new ArrayList<>();
 
-    @Setting(value = "log-to-file", comment = "config.commandlogger.file")
+    @Setting(value = "log-to-file")
+    @LocalisedComment("config.commandlogger.file")
     private boolean logToFile = false;
 
     public LoggerTargetConfig getLoggerTarget() {

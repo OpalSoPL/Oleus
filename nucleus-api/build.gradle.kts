@@ -1,5 +1,6 @@
 plugins {
     java
+    `java-library`
     idea
     eclipse
     maven
@@ -20,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]) {
+    api("org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]) {
         exclude("org.spongepowered", "configurate-core")
         exclude("org.spongepowered", "configurate-gson")
         exclude("org.spongepowered", "configurate-hocon")

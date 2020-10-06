@@ -33,15 +33,6 @@ dependencies {
     implementation(project(":nucleus-api"))
     implementation(project(":nucleus-core"))
 
-    val dep = "org.spongepowered:spongeapi:${rootProject.properties["spongeApiVersion"]}"
-    annotationProcessor(dep)
-    implementation(dep) {
-        exclude("org.spongepowered", "configurate-core")
-        exclude("org.spongepowered", "configurate-gson")
-        exclude("org.spongepowered", "configurate-hocon")
-        exclude("org.spongepowered", "configurate-yaml")
-    }
-
     testCompile("org.mockito:mockito-all:1.10.19")
     testCompile("org.powermock:powermock-module-junit4:1.6.4")
     testCompile("org.powermock:powermock-api-mockito:1.6.4")

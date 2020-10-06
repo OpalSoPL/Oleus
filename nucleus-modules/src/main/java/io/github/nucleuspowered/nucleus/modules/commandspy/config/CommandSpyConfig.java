@@ -4,12 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandspy.config;
 
-import io.github.nucleuspowered.neutrino.annotations.Default;
-import io.github.nucleuspowered.neutrino.annotations.ProcessSetting;
-import io.github.nucleuspowered.neutrino.settingprocessor.RemoveFirstSlashIfExistsSettingProcessor;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +16,20 @@ import java.util.List;
 @ConfigSerializable
 public class CommandSpyConfig {
 
-    @Setting(comment = "config.commandspy.template")
-    @Default(value = "&7[CS: {{name}}]: ", saveDefaultIfNull = true)
+    @DefaultValueSetting(key = "prefix", defaultValue = "&7[CS: {{name}}]: ")
+    @LocalisedComment("config.commandspy.template")
     private NucleusTextTemplateImpl prefix;
 
     // use-whitelist
-    @Setting(value = "filter-is-whitelist", comment = "config.commandspy.usewhitelist")
+    @Setting(value = "filter-is-whitelist")
+    @LocalisedComment("config.commandspy.usewhitelist")
     private boolean useWhitelist = true;
 
     // Was whitelisted-commands-to-spy-on
     // Removes the first "/" if it exists.
-    @ProcessSetting(RemoveFirstSlashIfExistsSettingProcessor.class)
-    @Setting(value = "command-filter", comment = "config.commandspy.filter")
+    // TODO: Remove the first "/"
+    @Setting("command-filter")
+    @LocalisedComment("config.commandspy.filter")
     private List<String> commands = new ArrayList<>();
 
     public NucleusTextTemplateImpl getTemplate() {

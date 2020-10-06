@@ -4,22 +4,27 @@
  */
 package io.github.nucleuspowered.nucleus.modules.back.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class BackConfig {
 
-    @Setting(value = "only-same-dimension", comment = "config.back.onlySameDimension")
+    @Setting(value = "only-same-dimension")
+    @LocalisedComment("config.back.onlySameDimension")
     private boolean onlySameDimension = false;
 
-    @Setting(value = "on-death", comment = "config.back.ondeath")
+    @Setting(value = "on-death")
+    @LocalisedComment("config.back.ondeath")
     private boolean onDeath = true;
 
-    @Setting(value = "on-teleport", comment = "config.back.onteleport")
+    @Setting(value = "on-teleport")
+    @LocalisedComment("config.back.onteleport")
     private boolean onTeleport = true;
 
-    @Setting(value = "on-portal", comment = "config.back.onportal")
+    @Setting(value = "on-portal")
+    @LocalisedComment("config.back.onportal")
     private boolean onPortal = false;
 
     public boolean isOnDeath() {

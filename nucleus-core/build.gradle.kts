@@ -1,5 +1,6 @@
 plugins {
     java
+    `java-library`
     eclipse
     id("ninja.miserable.blossom")
     id("de.undercouch.download")
@@ -35,17 +36,17 @@ dependencies {
 
     val dep = "org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]
     annotationProcessor(dep)
-    implementation(dep) {
+    api(dep) {
         exclude("org.spongepowered", "configurate-core")
         exclude("org.spongepowered", "configurate-gson")
         exclude("org.spongepowered", "configurate-hocon")
         exclude("org.spongepowered", "configurate-yaml")
     }
 
-    implementation("org.spongepowered:configurate-core:4.0.0-SNAPSHOT")
-    implementation("org.spongepowered:configurate-gson:4.0.0-SNAPSHOT")
-    implementation("org.spongepowered:configurate-hocon:4.0.0-SNAPSHOT")
-    implementation("org.spongepowered:configurate-yaml:4.0.0-SNAPSHOT")
+    api("org.spongepowered:configurate-core:4.0.0-SNAPSHOT")
+    api("org.spongepowered:configurate-gson:4.0.0-SNAPSHOT")
+    api("org.spongepowered:configurate-hocon:4.0.0-SNAPSHOT")
+    api("org.spongepowered:configurate-yaml:4.0.0-SNAPSHOT")
 
     testCompile("org.mockito:mockito-all:1.10.19")
     testCompile("org.powermock:powermock-module-junit4:1.6.4")

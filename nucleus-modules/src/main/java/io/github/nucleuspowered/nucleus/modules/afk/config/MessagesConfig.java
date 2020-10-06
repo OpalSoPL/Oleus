@@ -4,32 +4,29 @@
  */
 package io.github.nucleuspowered.nucleus.modules.afk.config;
 
-import io.github.nucleuspowered.neutrino.annotations.Default;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 
 @ConfigSerializable
 public class MessagesConfig {
 
-    @Setting("on-afk")
-    @Default(value = "&7*&f{{displayname}} &7has gone AFK.", saveDefaultIfNull = true)
+    @DefaultValueSetting(key = "on-afk", defaultValue = "&7*&f{{displayname}} &7has gone AFK.")
     private NucleusTextTemplateImpl afkMessage;
 
-    @Setting("on-return")
-    @Default(value = "&7*&f{{displayname}} &7is no longer AFK.", saveDefaultIfNull = true)
+    @DefaultValueSetting(key = "on-return", defaultValue = "&7*&f{{displayname}} &7is no longer AFK.")
     private NucleusTextTemplateImpl returnAfkMessage;
 
-    @Setting("on-command")
-    @Default(value = "&f{{displayname}} &7is currently AFK and may not respond quickly.", saveDefaultIfNull = true)
+    @DefaultValueSetting(key = "on-command", defaultValue = "&f{{displayname}} &7is currently AFK and may not respond quickly.")
     private NucleusTextTemplateImpl onCommand;
 
-    @Setting(value = "on-kick", comment = "config.afk.messagetobroadcastonkick")
-    @Default(value = "&f{{displayname}} &7has been kicked for being AFK too long.", saveDefaultIfNull = true)
+    @DefaultValueSetting(key = "on-kick", defaultValue = "&f{{displayname}} &7has been kicked for being AFK too long.")
+    @LocalisedComment("config.afk.messagetobroadcastonkick")
     private NucleusTextTemplateImpl onKick;
 
-    @Setting(value = "kick-message-to-subject", comment = "config.afk.playerkicked")
-    @Default(value = "You have been kicked for being AFK for too long.", saveDefaultIfNull = true)
+    @DefaultValueSetting(key = "kick-message-to-subject", defaultValue = "You have been kicked for being AFK for too long.")
+    @LocalisedComment("config.afk.playerkicked")
     private NucleusTextTemplateImpl kickMessage;
 
     public NucleusTextTemplateImpl getAfkMessage() {

@@ -4,34 +4,43 @@
  */
 package io.github.nucleuspowered.nucleus.modules.afk.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class AFKConfig {
 
-    @Setting(value = "afk-time", comment = "config.afk.time")
+    @Setting(value = "afk-time")
+    @LocalisedComment("config.afk.time")
     private long afkTime = 300;
 
-    @Setting(value = "afk-time-to-kick", comment = "config.afk.timetokick")
+    @Setting(value = "afk-time-to-kick")
+    @LocalisedComment("config.afk.timetokick")
     private long afkTimeToKick = 0;
 
-    @Setting(value = "broadcast-afk-when-vanished", comment = "config.afk.whenvanished")
+    @Setting(value = "broadcast-afk-when-vanished")
+    @LocalisedComment("config.afk.whenvanished")
     private boolean broadcastAfkOnVanish = false;
 
-    @Setting(value = "alert-on-command-send", comment = "config.afk.oncommandsend")
+    @Setting(value = "alert-on-command-send")
+    @LocalisedComment("config.afk.oncommandsend")
     private boolean alertSenderOnAfk = true;
 
-    @Setting(value = "broadcast-to-all-on-kick", comment = "config.afk.broadcastonkick")
+    @Setting(value = "broadcast-to-all-on-kick")
+    @LocalisedComment("config.afk.broadcastonkick")
     private boolean broadcastOnKick = true;
 
-    @Setting(value = "messages", comment = "config.afk.messages.base")
+    @Setting(value = "messages")
+    @LocalisedComment("config.afk.messages.base")
     private MessagesConfig messages = new MessagesConfig();
 
-    @Setting(value = "triggers", comment = "config.afk.triggers.summary")
+    @Setting(value = "triggers")
+    @LocalisedComment("config.afk.triggers.summary")
     private Triggers triggers = new Triggers();
 
-    @Setting(value = "disable-in-spectator-mode", comment = "config.afk.spectatormode")
+    @Setting(value = "disable-in-spectator-mode")
+    @LocalisedComment("config.afk.spectatormode")
     private boolean disableInSpectatorMode = false;
 
     public Triggers getTriggers() {
@@ -69,19 +78,24 @@ public class AFKConfig {
     @ConfigSerializable
     public static class Triggers {
 
-        @Setting(value = "on-chat", comment = "config.afk.triggers.onchat")
+        @Setting(value = "on-chat")
+    @LocalisedComment("config.afk.triggers.onchat")
         private boolean onChat = true;
 
-        @Setting(value = "on-command", comment = "config.afk.triggers.oncommand")
+        @Setting(value = "on-command")
+    @LocalisedComment("config.afk.triggers.oncommand")
         private boolean onCommand = true;
 
-        @Setting(value = "on-movement", comment = "config.afk.triggers.onmove")
+        @Setting(value = "on-movement")
+    @LocalisedComment("config.afk.triggers.onmove")
         private boolean onMovement = true;
 
-        @Setting(value = "on-rotation", comment = "config.afk.triggers.onrotation")
+        @Setting(value = "on-rotation")
+    @LocalisedComment("config.afk.triggers.onrotation")
         private boolean onRotation = true;
 
-        @Setting(value = "on-interact", comment = "config.afk.triggers.oninteract")
+        @Setting(value = "on-interact")
+    @LocalisedComment("config.afk.triggers.oninteract")
         private boolean onInteract = true;
 
         public boolean isOnChat() {

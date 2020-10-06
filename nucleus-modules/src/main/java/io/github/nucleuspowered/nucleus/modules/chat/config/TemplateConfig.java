@@ -4,8 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.modules.chat.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,14 +14,17 @@ import java.util.Map;
 @ConfigSerializable
 public class TemplateConfig {
 
-    @Setting(value = "use-group-templates", comment = "config.chat.useGroupTemplates")
+    @Setting(value = "use-group-templates")
+    @LocalisedComment("config.chat.useGroupTemplates")
     private boolean useGroupTemplates = true;
 
-    @Setting(value = "default", comment = "config.chat.default-template")
+    @Setting(value = "default")
+    @LocalisedComment("config.chat.default-template")
     private ChatTemplateConfig defaultTemplate = new ChatTemplateConfig();
 
     // NoMergeIfPresent
-    @Setting(value = "group-templates", comment = "config.chat.group-templates")
+    @Setting(value = "group-templates")
+    @LocalisedComment("config.chat.group-templates")
     private Map<String, ChatTemplateConfig> groupTemplates = new HashMap<String, ChatTemplateConfig>() {{
         // We don't want this affecting the default group, but we need an example.
         this.put("DefaultTemplate", new ChatTemplateConfig());

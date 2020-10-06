@@ -4,43 +4,47 @@
  */
 package io.github.nucleuspowered.nucleus.modules.connection.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.Optional;
 
 @ConfigSerializable
 public class ConnectionConfig {
 
-    @Setting(value = "reserved-slots", comment = "config.connection.reservedslots")
+    @Setting(value = "reserved-slots")
+    @LocalisedComment("config.connection.reservedslots")
     private int reservedSlots = -1;
 
-    @Setting(value = "whitelist-message", comment = "config.connection.whitelistmessage")
+    @Setting(value = "whitelist-message")
+    @LocalisedComment("config.connection.whitelistmessage")
     private String whitelistMessage = "";
 
-    @Setting(value = "server-full-message", comment = "config.connection.serverfullmessage")
+    @Setting(value = "server-full-message")
+    @LocalisedComment("config.connection.serverfullmessage")
     private String serverFullMessage = "";
 
     public int getReservedSlots() {
         return this.reservedSlots;
     }
 
-    public Optional<Text> getWhitelistMessage() {
-        return getMessageFrom(this.whitelistMessage);
+    public Optional<Component> getWhitelistMessage() {
+        return this.getMessageFrom(this.whitelistMessage);
     }
 
-    public Optional<Text> getServerFullMessage() {
-        return getMessageFrom(this.serverFullMessage);
+    public Optional<Component> getServerFullMessage() {
+        return this.getMessageFrom(this.serverFullMessage);
     }
 
-    private Optional<Text> getMessageFrom(final String text) {
+    private Optional<Component> getMessageFrom(final String text) {
         if (text == null || text.isEmpty()) {
             return Optional.empty();
         }
 
-        return Optional.of(TextSerializers.FORMATTING_CODE.deserializeUnchecked(text));
+        return Optional.of(LegacyComponentSerializer.legacyAmpersand().deserialize(text));
     }
 
 }

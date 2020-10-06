@@ -5,39 +5,46 @@
 package io.github.nucleuspowered.nucleus.modules.chat.config;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.nucleuspowered.neutrino.annotations.Default;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.Map;
 
 @ConfigSerializable
 public class ChatConfig {
 
-    @Setting(value = "modify-chat", comment = "config.chat.modify")
+    @Setting(value = "modify-chat")
+    @LocalisedComment("config.chat.modify")
     private boolean modifychat = true;
 
     @Setting(value = "templates")
     private TemplateConfig templates = new TemplateConfig();
 
-    @Setting(value = "try-to-remove-minecraft-prefix", comment = "config.chat.hardertoremove")
+    @Setting(value = "try-to-remove-minecraft-prefix")
+    @LocalisedComment("config.chat.hardertoremove")
     private boolean tryRemoveMinecraftPrefix = true;
 
-    @Setting(value = "remove-link-underlines", comment = "config.chat.removeunderlines")
+    @Setting(value = "remove-link-underlines")
+    @LocalisedComment("config.chat.removeunderlines")
     private boolean removeBlueUnderline = true;
 
-    @Setting(value = "aggressive-chat-formatting", comment = "config.chat.aggressive")
+    @Setting(value = "aggressive-chat-formatting")
+    @LocalisedComment("config.chat.aggressive")
     private boolean tryForceFormatting = false;
 
-    @Setting(value = "me-prefix", comment = "config.chat.meprefix")
-    @Default(value = "&7* {{displayName}} ", saveDefaultIfNull = true)
+    @DefaultValueSetting(key = "me-prefix", defaultValue = "&7* {{displayName}} ")
+    @LocalisedComment("config.chat.meprefix")
     private NucleusTextTemplateImpl mePrefix;
 
-    @Setting(value = "ignore-other-plugins-when-formatting", comment = "config.chat.removeother")
+    @Setting(value = "ignore-other-plugins-when-formatting")
+    @LocalisedComment("config.chat.removeother")
     private boolean ignoreOtherPlugins = false;
 
-    @Setting(value = "modify-message", comment = "config.chat.modifymessage")
+    @Setting(value = "modify-message")
+    @LocalisedComment("config.chat.modifymessage")
     private boolean modifyMessage = true;
 
     public NucleusTextTemplateImpl getMePrefix() {

@@ -4,34 +4,41 @@
  */
 package io.github.nucleuspowered.nucleus.modules.connection;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.connection.config.ConnectionConfig;
-import io.github.nucleuspowered.nucleus.modules.connection.config.ConnectionConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.annotation.ServerOnly;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ServerOnly
-@ModuleData(id = ConnectionModule.ID, name = "Connection")
-public class ConnectionModule extends ConfigurableModule<ConnectionConfig, ConnectionConfigAdapter> {
+public class ConnectionModule implements IModule.Configurable<ConnectionConfig> {
 
     public static final String ID = "connection";
 
-    @Inject
-    public ConnectionModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override public void init(final INucleusServiceCollection serviceCollection) {
+
     }
 
-
-    @Override
-    public ConnectionConfigAdapter createAdapter() {
-        return new ConnectionConfigAdapter();
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
     }
 
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override public Collection<Class<? extends TaskBase>> getTasks() {
+        return null;
+    }
+
+    @Override public Class<ConnectionConfig> getConfigClass() {
+        return null;
+    }
 }

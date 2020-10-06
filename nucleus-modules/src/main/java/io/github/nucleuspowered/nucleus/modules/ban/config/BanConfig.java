@@ -5,16 +5,19 @@
 package io.github.nucleuspowered.nucleus.modules.ban.config;
 
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class BanConfig {
 
-    @Setting(value = "maximum-tempban-length", comment = "config.tempban.maxtempbanlength")
+    @Setting(value = "maximum-tempban-length")
+    @LocalisedComment("config.tempban.maxtempbanlength")
     private long maxTempBanLength = 604800;
 
-    @Setting(value = "ban-permission-levels", comment = "config.ban.permissionlevel")
+    @Setting(value = "ban-permission-levels")
+    @LocalisedComment("config.ban.permissionlevel")
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
 
     public long getMaximumTempBanLength() {
