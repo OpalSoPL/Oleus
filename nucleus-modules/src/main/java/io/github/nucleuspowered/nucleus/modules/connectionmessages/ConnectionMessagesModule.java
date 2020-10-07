@@ -4,30 +4,53 @@
  */
 package io.github.nucleuspowered.nucleus.modules.connectionmessages;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.connectionmessages.config.ConnectionMessagesConfig;
-import io.github.nucleuspowered.nucleus.modules.connectionmessages.config.ConnectionMessagesConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.connectionmessages.listeners.ConnectionMessagesForceListener;
+import io.github.nucleuspowered.nucleus.modules.connectionmessages.listeners.ConnectionMessagesListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = ConnectionMessagesModule.ID, name = "Connection Messages")
-public class ConnectionMessagesModule extends ConfigurableModule<ConnectionMessagesConfig, ConnectionMessagesConfigAdapter> {
+public final class ConnectionMessagesModule implements IModule.Configurable<ConnectionMessagesConfig> {
 
     public static final String ID = "connection-messages";
 
-    @Inject
-    public ConnectionMessagesModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+
+    }
+
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.emptyList();
     }
 
     @Override
-    public ConnectionMessagesConfigAdapter createAdapter() {
-        return new ConnectionMessagesConfigAdapter();
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(ConnectionMessagesPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Arrays.asList(
+                ConnectionMessagesForceListener.class,
+                ConnectionMessagesListener.class
+        );
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<ConnectionMessagesConfig> getConfigClass() {
+        return ConnectionMessagesConfig.class;
     }
 }

@@ -4,13 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.craftinggui.commands;
 
-import io.github.nucleuspowered.nucleus.modules.craftinggui.BasicCraftingCommand;
 import io.github.nucleuspowered.nucleus.modules.craftinggui.CraftingGuiPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.ContainerType;
+import org.spongepowered.api.item.inventory.ContainerTypes;
+
+import java.util.function.Supplier;
+
 @Command(
         aliases = {"enchantingtable", "enchanttable", "etable"},
         basePermission = CraftingGuiPermissions.BASE_ENCHANTINGTABLE,
@@ -23,8 +25,11 @@ import org.spongepowered.api.item.inventory.InventoryArchetypes;
 )
 public class EnchantingTableCommand extends BasicCraftingCommand {
 
-    // Max power is 32, when we can implement it.
-    @Override protected InventoryArchetype getArchetype() {
-        return InventoryArchetypes.ENCHANTING_TABLE;
+    @Override
+    protected Supplier<ContainerType> getArchetype() {
+        // Max power is 32, when we can implement it.
+        return ContainerTypes.ENCHANTMENT;
     }
+
+
 }

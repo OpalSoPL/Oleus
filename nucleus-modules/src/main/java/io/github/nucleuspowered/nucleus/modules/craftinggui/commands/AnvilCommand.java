@@ -4,13 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.craftinggui.commands;
 
-import io.github.nucleuspowered.nucleus.modules.craftinggui.BasicCraftingCommand;
 import io.github.nucleuspowered.nucleus.modules.craftinggui.CraftingGuiPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.item.inventory.InventoryArchetype;
-import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.ContainerType;
+import org.spongepowered.api.item.inventory.ContainerTypes;
+
+import java.util.function.Supplier;
+
 @Command(
         aliases = "anvil",
         basePermission = CraftingGuiPermissions.BASE_ANVIL,
@@ -23,7 +25,8 @@ import org.spongepowered.api.item.inventory.InventoryArchetypes;
 )
 public class AnvilCommand extends BasicCraftingCommand {
 
-    @Override protected InventoryArchetype getArchetype() {
-        return InventoryArchetypes.ANVIL;
+    @Override
+    protected Supplier<ContainerType> getArchetype() {
+        return ContainerTypes.ANVIL;
     }
 }

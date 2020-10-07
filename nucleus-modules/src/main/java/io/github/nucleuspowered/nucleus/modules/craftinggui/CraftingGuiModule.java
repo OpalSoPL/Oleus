@@ -4,22 +4,50 @@
  */
 package io.github.nucleuspowered.nucleus.modules.craftinggui;
 
-import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.craftinggui.commands.AnvilCommand;
+import io.github.nucleuspowered.nucleus.modules.craftinggui.commands.EnchantingTableCommand;
+import io.github.nucleuspowered.nucleus.modules.craftinggui.commands.WorkbenchCommand;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = "crafting-gui", name = "Crafting GUIs")
-public class CraftingGuiModule extends StandardModule {
+public final class CraftingGuiModule implements IModule {
 
     public static final String ID = "crafting-gui";
 
-    @Inject
-    public CraftingGuiModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+
+    }
+
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                AnvilCommand.class,
+                EnchantingTableCommand.class,
+                WorkbenchCommand.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(CraftingGuiPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
     }
 }
