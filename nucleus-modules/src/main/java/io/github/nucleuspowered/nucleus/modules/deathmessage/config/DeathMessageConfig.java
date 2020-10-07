@@ -4,16 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.deathmessage.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class DeathMessageConfig {
 
-    @Setting(value = "enable-death-messages", comment = "config.deathmessages.enable")
+    @Setting(value = "enable-death-messages")
+    @LocalisedComment("config.deathmessages.enable")
     private boolean enableDeathMessages = true;
 
-    @Setting(value = "force-show-all-death-messages", comment = "config.deathmessages.showall")
+    @Setting(value = "force-show-all-death-messages")
+    @LocalisedComment("config.deathmessages.showall")
     private boolean forceForAll = true;
 
     public boolean isEnableDeathMessages() {

@@ -4,31 +4,48 @@
  */
 package io.github.nucleuspowered.nucleus.modules.deathmessage;
 
-import static io.github.nucleuspowered.nucleus.modules.deathmessage.DeathMessageModule.ID;
-
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.deathmessage.config.DeathMessageConfig;
-import io.github.nucleuspowered.nucleus.modules.deathmessage.config.DeathMessageConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.deathmessage.listeners.DisableDeathMessagesListener;
+import io.github.nucleuspowered.nucleus.modules.deathmessage.listeners.ForceAllDeathMessagesListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = ID, name = "Death Messages")
-public class DeathMessageModule extends ConfigurableModule<DeathMessageConfig, DeathMessageConfigAdapter> {
+public class DeathMessageModule implements IModule.Configurable<DeathMessageConfig> {
 
     public static final String ID = "death-message";
 
-    @Inject
-    public DeathMessageModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override public void init(final INucleusServiceCollection serviceCollection) {
+
     }
 
-    @Override
-    public DeathMessageConfigAdapter createAdapter() {
-        return new DeathMessageConfigAdapter();
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.emptyList();
+    }
+
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Arrays.asList(
+                DisableDeathMessagesListener.class,
+                ForceAllDeathMessagesListener.class
+        );
+    }
+
+    @Override public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
+
+    @Override public Class<DeathMessageConfig> getConfigClass() {
+        return DeathMessageConfig.class;
     }
 }
