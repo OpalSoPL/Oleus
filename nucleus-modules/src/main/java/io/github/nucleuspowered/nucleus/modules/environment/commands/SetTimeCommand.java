@@ -5,27 +5,27 @@
 package io.github.nucleuspowered.nucleus.modules.environment.commands;
 
 import com.google.common.reflect.TypeToken;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.environment.EnvironmentPermissions;
-import io.github.nucleuspowered.nucleus.modules.environment.parameter.WorldTimeArgument;
+import io.github.nucleuspowered.nucleus.modules.environment.parameter.WorldTimeParameter;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.storage.WorldProperties;
 
+import java.time.Duration;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.LongFunction;
 
-@SuppressWarnings("UnstableApiUsage")
 @EssentialsEquivalent(value = {"time", "day", "night"}, isExact = false, notes = "A time MUST be specified.")
 @Command(
         aliases = {"set", "#settime", "#timeset"},
@@ -39,25 +39,35 @@ import java.util.function.LongFunction;
         }
 )
 public class SetTimeCommand implements ICommandExecutor {
-    private final String time = "time";
-    private final String world = "world";
+
+    private final Parameter.Value<Function<Duration, Duration>> timeParameter;
+
+    @Inject
+    public SetTimeCommand(final INucleusServiceCollection serviceCollection) {
+        this.timeParameter = Parameter.builder(new TypeToken<LongFunction<Long>>() {}).setKey("time")
+                .parser(new WorldTimeParameter(allowAliases, serviceCollection))
+                .build()
+    }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-            GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.world(Text.of(this.world)))),
-            GenericArguments.onlyOne(new WorldTimeArgument(Text.of(this.time), serviceCollection))
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY,
+                this.timeParameter
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) {
-        final WorldProperties pr = context.getWorldPropertiesOrFromSelf(this.world).orElseGet(
-                () -> Sponge.getServer().getDefaultWorld().get()
-        );
+        final Optional<WorldProperties> pr = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.getKey());
+        if (!pr.isPresent()) {
+            return context.errorResult("command.world.player");
+        }
 
-        final LongFunction<Long> tick = context.requireOne(this.time, new TypeToken<LongFunction<Long>>() {});
-        final long time = tick.apply(pr.getWorldTime());
+        MinecraftTemporalUnit
+
+        final LongFunction<Long> tick = context.requireOne(this.timeParameter.getKey());
+        final long time = tick.apply(pr.get().getWorld().get().getTm.getWorldTime());
         pr.setWorldTime(time);
         context.sendMessage("command.settime.done2", pr.getWorldName(),
                 Util.getTimeFromTicks(context.getServiceCollection().messageProvider(), time));

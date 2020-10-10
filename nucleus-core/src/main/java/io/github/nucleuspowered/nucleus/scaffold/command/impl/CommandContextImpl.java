@@ -359,7 +359,12 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public Optional<WorldProperties> getWorldPropertiesOrFromSelf(final Parameter.Key<WorldProperties> worldKey) {
+    public WorldProperties getWorldPropertiesOrFromSelf(final Parameter.Key<WorldProperties> worldKey) throws CommandException {
+        return this.getWorldPropertiesOrFromSelfOptional(worldKey).orElseThrow(() -> new CommandException(this.getMessage("command.specifyworld")));
+    }
+
+    @Override
+    public Optional<WorldProperties> getWorldPropertiesOrFromSelfOptional(final Parameter.Key<WorldProperties> worldKey) {
         final Optional<WorldProperties> optionalWorldProperties = this.context.getOne(worldKey);
         if (!optionalWorldProperties.isPresent()) {
             return this.cause.getLocation().map(x -> x.getWorld().getProperties());

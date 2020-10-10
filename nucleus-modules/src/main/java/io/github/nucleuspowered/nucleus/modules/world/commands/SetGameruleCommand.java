@@ -38,7 +38,7 @@ public class SetGameruleCommand implements ICommandExecutor {
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
         final String gameRule = context.requireOne(gameRuleKey, String.class);
         final String value = context.requireOne(valueKey, String.class);

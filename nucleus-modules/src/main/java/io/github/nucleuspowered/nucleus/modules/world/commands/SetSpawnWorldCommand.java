@@ -47,7 +47,7 @@ public class SetSpawnWorldCommand implements ICommandExecutor {
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties world = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+        final WorldProperties world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
         final Vector3i loc;
         if (context.hasAny(this.xKey)) {

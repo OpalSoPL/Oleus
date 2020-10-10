@@ -41,7 +41,7 @@ public class SetGamemodeWorldCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final GameMode gamemodeInput = context.requireOne(this.gamemode, GameMode.class);
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
 
         worldProperties.setGameMode(gamemodeInput);

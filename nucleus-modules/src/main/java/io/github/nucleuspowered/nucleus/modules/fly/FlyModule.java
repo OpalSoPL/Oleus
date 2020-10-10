@@ -4,53 +4,68 @@
  */
 package io.github.nucleuspowered.nucleus.modules.fly;
 
-import com.google.common.collect.ImmutableMap;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.fly.commands.FlyCommand;
 import io.github.nucleuspowered.nucleus.modules.fly.config.FlyConfig;
-import io.github.nucleuspowered.nucleus.modules.fly.config.FlyConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.fly.listeners.FlyListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.data.key.Keys;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 
-import java.util.Map;
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
+public class FlyModule implements IModule.Configurable<FlyConfig> {
 
-@ModuleData(id = "fly", name = "Fly")
-public class FlyModule extends ConfigurableModule<FlyConfig, FlyConfigAdapter> {
+    private static final Component FLYING_TOKEN = Component.text("[Flying]", NamedTextColor.GRAY);
 
-    @Inject
-    public FlyModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.placeholderService().registerToken(
+                "flying",
+                PlaceholderParser.builder()
+                        .key(ResourceKey.of("nucleus", "flying"))
+                        .parser(p -> {
+                            if (p.getAssociatedObject().filter(x -> x instanceof Player).flatMap(x -> ((Player) x).get(Keys.IS_FLYING))
+                                    .orElse(false)) {
+                                return FlyModule.FLYING_TOKEN;
+                            }
+                            return Component.empty();
+                        })
+                        .build());
     }
 
     @Override
-    public FlyConfigAdapter createAdapter() {
-        return new FlyConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.singleton(FlyCommand.class);
     }
 
     @Override
-    protected Map<String, PlaceholderParser> tokensToRegister() {
-        return ImmutableMap.<String, PlaceholderParser>builder()
-                .put("flying",
-                        PlaceholderParser.builder()
-                            .plugin(this.serviceCollection.pluginContainer())
-                            .id("flying")
-                            .name("Nucleus Flying Indicator Token")
-                            .parser(p -> {
-                                if (p.getAssociatedObject().filter(x -> x instanceof Player).flatMap(x -> ((Player) x).get(Keys.IS_FLYING))
-                                        .orElse(false)) {
-                                    return Text.of(TextColors.GRAY, "[Flying]");
-                                }
-                                return Text.EMPTY;
-                            })
-                            .build())
-                .build();
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(FlyPermissions.class);
     }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(FlyListener.class);
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<FlyConfig> getConfigClass() {
+        return FlyConfig.class;
+    }
+
 }

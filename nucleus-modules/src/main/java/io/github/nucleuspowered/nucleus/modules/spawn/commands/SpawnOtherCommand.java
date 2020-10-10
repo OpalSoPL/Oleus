@@ -60,7 +60,7 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User target = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        final WorldProperties world = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+        final WorldProperties world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
             .orElseGet(() -> gsc.isOnSpawnCommand() ? gsc.getWorld().get() : Sponge.getServer().getDefaultWorld().get());
 
         final Transform<World> worldTransform = SpawnHelper.getSpawn(world, target.getPlayer().orElse(null), context);

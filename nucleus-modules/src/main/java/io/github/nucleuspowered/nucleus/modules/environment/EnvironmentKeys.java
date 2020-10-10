@@ -5,11 +5,12 @@
 package io.github.nucleuspowered.nucleus.modules.environment;
 
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IWorldDataObject;
+import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class EnvironmentKeys {
 
     public static final DataKey<Boolean, IWorldDataObject> LOCKED_WEATHER =
-            DataKey.of(false, TypeTokens.BOOLEAN, IWorldDataObject.class, "lock-weather");
+            DataKey.of(false, GeAnTyRefTypeTokens.BOOLEAN, IWorldDataObject.class, "lock-weather");
 }

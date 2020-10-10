@@ -17,7 +17,6 @@ import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
 import com.google.inject.Inject;
 
 @APIService(NucleusFreezePlayerService.class)
@@ -34,18 +33,18 @@ public class FreezePlayerService implements ServiceBase, NucleusFreezePlayerServ
                         .flatMap(x -> x.get(FreezePlayerKeys.FREEZE_PLAYER)).orElse(false));
     }
 
-    public boolean getFromUUID(@Nonnull final UUID uuid) {
+    public boolean getFromUUID(final UUID uuid) {
         final Boolean b = this.cache.get(uuid);
         return b != null ? b : false;
     }
 
-    public void invalidate(@Nonnull final UUID uuid) {
+    public void invalidate(final UUID uuid) {
         this.cache.invalidate(uuid);
     }
 
     @Override
     public boolean isFrozen(final UUID uuid) {
-        return getFromUUID(uuid);
+        return this.getFromUUID(uuid);
     }
 
     @Override

@@ -4,46 +4,72 @@
  */
 package io.github.nucleuspowered.nucleus.modules.freezeplayer;
 
-import com.google.common.collect.ImmutableMap;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.freezeplayer.commands.FreezePlayerCommand;
+import io.github.nucleuspowered.nucleus.modules.freezeplayer.infoprovider.FreezeInfoProvider;
+import io.github.nucleuspowered.nucleus.modules.freezeplayer.listeners.FreezePlayerListener;
 import io.github.nucleuspowered.nucleus.modules.freezeplayer.services.FreezePlayerService;
-import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 
-import java.util.Map;
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
+public final class FreezePlayerModule implements IModule {
 
-@ModuleData(id = "freeze-subject", name = "Freeze Player")
-public class FreezePlayerModule extends StandardModule {
+    public static final String ID = "freeze-subject";
+    public static final Component FROZEN_TAG = Component.text("[Frozen]", NamedTextColor.GRAY);
 
-    @Inject
-    public FreezePlayerModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        final FreezePlayerService service = new FreezePlayerService(serviceCollection);
+        serviceCollection.registerService(FreezePlayerService.class, service, false);
+        serviceCollection.placeholderService().registerToken(
+                "frozen",
+                PlaceholderParser.builder()
+                        .key(ResourceKey.of("nucleus", "frozen"))
+                        .parser(p -> {
+                            if (p.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
+                                    .map(x -> service.isFrozen(((ServerPlayer) x).getUniqueId()))
+                                    .orElse(false)) {
+                                return FreezePlayerModule.FROZEN_TAG;
+                            }
+                            return Component.empty();
+                        }).build()
+        );
     }
 
     @Override
-    protected Map<String, PlaceholderParser> tokensToRegister() {
-        return ImmutableMap.<String, PlaceholderParser>builder()
-                .put("frozen",
-                        PlaceholderParser.builder()
-                                .plugin(this.serviceCollection.pluginContainer())
-                                .id("frozen")
-                                .name("Nucleus Frozen Indicator Token")
-                                .parser(p -> {
-                                    if (p.getAssociatedObject().filter(x -> x instanceof User)
-                                            .map(x -> this.serviceCollection.getServiceUnchecked(FreezePlayerService.class).isFrozen((User) x))
-                                            .orElse(false)) {
-                                        return Text.of(TextColors.GRAY, "[Frozen]");
-                                    }
-                                    return Text.EMPTY;
-                                }).build()).build();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.singleton(FreezePlayerCommand.class);
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(FreezePlayerPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(FreezePlayerListener.class);
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<NucleusProvider> getInfoProvider() {
+        return Optional.of(new FreezeInfoProvider());
     }
 }

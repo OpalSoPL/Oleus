@@ -4,19 +4,23 @@
  */
 package io.github.nucleuspowered.nucleus.modules.fly.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class FlyConfig {
 
-    @Setting(value = "save-all-flystate-on-quit", comment = "config.fly.stateonquit")
+    @Setting(value = "save-all-flystate-on-quit")
+    @LocalisedComment("config.fly.stateonquit")
     private boolean saveOnQuit = true;
 
-    @Setting(value = "find-safe-location-on-login", comment = "config.fly.onlogin")
+    @Setting(value = "find-safe-location-on-login")
+    @LocalisedComment("config.fly.onlogin")
     private boolean findSafeOnLogin = true;
 
-    @Setting(value = "require-fly-permission-on-login", comment = "config.fly.permissiononlogin")
+    @Setting(value = "require-fly-permission-on-login")
+    @LocalisedComment("config.fly.permissiononlogin")
     private boolean permissionOnLogin = false;
 
     public boolean isSaveOnQuit() {

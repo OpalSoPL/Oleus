@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.experience.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.experience.ExperiencePermissions;
 import io.github.nucleuspowered.nucleus.modules.experience.parameter.ExperienceLevelArgument;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -12,13 +13,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
 import java.util.Optional;
 
 @Command(
@@ -29,18 +28,29 @@ import java.util.Optional;
 )
 public class GiveExperience implements ICommandExecutor {
 
+    private final Parameter.Value<Integer> experienceLevelParameter;
+    private final Parameter.Value<Integer> experienceValueParameter;
+
+    @Inject
+    public GiveExperience(final INucleusServiceCollection serviceCollection) {
+        this.experienceLevelParameter =
+                Parameter.integerNumber().parser(new ExperienceLevelArgument(serviceCollection))
+                        .setKey("experience").build();
+        this.experienceValueParameter =
+                Parameter.integerNumber().parser(VariableValueParameters.integerRange().setMin(0).setMax(Integer.MAX_VALUE).build())
+                        .setKey("experience").build();
+    }
+
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                NucleusParameters.OPTIONAL_ONE_PLAYER.get(serviceCollection),
-                GenericArguments.firstParsing(
-                    GenericArguments.onlyOne(new ExperienceLevelArgument(Text.of(ExperienceCommand.levelKey), serviceCollection)),
-                    GenericArguments.onlyOne(new PositiveIntegerArgument(Text.of(ExperienceCommand.experienceKey), serviceCollection))
-                )
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.OPTIONAL_ONE_PLAYER,
+                Parameter.firstOf(this.experienceLevelParameter, this.experienceValueParameter)
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player pl = context.getPlayerFromArgs();
         final Optional<ICommandResult> res = ExperienceCommand.checkGameMode(context, pl);
         if (res.isPresent()) {
@@ -48,7 +58,7 @@ public class GiveExperience implements ICommandExecutor {
         }
 
         final int extra;
-        if (context.hasAny(ExperienceCommand.levelKey)) {
+        if (context.hasAny(this.experienceLevelParameter)) {
             final int lvl = pl.get(Keys.EXPERIENCE_LEVEL).orElse(0) + context.requireOne(ExperienceCommand.levelKey, int.class);
             extra = pl.get(Keys.EXPERIENCE_SINCE_LEVEL).orElse(0);
 
@@ -58,9 +68,7 @@ public class GiveExperience implements ICommandExecutor {
             extra = context.requireOne(ExperienceCommand.experienceKey, int.class);
         }
 
-        int exp = pl.get(Keys.TOTAL_EXPERIENCE).get();
-        exp += extra;
-
-        return ExperienceCommand.tellUserAboutExperience(context, pl, pl.offer(Keys.TOTAL_EXPERIENCE, exp).isSuccessful());
+        final int exp = pl.get(Keys.EXPERIENCE).orElse(0) + extra;
+        return ExperienceCommand.tellUserAboutExperience(context, pl, pl.offer(Keys.EXPERIENCE_LEVEL, exp).isSuccessful());
     }
 }

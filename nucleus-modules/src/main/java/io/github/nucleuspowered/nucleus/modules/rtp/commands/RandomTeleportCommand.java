@@ -97,7 +97,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
         if (this.rc.getDefaultWorld().isPresent()) {
             wp = context.getOne(NucleusParameters.Keys.WORLD, WorldProperties.class).orElseGet(() -> this.rc.getDefaultWorld().get());
         } else {
-            wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD).get();
+            wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD).get();
         }
 
         if (this.rc.isPerWorldPermissions()) {

@@ -14,6 +14,8 @@ public final class GeAnTyRefTypeTokens {
     public static final TypeToken<AbstractConfigurateBackedDataObject> ABSTRACT_DATA_OBJECT_TYPE_TOKEN =
             TypeToken.get(AbstractConfigurateBackedDataObject.class);
 
+    public static final TypeToken<Boolean> BOOLEAN = TypeToken.get(Boolean.class);
+
     public static final TypeToken<Instant> INSTANT = TypeToken.get(Instant.class);
 
     public static final TypeToken<Integer> INTEGER = TypeToken.get(Integer.class);

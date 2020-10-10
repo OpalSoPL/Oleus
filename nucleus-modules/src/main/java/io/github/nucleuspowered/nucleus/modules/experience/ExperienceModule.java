@@ -4,19 +4,54 @@
  */
 package io.github.nucleuspowered.nucleus.modules.experience;
 
-import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.experience.commands.ExperienceCommand;
+import io.github.nucleuspowered.nucleus.modules.experience.commands.GiveExperience;
+import io.github.nucleuspowered.nucleus.modules.experience.commands.SetExperience;
+import io.github.nucleuspowered.nucleus.modules.experience.commands.TakeExperience;
+import io.github.nucleuspowered.nucleus.modules.experience.listener.ExperienceListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-@ModuleData(id = ExperienceModule.ID, name = "Experience")
-public class ExperienceModule extends StandardModule {
+public class ExperienceModule implements IModule {
 
     public static final String ID = "experience";
 
-    public ExperienceModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+
     }
+
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                ExperienceCommand.class,
+                GiveExperience.class,
+                SetExperience.class,
+                TakeExperience.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(ExperiencePermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(ExperienceListener.class);
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
+
 }

@@ -13,19 +13,18 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 
 public class FlyListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -39,28 +38,30 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
 
     // Do it first, so other plugins can have a say.
     @Listener(order = Order.FIRST)
-    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player pl) {
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer pl) {
         if (shouldIgnoreFromGameMode(pl)) {
             return;
         }
 
         if (this.flyConfig.isPermissionOnLogin() && !this.serviceCollection.permissionService().hasPermission(pl, FlyPermissions.BASE_FLY)) {
-            safeTeleport(pl);
+            this.safeTeleport(pl);
             return;
         }
 
         this.serviceCollection.storageManager().getUser(pl.getUniqueId()).thenAccept(x -> x.ifPresent(y -> {
             if (y.get(FlyKeys.FLY_TOGGLE).orElse(false)) {
-                if (Sponge.getServer().isMainThread()) {
-                    exec(pl);
+                if (Sponge.getServer().onMainThread()) {
+                    this.exec(pl);
                 } else {
-                    Task.builder().execute(() -> exec(pl)).submit(this.serviceCollection.pluginContainer());
+                    Sponge.getServer().getScheduler().submit(
+                            Task.builder().execute(() -> this.exec(pl)).plugin(this.serviceCollection.pluginContainer()).build());
                 }
             } else {
-                if (Sponge.getServer().isMainThread()) {
-                    safeTeleport(pl);
+                if (Sponge.getServer().onMainThread()) {
+                    this.safeTeleport(pl);
                 } else {
-                    Task.builder().execute(() -> safeTeleport(pl)).submit(this.serviceCollection.pluginContainer());
+                    Sponge.getServer().getScheduler().submit(
+                            Task.builder().execute(() -> this.safeTeleport(pl)).plugin(this.serviceCollection.pluginContainer()).build());
                 }
             }
         }));
@@ -70,13 +71,13 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
         pl.offer(Keys.CAN_FLY, true);
 
         // If in the air, flying!
-        if (pl.getLocation().add(0, -1, 0).getBlockType().getId().equals(BlockTypes.AIR.getId())) {
+        if (pl.getLocation().add(0, -1, 0).getBlockType() == BlockTypes.AIR.get()) {
             pl.offer(Keys.IS_FLYING, true);
         }
     }
 
     @Listener
-    public void onPlayerQuit(final ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") final Player pl) {
+    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer pl) {
         if (!this.flyConfig.isSaveOnQuit()) {
             return;
         }
@@ -92,43 +93,37 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
 
     // Only fire if there is no cancellation at the end.
     @Listener(order = Order.LAST)
-    public void onPlayerTransferWorld(final MoveEntityEvent.Teleport event,
-                                      @Getter("getTargetEntity") final Entity target,
-                                      @Getter("getFromTransform") final Transform<World> twfrom,
-                                      @Getter("getToTransform") final Transform<World> twto) {
-
-        if (!(target instanceof Player)) {
-            return;
-        }
-
-        final Player pl = (Player)target;
+    public void onPlayerTransferWorld(final ChangeEntityWorldEvent.Post event,
+                                      @Getter("getEntity") final ServerPlayer pl,
+                                      @Getter("getOriginalWorld") final ServerWorld twfrom,
+                                      @Getter("getDestinationWorld") final ServerWorld twto) {
         if (shouldIgnoreFromGameMode(pl)) {
             return;
         }
 
         // If we have a subject, and this happens...
-        final boolean isFlying = target.get(Keys.IS_FLYING).orElse(false);
+        final boolean isFlying = pl.get(Keys.IS_FLYING).orElse(false);
 
         // If we're moving world...
-        if (!twfrom.getExtent().getUniqueId().equals(twto.getExtent().getUniqueId())) {
+        if (!twfrom.getKey().equals(twto.getKey())) {
             // Next tick, they can fly... if they have permission to do so.
-            Sponge.getScheduler().createTaskBuilder().execute(() -> {
+            Sponge.getServer().getScheduler().submit(Task.builder().execute(() -> {
                 if (this.serviceCollection.permissionService().hasPermission(pl, FlyPermissions.BASE_FLY)) {
-                    target.offer(Keys.CAN_FLY, true);
+                    pl.offer(Keys.CAN_FLY, true);
                     if (isFlying) {
-                        target.offer(Keys.IS_FLYING, true);
+                        pl.offer(Keys.IS_FLYING, true);
                     }
                 } else {
                     this.serviceCollection.storageManager().getOrCreateUser(pl.getUniqueId()).thenAccept(x -> x.set(FlyKeys.FLY_TOGGLE, false));
-                    target.offer(Keys.CAN_FLY, false);
-                    target.offer(Keys.IS_FLYING, false);
+                    pl.offer(Keys.CAN_FLY, false);
+                    pl.offer(Keys.IS_FLYING, false);
                 }
-            }).submit(this.serviceCollection.pluginContainer());
+            }).plugin(this.serviceCollection.pluginContainer()).build());
         }
     }
 
     static boolean shouldIgnoreFromGameMode(final Player player) {
-        final GameMode gm = player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET);
+        final GameMode gm = player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET.get());
         return (gm.equals(GameModes.CREATIVE) || gm.equals(GameModes.SPECTATOR));
     }
 
@@ -137,14 +132,14 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
         this.flyConfig = this.serviceCollection.configProvider().getModuleConfig(FlyConfig.class);
     }
 
-    private void safeTeleport(final Player pl) {
-        if (!pl.isOnGround() && this.flyConfig.isFindSafeOnLogin()) {
+    private void safeTeleport(final ServerPlayer pl) {
+        if (!pl.get(Keys.IS_FLYING).orElse(false) && this.flyConfig.isFindSafeOnLogin()) {
             // Try to bring the subject down.
             this.serviceCollection
                     .teleportService()
                     .teleportPlayerSmart(
                             pl,
-                            pl.getTransform(),
+                            pl.getServerLocation(),
                             false,
                             true,
                             TeleportScanners.DESCENDING_SCAN.get()

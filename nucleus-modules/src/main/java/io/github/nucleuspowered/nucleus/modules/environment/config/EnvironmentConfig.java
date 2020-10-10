@@ -4,13 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.environment.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class EnvironmentConfig {
 
-    @Setting(value = "maximum-weather-timespan", comment = "config.environment.maxweathertime")
+    @Setting("maximum-weather-timespan")
+    @LocalisedComment("config.environment.maxweathertime")
     private long maximumWeatherTimespan = -1;
 
     public long getMaximumWeatherTimespan() {

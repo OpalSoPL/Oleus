@@ -4,29 +4,57 @@
  */
 package io.github.nucleuspowered.nucleus.modules.environment;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.environment.commands.LockWeatherCommand;
+import io.github.nucleuspowered.nucleus.modules.environment.commands.WeatherCommand;
 import io.github.nucleuspowered.nucleus.modules.environment.config.EnvironmentConfig;
-import io.github.nucleuspowered.nucleus.modules.environment.config.EnvironmentConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.environment.listeners.EnvironmentListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = "environment", name = "Environment")
-public class EnvironmentModule extends ConfigurableModule<EnvironmentConfig, EnvironmentConfigAdapter> {
+public class EnvironmentModule implements IModule.Configurable<EnvironmentConfig> {
 
     public static final String ID = "environment";
 
-    @Inject
-    public EnvironmentModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+
     }
 
     @Override
-    public EnvironmentConfigAdapter createAdapter() {
-        return new EnvironmentConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                LockWeatherCommand.class,
+                SetTimeCommand.class,
+                TimeCommand.class,
+                WeatherCommand.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(EnvironmentPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(EnvironmentListener.class);
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<EnvironmentConfig> getConfigClass() {
+        return EnvironmentConfig.class;
     }
 }

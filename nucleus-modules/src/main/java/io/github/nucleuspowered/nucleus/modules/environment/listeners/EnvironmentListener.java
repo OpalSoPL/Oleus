@@ -26,7 +26,7 @@ public class EnvironmentListener implements ListenerBase {
         event.setCancelled(this.serviceCollection
                 .storageManager()
                 .getWorldService()
-                .getOnThread(event.getTargetWorld().getUniqueId())
+                .getOnThread(event.getWorld().getKey())
                 .map(x -> x.getOrDefault(EnvironmentKeys.LOCKED_WEATHER))
                 .orElse(false));
     }

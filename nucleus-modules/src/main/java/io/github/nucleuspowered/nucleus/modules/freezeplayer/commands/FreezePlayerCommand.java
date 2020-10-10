@@ -14,11 +14,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
+
 @Command(
         aliases = {"freezeplayer", "freeze"},
         basePermission = FreezePlayerPermissions.BASE_FREEZEPLAYER,
@@ -34,18 +33,18 @@ import org.spongepowered.api.entity.living.player.User;
 public class FreezePlayerCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier().createOtherUserPermissionElement(false, FreezePlayerPermissions.OTHERS_FREEZEPLAYER),
-                GenericArguments.optional(NucleusParameters.ONE_TRUE_FALSE)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(FreezePlayerPermissions.OTHERS_FREEZEPLAYER),
+                NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User pl = context.getUserFromArgs();
         final FreezePlayerService service = context.getServiceCollection().getServiceUnchecked(FreezePlayerService.class);
-        final boolean f = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElseGet(() -> !service.isFrozen(pl));
-        service.setFrozen(pl, f);
+        final boolean f = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !service.isFrozen(pl.getUniqueId()));
+        service.setFrozen(pl.getUniqueId(), f);
         context.sendMessage(
             f ? "command.freezeplayer.success.frozen" : "command.freezeplayer.success.unfrozen",
                 context.getServiceCollection().playerDisplayNameService().getDisplayName(pl));

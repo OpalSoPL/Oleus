@@ -8,18 +8,19 @@ import io.github.nucleuspowered.nucleus.modules.experience.ExperiencePermissions
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.ExperienceOrb;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
+import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Tristate;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.google.inject.Inject;
+import org.spongepowered.plugin.PluginContainer;
 
 public class ExperienceListener implements ListenerBase {
 
@@ -46,10 +48,10 @@ public class ExperienceListener implements ListenerBase {
     // * FALSE (Explicitly set): remove EXP
     // * UNDEFINED: do whatever the system wants us to do.
     @Listener(order = Order.POST)
-    public void onPlayerDeathMonitor(final DestructEntityEvent.Death deathEvent, @Getter("getTargetEntity") final Player player) {
+    public void onPlayerDeathMonitor(final DestructEntityEvent.Death deathEvent, @Getter("getEntity") final ServerPlayer player) {
         final Tristate tristate = this.permissionService.hasPermissionTristate(player, ExperiencePermissions.KEEP_EXP_PERMISSION);
         if (tristate == Tristate.TRUE) {
-            final int exp = player.get(Keys.TOTAL_EXPERIENCE).orElse(0);
+            final int exp = player.get(Keys.EXPERIENCE).orElse(0);
             this.deadExpPlayers.put(player.getUniqueId(), exp);
         } else if (tristate == Tristate.FALSE) {
             this.deadExpPlayers.put(player.getUniqueId(), 0);
@@ -65,19 +67,20 @@ public class ExperienceListener implements ListenerBase {
     }
 
     @Listener
-    public void onPlayerRespawn(final RespawnPlayerEvent event, @Getter("getTargetEntity") final Player player) {
-        applyExperience(player);
+    public void onPlayerRespawn(final RespawnPlayerEvent event, @Getter("getPlayer") final ServerPlayer player) {
+        this.applyExperience(player);
     }
 
     @Listener
-    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
-        applyExperience(player);
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+        this.applyExperience(player);
     }
 
-    private void applyExperience(final Player player) {
+    private void applyExperience(final ServerPlayer player) {
         if (this.deadExpPlayers.containsKey(player.getUniqueId())) {
             final int exp = this.deadExpPlayers.get(player.getUniqueId());
-            Task.builder().delayTicks(1).execute(() -> player.offer(Keys.TOTAL_EXPERIENCE, exp)).submit(this.pluginContainer);
+            final Task task = Task.builder().delayTicks(1).execute(() -> player.offer(Keys.EXPERIENCE, exp)).plugin(this.pluginContainer).build();
+            Sponge.getServer().getScheduler().submit(task);
             this.deadExpPlayers.remove(player.getUniqueId());
         }
     }

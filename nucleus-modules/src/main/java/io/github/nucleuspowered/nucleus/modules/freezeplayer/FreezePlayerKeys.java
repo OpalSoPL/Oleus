@@ -5,10 +5,11 @@
 package io.github.nucleuspowered.nucleus.modules.freezeplayer;
 
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
+import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class FreezePlayerKeys {
 
-    public static DataKey<Boolean, IUserDataObject> FREEZE_PLAYER = DataKey.of(TypeTokens.BOOLEAN, IUserDataObject.class, "isFrozen");
+    public static DataKey<Boolean, IUserDataObject> FREEZE_PLAYER = DataKey.of(GeAnTyRefTypeTokens.BOOLEAN, IUserDataObject.class, "isFrozen");
 }

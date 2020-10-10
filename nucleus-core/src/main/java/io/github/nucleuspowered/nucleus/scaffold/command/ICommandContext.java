@@ -68,7 +68,7 @@ public interface ICommandContext {
 
     ServerPlayer getPlayerFromArgs(String key, String errorKey) throws CommandException;
 
-    default Player getPlayerFromArgs() throws CommandException {
+    default ServerPlayer getPlayerFromArgs() throws CommandException {
         return this.getPlayerFromArgs(NucleusParameters.Keys.PLAYER, "command.playeronly");
     }
 
@@ -208,7 +208,9 @@ public interface ICommandContext {
 
     boolean isConsoleAndBypass();
 
-    Optional<WorldProperties> getWorldPropertiesOrFromSelf(Parameter.Key<WorldProperties> worldKey);
+    WorldProperties getWorldPropertiesOrFromSelf(Parameter.Key<WorldProperties> worldKey) throws CommandException;
+
+    Optional<WorldProperties> getWorldPropertiesOrFromSelfOptional(Parameter.Key<WorldProperties> worldKey);
 
     String getName();
 

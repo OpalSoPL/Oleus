@@ -16,10 +16,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 @EssentialsEquivalent("fly")
 @Command(
         aliases = "fly",
@@ -34,18 +35,19 @@ import org.spongepowered.api.entity.living.player.Player;
 )
 public class FlyCommand implements ICommandExecutor { // extends AbstractCommand.SimpleTargetOtherPlayer {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, FlyPermissions.OTHERS_FLY),
+    @Override
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.commandElementSupplier().createOnlyOtherPlayerPermissionElement(FlyPermissions.OTHERS_FLY),
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player player = context.getPlayerFromArgs();
+        final ServerPlayer player = context.getPlayerFromArgs();
         final boolean fly = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!player.get(Keys.CAN_FLY).orElse(false));
 
-        if (!setFlying(player, fly)) {
+        if (!this.setFlying(player, fly)) {
             return context.errorResult("command.fly.error");
         }
 

@@ -50,7 +50,7 @@ public class GenerateChunksCommand implements ICommandExecutor {
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.Keys.WORLD)
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
 
         final WorldHelper worldHelper = context.getServiceCollection().getServiceUnchecked(WorldHelper.class);
