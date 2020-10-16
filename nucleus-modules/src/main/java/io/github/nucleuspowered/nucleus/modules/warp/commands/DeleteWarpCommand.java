@@ -23,7 +23,7 @@ import org.spongepowered.api.event.cause.Cause;
 @EssentialsEquivalent({"delwarp", "remwarp", "rmwarp"})
 @Command(
         aliases = {"delete", "del", "#delwarp", "#remwarp", "#rmwarp"},
-        basePermission = WarpPermissions.BASE_WARP_LIST,
+        basePermission = WarpPermissions.BASE_WARP_DELETE,
         commandDescriptionKey = "warp.list",
         async = true,
         parentCommand = WarpCommand.class
