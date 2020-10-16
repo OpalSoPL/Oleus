@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn.listeners;
 
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.teleport.data.NucleusTeleportHelperFilters;
@@ -56,12 +57,12 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
     }
 
     @Listener
-    public void onJoin(final ClientConnectionEvent.Login loginEvent) {
-        final UUID pl = loginEvent.getProfile().getUniqueId();
-        final IStorageManager storageManager = this.serviceCollection.storageManager();
-        final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
-        final boolean first = storageManager.getOrCreateUserOnThread(pl).get(CoreKeys.FIRST_JOIN).isPresent();
-        final IGeneralDataObject generalDataObject = storageManager.getGeneralService().getOrNew().join();
+    public void onJoin(ServerSideConnectionEvent.Login loginEvent) {
+        UUID pl = loginEvent.getProfile().getUniqueId();
+        IStorageManager storageManager = this.serviceCollection.storageManager();
+        IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
+        boolean first = storageManager.getOrCreateUserOnThread(pl).get(CoreKeys.FIRST_JOIN_PROCESSED).orElse(false);
+        IGeneralDataObject generalDataObject = storageManager.getGeneralService().getOrNew().join();
 
         try {
             if (first) {

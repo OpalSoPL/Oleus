@@ -24,6 +24,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.services.UserServi
 import io.github.nucleuspowered.nucleus.services.impl.storage.services.WorldService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
+import io.github.nucleuspowered.nucleus.services.interfaces.IDataVersioning;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.storage.IStorageModule;
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
@@ -66,16 +67,19 @@ public final class StorageManager implements IStorageManager {
             final Logger logger,
             final IConfigurateHelper configurateHelper,
             final IConfigProvider configProvider,
+            final IDataVersioning dataVersioning,
             final PluginContainer pluginContainer) {
         this.flatFileStorageRepositoryFactory = new FlatFileStorageRepositoryFactory(dataDirectory, logger);
         this.configurateHelper = configurateHelper;
         this.configProvider = configProvider;
-        this.userService = new UserService(this, pluginContainer);
-        this.worldService = new WorldService(this, pluginContainer);
+        this.userService = new UserService(this, pluginContainer, dataVersioning);
+        this.worldService = new WorldService(this, pluginContainer, dataVersioning);
         this.generalService = new SingleCachedService<>(
                 this::getGeneralRepository,
                 this::getGeneralDataAccess,
-                pluginContainer);
+                pluginContainer,
+                dataVersioning::setVersion,
+                dataVersioning::migrate);
     }
 
     @Override

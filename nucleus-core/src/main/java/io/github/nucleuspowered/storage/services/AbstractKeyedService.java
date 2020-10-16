@@ -28,6 +28,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D extends IKeyedDataObject<D>>
@@ -53,10 +54,14 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     private final ThrownFunction<Q, Optional<KeyedObject<K, D>>, Exception> getQuery;
     private final ThrownFunction<K, Optional<D>, Exception> get;
     private final PluginContainer pluginContainer;
+    private final Consumer<D> upgrader;
+    private final Consumer<D> versionSetter;
 
     public <O> AbstractKeyedService(
         final Supplier<IDataTranslator<D, O>> dts,
         final Supplier<IStorageRepository.Keyed<K, Q, O>> srs,
+        final Consumer<D> upgrader,
+        final Consumer<D> versionSetter,
         final PluginContainer pluginContainer
     ) {
         this(
@@ -78,6 +83,8 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
                 K -> srs.get().get(K).map(dts.get()::fromDataAccessObject),
                 query -> srs.get().get(query).map(x -> x.mapValue(dts.get()::fromDataAccessObject)),
                 srs::get,
+                upgrader,
+                versionSetter,
                 pluginContainer);
     }
 
@@ -88,6 +95,8 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
             final ThrownFunction<K, Optional<D>, Exception> get,
             final ThrownFunction<Q, Optional<KeyedObject<K, D>>, Exception> getQuery,
             final Supplier<IStorageRepository.Keyed<K, Q, ?>> storageRepositorySupplier,
+            final Consumer<D> upgrader,
+            final Consumer<D> versionSetter,
             final PluginContainer pluginContainer
     ) {
         this.pluginContainer = pluginContainer;
@@ -96,11 +105,15 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
         this.getAll = getAll;
         this.get = get;
         this.getQuery = getQuery;
+        this.upgrader = upgrader;
+        this.versionSetter = versionSetter;
         this.storageRepositorySupplier = storageRepositorySupplier;
     }
 
     public D createNew() {
-        return this.createNew.get();
+        final D data = this.createNew.get();
+        this.versionSetter.accept(data);
+        return data;
     }
 
     @Override
@@ -157,7 +170,10 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
         try {
             lock.lock();
             final Optional<D> r = this.get.apply(key);
-            r.ifPresent(d -> this.cache.put(key, d));
+            r.ifPresent(d -> {
+                this.upgrader.accept(d);
+                this.cache.put(key, d);
+            });
             return r;
         } finally {
             lock.unlock();

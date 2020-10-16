@@ -12,6 +12,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -32,9 +33,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -191,5 +194,10 @@ public final class Util {
                 .query(QueryTypes.PLAYER_PRIMARY_HOTBAR_FIRST.get().toQuery());
     }
 
+    public static boolean hasPlayedBeforeSponge(final User player) {
+        final Instant instant = player.get(Keys.FIRST_DATE_JOINED).orElseGet(Instant::now);
+        final Instant next = Instant.now().plus(5, ChronoUnit.SECONDS);
+        return instant.isBefore(next);
+    }
 
 }

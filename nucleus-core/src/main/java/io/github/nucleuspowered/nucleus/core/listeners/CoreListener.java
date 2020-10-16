@@ -4,7 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.core.listeners;
 
-import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.core.event.NucleusFirstJoinEvent;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.core.CoreKeys;
@@ -16,16 +17,18 @@ import io.github.nucleuspowered.nucleus.core.services.UniqueUserService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
+import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IUserQueryObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.util.AdventureUtils;
+import io.github.nucleuspowered.storage.services.IStorageService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
@@ -37,7 +40,6 @@ import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.pagination.PaginationService;
 
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -45,11 +47,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import com.google.inject.Inject;
 
 public class CoreListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -57,6 +55,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     @Nullable private NucleusTextTemplate getKickOnStopMessage = null;
     @Nullable private final URL url;
     private boolean warnOnWildcard = true;
+    private boolean checkSponge = false;
 
     @Inject
     public CoreListener(final INucleusServiceCollection serviceCollection) {
@@ -143,23 +142,32 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     @Listener
     public void onPlayerJoinLast(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
         // created before
-        // TODO: Fix this
-        if (!this.serviceCollection.storageManager().getUserService().getOnThread(player.getUniqueId())
-                .map(x -> x.get(CoreKeys.FIRST_JOIN)).isPresent()) {
-            this.serviceCollection.getServiceUnchecked(UniqueUserService.class).resetUniqueUserCount();
+        final UUID uuid = player.getUniqueId();
+        final IStorageService.Keyed.KeyedData<UUID, IUserQueryObject, IUserDataObject> userService =
+                this.serviceCollection.storageManager().getUserService();
+        if (!userService
+                .getOnThread(uuid)
+                .flatMap(x -> x.get(CoreKeys.FIRST_JOIN_PROCESSED))
+                .orElse(false)) {
 
-            final NucleusFirstJoinEvent firstJoinEvent = new OnFirstLoginEvent(
-                event.getCause(), player, event.getOriginalAudience(),
-                    event.getAudience().orElseGet(Sponge::getSystemSubject),
-                    event.getOriginalMessage(),
-                    event.isMessageCancelled());
+            if (!this.checkSponge || !Util.hasPlayedBeforeSponge(player.getUser())) {
+                this.serviceCollection.getServiceUnchecked(UniqueUserService.class).resetUniqueUserCount();
 
-            Sponge.getEventManager().post(firstJoinEvent);
-            firstJoinEvent.getAudience().ifPresent(event::setAudience);
-            event.setMessageCancelled(firstJoinEvent.isMessageCancelled());
-            this.serviceCollection.storageManager().getUserService()
-                    .getOrNew(player.getUniqueId())
-                    .thenAccept(x -> x.set(CoreKeys.FIRST_JOIN, x.get(CoreKeys.LAST_LOGIN).orElseGet(Instant::now)));
+                final NucleusFirstJoinEvent firstJoinEvent = new OnFirstLoginEvent(
+                        event.getCause(), player, event.getOriginalAudience(), event.getAudience().orElse(null), event.getOriginalMessage(),
+                        event.isMessageCancelled());
+
+                Sponge.getEventManager().post(firstJoinEvent);
+                event.setAudience(firstJoinEvent.getAudience().get());
+                event.setMessageCancelled(firstJoinEvent.isMessageCancelled());
+            }
+
+            userService.getOrNew(player.getUniqueId())
+                    .thenAccept(x -> {
+                        x.set(CoreKeys.FIRST_JOIN, x.get(CoreKeys.LAST_LOGIN).orElseGet(Instant::now));
+                        x.set(CoreKeys.FIRST_JOIN_PROCESSED, true);
+                        userService.save(uuid, x);
+                    });
         }
 
         // Warn about wildcard.
@@ -211,6 +219,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
         final CoreConfig c = this.serviceCollection.configProvider().getModuleConfig(CoreConfig.class);
         this.getKickOnStopMessage = c.isKickOnStop() ? c.getKickOnStopMessage() : null;
         this.warnOnWildcard = c.isCheckForWildcard();
+        this.checkSponge = c.isCheckFirstDatePlayed();
     }
 
     @Listener

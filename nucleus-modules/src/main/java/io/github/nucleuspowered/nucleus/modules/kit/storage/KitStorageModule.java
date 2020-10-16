@@ -13,10 +13,10 @@ import io.github.nucleuspowered.storage.IStorageModule;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
 import io.github.nucleuspowered.storage.services.IStorageService;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.SimpleConfigurationNode;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationOptions;
 
 public final class KitStorageModule implements IStorageModule<IKitDataObject, IStorageService.Single<IKitDataObject>,
         IStorageRepository.Single<JsonObject>, IConfigurateBackedDataTranslator<IKitDataObject>> {
@@ -27,7 +27,7 @@ public final class KitStorageModule implements IStorageModule<IKitDataObject, IS
 
     private final IConfigurateBackedDataTranslator<IKitDataObject> kitsDataAccess = new IConfigurateBackedDataTranslator<IKitDataObject>() {
         @Override public ConfigurationNode createNewNode() {
-            return SimpleConfigurationNode.root(KitStorageModule.this.serviceCollection.configurateHelper().setOptions(ConfigurationOptions.defaults()));
+            return CommentedConfigurationNode.root(KitStorageModule.this.serviceCollection.configurateHelper().setOptions(ConfigurationOptions.defaults()));
         }
 
         @Override public IKitDataObject createNew() {
@@ -42,7 +42,9 @@ public final class KitStorageModule implements IStorageModule<IKitDataObject, IS
         this.kitsService = new SingleCachedService<>(
                 this::getRepository,
                 this::getDataTranslator,
-                serviceCollection.pluginContainer());
+                serviceCollection.pluginContainer(),
+                c -> {},
+                c -> {});
         this.serviceCollection = serviceCollection;
     }
 
