@@ -59,7 +59,7 @@ public final class Util {
 
     public static String getNameOrUnkown(final ICommandContext context, final GameProfile profile) {
         return profile.getName().orElse(
-                context.getServiceCollection().messageProvider().getMessageString(context.getCommandKey(), "standard.unknown"));
+                context.getServiceCollection().messageProvider().getMessageString("standard.unknown"));
     }
 
     public static String getTimeFromTicks(final IMessageProviderService messageProviderService, long ticks) {
