@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.spawn.listeners;
 
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.math.vector.Vector3d;
+import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.teleport.data.NucleusTeleportHelperFilters;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
@@ -42,12 +43,12 @@ import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
 import com.google.inject.Inject;
 
 public class SpawnListener implements IReloadableService.Reloadable, ListenerBase {
 
     private SpawnConfig spawnConfig;
+    private boolean checkSponge;
 
     private final INucleusServiceCollection serviceCollection;
 
@@ -61,7 +62,12 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
         UUID pl = loginEvent.getProfile().getUniqueId();
         IStorageManager storageManager = this.serviceCollection.storageManager();
         IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
-        boolean first = storageManager.getOrCreateUserOnThread(pl).get(CoreKeys.FIRST_JOIN_PROCESSED).orElse(false);
+        final boolean first;
+        if (!storageManager.getOrCreateUserOnThread(pl).get(CoreKeys.FIRST_JOIN_PROCESSED).orElse(false)) {
+            first = !this.checkSponge || !Util.hasPlayedBeforeSponge(loginEvent.getTargetUser());
+        } else {
+            first = false;
+        }
         IGeneralDataObject generalDataObject = storageManager.getGeneralService().getOrNew().join();
 
         try {
@@ -207,6 +213,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         this.spawnConfig = serviceCollection.configProvider().getModuleConfig(SpawnConfig.class);
+        this.checkSponge = serviceCollection.configProvider().getCoreConfig().isCheckFirstDatePlayed();
     }
 
     private static Location<World> process(final Location<World> v3d) {
