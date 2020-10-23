@@ -48,6 +48,8 @@ dependencies {
     api("org.spongepowered:configurate-hocon:4.0.0-SNAPSHOT")
     api("org.spongepowered:configurate-yaml:4.0.0-SNAPSHOT")
 
+    api("io.vavr:vavr:0.10.3")
+
     testCompile("org.mockito:mockito-all:1.10.19")
     testCompile("org.powermock:powermock-module-junit4:1.6.4")
     testCompile("org.powermock:powermock-api-mockito:1.6.4")

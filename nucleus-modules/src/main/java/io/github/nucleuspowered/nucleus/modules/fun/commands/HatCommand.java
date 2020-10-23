@@ -12,17 +12,15 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.data.key.Keys;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-import java.util.Optional;
 
 @EssentialsEquivalent({"hat", "head"})
 @Command(
@@ -34,26 +32,28 @@ import java.util.Optional;
 public class HatCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(true, FunPermissions.OTHERS_HAT)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(FunPermissions.OTHERS_HAT)
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player pl = context.getPlayerFromArgs();
+        final ServerPlayer pl = context.getPlayerFromArgs();
         final boolean isSelf = context.is(pl);
-        final Optional<ItemStack> helmetOptional = pl.getHelmet();
+        final ItemStack helment = pl.getHead();
 
-        final ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND)
-                .orElseThrow(() -> context.createException("command.generalerror.handempty"));
+        final ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND);
+        if (stack.isEmpty()) {
+            return context.errorResult("command.generalerror.handempty");
+        }
         final ItemStack hand = stack.copy();
         hand.setQuantity(1);
-        pl.setHelmet(hand);
-        final TextComponent itemName = hand.get(Keys.DISPLAY_NAME).orElseGet(() -> Text.of(stack));
+        pl.setHead(hand);
+        final Component itemName = hand.getType().asComponent();
 
-        final GameMode gameMode = pl.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET);
+        final GameMode gameMode = pl.get(Keys.GAME_MODE).orElseGet(GameModes.NOT_SET);
         if (gameMode != GameModes.CREATIVE) {
             if (stack.getQuantity() > 1) {
                 stack.setQuantity(stack.getQuantity() - 1);
@@ -64,8 +64,11 @@ public class HatCommand implements ICommandExecutor {
         }
 
         // If the old item can't be placed back in the subject inventory, drop the item.
-        helmetOptional.ifPresent(itemStack -> Util.getStandardInventory(pl).offer(itemStack.copy())
-                .getRejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, pl.getWorld(), pl.getLocation().getPosition())));
+        if (!helment.isEmpty()) {
+            Util.getStandardInventory(pl).offer(helment)
+                    .getRejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, pl.getServerLocation().getWorld(),
+                        pl.getLocation().getPosition()));
+        }
 
         if (!isSelf) {
             context.sendMessage(

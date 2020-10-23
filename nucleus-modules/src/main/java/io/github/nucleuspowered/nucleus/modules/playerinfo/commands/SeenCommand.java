@@ -21,7 +21,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerInformationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
-import io.github.nucleuspowered.nucleus.util.TriFunction;
+import io.github.nucleuspowered.nucleus.util.functional.TriFunction;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandSource;

@@ -2,19 +2,18 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.util;
+package io.github.nucleuspowered.nucleus.util.functional;
 
 /**
- * A function that accepts three arguments and returns a result, but can also throw a checked exception.
+ * A function that accepts three arguments and returns a result.
  *
  * @param <A> The first argument type.
  * @param <B> The second argument type.
  * @param <C> The third argument type.
  * @param <R> The type of the result.
- * @param <T> The type of {@link Exception} that could be thrown.
  */
 @FunctionalInterface
-public interface ThrownTriFunction<A, B, C, R, T extends Exception> {
+public interface TriFunction<A, B, C, R> {
 
-    R accept(A a, B b, C c) throws T;
+    R accept(A a, B b, C c);
 }

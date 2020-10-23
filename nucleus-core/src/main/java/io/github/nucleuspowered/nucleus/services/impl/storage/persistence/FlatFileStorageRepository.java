@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.github.nucleuspowered.nucleus.util.ThrownFunction;
+import io.github.nucleuspowered.nucleus.util.functional.ThrownFunction;
 import io.github.nucleuspowered.storage.exceptions.DataDeleteException;
 import io.github.nucleuspowered.storage.exceptions.DataLoadException;
 import io.github.nucleuspowered.storage.exceptions.DataQueryException;

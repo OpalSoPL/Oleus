@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.storage.services;
 
-import io.github.nucleuspowered.nucleus.util.ThrownSupplier;
+import io.github.nucleuspowered.nucleus.util.functional.ThrownSupplier;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.plugin.PluginContainer;
 

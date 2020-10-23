@@ -2,10 +2,9 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.util;
+package io.github.nucleuspowered.nucleus.util.functional;
 
-@FunctionalInterface
-public interface Action {
+public interface ThrownSupplier<R, X extends Throwable> {
 
-    void action();
+    R get() throws X;
 }

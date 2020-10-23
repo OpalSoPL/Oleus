@@ -24,7 +24,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.ICommandMetadataServ
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import io.github.nucleuspowered.nucleus.util.Action;
+import io.github.nucleuspowered.nucleus.util.functional.Action;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;

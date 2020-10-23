@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.annotation.Permissio
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
 import io.github.nucleuspowered.nucleus.util.PrettyPrinter;
-import io.github.nucleuspowered.nucleus.util.ThrownFunction;
+import io.github.nucleuspowered.nucleus.util.functional.ThrownFunction;
 import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.api.Server;

@@ -255,13 +255,11 @@ tasks {
         dependencies {
             include(project(":nucleus-api"))
             include(project(":nucleus-core"))
-            include(dependency(project.properties["qsmlDep"]?.toString()!!))
-            include(dependency(project.properties["neutrinoDep"]?.toString()!!))
+            include(dependency("io.vavr:vavr:0.10.3"))
         }
 
         if (!project.properties.containsKey("norelocate")) {
-            relocate("uk.co.drnaylor", "io.github.nucleuspowered.relocate.uk.co.drnaylor")
-            relocate("io.github.nucleuspowered.neutrino", "io.github.nucleuspowered.relocate.nucleus.neutrino")
+            relocate("io.vavr", "io.github.nucleuspowered.reloate.io.vavr")
         }
 
         exclude("io/github/nucleuspowered/nucleus/api/NucleusAPIMod.class")

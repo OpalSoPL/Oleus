@@ -13,15 +13,14 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.text.Text;
+
 @EssentialsEquivalent("burn")
 @Command(
         aliases = {"ignite", "burn"},
@@ -36,21 +35,24 @@ import org.spongepowered.api.text.Text;
 )
 public class IgniteCommand implements ICommandExecutor {
 
-    private final String ticks = "ticks";
+    private final Parameter.Value<Integer> ticks = Parameter.builder(Integer.class)
+            .setKey("ticks")
+            .parser(VariableValueParameters.integerRange().setMin(0).build())
+            .build();
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, FunPermissions.OTHERS_IGNITE),
-                GenericArguments.onlyOne(GenericArguments.integer(Text.of(this.ticks)))
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(FunPermissions.OTHERS_IGNITE),
+                this.ticks
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player target = context.getPlayerFromArgs();
-        final int ticksInput = context.requireOne(this.ticks, Integer.class);
-        final GameMode gm = target.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL);
-        if (gm == GameModes.CREATIVE || gm == GameModes.SPECTATOR) {
+        final int ticksInput = context.requireOne(this.ticks);
+        final GameMode gm = target.get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL);
+        if (gm == GameModes.CREATIVE.get() || gm == GameModes.SPECTATOR.get()) {
             return context.errorResult("command.ignite.gamemode", target.getName());
         }
 

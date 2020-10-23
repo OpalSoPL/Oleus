@@ -4,35 +4,36 @@
  */
 package io.github.nucleuspowered.nucleus.modules.fun.commands;
 
+import com.google.common.reflect.TypeToken;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.fun.FunPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import io.github.nucleuspowered.nucleus.util.functional.NucleusCollectors;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.Collection;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 @EssentialsEquivalent(value = {"lightning", "strike", "smite", "thor", "shock"}, isExact = false,
         notes = "Selectors can be used, entities can be struck.")
@@ -49,18 +50,30 @@ import javax.annotation.Nullable;
 )
 public class LightningCommand implements ICommandExecutor {
 
+    private final Parameter.Value<Collection<Entity>> manyLivingParameter;
+
+    @Inject
+    public LightningCommand(final IPermissionService permissionService) {
+        this.manyLivingParameter = Parameter.builder(new TypeToken<Collection<Entity>>() {})
+            .optional()
+            .setRequirements(cause -> permissionService.hasPermission(cause, FunPermissions.OTHERS_LIGHTNING))
+            .setKey("targets")
+            .parser(CatalogedValueParameters.MANY_ENTITIES)
+            .build();
+    }
+
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[]{
-                GenericArguments.optional(
-                    serviceCollection.commandElementSupplier().createPermissionParameter(
-                            NucleusParameters.MANY_LIVING.get(serviceCollection),
-                            FunPermissions.OTHERS_LIGHTNING, false))
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.manyLivingParameter
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Collection<Living> playerCollection = context.getAll(NucleusParameters.Keys.SUBJECT, Living.class);
+        final Collection<Living> playerCollection =
+                context.requireOne(this.manyLivingParameter)
+                        .stream()
+                        .collect(NucleusCollectors.toFilteredElementCollection(Living.class));
 
         // No argument, let's not smite the subject.
         if (playerCollection.isEmpty()) {
@@ -79,7 +92,7 @@ public class LightningCommand implements ICommandExecutor {
 
         for (final Living pl : playerCollection) {
             this.spawnLightning(
-                    pl.getLocation(),
+                    pl.getServerLocation(),
                     context,
                     pl instanceof Player ? (Player)pl : null);
         }
@@ -88,15 +101,14 @@ public class LightningCommand implements ICommandExecutor {
     }
 
     private void spawnLightning(
-            final Location<World> location,
+            final ServerLocation location,
             final ICommandContext context,
             @Nullable final Player target) throws CommandException {
 
-        final World world = location.getExtent();
-        final Entity bolt = world.createEntity(EntityTypes.LIGHTNING, location.getPosition());
+        final ServerWorld world = location.getWorld();
+        final Entity bolt = world.createEntity(EntityTypes.LIGHTNING_BOLT.get(), location.getPosition());
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSourceRoot());
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
             world.spawnEntity(bolt);
             if (target != null) {
                 context.sendMessage("command.lightning.success.other",
