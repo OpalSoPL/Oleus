@@ -6,6 +6,7 @@ import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.ResourceKey;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -29,6 +30,8 @@ public final class GeAnTyRefTypeTokens {
     public static final TypeToken<String> STRING = TypeToken.get(String.class);
 
     public static final TypeToken<UUID> UUID = TypeToken.get(UUID.class);
+
+    public static final TypeToken<List<java.util.UUID>> UUID_LIST = new TypeToken<List<UUID>>() {};
 
     private GeAnTyRefTypeTokens() {
         // no-op

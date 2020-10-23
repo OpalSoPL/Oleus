@@ -4,20 +4,51 @@
  */
 package io.github.nucleuspowered.nucleus.modules.ignore;
 
-import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.ignore.commands.IgnoreCommand;
+import io.github.nucleuspowered.nucleus.modules.ignore.commands.IgnoreListCommand;
+import io.github.nucleuspowered.nucleus.modules.ignore.listeners.IgnoreListener;
+import io.github.nucleuspowered.nucleus.modules.ignore.services.IgnoreService;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
+// TODO: Bin in 1.16.4
+public class IgnoreModule implements IModule {
 
-@ModuleData(id = "ignore", name = "Ignore")
-public class IgnoreModule extends StandardModule {
+    public static final String ID = "ignore";
 
-    @Inject
-    public IgnoreModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(IgnoreService.class, new IgnoreService(serviceCollection), false);
+    }
+
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                IgnoreCommand.class,
+                IgnoreListCommand.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(IgnorePermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(IgnoreListener.class);
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
     }
 }

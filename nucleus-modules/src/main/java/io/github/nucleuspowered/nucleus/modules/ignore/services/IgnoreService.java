@@ -29,7 +29,7 @@ public class IgnoreService implements ServiceBase {
     }
 
     private void addPlayer(final UUID player, final List<UUID> ignored) {
-        removePlayer(player);
+        this.removePlayer(player);
         this.ignoredBy.put(player, new ArrayList<>(ignored));
     }
 
@@ -38,7 +38,7 @@ public class IgnoreService implements ServiceBase {
     }
 
     public void ignore(final UUID ignorer, final UUID ignoree) {
-        final List<UUID> uuid = get(ignorer);
+        final List<UUID> uuid = this.get(ignorer);
         if (!uuid.contains(ignoree)) {
             uuid.add(ignoree);
             this.serviceCollection.storageManager().getUserService()
@@ -48,7 +48,7 @@ public class IgnoreService implements ServiceBase {
     }
 
     public void unignore(final UUID ignorer, final UUID ignoree) {
-        final List<UUID> uuid = get(ignorer);
+        final List<UUID> uuid = this.get(ignorer);
         if (uuid.contains(ignoree)) {
             uuid.remove(ignoree);
             this.serviceCollection.storageManager().getUserService()
@@ -58,16 +58,16 @@ public class IgnoreService implements ServiceBase {
     }
 
     public boolean isIgnored(final UUID ignorer, final UUID ignoree) {
-        return get(ignorer).contains(ignoree);
+        return this.get(ignorer).contains(ignoree);
     }
 
     public List<UUID> getAllIgnored(final UUID ignorer) {
-        return ImmutableList.copyOf(get(ignorer));
+        return ImmutableList.copyOf(this.get(ignorer));
     }
 
     private List<UUID> get(final UUID player) {
         if (!this.ignoredBy.containsKey(player)) {
-            addPlayer(player,
+            this.addPlayer(player,
                     this.serviceCollection.storageManager().getUserService()
                             .getOnThread(player)
                             .flatMap(x -> x.get(IgnoreKeys.IGNORED))

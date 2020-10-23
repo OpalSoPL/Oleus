@@ -61,9 +61,10 @@ import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.transformation.ConfigurationTransformation;
 import org.spongepowered.plugin.PluginContainer;
 
@@ -124,12 +125,12 @@ public final class NucleusCore {
         final IConfigProvider provider = this.serviceCollection.configProvider();
         try {
             provider.prepareCoreConfig(this.coreConfigurationTransformations());
-        } catch (final IOException | ObjectMappingException e) {
+        } catch (final ConfigurateException e) {
             new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getCoreConfigFileName());
         }
         try {
             provider.prepareModuleConfig();
-        } catch (final IOException | ObjectMappingException e) {
+        } catch (final ConfigurateException e) {
             new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getModuleConfigFileName());
         }
         this.completeModuleInit(tuple);
@@ -302,15 +303,22 @@ public final class NucleusCore {
 
             module.init(this.serviceCollection);
             if (module instanceof IModule.Configurable) {
-                final IModule.Configurable<?> configurable = (IModule.Configurable<?>) module;
-                this.serviceCollection.configurateHelper().addTypeSerialiser(configurable.moduleTypeSerializers());
-                this.serviceCollection.configProvider().registerModuleConfig(container.getId(), configurable.getConfigClass(), configurable.getTransformations());
+                this.registerConfigurableModule(container, (IModule.Configurable<?>) module);
             }
 
             modules.add(Tuple.of(container, module));
         }
 
         return modules;
+    }
+
+    private <T> void registerConfigurableModule(final ModuleContainer container, final IModule.Configurable<T> configurable) {
+        this.serviceCollection.configurateHelper().addTypeSerialiser(configurable.moduleTypeSerializers());
+        this.serviceCollection.configProvider().registerModuleConfig(
+                container.getId(),
+                configurable.getConfigClass(),
+                configurable::createInstance,
+                configurable.getTransformations());
     }
 
     private void completeModuleInit(final Collection<Tuple<ModuleContainer, IModule>> modules) {
@@ -358,22 +366,26 @@ public final class NucleusCore {
     private Collection<ModuleContainer> filterModules(final Collection<ModuleContainer> moduleContainers) {
         final CommentedConfigurationNode defaults = this.serviceCollection.configurateHelper().createNode();
         for (final ModuleContainer moduleContainer : moduleContainers) {
-            defaults.getNode(moduleContainer.getId()).setValue(ModuleState.TRUE);
+            try {
+                defaults.node(moduleContainer.getId()).set(ModuleState.TRUE);
+            } catch (final SerializationException e) {
+                // ignored
+            }
         }
         final Collection<String> modules = moduleContainers.stream().map(ModuleContainer::getId).collect(Collectors.toList());
         modules.add("core");
         this.serviceCollection.moduleReporter().provideDiscoveredModules(modules);
 
         final ConfigurationLoader<CommentedConfigurationNode> moduleConfig = HoconConfigurationLoader.builder()
-                .setPath(this.configDirectory.resolve("modules.conf"))
+                .path(this.configDirectory.resolve("modules.conf"))
                 .build();
 
         CommentedConfigurationNode node;
         try {
             node = moduleConfig.load(this.serviceCollection.configurateHelper().getOptions());
-            node.mergeValuesFrom(defaults);
+            node.mergeFrom(defaults);
             moduleConfig.save(node);
-        } catch (final IOException e) {
+        } catch (final ConfigurateException e) {
             node = defaults;
             this.logger.error("Could not load module config. Defaulting all to TRUE.", e);
         }
@@ -385,8 +397,8 @@ public final class NucleusCore {
                 moduleContainers.stream().map(ModuleContainer::getId)
                         .filter(x -> {
                             try {
-                                return finalNode.getNode(x).getValue(TypeToken.get(ModuleState.class), ModuleState.TRUE) == ModuleState.TRUE;
-                            } catch (final ObjectMappingException e) {
+                                return finalNode.node(x).get(TypeToken.get(ModuleState.class), ModuleState.TRUE) == ModuleState.TRUE;
+                            } catch (final SerializationException e) {
                                 return true;
                             }
                         }).collect(Collectors.toSet()));
@@ -440,7 +452,7 @@ public final class NucleusCore {
 
     }
 
-    private Collection<ConfigurationTransformation<CommentedConfigurationNode>> coreConfigurationTransformations() {
+    private Collection<ConfigurationTransformation> coreConfigurationTransformations() {
         return Collections.emptyList();
     }
 

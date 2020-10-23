@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.ignore;
 
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
+import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
 import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
@@ -13,6 +14,6 @@ import java.util.UUID;
 
 public final class IgnoreKeys {
 
-    public static DataKey<List<UUID>, IUserDataObject> IGNORED = DataKey.of(TypeTokens.UUID_LIST, IUserDataObject.class, "ignoreList");
+    public static DataKey<List<UUID>, IUserDataObject> IGNORED = DataKey.of(GeAnTyRefTypeTokens.UUID_LIST, IUserDataObject.class, "ignoreList");
 
 }

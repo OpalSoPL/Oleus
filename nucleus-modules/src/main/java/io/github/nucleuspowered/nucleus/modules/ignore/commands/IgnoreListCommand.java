@@ -13,11 +13,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,20 +30,20 @@ import java.util.stream.Collectors;
 )
 public class IgnoreListCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(false, IgnorePermissions.OTHERS_IGNORELIST)
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(IgnorePermissions.OTHERS_IGNORELIST)
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final IgnoreService ignoreService = context.getServiceCollection().getServiceUnchecked(IgnoreService.class);
-        final User target = context.getPlayerFromArgs();
+        final ServerPlayer target = context.getPlayerFromArgs();
         final boolean isSelf = context.is(target);
         final IPlayerDisplayNameService playerDisplayNameService = context.getServiceCollection().playerDisplayNameService();
 
-        final List<Text> ignoredList = ignoreService
+        final List<Component> ignoredList = ignoreService
                 .getAllIgnored(target.getUniqueId())
                 .stream()
                 .map(playerDisplayNameService::getDisplayName)
@@ -56,10 +56,10 @@ public class IgnoreListCommand implements ICommandExecutor {
                 context.sendMessage("command.ignorelist.noignores.other", target);
             }
         } else {
-            Util.getPaginationBuilder(context.getCommandSourceRoot())
+            Util.getPaginationBuilder(context.getAudience())
                     .contents(ignoredList)
                     .title(context.getMessage("command.ignorelist.header", target))
-                    .sendTo(context.getCommandSourceRoot());
+                    .sendTo(context.getAudience());
         }
         return context.successResult();
     }

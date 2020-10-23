@@ -15,11 +15,10 @@ import io.leangen.geantyref.TypeToken;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.configurate.transformation.ConfigurationTransformation;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,10 +31,6 @@ public class ConfigProvider implements IConfigProvider {
     private static final String CORE_CONFIG_PATH = "core_config.conf";
     private static final String MODULES_CONFIG_PATH = "module_config.conf";
 
-    private final Path configPath;
-    private final Path modulesConfigPath;
-    private final Path coreConfigPath;
-
     private final HoconConfigurationLoader coreLoader;
     private final HoconConfigurationLoader modulesLoader;
     private final Logger logger;
@@ -44,18 +39,16 @@ public class ConfigProvider implements IConfigProvider {
     @Nullable private CommentedConfigurationNode moduleNode = null;
     @Nullable private CoreConfig coreConfig = null;
     private final Map<String, Class<?>> moduleConfigs = new HashMap<>();
-    private final Map<Class<?>, Collection<ConfigurationTransformation<CommentedConfigurationNode>>> moduleTransformations = new HashMap<>();
+    private final Map<Class<?>, Collection<ConfigurationTransformation>> moduleTransformations = new HashMap<>();
     private final Map<Class<?>, Supplier<?>> providers = new HashMap<>();
     private final Map<Class<?>, Object> cachedConfig = new HashMap<>();
 
     @Inject
     public ConfigProvider(@ConfigDirectory final Path configPath, final IConfigurateHelper configurateHelper, final Logger logger) {
-        this.configPath = configPath;
-        this.coreConfigPath = this.configPath.resolve(CORE_CONFIG_PATH);
-        this.modulesConfigPath = this.configPath.resolve(MODULES_CONFIG_PATH);
         this.logger = logger;
-        this.coreLoader = ConfigProvider.getLoader(configurateHelper, this.coreConfigPath);
-        this.modulesLoader = ConfigProvider.getLoader(configurateHelper, this.modulesConfigPath);
+        this.coreLoader = ConfigProvider.getLoader(configurateHelper, configPath.resolve(ConfigProvider.CORE_CONFIG_PATH));
+        this.modulesLoader = ConfigProvider.getLoader(configurateHelper, configPath.resolve(ConfigProvider.MODULES_CONFIG_PATH));
+        this.providers.put(CoreConfig.class, CoreConfig::new);
     }
 
     @Override
@@ -66,12 +59,15 @@ public class ConfigProvider implements IConfigProvider {
     @Override
     public <T> void registerModuleConfig(final String moduleId,
             final Class<T> typeOfConfig,
-            final Collection<ConfigurationTransformation<CommentedConfigurationNode>> configurationTransformationCollection) {
+            final Supplier<T> creator,
+            final Collection<ConfigurationTransformation> configurationTransformationCollection) {
         if (this.providers.containsKey(typeOfConfig) || this.moduleConfigs.containsKey(moduleId)) {
             throw new IllegalStateException("Cannot register type or module more than once!");
         }
 
+        this.providers.put(typeOfConfig, creator);
         this.moduleConfigs.put(moduleId, typeOfConfig);
+        this.moduleTransformations.put(typeOfConfig, configurationTransformationCollection);
     }
 
     @SuppressWarnings("unchecked")
@@ -80,8 +76,13 @@ public class ConfigProvider implements IConfigProvider {
         if (configType == CoreConfig.class) {
             return (T) this.getCoreConfig();
         }
+        if (this.cachedConfig.containsKey(configType)) {
+            return (T) this.cachedConfig.get(configType);
+        }
         if (this.providers.containsKey(configType)) {
-            return (T) this.providers.get(configType).get();
+            final T result = (T) this.providers.get(configType).get();
+            this.cachedConfig.put(configType, result);
+            return result;
         }
 
         throw new IllegalArgumentException(configType.getSimpleName() + " does not exist");
@@ -103,87 +104,101 @@ public class ConfigProvider implements IConfigProvider {
         throw new IllegalArgumentException(configType.getSimpleName() + " does not exist");
     }
 
-    public void loadCore(final boolean actualLoad) throws IOException, ObjectMappingException {
+    public void loadCore(final boolean actualLoad) throws ConfigurateException {
         if (this.coreNode == null || actualLoad) {
             this.coreNode = this.coreLoader.load();
         }
-        this.coreConfig = this.coreNode.getValue(io.leangen.geantyref.TypeToken.get(CoreConfig.class), (Supplier<CoreConfig>) CoreConfig::new);
+        this.coreConfig = this.coreNode.get(io.leangen.geantyref.TypeToken.get(CoreConfig.class), (Supplier<CoreConfig>) CoreConfig::new);
     }
 
-    public void loadModules(final boolean actualLoad) throws IOException {
+    public void loadModules(final boolean actualLoad) throws ConfigurateException {
         if (this.moduleNode == null || actualLoad) {
             this.moduleNode = this.modulesLoader.load();
         }
         this.cachedConfig.clear();
         for (final Map.Entry<String, Class<?>> moduleClass : this.moduleConfigs.entrySet()) {
             try {
-                this.cachedConfig.put(moduleClass.getValue(), this.get(this.moduleNode.getNode(moduleClass.getKey()), moduleClass.getValue()));
-            } catch (final ObjectMappingException exception) {
+                this.cachedConfig.put(moduleClass.getValue(), this.get(this.moduleNode.node(moduleClass.getKey()), moduleClass.getValue()));
+            } catch (final Exception exception) {
                 this.logger.error("Could not load module config section for '" + moduleClass.getKey() + "' - using default.", exception);
-                this.cachedConfig.put(moduleClass.getValue(), this.moduleNode.getNode(moduleClass.getKey()));
+                this.cachedConfig.put(moduleClass.getValue(), this.moduleNode.node(moduleClass.getKey()));
             }
         }
     }
 
-    @Override public void prepareCoreConfig(final Collection<ConfigurationTransformation<CommentedConfigurationNode>> coreConfigurationTransformations)
-            throws IOException, ObjectMappingException {
+    @Override
+    public void prepareCoreConfig(final Collection<ConfigurationTransformation> coreConfigurationTransformations)
+            throws ConfigurateException {
         final CommentedConfigurationNode coreToSave = this.coreLoader.load();
-        coreConfigurationTransformations.forEach(x -> x.apply(coreToSave));
-        coreToSave.mergeValuesFrom(this.coreLoader.createNode().setValue(TypeToken.get(CoreConfig.class), new CoreConfig()));
+        for (final ConfigurationTransformation transformation : coreConfigurationTransformations) {
+            transformation.apply(coreToSave);
+        }
+        coreToSave.mergeFrom(this.coreLoader.createNode().set(TypeToken.get(CoreConfig.class), new CoreConfig()));
         this.coreLoader.save(coreToSave);
         this.coreNode = coreToSave;
         this.loadCore(false);
     }
 
-    @Override public void prepareModuleConfig() throws IOException, ObjectMappingException {
+    @Override
+    public void prepareModuleConfig() throws ConfigurateException {
         final CommentedConfigurationNode modulesToSave = this.modulesLoader.load();
         final CommentedConfigurationNode defaults = this.modulesLoader.createNode();
         for (final Map.Entry<String, Class<?>> moduleClass : this.moduleConfigs.entrySet()) {
-             this.set(defaults.getNode(moduleClass.getKey()), moduleClass.getValue());
+            // Transform existing nodes
+            final Collection<ConfigurationTransformation> transformations = this.moduleTransformations.get(moduleClass.getValue());
+            if (transformations != null) {
+                for (final ConfigurationTransformation transformation : transformations) {
+                    transformation.apply(modulesToSave.node(moduleClass.getKey()));
+                }
+            }
+
+            // Default nodes.
+            this.set(defaults.node(moduleClass.getKey()), moduleClass.getValue());
         }
-        modulesToSave.mergeValuesFrom(defaults);
+        modulesToSave.mergeFrom(defaults);
         this.modulesLoader.save(modulesToSave);
         this.moduleNode = modulesToSave;
         this.loadModules(false);
     }
 
     @Override public String getCoreConfigFileName() {
-        return CORE_CONFIG_PATH;
+        return ConfigProvider.CORE_CONFIG_PATH;
     }
 
     @Override public String getModuleConfigFileName() {
-        return MODULES_CONFIG_PATH;
+        return ConfigProvider.MODULES_CONFIG_PATH;
     }
 
     @SuppressWarnings("unchecked")
-    private <T> T get(final CommentedConfigurationNode node, final Class<T> clazz) throws ObjectMappingException {
-        return node.getValue(TypeToken.get(clazz), (Supplier<T>) () -> (T) this.providers.get(clazz).get());
+    private <T> T get(final CommentedConfigurationNode node, final Class<T> clazz) throws ConfigurateException {
+        return node.get(TypeToken.get(clazz), (Supplier<T>) () -> (T) this.providers.get(clazz).get());
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void set(final CommentedConfigurationNode node, final Class<T> clazz) throws ObjectMappingException {
-        node.setValue(TypeToken.get(clazz), (T) this.providers.get(clazz).get());
+    private <T> void set(final CommentedConfigurationNode node, final Class<T> clazz) throws ConfigurateException {
+        node.set(TypeToken.get(clazz), (T) this.providers.get(clazz).get());
     }
 
     @Override
     public void reload() {
+        this.cachedConfig.clear();
         try {
             this.loadCore(true);
-        } catch (final IOException | ObjectMappingException e) {
+        } catch (final ConfigurateException e) {
             this.logger.error("Could not load core configuration file. Using default.", e);
         }
 
         try {
             this.loadModules(true);
-        } catch (final IOException e) {
+        } catch (final ConfigurateException e) {
             this.logger.error("Could not load module configuration file. Using default.", e);
         }
     }
 
     private static HoconConfigurationLoader getLoader(final IConfigurateHelper helper, final Path path) {
         return HoconConfigurationLoader.builder()
-                .setDefaultOptions(helper.getOptions())
-                .setPath(path)
+                .defaultOptions(helper.getOptions())
+                .path(path)
                 .build();
     }
 }

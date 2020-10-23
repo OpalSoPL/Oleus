@@ -14,9 +14,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+
 @EssentialsEquivalent("ignore")
 @Command(
         aliases = { "ignore" },
@@ -28,9 +29,9 @@ import org.spongepowered.api.entity.living.player.User;
 public class IgnoreCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                NucleusParameters.ONE_USER.get(serviceCollection),
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.ONE_USER,
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }

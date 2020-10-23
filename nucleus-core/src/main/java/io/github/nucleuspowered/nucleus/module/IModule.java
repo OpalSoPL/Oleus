@@ -33,7 +33,9 @@ public interface IModule {
 
     Collection<Class<? extends ListenerBase>> getListeners();
 
-    Collection<Class<? extends TaskBase>> getTasks();
+    default Collection<Class<? extends TaskBase>> getTasks() {
+        return Collections.emptyList();
+    }
 
     default Optional<NucleusProvider> getInfoProvider() {
         return Optional.empty();
@@ -43,13 +45,21 @@ public interface IModule {
 
         Class<T> getConfigClass();
 
-        default Collection<ConfigurationTransformation<CommentedConfigurationNode>> getTransformations() {
+        default Collection<ConfigurationTransformation> getTransformations() {
             return Collections.emptyList();
         }
 
         @Nullable
         default TypeSerializerCollection moduleTypeSerializers() {
             return null;
+        }
+
+        default T createInstance() {
+            try {
+                return this.getConfigClass().newInstance();
+            } catch (final InstantiationException | IllegalAccessException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
         }
 
     }

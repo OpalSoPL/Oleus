@@ -8,9 +8,11 @@ import io.github.nucleuspowered.nucleus.services.interfaces.annotation.Permissio
 import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
 
 public final class ChatPermissions {
+
     private ChatPermissions() {
         throw new AssertionError("Nope");
     }
+
 
     @PermissionMetadata(descriptionKey = "permission.chat.color", level = SuggestedLevel.ADMIN, isPrefix = true)
     public static final String CHAT_COLOR = "nucleus.chat.color";
@@ -36,4 +38,6 @@ public final class ChatPermissions {
     @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "me" }, level = SuggestedLevel.ADMIN)
     public static final String EXEMPT_WARMUP_ME = "nucleus.me.exempt.warmup";
 
+    @PermissionMetadata(descriptionKey = "permission.base", replacements = { "asserver" }, level = SuggestedLevel.ADMIN)
+    public static final String BASE_AS_SERVER = "nucleus.asserver.base";
 }

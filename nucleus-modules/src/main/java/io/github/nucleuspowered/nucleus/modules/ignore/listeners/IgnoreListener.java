@@ -14,14 +14,16 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
+import org.spongepowered.api.event.message.PlayerChatEvent;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,16 +45,13 @@ public class IgnoreListener implements ListenerBase {
     }
 
     @Listener(order = Order.LAST)
-    public void onChat(final MessageChannelEvent.Chat event) {
-        Util.onPlayerSimulatedOrPlayer(event, this::onChat);
-    }
-
-    private void onChat(final MessageChannelEvent.Chat event, final Player player) {
+    private void onChat(final PlayerChatEvent event, @Root final ServerPlayer player) {
         // Reset the channel - but only if we have to.
         if (!this.chatMessageFormatterService.getNucleusChannel(player.getUniqueId())
                 .map(IChatMessageFormatterService.Channel::ignoreIgnoreList)
                 .orElse(false)) {
-            checkCancels(event.getChannel().orElseGet(event::getOriginalChannel).getMembers(), player).ifPresent(x -> {
+            // TODO: Chat Router doesn't tell me who is going to receive the message, so I cannot filter it. API change?
+            this.checkCancels(event.getChatRouter().orElseGet(event::getOriginalChatRouter).getMembers(), player).ifPresent(x -> {
                 final MutableMessageChannel mmc = event.getChannel().orElseGet(event::getOriginalChannel).asMutable();
                 x.forEach(mmc::removeMember);
                 event.setChannel(mmc);
@@ -61,10 +60,10 @@ public class IgnoreListener implements ListenerBase {
     }
 
     @Listener(order = Order.FIRST)
-    public void onMessage(final NucleusMessageEvent event, @Root final Player player) {
-        if (event.getRecipient() instanceof User) {
+    public void onMessage(final NucleusMessageEvent event, @Root final ServerPlayer player) {
+        if (event.getRecipient().isPresent()) {
             try {
-                event.setCancelled(this.service.isIgnored(((User) event.getRecipient()).getUniqueId(), player.getUniqueId()));
+                event.setCancelled(this.service.isIgnored(event.getRecipient().get(), player.getUniqueId()));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -85,17 +84,17 @@ public class IgnoreListener implements ListenerBase {
      *
      * @param collection The collection to check through.
      * @param player The subject who is sending the message.
-     * @return {@link Optional} if unchanged, otherwise a {@link Collection} of {@link MessageReceiver}s to remove
+     * @return {@link Optional} if unchanged, otherwise a {@link Collection} of {@link Audience}s to remove
      */
-    private Optional<Collection<MessageReceiver>> checkCancels(final Collection<MessageReceiver> collection, final Player player) {
+    private Optional<Collection<Audience>> checkCancels(final Collection<Audience> collection, final ServerPlayer player) {
         if (this.permissionService.hasPermission(player, IgnorePermissions.IGNORE_CHAT)) {
             return Optional.empty();
         }
 
-        final List<MessageReceiver> list = Lists.newArrayList(collection);
+        final List<Audience> list = Lists.newArrayList(collection);
         list.removeIf(x -> {
             try {
-                if (!(x instanceof Player)) {
+                if (!(x instanceof ServerPlayer)) {
                     // Remove if not a player.
                     return true;
                 }
