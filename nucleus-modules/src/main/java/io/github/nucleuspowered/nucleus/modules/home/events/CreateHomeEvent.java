@@ -5,14 +5,14 @@
 package io.github.nucleuspowered.nucleus.modules.home.events;
 
 import io.github.nucleuspowered.nucleus.api.module.home.event.NucleusHomeEvent;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.world.ServerLocation;
+
+import java.util.UUID;
 
 public class CreateHomeEvent extends AbstractHomeEvent implements NucleusHomeEvent.Create {
 
-    public CreateHomeEvent(final String name, final User owner, final Cause cause, final Location<World> newLocation) {
+    public CreateHomeEvent(final String name, final UUID owner, final Cause cause, final ServerLocation newLocation) {
         super(name, owner, cause, newLocation);
     }
 }

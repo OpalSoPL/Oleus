@@ -6,24 +6,22 @@ package io.github.nucleuspowered.nucleus.modules.home.events;
 
 import io.github.nucleuspowered.nucleus.api.module.home.event.NucleusHomeEvent;
 import io.github.nucleuspowered.nucleus.scaffold.event.AbstractCancelMessageEvent;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
+import java.util.UUID;
 
 public abstract class AbstractHomeEvent extends AbstractCancelMessageEvent implements NucleusHomeEvent {
 
     private final String name;
-    private final User owner;
+    private final UUID owner;
+    private final ServerLocation location;
 
     private boolean isCancelled = false;
-    private final Location<World> location;
 
-    AbstractHomeEvent(final String name, final User owner, final Cause cause, @Nullable final Location<World> location) {
+    AbstractHomeEvent(final String name, final UUID owner, final Cause cause, @Nullable final ServerLocation location) {
         super(cause);
         this.name = name;
         this.owner = owner;
@@ -34,11 +32,11 @@ public abstract class AbstractHomeEvent extends AbstractCancelMessageEvent imple
         return this.name;
     }
 
-    @Override public User getUser() {
+    @Override public UUID getUser() {
         return this.owner;
     }
 
-    @Override public Optional<Location<World>> getLocation() {
+    @Override public Optional<ServerLocation> getLocation() {
         return Optional.ofNullable(this.location);
     }
 

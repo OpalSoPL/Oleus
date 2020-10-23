@@ -4,9 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.modules.home.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
+import io.github.nucleuspowered.nucleus.api.module.home.exception.HomeException;
 import io.github.nucleuspowered.nucleus.modules.home.HomePermissions;
-import io.github.nucleuspowered.nucleus.modules.home.parameters.HomeArgument;
+import io.github.nucleuspowered.nucleus.modules.home.parameters.HomeParameter;
 import io.github.nucleuspowered.nucleus.modules.home.services.HomeService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -14,41 +16,65 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.text.Text;
+
+import java.util.Optional;
+
 @Command(
         aliases = {"delete", "del", "#deletehome", "#delhome"},
         basePermission = HomePermissions.BASE_HOME,
         commandDescriptionKey = "home.delete",
-        parentCommand = HomeCommand.class
+        parentCommand = HomeCommand.class,
+        associatedPermissions = HomePermissions.BASE_HOME_DELETEOTHER
 )
 @EssentialsEquivalent({"delhome", "remhome", "rmhome"})
 public class DeleteHomeCommand implements ICommandExecutor {
 
-    private final String homeKey = "home";
+    private final Parameter.Value<Home> parameter;
+    private final Parameter.Value<User> userParameter;
+
+    @Inject
+    public DeleteHomeCommand(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        this.userParameter =
+                Parameter.user().optional()
+                        .setRequirements(x -> permissionService.hasPermission(x, HomePermissions.BASE_HOME_DELETEOTHER))
+                        .setKey(HomeParameter.OTHER_PLAYER_KEY)
+                        .build();
+        this.parameter = Parameter.builder(Home.class)
+                .parser(new HomeParameter(serviceCollection.getServiceUnchecked(HomeService.class), serviceCollection.messageProvider()))
+                .setKey("home")
+                .build();
+    }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.onlyOne(new HomeArgument(
-                        Text.of(this.homeKey),
-                        serviceCollection.getServiceUnchecked(HomeService.class),
-                        serviceCollection.messageProvider()))
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.userParameter,
+                this.parameter
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Home wl = context.requireOne(this.homeKey, Home.class);
+        final Home wl = context.requireOne(this.parameter);
+        final Optional<User> target = context.getOne(this.userParameter);
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
-            context.getServiceCollection().getServiceUnchecked(HomeService.class).removeHomeInternal(frame.getCurrentCause(), wl);
-            context.sendMessage("command.home.delete.success", wl.getName());
+            context.getServiceCollection().getServiceUnchecked(HomeService.class).removeHome(wl.getOwnersUniqueId(), wl.getName());
+            if (target.isPresent()) {
+                context.sendMessage("command.home.delete.other.success", target.get().getName(), wl.getName());
+            } else {
+                context.sendMessage("command.home.delete.success", wl.getName());
+            }
+        } catch (final HomeException e) {
+            return context.errorResultLiteral(e.getText());
         }
 
         return context.successResult();

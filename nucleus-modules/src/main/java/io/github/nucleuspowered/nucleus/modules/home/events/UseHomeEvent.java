@@ -6,24 +6,28 @@ package io.github.nucleuspowered.nucleus.modules.home.events;
 
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
 import io.github.nucleuspowered.nucleus.api.module.home.event.NucleusHomeEvent;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
+
+import java.util.UUID;
+
 public class UseHomeEvent extends AbstractHomeEvent implements NucleusHomeEvent.Use {
 
-    private final User targetUser;
+    private final UUID targetUser;
     private final Home home;
 
-    public UseHomeEvent(final Cause cause, final User targetUser, final Home home) {
-        super(home.getName(), home.getUser(), cause, home.getLocation().orElse(null));
+    public UseHomeEvent(final Cause cause, final UUID targetUser, final Home home) {
+        super(home.getName(), home.getOwnersUniqueId(), cause, home.getLocation().orElse(null));
         this.targetUser = targetUser;
         this.home = home;
     }
 
-    @Override public User getTargetUser() {
+    @Override
+    public UUID getTeleportingUser() {
         return this.targetUser;
     }
 
-    @Override public Home getHome() {
+    @Override
+    public Home getHome() {
         return this.home;
     }
 }

@@ -6,9 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.home.events;
 
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
 import io.github.nucleuspowered.nucleus.api.module.home.event.NucleusHomeEvent;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.Optional;
 
@@ -16,8 +15,8 @@ public class ModifyHomeEvent extends AbstractHomeEvent implements NucleusHomeEve
 
     private final Home home;
 
-    public ModifyHomeEvent(final Cause cause, final Home home, final Location<World> newLocation) {
-        super(home.getName(), home.getUser(), cause, newLocation);
+    public ModifyHomeEvent(final Cause cause, final Home home, final ServerLocation newLocation) {
+        super(home.getName(), home.getOwnersUniqueId(), cause, newLocation);
         this.home = home;
     }
 
@@ -25,7 +24,7 @@ public class ModifyHomeEvent extends AbstractHomeEvent implements NucleusHomeEve
         return this.home;
     }
 
-    @Override public Optional<Location<World>> getOriginalLocation() {
+    @Override public Optional<ServerLocation> getOriginalLocation() {
         return this.home.getLocation();
     }
 }

@@ -6,14 +6,14 @@ package io.github.nucleuspowered.nucleus.modules.home.events;
 
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
 import io.github.nucleuspowered.nucleus.api.module.home.event.NucleusHomeEvent;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 
 public class DeleteHomeEvent extends AbstractHomeEvent implements NucleusHomeEvent.Delete {
 
     private final Home home;
 
     public DeleteHomeEvent(final Cause cause, final Home home) {
-        super(home.getName(), home.getUser(), cause, home.getLocation().orElse(null));
+        super(home.getName(), home.getOwnersUniqueId(), cause, home.getLocation().orElse(null));
         this.home = home;
     }
 

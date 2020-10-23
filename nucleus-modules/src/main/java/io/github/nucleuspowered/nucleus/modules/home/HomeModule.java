@@ -4,31 +4,39 @@
  */
 package io.github.nucleuspowered.nucleus.modules.home;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.home.config.HomeConfig;
-import io.github.nucleuspowered.nucleus.modules.home.config.HomeConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.home.services.HomeService;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = HomeModule.ID, name = "Home")
-public class HomeModule extends ConfigurableModule<HomeConfig, HomeConfigAdapter> {
+public class HomeModule implements IModule.Configurable<HomeConfig> {
 
     public static final String ID = "home";
 
-    @Inject
-    public HomeModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(HomeService.class, new HomeService(serviceCollection), false);
     }
 
     @Override
-    public HomeConfigAdapter createAdapter() {
-        return new HomeConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
     }
 
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override public Class<HomeConfig> getConfigClass() {
+        return null;
+    }
 }

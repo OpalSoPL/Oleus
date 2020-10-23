@@ -19,11 +19,6 @@ public final class HomeException extends TextMessageException {
         this.reason = reasons;
     }
 
-    public HomeException(final Component message, final Throwable cause, final Reasons reasons) {
-        super(message, cause);
-        this.reason = reasons;
-    }
-
     public Reasons getReason() {
         return this.reason;
     }
