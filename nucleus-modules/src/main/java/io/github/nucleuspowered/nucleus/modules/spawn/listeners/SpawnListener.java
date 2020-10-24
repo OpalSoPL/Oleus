@@ -4,6 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn.listeners;
 
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.Util;
@@ -16,7 +18,6 @@ import io.github.nucleuspowered.nucleus.modules.spawn.SpawnKeys;
 import io.github.nucleuspowered.nucleus.modules.spawn.SpawnPermissions;
 import io.github.nucleuspowered.nucleus.modules.spawn.config.GlobalSpawnConfig;
 import io.github.nucleuspowered.nucleus.modules.spawn.config.SpawnConfig;
-import io.github.nucleuspowered.nucleus.modules.spawn.events.SendToSpawnEvent;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
@@ -24,17 +25,13 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderServ
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -165,10 +162,15 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
         }
     }
 
-    @Listener(order = Order.EARLY)
-    public void onRespawn(final RespawnPlayerEvent event, @Getter("getTargetEntity") final Player player) {
+    @Listener(order = Order.LAST)
+    public void onRespawn(final RespawnPlayerEvent event, @Getter("getPlayer") final ServerPlayer player) {
         if (event.isBedSpawn() && !this.spawnConfig.isRedirectBedSpawn()) {
             // Nope, we don't care.
+            return;
+        }
+
+        if (!event.getFromLocation().equals(event.getToLocation())) {
+            // Something else has made a change, we do not.
             return;
         }
 

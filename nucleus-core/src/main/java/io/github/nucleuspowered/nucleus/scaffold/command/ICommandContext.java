@@ -32,7 +32,7 @@ import java.util.function.Consumer;
 
 public interface ICommandContext {
 
-    ServerPlayer reqiurePlayer() throws CommandException;
+    ServerPlayer requirePlayer() throws CommandException;
 
     CommandCause getCause();
 
@@ -151,6 +151,8 @@ public interface ICommandContext {
     CommandException createException(Throwable ex, String key, Object... args);
 
     CommandException createException(String key, Object... args);
+
+    Optional<ServerPlayer> getAsPlayer();
 
     @NonNull
     default ServerPlayer getIfPlayer() throws CommandException {

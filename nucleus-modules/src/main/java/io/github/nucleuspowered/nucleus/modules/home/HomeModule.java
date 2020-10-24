@@ -5,13 +5,21 @@
 package io.github.nucleuspowered.nucleus.modules.home;
 
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.home.commands.DeleteHomeCommand;
+import io.github.nucleuspowered.nucleus.modules.home.commands.HomeCommand;
+import io.github.nucleuspowered.nucleus.modules.home.commands.HomeLimitCommand;
+import io.github.nucleuspowered.nucleus.modules.home.commands.ListHomeCommand;
+import io.github.nucleuspowered.nucleus.modules.home.commands.SetHomeCommand;
 import io.github.nucleuspowered.nucleus.modules.home.config.HomeConfig;
+import io.github.nucleuspowered.nucleus.modules.home.listeners.RespawnConditionalListener;
 import io.github.nucleuspowered.nucleus.modules.home.services.HomeService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public class HomeModule implements IModule.Configurable<HomeConfig> {
@@ -25,18 +33,24 @@ public class HomeModule implements IModule.Configurable<HomeConfig> {
 
     @Override
     public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Arrays.asList(
+                DeleteHomeCommand.class,
+                HomeCommand.class,
+                HomeLimitCommand.class,
+                ListHomeCommand.class,
+                SetHomeCommand.class
+        );
     }
 
     @Override public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(HomePermissions.class);
     }
 
     @Override public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
+        return Collections.singleton(RespawnConditionalListener.class);
     }
 
     @Override public Class<HomeConfig> getConfigClass() {
-        return null;
+        return HomeConfig.class;
     }
 }

@@ -188,7 +188,8 @@ public class HomeService implements NucleusHomeService, ServiceBase {
         return this.getMaximumHomes(user.get());
     }
 
-    @Override public int getMaximumHomes(final User src) {
+    @Override
+    public int getMaximumHomes(final User src) {
         final IPermissionService permissionService = this.serviceCollection.permissionService();
         if (permissionService.hasPermission(src, HomePermissions.HOMES_UNLIMITED)) {
             return Integer.MAX_VALUE;

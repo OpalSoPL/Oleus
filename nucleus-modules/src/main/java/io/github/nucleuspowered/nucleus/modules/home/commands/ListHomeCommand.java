@@ -18,18 +18,19 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.living.player.Player;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.Comparator;
 import java.util.List;
@@ -49,15 +50,15 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
     private boolean isOnlySameDimension = false;
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(false, HomePermissions.OTHERS_LIST_HOME)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(HomePermissions.OTHERS_LIST_HOME)
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.getUserFromArgs();
-        final TextComponent header;
+        final Component header;
 
         final boolean other = !context.is(user);
         if (other && (context.isConsoleAndBypass() || context.testPermissionFor(user, HomePermissions.HOME_OTHER_EXEMPT_TARGET))) {
@@ -69,37 +70,41 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
             return context.errorResult("command.home.nohomes");
         }
 
-        final CommandSource source = context.getCommandSourceRoot();
+        final Audience audience = context.getAudience();
         final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         if (other) {
-            header = messageProviderService.getMessageFor(source, "home.title.name", user.getName());
+            header = messageProviderService.getMessageFor(audience, "home.title.name", user.getName());
         } else {
-            header = messageProviderService.getMessageFor(source, "home.title.normal");
+            header = messageProviderService.getMessageFor(audience, "home.title.normal");
         }
 
         final IPermissionService permissionService = context.getServiceCollection().permissionService();
-        final List<Text> lt = msw.stream().sorted(Comparator.comparing(NamedLocation::getName)).map(x -> {
-            final Optional<Location<World>> olw = x.getLocation();
+        final List<Component> lt = msw.stream().sorted(Comparator.comparing(NamedLocation::getName)).map(x -> {
+            final Optional<ServerLocation> olw = x.getLocation();
             if (!olw.isPresent()) {
-                return Text.builder().append(
-                                Text.builder(x.getName()).color(TextColors.RED)
-                                        .onHover(TextActions.showText(
-                                                messageProviderService.getMessageFor(source, "home.warphoverinvalid", x.getName())))
+                return Component.text().append(
+                                Component.text()
+                                        .content(x.getName())
+                                        .color(NamedTextColor.RED)
+                                        .hoverEvent(HoverEvent.showText(
+                                                messageProviderService.getMessageFor(audience, "home.warphoverinvalid", x.getName())))
                                         .build())
                         .build();
             } else {
-                final Location<World> lw = olw.get();
-                final TextComponent textMessage = messageProviderService.getMessageFor(source, "home.location",
-                                                 lw.getExtent().getName(), lw.getBlockX(), lw.getBlockY(), lw.getBlockZ());
+                final ServerLocation lw = olw.get();
+                final Component textMessage = messageProviderService.getMessageFor(audience, "home.location",
+                                                 lw.getWorldKey().asString(), lw.getBlockX(), lw.getBlockY(), lw.getBlockZ());
 
-                if (this.isOnlySameDimension && source instanceof Player && !other) {
-                    if (!lw.getExtent().getUniqueId().equals(((Player) source).getLocation().getExtent().getUniqueId())) {
+                final Optional<ServerPlayer> optional = context.getAsPlayer();
+                if (this.isOnlySameDimension && optional.isPresent() && !other) {
+                    final ServerPlayer player = optional.get();
+                    if (!lw.getWorldKey().equals(player.getWorld().getKey())) {
                         if (!context.isConsoleAndBypass() && !permissionService.hasPermission(user, HomePermissions.HOME_EXEMPT_SAMEDIMENSION)) {
-                            return Text.builder()
-                                       .append(Text.builder(x.getName())
-                                                   .color(TextColors.LIGHT_PURPLE)
-                                                   .onHover(TextActions.showText(
-                                                           messageProviderService.getMessageFor(source, "home.warphoverotherdimension", x.getName())))
+                            return Component.text()
+                                       .append(Component.text().content(x.getName())
+                                                   .color(NamedTextColor.LIGHT_PURPLE)
+                                                   .hoverEvent(HoverEvent.showText(
+                                                           messageProviderService.getMessageFor(audience, "home.warphoverotherdimension", x.getName())))
                                                    .build())
                                        .append(textMessage)
                                        .build();
@@ -107,13 +112,13 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
                     }
                 }
 
-                return Text.builder()
+                return Component.text()
                            .append(
-                                Text.builder(x.getName())
-                                    .color(TextColors.GREEN).style(TextStyles.UNDERLINE)
-                                    .onHover(TextActions.showText(messageProviderService.getMessageFor(source, "home.warphover", x.getName())))
-                                    .onClick(TextActions.runCommand(other ? "/homeother " + user.getName() + " " + x.getName()
-                                                                          : "/home " + x.getName()))
+                                Component.text().content(x.getName())
+                                    .color(NamedTextColor.GREEN).style(Style.style(TextDecoration.UNDERLINED))
+                                    .hoverEvent(HoverEvent.showText(messageProviderService.getMessageFor(audience, "home.warphover", x.getName())))
+                                    .clickEvent(ClickEvent.runCommand(other ? "/nucleus:home " + user.getName() + " " + x.getName()
+                                                                          : "/nucleus:home " + x.getName()))
                                     .build())
                            .append(textMessage)
                            .build();
@@ -121,9 +126,10 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
         }).collect(Collectors.toList());
 
         final PaginationList.Builder pb =
-            Util.getPaginationBuilder(source).title(Text.of(TextColors.YELLOW, header)).padding(Text.of(TextColors.GREEN, "-")).contents(lt);
+            Util.getPaginationBuilder(audience).title(header)
+                    .padding(Component.text("-", NamedTextColor.GREEN)).contents(lt);
 
-        pb.sendTo(source);
+        pb.sendTo(audience);
         return context.successResult();
     }
 

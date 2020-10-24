@@ -4,22 +4,27 @@
  */
 package io.github.nucleuspowered.nucleus.modules.home.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class HomeConfig {
 
-    @Setting(value = "use-safe-warp", comment = "config.home.safeTeleport")
+    @Setting(value = "use-safe-warp")
+    @LocalisedComment("config.home.safeTeleport")
     private boolean safeTeleport = true;
 
-    @Setting(value = "respawn-at-home", comment = "config.home.respawnAtHome")
+    @Setting(value = "respawn-at-home")
+    @LocalisedComment("config.home.respawnAtHome")
     private boolean respawnAtHome = false;
 
-    @Setting(value = "prevent-home-count-overhang", comment = "config.home.overhang")
+    @Setting(value = "prevent-home-count-overhang")
+    @LocalisedComment("config.home.overhang")
     private boolean preventHomeCountOverhang = true;
     
-    @Setting(value = "only-same-dimension", comment = "config.home.onlySameDimension")
+    @Setting(value = "only-same-dimension")
+    @LocalisedComment("config.home.onlySameDimension")
     private boolean onlySameDimension = false;
 
     public boolean isSafeTeleport() {

@@ -14,6 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -82,7 +83,7 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public ServerPlayer reqiurePlayer() throws CommandException {
+    public ServerPlayer requirePlayer() throws CommandException {
         final Object root = this.cause.root();
         if (root instanceof ServerPlayer) {
             return (ServerPlayer) root;
@@ -158,7 +159,7 @@ public final class CommandContextImpl implements ICommandContext {
     @Override
     public ServerPlayer getCommandSourceAsPlayerUnchecked() {
         try {
-            return this.reqiurePlayer();
+            return this.requirePlayer();
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -338,7 +339,7 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public void sendMessageText(final Component message) {
-        this.context.sendMessage(message);
+        this.context.sendMessage(Identity.nil(), message);
     }
 
     @Override public void sendMessageTo(final Audience source, final String key, final Object... replacements) {
@@ -400,6 +401,14 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public Optional<UUID> getUniqueId() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ServerPlayer> getAsPlayer() {
+        if (this.getCommandSourceRoot() instanceof ServerPlayer) {
+            return Optional.of((ServerPlayer) this.getCommandSourceRoot());
+        }
         return Optional.empty();
     }
 

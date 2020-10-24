@@ -47,17 +47,8 @@ public final class HomePermissions {
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "home other" }, level = SuggestedLevel.MOD)
     public static final String BASE_HOME_OTHER = "nucleus.home.other.base";
 
-    @PermissionMetadata(descriptionKey = "permission.exempt.cooldown", replacements = { "home other" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COOLDOWN_HOME_OTHER = "nucleus.home.other.exempt.cooldown";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.cost", replacements = { "home other" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_COST_HOME_OTHER = "nucleus.home.other.exempt.cost";
-
     @PermissionMetadata(descriptionKey = "permission.home.other.exempt.target", level = SuggestedLevel.ADMIN)
     public static final String HOME_OTHER_EXEMPT_TARGET = "nucleus.home.other.exempt.target";
-
-    @PermissionMetadata(descriptionKey = "permission.exempt.warmup", replacements = { "home other" }, level = SuggestedLevel.ADMIN)
-    public static final String EXEMPT_WARMUP_HOME_OTHER = "nucleus.home.other.exempt.warmup";
 
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "home set" }, level = SuggestedLevel.USER)
     public static final String BASE_HOME_SET = "nucleus.home.set.base";

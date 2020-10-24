@@ -1,6 +1,7 @@
 package io.github.nucleuspowered.nucleus.util;
 
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
+import io.github.nucleuspowered.nucleus.configurate.datatypes.LocationNode;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
 import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.ResourceKey;
@@ -8,6 +9,7 @@ import org.spongepowered.api.ResourceKey;
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public final class GeAnTyRefTypeTokens {
@@ -23,7 +25,11 @@ public final class GeAnTyRefTypeTokens {
 
     public static final TypeToken<Locale> LOCALE = TypeToken.get(Locale.class);
 
+    public static final TypeToken<LocationNode> LOCATION_NODE = TypeToken.get(LocationNode.class);
+
     public static final TypeToken<NamedLocation> NAMED_LOCATION = TypeToken.get(NamedLocation.class);
+
+    public static final TypeToken<Map<String, LocationNode>> LOCATION_NODES_MAP = new TypeToken<Map<String, LocationNode>>() { };
 
     public static final TypeToken<ResourceKey> RESOURCE_KEY = TypeToken.get(ResourceKey.class);
 

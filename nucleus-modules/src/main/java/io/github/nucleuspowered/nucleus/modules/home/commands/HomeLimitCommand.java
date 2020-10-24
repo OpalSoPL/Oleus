@@ -11,10 +11,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
+
 @Command(
         aliases = {"limit"},
         basePermission = HomePermissions.BASE_HOME_LIMIT,
@@ -26,16 +26,16 @@ import org.spongepowered.api.entity.living.player.User;
 public class HomeLimitCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(false, HomePermissions.OTHERS_LIMIT)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(HomePermissions.OTHERS_LIMIT)
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.getUserFromArgs();
         final HomeService service = context.getServiceCollection().getServiceUnchecked(HomeService.class);
-        final int current = service.getHomeCount(user);
+        final int current = service.getHomeCount(user.getUniqueId());
         final int max = service.getMaximumHomes(user);
         if (context.is(user)) {
             if (max == Integer.MAX_VALUE) {
