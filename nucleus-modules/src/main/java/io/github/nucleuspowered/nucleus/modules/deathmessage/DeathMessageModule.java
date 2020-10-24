@@ -41,7 +41,7 @@ public class DeathMessageModule implements IModule.Configurable<DeathMessageConf
         );
     }
 
-    @Override public Collection<Class<? extends TaskBase>> getTasks() {
+    @Override public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return Collections.emptyList();
     }
 

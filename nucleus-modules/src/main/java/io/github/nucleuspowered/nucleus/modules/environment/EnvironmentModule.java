@@ -49,7 +49,7 @@ public class EnvironmentModule implements IModule.Configurable<EnvironmentConfig
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return Collections.emptyList();
     }
 

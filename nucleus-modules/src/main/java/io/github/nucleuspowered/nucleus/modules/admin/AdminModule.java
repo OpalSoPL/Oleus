@@ -68,7 +68,7 @@ public class AdminModule implements IModule.Configurable<AdminConfig> {
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return Collections.emptyList();
     }
 

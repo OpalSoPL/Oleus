@@ -45,7 +45,7 @@ public final class ConnectionMessagesModule implements IModule.Configurable<Conn
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return Collections.emptyList();
     }
 

@@ -88,7 +88,7 @@ public class CoreModule implements IModule.Configurable<CoreConfig> {
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return Collections.singletonList(CoreTask.class);
     }
 

@@ -8,8 +8,6 @@ group = "io.github.nucleuspowered"
 repositories {
     jcenter()
     maven("https://repo-new.spongepowered.org/repository/maven-public")
-    maven("https://repo.drnaylor.co.uk/artifactory/list/minecraft")
-    maven("https://repo.drnaylor.co.uk/artifactory/list/quickstart")
     // maven("https://jitpack.io")
 }
 

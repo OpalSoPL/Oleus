@@ -35,17 +35,17 @@ public class CommandElementSupplier implements ICommandElementSupplier {
 
     @Override
     public Parameter.Value<User> createOnlyOtherUserPermissionElement(final String permission) {
-        return Parameter.userOrSource().setKey(NucleusParameters.ONE_USER.getKey()).setRequiredPermission(permission).build();
+        return Parameter.userOrSource().optional().setKey(NucleusParameters.ONE_USER.getKey()).setRequiredPermission(permission).build();
     }
 
     @Override
     public Parameter.Value<ServerPlayer> createOnlyOtherPlayerPermissionElement(final String permission) {
-        return Parameter.playerOrSource().setKey(NucleusParameters.ONE_PLAYER.getKey()).setRequiredPermission(permission).build();
+        return Parameter.playerOrSource().optional().setKey(NucleusParameters.ONE_PLAYER.getKey()).setRequiredPermission(permission).build();
     }
 
     @Override
     public User getUserFromParametersElseSelf(final ICommandContext context) throws CommandException {
-        final Optional<? extends User> user = context.getOne(NucleusParameters.Keys.USER, User.class).filter(context::isNot);
+        final Optional<? extends User> user = context.getOne(NucleusParameters.ONE_USER).filter(context::isNot);
         if (!user.isPresent()) {
             return context.getIfPlayer().getUser();
         }

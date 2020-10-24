@@ -4,28 +4,45 @@
  */
 package io.github.nucleuspowered.nucleus.modules.inventory;
 
-import io.github.nucleuspowered.nucleus.modules.inventory.config.InventoryConfig;
-import io.github.nucleuspowered.nucleus.modules.inventory.config.InventoryConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.inventory.commands.ClearInventoryCommand;
+import io.github.nucleuspowered.nucleus.modules.inventory.commands.EnderChestCommand;
+import io.github.nucleuspowered.nucleus.modules.inventory.commands.InvSeeCommand;
+import io.github.nucleuspowered.nucleus.modules.inventory.listeners.KeepInventoryListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = InventoryModule.ID, name = "Inventory")
-public class InventoryModule extends ConfigurableModule<InventoryConfig, InventoryConfigAdapter> {
+public final class InventoryModule implements IModule {
 
     public static final String ID = "inventory";
 
-    @Inject
-    public InventoryModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
     }
 
-    @Override public InventoryConfigAdapter createAdapter() {
-        return new InventoryConfigAdapter();
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                ClearInventoryCommand.class,
+                EnderChestCommand.class,
+                InvSeeCommand.class
+        );
     }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(InventoryPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(KeepInventoryListener.class);
+    }
+
 }

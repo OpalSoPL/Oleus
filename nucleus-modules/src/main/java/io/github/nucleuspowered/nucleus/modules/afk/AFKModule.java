@@ -91,7 +91,7 @@ public class AFKModule implements IModule.Configurable<AFKConfig> {
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         final List<Class<? extends TaskBase>> tasks = new ArrayList<>();
         tasks.add(AFKRefreshPermsTask.class);
         tasks.add(AFKTask.class);

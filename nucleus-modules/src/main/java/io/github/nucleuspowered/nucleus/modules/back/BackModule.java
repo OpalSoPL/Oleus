@@ -49,7 +49,7 @@ public class BackModule implements IModule.Configurable<BackConfig> {
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return Collections.emptyList();
     }
 

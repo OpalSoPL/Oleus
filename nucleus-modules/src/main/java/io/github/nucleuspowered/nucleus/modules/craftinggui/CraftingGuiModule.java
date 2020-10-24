@@ -47,7 +47,7 @@ public final class CraftingGuiModule implements IModule {
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return Collections.emptyList();
     }
 }

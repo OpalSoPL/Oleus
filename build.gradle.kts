@@ -106,21 +106,13 @@ java {
 
 repositories {
     jcenter()
-    maven("https://repo.spongepowered.org/maven")
-    maven("https://repo.drnaylor.co.uk/artifactory/list/minecraft")
-    maven("https://repo.drnaylor.co.uk/artifactory/list/quickstart")
+    maven("https://repo-new.spongepowered.org/maven")
 }
 
 dependencies {
     implementation(project(":nucleus-api"))
     implementation(project(":nucleus-core"))
-
-    implementation(project.properties["qsmlDep"]?.toString()!!)  {
-        exclude("org.spongepowered", "configurate-core")
-    }
-/*    implementation(project.properties["neutrinoDep"]?.toString()!!)  {
-        exclude("org.spongepowered", "configurate-core")
-    } */
+    implementation(project(":nucleus-bootstrap"))
 }
 
 /**

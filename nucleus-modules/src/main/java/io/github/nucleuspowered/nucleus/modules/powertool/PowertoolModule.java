@@ -39,7 +39,7 @@ public class PowertoolModule implements IModule {
         return null;
     }
 
-    @Override public Collection<Class<? extends TaskBase>> getTasks() {
+    @Override public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return null;
     }
 

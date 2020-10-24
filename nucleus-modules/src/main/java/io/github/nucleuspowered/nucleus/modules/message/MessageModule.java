@@ -44,7 +44,7 @@ public final class MessageModule implements IModule.Configurable<MessageConfig> 
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return null;
     }
 

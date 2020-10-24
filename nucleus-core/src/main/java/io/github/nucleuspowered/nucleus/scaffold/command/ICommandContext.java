@@ -64,8 +64,6 @@ public interface ICommandContext {
      */
     void setWarmup(int warmup);
 
-    <T> T requireOne(Parameter.Value<T> key);
-
     ServerPlayer getPlayerFromArgs(String key, String errorKey) throws CommandException;
 
     default ServerPlayer getPlayerFromArgs() throws CommandException {
@@ -96,7 +94,7 @@ public interface ICommandContext {
 
     boolean hasAny(Parameter.Key<?> name);
 
-    default boolean hasAny(Parameter.Value<?> name) {
+    default boolean hasAny(final Parameter.Value<?> name) {
         return this.hasAny(name.getKey());
     }
 
@@ -106,35 +104,11 @@ public interface ICommandContext {
 
     <T> Collection<? extends T> getAll(Parameter.Key<T> name);
 
-    default <T> Optional<T> getOne(final String name, final Class<T> clazz) {
-        return this.getOne(Parameter.key(name, TypeToken.of(clazz)));
-    }
-
-    default <T> Optional<T> getOne(final String name, final TypeToken<T> clazz) {
-        return this.getOne(Parameter.key(name, clazz));
-    }
-
-    default <T> Collection<? extends T> getAll(final String name, final Class<T> clazz) {
-        return this.getAll(Parameter.key(name, TypeToken.of(clazz)));
-    }
-
-    default <T> Collection<? extends T> getAll(final String name, final TypeToken<T> clazz) {
-        return this.getAll(Parameter.key(name, clazz));
-    }
-
     <T> Collection<? extends T> getAll(Parameter.Value<T> name);
 
     <T> T requireOne(Parameter.Key<T> key);
 
-    @NonNull
-    default <T> T requireOne(final String name, final Class<T> clazz) {
-        return this.requireOne(Parameter.key(name, TypeToken.of(clazz)));
-    }
-
-    @NonNull
-    default <T> T requireOne(final String name, final TypeToken<T> clazz) {
-        return this.requireOne(Parameter.key(name, clazz));
-    }
+    <T> T requireOne(Parameter.Value<T> key);
 
     INucleusServiceCollection getServiceCollection();
 

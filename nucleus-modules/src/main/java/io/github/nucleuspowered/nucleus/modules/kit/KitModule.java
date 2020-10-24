@@ -52,7 +52,7 @@ public class KitModule implements IModule.Configurable<KitConfig> {
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return null;
     }
 }

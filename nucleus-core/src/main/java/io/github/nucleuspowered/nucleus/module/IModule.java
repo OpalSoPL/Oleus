@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.module;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandInterceptor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.SyncTaskBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
@@ -33,7 +34,11 @@ public interface IModule {
 
     Collection<Class<? extends ListenerBase>> getListeners();
 
-    default Collection<Class<? extends TaskBase>> getTasks() {
+    default Collection<Class<? extends TaskBase>> getAsyncTasks() {
+        return Collections.emptyList();
+    }
+
+    default Collection<Class<? extends SyncTaskBase>> getSyncTasks() {
         return Collections.emptyList();
     }
 

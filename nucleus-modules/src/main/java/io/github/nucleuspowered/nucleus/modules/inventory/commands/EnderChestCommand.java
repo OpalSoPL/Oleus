@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.inventory.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.inventory.InventoryPermissions;
-import io.github.nucleuspowered.nucleus.modules.inventory.listeners.InvSeeListener;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -15,12 +15,20 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.item.inventory.Container;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.menu.InventoryMenu;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
+
+import java.util.UUID;
+
+;
+
 @Command(
         aliases = {"enderchest", "ec", "echest"},
         basePermission = InventoryPermissions.BASE_ENDERCHEST,
@@ -41,22 +49,28 @@ import org.spongepowered.api.item.inventory.Inventory;
 @EssentialsEquivalent({"enderchest", "echest", "endersee", "ec"})
 public class EnderChestCommand implements ICommandExecutor {
 
+    private final Parameter.Value<ServerPlayer> onlinePlayerParameter;
+    private final Parameter.Value<User> offlinePlayerParameter;
+
+    @Inject
+    public EnderChestCommand(final IPermissionService permissionService) {
+        this.onlinePlayerParameter = Parameter.player()
+                .setRequirements(cause -> permissionService.hasPermission(cause, InventoryPermissions.OTHERS_ENDERCHEST))
+                .build();
+        this.offlinePlayerParameter = Parameter.user()
+                .setRequirements(cause -> permissionService.hasPermission(cause, InventoryPermissions.OTHERS_ENDERCHEST))
+                .build();
+    }
+
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.optional(
-                        serviceCollection.commandElementSupplier().createPermissionParameter(
-                            IfConditionElseArgument.permission(
-                                    serviceCollection.permissionService(),
-                                    InventoryPermissions.ENDERCHEST_OFFLINE,
-                                    NucleusParameters.ONE_USER_PLAYER_KEY.get(serviceCollection), // user if permission
-                                    NucleusParameters.ONE_PLAYER.get(serviceCollection) // player if not
-                            ),
-                            InventoryPermissions.OTHERS_ENDERCHEST, false))
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                Parameter.firstOfBuilder(this.onlinePlayerParameter).or(this.offlinePlayerParameter).optional().build()
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer currentPlayer = context.requirePlayer();
         final User target = context.getUserFromArgs(NucleusParameters.Keys.PLAYER);
 
         if (!context.is(target)) {
@@ -65,18 +79,23 @@ public class EnderChestCommand implements ICommandExecutor {
             }
 
             final Inventory ec = target.getEnderChestInventory();
-            final Container container = context.getCommandSourceAsPlayerUnchecked()
-                    .openInventory(ec)
-                    .orElseThrow(() -> context.createException("command.invsee.failed"));
-
-            if (context.testPermissionFor(target, InventoryPermissions.ENDERCHEST_EXEMPT_MODIFY)
-                || !context.testPermission(InventoryPermissions.ENDERCHEST_MODIFY)) {
-                InvSeeListener.addEntry(context.getCommandSourceAsPlayerUnchecked().getUniqueId(), container);
+            if (!context.testPermission(InventoryPermissions.ENDERCHEST_MODIFY)
+                    || context.testPermissionFor(target, InventoryPermissions.ENDERCHEST_EXEMPT_MODIFY)) {
+                final UUID uuid = UUID.randomUUID();
+                final InventoryMenu menu =
+                        ViewableInventory.builder().type(ContainerTypes.GENERIC_9x5).slots(ec.slots(), 0).completeStructure()
+                                .identity(uuid).build().asMenu();
+                menu.setReadOnly(true);
+                return menu.open(currentPlayer)
+                        .map(x -> context.successResult())
+                        .orElseGet(() -> context.errorResult("command.invsee.failed"));
+            } else {
+                return currentPlayer.openInventory(ec)
+                        .map(x -> context.successResult())
+                        .orElseGet(() -> context.errorResult("command.invsee.failed"));
             }
-
-            return context.successResult();
         } else {
-            return context.getCommandSourceAsPlayerUnchecked().openInventory(
+            return context.requirePlayer().openInventory(
                         context.getCommandSourceAsPlayerUnchecked().getEnderChestInventory())
                     .map(x -> context.successResult())
                     .orElseGet(() -> context.errorResult("command.invsee.failed"));

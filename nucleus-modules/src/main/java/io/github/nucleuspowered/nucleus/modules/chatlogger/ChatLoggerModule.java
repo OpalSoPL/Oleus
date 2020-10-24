@@ -52,7 +52,7 @@ public class ChatLoggerModule implements IModule.Configurable<ChatLoggingConfig>
     }
 
     @Override
-    public Collection<Class<? extends TaskBase>> getTasks() {
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
         return Collections.singleton(ChatLoggerRunnable.class);
     }
 

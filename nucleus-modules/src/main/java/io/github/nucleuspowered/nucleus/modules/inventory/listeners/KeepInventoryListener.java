@@ -9,13 +9,14 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 
 import com.google.inject.Inject;
 
-public class KeepInventoryListener implements ListenerBase.Conditional {
+public final class KeepInventoryListener implements ListenerBase {
 
     private final IPermissionService permissionService;
 
@@ -25,15 +26,12 @@ public class KeepInventoryListener implements ListenerBase.Conditional {
     }
 
     @Listener
-    public void onEntityDeath(final DestructEntityEvent.Death event, @Getter("getTargetEntity") final Player living) {
-        if (this.permissionService.hasPermission(living, InventoryPermissions.INVENTORY_KEEP)) {
-            event.setKeepInventory(true);
+    public void onEntityDeath(final DestructEntityEvent.Death event) {
+        if (event.getEntity() instanceof ServerPlayer) {
+            if (this.permissionService.hasPermission((ServerPlayer) event.getEntity(), InventoryPermissions.INVENTORY_KEEP)) {
+                event.setKeepInventory(true);
+            }
         }
-    }
-
-    @Override
-    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
-        return !serviceCollection.permissionService().isOpOnly();
     }
 
 }

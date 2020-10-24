@@ -1,5 +1,5 @@
 plugins {
-    java
+    `java-library`
     eclipse
 }
 
@@ -24,8 +24,8 @@ java {
 }
 
 dependencies {
-    implementation(project(":nucleus-core"))
-    implementation(project(":nucleus-modules"))
+    api(project(":nucleus-core"))
+    api(project(":nucleus-modules"))
 
     val dep = "org.spongepowered:spongeapi:${rootProject.properties["spongeApiVersion"]}"
     annotationProcessor(dep)

@@ -7,12 +7,19 @@ package io.github.nucleuspowered.nucleus.api.module.inventory;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 
+import java.util.UUID;
+
 /**
  * Fired when a player's inventory is cleared. Should be used to clear other, secondary, inventories
- *
- * <p>Note that the target user may be a {@link org.spongepowered.api.entity.living.player.Player}</p>
  */
 public interface NucleusClearInventoryEvent extends Event {
+
+    /**
+     * Gets the {@link UUID} of the user being cleared.
+     *
+     * @return The UUID of the user.
+     */
+    UUID getUser();
 
     /**
      * Gets whether the entire inventory is being cleared, or the

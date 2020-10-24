@@ -6,24 +6,25 @@ package io.github.nucleuspowered.nucleus.modules.inventory.events;
 
 import io.github.nucleuspowered.nucleus.api.module.inventory.NucleusClearInventoryEvent;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.event.user.TargetUserEvent;
 
-public abstract class ClearInventoryEvent extends AbstractEvent implements TargetUserEvent, NucleusClearInventoryEvent {
+import java.util.UUID;
 
-    private final User target;
+public abstract class ClearInventoryEvent extends AbstractEvent implements NucleusClearInventoryEvent {
+
+    private final UUID target;
     private final Cause cause;
     private final boolean isClearingAll;
 
-    public ClearInventoryEvent(final Cause cause, final User target, final boolean isClearingAll) {
+    public ClearInventoryEvent(final Cause cause, final UUID target, final boolean isClearingAll) {
         this.cause = cause;
         this.target = target;
         this.isClearingAll = isClearingAll;
     }
 
     @Override
-    public User getTargetUser() {
+    public UUID getUser() {
         return this.target;
     }
 
@@ -40,7 +41,7 @@ public abstract class ClearInventoryEvent extends AbstractEvent implements Targe
 
         private boolean cancelled = false;
 
-        public Pre(final Cause cause, final User target, final boolean isClearingAll) {
+        public Pre(final Cause cause, final UUID target, final boolean isClearingAll) {
             super(cause, target, isClearingAll);
         }
 
@@ -55,7 +56,7 @@ public abstract class ClearInventoryEvent extends AbstractEvent implements Targe
 
     public static class Post extends ClearInventoryEvent implements NucleusClearInventoryEvent.Post {
 
-        public Post(final Cause cause, final User target, final boolean isClearingAll) {
+        public Post(final Cause cause, final UUID target, final boolean isClearingAll) {
             super(cause, target, isClearingAll);
         }
     }

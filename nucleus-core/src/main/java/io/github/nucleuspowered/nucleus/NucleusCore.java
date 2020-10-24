@@ -28,6 +28,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.RequiresE
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.impl.WarmupModifier;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerReloadableWrapper;
+import io.github.nucleuspowered.nucleus.scaffold.task.SyncTaskBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.NucleusServiceCollection;
@@ -37,6 +38,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.startuperror.ConfigErrorHandler;
+import io.github.nucleuspowered.nucleus.util.functional.Action;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
 import io.leangen.geantyref.TypeToken;
 import org.apache.logging.log4j.Logger;
@@ -58,6 +60,8 @@ import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.scheduler.ScheduledTask;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -77,6 +81,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -91,6 +96,7 @@ public final class NucleusCore {
     private final Injector injector;
     private final IModuleProvider provider;
     private final boolean runDocGen = System.getProperty(DOCGEN_PROPERTY) != null;
+    private final List<Action> onStartedActions = new LinkedList<>();
 
     @Nullable private Path dataDirectory;
 
@@ -268,6 +274,7 @@ public final class NucleusCore {
             Sponge.getServer().shutdown();
             return;
         }
+        this.onStartedActions.forEach(Action::action);
         this.serviceCollection.getServiceUnchecked(UniqueUserService.class).resetUniqueUserCount();
         event.getGame().getAsyncScheduler().createExecutor(this.pluginContainer)
                 .submit(() -> this.serviceCollection.userCacheService().startFilewalkIfNeeded());
@@ -279,6 +286,7 @@ public final class NucleusCore {
         // Teardown data here
         final IStorageManager manager = this.serviceCollection.storageManager();
         manager.saveAndInvalidateAllCaches().whenComplete((v, t) -> manager.detachAll());
+        Sponge.getAsyncScheduler().getTasksByPlugin(this.pluginContainer).forEach(ScheduledTask::cancel);
     }
 
     @Listener
@@ -341,18 +349,33 @@ public final class NucleusCore {
             this.serviceCollection.commandMetadataService().registerInterceptors(module.getCommandInterceptors());
 
             // tasks
-            for (final Class<? extends TaskBase> taskBaseClass : module.getTasks()) {
+            for (final Class<? extends TaskBase> taskBaseClass : module.getAsyncTasks()) {
                 final TaskBase taskBase = this.injector.getInstance(taskBaseClass);
                 if (taskBase instanceof IReloadableService.Reloadable) {
                     this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) taskBase);
                 }
-                Sponge.getAsyncScheduler()
+                this.onStartedActions.add(() -> Sponge.getAsyncScheduler()
                         .createExecutor(this.pluginContainer)
                         .scheduleAtFixedRate(
                                 taskBase,
                                 taskBase.interval().getSeconds(),
                                 taskBase.interval().getSeconds(),
-                                TimeUnit.SECONDS);
+                                TimeUnit.SECONDS));
+            }
+
+            for (final Class<? extends SyncTaskBase> taskBaseClass : module.getSyncTasks()) {
+                final SyncTaskBase taskBase = this.injector.getInstance(taskBaseClass);
+                if (taskBase instanceof IReloadableService.Reloadable) {
+                    this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) taskBase);
+                }
+                this.onStartedActions.add(() -> Sponge.getServer().getScheduler()
+                        .submit(
+                                Task.builder().plugin(this.pluginContainer)
+                                        .delay(taskBase.interval().getSeconds(), TimeUnit.SECONDS)
+                                        .interval(taskBase.interval().getSeconds(), TimeUnit.SECONDS)
+                                        .execute(taskBase)
+                                        .build()
+                        ));
             }
 
             // Player info service
