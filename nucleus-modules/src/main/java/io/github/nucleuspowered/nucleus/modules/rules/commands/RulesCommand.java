@@ -29,7 +29,7 @@ public class RulesCommand implements ICommandExecutor, IReloadableService.Reload
                 .textFileControllerCollection()
                 .get(RulesModule.RULES_KEY)
                 .orElseThrow(() -> context.createException("command.rules.empty"))
-                .sendToPlayer(context.getCommandSourceRoot(), this.title);
+                .sendToAudience(context.getCommandSourceRoot(), this.title);
         return context.successResult();
     }
 

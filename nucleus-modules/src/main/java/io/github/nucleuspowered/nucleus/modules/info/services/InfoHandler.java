@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.AssetManager;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -95,7 +95,9 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
                     return;
                 }
 
-                mst.put(name, new TextFileController(serviceCollection.textTemplateFactory(), x, true));
+                final TextFileController tfc = new TextFileController(serviceCollection.textTemplateFactory(), x, true);
+                tfc.load();
+                mst.put(name, tfc);
             } catch (final IOException e) {
                 e.printStackTrace();
             }

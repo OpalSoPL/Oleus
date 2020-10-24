@@ -41,7 +41,7 @@ public class MotdCommand implements ICommandExecutor, IReloadableService.Reloada
 
         final CommandSource src = context.getCommandSourceRoot();
         if (this.usePagination) {
-            otfc.get().sendToPlayer(src, this.title);
+            otfc.get().sendToAudience(src, this.title);
         } else {
             otfc.get().getTextFromNucleusTextTemplates(src).forEach(src::sendMessage);
         }

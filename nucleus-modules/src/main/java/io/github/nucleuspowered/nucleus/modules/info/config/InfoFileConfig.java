@@ -4,16 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.info.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class InfoFileConfig {
 
-    @Setting(value = "use-default-info-section", comment = "config.info.defaultinfo")
+    @Setting(value = "use-default-info-section")
+    @LocalisedComment("config.info.defaultinfo")
     private boolean useDefaultFile = false;
 
-    @Setting(value = "default-info-section", comment = "config.info.section")
+    @Setting(value = "default-info-section")
+    @LocalisedComment("config.info.section")
     private String defaultInfoSection = "info";
 
     public boolean isUseDefaultFile() {

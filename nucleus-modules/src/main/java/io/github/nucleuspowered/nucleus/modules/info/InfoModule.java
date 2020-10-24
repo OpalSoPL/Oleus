@@ -5,42 +5,56 @@
 package io.github.nucleuspowered.nucleus.modules.info;
 
 import io.github.nucleuspowered.nucleus.io.TextFileController;
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.info.config.InfoConfig;
-import io.github.nucleuspowered.nucleus.modules.info.config.InfoConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.info.services.InfoHandler;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = InfoModule.ID, name = "Info")
-public class InfoModule extends ConfigurableModule<InfoConfig, InfoConfigAdapter> {
+public class InfoModule implements IModule.Configurable<InfoConfig> {
 
     public static final String ID = "info";
     public static final String MOTD_KEY = "motd";
 
-    @Inject
-    public InfoModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(InfoHandler.class, new InfoHandler(), false);
+        final TextFileController motdController = new TextFileController(
+                serviceCollection.textTemplateFactory(),
+                Sponge.getAssetManager().getAsset(serviceCollection.pluginContainer(), "motd.txt").get(),
+                serviceCollection.configDir().resolve("motd.txt"));
+        serviceCollection.textFileControllerCollection().register(InfoModule.MOTD_KEY, motdController);
+
     }
 
     @Override
-    public InfoConfigAdapter createAdapter() {
-        return new InfoConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
     }
 
-    @Override public void performPreTasks(final INucleusServiceCollection serviceCollection) throws Exception {
-        super.performPreTasks(serviceCollection);
-
-        serviceCollection.textFileControllerCollection()
-                .register(MOTD_KEY,
-                new TextFileController(
-                        serviceCollection.textTemplateFactory(),
-                        Sponge.getAssetManager().getAsset(serviceCollection.pluginContainer(), "motd.txt").get(),
-                        serviceCollection.configDir().resolve("motd.txt")));
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(InfoPermissions.class);
     }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override
+    public Class<InfoConfig> getConfigClass() {
+        return InfoConfig.class;
+    }
+
+    @Override
+    public InfoConfig createInstance() {
+        return new InfoConfig();
+    }
+
 }

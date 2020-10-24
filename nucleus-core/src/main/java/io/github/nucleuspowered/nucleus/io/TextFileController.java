@@ -70,21 +70,20 @@ public final class TextFileController {
     private long fileTimeStamp = 0;
     @Nullable private NucleusTextTemplate title;
 
-    public TextFileController(final INucleusTextTemplateFactory textTemplateFactory, final Path fileLocation, final boolean getTitle) throws IOException {
+    public TextFileController(final INucleusTextTemplateFactory textTemplateFactory, final Path fileLocation, final boolean getTitle) {
         this(textTemplateFactory, null, fileLocation, getTitle);
     }
 
-    public TextFileController(final INucleusTextTemplateFactory textTemplateFactory, @Nullable final Asset asset, final Path fileLocation) throws IOException {
+    public TextFileController(final INucleusTextTemplateFactory textTemplateFactory, @Nullable final Asset asset, final Path fileLocation) {
         this(textTemplateFactory, asset, fileLocation, false);
     }
 
     private TextFileController(
-            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final Asset asset, final Path fileLocation, final boolean getTitle) throws IOException {
+            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final Asset asset, final Path fileLocation, final boolean getTitle) {
         this.textTemplateFactory = textTemplateFactory;
         this.asset = asset;
         this.fileLocation = fileLocation;
         this.getTitle = getTitle;
-        this.load();
     }
 
     /**
@@ -140,7 +139,7 @@ public final class TextFileController {
         return this.getFileContentsAsText().stream().map(x -> x.getForObject(source)).collect(Collectors.toList());
     }
 
-    public void sendToPlayer(final ServerPlayer src, final Component title) {
+    public void sendToAudience(final Audience src, final Component title) {
 
         final PaginationList.Builder pb = Util.getPaginationBuilder(src).contents(this.getTextFromNucleusTextTemplates(src));
 

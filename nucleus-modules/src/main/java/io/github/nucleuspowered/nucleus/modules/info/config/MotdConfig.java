@@ -4,22 +4,27 @@
  */
 package io.github.nucleuspowered.nucleus.modules.info.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class MotdConfig {
 
-    @Setting(value = "show-motd-on-join", comment = "config.motd.onjoin")
+    @Setting(value = "show-motd-on-join")
+    @LocalisedComment("config.motd.onjoin")
     private boolean showMotdOnJoin = true;
 
-    @Setting(value = "motd-login-delay", comment = "config.motd.delay")
+    @Setting(value = "motd-login-delay")
+    @LocalisedComment("config.motd.delay")
     private float delay = 0.5f;
 
-    @Setting(value = "motd-title", comment = "config.motd.title")
+    @Setting(value = "motd-title")
+    @LocalisedComment("config.motd.title")
     private String motdTitle = "MOTD";
 
-    @Setting(value = "use-pagination", comment = "config.motd.pagination")
+    @Setting(value = "use-pagination")
+    @LocalisedComment("config.motd.pagination")
     private boolean usePagination = true;
 
     public boolean isShowMotdOnJoin() {
