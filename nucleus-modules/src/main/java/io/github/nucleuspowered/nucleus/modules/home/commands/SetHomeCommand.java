@@ -105,7 +105,6 @@ public class SetHomeCommand implements ICommandExecutor, IReloadableService.Relo
                 homeService.createHome(player.getUniqueId(), home, player.getServerLocation(), player.getRotation());
             }
         } catch (final HomeException e) {
-            e.printStackTrace();
             return context.errorResultLiteral(e.getText());
         }
 
