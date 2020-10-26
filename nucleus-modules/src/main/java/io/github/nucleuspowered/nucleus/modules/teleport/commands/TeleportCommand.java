@@ -174,8 +174,8 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
                                         from,
                                         to.getPlayer().get(),
                                         !context.hasAny("f"),
-                                        beQuiet,
-                                        false
+                                        false,
+                                        beQuiet
                                 );
                 return result.isSuccessful() ? context.successResult() : context.failResult();
             }
