@@ -225,7 +225,11 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     public <T2> CompletableFuture<Void> setAndSave(@NonNull final K key, final DataKey<T2, ? extends D> dataKey, final T2 data) {
         return this.getOrNew(key).thenAccept(x -> {
             x.set(dataKey, data);
-            this.save(key, x);
+            try {
+                this.saveOnThread(key, x);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 
