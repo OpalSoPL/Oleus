@@ -230,18 +230,22 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
+    public <T2> CompletableFuture<Void> removeAndSave(@NonNull final K key, final DataKey<T2, ? extends D> dataKey) {
+        return this.getOrNew(key).handle((x, ex) -> {
+            x.remove(dataKey);
+            try {
+                this.saveOnThread(key, x);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        });
+    }
+
+    @Override
     public CompletableFuture<Void> save(@NonNull final K key, @NonNull final D value) {
         return ServicesUtil.run(() -> {
-            final ReentrantReadWriteLock reentrantReadWriteLock = this.dataLocks.get(key);
-            final ReentrantReadWriteLock.WriteLock lock = reentrantReadWriteLock.writeLock();
-            try {
-                lock.lock();
-                this.cache.put(key, value);
-                this.save.apply(key, value);
-                this.dirty.remove(key);
-            } finally {
-                lock.unlock();
-            }
+            this.saveOnThread(key, value);
             return null;
         }, this.pluginContainer);
     }
@@ -276,4 +280,18 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
             return null;
         }, this.pluginContainer);
     }
+
+    private void saveOnThread(@NonNull final K key, @NonNull final D value) throws Exception {
+        final ReentrantReadWriteLock reentrantReadWriteLock = this.dataLocks.get(key);
+        final ReentrantReadWriteLock.WriteLock lock = reentrantReadWriteLock.writeLock();
+        try {
+            lock.lock();
+            this.cache.put(key, value);
+            this.save.apply(key, value);
+            this.dirty.remove(key);
+        } finally {
+            lock.unlock();
+        }
+    }
+
 }
