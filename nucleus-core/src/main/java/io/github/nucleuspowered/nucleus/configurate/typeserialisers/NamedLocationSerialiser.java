@@ -13,7 +13,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -34,73 +34,73 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
 
     @Nullable
     @Override
-    public NamedLocation deserialize(@NonNull final Type type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
+    public NamedLocation deserialize(@NonNull final Type type, @NonNull final ConfigurationNode value) throws SerializationException {
         final Vector3d pos = getPosition(value);
         final Vector3d rot = getRotation(value);
 
         return new LocationData(
-                getName(value),
-                getWorldResourceKey(value),
+                NamedLocationSerialiser.getName(value),
+                NamedLocationSerialiser.getWorldResourceKey(value),
                 pos,
                 rot
         );
     }
 
     @Override
-    public void serialize(@NonNull final Type type, @Nullable final NamedLocation obj, @NonNull final ConfigurationNode value) throws ObjectMappingException {
+    public void serialize(@NonNull final Type type, @Nullable final NamedLocation obj, @NonNull final ConfigurationNode value) throws SerializationException {
         if (obj == null) {
             return;
         }
 
-        serializeLocation(obj, value);
+        NamedLocationSerialiser.serializeLocation(obj, value);
     }
 
     public static String getName(final ConfigurationNode value) {
-        return value.getNode("name").getString(String.valueOf(value.getKey()));
+        return value.node("name").getString(String.valueOf(value.key()));
     }
 
-    public static ResourceKey convertUUID(final UUID value, final ObjectMappingException ex) throws ObjectMappingException {
+    public static ResourceKey convertUUID(final UUID value, final SerializationException ex) throws SerializationException {
         return Sponge.getServer().getWorldManager().getWorlds().stream().filter(x -> x.getUniqueId().equals(value)).findFirst()
                 .orElseThrow(() -> ex)
                 .getKey();
     }
 
-    public static ResourceKey getWorldResourceKey(final ConfigurationNode value) throws ObjectMappingException {
+    public static ResourceKey getWorldResourceKey(final ConfigurationNode value) throws SerializationException {
         try {
-            return value.getNode("world").getValue(GeAnTyRefTypeTokens.RESOURCE_KEY);
-        } catch (final ObjectMappingException e) {
-            final UUID uuid = value.getNode("world").getValue(GeAnTyRefTypeTokens.UUID);
-            return convertUUID(uuid, e);
+            return value.node("world").get(GeAnTyRefTypeTokens.RESOURCE_KEY);
+        } catch (final SerializationException e) {
+            final UUID uuid = value.node("world").get(GeAnTyRefTypeTokens.UUID);
+            return NamedLocationSerialiser.convertUUID(uuid, e);
         }
     }
 
     public static Vector3d getPosition(final ConfigurationNode value) {
         return new Vector3d(
-                value.getNode("x").getDouble(),
-                value.getNode("y").getDouble(),
-                value.getNode("z").getDouble()
+                value.node("x").getDouble(),
+                value.node("y").getDouble(),
+                value.node("z").getDouble()
         );
     }
 
     public static Vector3d getRotation(final ConfigurationNode value) {
         return new Vector3d(
-                value.getNode("rotx").getDouble(),
-                value.getNode("roty").getDouble(),
-                value.getNode("rotz").getDouble()
+                value.node("rotx").getDouble(),
+                value.node("roty").getDouble(),
+                value.node("rotz").getDouble()
         );
     }
 
-    public static void serializeLocation(final NamedLocation obj, final ConfigurationNode value) throws ObjectMappingException {
-        value.getNode("world").setValue(GeAnTyRefTypeTokens.RESOURCE_KEY, obj.getResourceKey());
+    public static void serializeLocation(final NamedLocation obj, final ConfigurationNode value) throws SerializationException {
+        value.node("world").set(GeAnTyRefTypeTokens.RESOURCE_KEY, obj.getResourceKey());
 
-        value.getNode("x").setValue(obj.getPosition().getX());
-        value.getNode("y").setValue(obj.getPosition().getY());
-        value.getNode("z").setValue(obj.getPosition().getZ());
+        value.node("x").set(obj.getPosition().getX());
+        value.node("y").set(obj.getPosition().getY());
+        value.node("z").set(obj.getPosition().getZ());
 
-        value.getNode("rotx").setValue(obj.getRotation().getX());
-        value.getNode("roty").setValue(obj.getRotation().getY());
-        value.getNode("rotz").setValue(obj.getRotation().getZ());
+        value.node("rotx").set(obj.getRotation().getX());
+        value.node("roty").set(obj.getRotation().getY());
+        value.node("rotz").set(obj.getRotation().getZ());
 
-        value.getNode("name").setValue(obj.getName());
+        value.node("name").set(obj.getName());
     }
 }

@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.services.impl.storage.services;
 
 import com.google.gson.JsonObject;
-import io.github.nucleuspowered.nucleus.services.interfaces.IDataVersioning;
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
 import io.github.nucleuspowered.storage.dataobjects.IDataObject;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
@@ -98,12 +97,14 @@ public class SingleCachedService<O extends IDataObject> implements IStorageServi
     }
 
     private Optional<O> getFromRepo() throws Exception {
-        final Optional<O> gdo = this.repositorySupplier.get().get().map(x -> this.dataAccessSupplier.get().fromDataAccessObject(x));
-        gdo.ifPresent(x -> {
-            this.dataMigrator.accept(x);
-            this.cached = x;
-        });
-        return gdo;
+        final Optional<JsonObject> gdo = this.repositorySupplier.get().get();
+        if (gdo.isPresent()) {
+            final O r = this.dataAccessSupplier.get().fromDataAccessObject(gdo.get());
+            this.dataMigrator.accept(r);
+            this.cached = r;
+            return Optional.of(r);
+        }
+        return Optional.empty();
     }
 
     @Override

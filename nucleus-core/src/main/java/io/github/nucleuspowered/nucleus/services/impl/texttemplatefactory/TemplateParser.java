@@ -284,7 +284,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
 
         Component toAdd = textBuilder.build();
         if (!whiteSpace.isEmpty()) {
-            toAdd = TextComponent.join(Component.text(whiteSpace), toAdd);
+            toAdd = Component.join(Component.text(whiteSpace), toAdd);
         }
 
         return toAdd;

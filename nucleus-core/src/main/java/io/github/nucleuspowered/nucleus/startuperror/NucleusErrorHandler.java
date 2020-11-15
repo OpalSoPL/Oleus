@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.startuperror;
 
-import io.github.nucleuspowered.nucleus.NucleusPluginInfo;
+import io.github.nucleuspowered.nucleus.IPluginInfo;
 import io.github.nucleuspowered.nucleus.util.PrettyPrinter;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -24,16 +24,19 @@ public class NucleusErrorHandler {
     private final boolean shouldShutdown;
     protected final Throwable capturedThrowable;
     private final Logger logger;
+    private final IPluginInfo pluginInfo;
 
     public NucleusErrorHandler(
             final PluginContainer pluginContainer,
             final Throwable throwable,
             final boolean shouldShutdown,
-            final Logger logger) {
+            final Logger logger,
+            final IPluginInfo pluginInfo) {
         this.pluginContainer = pluginContainer;
         this.capturedThrowable = throwable;
         this.shouldShutdown = shouldShutdown;
         this.logger = logger;
+        this.pluginInfo = pluginInfo;
         this.disable();
     }
 
@@ -84,7 +87,7 @@ public class NucleusErrorHandler {
         prettyPrinter.hr('*');
         prettyPrinter.add();
 
-        prettyPrinter.add("Nucleus version: " + NucleusPluginInfo.VERSION + ", (Git: " + NucleusPluginInfo.GIT_HASH + ")");
+        prettyPrinter.add("Nucleus version: " + this.pluginInfo.version() + ", (Git: " + this.pluginInfo.gitHash() + ")");
         final Platform platform = Sponge.getPlatform();
         final PluginContainer api = platform.getContainer(Platform.Component.API);
         final PluginContainer impl = platform.getContainer(Platform.Component.IMPLEMENTATION);

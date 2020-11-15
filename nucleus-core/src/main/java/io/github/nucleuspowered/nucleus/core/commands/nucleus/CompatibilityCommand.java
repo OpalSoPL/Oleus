@@ -13,7 +13,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICompatibilityService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -44,7 +43,7 @@ public class CompatibilityCommand implements ICommandExecutor {
                             x.getModules().isEmpty() ?
                                     context.getMessage("command.nucleus.compat.all") :
                                     Component.text(String.join(" ,", x.getModules()));
-                    return TextComponent.join(Component.newline(),
+                    return Component.join(Component.newline(),
                         context.getMessage("command.nucleus.compat.severity.base",
                             "loc:command.nucleus.compat.severity." + x.getSeverity().name().toLowerCase()),
                             context.getMessage("command.nucleus.compat.modulesaffected", modulesAffected),

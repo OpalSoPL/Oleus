@@ -198,7 +198,7 @@ public final class CommandControl {
     }
 
     public Component getSubcommandTexts(@Nullable final CommandContext source) {
-        return TextComponent.join(Component.text(", "), this.primarySubcommands.entrySet()
+        return Component.join(Component.text(", "), this.primarySubcommands.entrySet()
                 .stream()
                 .filter(x -> source == null || x.getValue().testPermission(source))
                 .map(x -> Component.text(x.getKey()))

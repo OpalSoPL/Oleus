@@ -79,14 +79,13 @@ public class CoreConfig {
     @LocalisedComment("config.core.defaultperms")
     private boolean giveDefaultsUserPermissions = false;
 
-<<<<<<< HEAD:nucleus-core/src/main/java/io/github/nucleuspowered/nucleus/core/config/CoreConfig.java
+    @Setting(value = "check-first-date-played-on-first-joined")
+    @LocalisedComment("config.core.firstdateplayed")
+    private boolean checkFirstDatePlayed = true;
+
     public String getDataFileLocation() {
         return this.dataFileLocation;
     }
-=======
-    @Setting(value = "check-first-date-played-on-first-joined", comment = "config.core.firstdateplayed")
-    private boolean checkFirstDatePlayed = true;
->>>>>>> f0d2fd8a (Rework first join mechanics. Partially solves #1540):nucleus-core/src/main/java/io/github/nucleuspowered/nucleus/modules/core/config/CoreConfig.java
 
     public boolean isDebugmode() {
         return this.debugmode;

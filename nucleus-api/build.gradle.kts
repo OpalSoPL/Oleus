@@ -5,7 +5,6 @@ plugins {
     eclipse
     maven
     `maven-publish`
-    id("ninja.miserable.blossom")
 }
 
 description = "The Ultimate Essentials Plugin API."
@@ -21,12 +20,7 @@ repositories {
 }
 
 dependencies {
-    api("org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]) {
-        exclude("org.spongepowered", "configurate-core")
-        exclude("org.spongepowered", "configurate-gson")
-        exclude("org.spongepowered", "configurate-hocon")
-        exclude("org.spongepowered", "configurate-yaml")
-    }
+    api("org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"])
 }
 
 val filenameSuffix = "SpongeAPI${rootProject.properties["declaredApiVersion"]}"
@@ -55,10 +49,6 @@ val copyJars by tasks.registering(Copy::class) {
 }
 
 tasks {
-
-    blossomSourceReplacementJava {
-        dependsOn(rootProject.tasks["gitHash"])
-    }
 
     jar {
         manifest {
@@ -102,13 +92,6 @@ publishing {
             }
         }
     }
-}
-
-blossom {
-    replaceTokenIn("src/main/java/io/github/nucleuspowered/nucleus/api/NucleusAPITokens.java")
-    replaceToken("@version@", version)
-    replaceToken("@description@", description)
-    replaceToken("@gitHash@", rootProject.extra["gitHash"])
 }
 
 artifacts {

@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Type;
@@ -25,9 +26,10 @@ public class LocaleSerialiser implements TypeSerializer<Locale> {
     }
 
     @Override
-    public void serialize(@NonNull final Type type, @Nullable final Locale obj, @NonNull final ConfigurationNode value) {
+    public void serialize(@NonNull final Type type, @Nullable final Locale obj, @NonNull final ConfigurationNode value)
+            throws SerializationException {
         if (obj != null && !obj.toString().isEmpty()) {
-            value.setValue(obj.toString());
+            value.set(obj.toString());
         }
     }
 

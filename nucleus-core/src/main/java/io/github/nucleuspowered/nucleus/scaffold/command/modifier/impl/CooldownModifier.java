@@ -17,6 +17,7 @@ import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -26,15 +27,19 @@ public class CooldownModifier implements ICommandModifier {
     private static final String COOLDOWN = "cooldown";
 
     @Override public void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) {
-        final ConfigurationNode n = node.getNode(COOLDOWN);
+        final ConfigurationNode n = node.node(COOLDOWN);
         if (n instanceof CommentedConfigurationNode) {
-            ((CommentedConfigurationNode) n).setComment(messageProviderService.getMessageString("config.cooldown"));
+            ((CommentedConfigurationNode) n).comment(messageProviderService.getMessageString("config.cooldown"));
         }
-        n.setValue(0);
+        try {
+            n.set(0);
+        } catch (final SerializationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override public void setDataFromNode(final CommandModifiersConfig config, final ConfigurationNode node) {
-        config.setCooldown(node.getNode(COOLDOWN).getInt(0));
+        config.setCooldown(node.node(COOLDOWN).getInt(0));
     }
 
     @Override public void setValueFromOther(final CommandModifiersConfig from, final CommandModifiersConfig to) {

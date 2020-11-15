@@ -9,9 +9,8 @@ import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.entity.living.player.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,13 +18,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 @Singleton
 public class UserPreferenceService implements IUserPreferenceService {
 
     private final NucleusKeysProvider provider;
-
     private final Map<ResourceKey, NucleusUserPreferenceService.PreferenceKey<?>> registered = new HashMap<>();
     private final INucleusServiceCollection serviceCollection;
 
@@ -47,7 +43,7 @@ public class UserPreferenceService implements IUserPreferenceService {
         this.registered.put(key.getKey(), key);
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public <T> void set(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key, @Nullable final T value) {
         final PreferenceKeyImpl pki;
@@ -70,6 +66,7 @@ public class UserPreferenceService implements IUserPreferenceService {
                 .thenAccept(x -> x.set(key, value));
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> get(final UUID user) {
         final Map<NucleusUserPreferenceService.PreferenceKey<?>, Object> ret = new HashMap<>();
@@ -132,11 +129,13 @@ public class UserPreferenceService implements IUserPreferenceService {
         this.set(user, key, null);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public boolean canAccess(final UUID user, final PreferenceKey<?> key) {
         return ((PreferenceKeyImpl) key).canAccess(this.serviceCollection, user);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public String getDescription(final PreferenceKey<?> key) {
         return ((PreferenceKeyImpl) key).getDescription(this.serviceCollection.messageProvider());

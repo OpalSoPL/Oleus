@@ -48,13 +48,9 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Collection<GameProfile> cgp = context.requireOne(NucleusParameters.GAME_PROFILE);
-        if (cgp.size() != 1) {
-            return context.errorResult("command.checkban.multpleprofiles", cgp.size());
-        }
+        final GameProfile profile = context.requireOne(NucleusParameters.GAME_PROFILE);
         final BanService service = Sponge.getServer().getServiceProvider().banService();
-        final GameProfile profile = cgp.iterator().next();
-
+        
         final Optional<Ban.Profile> obp = service.getBanFor(profile);
         if (!obp.isPresent()) {
             return context.errorResult(

@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D extends IKeyedDataObject<D>>
         implements IStorageService.Keyed.KeyedData<K, Q, D> {
@@ -75,7 +76,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
                         .entrySet().stream()
                         .filter(x -> x.getValue() != null)
                         .collect(
-                                ImmutableMap.toImmutableMap(
+                                Collectors.toMap(
                                         Map.Entry::getKey,
                                         x -> dts.get().fromDataAccessObject(x.getValue())
                                 )

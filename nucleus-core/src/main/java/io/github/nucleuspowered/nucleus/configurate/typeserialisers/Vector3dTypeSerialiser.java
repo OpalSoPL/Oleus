@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
 import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -14,15 +15,15 @@ public class Vector3dTypeSerialiser implements TypeSerializer<Vector3d> {
 
     @Override
     public Vector3d deserialize(final Type type, final ConfigurationNode value) {
-        return new Vector3d(value.getNode("rotx").getDouble(), value.getNode("roty").getDouble(), value.getNode("rotz").getDouble());
+        return new Vector3d(value.node("rotx").getDouble(), value.node("roty").getDouble(), value.node("rotz").getDouble());
     }
 
     @Override
-    public void serialize(final Type type, final Vector3d obj, final ConfigurationNode value) {
+    public void serialize(final Type type, final Vector3d obj, final ConfigurationNode value) throws SerializationException {
         if (obj != null) {
-            value.getNode("rotx").setValue(obj.getX());
-            value.getNode("roty").setValue(obj.getY());
-            value.getNode("rotz").setValue(obj.getZ());
+            value.node("rotx").set(obj.getX());
+            value.node("roty").set(obj.getY());
+            value.node("rotz").set(obj.getZ());
         }
     }
 

@@ -8,6 +8,7 @@ import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.impl.storage.services.UserService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -64,23 +65,21 @@ public interface ICommandContext {
      */
     void setWarmup(int warmup);
 
-    ServerPlayer getPlayerFromArgs(String key, String errorKey) throws CommandException;
+    ServerPlayer getPlayerFromArgs(Parameter.Key<? extends ServerPlayer> serverPlayer, String errorKey) throws CommandException;
 
     default ServerPlayer getPlayerFromArgs() throws CommandException {
-        return this.getPlayerFromArgs(NucleusParameters.Keys.PLAYER, "command.playeronly");
+        return this.getPlayerFromArgs(NucleusParameters.ONE_PLAYER.getKey(), "command.playeronly");
     }
 
     ServerPlayer getCommandSourceAsPlayerUnchecked();
 
     default User getUserFromArgs() throws CommandException {
-        return this.getUserFromArgs(NucleusParameters.Keys.USER, "command.playeronly");
+        return this.getUserFromArgs(NucleusParameters.ONE_USER, "command.playeronly");
     }
 
-    default User getUserFromArgs(String key) throws CommandException {
+    default User getUserFromArgs(final Parameter.Key<? extends User> key) throws CommandException {
         return this.getUserFromArgs(key, "command.playeronly");
     }
-
-    User getUserFromArgs(String key, String errorKey) throws CommandException;
 
     default User getUserFromArgs(final Parameter.Value<? extends User> key) throws CommandException {
         return this.getUserFromArgs(key, "command.playeronly");

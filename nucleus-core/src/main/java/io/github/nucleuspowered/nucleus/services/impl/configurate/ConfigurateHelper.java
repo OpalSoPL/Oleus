@@ -66,9 +66,9 @@ public class ConfigurateHelper implements IConfigurateHelper {
     public ConfigurationOptions setOptions(final ConfigurationOptions options) {
         // Allows us to use localised comments and @ProcessSetting annotations
         if (this.withModules != null) {
-            return options.withSerializers(this.withModules);
+            return options.serializers(this.withModules);
         } else {
-            return options.withSerializers(this.baseTypeSerializerCollection);
+            return options.serializers(this.baseTypeSerializerCollection);
         }
     }
 
@@ -89,7 +89,7 @@ public class ConfigurateHelper implements IConfigurateHelper {
     private static TypeSerializerCollection setupCore(final INucleusServiceCollection serviceCollection,
             final ObjectMapper.Factory factory,
             final ConfigurationOptions options) {
-        final TypeSerializerCollection.Builder typeSerializerCollection = options.getSerializers().childBuilder();
+        final TypeSerializerCollection.Builder typeSerializerCollection = options.serializers().childBuilder();
 
         // Custom type serialisers for Nucleus
         typeSerializerCollection.registerAnnotatedObjects(factory);

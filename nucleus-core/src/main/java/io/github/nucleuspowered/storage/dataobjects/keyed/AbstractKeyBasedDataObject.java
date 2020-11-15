@@ -6,8 +6,9 @@ package io.github.nucleuspowered.storage.dataobjects.keyed;
 
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
 
     @Override
     public boolean has(final DataKey<?, ? extends T> dataKey) {
-        return !this.getNode(dataKey.getDataPath()).isVirtual();
+        return !this.getNode(dataKey.getDataPath()).virtual();
     }
 
     public <V> Value<V> getAndSet(final DataKey<V, ? extends T> dataKey) {
@@ -26,8 +27,8 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
     @SuppressWarnings("unchecked")
     public <V> V getNullable(final DataKey<V, ? extends T> dataKey) {
         try {
-            return (V) this.getNode(dataKey.getDataPath()).getValue(dataKey.getKeyType());
-        } catch (final ObjectMappingException e) {
+            return (V) this.getNode(dataKey.getDataPath()).get(dataKey.getKeyType());
+        } catch (final ConfigurateException e) {
             e.printStackTrace();
             return null;
         }
@@ -49,22 +50,26 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
 
     public <V> boolean set(final DataKey<V, ? extends T> dataKey, final V data) {
         try {
-            this.getNode(dataKey.getDataPath()).setValue(dataKey.getKeyType(), data);
+            this.getNode(dataKey.getDataPath()).set(dataKey.getKeyType(), data);
             return true;
-        } catch (final ObjectMappingException e) {
+        } catch (final ConfigurateException e) {
             e.printStackTrace();
             return false;
         }
     }
 
     public void remove(final DataKey<?, ? extends T> dataKey) {
-        this.getNode(dataKey.getDataPath()).setValue(null);
+        try {
+            this.getNode(dataKey.getDataPath()).set(null);
+        } catch (SerializationException e) {
+            e.printStackTrace();
+        }
     }
 
     private ConfigurationNode getNode(final String[] key) {
         ConfigurationNode r = this.backingNode;
         for (final String k : key) {
-            r = r.getNode(k);
+            r = r.node(k);
         }
 
         return r;

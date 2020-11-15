@@ -18,6 +18,7 @@ import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.util.Optional;
 
@@ -26,15 +27,19 @@ public class CostModifier implements ICommandModifier {
     private static final String COST = "cost";
 
     @Override public void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) {
-        final ConfigurationNode n = node.getNode(COST);
+        final ConfigurationNode n = node.node(COST);
         if (n instanceof CommentedConfigurationNode) {
-            ((CommentedConfigurationNode) n).setComment(messageProviderService.getMessageString("config.cost"));
+            ((CommentedConfigurationNode) n).comment(messageProviderService.getMessageString("config.cost"));
         }
-        n.setValue(0.0);
+        try {
+            n.set(0.0);
+        } catch (final SerializationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override public void setDataFromNode(final CommandModifiersConfig config, final ConfigurationNode node) {
-        config.setCost(node.getNode(COST).getInt(0));
+        config.setCost(node.node(COST).getInt(0));
     }
 
     @Override public void setValueFromOther(final CommandModifiersConfig from, final CommandModifiersConfig to) {

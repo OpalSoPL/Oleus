@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.startuperror;
 
+import io.github.nucleuspowered.nucleus.IPluginInfo;
 import io.github.nucleuspowered.nucleus.util.PrettyPrinter;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.plugin.PluginContainer;
@@ -15,8 +16,9 @@ public final class InvalidVersionErrorHandler extends NucleusErrorHandler {
     public InvalidVersionErrorHandler(final PluginContainer pluginContainer,
             final boolean shouldShutDown,
             final Logger logger,
-            final String versionRequested) {
-        super(pluginContainer, null, shouldShutDown, logger);
+            final String versionRequested,
+            final IPluginInfo pluginInfo) {
+        super(pluginContainer, null, shouldShutDown, logger, pluginInfo);
         this.versionRequested = versionRequested;
     }
 

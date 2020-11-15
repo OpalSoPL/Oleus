@@ -29,7 +29,6 @@ import org.spongepowered.api.placeholder.PlaceholderContext;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Nameable;
-import org.spongepowered.api.util.TemporalUnits;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -125,7 +124,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
                         .parser(placeholder ->
                                 Component.text(
                                         Util.getTimeFromTicks(serviceCollection.messageProvider(),
-                                                PlaceholderService.getWorld(placeholder).getDayTime().get(TemporalUnits.MINECRAFT_TICKS))))
+                                                PlaceholderService.getWorld(placeholder).getDayTime().asTicks().getTicks())))
                         .build());
 
         this.registerToken("uniquevisitor",

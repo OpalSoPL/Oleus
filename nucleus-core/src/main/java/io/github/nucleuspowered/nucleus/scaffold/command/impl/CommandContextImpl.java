@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.scaffold.command.impl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
@@ -147,8 +146,8 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public ServerPlayer getPlayerFromArgs(final String key, final String errorKey) throws CommandException {
-        final Optional<? extends ServerPlayer> player = this.getOne(key, ServerPlayer.class);
+    public ServerPlayer getPlayerFromArgs(final Parameter.Key<? extends ServerPlayer> key, final String errorKey) throws CommandException {
+        final Optional<? extends ServerPlayer> player = this.getOne(key);
         if (player.isPresent()) {
             return player.get();
         } else {
@@ -163,11 +162,6 @@ public final class CommandContextImpl implements ICommandContext {
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public User getUserFromArgs(final String key, final String errorKey) throws CommandException {
-        return this.getUserFromArgs(Parameter.key(key, TypeToken.of(User.class)), errorKey);
     }
 
     @Override

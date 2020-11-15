@@ -34,6 +34,7 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.ban.Ban;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.ban.BanTypes;
+import org.spongepowered.api.util.Ticks;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -137,7 +138,7 @@ public class ResetUserCommand implements ICommandExecutor {
                     this.callbacks.remove(responsible);
                 })).build());
 
-        targetAudience.sendMessage(TextComponent.join(Component.newline(), messages));
+        targetAudience.sendMessage(Component.join(Component.newline(), messages));
         return context.successResult();
     }
 
@@ -177,7 +178,7 @@ public class ResetUserCommand implements ICommandExecutor {
                 player.kick(kickReason);
 
                 // Let Sponge do what it needs to close the user off.
-                Task.builder().execute(() -> this.accept(source)).delayTicks(1).plugin(this.serviceCollection.pluginContainer()).build();
+                Task.builder().execute(() -> this.accept(source)).delay(Ticks.of(1)).plugin(this.serviceCollection.pluginContainer()).build();
                 return;
             }
 

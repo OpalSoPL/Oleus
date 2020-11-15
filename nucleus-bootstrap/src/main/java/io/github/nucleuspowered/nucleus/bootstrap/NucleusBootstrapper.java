@@ -6,8 +6,8 @@ package io.github.nucleuspowered.nucleus.bootstrap;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import io.github.nucleuspowered.nucleus.IPluginInfo;
 import io.github.nucleuspowered.nucleus.NucleusCore;
-import io.github.nucleuspowered.nucleus.NucleusPluginInfo;
 import io.github.nucleuspowered.nucleus.modules.NucleusModuleProvider;
 import io.github.nucleuspowered.nucleus.startuperror.InvalidVersionErrorHandler;
 import org.apache.logging.log4j.Logger;
@@ -45,7 +45,7 @@ public class NucleusBootstrapper {
         this.injector = injector;
     }
 
-    private boolean versionCheck() throws IllegalStateException {
+    private boolean versionCheck(final IPluginInfo pluginInfo) throws IllegalStateException {
         if (System.getProperty(NO_VERSION_CHECK) != null) {
             final Pattern matching = Pattern.compile("^(?<major>\\d+)\\.(?<minor>\\d+)");
             final String v = Sponge.getPlatform().getContainer(Platform.Component.API).getMetadata().getVersion();
@@ -69,7 +69,8 @@ public class NucleusBootstrapper {
                             this.pluginContainer,
                             System.getProperty(NucleusCore.DOCGEN_PROPERTY) != null,
                             this.logger,
-                            NucleusPluginInfo.SPONGE_API_VERSION
+                            NucleusPluginInfo.SPONGE_API_VERSION,
+                            pluginInfo
                             );
                     return false;
                 }
@@ -90,7 +91,8 @@ public class NucleusBootstrapper {
                             this.pluginContainer,
                             System.getProperty(NucleusCore.DOCGEN_PROPERTY) != null,
                             this.logger,
-                            NucleusPluginInfo.SPONGE_API_VERSION
+                            NucleusPluginInfo.SPONGE_API_VERSION,
+                            pluginInfo
                     );
                     return false;
                 }
@@ -101,10 +103,11 @@ public class NucleusBootstrapper {
 
     @Listener
     public void startPlugin(final ConstructPluginEvent event) {
-        if (this.versionCheck()) {
+        final IPluginInfo pluginInfo = new NucleusPluginInfo();
+        if (this.versionCheck(pluginInfo)) {
             this.logger.info("Nucleus is starting.");
             final NucleusCore core =
-                    new NucleusCore(this.pluginContainer, this.configDirectory, this.logger, this.injector, new NucleusModuleProvider());
+                    new NucleusCore(this.pluginContainer, this.configDirectory, this.logger, this.injector, new NucleusModuleProvider(), pluginInfo);
             Sponge.getEventManager().registerListeners(this.pluginContainer, core);
         }
     }

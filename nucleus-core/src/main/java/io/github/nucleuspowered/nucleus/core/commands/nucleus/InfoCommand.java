@@ -6,7 +6,8 @@ package io.github.nucleuspowered.nucleus.core.commands.nucleus;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import io.github.nucleuspowered.nucleus.NucleusPluginInfo;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.IPluginInfo;
 import io.github.nucleuspowered.nucleus.core.CorePermissions;
 import io.github.nucleuspowered.nucleus.core.commands.NucleusCommand;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -39,7 +40,14 @@ import java.util.stream.Collectors;
         parentCommand = NucleusCommand.class,
         async = true
 )
-public class InfoCommand implements ICommandExecutor {
+public final class InfoCommand implements ICommandExecutor {
+
+    private final IPluginInfo pluginInfo;
+
+    @Inject
+    public InfoCommand(final IPluginInfo pluginInfo) {
+        this.pluginInfo = pluginInfo;
+    }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
@@ -66,7 +74,7 @@ public class InfoCommand implements ICommandExecutor {
         information.add(String.format("Sponge Version: %s %s", implementation.getMetadata().getName().orElse("unknown"),
                 implementation.getMetadata().getVersion()));
         information.add(String.format("Sponge API Version: %s %s", api.getMetadata().getName().orElse("unknown"), api.getMetadata().getVersion()));
-        information.add("Nucleus Version: " + NucleusPluginInfo.VERSION + " (Git: " + NucleusPluginInfo.GIT_HASH + ")");
+        information.add("Nucleus Version: " + this.pluginInfo.version() + " (Git: " + this.pluginInfo.gitHash() + ")");
 
         information.add(separator);
         information.add("Plugins");

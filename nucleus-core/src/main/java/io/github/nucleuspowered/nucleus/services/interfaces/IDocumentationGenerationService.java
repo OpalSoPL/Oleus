@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.services.impl.docgen.DocumentationGenerationService;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -14,6 +13,6 @@ import java.nio.file.Path;
 @ImplementedBy(DocumentationGenerationService.class)
 public interface IDocumentationGenerationService {
 
-    void generate(Path directory) throws IOException, ObjectMappingException;
+    void generate(Path directory) throws IOException;
 
 }

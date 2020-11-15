@@ -38,7 +38,7 @@ public final class ResetFirstJoinCommand implements ICommandExecutor, IReloadabl
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final User targetUser = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final User targetUser = context.requireOne(NucleusParameters.ONE_USER);
         context.getServiceCollection().storageManager().getUserService()
                 .setAndSave(targetUser.getUniqueId(), CoreKeys.FIRST_JOIN_PROCESSED, false)
                 .handle((result, exception) -> {

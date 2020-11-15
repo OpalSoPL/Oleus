@@ -44,6 +44,7 @@ import org.spongepowered.api.scheduler.Task;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +134,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
             // We'll do this bit shortly - after the login events have resolved.
             final String name = player.getName();
-            Task.builder().execute(() -> qsu.set(CoreKeys.LAST_KNOWN_NAME, name)).delayTicks(20L).plugin(this.serviceCollection.pluginContainer()).build();
+            Task.builder().execute(() -> qsu.set(CoreKeys.LAST_KNOWN_NAME, name)).delay(Duration.ofSeconds(1)).plugin(this.serviceCollection.pluginContainer()).build();
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -164,7 +165,6 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
             userService.getOrNew(player.getUniqueId())
                     .thenAccept(x -> {
-                        x.set(CoreKeys.FIRST_JOIN, x.get(CoreKeys.LAST_LOGIN).orElseGet(Instant::now));
                         x.set(CoreKeys.FIRST_JOIN_PROCESSED, true);
                     });
         }

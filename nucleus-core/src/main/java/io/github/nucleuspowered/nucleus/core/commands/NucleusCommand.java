@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.core.commands;
 
 import com.google.inject.Inject;
-import io.github.nucleuspowered.nucleus.NucleusPluginInfo;
+import io.github.nucleuspowered.nucleus.IPluginInfo;
 import io.github.nucleuspowered.nucleus.core.CorePermissions;
 import io.github.nucleuspowered.nucleus.module.ModuleContainer;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -32,16 +32,16 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class NucleusCommand implements ICommandExecutor {
 
     private final IModuleReporter reporter;
+    private final Component version;
 
     @Inject
-    public NucleusCommand(final IModuleReporter reporter) {
+    public NucleusCommand(final IModuleReporter reporter, final IPluginInfo pluginInfo) {
         this.reporter = reporter;
+        this.version = Component.text()
+                .color(NamedTextColor.GREEN)
+                .content(pluginInfo.name() + " version " + pluginInfo.version() + " (built from commit " + pluginInfo.gitHash() + ")")
+                .build();
     }
-
-    private final Component version = Component.text()
-            .color(NamedTextColor.GREEN)
-            .content(NucleusPluginInfo.NAME + " version " + NucleusPluginInfo.VERSION + " (built from commit " + NucleusPluginInfo.GIT_HASH + ")")
-            .build();
     @Nullable private Component modules = null;
 
     @Override

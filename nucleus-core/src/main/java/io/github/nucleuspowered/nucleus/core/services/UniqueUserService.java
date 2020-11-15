@@ -78,7 +78,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
 
         // This could be slow...
         if (this.isMoreAccurate) {
-            this.userCount = uss.getAll().stream().filter(GameProfile::isFilled)
+            this.userCount = uss.getAll().stream().filter(GameProfile::hasName)
                     .map(uss::get).filter(Optional::isPresent)
                     .filter(x -> {
                         final boolean ret = x.get().getPlayer().isPresent() || service.exists(x.get().getUniqueId()).join(); // already async
@@ -102,7 +102,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
                         return ret;
                     }).count();
         } else {
-            this.userCount = uss.getAll().stream().filter(GameProfile::isFilled).filter(x -> service.exists(x.getUniqueId()).join()).count();
+            this.userCount = uss.getAll().stream().filter(GameProfile::hasName).filter(x -> service.exists(x.getUniqueId()).join()).count();
         }
 
         this.userCountIsDirty = false;

@@ -129,7 +129,7 @@ public class TextStyleService implements ITextStyleService {
         this.messageProviderService = messageProviderService;
         this.logger = logger;
 
-        final Style.Builder sb = Style.builder();
+        final Style.Builder sb = Style.style();
         for (final TextDecoration decoration : this.styleToPerms.keySet()) {
             sb.decoration(decoration, false);
         }
@@ -363,7 +363,7 @@ public class TextStyleService implements ITextStyleService {
             return Style.empty();
         }
 
-        final Style.Builder ts = Style.builder();
+        final Style.Builder ts = Style.style();
         for (final String split : s.split("\\s*,\\s*")) {
             if (split.length() == 1) {
                 final TextDecoration decoration = this.idToStyle.get(split.charAt(0));
@@ -533,7 +533,7 @@ public class TextStyleService implements ITextStyleService {
             last = n;
         }
 
-        return TextComponent.join(Component.empty(), result);
+        return Component.join(Component.empty(), result);
     }
 
     private static TextComponent.Builder create(@Nullable final String string, final TextFormat format) {

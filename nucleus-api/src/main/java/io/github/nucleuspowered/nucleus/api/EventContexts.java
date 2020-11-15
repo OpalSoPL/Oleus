@@ -4,11 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.api;
 
-import io.github.nucleuspowered.nucleus.api.module.spawn.event.NucleusSendToSpawnEvent;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.EventContextKey;
-import org.spongepowered.api.event.EventContextKeys;
 
 /**
  * Contexts that may appear in the {@link Cause} of some events.
@@ -28,19 +26,6 @@ public final class EventContexts {
             EventContextKey.builder()
                     .type(Boolean.class)
                     .key(Identifiers.SHOULD_FORMAT_CHANNEL)
-                    .build();
-
-    /**
-     * A context that indicates the source of the Nucleus redirectable spawn events.
-     *
-     * <p>
-     *     For the ID, see {@link Identifiers#SPAWN_EVENT_TYPE}
-     * </p>
-     */
-    public static final EventContextKey<NucleusSendToSpawnEvent.Type> SPAWN_EVENT_TYPE =
-            EventContextKey.builder()
-                    .type(NucleusSendToSpawnEvent.Type.class)
-                    .key(Identifiers.SPAWN_EVENT_TYPE)
                     .build();
 
     /**
@@ -77,11 +62,6 @@ public final class EventContexts {
          * ID for {@link EventContexts#SHOULD_FORMAT_CHANNEL}
          */
         public static final ResourceKey SHOULD_FORMAT_CHANNEL = ResourceKey.resolve("nucleus:should_format_channel");
-
-        /**
-         * ID for {@link EventContexts#SPAWN_EVENT_TYPE}
-         */
-        public static final ResourceKey SPAWN_EVENT_TYPE = ResourceKey.resolve("nucleus:spawn_event_type");
 
         /**
          * ID for {@link EventContexts#IS_JAILING_ACTION}

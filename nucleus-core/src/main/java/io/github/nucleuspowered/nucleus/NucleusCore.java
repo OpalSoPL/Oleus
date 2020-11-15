@@ -97,6 +97,7 @@ public final class NucleusCore {
     private final IModuleProvider provider;
     private final boolean runDocGen = System.getProperty(DOCGEN_PROPERTY) != null;
     private final List<Action> onStartedActions = new LinkedList<>();
+    private final IPluginInfo pluginInfo;
 
     @Nullable private Path dataDirectory;
 
@@ -107,11 +108,13 @@ public final class NucleusCore {
             final Path configDirectory,
             final Logger logger,
             final Injector injector,
-            final IModuleProvider provider) {
+            final IModuleProvider provider,
+            final IPluginInfo pluginInfo) {
         this.pluginContainer = pluginContainer;
         this.configDirectory = configDirectory;
         this.logger = logger;
-        this.injector = injector.createChildInjector(new NucleusInjectorModule(() -> this));
+        this.pluginInfo = pluginInfo;
+        this.injector = injector.createChildInjector(new NucleusInjectorModule(() -> this, pluginInfo));
         this.provider = provider;
         this.serviceCollection = new NucleusServiceCollection(
                 this.injector,
@@ -132,12 +135,12 @@ public final class NucleusCore {
         try {
             provider.prepareCoreConfig(this.coreConfigurationTransformations());
         } catch (final ConfigurateException e) {
-            new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getCoreConfigFileName());
+            new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getCoreConfigFileName(), this.pluginInfo);
         }
         try {
             provider.prepareModuleConfig();
         } catch (final ConfigurateException e) {
-            new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getModuleConfigFileName());
+            new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getModuleConfigFileName(), this.pluginInfo);
         }
         this.completeModuleInit(tuple);
         this.serviceCollection.userPreferenceService().postInit();

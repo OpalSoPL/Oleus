@@ -4,10 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.scaffold.command;
 
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.AudienceValueParameter;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.WorldPropertiesValueParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -40,11 +40,13 @@ public final class NucleusParameters {
         private Keys() {
         }
 
+
         public static final String BOOL = "true|false";
         public static final String COMMAND = "command";
         public static final String CONSOLE = "-";
         public static final String DESCRIPTION = "description";
         public static final String DURATION = "duration";
+        public static final String GAME_PROFILE = "game profile";
         public static final String LOCATION = "location";
         public static final String LORE = "lore";
         public static final String MESSAGE = "message";
@@ -82,14 +84,12 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<Boolean> OPTIONAL_ONE_TRUE_FALSE = Parameter.bool().setKey(Keys.BOOL).optional().build();
 
-    public static final Parameter.Value<List<Entity>> MANY_ENTITY = Parameter.builder(new TypeToken<List<Entity>>() {
-    })
+    public static final Parameter.Value<List<Entity>> MANY_ENTITY = Parameter.builder(new TypeToken<List<Entity>>() {})
             .setKey(Keys.SUBJECT)
             .parser(CatalogedValueParameters.MANY_ENTITIES)
             .build();
 
-    public static final Parameter.Value<List<ServerPlayer>> MANY_PLAYER = Parameter.builder(new TypeToken<List<ServerPlayer>>() {
-    })
+    public static final Parameter.Value<List<ServerPlayer>> MANY_PLAYER = Parameter.builder(new TypeToken<List<ServerPlayer>>() {})
             .setKey(Keys.PLAYER)
             .parser(CatalogedValueParameters.MANY_PLAYERS)
             .build();
@@ -109,8 +109,11 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<User> ONE_USER = Parameter.user().setKey(Keys.USER).build();
 
-    public static final Parameter.Value<Collection<GameProfile>> GAME_PROFILE =
-            Parameter.builder(new TypeToken<Collection<GameProfile>>() {}).parser(CatalogedValueParameters.GAME_PROFILE).build();
+    public static final Parameter.Value<GameProfile> GAME_PROFILE =
+            Parameter.builder(TypeToken.get(GameProfile.class)).setKey(Keys.GAME_PROFILE).parser(CatalogedValueParameters.GAME_PROFILE).build();
+
+    public static final Parameter.Value<Collection<GameProfile>> MANY_GAME_PROFILES =
+            Parameter.builder(new TypeToken<Collection<GameProfile>>() {}).setKey(Keys.GAME_PROFILE).parser(CatalogedValueParameters.MANY_GAME_PROFILES).build();
 
     public static final Parameter.Value<String> COMMAND = Parameter.remainingJoinedStrings().setKey(Keys.COMMAND).build();
 

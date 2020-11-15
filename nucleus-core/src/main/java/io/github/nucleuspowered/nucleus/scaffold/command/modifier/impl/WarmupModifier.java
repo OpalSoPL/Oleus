@@ -18,6 +18,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -27,15 +28,19 @@ public class WarmupModifier implements ICommandModifier {
     private static final String WARMUP = "warmup";
 
     @Override public void getDefaultNode(final ConfigurationNode node, final IMessageProviderService messageProviderService) {
-        final ConfigurationNode n = node.getNode(WARMUP);
+        final ConfigurationNode n = node.node(WARMUP);
         if (n instanceof CommentedConfigurationNode) {
-            ((CommentedConfigurationNode) n).setComment(messageProviderService.getMessageString("config.warmup"));
+            ((CommentedConfigurationNode) n).comment(messageProviderService.getMessageString("config.warmup"));
         }
-        n.setValue(0);
+        try {
+            n.set(0);
+        } catch (final SerializationException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override public void setDataFromNode(final CommandModifiersConfig config, final ConfigurationNode node) {
-        config.setWarmup(node.getNode(WARMUP).getInt(0));
+        config.setWarmup(node.node(WARMUP).getInt(0));
     }
 
     @Override public void setValueFromOther(final CommandModifiersConfig from, final CommandModifiersConfig to) {

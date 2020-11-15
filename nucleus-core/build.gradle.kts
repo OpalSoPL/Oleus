@@ -2,7 +2,6 @@ plugins {
     java
     `java-library`
     eclipse
-    id("ninja.miserable.blossom")
     id("de.undercouch.download")
 }
 
@@ -34,17 +33,7 @@ dependencies {
 
     val dep = "org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]
     annotationProcessor(dep)
-    api(dep) {
-        exclude("org.spongepowered", "configurate-core")
-        exclude("org.spongepowered", "configurate-gson")
-        exclude("org.spongepowered", "configurate-hocon")
-        exclude("org.spongepowered", "configurate-yaml")
-    }
-
-    api("org.spongepowered:configurate-core:4.0.0-SNAPSHOT")
-    api("org.spongepowered:configurate-gson:4.0.0-SNAPSHOT")
-    api("org.spongepowered:configurate-hocon:4.0.0-SNAPSHOT")
-    api("org.spongepowered:configurate-yaml:4.0.0-SNAPSHOT")
+    api(dep)
 
     api("io.vavr:vavr:0.10.3")
 
@@ -59,24 +48,4 @@ val downloadCompat by tasks.registering(de.undercouch.gradle.tasks.download.Down
     src("https://v2.nucleuspowered.org/data/nca.json")
     dest(File(buildDir, "resources/main/assets/nucleus/compat.json"))
     onlyIfModified(true)
-}
-
-tasks {
-
-    blossomSourceReplacementJava {
-        dependsOn(rootProject.tasks["gitHash"])
-    }
-
-}
-
-blossom {
-    replaceTokenIn("src/main/java/io/github/nucleuspowered/nucleus/NucleusPluginInfo.java")
-    replaceToken("@name@", rootProject.name)
-    replaceToken("@version@", version)
-
-    replaceToken("@description@", rootProject.properties["description"])
-    replaceToken("@url@", rootProject.properties["url"])
-    replaceToken("@gitHash@", rootProject.extra["gitHash"])
-
-    replaceToken("@spongeversion@", rootProject.properties["declaredApiVersion"]) //declaredApiVersion
 }

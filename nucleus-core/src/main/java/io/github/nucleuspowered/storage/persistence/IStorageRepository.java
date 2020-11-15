@@ -11,7 +11,7 @@ import io.github.nucleuspowered.storage.exceptions.DataQueryException;
 import io.github.nucleuspowered.storage.exceptions.DataSaveException;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 import io.github.nucleuspowered.storage.util.KeyedObject;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.ConfigurateException;
 
 import java.util.Collection;
 import java.util.Map;
@@ -74,7 +74,7 @@ public interface IStorageRepository {
          *
          * @param object The object to save
          */
-        void save(O object) throws ObjectMappingException, DataSaveException;
+        void save(O object) throws ConfigurateException, DataSaveException;
     }
 
     /**
@@ -124,7 +124,7 @@ public interface IStorageRepository {
          * @param key The key that indicates the location to store the object in
          * @param object The object to save
          */
-        void save(K key, O object) throws ObjectMappingException, DataSaveException;
+        void save(K key, O object) throws ConfigurateException, DataSaveException;
 
         /**
          * Deletes the object at the supplied {@code key}

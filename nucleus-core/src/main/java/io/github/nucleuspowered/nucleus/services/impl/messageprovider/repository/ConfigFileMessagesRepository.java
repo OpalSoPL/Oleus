@@ -11,6 +11,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.io.IOException;
@@ -70,21 +71,25 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
         final CommentedConfigurationNode ccn = CommentedConfigurationNode.root();
         final PropertiesMessageRepository repository = this.messageRepositorySupplier.get();
 
-        repository.getKeys()
-                .forEach(x ->
-                        ccn.getNode((Object[])x.split("\\.")).setValue(repository.getEntry(x)));
+        for (final String key : repository.getKeys()) {
+            try {
+                ccn.node((Object[]) key.split("\\.")).set(repository.getEntry(key));
+            } catch (final ConfigurateException exception) {
+                exception.printStackTrace();
+            }
+        }
 
         return ccn;
     }
 
     protected HoconConfigurationLoader getLoader(final Path file) {
-        return HoconConfigurationLoader.builder().setPath(file).build();
+        return HoconConfigurationLoader.builder().path(file).build();
     }
 
     public Optional<String> getKey(@NonNull final String key) {
         Preconditions.checkNotNull(key);
         final Object[] obj = key.split("\\.");
-        return Optional.ofNullable(this.node.getNode(obj).getString());
+        return Optional.ofNullable(this.node.node(obj).getString());
     }
 
     public List<String> walkThroughForMismatched() {
@@ -110,8 +115,12 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
             final Optional<String> msgKey = this.getKey(x);
 
             final Object[] nodeKey = x.split("\\.");
-            final CommentedConfigurationNode cn = this.node.getNode(nodeKey).setValue(resKey);
-            msgKey.ifPresent(cn::setComment);
+            try {
+                final CommentedConfigurationNode cn = this.node.node(nodeKey).set(resKey);
+                msgKey.ifPresent(cn::comment);
+            } catch (final ConfigurateException ex) {
+                ex.printStackTrace();
+            }
         });
 
         this.save();
@@ -144,7 +153,7 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
 
         if (firstLoad) {
             // get defaults and merge in
-            this.node.mergeValuesFrom(this.getDefaults());
+            this.node.mergeFrom(this.getDefaults());
             this.fixMismatched(this.walkThroughForMismatched());
             this.save();
         }

@@ -1,6 +1,7 @@
 plugins {
     `java-library`
     eclipse
+    id("ninja.miserable.blossom")
 }
 
 repositories {
@@ -41,4 +42,24 @@ dependencies {
     testCompile("org.powermock:powermock-api-mockito:1.6.4")
     testCompile("org.hamcrest:hamcrest-junit:2.0.0.0")
     testCompile("junit", "junit", "4.12")
+}
+
+tasks {
+
+    blossomSourceReplacementJava {
+        dependsOn(rootProject.tasks["gitHash"])
+    }
+
+}
+
+blossom {
+    replaceTokenIn("src/main/java/io/github/nucleuspowered/nucleus/bootstrap/NucleusPluginInfo.java")
+    replaceToken("@name@", rootProject.name)
+    replaceToken("@version@", version)
+
+    replaceToken("@description@", rootProject.properties["description"])
+    replaceToken("@url@", rootProject.properties["url"])
+    replaceToken("@gitHash@", rootProject.extra["gitHash"])
+
+    replaceToken("@spongeversion@", rootProject.properties["declaredApiVersion"]) //declaredApiVersion
 }

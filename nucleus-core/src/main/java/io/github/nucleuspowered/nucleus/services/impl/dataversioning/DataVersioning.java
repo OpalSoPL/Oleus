@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.services.impl.dataversioning;
 
 import com.google.inject.Singleton;
-import io.github.nucleuspowered.nucleus.modules.core.CoreKeys;
+import io.github.nucleuspowered.nucleus.core.CoreKeys;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IWorldDataObject;
@@ -19,22 +19,22 @@ public final class DataVersioning implements IDataVersioning {
     private final int generalDataVersion = 1;
 
     @Override
-    public void setVersion(IUserDataObject userDataObject) {
+    public void setVersion(final IUserDataObject userDataObject) {
         userDataObject.set(CoreKeys.USER_VERSION, this.userDataVersion);
     }
 
     @Override
-    public void setVersion(IWorldDataObject worldDataObject) {
+    public void setVersion(final IWorldDataObject worldDataObject) {
         worldDataObject.set(CoreKeys.WORLD_VERSION, this.worldDataVersion);
     }
 
     @Override
-    public void setVersion(IGeneralDataObject generalDataObject) {
+    public void setVersion(final IGeneralDataObject generalDataObject) {
         generalDataObject.set(CoreKeys.GENERAL_VERSION, this.generalDataVersion);
     }
 
     @Override
-    public void migrate(IUserDataObject userDataObject) {
+    public void migrate(final IUserDataObject userDataObject) {
         final int currentVersion = userDataObject.get(CoreKeys.USER_VERSION).orElse(1);
         if (currentVersion < this.userDataVersion) {
             if (currentVersion <= 1) {
@@ -45,7 +45,7 @@ public final class DataVersioning implements IDataVersioning {
     }
 
     @Override
-    public void migrate(IWorldDataObject worldDataObject) {
+    public void migrate(final IWorldDataObject worldDataObject) {
         final int currentVersion = worldDataObject.get(CoreKeys.WORLD_VERSION).orElse(0);
         if (currentVersion == 0) {
             worldDataObject.set(CoreKeys.WORLD_VERSION, this.worldDataVersion);
@@ -53,7 +53,7 @@ public final class DataVersioning implements IDataVersioning {
     }
 
     @Override
-    public void migrate(IGeneralDataObject generalDataObject) {
+    public void migrate(final IGeneralDataObject generalDataObject) {
         final int currentVersion = generalDataObject.get(CoreKeys.GENERAL_VERSION).orElse(0);
         if (currentVersion == 0) {
             generalDataObject.set(CoreKeys.GENERAL_VERSION, this.generalDataVersion);

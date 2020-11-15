@@ -5,13 +5,15 @@
 package io.github.nucleuspowered.storage.dataaccess;
 
 import io.github.nucleuspowered.storage.dataobjects.IDataObject;
+import io.github.nucleuspowered.storage.exceptions.DataLoadException;
+import io.github.nucleuspowered.storage.exceptions.DataSaveException;
 
 public interface IDataTranslator<R extends IDataObject, O> {
 
     R createNew();
 
-    R fromDataAccessObject(O object);
+    R fromDataAccessObject(O object) throws DataLoadException;
 
-    O toDataAccessObject(R object);
+    O toDataAccessObject(R object) throws DataSaveException;
 
 }

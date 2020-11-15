@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.startuperror;
 
+import io.github.nucleuspowered.nucleus.IPluginInfo;
 import io.github.nucleuspowered.nucleus.util.PrettyPrinter;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.plugin.PluginContainer;
@@ -17,8 +18,9 @@ public final class ConfigErrorHandler extends NucleusErrorHandler {
             final Throwable throwable,
             final boolean shouldShutDown,
             final Logger logger,
-            final String file) {
-        super(pluginContainer, throwable, shouldShutDown, logger);
+            final String file,
+            final IPluginInfo pluginInfo) {
+        super(pluginContainer, throwable, shouldShutDown, logger, pluginInfo);
         this.file = file;
     }
 

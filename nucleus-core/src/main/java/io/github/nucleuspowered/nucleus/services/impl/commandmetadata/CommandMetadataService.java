@@ -29,8 +29,9 @@ import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -173,11 +174,11 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
         for (final CommandMetadata metadata : this.commandMetadataMap.values()) {
             // Only do this if it's enabled.
-            final CommentedConfigurationNode commandNode = this.commandsConfConfigNode.getNode(metadata.getCommandKey());
-            if (commandNode.getNode(ENABLED).getBoolean(false)) {
+            final CommentedConfigurationNode commandNode = this.commandsConfConfigNode.node(metadata.getCommandKey());
+            if (commandNode.node(ENABLED).getBoolean(false)) {
                 // Get the aliases
                 try {
-                    final Map<String, Boolean> m = commandNode.getNode(ROOT_ALIASES).getValue(MAP_TYPE_TOKEN);
+                    final Map<String, Boolean> m = commandNode.node(ROOT_ALIASES).get(MAP_TYPE_TOKEN);
                     if (m != null) {
                             m.entrySet()
                                 .stream()
@@ -187,7 +188,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
                                         metadata.getCommandAnnotation().parentCommand(), y -> new HashMap<>())
                                             .put(x, metadata));
                     }
-                } catch (final ObjectMappingException e) {
+                } catch (final ConfigurateException e) {
                     e.printStackTrace();
                 }
 
@@ -206,9 +207,14 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         // Now for mappings
         final Set<String> toRemove = new HashSet<>();
         for (final Map.Entry<String, String> entry : this.commandremap.entrySet()) {
-            final CommentedConfigurationNode node = this.commandsConfConfigNode.getNode(entry.getKey()).getNode("enabled");
-            if (node.isVirtual()) {
-                node.setValue(true).setComment(serviceCollection.messageProvider().getMessageString("config.enabled"));
+            final CommentedConfigurationNode node = this.commandsConfConfigNode.node(entry.getKey()).node("enabled");
+            if (node.virtual()) {
+                try {
+                    node.set(true).comment(serviceCollection.messageProvider().getMessageString("config.enabled"));
+                } catch (final SerializationException e) {
+                    // this better not happen
+                    e.printStackTrace();
+                }
             } else if (!node.getBoolean(true)) {
                 // remove from mapping
                 toRemove.add(entry.getKey());
@@ -291,28 +297,32 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     private void mergeAliases() {
         final CommentedConfigurationNode toMerge = this.configurateHelper.createNode();
         this.commandMetadataMap.values().forEach(metadata -> {
-            final CommentedConfigurationNode node = toMerge.getNode(metadata.getCommandKey());
-            final String messageKey = metadata.getCommandAnnotation().commandDescriptionKey() + ".desc";
-            if (this.messageProviderService.hasKey(messageKey)) {
-                node.setComment(this.messageProviderService.getMessageString(messageKey));
-            }
-            node.getNode(ENABLED).setComment(this.messageProviderService.getMessageString("config.enabled")).setValue(true);
-            final CommentedConfigurationNode al = node.getNode(ROOT_ALIASES);
-            for (final String a : metadata.getRootAliases()) {
-                al.getNode(a).setValue(!metadata.getDisabledByDefaultRootAliases().contains(a));
-            }
-            if (!al.isVirtual()) {
-                al.setComment(this.messageProviderService.getMessageString("config.rootaliases"));
+            try {
+                final CommentedConfigurationNode node = toMerge.node(metadata.getCommandKey());
+                final String messageKey = metadata.getCommandAnnotation().commandDescriptionKey() + ".desc";
+                if (this.messageProviderService.hasKey(messageKey)) {
+                    node.comment(this.messageProviderService.getMessageString(messageKey));
+                }
+                node.node(ENABLED).comment(this.messageProviderService.getMessageString("config.enabled")).set(true);
+                final CommentedConfigurationNode al = node.node(ROOT_ALIASES);
+                for (final String a : metadata.getRootAliases()) {
+                    al.node(a).set(!metadata.getDisabledByDefaultRootAliases().contains(a));
+                }
+                if (!al.virtual()) {
+                    al.comment(this.messageProviderService.getMessageString("config.rootaliases"));
+                }
+            } catch (final ConfigurateException e) {
+                e.printStackTrace();
             }
         });
 
-        this.commandsConfConfigNode.mergeValuesFrom(toMerge);
+        this.commandsConfConfigNode.mergeFrom(toMerge);
     }
 
     private void mergeModifierDefaults() {
         final CommentedConfigurationNode toMerge = this.configurateHelper.createNode();
         this.controlToAliases.keySet().forEach(control -> {
-            final CommentedConfigurationNode node = toMerge.getNode(control.getCommandKey());
+            final CommentedConfigurationNode node = toMerge.node(control.getCommandKey());
             if (!control.isModifierKeyRedirected()) { // if redirected, another command will deal with this.
                 for (final Map.Entry<CommandModifier, ICommandModifier> modifier : control.getCommandModifiers().entrySet()) {
                     if (modifier.getKey().useFrom() == ICommandExecutor.class) {
@@ -322,7 +332,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             }
         });
 
-        this.commandsConfConfigNode.mergeValuesFrom(toMerge);
+        this.commandsConfConfigNode.mergeFrom(toMerge);
     }
 
     private void setupData() {
@@ -330,9 +340,9 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         this.controlToAliases.keySet().forEach(control -> {
             final CommentedConfigurationNode node;
             if (control.isModifierKeyRedirected()) {
-                node = this.commandsConfConfigNode.getNode(control.getMetadata().getCommandAnnotation().modifierOverride());
+                node = this.commandsConfConfigNode.node(control.getMetadata().getCommandAnnotation().modifierOverride());
             } else {
-                node = this.commandsConfConfigNode.getNode(control.getCommandKey());
+                node = this.commandsConfConfigNode.node(control.getCommandKey());
             }
             for (final Map.Entry<CommandModifier, ICommandModifier> modifier : control.getCommandModifiers().entrySet()) {
                 if (modifier.getKey().useFrom() != ICommandExecutor.class) {
@@ -400,7 +410,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     private void load() {
         try {
             this.commandsConfConfigNode = HoconConfigurationLoader.builder()
-                    .setPath(this.commandsFile)
+                    .path(this.commandsFile)
                     .build()
                     .load();
         } catch (final IOException e) {
@@ -412,7 +422,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     private void save() {
         try {
             HoconConfigurationLoader.builder()
-                    .setPath(this.commandsFile)
+                    .path(this.commandsFile)
                     .build()
                     .save(this.commandsConfConfigNode);
         } catch (final IOException e) {

@@ -33,7 +33,6 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.gson.GsonConfigurationLoader;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
 
 @Singleton
 public class UserCacheService implements IUserCacheService, IReloadableService.DataLocationReloadable {
@@ -62,8 +61,8 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         try {
             this.data = this.configurationLoader()
                     .load()
-                    .getValue(TypeToken.get(UserCacheVersionNode.class), (Supplier<UserCacheVersionNode>) UserCacheVersionNode::new);
-        } catch (final IOException | ObjectMappingException e) {
+                    .get(TypeToken.get(UserCacheVersionNode.class), (Supplier<UserCacheVersionNode>) UserCacheVersionNode::new);
+        } catch (final IOException e) {
             e.printStackTrace();
             this.data = new UserCacheVersionNode();
         }
@@ -73,9 +72,9 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         try {
             final GsonConfigurationLoader gsonConfigurationLoader = this.configurationLoader();
             final ConfigurationNode node = gsonConfigurationLoader.createNode();
-            node.setValue(TypeToken.get(UserCacheVersionNode.class), this.data);
+            node.set(TypeToken.get(UserCacheVersionNode.class), this.data);
             gsonConfigurationLoader.save(node);
-        } catch (final ObjectMappingException | IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 
@@ -182,7 +181,7 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
 
     private GsonConfigurationLoader configurationLoader() {
         return GsonConfigurationLoader.builder()
-                .setPath(this.dataDirectory.get().resolve("usercache.json"))
+                .path(this.dataDirectory.get().resolve("usercache.json"))
                 .build();
     }
 

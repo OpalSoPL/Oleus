@@ -16,7 +16,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,7 +39,7 @@ public class DocGenCommand implements ICommandExecutor {
         final Path dataPath = serviceCollection.injector().getInstance(Key.get(new TypeLiteral<Supplier<Path>>() {}, DataDirectory.class)).get();
         try {
             serviceCollection.documentationGenerationService().generate(dataPath);
-        } catch (final IOException | ObjectMappingException e) {
+        } catch (final IOException e) {
             throw new CommandException(Component.text("Could not generate docs"), e);
         }
         context.sendMessage("command.nucleus.docgen.complete");

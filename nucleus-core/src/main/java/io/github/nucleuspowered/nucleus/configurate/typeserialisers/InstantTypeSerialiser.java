@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 
 import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Type;
@@ -18,9 +19,9 @@ public class InstantTypeSerialiser implements TypeSerializer<Instant> {
     }
 
     @Override
-    public void serialize(final Type type, final Instant obj, final ConfigurationNode value) {
+    public void serialize(final Type type, final Instant obj, final ConfigurationNode value) throws SerializationException {
         if (obj != null) {
-            value.setValue(obj.toEpochMilli());
+            value.set(obj.toEpochMilli());
         }
     }
 

@@ -11,7 +11,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.ParameterizedType;
@@ -28,7 +28,7 @@ public final class DataObjectTranslator implements TypeSerializer<AbstractConfig
 
     @Nullable
     @Override
-    public AbstractConfigurateBackedDataObject deserialize(@NonNull final Type type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
+    public AbstractConfigurateBackedDataObject deserialize(@NonNull final Type type, @NonNull final ConfigurationNode value) {
         AbstractConfigurateBackedDataObject ado = null;
         Class<?> clazz = null;
         if (type instanceof ParameterizedType) {
@@ -55,9 +55,10 @@ public final class DataObjectTranslator implements TypeSerializer<AbstractConfig
     }
 
     @Override
-    public void serialize(@NonNull final Type type, @Nullable final AbstractConfigurateBackedDataObject obj, @NonNull final ConfigurationNode value) throws ObjectMappingException {
+    public void serialize(@NonNull final Type type, @Nullable final AbstractConfigurateBackedDataObject obj, @NonNull final ConfigurationNode value)
+            throws SerializationException {
         if (obj != null) {
-            value.setValue(obj.getBackingNode());
+            value.set(obj.getBackingNode());
         }
     }
 }

@@ -31,7 +31,7 @@ import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
-import org.spongepowered.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
@@ -67,7 +67,7 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
     }
 
     @Override
-    public void generate(final Path directory) throws IOException, ObjectMappingException {
+    public void generate(final Path directory) throws IOException {
         try (final CauseStackManager.StackFrame stackFrame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
             stackFrame.pushCause(Sponge.getSystemSubject());
             final CommandCause cause = CommandCause.create();
@@ -205,8 +205,8 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     .collect(Collectors.toList());
 
             final YamlConfigurationLoader configurationLoader = YamlConfigurationLoader.builder()
-                    .setPath(directory.resolve("commands.yml"))
-                    .setNodeStyle(NodeStyle.BLOCK)
+                    .path(directory.resolve("commands.yml"))
+                    .nodeStyle(NodeStyle.BLOCK)
                     .build();
 
             // Now do all the saving
@@ -217,41 +217,42 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
             final ConfigurationNode configNode = configurationLoader.createNode();
             for (final Map.Entry<String, Class<?>> entry : configs.entrySet()) {
                 try {
-                    configNode.getNode(entry.getKey()).setValue(this.createConfigString(entry.getValue().newInstance()));
+                    configNode.node(entry.getKey()).set(this.createConfigString(entry.getValue().newInstance()));
                 } catch (final InstantiationException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
 
             // Generate command file.
-            final ConfigurationNode commandConfigurationNode = configurationLoader.createNode().setValue(COMMAND_DOC_LIST_TYPE_TOKEN, lcd);
+            final ConfigurationNode commandConfigurationNode = configurationLoader.createNode().set(COMMAND_DOC_LIST_TYPE_TOKEN, lcd);
             configurationLoader.save(commandConfigurationNode);
 
             final YamlConfigurationLoader permissionsConfigurationLoader = YamlConfigurationLoader.builder()
-                    .setPath(directory.resolve("permissions.yml"))
-                    .setNodeStyle(NodeStyle.BLOCK)
+                    .path(directory.resolve("permissions.yml"))
+                    .nodeStyle(NodeStyle.BLOCK)
                     .build();
-            final ConfigurationNode permissionConfiguationNode = configurationLoader.createNode().setValue(PERMISSION_DOC_LIST_TYPE_TOKEN, permdocs);
+            final ConfigurationNode permissionConfiguationNode = configurationLoader.createNode().set(PERMISSION_DOC_LIST_TYPE_TOKEN, permdocs);
             permissionsConfigurationLoader.save(permissionConfiguationNode);
 
             final YamlConfigurationLoader essentialsConfigurationLoader = YamlConfigurationLoader.builder()
-                    .setPath(directory.resolve("essentials.yml"))
-                    .setNodeStyle(NodeStyle.BLOCK)
+                    .path(directory.resolve("essentials.yml"))
+                    .nodeStyle(NodeStyle.BLOCK)
                     .build();
-            final ConfigurationNode essentialsConfigurationNode = configurationLoader.createNode().setValue(ESSENTIALS_DOC_LIST_TYPE_TOKEN, essentialsDocs);
+            final ConfigurationNode essentialsConfigurationNode = configurationLoader.createNode().set(ESSENTIALS_DOC_LIST_TYPE_TOKEN,
+                    essentialsDocs);
             essentialsConfigurationLoader.save(essentialsConfigurationNode);
 
             final YamlConfigurationLoader configurationConfigurationLoader = YamlConfigurationLoader.builder()
-                    .setPath(directory.resolve("conf.yml"))
-                    .setNodeStyle(NodeStyle.BLOCK)
+                    .path(directory.resolve("conf.yml"))
+                    .nodeStyle(NodeStyle.BLOCK)
                     .build();
             configurationConfigurationLoader.save(configNode);
 
             final YamlConfigurationLoader tokensConfigurationLoader = YamlConfigurationLoader.builder()
-                    .setPath(directory.resolve("tokens.yml"))
-                    .setNodeStyle(NodeStyle.BLOCK)
+                    .path(directory.resolve("tokens.yml"))
+                    .nodeStyle(NodeStyle.BLOCK)
                     .build();
-            final ConfigurationNode tokensConfigNode = configurationLoader.createNode().setValue(TOKEN_DOC_LIST_TYPE_TOKEN, tokenDocs);
+            final ConfigurationNode tokensConfigNode = configurationLoader.createNode().set(TOKEN_DOC_LIST_TYPE_TOKEN, tokenDocs);
             tokensConfigurationLoader.save(tokensConfigNode);
         }
     }
@@ -278,8 +279,8 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
     private String createConfigString(final Object obj) throws IOException {
         try (final StringWriter sw = new StringWriter(); final BufferedWriter writer = new BufferedWriter(sw)) {
             final HoconConfigurationLoader hcl = HoconConfigurationLoader.builder()
-                    .setDefaultOptions(this.serviceCollection.configurateHelper().getOptions())
-                    .setSink(() -> writer)
+                    .defaultOptions(this.serviceCollection.configurateHelper().getOptions())
+                    .sink(() -> writer)
                     .build();
             final CommentedConfigurationNode cn = hcl.createNode(this.serviceCollection.configurateHelper().getOptions());
             this.applyToNode(obj.getClass(), obj, cn);
@@ -290,8 +291,8 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
 
     private <T> void applyToNode(final Class<T> c, final Object object, final ConfigurationNode node) {
         try {
-            node.setValue(TypeToken.get(c), c.cast(object));
-        } catch (final ObjectMappingException e) {
+            node.set(TypeToken.get(c), c.cast(object));
+        } catch (final SerializationException e) {
             e.printStackTrace();
         }
     }

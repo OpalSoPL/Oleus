@@ -7,6 +7,7 @@ import org.spongepowered.configurate.CommentedConfigurationNodeIntermediary;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.objectmapping.meta.NodeResolver;
 import org.spongepowered.configurate.objectmapping.meta.Processor;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 public final class ObjectMapperActions {
 
@@ -16,7 +17,7 @@ public final class ObjectMapperActions {
             return (value, destination) -> {
                 if (destination instanceof CommentedConfigurationNodeIntermediary<?>) {
                     final CommentedConfigurationNodeIntermediary<?> commented = (CommentedConfigurationNodeIntermediary<?>) destination;
-                    commented.setComment(translated);
+                    commented.comment(translated);
                 }
             };
         };
@@ -26,9 +27,13 @@ public final class ObjectMapperActions {
         return (name, element) -> {
             if (element.isAnnotationPresent(DefaultValueSetting.class)) {
                 return node -> {
-                    final ConfigurationNode node1 = node.getNode(node.getKey());
-                    if (node1.isVirtual()) {
-                        node1.setValue(element.getAnnotation(DefaultValueSetting.class).defaultValue());
+                    final ConfigurationNode node1 = node.node(node.key());
+                    if (node1.virtual()) {
+                        try {
+                            node1.set(element.getAnnotation(DefaultValueSetting.class).defaultValue());
+                        } catch (final SerializationException exception) {
+                            // ignored
+                        }
                     }
                     return node1;
                 };
