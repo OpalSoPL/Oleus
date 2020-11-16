@@ -8,21 +8,26 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
+import io.github.nucleuspowered.storage.exceptions.DataLoadException;
+import io.github.nucleuspowered.storage.exceptions.DataQueryException;
+import io.github.nucleuspowered.storage.exceptions.DataSaveException;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 import io.github.nucleuspowered.storage.util.KeyedObject;
-import io.github.nucleuspowered.storage.util.ThrownBiConsumer;
-import io.github.nucleuspowered.storage.util.ThrownFunction;
+import io.vavr.Tuple2;
+import io.vavr.Value;
+import io.vavr.collection.Stream;
+import io.vavr.control.Try;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -32,7 +37,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D extends IKeyedDataObject<D>>
+public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D extends IKeyedDataObject<D>, O>
         implements IStorageService.Keyed.KeyedData<K, Q, D> {
 
     private final LoadingCache<K, ReentrantReadWriteLock> dataLocks =
@@ -48,71 +53,66 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
             .build();
     private final Set<K> dirty = new HashSet<>();
 
-    private final Supplier<IStorageRepository.Keyed<K, Q, ?>> storageRepositorySupplier;
-    private final Supplier<D> createNew;
-    private final ThrownBiConsumer<K, D, Exception> save;
-    private final ThrownFunction<Q, Map<K, D>, Exception> getAll;
-    private final ThrownFunction<Q, Optional<KeyedObject<K, D>>, Exception> getQuery;
-    private final ThrownFunction<K, Optional<D>, Exception> get;
+    private final Supplier<IDataTranslator<D, O>> dataTranslator;
+    private final Supplier<IStorageRepository.Keyed<K, Q, O>> storageRepositorySupplier;
     private final PluginContainer pluginContainer;
     private final Consumer<D> upgrader;
     private final Consumer<D> versionSetter;
 
-    public <O> AbstractKeyedService(
-        final Supplier<IDataTranslator<D, O>> dts,
-        final Supplier<IStorageRepository.Keyed<K, Q, O>> srs,
-        final Consumer<D> upgrader,
-        final Consumer<D> versionSetter,
-        final PluginContainer pluginContainer
-    ) {
-        this(
-                () -> dts.get().createNew(),
-                (key, udo) -> srs.get().save(
-                        key,
-                        dts.get().toDataAccessObject(udo)
-                ),
-                query -> srs.get()
-                        .getAll(query)
-                        .entrySet().stream()
-                        .filter(x -> x.getValue() != null)
-                        .collect(
-                                Collectors.toMap(
-                                        Map.Entry::getKey,
-                                        x -> dts.get().fromDataAccessObject(x.getValue())
-                                )
-                        ),
-                K -> srs.get().get(K).map(dts.get()::fromDataAccessObject),
-                query -> srs.get().get(query).map(x -> x.mapValue(dts.get()::fromDataAccessObject)),
-                srs::get,
-                upgrader,
-                versionSetter,
-                pluginContainer);
-    }
-
-    private AbstractKeyedService(
-            final Supplier<D> createNew,
-            final ThrownBiConsumer<K, D, Exception> save,
-            final ThrownFunction<Q, Map<K, D>, Exception> getAll,
-            final ThrownFunction<K, Optional<D>, Exception> get,
-            final ThrownFunction<Q, Optional<KeyedObject<K, D>>, Exception> getQuery,
-            final Supplier<IStorageRepository.Keyed<K, Q, ?>> storageRepositorySupplier,
+    public AbstractKeyedService(
+            final Supplier<IDataTranslator<D, O>> dts,
+            final Supplier<IStorageRepository.Keyed<K, Q, O>> storageRepositorySupplier,
             final Consumer<D> upgrader,
             final Consumer<D> versionSetter,
             final PluginContainer pluginContainer
     ) {
         this.pluginContainer = pluginContainer;
-        this.createNew = createNew;
-        this.save = save;
-        this.getAll = getAll;
-        this.get = get;
-        this.getQuery = getQuery;
+        this.dataTranslator = dts;
         this.upgrader = upgrader;
         this.versionSetter = versionSetter;
         this.storageRepositorySupplier = storageRepositorySupplier;
     }
 
+    protected D createNewDataObject() {
+        return this.dataTranslator.get().createNew();
+    }
+
+    protected void saveObject(final K key, final D object) throws DataSaveException {
+        this.storageRepositorySupplier.get().save(key, this.dataTranslator.get().toDataAccessObject(object));
+    }
+
+    protected Map<K, D> getAllFromQuery(final Q query) throws DataQueryException, DataLoadException {
+        return Stream.ofAll(this.storageRepositorySupplier.get().getAll(query).entrySet())
+                .map(x -> Try.of(() -> new Tuple2<>(x.getKey(), this.dataTranslator.get().fromDataAccessObject(x.getValue()))))
+                .map(Value::getOrNull)
+                .reject(Objects::isNull)
+                .collect(
+                        Collectors.toMap(
+                                x -> x._1,
+                                x -> x._2
+                        )
+                );
+    }
+
+    protected Optional<D> getFromKey(final K key) throws DataQueryException, DataLoadException {
+        final Optional<O> o = this.storageRepositorySupplier.get().get(key);
+        if (o.isPresent()) {
+            return Optional.of(this.dataTranslator.get().fromDataAccessObject(o.get()));
+        }
+        return Optional.empty();
+    }
+
+    protected Optional<KeyedObject<K, D>> getFromQuery(final Q query) throws DataQueryException, DataLoadException {
+        final Optional<KeyedObject<K, O>> o = this.storageRepositorySupplier.get().get(query);
+        if (o.filter(x -> x.getValue().isPresent()).isPresent()) {
+            final D value = this.dataTranslator.get().fromDataAccessObject(o.get().getValue().get());
+            return o.map(x -> x.mapValue(d -> value));
+        }
+        return Optional.empty();
+    }
+
     public D createNew() {
-        final D data = this.createNew.get();
+        final D data = this.createNewDataObject();
         this.versionSetter.accept(data);
         return data;
     }
@@ -170,12 +170,14 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
         final ReentrantReadWriteLock.WriteLock lock = this.dataLocks.get(key).writeLock();
         try {
             lock.lock();
-            final Optional<D> r = this.get.apply(key);
+            final Optional<D> r = this.getFromKey(key);
             r.ifPresent(d -> {
                 this.upgrader.accept(d);
                 this.cache.put(key, d);
             });
             return r;
+        } catch (final Throwable e) {
+            throw new DataLoadException("Could not get from repo", e);
         } finally {
             lock.unlock();
         }
@@ -184,7 +186,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     @Override
     public CompletableFuture<Optional<KeyedObject<K, D>>> get(@NonNull final Q query) {
         return ServicesUtil.run(() -> {
-            final Optional<KeyedObject<K, D>> r = this.getQuery.apply(query);
+            final Optional<KeyedObject<K, D>> r = this.getFromQuery(query);
             r.ifPresent(d -> {
                 if (d.getValue().isPresent()) {
                     this.cache.put(d.getKey(), d.getValue().get());
@@ -200,7 +202,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     @Override
     public CompletableFuture<Map<K, D>> getAll(@NonNull final Q query) {
         return ServicesUtil.run(() -> {
-            final Map<K, D> res = this.getAll.apply(query);
+            final Map<K, D> res = this.getAllFromQuery(query);
             /* Map<K, D> res = r.entrySet().stream()
                     .filter(x -> x.getValue() != null)
                     .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, v -> dataAccess.fromDataAccessObject(v.getValue()))); */
@@ -292,7 +294,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
         try {
             lock.lock();
             this.cache.put(key, value);
-            this.save.apply(key, value);
+            this.saveObject(key, value);
             this.dirty.remove(key);
         } finally {
             lock.unlock();

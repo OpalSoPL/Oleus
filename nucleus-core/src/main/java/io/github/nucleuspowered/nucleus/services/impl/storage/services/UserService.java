@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.storage.services;
 
+import com.google.gson.JsonObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IUserQueryObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IDataVersioning;
@@ -13,7 +14,7 @@ import org.spongepowered.plugin.PluginContainer;
 
 import java.util.UUID;
 
-public class UserService extends AbstractKeyedService<UUID, IUserQueryObject, IUserDataObject> {
+public final class UserService extends AbstractKeyedService<UUID, IUserQueryObject, IUserDataObject, JsonObject> {
 
     public UserService(final IStorageManager repository, final PluginContainer pluginContainer, final IDataVersioning dataVersioning) {
         super(repository::getUserDataAccess, repository::getUserRepository, dataVersioning::migrate, dataVersioning::setVersion, pluginContainer);

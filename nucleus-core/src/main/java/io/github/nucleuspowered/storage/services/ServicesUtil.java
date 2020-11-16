@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.storage.services;
 
 import io.github.nucleuspowered.nucleus.util.functional.ThrownSupplier;
+import io.vavr.CheckedFunction0;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.plugin.PluginContainer;
 
@@ -12,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 public final class ServicesUtil {
 
-    public static <R> CompletableFuture<R> run(final ThrownSupplier<R, Exception> taskConsumer, final PluginContainer pluginContainer) {
+    public static <R> CompletableFuture<R> run(final CheckedFunction0<R> taskConsumer, final PluginContainer pluginContainer) {
         final CompletableFuture<R> future = new CompletableFuture<>();
 
         if (Sponge.isServerAvailable() && Sponge.getServer().onMainThread()) {
@@ -24,10 +25,10 @@ public final class ServicesUtil {
         return future;
     }
 
-    private static <R> void runInternal(final CompletableFuture<R> future, final ThrownSupplier<R, Exception> taskConsumer) {
+    private static <R> void runInternal(final CompletableFuture<R> future, final CheckedFunction0<R> taskConsumer) {
         try {
-            future.complete(taskConsumer.get());
-        } catch (final Exception e) {
+            future.complete(taskConsumer.apply());
+        } catch (final Throwable e) {
             future.completeExceptionally(e);
         }
     }

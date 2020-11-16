@@ -215,7 +215,7 @@ public final class CommandControl {
             this.execute(contextSource);
         } catch (final CommandException ex) {
             // If we are here, then we're handling the command ourselves.
-            final Component message = ex.getText() == null ? Component.text("Unknown error!", NamedTextColor.RED) : ex.getText();
+            final Component message = ex.componentMessage() == null ? Component.text("Unknown error!", NamedTextColor.RED) : ex.componentMessage();
             this.onFail(contextSource, message);
             this.serviceCollection.logger().warn("Error executing command {}", this.command, ex);
         }

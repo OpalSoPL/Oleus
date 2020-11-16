@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.api.module.nickname.exception;
 
 import net.kyori.adventure.text.Component;
-import org.spongepowered.api.util.TextMessageException;
+import org.spongepowered.api.util.ComponentMessageException;
 
-public class NicknameException extends TextMessageException {
+public class NicknameException extends ComponentMessageException {
 
     private final Type type;
 

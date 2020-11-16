@@ -124,7 +124,7 @@ public interface IStorageRepository {
          * @param key The key that indicates the location to store the object in
          * @param object The object to save
          */
-        void save(K key, O object) throws ConfigurateException, DataSaveException;
+        void save(K key, O object) throws DataSaveException;
 
         /**
          * Deletes the object at the supplied {@code key}

@@ -5,12 +5,12 @@
 package io.github.nucleuspowered.nucleus.api.module.home.exception;
 
 import net.kyori.adventure.text.Component;
-import org.spongepowered.api.util.TextMessageException;
+import org.spongepowered.api.util.ComponentMessageException;
 
 /**
  * Thrown when a home related action fails.
  */
-public final class HomeException extends TextMessageException {
+public final class HomeException extends ComponentMessageException {
 
     private final Reasons reason;
 

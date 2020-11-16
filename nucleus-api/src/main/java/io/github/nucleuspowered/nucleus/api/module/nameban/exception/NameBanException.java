@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.api.module.nameban.exception;
 
 import net.kyori.adventure.text.Component;
-import org.spongepowered.api.util.TextMessageException;
+import org.spongepowered.api.util.ComponentMessageException;
 
-public class NameBanException extends TextMessageException {
+public class NameBanException extends ComponentMessageException {
 
     private final Reason reason;
 
