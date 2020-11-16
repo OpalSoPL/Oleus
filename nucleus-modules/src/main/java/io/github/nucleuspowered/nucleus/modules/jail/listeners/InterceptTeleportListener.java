@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
@@ -12,16 +13,13 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventContext;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.filter.cause.Root;
-
-import com.google.inject.Inject;
 
 public class InterceptTeleportListener implements ListenerBase.Conditional {
 
@@ -37,17 +35,18 @@ public class InterceptTeleportListener implements ListenerBase.Conditional {
     }
 
     @Listener(order = Order.LAST)
-    public void onTeleport(final MoveEntityEvent.Teleport event, @Root final CommandSource cause, @Getter("getTargetEntity") final Player player) {
+    public void onTeleport(final MoveEntityEvent event, @Getter("getEntity") final ServerPlayer player) {
+        final CommandCause cause = CommandCause.create();
         final EventContext context = event.getCause().getContext();
         if (!context.get(EventContexts.BYPASS_JAILING_RESTRICTION).orElse(false) &&
                 context.get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
-            if (this.handler.isPlayerJailed(player)) {
+            if (this.handler.isPlayerJailed(player.getUser())) {
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
                     event.setCancelled(true);
-                    this.messageProvider.sendMessageTo(cause, "jail.abouttoteleporttarget.isjailed", player.getName());
+                    this.messageProvider.sendMessageTo(cause.getAudience(), "jail.abouttoteleporttarget.isjailed", player.getName());
                 } else if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTTOJAILED)) {
                     event.setCancelled(true);
-                    this.messageProvider.sendMessageTo(cause,"jail.abouttoteleportcause.targetisjailed", player.getName());
+                    this.messageProvider.sendMessageTo(cause.getAudience(),"jail.abouttoteleportcause.targetisjailed", player.getName());
                 }
             }
         }

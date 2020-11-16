@@ -7,11 +7,12 @@ package io.github.nucleuspowered.nucleus.modules.jail.data;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.jail.data.Jailing;
 import io.github.nucleuspowered.nucleus.datatypes.EndTimestamp;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -40,7 +41,7 @@ public final class JailData extends EndTimestamp implements Jailing {
     private double previousz = 0;
 
     @Setting
-    private UUID world;
+    private ResourceKey worldKey;
 
     @Setting
     private long creationTime = Instant.now().getEpochSecond();
@@ -48,31 +49,31 @@ public final class JailData extends EndTimestamp implements Jailing {
     // Configurate
     public JailData() { }
 
-    public JailData(final UUID jailer, final String jailName, final String reason, final Location<World> previousLocation) {
+    public JailData(final UUID jailer, final String jailName, final String reason, final ServerLocation previousLocation) {
         this.jailer = jailer;
         this.reason = reason;
         this.jailName = jailName;
 
         if (previousLocation != null) {
-            this.world = previousLocation.getExtent().getUniqueId();
+            this.worldKey = previousLocation.getWorldKey();
             this.previousx = previousLocation.getX();
             this.previousy = previousLocation.getY();
             this.previousz = previousLocation.getZ();
         }
     }
 
-    public JailData(final UUID jailer, final String jailName, final String reason, final Location<World> previousLocation, final Instant endTimestamp) {
+    public JailData(final UUID jailer, final String jailName, final String reason, final ServerLocation previousLocation, final Instant endTimestamp) {
         this(jailer, jailName, reason, previousLocation);
         this.endtimestamp = endTimestamp.getEpochSecond();
     }
 
-    public JailData(final UUID jailer, final String jailName, final String reason, final Location<World> previousLocation, final Duration timeFromNextLogin) {
+    public JailData(final UUID jailer, final String jailName, final String reason, final ServerLocation previousLocation, final Duration timeFromNextLogin) {
         this(jailer, jailName, reason, previousLocation);
         this.timeFromNextLogin = timeFromNextLogin.getSeconds();
     }
 
-    public void setPreviousLocation(final Location<World> previousLocation) {
-        this.world = previousLocation.getExtent().getUniqueId();
+    public void setPreviousLocation(final ServerLocation previousLocation) {
+        this.worldKey = previousLocation.getWorldKey();
         this.previousx = previousLocation.getX();
         this.previousy = previousLocation.getY();
         this.previousz = previousLocation.getZ();
@@ -102,11 +103,12 @@ public final class JailData extends EndTimestamp implements Jailing {
         return this.jailer;
     }
 
-    @Override public Optional<Location<World>> getPreviousLocation() {
-        if (this.world != null) {
-            final Optional<World> ow = Sponge.getServer().getWorld(this.world);
+    @Override
+    public Optional<ServerLocation> getPreviousLocation() {
+        if (this.worldKey != null) {
+            final Optional<ServerWorld> ow = Sponge.getServer().getWorldManager().getWorld(this.worldKey);
             if (ow.isPresent() && this.previousx != 0 && this.previousy != -1 && this.previousz != 0) {
-                return Optional.of(new Location<>(ow.get(), this.previousx, this.previousy, this.previousz));
+                return Optional.of(ServerLocation.of(ow.get(), this.previousx, this.previousy, this.previousz));
             }
         }
 

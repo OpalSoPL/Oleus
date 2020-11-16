@@ -11,11 +11,14 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.event.message.PlayerChatEvent;
 
 public class ChatJailListener implements ListenerBase.Conditional {
 
@@ -29,12 +32,8 @@ public class ChatJailListener implements ListenerBase.Conditional {
     }
 
     @Listener(order = Order.FIRST)
-    public void onChat(final MessageChannelEvent.Chat event) {
-        Util.onPlayerSimulatedOrPlayer(event, this::onChat);
-    }
-
-    private void onChat(final MessageChannelEvent.Chat event, final Player player) {
-        if (this.handler.checkJail(player, false)) {
+    public void onChat(final PlayerChatEvent event, @Root final ServerPlayer player) {
+        if (this.handler.checkJail(player.getUniqueId(), false)) {
             this.messageProviderService.sendMessageTo(player, "jail.muteonchat");
             event.setCancelled(true);
         }

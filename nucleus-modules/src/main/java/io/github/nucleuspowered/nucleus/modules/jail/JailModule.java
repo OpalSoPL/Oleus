@@ -4,68 +4,74 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail;
 
-import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
-import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfigAdapter;
 import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.placeholder.PlaceholderParser;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.placeholder.PlaceholderParser;
 
-import java.util.Map;
+import java.util.Collection;
+import java.util.Optional;
 
-@ModuleData(id = JailModule.ID, name = "Jail")
 public class JailModule implements IModule.Configurable<JailConfig> { //extends ConfigurableModule<JailConfig, JailConfigAdapter> {
 
     public static final String ID = "jail";
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
+        final JailHandler handler = new JailHandler(serviceCollection);
+        serviceCollection.registerService(JailHandler.class, handler, false);
         serviceCollection.userCacheService().setJailProcessor(x -> x.get(JailKeys.JAIL_DATA).map(JailData::getJailName).orElse(null));
-    }
-
-    @Override
-    public JailConfigAdapter createAdapter() {
-        return new JailConfigAdapter();
-    }
-
-    @Override
-    protected Map<String, PlaceholderParser> tokensToRegister() {
-        return ImmutableMap.<String, PlaceholderParser>builder()
-                .put("jailed",
-                        PlaceholderParser.builder()
-                                .plugin(this.serviceCollection.pluginContainer())
-                                .id("jailed")
-                                .name("Nucleus Jailed Indicator Token")
-                                .parser(p -> {
-                                    if (p.getAssociatedObject().filter(x -> x instanceof User)
-                                            .map(x -> this.serviceCollection.getServiceUnchecked(JailHandler.class).isPlayerJailed((User) x))
-                                            .orElse(false)) {
-                                        return Text.of(TextColors.GRAY, "[Jailed]");
-                                    }
-                                    return Text.EMPTY;
-                                }).build())
-                .put("jail", PlaceholderParser.builder()
-                        .plugin(this.serviceCollection.pluginContainer())
-                        .id("jail")
-                        .name("Nucleus Jail Name Token")
-                        .parser(placeholder -> {
+        final IPlaceholderService placeholderService = serviceCollection.placeholderService();
+        placeholderService.registerToken("jailed", PlaceholderParser.builder()
+                .key(ResourceKey.of(serviceCollection.pluginContainer(), "jailed"))
+                .parser(p -> {
+                    if (p.getAssociatedObject().filter(x -> x instanceof User)
+                            .map(x -> serviceCollection.getServiceUnchecked(JailHandler.class).isPlayerJailed((User) x))
+                            .orElse(false)) {
+                        return Component.text("[Jailed]", NamedTextColor.GRAY);
+                    }
+                    return Component.empty();
+                }).build());
+        placeholderService.registerToken("jail", PlaceholderParser.builder()
+                .key(ResourceKey.of(serviceCollection.pluginContainer(), "jail"))
+                .parser(placeholder -> {
                     if (placeholder.getAssociatedObject().filter(x -> x instanceof Player).isPresent()) {
                         return serviceCollection.getServiceUnchecked(JailHandler.class)
-                                .getPlayerJailData((Player) placeholder.getAssociatedObject().get())
-                                .<Text>map(x -> Text.of(x.getJailName()))
-                                .orElse(Text.EMPTY);
+                                .getPlayerJailData(((ServerPlayer) placeholder.getAssociatedObject().get()).getUniqueId())
+                                .<Component>map(x -> Component.text(x.getJailName()))
+                                .orElseGet(Component::empty);
                     }
 
-                    return Text.EMPTY;
-                }).build()).build();
+                    return Component.empty();
+                }).build());
+    }
+
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
+    }
+
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.of(JailPermissions.class);
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+
+    @Override public Class<JailConfig> getConfigClass() {
+        return null;
     }
 }

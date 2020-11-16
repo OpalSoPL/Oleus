@@ -6,30 +6,37 @@ package io.github.nucleuspowered.nucleus.modules.jail.config;
 
 import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.List;
 
 @ConfigSerializable
 public class JailConfig {
 
-    @Setting(value = "allowed-commands", comment = "config.jail.commands")
+    @Setting(value = "allowed-commands")
+    @LocalisedComment("config.jail.commands")
     private List<String> allowedCommands = Lists.newArrayList("m", "msg", "r", "mail", "rules", "info");
 
-    @Setting(value = "mute-when-jailed",comment = "config.jail.muteWhenJailed")
+    @Setting(value = "mute-when-jailed")
+    @LocalisedComment("config.jail.muteWhenJailed")
     private boolean muteOnJail = false;
 
-    @Setting(value = "jail-time-counts-online-only",comment = "config.jail.countonlineonly")
+    @Setting(value = "jail-time-counts-online-only")
+    @LocalisedComment("config.jail.countonlineonly")
     private boolean jailOnlineOnly = false;
 
-    @Setting(value = "require-separate-unjail-permission", comment = "config.jail.unjail")
+    @Setting(value = "require-separate-unjail-permission")
+    @LocalisedComment("config.jail.unjail")
     private boolean requireUnjailPermission = false;
 
-    @Setting(value = "prevent-teleport-when-jailed-aggressively", comment = "config.jail.aggressive-teleport")
+    @Setting(value = "prevent-teleport-when-jailed-aggressively")
+    @LocalisedComment("config.jail.aggressive-teleport")
     private boolean aggressiveDisableTeleport = true;
 
-    @Setting(value = "jail-permission-levels", comment = "config.jail.permissionlevel")
+    @Setting(value = "jail-permission-levels")
+    @LocalisedComment("config.jail.permissionlevel")
     private CommonPermissionLevelConfig commonPermissionLevelConfig = new CommonPermissionLevelConfig();
 
     public List<String> getAllowedCommands() {

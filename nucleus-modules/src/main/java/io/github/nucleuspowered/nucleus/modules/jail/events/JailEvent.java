@@ -5,14 +5,14 @@
 package io.github.nucleuspowered.nucleus.modules.jail.events;
 
 import io.github.nucleuspowered.nucleus.api.module.jail.event.NucleusJailEvent;
+import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.text.Text;
 import java.time.Duration;
 import java.util.Optional;
-
-import javax.annotation.Nullable;
+import java.util.UUID;
 
 public abstract class JailEvent extends AbstractEvent implements NucleusJailEvent {
 
@@ -24,8 +24,9 @@ public abstract class JailEvent extends AbstractEvent implements NucleusJailEven
         this.cause = cause;
     }
 
-    @Override public User getTargetUser() {
-        return this.targetUser;
+    @Override
+    public UUID getJailedUser() {
+        return this.targetUser.getUniqueId();
     }
 
     @Override public Cause getCause() {
@@ -35,10 +36,10 @@ public abstract class JailEvent extends AbstractEvent implements NucleusJailEven
     public static class Jailed extends JailEvent implements NucleusJailEvent.Jailed {
 
         private final String jailName;
-        private final TextComponent reason;
+        private final Component reason;
         @Nullable private final Duration duration;
 
-        public Jailed(final User targetUser, final Cause cause, final String jailName, final TextComponent reason, @Nullable final Duration duration) {
+        public Jailed(final User targetUser, final Cause cause, final String jailName, final Component reason, @Nullable final Duration duration) {
             super(targetUser, cause);
             this.jailName = jailName;
             this.reason = reason;
@@ -53,7 +54,7 @@ public abstract class JailEvent extends AbstractEvent implements NucleusJailEven
             return Optional.ofNullable(this.duration);
         }
 
-        @Override public TextComponent getReason() {
+        @Override public Component getReason() {
             return this.reason;
         }
     }

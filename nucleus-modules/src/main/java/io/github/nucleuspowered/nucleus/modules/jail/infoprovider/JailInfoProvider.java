@@ -9,10 +9,10 @@ import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
-import org.spongepowered.api.command.CommandSource;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 
 import java.util.Optional;
 
@@ -22,14 +22,14 @@ public class JailInfoProvider implements NucleusProvider {
         return NucleusProvider.PUNISHMENT;
     }
 
-    @Override public Optional<Text> get(final User user, final CommandSource source,
+    @Override public Optional<Component> get(final User user, final CommandCause source,
             final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, JailPermissions.BASE_CHECKJAIL)) {
             // If we have a ban service, then check for a ban.
             final JailHandler jh = serviceCollection.getServiceUnchecked(JailHandler.class);
             if (jh.isPlayerJailed(user)) {
                 final JailData jd = jh.getPlayerJailDataInternal(user).get();
-                final Text.Builder m;
+                final TextComponent.Builder m;
                 if (jd.getRemainingTime().isPresent()) {
                     m = serviceCollection.messageProvider().getMessageFor(source, "seen.isjailed.temp",
                             serviceCollection.messageProvider().getTimeString(source.getLocale(),
@@ -39,7 +39,7 @@ public class JailInfoProvider implements NucleusProvider {
                 }
 
                 return Optional.of(
-                        Text.of(
+                        Component.text(
                             m.onClick(TextActions.runCommand("/nucleus:checkjail " + user.getName()))
                                 .onHover(TextActions.showText(serviceCollection.messageProvider().getMessageFor(source.getLocale(),
                                         "standard.clicktoseemore"))).build(),

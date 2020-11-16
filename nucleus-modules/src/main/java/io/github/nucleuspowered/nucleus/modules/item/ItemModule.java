@@ -64,7 +64,7 @@ public final class ItemModule implements IModule.Configurable<ItemConfig> {
 
     @Override
     public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(ItemPermissions.class);
     }
 
     @Override
