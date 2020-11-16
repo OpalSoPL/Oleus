@@ -48,9 +48,10 @@ public class BlockZapCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerLocation location = context.requireOne(CommonParameters.LOCATION_ONLINE_ONLY.getKey());
-        if (location.getBlockType() == BlockTypes.AIR) {
+        if (!location.getBlockType().getItem().isPresent()) {
             return context.errorResult("command.blockzap.alreadyair", location.getPosition().toString(), location.getWorldKey().asString());
         }
 

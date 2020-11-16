@@ -16,24 +16,20 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.entity.Hotbar;
-import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
+
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -63,26 +59,25 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
     }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.flags()
-                        .flag("m", "-mainhand")
-                        .permissionFlag(ItemPermissions.REPAIR_FLAG_ALL, "a", "-all")
-                        .permissionFlag(ItemPermissions.REPAIR_FLAG_HOTBAR, "h", "-hotbar")
-                        .permissionFlag(ItemPermissions.REPAIR_FLAG_EQUIP, "e", "-equip")
-                        .permissionFlag(ItemPermissions.REPAIR_FLAG_OFFHAND, "o", "-offhand")
-                        .buildWith(GenericArguments.none())
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        return new Flag[] {
+                Flag.of("m", "mainhand"),
+                Flag.builder().setRequirement(x -> permissionService.hasPermission(x, ItemPermissions.REPAIR_FLAG_ALL)).alias("a").alias("all").build(),
+                Flag.builder().setRequirement(x -> permissionService.hasPermission(x, ItemPermissions.REPAIR_FLAG_HOTBAR)).alias("h").alias("hotbar").build(),
+                Flag.builder().setRequirement(x -> permissionService.hasPermission(x, ItemPermissions.REPAIR_FLAG_EQUIP)).alias("e").alias("equip").build(),
+                Flag.builder().setRequirement(x -> permissionService.hasPermission(x, ItemPermissions.REPAIR_FLAG_OFFHAND)).alias("o").alias("offhand").build()
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final EnumMap<ResultType, Integer> resultCount = new EnumMap<ResultType, Integer>(ResultType.class) {{
-            put(ResultType.SUCCESS, 0);
-            put(ResultType.ERROR, 0);
-            put(ResultType.NEGATIVE_DURABILITY, 0);
-            put(ResultType.NO_DURABILITY, 0);
-            put(ResultType.RESTRICTED, 0);
+            this.put(ResultType.SUCCESS, 0);
+            this.put(ResultType.ERROR, 0);
+            this.put(ResultType.NEGATIVE_DURABILITY, 0);
+            this.put(ResultType.NO_DURABILITY, 0);
+            this.put(ResultType.RESTRICTED, 0);
         }};
         final EnumMap<ResultType, ItemStackSnapshot> lastItem = new EnumMap<>(ResultType.class);
 
@@ -90,13 +85,13 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
 
         final Player pl = context.getIfPlayer();
         String location = "inventory";
-        if (context.hasAny("a")) {
-            repairInventory(pl.getInventory(), checkRestrictions, resultCount, lastItem);
+        if (context.hasFlag("a")) {
+            this.repairInventory(pl.getInventory(), checkRestrictions, resultCount, lastItem);
         } else {
-            final boolean repairHotbar = context.hasAny("h");
-            final boolean repairEquip = context.hasAny("e");
-            final boolean repairOffhand = context.hasAny("o");
-            final boolean repairMainhand = context.hasAny("m") || !repairHotbar && !repairEquip && !repairOffhand;
+            final boolean repairHotbar = context.hasFlag("h");
+            final boolean repairEquip = context.hasFlag("e");
+            final boolean repairOffhand = context.hasFlag("o");
+            final boolean repairMainhand = context.hasFlag("m") || !repairHotbar && !repairEquip && !repairOffhand;
 
             if (repairHotbar && !repairEquip && !repairOffhand && !repairMainhand) {
                 location = "hotbar";
@@ -109,9 +104,9 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             }
 
             // Repair item in main hand
-            if (repairMainhand && pl.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
-                final ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND).get();
-                final RepairResult result = repairStack(stack, checkRestrictions);
+            if (repairMainhand && !pl.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+                final ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND);
+                final RepairResult result = this.repairStack(stack, checkRestrictions);
                 resultCount.compute(result.type, (t, i) -> i += 1);
                 lastItem.put(result.type, result.stack.createSnapshot());
                 if (result.isSuccessful()) {
@@ -120,9 +115,9 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             }
 
             // Repair item in off hand
-            if (repairOffhand && pl.getItemInHand(HandTypes.OFF_HAND).isPresent()) {
-                final ItemStack stack = pl.getItemInHand(HandTypes.OFF_HAND).get();
-                final RepairResult result = repairStack(stack, checkRestrictions);
+            if (repairOffhand && !pl.getItemInHand(HandTypes.OFF_HAND).isEmpty()) {
+                final ItemStack stack = pl.getItemInHand(HandTypes.OFF_HAND);
+                final RepairResult result = this.repairStack(stack, checkRestrictions);
                 resultCount.compute(result.type, (t, i) -> i += 1);
                 lastItem.put(result.type, result.stack.createSnapshot());
                 if (result.isSuccessful()) {
@@ -132,14 +127,12 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
 
             // Repair worn equipment
             if (repairEquip) {
-                repairInventory(pl.getInventory()
-                        .query(QueryOperationTypes.INVENTORY_TYPE.of(EquipmentInventory.class)), checkRestrictions, resultCount, lastItem);
+                this.repairInventory(pl.getInventory().getEquipment(), checkRestrictions, resultCount, lastItem);
             }
 
             // Repair Hotbar
             if (repairHotbar) {
-                repairInventory(pl.getInventory()
-                        .query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class)), checkRestrictions, resultCount, lastItem);
+                this.repairInventory(pl.getInventory().getHotbar(), checkRestrictions, resultCount, lastItem);
             }
         }
 
@@ -164,13 +157,12 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
                     if (item == null) {
                         item = lastItem.get(ResultType.NEGATIVE_DURABILITY);
                     }
+                    final Component name = this.getFromItem(item);
                     context.sendMessage(
                             "command.repair.nodurability.single",
-                            item.get(Keys.DISPLAY_NAME).orElse(Text.of(item.getTranslation().get())).toBuilder()
-                                    .onHover(TextActions.showItem(item))
-                                    .build(),
-                            Text.of(pl.getName()),
-                            Text.of(location)
+                            name.hoverEvent(item),
+                            Component.text(pl.getName()),
+                            Component.text(location)
                     );
                 } else {
                     context.sendMessage(
@@ -183,11 +175,10 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             // Success Message
             if (resultCount.get(ResultType.SUCCESS) == 1) {
                 final ItemStackSnapshot item = lastItem.get(ResultType.SUCCESS);
+                final Component name = this.getFromItem(item);
                 context.sendMessage(
                         "command.repair.success.single",
-                        item.get(Keys.DISPLAY_NAME).orElse(Text.of(item.getTranslation().get())).toBuilder()
-                                .onHover(TextActions.showItem(item))
-                                .build(),
+                        name,
                         context.getDisplayName(),
                         location
                 );
@@ -201,13 +192,12 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             // Error Message
             if (resultCount.get(ResultType.ERROR) == 1) {
                 final ItemStackSnapshot item = lastItem.get(ResultType.ERROR);
+                final Component name = this.getFromItem(item);
                 context.sendMessage(
                         "command.repair.error.single",
-                        item.get(Keys.DISPLAY_NAME).orElse(Text.of(item.getTranslation().get())).toBuilder()
-                                .onHover(TextActions.showItem(item))
-                                .build(),
+                        name,
                         context.getDisplayName(),
-                        Text.of(location)
+                        Component.text(location)
                 );
             } else if (resultCount.get(ResultType.ERROR) > 1) {
                 context.sendMessage(
@@ -219,13 +209,12 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             // Restriction Message
             if (resultCount.get(ResultType.RESTRICTED) == 1) {
                 final ItemStackSnapshot item = lastItem.get(ResultType.RESTRICTED);
+                final Component name = this.getFromItem(item);
                 context.sendMessage(
                         "command.repair.restricted.single",
-                        item.get(Keys.DISPLAY_NAME).orElse(Text.of(item.getTranslation().get())).toBuilder()
-                                .onHover(TextActions.showItem(item))
-                                .build(),
+                        name,
                         context.getDisplayName(),
-                        Text.of(location)
+                        Component.text(location)
                 );
             } else if (resultCount.get(ResultType.RESTRICTED) > 1) {
                 context.sendMessage(
@@ -245,13 +234,13 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
     private void repairInventory(final Inventory inventory, final boolean checkRestrictions,
             final EnumMap<ResultType, Integer> resultCount, final EnumMap<ResultType, ItemStackSnapshot> lastItem) {
         for (final Inventory slot : inventory.slots()) {
-            if (slot.peek().isPresent() && !slot.peek().get().isEmpty()) {
-                final ItemStack stack = slot.peek().get();
-                final RepairResult result = repairStack(stack, checkRestrictions);
+            final ItemStack stack = slot.peek();
+            if (!stack.isEmpty()) {
+                final RepairResult result = this.repairStack(stack, checkRestrictions);
                 resultCount.compute(result.type, (t, i) -> i += 1);
                 lastItem.put(result.type, result.stack.createSnapshot());
                 if (result.isSuccessful()) {
-                    slot.set(result.stack);
+                    slot.offer(result.stack);
                 }
             }
         }
@@ -262,9 +251,9 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             return new RepairResult(stack, ResultType.RESTRICTED);
         }
         try {
-            if (stack.get(DurabilityData.class).isPresent()) {
-                final DurabilityData durabilityData = stack.get(DurabilityData.class).get();
-                final DataTransactionResult transactionResult = stack.offer(Keys.ITEM_DURABILITY, durabilityData.durability().getMaxValue());
+            if (stack.get(Keys.ITEM_DURABILITY).isPresent()) {
+                final int maxDurability = stack.get(Keys.MAX_DURABILITY).orElse(Integer.MAX_VALUE);
+                final DataTransactionResult transactionResult = stack.offer(Keys.ITEM_DURABILITY, maxDurability);
                 if (transactionResult.isSuccessful()) {
                     return new RepairResult(stack, ResultType.SUCCESS);
                 } else {
@@ -277,8 +266,12 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
         return new RepairResult(stack, ResultType.NO_DURABILITY);
     }
 
+    private Component getFromItem(final ItemStackSnapshot stack) {
+        return stack.get(Keys.CUSTOM_NAME).orElseGet(() -> stack.getType().asComponent()).hoverEvent(stack);
+    }
+
     private enum ResultType {
-        SUCCESS, ERROR, RESTRICTED, NEGATIVE_DURABILITY, NO_DURABILITY;
+        SUCCESS, ERROR, RESTRICTED, NEGATIVE_DURABILITY, NO_DURABILITY
     }
 
     private static class RepairResult {
@@ -295,4 +288,5 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             return this.type == ResultType.SUCCESS;
         }
     }
+
 }

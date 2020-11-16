@@ -24,11 +24,10 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
 
-@EssentialsEquivalent(value = {"time", "day", "night"}, isExact = false, notes = "A time MUST be specified.")
 @Command(
-        aliases = {"set", "#settime", "#timeset"},
+        aliases = {"add", "#addtime", "#timeadd"},
         basePermission = EnvironmentPermissions.BASE_TIME_SET,
-        commandDescriptionKey = "time.set",
+        commandDescriptionKey = "time.add",
         parentCommand = TimeCommand.class,
         modifiers = {
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = EnvironmentPermissions.EXEMPT_COOLDOWN_TIME_SET),
@@ -36,14 +35,14 @@ import java.util.Optional;
                 @CommandModifier(value = CommandModifiers.HAS_COST, exemptPermission = EnvironmentPermissions.EXEMPT_COST_TIME_SET)
         }
 )
-public class SetTimeCommand implements ICommandExecutor {
+public class AddTimeCommand implements ICommandExecutor {
 
     private final Parameter.Value<MinecraftDayTime> timeParameter;
 
     @Inject
-    public SetTimeCommand(final INucleusServiceCollection serviceCollection) {
+    public AddTimeCommand(final INucleusServiceCollection serviceCollection) {
         this.timeParameter = Parameter.builder(GeAnTyRefTypeTokens.MINECRAFT_DAY_TIME).setKey("time")
-                .parser(new WorldTimeParameter(true, serviceCollection.messageProvider()))
+                .parser(new WorldTimeParameter(false, serviceCollection.messageProvider()))
                 .build();
     }
 
@@ -64,7 +63,7 @@ public class SetTimeCommand implements ICommandExecutor {
 
         final WorldProperties worldProperties = pr.get();
         final MinecraftDayTime dayTime = context.requireOne(this.timeParameter.getKey());
-        worldProperties.setDayTime(dayTime);
+        worldProperties.setDayTime(worldProperties.getGameTime().add(dayTime.asTicks()));
         context.sendMessage("command.settime.done2", worldProperties.getKey().asString(),
                 Util.getTimeFromDayTime(context.getServiceCollection().messageProvider(), dayTime));
         return context.successResult();

@@ -123,8 +123,8 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
                         .key(ResourceKey.resolve("nucleus:time"))
                         .parser(placeholder ->
                                 Component.text(
-                                        Util.getTimeFromTicks(serviceCollection.messageProvider(),
-                                                PlaceholderService.getWorld(placeholder).getDayTime().asTicks().getTicks())))
+                                        Util.getTimeFromDayTime(serviceCollection.messageProvider(),
+                                                PlaceholderService.getWorld(placeholder).getDayTime())))
                         .build());
 
         this.registerToken("uniquevisitor",

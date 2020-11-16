@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.item.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.item.ItemPermissions;
-import io.github.nucleuspowered.nucleus.quickstart.annotation.RequireExistenceOf;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -13,24 +13,20 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.item.PlainPagedData;
+import io.github.nucleuspowered.nucleus.services.interfaces.ICommandElementSupplier;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
-import org.spongepowered.plugin.meta.util.NonnullByDefault;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-@RequireExistenceOf("org.spongepowered.api.data.manipulator.mutable.item.PlainPagedData") // not in 7.1
 @Command(
         aliases = {"unsignbook", "unsign"},
         basePermission = ItemPermissions.BASE_UNSIGNBOOK,
@@ -44,11 +40,17 @@ import java.util.Optional;
 )
 public class UnsignBookCommand implements ICommandExecutor {
 
+    private final Parameter.Value<User> user;
+
+    @Inject
+    public UnsignBookCommand(final ICommandElementSupplier elementSupplier) {
+        this.user = elementSupplier.createOnlyOtherUserPermissionElement(ItemPermissions.OTHERS_UNSIGNBOOK);
+    }
+
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier()
-                    .createOnlyOtherUserPermissionElement(true, ItemPermissions.OTHERS_UNSIGNBOOK)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.user
         };
     }
 
@@ -58,13 +60,12 @@ public class UnsignBookCommand implements ICommandExecutor {
         final boolean isSelf = context.is(target);
 
         // Very basic for now, unsign book in hand.
-        final Optional<ItemStack> bookToUnsign =
-                target.getItemInHand(HandTypes.MAIN_HAND).filter(item -> item.getType().equals(ItemTypes.WRITTEN_BOOK));
-        if (bookToUnsign.isPresent()) {
+        final ItemStack bookToUnsign = target.getItemInHand(HandTypes.MAIN_HAND);
+        if (bookToUnsign.getType().equals(ItemTypes.WRITTEN_BOOK.get())) {
             final ItemStack unsignedBook = ItemStack.builder()
                     .itemType(ItemTypes.WRITABLE_BOOK)
-                    .itemData(bookToUnsign.get().get(Keys.BOOK_PAGES).map(this::from).orElseGet(this::createData))
-                    .quantity(bookToUnsign.get().getQuantity())
+                    .add(Keys.PLAIN_PAGES, this.from(bookToUnsign))
+                    .quantity(bookToUnsign.getQuantity())
                     .build();
             target.setItemInHand(HandTypes.MAIN_HAND, unsignedBook);
 
@@ -83,18 +84,10 @@ public class UnsignBookCommand implements ICommandExecutor {
         }
     }
 
-    private PlainPagedData from(final List<Text> texts) {
-        final PlainPagedData ppd = createData();
-        for (final TextComponent text : texts) {
-            ppd.addElement(TextSerializers.FORMATTING_CODE.serialize(text));
-        }
-
-        return ppd;
+    private List<String> from(final ItemStack bookToUnsign) {
+        return bookToUnsign.get(Keys.PAGES)
+                .map(x -> x.stream().map(y -> LegacyComponentSerializer.legacyAmpersand().serialize(y)).collect(Collectors.toList()))
+                .orElseGet(ArrayList::new);
     }
-
-    private PlainPagedData createData() {
-        return Sponge.getDataManager().getManipulatorBuilder(PlainPagedData.class).get().create();
-    }
-
 
 }

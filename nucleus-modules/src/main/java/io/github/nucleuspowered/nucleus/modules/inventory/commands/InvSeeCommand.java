@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.inventory.commands;
 
 import io.github.nucleuspowered.nucleus.modules.inventory.InventoryPermissions;
-import io.github.nucleuspowered.nucleus.modules.inventory.config.InventoryConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -13,7 +12,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
@@ -24,7 +22,6 @@ import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
 import java.util.UUID;
-
 
 @EssentialsEquivalent("invsee")
 @Command(
@@ -38,9 +35,7 @@ import java.util.UUID;
                 InventoryPermissions.INVSEE_OFFLINE
         }
 )
-public class InvSeeCommand implements ICommandExecutor, IReloadableService.Reloadable {
-
-    private boolean self = false;
+public class InvSeeCommand implements ICommandExecutor {
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -56,7 +51,7 @@ public class InvSeeCommand implements ICommandExecutor, IReloadableService.Reloa
             return context.errorResult("command.invsee.nooffline");
         }
 
-        if (!this.self && context.is(target)) {
+        if (!context.is(target)) {
             return context.errorResult("command.invsee.self");
         }
 
@@ -84,9 +79,4 @@ public class InvSeeCommand implements ICommandExecutor, IReloadableService.Reloa
         }
     }
 
-    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.self = serviceCollection.configProvider()
-                .getModuleConfig(InventoryConfig.class)
-                .isAllowInvseeOnSelf();
-    }
 }

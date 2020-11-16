@@ -25,6 +25,8 @@ import java.util.Optional;
 
 public class FlyModule implements IModule.Configurable<FlyConfig> {
 
+    public static final String ID = "fly";
+
     private static final Component FLYING_TOKEN = Component.text("[Flying]", NamedTextColor.GRAY);
 
     @Override

@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.item.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.item.ItemPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -13,21 +12,24 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.BoundedIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import io.vavr.collection.Stream;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @EssentialsEquivalent({"enchant", "enchantment"})
 @Command(
@@ -43,35 +45,48 @@ import java.util.stream.Collectors;
 )
 public class EnchantCommand implements ICommandExecutor {
 
-    private final String enchantmentKey = "enchantment";
-    private final String levelKey = "level";
+    private final Parameter.Value<EnchantmentType> enchantmentType = Parameter.builder(EnchantmentType.class)
+            .parser(VariableValueParameters.catalogedElementParameterBuilder(EnchantmentType.class).defaultNamespace("minecraft").build())
+            .setKey("enchantment")
+            .build();
+    private final Parameter.Value<Integer> level = Parameter.builder(Integer.class)
+            .parser(VariableValueParameters.integerRange().setMin(0).setMax((int) Short.MAX_VALUE).build())
+            .setKey("level")
+            .build();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-            new ImprovedCatalogTypeArgument(Text.of(this.enchantmentKey), EnchantmentType.class, serviceCollection),
-            new BoundedIntegerArgument(Text.of(this.levelKey), 0, Short.MAX_VALUE, serviceCollection),
-            GenericArguments.flags()
-                    .valueFlag(serviceCollection.commandElementSupplier()
-                            .createPermissionParameter(GenericArguments.none(), ItemPermissions.ENCHANT_UNSAFE, false), "u", "-unsafe")
-                    .flag("o", "-overwrite")
-                    .buildWith(GenericArguments.none())
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.builder().setRequirement(x -> serviceCollection.permissionService().hasPermission(x, ItemPermissions.ENCHANT_UNSAFE))
+                    .alias("u")
+                    .alias("unsafe")
+                    .build(),
+                Flag.of("o", "overwrite")
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.enchantmentType,
+                this.level
+        };
+    }
+
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player src = context.getIfPlayer();
         // Check for item in hand
-        if (!src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
+        final ItemStack itemInHand = src.getItemInHand(HandTypes.MAIN_HAND);
+        if (itemInHand.isEmpty()) {
             return context.errorResult("command.enchant.noitem");
         }
 
         // Get the arguments
-        final ItemStack itemInHand = src.getItemInHand(HandTypes.MAIN_HAND).get();
-        final EnchantmentType enchantment = context.requireOne(this.enchantmentKey, EnchantmentType.class);
-        final int level = context.requireOne(this.levelKey, Integer.class);
-        final boolean allowUnsafe = context.hasAny("u");
-        final boolean allowOverwrite = context.hasAny("o");
+        final EnchantmentType enchantment = context.requireOne(this.enchantmentType);
+        final int level = context.requireOne(this.level);
+        final boolean allowUnsafe = context.hasFlag("u");
+        final boolean allowOverwrite = context.hasFlag("o");
 
         // Can we apply the enchantment?
         if (!allowUnsafe) {
@@ -85,47 +100,37 @@ public class EnchantCommand implements ICommandExecutor {
         }
 
         // We know this should exist.
-        final EnchantmentData ed = itemInHand.getOrCreate(EnchantmentData.class).get();
+        final List<Enchantment> enchantments = itemInHand.get(Keys.APPLIED_ENCHANTMENTS).orElseGet(Collections::emptyList);
 
-        // Get all the enchantments.
-        final List<Enchantment> currentEnchants = ed.getListValue().get();
-
+        final List<Enchantment> enchantsToSet;
         if (level == 0) {
             // we want to remove only.
-            if (!currentEnchants.removeIf(x -> x.getType().getId().equals(enchantment.getId()))) {
+            enchantsToSet = Stream.ofAll(enchantments).filter(x -> !x.getType().equals(enchantment)).asJava();
+            if (enchantsToSet.size() == enchantments.size()) {
                 return context.errorResult("command.enchant.noenchantment", enchantment);
             }
         } else {
 
-            final List<Enchantment> enchantmentsToRemove = currentEnchants.stream()
-                    .filter(x -> !x.getType().isCompatibleWith(enchantment) || x.getType().equals(enchantment))
-                    .collect(Collectors.toList());
+            final Stream<Enchantment> toRemove = Stream.ofAll(enchantments)
+                    .filter(x -> x.getType().isCompatibleWith(enchantment) || x.getType().equals(enchantment));
 
-            if (!allowOverwrite && !enchantmentsToRemove.isEmpty()) {
+            if (!allowOverwrite && toRemove.isEmpty()) {
                 // Build the list of the enchantment names, and send it.
-                final StringBuilder sb = new StringBuilder();
-                enchantmentsToRemove.forEach(x -> {
-                    if (sb.length() > 0) {
-                        sb.append(", ");
-                    }
-
-                    sb.append(Util.getTranslatableIfPresent(x.getType()));
-                });
-
-                return context.errorResult("command.enchant.overwrite", sb.toString());
+                return context.errorResult("command.enchant.overwrite",
+                        Component.join(Component.text(", "), toRemove.map(Enchantment::getType).toJavaList()));
             }
 
-            // Remove all enchants that cannot co-exist.
-            currentEnchants.removeIf(enchantmentsToRemove::contains);
+            enchantsToSet = new ArrayList<>(enchantments);
+            for (final Enchantment r : toRemove) {
+                enchantsToSet.remove(r);
+            }
 
             // Create the enchantment
-            currentEnchants.add(Enchantment.of(enchantment, level));
+            enchantsToSet.add(Enchantment.of(enchantment, level));
         }
 
-        ed.setElements(currentEnchants);
-
         // Offer it to the item.
-        final DataTransactionResult dtr = itemInHand.offer(ed);
+        final DataTransactionResult dtr = itemInHand.offer(Keys.APPLIED_ENCHANTMENTS, enchantsToSet);
         if (dtr.isSuccessful()) {
             // If successful, we need to put the item in the player's hand for it to actually take effect.
             src.setItemInHand(HandTypes.MAIN_HAND, itemInHand);

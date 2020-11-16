@@ -33,6 +33,19 @@ import io.github.nucleuspowered.nucleus.modules.deathmessage.config.DeathMessage
 import io.github.nucleuspowered.nucleus.modules.environment.EnvironmentModule;
 import io.github.nucleuspowered.nucleus.modules.environment.config.EnvironmentConfig;
 import io.github.nucleuspowered.nucleus.modules.experience.ExperienceModule;
+import io.github.nucleuspowered.nucleus.modules.fly.FlyModule;
+import io.github.nucleuspowered.nucleus.modules.fly.config.FlyConfig;
+import io.github.nucleuspowered.nucleus.modules.freezeplayer.FreezePlayerModule;
+import io.github.nucleuspowered.nucleus.modules.fun.FunModule;
+import io.github.nucleuspowered.nucleus.modules.home.HomeModule;
+import io.github.nucleuspowered.nucleus.modules.home.config.HomeConfig;
+import io.github.nucleuspowered.nucleus.modules.ignore.IgnoreModule;
+import io.github.nucleuspowered.nucleus.modules.info.InfoModule;
+import io.github.nucleuspowered.nucleus.modules.info.config.InfoConfig;
+import io.github.nucleuspowered.nucleus.modules.inventory.InventoryModule;
+import io.github.nucleuspowered.nucleus.modules.invulnerability.InvulnerabilityModule;
+import io.github.nucleuspowered.nucleus.modules.item.ItemModule;
+import io.github.nucleuspowered.nucleus.modules.item.config.ItemConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,43 +57,50 @@ public final class NucleusModuleProvider implements IModuleProvider {
 
     private static ModuleContainer createContainer(
             final String id,
+            final String name,
             final Class<? extends IModule> moduleClass
     ) {
-        return new ModuleContainer(id, false, moduleClass);
+        return new ModuleContainer(id, name, false, moduleClass);
     }
 
     private static <T> ModuleContainer.Configurable<T> createContainer(
             final String id,
+            final String name,
             final Class<? extends IModule> moduleClass,
             final Class<T> configurableClass
     ) {
-        return new ModuleContainer.Configurable<>(id, false, moduleClass, configurableClass);
+        return new ModuleContainer.Configurable<>(id, name, false, moduleClass, configurableClass);
     }
 
     private static Collection<ModuleContainer> createContainers() {
         final ArrayList<ModuleContainer> containers = new ArrayList<>();
-        containers.add(NucleusModuleProvider.createContainer(AdminModule.ID, AdminModule.class, AdminConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(AFKModule.ID, AFKModule.class, AFKConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(BackModule.ID, BackModule.class, BackConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(BanModule.ID, BanModule.class, BanConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(ChatModule.ID, ChatModule.class, ChatConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(ChatLoggerModule.ID, ChatLoggerModule.class));
-        containers.add(NucleusModuleProvider.createContainer(CommandLoggerModule.ID, CommandLoggerModule.class, CommandLoggerConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(CommandSpyModule.ID, CommandSpyModule.class, CommandSpyConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(ConnectionModule.ID, ConnectionModule.class, ConnectionConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(ConnectionMessagesModule.ID, ConnectionMessagesModule.class, ConnectionMessagesConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(CraftingGuiModule.ID, CraftingGuiModule.class));
-        containers.add(NucleusModuleProvider.createContainer(DeathMessageModule.ID, DeathMessageModule.class, DeathMessageConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(EnvironmentModule.ID, EnvironmentModule.class, EnvironmentConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(ExperienceModule.ID, ExperienceModule.class));
-        containers.add(NucleusModuleProvider.createContainer("fly", EnvironmentModule.class));
-        containers.add(NucleusModuleProvider.createContainer("freeze-subject", EnvironmentModule.class));
-        containers.add(NucleusModuleProvider.createContainer("fun", EnvironmentModule.class));
-        containers.add(NucleusModuleProvider.createContainer("environment", EnvironmentModule.class));
-        containers.add(NucleusModuleProvider.createContainer("environment", EnvironmentModule.class));
-        containers.add(NucleusModuleProvider.createContainer("environment", EnvironmentModule.class));
-        containers.add(NucleusModuleProvider.createContainer("environment", EnvironmentModule.class));
-        containers.add(NucleusModuleProvider.createContainer("environment", EnvironmentModule.class));
+        containers.add(NucleusModuleProvider.createContainer(AdminModule.ID, "Admin", AdminModule.class, AdminConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(AFKModule.ID, "AFK", AFKModule.class, AFKConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(BackModule.ID, "Back", BackModule.class, BackConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(BanModule.ID, "Ban", BanModule.class, BanConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(ChatModule.ID, "Chat", ChatModule.class, ChatConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(ChatLoggerModule.ID, "Chat Logger", ChatLoggerModule.class));
+        containers.add(NucleusModuleProvider.createContainer(
+                CommandLoggerModule.ID, "Command Logger", CommandLoggerModule.class, CommandLoggerConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(
+                CommandSpyModule.ID, "Command Spy", CommandSpyModule.class, CommandSpyConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(ConnectionModule.ID, "Connection", ConnectionModule.class, ConnectionConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(ConnectionMessagesModule.ID, "Connection Messages",
+                ConnectionMessagesModule.class, ConnectionMessagesConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(CraftingGuiModule.ID, "Crafting GUI", CraftingGuiModule.class));
+        containers.add(NucleusModuleProvider.createContainer(DeathMessageModule.ID, "Death Message",
+                DeathMessageModule.class, DeathMessageConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(EnvironmentModule.ID, "Environment", EnvironmentModule.class, EnvironmentConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(ExperienceModule.ID, "Experience", ExperienceModule.class));
+        containers.add(NucleusModuleProvider.createContainer(FlyModule.ID, "Flying", FlyModule.class, FlyConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(FreezePlayerModule.ID, "Freeze Player", FreezePlayerModule.class));
+        containers.add(NucleusModuleProvider.createContainer(FunModule.ID, "Fun", FunModule.class));
+        containers.add(NucleusModuleProvider.createContainer(HomeModule.ID, "Home", HomeModule.class, HomeConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(IgnoreModule.ID, "Ignore", IgnoreModule.class));
+        containers.add(NucleusModuleProvider.createContainer(InfoModule.ID, "Info", InfoModule.class, InfoConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(InventoryModule.ID, "Inventory", InventoryModule.class));
+        containers.add(NucleusModuleProvider.createContainer(InvulnerabilityModule.ID, "Invulnerability", InvulnerabilityModule.class));
+        containers.add(NucleusModuleProvider.createContainer(ItemModule.ID, "Item", ItemModule.class, ItemConfig.class));
 
         return containers;
     }

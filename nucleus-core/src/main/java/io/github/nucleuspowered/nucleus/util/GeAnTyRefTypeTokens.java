@@ -9,6 +9,7 @@ import io.github.nucleuspowered.nucleus.configurate.datatypes.LocationNode;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
 import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.util.MinecraftDayTime;
 
 import java.time.Instant;
 import java.util.List;
@@ -30,6 +31,8 @@ public final class GeAnTyRefTypeTokens {
     public static final TypeToken<Locale> LOCALE = TypeToken.get(Locale.class);
 
     public static final TypeToken<LocationNode> LOCATION_NODE = TypeToken.get(LocationNode.class);
+
+    public static final TypeToken<MinecraftDayTime> MINECRAFT_DAY_TIME = TypeToken.get(MinecraftDayTime.class);
 
     public static final TypeToken<NamedLocation> NAMED_LOCATION = TypeToken.get(NamedLocation.class);
 

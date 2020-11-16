@@ -4,9 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.item.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +15,12 @@ import java.util.List;
 @ConfigSerializable
 public class RepairConfig {
 
-    @Setting(value = "use-whitelist", comment = "config.item.repair.whitelist")
+    @Setting(value = "use-whitelist")
+    @LocalisedComment("config.item.repair.whitelist")
     private boolean useWhitelist = false;
 
-    @Setting(value = "restrictions", comment = "config.item.repair.restrictions")
+    @Setting(value = "restrictions")
+    @LocalisedComment("config.item.repair.restrictions")
     private List<ItemType> restrictions = new ArrayList<>();
 
     public boolean isWhitelist() {

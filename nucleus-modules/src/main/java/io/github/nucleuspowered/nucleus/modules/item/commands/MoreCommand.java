@@ -12,10 +12,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
+
 @EssentialsEquivalent("more")
 @Command(
         aliases = { "more", "stack" },
@@ -31,11 +32,11 @@ public class MoreCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player player = context.getIfPlayer();
-        if (player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
-            final ItemStack stack = player.getItemInHand(HandTypes.MAIN_HAND).get();
+        if (!player.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+            final ItemStack stack = player.getItemInHand(HandTypes.MAIN_HAND);
             stack.setQuantity(stack.getMaxStackQuantity());
             player.setItemInHand(HandTypes.MAIN_HAND, stack);
-            context.sendMessage("command.more.success", stack.getType().getName(), stack.getType().getMaxStackQuantity());
+            context.sendMessage("command.more.success", stack.getType().asComponent(), stack.getType().getMaxStackQuantity());
             return context.successResult();
         }
 

@@ -27,7 +27,6 @@ import org.spongepowered.api.command.exception.CommandException;;
 public class LoreInsertCommand extends LoreModifyBaseCommand {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        return setLore(context, context.requireOne(NucleusParameters.Keys.LORE, String.class),
-                context.requireOne(this.loreLine, Integer.class), false);
+        return this.setLore(context, false);
     }
 }

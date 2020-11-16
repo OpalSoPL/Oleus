@@ -12,14 +12,17 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Command(
@@ -35,31 +38,38 @@ import java.util.List;
 )
 public class LoreDeleteCommand implements ICommandExecutor {
 
-    private final String loreLine = "line";
+    private final Parameter.Value<Integer> loreLine =
+            Parameter.builder(Integer.class)
+                    .parser(VariableValueParameters.integerRange().setMin(0).build())
+                    .setKey("line")
+                    .build();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                new PositiveIntegerArgument(Text.of(this.loreLine), false, serviceCollection)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.loreLine
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player src = context.getIfPlayer();
-        final int line = context.requireOne(this.loreLine, Integer.class) - 1;
+        final int line = context.requireOne(this.loreLine) - 1;
 
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).orElseThrow(() -> context.createException("command.lore.clear.noitem"));
-        final LoreData loreData = stack.getOrCreate(LoreData.class).get();
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        if (stack.isEmpty()) {
+            return context.errorResult("command.lore.clear.noitem");
+        }
 
-        final List<Text> loreList = loreData.lore().get();
+        final List<Component> loreList = stack.get(Keys.LORE).orElseGet(Collections::emptyList);
         if (loreList.size() < line) {
             return context.errorResult("command.lore.set.invalidLine");
         }
 
-        loreList.remove(line);
+        final List<Component> components = new ArrayList<>(loreList);
+        components.remove(line);
 
-        if (stack.offer(Keys.ITEM_LORE, loreList).isSuccessful()) {
+        if (stack.offer(Keys.LORE, components).isSuccessful()) {
             src.setItemInHand(HandTypes.MAIN_HAND, stack);
 
             context.sendMessage("command.lore.set.success");

@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.item.commands;
 
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.item.ItemPermissions;
 import io.github.nucleuspowered.nucleus.modules.item.config.ItemConfig;
 import io.github.nucleuspowered.nucleus.modules.item.config.SkullConfig;
@@ -16,25 +17,25 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.ICommandElementSupplier;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.SkullTypes;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.inventory.entity.Hotbar;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.item.inventory.query.QueryTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
-import org.spongepowered.api.item.inventory.type.GridInventory;
-import org.spongepowered.api.text.Text;
+
 import java.util.List;
 
 @EssentialsEquivalent({"skull", "playerskull", "head"})
@@ -51,10 +52,20 @@ import java.util.List;
 )
 public class SkullCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private final String amountKey = "amount";
+    private final Parameter.Value<User> userParameter;
+    private final Parameter.Value<Integer> amountParameter = Parameter.builder(Integer.class)
+            .setKey("amount")
+            .parser(VariableValueParameters.integerRange().setMin(1).build())
+            .orDefault(1)
+            .build();
 
     private int amountLimit = Integer.MAX_VALUE;
     private boolean isUseMinecraftCommand = false;
+
+    @Inject
+    public SkullCommand(final ICommandElementSupplier supplier) {
+        this.userParameter = supplier.createOnlyOtherUserPermissionElement(ItemPermissions.OTHERS_SKULL);
+    }
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
@@ -64,17 +75,18 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
     }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.commandElementSupplier().createOtherUserPermissionElement(false, ItemPermissions.OTHERS_SKULL),
-                GenericArguments.optional(new PositiveIntegerArgument(Text.of(this.amountKey), serviceCollection))
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.userParameter,
+                this.amountParameter
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.getUserFromArgs();
-        final Player player = context.getIfPlayer();
-        final int amount = context.getOne(this.amountKey, Integer.class).orElse(1);
+        final ServerPlayer player = context.getIfPlayer();
+        final int amount = context.requireOne(this.amountParameter);
 
         if (amount > this.amountLimit && !(context.isConsoleAndBypass() || context.testPermission(ItemPermissions.SKULL_EXEMPT_LIMIT))) {
             // fail
@@ -82,25 +94,27 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
         }
 
         if (this.isUseMinecraftCommand) {
-            final CommandResult result = Sponge.getCommandManager().process(Sponge.getServer().getConsole(),
-                String.format("minecraft:give %s skull %d 3 {SkullOwner:%s}", player.getName(), amount, user.getName()));
-            if (result.getSuccessCount().orElse(0) > 0) {
-                context.sendMessage("command.skull.success.plural", String.valueOf(amount), user.getName());
-                return context.successResult();
-            }
+            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+                frame.addContext(EventContextKeys.SUBJECT, Sponge.getSystemSubject());
+                final CommandResult result = Sponge.getCommandManager().process(
+                        String.format("minecraft:give %s skull %d 3 {SkullOwner:%s}", player.getName(), amount, user.getName()));
+                if (result.isSuccess()) {
+                    context.sendMessage("command.skull.success.plural", String.valueOf(amount), user.getName());
+                    return context.successResult();
+                }
 
-            return context.errorResult("command.skull.error", user.getName());
+                return context.errorResult("command.skull.error", user.getName());
+            }
         }
 
         final int fullStacks = amount / 64;
         final int partialStack = amount % 64;
 
         // Create the Skull
-        final ItemStack skullStack = ItemStack.builder().itemType(ItemTypes.SKULL).quantity(64).build();
+        final ItemStack skullStack = ItemStack.builder().itemType(ItemTypes.PLAYER_HEAD).quantity(64).build();
 
         // Set it to subject skull type and set the owner to the specified subject
-        if (skullStack.offer(Keys.SKULL_TYPE, SkullTypes.PLAYER).isSuccessful()
-                && skullStack.offer(Keys.REPRESENTED_PLAYER, user.getProfile()).isSuccessful()) {
+        if (skullStack.offer(Keys.GAME_PROFILE, user.getProfile()).isSuccessful()) {
             final List<ItemStack> itemStackList = Lists.newArrayList();
 
             // If there were stacks, create as many as needed.
@@ -121,10 +135,7 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
             int accepted = 0;
             int failed = 0;
 
-            final Inventory inventoryToOfferTo = player.getInventory()
-                    .query(
-                            QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class),
-                            QueryOperationTypes.INVENTORY_TYPE.of(GridInventory.class));
+            final Inventory inventoryToOfferTo = player.getInventory().query(QueryTypes.PLAYER_PRIMARY_HOTBAR_FIRST.get().toQuery());
             for (final ItemStack itemStack : itemStackList) {
                 final int stackSize = itemStack.getQuantity();
                 final InventoryTransactionResult itr = inventoryToOfferTo.offer(itemStack);

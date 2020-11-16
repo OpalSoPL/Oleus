@@ -5,22 +5,20 @@
 package io.github.nucleuspowered.nucleus.modules.environment.parameter;
 
 import com.google.common.collect.Maps;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.audience.Audience;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.ValueParameter;
-import org.spongepowered.api.util.TemporalUnits;
+import org.spongepowered.api.util.MinecraftDayTime;
+import org.spongepowered.api.util.Ticks;
 
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.LongFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -45,20 +43,19 @@ import java.util.stream.Collectors;
  *     <li>midnight: 18000 ticks (12 am)</li>
  * </ul>
  */
-public class WorldTimeParameter implements ValueParameter<Duration> {
+public class WorldTimeParameter implements ValueParameter<MinecraftDayTime> {
 
-    private static final int TICKS_IN_DAY = 24000;
-    private static final HashMap<String, Duration> TICK_ALIASES = Maps.newHashMap();
+    private static final HashMap<String, MinecraftDayTime> TICK_ALIASES = Maps.newHashMap();
     private static final Pattern tfh = Pattern.compile("^(\\d{1,2})[hH]$");
     private static final Pattern ampm = Pattern.compile("^(\\d{1,2})(a[m]?|p[m]?)$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-    private static final Pattern ticks = Pattern.compile("^(\\d{1,5})$");
+    private static final Pattern ticks = Pattern.compile("^(\\d+)$");
 
-    private static final Duration DAWN = Duration.of(0, TemporalUnits.MINECRAFT_TICKS);
-    private static final Duration DAY = Duration.of(1000, TemporalUnits.MINECRAFT_TICKS);
-    private static final Duration NOON = Duration.of(6000, TemporalUnits.MINECRAFT_TICKS);
-    private static final Duration DUSK = Duration.of(12000, TemporalUnits.MINECRAFT_TICKS);
-    private static final Duration NIGHT = Duration.of(14000, TemporalUnits.MINECRAFT_TICKS);
-    private static final Duration MIDNIGHT = Duration.of(18000, TemporalUnits.MINECRAFT_TICKS);
+    private static final MinecraftDayTime DAWN = MinecraftDayTime.minecraftEpoch();
+    private static final MinecraftDayTime DAY = MinecraftDayTime.of(0, 7, 0);
+    private static final MinecraftDayTime NOON = MinecraftDayTime.of(0, 12, 0);
+    private static final MinecraftDayTime DUSK = MinecraftDayTime.of(0, 18, 0);
+    private static final MinecraftDayTime NIGHT = MinecraftDayTime.of(0, 20, 0);
+    private static final MinecraftDayTime MIDNIGHT = MinecraftDayTime.of(1, 0, 0);
 
     private final boolean allowAliases;
 
@@ -85,9 +82,9 @@ public class WorldTimeParameter implements ValueParameter<Duration> {
         this.messageProvider = messageProviderService;
     }
 
-    private Duration getValue(final CommandContext source, final ArgumentReader.Mutable reader, final String arg) throws ArgumentParseException {
+    private MinecraftDayTime getValue(final CommandContext source, final ArgumentReader.Mutable reader, final String arg) throws ArgumentParseException {
         if (this.allowAliases && TICK_ALIASES.containsKey(arg)) {
-            return TICK_ALIASES.get(arg);
+            return WorldTimeParameter.TICK_ALIASES.get(arg);
         }
         final Audience audience = source.getCause().getAudience();
 
@@ -95,17 +92,12 @@ public class WorldTimeParameter implements ValueParameter<Duration> {
         final Matcher m1 = tfh.matcher(arg);
         if (m1.matches()) {
             // Get the number, multiply by 1000, return.
-            long i = Long.parseLong(m1.group(1));
+            final long i = Long.parseLong(m1.group(1));
             if (i > 23 || i < 0) {
                 throw reader.createException(this.messageProvider.getMessageFor(audience, "args.worldtime.24herror"));
             }
 
-            i -= 6;
-            if (i < 0) {
-                i += 24;
-            }
-
-            return Duration.of(i, TemporalUnits.MINECRAFT_DAYS);
+            return MinecraftDayTime.of(i < 6 ? 1 : 0, (int) i, 0);
         }
 
         // <number>am,pm
@@ -127,24 +119,12 @@ public class WorldTimeParameter implements ValueParameter<Duration> {
                 i = 0;
             }
 
-            // Adjust for Minecraft time.
-            i -= 6;
-            if (i < 0) {
-                i += 24;
-            }
-
-            return Duration.of(i, TemporalUnits.MINECRAFT_DAYS);
-            return x -> res;
+            return MinecraftDayTime.of(i < 6 ? 1 : 0, i, 0);
         }
 
         // 0 -> 23999
         if (ticks.matcher(arg).matches()) {
-            final long i = Long.parseLong(arg);
-            if (i >= 0 && i <= 23999) {
-                return x -> i;
-            }
-
-            throw reader.createException(this.messageProvider.getMessageFor(audience, "args.worldtime.ticks"));
+            return MinecraftDayTime.of(Sponge.getServer(), Ticks.of(Long.parseLong(arg)));
         }
 
         throw reader.createException(this.messageProvider.getMessageFor(audience, "args.worldtime.error", arg));
@@ -156,41 +136,12 @@ public class WorldTimeParameter implements ValueParameter<Duration> {
     }
 
     @Override
-    public Optional<? extends Function<Duration, Duration>> getValue(
-            final Parameter.Key<? super Function<Duration, Duration>> parameterKey,
+    public Optional<? extends MinecraftDayTime> getValue(
+            final Parameter.Key<? super MinecraftDayTime> parameterKey,
             final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
         final String arg = reader.parseString();
         return Optional.of(this.getValue(context, reader, arg));
     }
 
-    private static final class RoundUp implements Function<Duration, Duration> {
-
-        private final Duration target;
-
-        private RoundUp(final Duration target) {
-            this.target = target;
-        }
-
-        @Override
-        public final Duration apply(final Duration value) {
-            final value.get(TemporalUnits.DAYS)
-            // 23999 is the max tick number
-            // Get the time of day
-            final long remainder = value % TICKS_IN_DAY;
-
-            if (this.target == remainder) {
-                // no advancement
-                return value;
-            }
-
-            if (this.target < remainder) {
-                // target is below remainder, we need to get to target on next day
-                value += TICKS_IN_DAY;
-            }
-
-            // remove remainder, add target
-            return value - remainder + this.target;
-        }
-    }
 }

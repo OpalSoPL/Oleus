@@ -16,16 +16,21 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import io.vavr.control.Either;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
+import org.spongepowered.api.service.permission.Subject;
 
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 ;
 
@@ -55,10 +60,13 @@ public class EnderChestCommand implements ICommandExecutor {
     @Inject
     public EnderChestCommand(final IPermissionService permissionService) {
         this.onlinePlayerParameter = Parameter.player()
+                .setKey(NucleusParameters.Keys.PLAYER)
                 .setRequirements(cause -> permissionService.hasPermission(cause, InventoryPermissions.OTHERS_ENDERCHEST))
                 .build();
         this.offlinePlayerParameter = Parameter.user()
-                .setRequirements(cause -> permissionService.hasPermission(cause, InventoryPermissions.OTHERS_ENDERCHEST))
+                .setKey(NucleusParameters.Keys.USER)
+                .setRequirements(cause -> permissionService.hasPermission(cause, InventoryPermissions.OTHERS_ENDERCHEST) &&
+                        permissionService.hasPermission(cause, InventoryPermissions.ENDERCHEST_OFFLINE))
                 .build();
     }
 
@@ -69,18 +77,27 @@ public class EnderChestCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer currentPlayer = context.requirePlayer();
-        final User target = context.getUserFromArgs(NucleusParameters.Keys.PLAYER);
+        final Either<ServerPlayer, User> either;
+        final Optional<User> userTarget = context.getOne(this.offlinePlayerParameter);
+        if (userTarget.isPresent()) {
+            either = Either.right(userTarget.get());
+        } else {
+            final Optional<ServerPlayer> playerTarget = context.getOne(this.onlinePlayerParameter);
+            either = Either.left(playerTarget.orElse(currentPlayer));
+        }
 
-        if (!context.is(target)) {
-            if (context.testPermissionFor(target, InventoryPermissions.ENDERCHEST_EXEMPT_INSPECT)) {
-                return context.errorResult("command.enderchest.targetexempt", target.getName());
+        if (!either.fold(context::is, context::is)) {
+            final Subject subject = either.fold(Function.identity(), Function.identity());
+            if (context.testPermissionFor(subject, InventoryPermissions.ENDERCHEST_EXEMPT_INSPECT)) {
+                return context.errorResult("command.enderchest.targetexempt", either.fold(Function.identity(), Function.identity()).getName());
             }
 
-            final Inventory ec = target.getEnderChestInventory();
+            final Inventory ec = either.fold(ServerPlayer::getEnderChestInventory, User::getEnderChestInventory);
             if (!context.testPermission(InventoryPermissions.ENDERCHEST_MODIFY)
-                    || context.testPermissionFor(target, InventoryPermissions.ENDERCHEST_EXEMPT_MODIFY)) {
+                    || context.testPermissionFor(subject, InventoryPermissions.ENDERCHEST_EXEMPT_MODIFY)) {
                 final UUID uuid = UUID.randomUUID();
                 final InventoryMenu menu =
                         ViewableInventory.builder().type(ContainerTypes.GENERIC_9x5).slots(ec.slots(), 0).completeStructure()
@@ -95,8 +112,7 @@ public class EnderChestCommand implements ICommandExecutor {
                         .orElseGet(() -> context.errorResult("command.invsee.failed"));
             }
         } else {
-            return context.requirePlayer().openInventory(
-                        context.getCommandSourceAsPlayerUnchecked().getEnderChestInventory())
+            return context.requirePlayer().openInventory(currentPlayer.getEnderChestInventory())
                     .map(x -> context.successResult())
                     .orElseGet(() -> context.errorResult("command.invsee.failed"));
         }

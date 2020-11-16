@@ -21,6 +21,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.query.QueryTypes;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.pagination.PaginationList;
+import org.spongepowered.api.util.MinecraftDayTime;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -65,18 +66,12 @@ public final class Util {
                 context.getServiceCollection().messageProvider().getMessageString("standard.unknown"));
     }
 
-    public static String getTimeFromTicks(final IMessageProviderService messageProviderService, long ticks) {
-        if (ticks < 0 || ticks > 23999) {
-            // Normalise
-            ticks = ticks % 24000;
-        }
-
-        final int mins = (int) ((ticks % 1000) / (100. / 6.));
-        long hours = (ticks / 1000 + 6) % 24;
-
+    public static String getTimeFromDayTime(final IMessageProviderService messageProviderService, final MinecraftDayTime dayTime) {
         final NumberFormat m = NumberFormat.getIntegerInstance();
         m.setMinimumIntegerDigits(2);
 
+        int hours = dayTime.hour();
+        final int mins = dayTime.minute();
         if (hours < 12) {
             final long ahours = hours == 0 ? 12 : hours;
             return messageProviderService.getMessageString("standard.time.am", ahours, hours, m.format(mins));

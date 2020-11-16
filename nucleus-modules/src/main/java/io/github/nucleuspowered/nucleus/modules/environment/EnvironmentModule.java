@@ -5,7 +5,10 @@
 package io.github.nucleuspowered.nucleus.modules.environment;
 
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.environment.commands.AddTimeCommand;
 import io.github.nucleuspowered.nucleus.modules.environment.commands.LockWeatherCommand;
+import io.github.nucleuspowered.nucleus.modules.environment.commands.SetTimeCommand;
+import io.github.nucleuspowered.nucleus.modules.environment.commands.TimeCommand;
 import io.github.nucleuspowered.nucleus.modules.environment.commands.WeatherCommand;
 import io.github.nucleuspowered.nucleus.modules.environment.config.EnvironmentConfig;
 import io.github.nucleuspowered.nucleus.modules.environment.listeners.EnvironmentListener;
@@ -32,6 +35,7 @@ public class EnvironmentModule implements IModule.Configurable<EnvironmentConfig
     public Collection<Class<? extends ICommandExecutor>> getCommands() {
         return Arrays.asList(
                 LockWeatherCommand.class,
+                AddTimeCommand.class,
                 SetTimeCommand.class,
                 TimeCommand.class,
                 WeatherCommand.class

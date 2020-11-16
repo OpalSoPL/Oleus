@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.misc.commands;
 
+import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.Util;
@@ -14,25 +15,16 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.blockray.BlockRay;
-import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,11 +37,13 @@ import java.util.stream.Collectors;
 public class EntityInfoCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.flags()
-                        .permissionFlag(MiscPermissions.ENTITYINFO_EXTENDED, "e", "-extended")
-                        .buildWith(GenericArguments.none())
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.builder()
+                        .setRequirement(x -> serviceCollection.permissionService().hasPermission(x, MiscPermissions.ENTITYINFO_EXTENDED))
+                        .alias("e")
+                        .alias("extended")
+                        .build()
         };
     }
 

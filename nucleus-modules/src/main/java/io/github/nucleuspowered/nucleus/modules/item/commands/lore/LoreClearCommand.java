@@ -11,11 +11,12 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
+
 @Command(
         aliases = { "clear" },
         basePermission = ItemPermissions.BASE_LORE_SET,
@@ -29,19 +30,15 @@ import org.spongepowered.api.item.inventory.ItemStack;
 )
 public class LoreClearCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player src = context.getIfPlayer();
-        if (!src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
+        if (src.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
             return context.errorResult("command.lore.clear.noitem");
         }
 
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).get();
-        final LoreData loreData = stack.getOrCreate(LoreData.class).get();
-        if (loreData.lore().isEmpty()) {
-            return context.errorResult("command.lore.clear.none");
-        }
-
-        if (stack.remove(LoreData.class).isSuccessful()) {
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        if (stack.remove(Keys.LORE).isSuccessful()) {
             src.setItemInHand(HandTypes.MAIN_HAND, stack);
             context.errorResult("command.lore.clear.success");
             return context.successResult();

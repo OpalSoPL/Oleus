@@ -12,15 +12,14 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Keys;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+
 @Command(
         aliases = { "set", "#setitemname", "#renameitem" },
         basePermission = ItemPermissions.BASE_ITEMNAME_SET,
@@ -34,26 +33,26 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 )
 public class ItemNameSetCommand implements ICommandExecutor {
 
-    private final String nameKey = "name";
+    private final Parameter.Value<Component> parameter = Parameter.formattingCodeTextOfRemainingElements().setKey("name").build();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.remainingJoinedStrings(Text.of(this.nameKey))
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.parameter
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player src = context.getIfPlayer();
-        if (!src.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
+        if (src.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
             return context.errorResult("command.itemname.set.noitem");
         }
 
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).get();
-        final TextComponent name = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(this.nameKey, String.class));
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        final Component name = context.requireOne(this.parameter);
 
-        if (stack.offer(Keys.DISPLAY_NAME, name).isSuccessful()) {
+        if (stack.offer(Keys.CUSTOM_NAME, name).isSuccessful()) {
             src.setItemInHand(HandTypes.MAIN_HAND, stack);
 
             context.sendMessage("command.itemname.set.success");

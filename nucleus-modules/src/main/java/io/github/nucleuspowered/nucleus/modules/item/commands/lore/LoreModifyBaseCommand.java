@@ -9,25 +9,32 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+
+import java.util.ArrayList;
 import java.util.List;
+
+;
 
 abstract class LoreModifyBaseCommand implements ICommandExecutor {
 
-    final String loreLine = "line";
+    private final Parameter.Value<Integer> loreLine =
+            Parameter.builder(Integer.class)
+                    .parser(VariableValueParameters.integerRange().setMin(1).build())
+                    .setKey("line")
+                    .build();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[]{
-                new PositiveIntegerArgument(Text.of(this.loreLine), false, serviceCollection),
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.loreLine,
                 NucleusParameters.LORE
         };
     }
@@ -39,22 +46,21 @@ abstract class LoreModifyBaseCommand implements ICommandExecutor {
      * line.
      *
      * @param context The player attempting to alter an item's lore
-     * @param message The text to offer to the item
-     * @param line The line of the lore we want to edit
      * @param editOrInsert True to edit, false to insert
      * @return The result of the operation
      */
-    ICommandResult setLore(final ICommandContext context, final String message, int line, final boolean editOrInsert) throws CommandException {
+    ICommandResult setLore(final ICommandContext context, final boolean editOrInsert) throws CommandException {
         final Player src = context.getIfPlayer();
-        // The number will come in one based - we need to reduce by one.
-        line--;
 
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND).orElseThrow(() -> context.createException("command.lore.set.noitem"));
-        final LoreData loreData = stack.getOrCreate(LoreData.class).get();
+        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        if (stack.isEmpty()) {
+            return context.errorResult("command.lore.set.noitem");
+        }
 
-        final TextComponent getLore = TextSerializers.FORMATTING_CODE.deserialize(message);
+        final List<Component> loreList = stack.get(Keys.LORE).map(ArrayList::new).orElseGet(ArrayList::new);
+        final Component getLore = context.requireOne(NucleusParameters.LORE);
+        final int line = context.requireOne(this.loreLine) - 1;
 
-        final List<Text> loreList = loreData.lore().get();
         if (editOrInsert) {
             if (loreList.size() < line) {
                 return context.errorResult("command.lore.set.invalidEdit");
@@ -69,7 +75,7 @@ abstract class LoreModifyBaseCommand implements ICommandExecutor {
             }
         }
 
-        if (stack.offer(Keys.ITEM_LORE, loreList).isSuccessful()) {
+        if (stack.offer(Keys.LORE, loreList).isSuccessful()) {
             src.setItemInHand(HandTypes.MAIN_HAND, stack);
 
             context.sendMessage("command.lore.set.success");

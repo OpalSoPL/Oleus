@@ -123,7 +123,7 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<String> OPTIONAL_DESCRIPTION = Parameter.remainingJoinedStrings().setKey(Keys.DESCRIPTION).optional().build();
 
-    public static final Parameter.Value<String> LORE = Parameter.remainingJoinedStrings().setKey(Keys.LORE).build();
+    public static final Parameter.Value<Component> LORE = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.LORE).build();
 
     public static final Parameter.Value<String> MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).build();
 

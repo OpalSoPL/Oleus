@@ -14,12 +14,13 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
+
 @Command(
         aliases = {"showitemattributes", "showattributes"},
         basePermission = ItemPermissions.BASE_SHOWITEMATTRIBUTES,
@@ -33,25 +34,28 @@ import org.spongepowered.api.text.Text;
 public class ShowAttributesCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player src = context.getIfPlayer();
-        final ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND)
-                .orElseThrow(() -> context.createException("command.generalerror.handempty"));
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer src = context.getIfPlayer();
+        final ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND);
+        if (itemStack.isEmpty()) {
+            return context.errorResult("command.generalerror.handempty");
+        }
 
-        final boolean b = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
+        final boolean b = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE)
                 .orElseGet(() -> itemStack.get(Keys.HIDE_ATTRIBUTES).orElse(false));
 
         // Command is show, key is hide. We invert.
         itemStack.offer(Keys.HIDE_ATTRIBUTES, !b);
         src.setItemInHand(HandTypes.MAIN_HAND, itemStack);
 
-        context.sendMessage("command.showitemattributes.success." + b, Text.of(itemStack));
+        context.sendMessage("command.showitemattributes.success." + b, itemStack.getType().asComponent());
         return context.successResult();
     }
 

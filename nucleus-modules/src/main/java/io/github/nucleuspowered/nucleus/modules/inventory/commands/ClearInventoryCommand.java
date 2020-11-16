@@ -22,8 +22,6 @@ import org.spongepowered.api.item.inventory.Carrier;
 
 import java.util.UUID;
 
-;
-
 @Command(
         aliases = {"clear", "clearinv", "clearinventory", "ci", "clearinvent"},
         basePermission = InventoryPermissions.BASE_CLEAR,

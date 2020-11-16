@@ -4,16 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.item.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class SkullConfig {
 
-    @Setting(value = "use-minecraft-command", comment = "config.item.skullcompat")
+    @Setting(value = "use-minecraft-command")
+    @LocalisedComment("config.item.skullcompat")
     private boolean useMinecraftCommand = false;
 
-    @Setting(value = "spawn-limit", comment = "config.item.skullspawnlimit")
+    @Setting(value = "spawn-limit")
+    @LocalisedComment("config.item.skullspawnlimit")
     private int skullLimit = -1;
 
     public boolean isUseMinecraftCommand() {

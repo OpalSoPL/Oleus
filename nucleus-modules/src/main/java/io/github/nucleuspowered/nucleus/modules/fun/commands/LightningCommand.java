@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.fun.commands;
 
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.fun.FunPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -17,6 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.util.functional.NucleusCollectors;
+import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
@@ -27,13 +27,14 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.util.blockray.BlockRayHit;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.util.blockray.RayTrace;
+import org.spongepowered.api.util.blockray.RayTraceResult;
+import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @EssentialsEquivalent(value = {"lightning", "strike", "smite", "thor", "shock"}, isExact = false,
         notes = "Selectors can be used, entities can be struck.")
@@ -69,7 +70,8 @@ public class LightningCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Collection<Living> playerCollection =
                 context.requireOne(this.manyLivingParameter)
                         .stream()
@@ -80,11 +82,13 @@ public class LightningCommand implements ICommandExecutor {
             final Player pl = context.getIfPlayer();
 
             // 100 is a good limit here.
-            final BlockRay<World> playerBlockRay = BlockRay.from(pl).distanceLimit(100).stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1)).build();
-            final Optional<BlockRayHit<World>> obh = playerBlockRay.end();
-            final Location<World> lightningLocation;
+            final Optional<RayTraceResult<LocatableBlock>> result =
+                    RayTrace.block().sourceEyePosition(pl).limit(100).select(RayTrace.nonAir()).continueWhileBlock(RayTrace.onlyAir()).execute();
             // Smite above, but not on.
-            lightningLocation = obh.map(BlockRayHit::getLocation).orElseGet(() -> pl.getLocation().add(0, 3, 0));
+            final ServerLocation lightningLocation =
+                    result.map(RayTraceResult::getHitPosition)
+                            .map(x -> ServerLocation.of(pl.getServerLocation().getWorld(), x.getX(), x.getY(), x.getZ()))
+                            .orElseGet(() -> pl.getServerLocation().add(0.0, 3.0, 0.0));
 
             this.spawnLightning(lightningLocation, context, null);
             return context.successResult();
