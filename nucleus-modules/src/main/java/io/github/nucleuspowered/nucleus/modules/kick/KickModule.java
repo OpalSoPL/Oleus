@@ -4,23 +4,45 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kick;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.kick.commands.KickAllCommand;
+import io.github.nucleuspowered.nucleus.modules.kick.commands.KickCommand;
 import io.github.nucleuspowered.nucleus.modules.kick.config.KickConfig;
-import io.github.nucleuspowered.nucleus.modules.kick.config.KickConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-@ModuleData(id = "kick", name = "Kick")
-public class KickModule extends ConfigurableModule<KickConfig, KickConfigAdapter> {
+public final class KickModule implements IModule.Configurable<KickConfig> {
 
-    public KickModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
     }
 
-    @Override public KickConfigAdapter createAdapter() {
-        return new KickConfigAdapter();
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                KickAllCommand.class,
+                KickCommand.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(KickPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<KickConfig> getConfigClass() {
+        return KickConfig.class;
     }
 }

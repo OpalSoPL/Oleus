@@ -46,6 +46,10 @@ import io.github.nucleuspowered.nucleus.modules.inventory.InventoryModule;
 import io.github.nucleuspowered.nucleus.modules.invulnerability.InvulnerabilityModule;
 import io.github.nucleuspowered.nucleus.modules.item.ItemModule;
 import io.github.nucleuspowered.nucleus.modules.item.config.ItemConfig;
+import io.github.nucleuspowered.nucleus.modules.jail.JailModule;
+import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
+import io.github.nucleuspowered.nucleus.modules.jump.JumpModule;
+import io.github.nucleuspowered.nucleus.modules.jump.config.JumpConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,7 +70,7 @@ public final class NucleusModuleProvider implements IModuleProvider {
     private static <T> ModuleContainer.Configurable<T> createContainer(
             final String id,
             final String name,
-            final Class<? extends IModule> moduleClass,
+            final Class<? extends IModule.Configurable<T>> moduleClass,
             final Class<T> configurableClass
     ) {
         return new ModuleContainer.Configurable<>(id, name, false, moduleClass, configurableClass);
@@ -101,7 +105,8 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(InventoryModule.ID, "Inventory", InventoryModule.class));
         containers.add(NucleusModuleProvider.createContainer(InvulnerabilityModule.ID, "Invulnerability", InvulnerabilityModule.class));
         containers.add(NucleusModuleProvider.createContainer(ItemModule.ID, "Item", ItemModule.class, ItemConfig.class));
-
+        containers.add(NucleusModuleProvider.createContainer(JailModule.ID, "Jail", JailModule.class, JailConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(JumpModule.ID, "Jump", JumpModule.class, JumpConfig.class));
         return containers;
     }
 

@@ -169,6 +169,8 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<String> STRING_NAME = Parameter.string().setKey(Keys.NAME).build();
 
+    public static final Parameter.Value<Component> OPTIONAL_REASON_COMPONENT = Parameter.formattingCodeText().setKey("reason").optional().build();
+
     public static final class Composite {
 
         public static final Parameter USER_OR_GAME_PROFILE = Parameter.firstOf(

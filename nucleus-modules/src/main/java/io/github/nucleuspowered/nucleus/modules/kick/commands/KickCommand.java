@@ -15,13 +15,12 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 @EssentialsEquivalent("kick")
 @Command(
         aliases = "kick",
@@ -38,37 +37,36 @@ public class KickCommand implements ICommandExecutor, IReloadableService.Reloada
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                NucleusParameters.ONE_PLAYER.get(serviceCollection),
-                NucleusParameters.OPTIONAL_REASON
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.ONE_PLAYER,
+                NucleusParameters.OPTIONAL_REASON_COMPONENT
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player pl = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
-        final String r = context.getOne(NucleusParameters.Keys.REASON, String.class)
-                .orElseGet(() -> context.getMessageString("command.kick.defaultreason"));
+        final ServerPlayer pl = context.requireOne(NucleusParameters.ONE_PLAYER);
+        final Component r = context.getOne(NucleusParameters.OPTIONAL_REASON_COMPONENT)
+                .orElseGet(() -> context.getMessage("command.kick.defaultreason"));
 
         if (context.isConsoleAndBypass() || context.testPermissionFor(pl, KickPermissions.KICK_EXEMPT_TARGET)) {
             return context.errorResult("command.kick.exempt", pl.getName());
         }
 
-        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
         if (this.levelConfig.isUseLevels() &&
-                !context.isPermissionLevelOkay(user,
+                !context.isPermissionLevelOkay(pl,
                         KickPermissions.LEVEL_KEY,
                         KickPermissions.BASE_KICK,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", user.getName());
+            return context.errorResult("command.modifiers.level.insufficient", pl.getName());
         }
 
-        pl.kick(TextSerializers.FORMATTING_CODE.deserialize(r));
+        pl.kick(r);
 
-        final MessageChannel messageChannel = context.getServiceCollection().permissionService().permissionMessageChannel(KickPermissions.KICK_NOTIFY);
-        messageChannel.send(context.getCommandSourceRoot(), context.getMessage("command.kick.message", pl.getName(), context.getName()));
-        messageChannel.send(context.getCommandSourceRoot(), context.getMessage("command.reason", r));
+        final Audience audience = context.getServiceCollection().permissionService().permissionMessageChannel(KickPermissions.KICK_NOTIFY);
+        context.sendMessageTo(audience, "command.kick.message", pl.getName(), context.getName());
+        context.sendMessageTo(audience, "command.reason", r);
         return context.successResult();
     }
 
