@@ -62,12 +62,14 @@ public class KickCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.errorResult("command.modifiers.level.insufficient", pl.getName());
         }
 
-        pl.kick(r);
+        if (pl.kick(r)) {
 
-        final Audience audience = context.getServiceCollection().permissionService().permissionMessageChannel(KickPermissions.KICK_NOTIFY);
-        context.sendMessageTo(audience, "command.kick.message", pl.getName(), context.getName());
-        context.sendMessageTo(audience, "command.reason", r);
-        return context.successResult();
+            final Audience audience = context.getServiceCollection().permissionService().permissionMessageChannel(KickPermissions.KICK_NOTIFY);
+            context.sendMessageTo(audience, "command.kick.message", pl.getName(), context.getName());
+            context.sendMessageTo(audience, "command.reason", r);
+            return context.successResult();
+        }
+        return context.errorResult("command.kick.failevent");
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {

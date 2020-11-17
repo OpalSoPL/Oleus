@@ -50,6 +50,8 @@ import io.github.nucleuspowered.nucleus.modules.jail.JailModule;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
 import io.github.nucleuspowered.nucleus.modules.jump.JumpModule;
 import io.github.nucleuspowered.nucleus.modules.jump.config.JumpConfig;
+import io.github.nucleuspowered.nucleus.modules.kick.KickModule;
+import io.github.nucleuspowered.nucleus.modules.kick.config.KickConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -107,6 +109,7 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(ItemModule.ID, "Item", ItemModule.class, ItemConfig.class));
         containers.add(NucleusModuleProvider.createContainer(JailModule.ID, "Jail", JailModule.class, JailConfig.class));
         containers.add(NucleusModuleProvider.createContainer(JumpModule.ID, "Jump", JumpModule.class, JumpConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(KickModule.ID, "Kick", KickModule.class, KickConfig.class));
         return containers;
     }
 

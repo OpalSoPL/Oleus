@@ -19,6 +19,8 @@ import java.util.Optional;
 
 public final class KickModule implements IModule.Configurable<KickConfig> {
 
+    public static final String ID = "kick";
+
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
     }
