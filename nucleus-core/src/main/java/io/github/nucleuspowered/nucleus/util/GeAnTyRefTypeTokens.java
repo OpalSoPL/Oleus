@@ -46,6 +46,8 @@ public final class GeAnTyRefTypeTokens {
 
     public static final TypeToken<List<java.util.UUID>> UUID_LIST = new TypeToken<List<UUID>>() {};
 
+    public static final TypeToken<NamedLocation> NAMEDLOCATION = TypeToken.get(NamedLocation.class);
+
     private GeAnTyRefTypeTokens() {
         // no-op
     }

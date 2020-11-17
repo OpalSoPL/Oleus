@@ -8,7 +8,7 @@ import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
-import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
@@ -23,13 +23,13 @@ import org.spongepowered.api.event.filter.Getter;
 
 public class InterceptTeleportListener implements ListenerBase.Conditional {
 
-    private final JailHandler handler;
+    private final JailService handler;
     private final IPermissionService permissionService;
     private final IMessageProviderService messageProvider;
 
     @Inject
     public InterceptTeleportListener(final INucleusServiceCollection serviceCollection) {
-        this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
+        this.handler = serviceCollection.getServiceUnchecked(JailService.class);
         this.permissionService = serviceCollection.permissionService();
         this.messageProvider = serviceCollection.messageProvider();
     }
@@ -40,7 +40,7 @@ public class InterceptTeleportListener implements ListenerBase.Conditional {
         final EventContext context = event.getCause().getContext();
         if (!context.get(EventContexts.BYPASS_JAILING_RESTRICTION).orElse(false) &&
                 context.get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
-            if (this.handler.isPlayerJailed(player.getUser())) {
+            if (this.handler.isPlayerJailed(player.getUniqueId())) {
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
                     event.setCancelled(true);
                     this.messageProvider.sendMessageTo(cause.getAudience(), "jail.abouttoteleporttarget.isjailed", player.getName());

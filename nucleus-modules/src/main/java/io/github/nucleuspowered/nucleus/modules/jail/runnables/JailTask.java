@@ -4,46 +4,22 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail.runnables;
 
-import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import com.google.inject.Inject;
-
 public class JailTask implements TaskBase {
 
-    private final JailHandler jailHandler;
-    private final PluginContainer pluginContainer;
-
+    private final JailService jailHandler;
 
     @Inject
     public JailTask(final INucleusServiceCollection serviceCollection) {
-        this.jailHandler = serviceCollection.getServiceUnchecked(JailHandler.class);
-        this.pluginContainer = serviceCollection.pluginContainer();
-    }
-
-    @Override
-    public void accept(final Task task) {
-        Sponge.getServer()
-                .getOnlinePlayers()
-                .stream()
-                .filter(x -> this.jailHandler.isPlayerJailedCached(x))
-                .filter(x -> this.jailHandler.getPlayerJailDataInternal(x).map(y -> y.expired()).orElse(false))
-                .forEach(x -> this.jailHandler.unjailPlayer(x, Cause.of(EventContext.empty(), this.pluginContainer)));
-    }
-
-    @Override
-    public boolean isAsync() {
-        return true;
+        this.jailHandler = serviceCollection.getServiceUnchecked(JailService.class);
     }
 
     @Override
@@ -52,4 +28,8 @@ public class JailTask implements TaskBase {
         return Duration.of(1, ChronoUnit.SECONDS);
     }
 
+    @Override
+    public void run() {
+        this.jailHandler.checkExpiry();
+    }
 }

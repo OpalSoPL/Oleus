@@ -9,8 +9,10 @@ import com.google.inject.Injector;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.guice.DataDirectory;
+import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.impl.scheduler.SchedulerService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICommandElementSupplier;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICommandMetadataService;
@@ -31,6 +33,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameSe
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerInformationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.services.interfaces.ISchedulerService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextFileControllerCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
@@ -82,6 +85,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     private final Supplier<IDocumentationGenerationService> documentationGenerationServiceProvider;
     private final Supplier<ITextStyleService> textStyleServiceProvider;
     private final Supplier<IModuleReporter> moduleReporterSupplier;
+    private final Supplier<ISchedulerService> schedulerServiceProvider;
     private final Injector injector;
     private final PluginContainer pluginContainer;
     private final Logger logger;
@@ -121,6 +125,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         this.placeholderServiceProvider = new LazyLoad<>(this, injector, IPlaceholderService.class);
         this.documentationGenerationServiceProvider = new LazyLoad<>(this, injector, IDocumentationGenerationService.class);
         this.moduleReporterSupplier = new LazyLoad<>(this, injector, IModuleReporter.class);
+        this.schedulerServiceProvider = new LazyLoad<>(this, injector, ISchedulerService.class);
         this.injector = injector;
         this.pluginContainer = pluginContainer;
         this.logger = logger;
@@ -219,6 +224,10 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         return this.placeholderServiceProvider.get();
     }
 
+    @Override public ISchedulerService schedulerService() {
+        return this.schedulerServiceProvider.get();
+    }
+
     @Override public IUserCacheService userCacheService() {
         return this.userCacheServiceProvider.get();
     }
@@ -239,7 +248,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         return this.moduleReporterSupplier.get();
     }
 
-   @Override
+    @Override
     public Injector injector() {
         return this.injector;
     }

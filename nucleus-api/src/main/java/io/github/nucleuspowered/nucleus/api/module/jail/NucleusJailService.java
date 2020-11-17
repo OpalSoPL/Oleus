@@ -7,11 +7,13 @@ package io.github.nucleuspowered.nucleus.api.module.jail;
 import io.github.nucleuspowered.nucleus.api.module.jail.data.Jail;
 import io.github.nucleuspowered.nucleus.api.module.jail.data.Jailing;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -91,9 +93,11 @@ public interface NucleusJailService {
      * @param victim The user to jail.
      * @param jail The jail to send the user to.
      * @param reason The reason for jailing.
+     * @param duration The {@link Duration} the user should be jailed for,
+     *          if temporary.
      * @return <code>true</code> if the subject was jailed successfully.
      */
-    boolean jailPlayer(UUID victim, Jail jail, String reason);
+    boolean jailPlayer(UUID victim, Jail jail, String reason, @Nullable Duration duration);
 
     /**
      * Unjails a subject if they are currently jailed.

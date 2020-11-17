@@ -4,19 +4,22 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail.infoprovider;
 
+import io.github.nucleuspowered.nucleus.api.module.jail.data.Jailing;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
-import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
-import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
 
+import java.time.Duration;
 import java.util.Optional;
 
-public class JailInfoProvider implements NucleusProvider {
+public final class JailInfoProvider implements NucleusProvider {
 
     @Override public String getCategory() {
         return NucleusProvider.PUNISHMENT;
@@ -26,28 +29,29 @@ public class JailInfoProvider implements NucleusProvider {
             final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, JailPermissions.BASE_CHECKJAIL)) {
             // If we have a ban service, then check for a ban.
-            final JailHandler jh = serviceCollection.getServiceUnchecked(JailHandler.class);
-            if (jh.isPlayerJailed(user)) {
-                final JailData jd = jh.getPlayerJailDataInternal(user).get();
-                final TextComponent.Builder m;
-                if (jd.getRemainingTime().isPresent()) {
-                    m = serviceCollection.messageProvider().getMessageFor(source, "seen.isjailed.temp",
-                            serviceCollection.messageProvider().getTimeString(source.getLocale(),
-                                    jd.getRemainingTime().get().getSeconds())).toBuilder();
+            final JailService jh = serviceCollection.getServiceUnchecked(JailService.class);
+            final Optional<Jailing> jailing = jh.getPlayerJailData(user.getUniqueId());
+            if (jailing.isPresent()) {
+                final Jailing jd = jailing.get();
+                final Component m;
+                final Optional<Duration> duration = jd.getRemainingTime();
+                if (duration.isPresent()) {
+                    m = serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.isjailed.temp",
+                            serviceCollection.messageProvider().getTimeString(source.getAudience(), duration.get()));
                 } else {
-                    m = serviceCollection.messageProvider().getMessageFor(source.getLocale(), "seen.isjailed.perm").toBuilder();
+                    m = serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.isjailed.perm");
                 }
 
                 return Optional.of(
-                        Component.text(
-                            m.onClick(TextActions.runCommand("/nucleus:checkjail " + user.getName()))
-                                .onHover(TextActions.showText(serviceCollection.messageProvider().getMessageFor(source.getLocale(),
-                                        "standard.clicktoseemore"))).build(),
-                        Text.NEW_LINE,
-                        serviceCollection.messageProvider().getMessageFor(source.getLocale(), "standard.reason", jd.getReason())));
+                        LinearComponents.linear(
+                            m.clickEvent(ClickEvent.runCommand("/nucleus:checkjail " + user.getName()))
+                                .hoverEvent(HoverEvent.showText(serviceCollection.messageProvider().getMessageFor(source.getAudience(),
+                                        "standard.clicktoseemore"))),
+                        Component.newline(),
+                        serviceCollection.messageProvider().getMessageFor(source.getAudience(), "standard.reason", jd.getReason())));
             }
 
-            return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getLocale(), "seen.notjailed"));
+            return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.notjailed"));
         }
         return Optional.empty();
     }

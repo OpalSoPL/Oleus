@@ -5,37 +5,37 @@
 package io.github.nucleuspowered.nucleus.modules.teleport.events;
 
 import io.github.nucleuspowered.nucleus.api.teleport.event.NucleusTeleportEvent;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
+import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 public abstract class RequestEvent extends AbstractEvent implements NucleusTeleportEvent.Request {
 
-    @Nullable private TextComponent cancelMessage;
+    @Nullable private Component cancelMessage;
     private boolean isCancelled = false;
 
     private final Cause cause;
-    private final Player targetEntity;
+    private final ServerPlayer targetEntity;
 
-    private RequestEvent(final Cause cause, final Player targetEntity) {
+    private RequestEvent(final Cause cause, final ServerPlayer targetEntity) {
         this.cause = cause;
         this.targetEntity = targetEntity;
     }
 
-    @Override public Optional<Text> getCancelMessage() {
+    @Override public Optional<Component> getCancelMessage() {
         return Optional.ofNullable(this.cancelMessage);
     }
 
-    @Override public void setCancelMessage(@Nullable final TextComponent message) {
+    @Override public void setCancelMessage(@Nullable final Component message) {
         this.cancelMessage = message;
     }
 
-    @Override public Player getTargetEntity() {
+    @Override
+    public ServerPlayer getPlayer() {
         return this.targetEntity;
     }
 
@@ -53,14 +53,14 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
 
     public static class CauseToPlayer extends RequestEvent implements NucleusTeleportEvent.Request.CauseToPlayer {
 
-        public CauseToPlayer(final Cause cause, final Player targetEntity) {
+        public CauseToPlayer(final Cause cause, final ServerPlayer targetEntity) {
             super(cause, targetEntity);
         }
     }
 
     public static class PlayerToCause extends RequestEvent implements NucleusTeleportEvent.Request.PlayerToCause {
 
-        public PlayerToCause(final Cause cause, final Player targetEntity) {
+        public PlayerToCause(final Cause cause, final ServerPlayer targetEntity) {
             super(cause, targetEntity);
         }
     }

@@ -4,16 +4,17 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
-import io.github.nucleuspowered.nucleus.api.module.spawn.event.NucleusSendToSpawnEvent;
+import io.github.nucleuspowered.nucleus.api.module.jail.data.Jail;
+import io.github.nucleuspowered.nucleus.api.module.jail.data.Jailing;
 import io.github.nucleuspowered.nucleus.api.teleport.event.NucleusTeleportEvent;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import io.github.nucleuspowered.nucleus.core.events.NucleusOnLoginEvent;
-import io.github.nucleuspowered.nucleus.modules.fly.FlyKeys;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
-import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
-import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailingEntry;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
@@ -22,85 +23,55 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.command.SendCommandEvent;
-import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
+import org.spongepowered.api.event.command.ExecuteCommandEvent;
+import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
-import com.google.inject.Inject;
 
 public class JailListener implements IReloadableService.Reloadable, ListenerBase {
 
     private final IPermissionService permissionService;
     private final IMessageProviderService messageProviderService;
-    private final IPlayerDisplayNameService playerDisplayNameService;
-    private final JailHandler handler;
+    private final JailService handler;
     private List<String> allowedCommands;
-    private PluginContainer pluginContainer;
 
     @Inject
     public JailListener(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
         this.messageProviderService = serviceCollection.messageProvider();
-        this.playerDisplayNameService = serviceCollection.playerDisplayNameService();
-        this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
-        this.pluginContainer = serviceCollection.pluginContainer();
+        this.handler = serviceCollection.getServiceUnchecked(JailService.class);
     }
 
     // fires after spawn login event
     @Listener
-    public void onPlayerLogin(final NucleusOnLoginEvent event, @Getter("getTargetUser") final User user, @Getter("getUserService")
-    final IUserDataObject qs) {
-        final Optional<JailData> optionalJailData = this.handler.getPlayerJailDataInternal(user);
-        if (!optionalJailData.isPresent()) {
+    public void onPlayerLogin(final NucleusOnLoginEvent event, @Getter("getTargetUser") final User user, @Getter("getUserService") final IUserDataObject qs) {
+        final Jailing jailing = this.handler.onPlayerLogin(user.getUniqueId());
+        if (jailing == JailService.NOT_JAILED) {
             return;
         }
 
-        final JailData jd = optionalJailData.get();
-
-        // Send them back to where they should be.
-        final Optional<NamedLocation> owl = this.handler.getWarpLocation(user);
-        if (!owl.isPresent()) {
+        final Optional<Jail> jail = this.handler.getJail(jailing.getJailName()).filter(x -> x.getLocation().isPresent());
+        if (!jail.isPresent()) {
             new PermissionMessageChannel(this.permissionService, JailPermissions.JAIL_NOTIFY)
-                    .send(Text.of(TextColors.RED, "WARNING: No jail is defined. Jailed players are going free!"));
-            this.handler.unjailPlayer(user);
+                    .sendMessage(Component.text("WARNING: No jail is defined for " + user.getName() + " - they're going free!", NamedTextColor.RED));
+            this.handler.unjailPlayer(user.getUniqueId());
             return;
         }
 
         // always send the player back to the jail location
-        event.setTo(owl.get().getTransform().get());
-
-        // Jailing the subject if we need to.
-        if (this.handler.shouldJailOnNextLogin(user)) {
-            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-                frame.addContext(EventContexts.IS_JAILING_ACTION, true);
-                // only set previous location if the player hasn't been moved to the jail before.
-                if (event.getFrom().equals(owl.get().getTransform().get())) {
-                    jd.setPreviousLocation(event.getFrom().getLocation());
-                }
-
-                this.handler.updateJailData(user, jd);
-                qs.set(FlyKeys.FLY_TOGGLE, false);
-            }
-        }
+        event.setTo(jail.get().getLocation().get());
     }
 
     /**
@@ -109,60 +80,22 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
      * @param event The event.
      */
     @Listener(order = Order.LATE)
-    public void onPlayerJoin(final ClientConnectionEvent.Join event) {
-        final Player user = event.getTargetEntity();
-
-        // Jailing the subject if we need to.
-        final Optional<JailData> data = this.handler.getPlayerJailDataInternal(user);
-        if (this.handler.shouldJailOnNextLogin(user) && data.isPresent()) {
-            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-                frame.addContext(EventContexts.IS_JAILING_ACTION, true);
-                // It exists.
-                final NamedLocation owl = this.handler.getWarpLocation(user).get();
-                final JailData jd = data.get();
-                final Optional<Duration> timeLeft = jd.getRemainingTime();
-                final TextComponent message = timeLeft.map(duration ->
-                        this.messageProviderService.getMessageFor(
-                                user.getLocale(),
-                                "command.jail.jailedfor",
-                                owl.getName(),
-                                this.playerDisplayNameService.getDisplayName(jd.getJailerInternal()),
-                                this.messageProviderService.getTimeString(user.getLocale(), duration.getSeconds()))
-                )
-                        .orElseGet(() -> this.messageProviderService.getMessageFor(user, "command.jail.jailedperm", owl.getName(),
-                                this.playerDisplayNameService.getDisplayName(jd.getJailerInternal()), "", ""));
-
-                user.sendMessage(message);
-                this.messageProviderService.sendMessageTo(user, "standard.reasoncoloured", jd.getReason());
-            }
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer serverPlayer) {
+        final Optional<Jailing> jailing = this.handler.getPlayerJailData(serverPlayer.getUniqueId());
+        if (!jailing.filter(x -> x instanceof JailingEntry).isPresent()) {
+            return;
         }
 
-        this.handler.setJailOnNextLogin(user, false);
-
-        // Kick off a scheduled task to do jail time checks.
-        Sponge.getScheduler().createTaskBuilder().async().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
-            final Optional<JailData> omd = this.handler.getPlayerJailDataInternal(user);
-            if (omd.isPresent()) {
-                final JailData md = omd.get();
-                md.nextLoginToTimestamp();
-
-                if (md.expired()) {
-                    // free.
-                    this.handler.unjailPlayer(user);
-                } else {
-                    // ensure jailing is current
-                    this.handler.onJail(md, event.getTargetEntity());
-                }
-            }
-        }).submit(this.pluginContainer);
+        final JailingEntry entry = jailing.map(x -> (JailingEntry) x).get();
+        this.handler.onJail(entry, serverPlayer);
     }
 
     @Listener
-    public void onRequestSent(final NucleusTeleportEvent.Request event, @Root final Player cause, @Getter("getTargetEntity") final Player player) {
-        if (this.handler.isPlayerJailed(cause)) {
+    public void onRequestSent(final NucleusTeleportEvent.Request event, @Root final ServerPlayer cause, @Getter("getPlayer") final ServerPlayer player) {
+        if (this.handler.isPlayerJailed(cause.getUniqueId())) {
             event.setCancelled(true);
             event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(), "jail.teleportcause.isjailed"));
-        } else if (this.handler.isPlayerJailed(player)) {
+        } else if (this.handler.isPlayerJailed(player.getUniqueId())) {
             event.setCancelled(true);
             event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(),"jail.teleporttarget.isjailed", player.getName()));
         }
@@ -170,9 +103,9 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onAboutToTeleport(
-            final NucleusTeleportEvent.AboutToTeleport event, @Root final CommandSource cause, @Getter("getTargetEntity") final Player player) {
+            final NucleusTeleportEvent.AboutToTeleport event, @Root final ServerPlayer cause, @Getter("getPlayer") final ServerPlayer player) {
         if (event.getCause().getContext().get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
-            if (this.handler.isPlayerJailed(player)) {
+            if (this.handler.isPlayerJailed(player.getUniqueId())) {
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
                     event.setCancelled(true);
                     event.setCancelMessage(
@@ -187,40 +120,40 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onCommand(final SendCommandEvent event, @Root final Player player) {
+    public void onCommand(final ExecuteCommandEvent.Pre event, @Root final ServerPlayer player) {
         // Only if the command is not in the control list.
-        if (this.handler.checkJail(player, false) && this.allowedCommands.stream().noneMatch(x -> event.getCommand().equalsIgnoreCase(x))) {
+        if (this.handler.isPlayerJailed(player.getUniqueId()) && this.allowedCommands.stream().noneMatch(x -> event.getCommand().equalsIgnoreCase(x))) {
             event.setCancelled(true);
 
             // This is the easiest way to send the messages.
-            this.handler.checkJail(player, true);
+            this.handler.notify(player);
         }
     }
 
     @Listener
-    public void onBlockChange(final ChangeBlockEvent event, @Root final Player player) {
-        event.setCancelled(this.handler.checkJail(player, true));
-    }
-
-    @Listener
-    public void onInteract(final InteractEvent event, @Root final Player player) {
-        event.setCancelled(this.handler.checkJail(player, true));
-    }
-
-    @Listener
-    public void onSpawn(final RespawnPlayerEvent event) {
-        if (this.handler.checkJail(event.getTargetEntity(), false)) {
-            event.setToTransform(event.getToTransform().setLocation(this.handler.getWarpLocation(event.getTargetEntity()).get().getLocation().get()));
-        }
-    }
-
-    @Listener
-    public void onSendToSpawn(final NucleusSendToSpawnEvent event, @Getter("getTargetUser") final User user) {
-        if (this.handler.checkJail(user, false)) {
+    public void onBlockChange(final ChangeBlockEvent event, @Root final ServerPlayer player) {
+        if (this.handler.isPlayerJailed(player.getUniqueId())) {
             event.setCancelled(true);
-            event.setCancelReason(this.messageProviderService.getMessageString(event.getCause().first(CommandSource.class)
-                    .orElseGet(Sponge.getServer()::getConsole), "jail.isjailed"));
+            this.handler.notify(player);
         }
+    }
+
+    @Listener
+    public void onInteract(final InteractEvent event, @Root final ServerPlayer player) {
+        if (this.handler.isPlayerJailed(player.getUniqueId())) {
+            event.setCancelled(true);
+            this.handler.notify(player);
+        }
+    }
+
+    @Listener
+    public void onSpawn(final RespawnPlayerEvent event, @Root final ServerPlayer player) {
+        this.handler.getPlayerJail(player.getUniqueId()).flatMap(NamedLocation::getLocation).ifPresent(event::setToLocation);
+    }
+
+    @Listener
+    public void onLogout(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer serverPlayer) {
+        this.handler.clearCacheFor(serverPlayer.getUniqueId());
     }
 
     @Override

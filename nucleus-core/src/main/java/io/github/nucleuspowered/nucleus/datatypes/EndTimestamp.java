@@ -20,11 +20,6 @@ public abstract class EndTimestamp implements TimedEntry {
     @Setting
     protected Long timeFromNextLogin;
 
-    /**
-     * Gets the timestamp for the end of the mute.
-     *
-     * @return An {@link Instant}
-     */
     public Optional<Instant> getEndTimestamp() {
         if (this.endtimestamp == null) {
             return Optional.empty();

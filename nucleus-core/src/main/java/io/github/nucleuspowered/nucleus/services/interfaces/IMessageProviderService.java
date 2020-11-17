@@ -125,6 +125,14 @@ public interface IMessageProviderService {
         return this.getTimeString(locale, Instant.now().getEpochSecond() - instant.getEpochSecond());
     }
 
+    default String getTimeString(final Audience locale, final Duration duration) {
+        return this.getTimeString(this.getLocaleFor(locale), duration);
+    }
+
+    default String getTimeString(final Audience locale, final long duration) {
+        return this.getTimeString(this.getLocaleFor(locale), duration);
+    }
+
     String getTimeString(Locale locale, Duration duration);
 
     String getTimeString(Locale locale, long time);

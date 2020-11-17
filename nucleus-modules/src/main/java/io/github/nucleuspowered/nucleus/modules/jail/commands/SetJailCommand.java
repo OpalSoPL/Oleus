@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.jail.commands;
 
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
-import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -13,10 +13,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 @EssentialsEquivalent({"setjail", "createjail"})
 @Command(
         aliases = { "set", "#setjail", "#createjail" },
@@ -27,25 +27,25 @@ import org.spongepowered.api.text.Text;
 )
 public class SetJailCommand implements ICommandExecutor {
 
-    private final String jailName = "jail";
+    private final Parameter.Value<String> parameter = Parameter.string().setKey("jail").build();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.onlyOne(GenericArguments.string(Text.of(this.jailName)))
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.parameter
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final String name = context.requireOne(this.jailName, String.class).toLowerCase();
-        final JailHandler handler = context.getServiceCollection().getServiceUnchecked(JailHandler.class);
+        final String name = context.requireOne(this.parameter).toLowerCase();
+        final JailService handler = context.getServiceCollection().getServiceUnchecked(JailService.class);
         if (handler.getJail(name).isPresent()) {
             return context.errorResult("command.jails.set.exists", name);
         }
 
-        final Player src = context.getIfPlayer();
-        if (handler.setJail(name, src.getLocation(), src.getRotation())) {
+        final ServerPlayer src = context.getIfPlayer();
+        if (handler.setJail(name, src.getServerLocation(), src.getRotation()).isPresent()) {
             context.sendMessage("command.jails.set.success", name);
             return context.successResult();
         } else {

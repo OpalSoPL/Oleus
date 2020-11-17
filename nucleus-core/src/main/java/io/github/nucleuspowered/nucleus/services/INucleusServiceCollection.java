@@ -27,6 +27,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameSe
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerInformationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.services.interfaces.ISchedulerService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextFileControllerCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
@@ -97,6 +98,8 @@ public interface INucleusServiceCollection {
     ICompatibilityService compatibilityService();
 
     IPlaceholderService placeholderService();
+
+    ISchedulerService schedulerService();
 
     Logger logger();
 

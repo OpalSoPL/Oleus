@@ -7,10 +7,11 @@ package io.github.nucleuspowered.nucleus.api.util;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.Event;
 
 import java.util.Optional;
 
-public interface CancelMessageEvent extends Cancellable {
+public interface CancelMessageEvent extends Cancellable, Event {
 
     /**
      * The message to send to the player if the event is cancelled, if any.

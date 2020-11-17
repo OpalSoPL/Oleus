@@ -4,14 +4,13 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.api.module.jail.data.Jail;
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
-import io.github.nucleuspowered.nucleus.datatypes.LocationData;
-import io.github.nucleuspowered.nucleus.modules.jail.JailParameters;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
-import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
-import io.github.nucleuspowered.nucleus.modules.jail.services.JailHandler;
+import io.github.nucleuspowered.nucleus.modules.jail.parameter.JailParameter;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -22,20 +21,16 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
-import org.spongepowered.api.world.Locatable;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-
-import com.google.inject.Inject;
+import java.util.function.Function;
 
 @Command(
         aliases = {"jail"},
@@ -53,27 +48,33 @@ import com.google.inject.Inject;
 @EssentialsEquivalent(value = {"togglejail", "tjail", "jail"}, isExact = false, notes = "This command is not a toggle.")
 public class JailCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
+    private final Parameter.Value<Jail> parameter;
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
-    private final JailHandler handler;
+    private final JailService handler;
 
     @Inject
     public JailCommand(final INucleusServiceCollection serviceCollection) {
-        this.handler = serviceCollection.getServiceUnchecked(JailHandler.class);
+        this.handler = serviceCollection.getServiceUnchecked(JailService.class);
+        this.parameter = Parameter.builder(Jail.class)
+                .setKey("jail")
+                .parser(new JailParameter(this.handler, serviceCollection.messageProvider()))
+                .build();
     }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                NucleusParameters.ONE_USER.get(serviceCollection),
-                JailParameters.OPTIONAL_JAIL.get(serviceCollection),
-                NucleusParameters.OPTIONAL_WEAK_DURATION.get(serviceCollection),
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.Composite.USER_OR_GAME_PROFILE,
+                this.parameter,
+                NucleusParameters.OPTIONAL_DURATION,
                 NucleusParameters.OPTIONAL_REASON
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the subject.
-        final User pl = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final User pl = NucleusParameters.Composite.parseUserOrGameProfile(context).fold(Function.identity(),
+                x -> Sponge.getServer().getUserManager().getOrCreate(x));
         if (!pl.isOnline() && !context.testPermission(JailPermissions.JAIL_OFFLINE)) {
             return context.errorResult("command.jail.offline.noperms");
         }
@@ -87,7 +88,7 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.errorResult("command.modifiers.level.insufficient", pl.getName());
         }
 
-        if (this.handler.isPlayerJailed(pl)) {
+        if (this.handler.isPlayerJailed(pl.getUniqueId())) {
             return context.errorResult("command.jail.alreadyjailed", pl.getName());
         }
 
@@ -95,49 +96,44 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.errorResult("command.jail.exempt", pl.getName());
         }
 
-        return onJail(context, pl);
+        return this.onJail(context, pl);
     }
 
-    private ICommandResult onJail(final ICommandContext context, final User user) throws CommandException {
-        final Optional<LocationData> owl = context.getOne(JailParameters.JAIL_KEY, LocationData.class);
-        if (!owl.isPresent()) {
-            return context.errorResult("command.jail.jail.nojail");
-        }
+    private ICommandResult onJail(final ICommandContext context, final User user) {
+        final Jail jail = context.requireOne(this.parameter);
 
         // This might not be there.
-        final Optional<Long> duration = context.getOne(NucleusParameters.Keys.DURATION, Long.class);
-        final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class)
+        final Optional<Duration> duration = context.getOne(NucleusParameters.DURATION);
+        final String reason = context.getOne(NucleusParameters.REASON)
                 .orElseGet(() -> context.getMessageString("command.jail.reason"));
-        final JailData jd;
-        final TextComponent message;
-        final TextComponent messageTo;
+        final Component message;
+        final Component messageTo;
 
-        final CommandSource src = context.getCommandSourceRoot();
-        if (duration.isPresent()) {
-            if (user.isOnline()) {
-                jd = new JailData(Util.getUUID(src), owl.get().getName(), reason, user.getPlayer().get().getLocation(),
-                        Instant.now().plusSeconds(duration.get()));
+        final boolean success = this.handler.jailPlayer(
+                user.getUniqueId(),
+                jail,
+                reason,
+                duration.orElse(null)
+        );
+
+        if (success) {
+            if (duration.isPresent()) {
+                final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
+                message = context.getMessage("command.checkjail.jailedfor", user.getName(), jail.getName(),
+                        context.getName(), messageProviderService.getTimeString(context.getAudience(), duration.get()));
+                messageTo = context.getMessage("command.jail.jailedfor", jail.getName(), context.getName(),
+                        messageProviderService.getTimeString(context.getLocale(), duration.get()));
             } else {
-                jd = new JailData(Util.getUUID(src), owl.get().getName(), reason, null, Duration.of(duration.get(), ChronoUnit.SECONDS));
+                message = context.getMessage("command.checkjail.jailedperm", user.getName(), jail.getName(), context.getName());
+                messageTo = context.getMessage("command.jail.jailedperm", jail.getName(), context.getName());
             }
 
-            final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
-            message = context.getMessage("command.checkjail.jailedfor", user.getName(), jd.getJailName(),
-                    src.getName(), messageProviderService.getTimeString(src.getLocale(), duration.get()));
-            messageTo = context.getMessage("command.jail.jailedfor", owl.get().getName(), src.getName(),
-                    messageProviderService.getTimeString(src.getLocale(), duration.get()));
-        } else {
-            jd = new JailData(Util.getUUID(src), owl.get().getName(), reason, user.getPlayer().map(Locatable::getLocation).orElse(null));
-            message = context.getMessage("command.checkjail.jailedperm", user.getName(), owl.get().getName(), src.getName());
-            messageTo = context.getMessage("command.jail.jailedperm", owl.get().getName(), src.getName());
-        }
+            final Audience audience = Audience.audience(
+                    new PermissionMessageChannel(context.getServiceCollection().permissionService(), JailPermissions.JAIL_NOTIFY),
+                    context.getAudience());
 
-        if (this.handler.jailPlayer(user, jd)) {
-            final MutableMessageChannel mc = new PermissionMessageChannel(context.getServiceCollection().permissionService(),
-                    JailPermissions.JAIL_NOTIFY).asMutable();
-            mc.addMember(src);
-            mc.send(message);
-            mc.send(context.getMessage("standard.reasoncoloured", reason));
+            audience.sendMessage(message);
+            audience.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
             user.getPlayer().ifPresent(x -> {
                 x.sendMessage(messageTo);
@@ -152,7 +148,6 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        final boolean requireUnjailPermission = serviceCollection.configProvider().getModuleConfig(JailConfig.class).isRequireUnjailPermission();
         this.levelConfig = serviceCollection.configProvider().getModuleConfig(JailConfig.class).getCommonPermissionLevelConfig();
     }
 }

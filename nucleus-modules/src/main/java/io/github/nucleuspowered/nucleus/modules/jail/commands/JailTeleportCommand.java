@@ -4,19 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail.commands;
 
-import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
-import io.github.nucleuspowered.nucleus.modules.jail.JailParameters;
+import io.github.nucleuspowered.nucleus.api.module.jail.data.Jail;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
+import io.github.nucleuspowered.nucleus.modules.jail.parameter.JailParameter;
+import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
 
 @Command(
         aliases = "tp",
@@ -26,20 +26,32 @@ import org.spongepowered.api.world.World;
 )
 public class JailTeleportCommand implements ICommandExecutor {
 
+    private final Parameter.Value<Jail> parameter;
+
+    public JailTeleportCommand(final INucleusServiceCollection serviceCollection) {
+        final JailService handler = serviceCollection.getServiceUnchecked(JailService.class);
+        this.parameter = Parameter.builder(Jail.class)
+                .setKey("jail")
+                .parser(new JailParameter(handler, serviceCollection.messageProvider()))
+                .build();
+    }
+
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                JailParameters.JAIL.get(serviceCollection)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.parameter
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final NamedLocation location = context.requireOne(JailParameters.JAIL_KEY, NamedLocation.class);
-        final Transform<World> location1 = location.getTransform().orElseThrow(() -> context.createException("command.jails.tp.noworld",
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final Jail location = context.requireOne(this.parameter);
+        final ServerLocation serverLocation = location.getLocation().orElseThrow(() -> context.createException("command.jails.tp.noworld",
                 location.getName()));
 
-        final Player player = context.getIfPlayer();
-        player.setTransform(location1);
+        final ServerPlayer player = context.getIfPlayer();
+        player.setLocation(serverLocation);
+        player.setRotation(location.getRotation());
         context.sendMessage("command.jails.tp.success", location.getName());
         return context.successResult();
     }

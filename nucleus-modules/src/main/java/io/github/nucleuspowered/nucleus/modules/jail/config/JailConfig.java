@@ -27,10 +27,6 @@ public class JailConfig {
     @LocalisedComment("config.jail.countonlineonly")
     private boolean jailOnlineOnly = false;
 
-    @Setting(value = "require-separate-unjail-permission")
-    @LocalisedComment("config.jail.unjail")
-    private boolean requireUnjailPermission = false;
-
     @Setting(value = "prevent-teleport-when-jailed-aggressively")
     @LocalisedComment("config.jail.aggressive-teleport")
     private boolean aggressiveDisableTeleport = true;
@@ -49,10 +45,6 @@ public class JailConfig {
 
     public boolean isJailOnlineOnly() {
         return this.jailOnlineOnly;
-    }
-
-    public boolean isRequireUnjailPermission() {
-        return this.requireUnjailPermission;
     }
 
     public boolean aggressivelyDisableTeleportsForJailed() {

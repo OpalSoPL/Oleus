@@ -29,7 +29,7 @@ public interface NucleusTeleportEvent extends CancelMessageEvent {
          *
          * @return The {@link Player} in question.
          */
-        Player getPlayer();
+        ServerPlayer getPlayer();
 
         /**
          * Called when the root cause wants to teleport to the target player (like /tpa).

@@ -8,6 +8,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.parameter.AudienceValue
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.WorldPropertiesValueParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.leangen.geantyref.TypeToken;
+import io.vavr.control.Either;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -59,22 +60,6 @@ public final class NucleusParameters {
         public static final String USER_UUID = "user uuid";
         public static final String WORLD = "world";
         public static final String XYZ = "x y z";
-    }
-
-    public static abstract class LazyLoadedCommandElement<T> {
-
-        private Parameter.@Nullable Value<T> load;
-
-        public final Parameter.Value<T> get(final INucleusServiceCollection serviceCollection) {
-            if (this.load == null) {
-                this.load = this.create(serviceCollection);
-            }
-
-            return this.load;
-        }
-
-        protected abstract Parameter.Value<T> create(INucleusServiceCollection serviceCollection);
-
     }
 
     private NucleusParameters() {
@@ -182,7 +167,20 @@ public final class NucleusParameters {
             .parser(new AudienceValueParameter())
             .build();
 
-
     public static final Parameter.Value<String> STRING_NAME = Parameter.string().setKey(Keys.NAME).build();
+
+    public static final class Composite {
+
+        public static final Parameter USER_OR_GAME_PROFILE = Parameter.firstOf(
+                NucleusParameters.ONE_USER,
+                NucleusParameters.GAME_PROFILE
+        );
+
+        public static Either<User, GameProfile> parseUserOrGameProfile(final ICommandContext context) {
+            return context.getOne(NucleusParameters.ONE_USER)
+                    .<Either<User, GameProfile>>map(Either::left)
+                    .orElseGet(() -> Either.right(context.requireOne(NucleusParameters.GAME_PROFILE)));
+        }
+    }
 
 }

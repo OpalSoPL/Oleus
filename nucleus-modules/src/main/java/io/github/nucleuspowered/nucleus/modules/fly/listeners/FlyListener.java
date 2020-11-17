@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.fly.listeners;
 
+import io.github.nucleuspowered.nucleus.api.module.jail.event.NucleusJailEvent;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.modules.fly.FlyKeys;
 import io.github.nucleuspowered.nucleus.modules.fly.FlyPermissions;
@@ -120,6 +121,11 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
                 }
             }).plugin(this.serviceCollection.pluginContainer()).build());
         }
+    }
+
+    @Listener
+    public void onJail(final NucleusJailEvent.Jailed event) {
+        this.serviceCollection.storageManager().getUserService().setAndSave(event.getJailedUser(), FlyKeys.FLY_TOGGLE, false);
     }
 
     static boolean shouldIgnoreFromGameMode(final Player player) {
