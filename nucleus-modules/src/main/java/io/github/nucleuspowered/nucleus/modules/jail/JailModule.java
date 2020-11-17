@@ -5,12 +5,25 @@
 package io.github.nucleuspowered.nucleus.modules.jail;
 
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.jail.commands.CheckJailCommand;
+import io.github.nucleuspowered.nucleus.modules.jail.commands.CheckJailedCommand;
+import io.github.nucleuspowered.nucleus.modules.jail.commands.DeleteJailCommand;
+import io.github.nucleuspowered.nucleus.modules.jail.commands.JailCommand;
+import io.github.nucleuspowered.nucleus.modules.jail.commands.JailTeleportCommand;
+import io.github.nucleuspowered.nucleus.modules.jail.commands.JailsCommand;
+import io.github.nucleuspowered.nucleus.modules.jail.commands.SetJailCommand;
+import io.github.nucleuspowered.nucleus.modules.jail.commands.UnjailCommand;
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
 import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.modules.jail.infoprovider.JailInfoProvider;
+import io.github.nucleuspowered.nucleus.modules.jail.listeners.ChatJailListener;
+import io.github.nucleuspowered.nucleus.modules.jail.listeners.InterceptTeleportListener;
+import io.github.nucleuspowered.nucleus.modules.jail.listeners.JailListener;
+import io.github.nucleuspowered.nucleus.modules.jail.runnables.JailTask;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
@@ -20,10 +33,12 @@ import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
-public class JailModule implements IModule.Configurable<JailConfig> { //extends ConfigurableModule<JailConfig, JailConfigAdapter> {
+public class JailModule implements IModule.Configurable<JailConfig> {
 
     public static final String ID = "jail";
 
@@ -64,18 +79,39 @@ public class JailModule implements IModule.Configurable<JailConfig> { //extends 
 
     @Override
     public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Arrays.asList(
+                CheckJailCommand.class,
+                CheckJailedCommand.class,
+                DeleteJailCommand.class,
+                JailCommand.class,
+                JailsCommand.class,
+                JailTeleportCommand.class,
+                SetJailCommand.class,
+                UnjailCommand.class
+        );
     }
 
-    @Override public Optional<Class<?>> getPermissions() {
+    @Override
+    public Optional<Class<?>> getPermissions() {
         return Optional.of(JailPermissions.class);
     }
 
-    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Arrays.asList(
+                ChatJailListener.class,
+                InterceptTeleportListener.class,
+                JailListener.class
+        );
     }
 
-    @Override public Class<JailConfig> getConfigClass() {
-        return null;
+    @Override
+    public Class<JailConfig> getConfigClass() {
+        return JailConfig.class;
+    }
+
+    @Override
+    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
+        return Collections.singleton(JailTask.class);
     }
 }
