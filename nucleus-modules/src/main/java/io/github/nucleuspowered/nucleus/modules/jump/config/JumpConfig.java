@@ -4,16 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jump.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class JumpConfig {
 
-    @Setting(value = "max-jump-distance", comment = "config.jump.maxdist")
+    @Setting(value = "max-jump-distance")
+    @LocalisedComment("config.jump.maxdist")
     private int maxjump = 350;
 
-    @Setting(value = "max-thru-distance", comment = "config.thru.maxdist")
+    @Setting(value = "max-thru-distance")
+    @LocalisedComment("config.thru.maxdist")
     private int maxthru = 25;
 
     @Setting(value = "unstuck-distances")
@@ -38,10 +41,12 @@ public class JumpConfig {
     @ConfigSerializable
     public static class UnstuckConfig {
 
-        @Setting(value = "horizontal-radius", comment = "config.unstuck.radius")
+        @Setting(value = "horizontal-radius")
+        @LocalisedComment("config.unstuck.radius")
         int hr = 1;
 
-        @Setting(value = "height", comment = "config.unstuck.height")
+        @Setting(value = "height")
+        @LocalisedComment("config.unstuck.height")
         int h = 1;
 
     }

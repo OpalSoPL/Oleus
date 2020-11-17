@@ -17,19 +17,15 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.data.property.block.PassableProperty;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.blockray.BlockRay;
-import org.spongepowered.api.util.blockray.BlockRayHit;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.blockray.RayTrace;
+import org.spongepowered.api.util.blockray.RayTraceResult;
+import org.spongepowered.api.world.LocatableBlock;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 @EssentialsEquivalent({"jump", "j", "jumpto"})
 @Command(
@@ -46,63 +42,42 @@ public class JumpCommand implements ICommandExecutor, IReloadableService.Reloada
 
     private int maxJump = 20;
 
-    // Original code taken from EssentialCmds. With thanks to 12AwsomeMan34 for
-    // the initial contribution.
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player player = context.getIfPlayer();
-        final BlockRay<World> playerBlockRay = BlockRay.from(player).distanceLimit(this.maxJump).build();
+        final ServerPlayer player = context.requirePlayer();
+        final Optional<RayTraceResult<LocatableBlock>> blockRayTraceResult = RayTrace.block()
+                .sourceEyePosition(player)
+                .direction(player.getDirection())
+                .limit(this.maxJump)
+                .select(RayTrace.nonAir())
+                .continueWhileBlock(RayTrace.onlyAir())
+                .execute();
 
-        BlockRayHit<World> finalHitRay = null;
-
-        // Iterate over the blocks until we get a solid block.
-        while (finalHitRay == null && playerBlockRay.hasNext()) {
-            final BlockRayHit<World> currentHitRay = playerBlockRay.next();
-            if (!player.getWorld().getBlockType(currentHitRay.getBlockPosition()).equals(BlockTypes.AIR)) {
-                finalHitRay = currentHitRay;
-            }
-        }
-
-        if (finalHitRay == null) {
+        if (!blockRayTraceResult.isPresent()) {
             // We didn't find anywhere to jump to.
             return context.errorResult("command.jump.noblock");
         }
 
-        // If the block not passable, then it is a solid block
-        Location<World> finalLocation = finalHitRay.getLocation();
-        final Optional<PassableProperty> pp = finalHitRay.getLocation().getProperty(PassableProperty.class);
-        if (pp.isPresent() && !getFromBoxed(pp.get().getValue())) {
-            finalLocation = finalLocation.add(0, 1, 0);
+        final LocatableBlock block = blockRayTraceResult.get().getSelectedObject();
+        final ServerLocation targetLocation;
+        if (RayTrace.onlyAir().test(block.getServerLocation().add(0, 1, 0).asLocatableBlock()) &&
+                        RayTrace.onlyAir().test(block.getServerLocation().add(0, 2, 0).asLocatableBlock())) {
+            targetLocation = block.getServerLocation().add(0, 1, 0);
         } else {
-            final Optional<PassableProperty> ppbelow = finalHitRay.getLocation().getRelative(Direction.DOWN).getProperty(PassableProperty.class);
-            if (ppbelow.isPresent() && !getFromBoxed(ppbelow.get().getValue())) {
-                finalLocation = finalLocation.sub(0, 1, 0);
-            }
+            // safe teleport
+            targetLocation = context.getServiceCollection().teleportService()
+                    .getSafeLocation(block.getServerLocation(), TeleportScanners.NO_SCAN.get(), TeleportHelperFilters.CONFIG.get())
+                    .orElseThrow(() -> context.createException("command.jump.notsafe"));
         }
 
-        if (!Util.isLocationInWorldBorder(finalLocation)) {
+        // Get a safe location
+        if (!Util.isLocationInWorldBorder(targetLocation)) {
             return context.errorResult("command.jump.outsideborder");
         }
 
-        final boolean result = context.getServiceCollection()
-                .teleportService()
-                .teleportPlayerSmart(
-                        player,
-                        finalLocation,
-                        false,
-                        true,
-                        TeleportScanners.NO_SCAN.get()
-                ).isSuccessful();
-        if (result) {
-            context.sendMessage("command.jump.success");
-            return context.successResult();
-        }
-
-        return context.errorResult("command.jump.notsafe");
-    }
-
-    private boolean getFromBoxed(@Nullable final Boolean bool) {
-        return bool != null ? bool : false;
+        player.setLocation(targetLocation);
+        context.sendMessage("command.jump.success");
+        return context.successResult();
     }
 
     @Override

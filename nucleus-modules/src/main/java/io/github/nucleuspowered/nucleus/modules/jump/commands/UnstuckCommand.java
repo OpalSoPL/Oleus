@@ -16,10 +16,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 
 @Command(
@@ -39,8 +38,8 @@ public class UnstuckCommand implements ICommandExecutor, IReloadableService.Relo
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the player location, find a safe location. Prevent players trying this to get out of sticky situations, height and width is 1.
-        final Player src = context.getIfPlayer();
-        final Location<World> location = Sponge.getGame().getTeleportHelper().getSafeLocation(src.getLocation(), this.height, this.radius)
+        final ServerPlayer src = context.requirePlayer();
+        final ServerLocation location = Sponge.getServer().getTeleportHelper().getSafeLocation(src.getServerLocation(), this.height, this.radius)
             .orElseThrow(() -> context.createException("command.unstuck.nolocation"));
         if (location.getBlockPosition().equals(src.getLocation().getBlockPosition())) {
             return context.errorResult("command.unstuck.notneeded");
@@ -49,10 +48,10 @@ public class UnstuckCommand implements ICommandExecutor, IReloadableService.Relo
         if (context.getServiceCollection().teleportService().teleportPlayer(
                 src,
                 location,
+                src.getRotation(),
                 false,
                 TeleportScanners.NO_SCAN.get(),
-                TeleportHelperFilters.DEFAULT).isSuccessful())
-        if (context.getServiceCollection().teleportService().setLocation(src, location)) {
+                TeleportHelperFilters.DEFAULT.get()).isSuccessful()) {
             context.sendMessage("command.unstuck.success");
             return context.successResult();
         }

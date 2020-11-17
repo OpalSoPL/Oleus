@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.jump.commands;
 
 import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.modules.jump.JumpPermissions;
 import io.github.nucleuspowered.nucleus.modules.jump.config.JumpConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -16,12 +15,13 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.blockray.BlockRay;
-import org.spongepowered.api.util.blockray.BlockRayHit;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.blockray.RayTrace;
+import org.spongepowered.api.util.blockray.RayTraceResult;
+import org.spongepowered.api.world.LocatableBlock;
+
+import java.util.Optional;
 
 @Command(
         aliases = {"thru", "through"},
@@ -37,55 +37,64 @@ public class ThruCommand implements ICommandExecutor, IReloadableService.Reloada
 
     private int maxThru = 20;
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player player = context.getIfPlayer();
-        final BlockRay<World> playerBlockRay = BlockRay.from(player).distanceLimit(this.maxThru).build();
-        final World world = player.getWorld();
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer player = context.requirePlayer();
 
-        // First, see if we get a wall.
-        while (playerBlockRay.hasNext()) {
-            // Once we have a wall, we'll break out.
-            if (!world.getBlockType(playerBlockRay.next().getBlockPosition()).equals(BlockTypes.AIR)) {
-                break;
+        final ThruState state = new ThruState();
+
+        final Optional<RayTraceResult<LocatableBlock>> blockRayTraceResult = RayTrace.block()
+                .sourceEyePosition(player)
+                .direction(player.getDirection())
+                .limit(this.maxThru)
+                .select(state::select)
+                .continueWhileBlock(state::continueWhile)
+                .execute();
+
+        if (!blockRayTraceResult.isPresent()) {
+            if (state.hitWall) {
+                // We didn't find anywhere to jump to.
+                return context.errorResult("command.thru.nospot");
+            } else {
+                return context.errorResult("command.thru.nowall");
             }
         }
 
-        // Even if we did find a wall, no good if we are at the end of the ray.
-        if (!playerBlockRay.hasNext()) {
-            return context.errorResult("command.thru.nowall");
+        final LocatableBlock block = blockRayTraceResult.get().getSelectedObject();
+
+        // Get a safe location
+        if (!Util.isLocationInWorldBorder(block.getServerLocation())) {
+            return context.errorResult("command.jump.outsideborder");
         }
 
-        do {
-            final BlockRayHit<World> b = playerBlockRay.next();
-            if (player.getWorld().getBlockType(b.getBlockPosition()).equals(BlockTypes.AIR)) {
-                if (!Util.isLocationInWorldBorder(b.getLocation())) {
-                    return context.errorResult("command.jump.outsideborder");
-                }
-
-                // If we can go, do so.
-                final boolean result =
-                        context.getServiceCollection().teleportService().teleportPlayerSmart(
-                                player,
-                                b.getLocation(),
-                                false,
-                                true,
-                                TeleportScanners.NO_SCAN.get()
-                        ).isSuccessful();
-                if (result) {
-                    context.sendMessage("command.thru.success");
-                    return context.successResult();
-                } else {
-                    return context.errorResult("command.thru.notsafe");
-                }
-            }
-        } while (playerBlockRay.hasNext());
-
-        return context.errorResult("command.thru.nospot");
+        player.setLocation(block.getServerLocation());
+        context.sendMessage("command.thru.success");
+        return context.successResult();
     }
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
         this.maxThru = serviceCollection.configProvider().getModuleConfig(JumpConfig.class).getMaxThru();
+    }
+
+    static final class ThruState {
+
+        boolean hitWall = false;
+
+        boolean continueWhile(final LocatableBlock block) {
+            if (RayTrace.nonAir().test(block)) {
+                this.hitWall = true;
+            }
+            return true;
+        }
+
+        boolean select(final LocatableBlock block) {
+            if (this.hitWall) {
+                return RayTrace.onlyAir().test(block) && RayTrace.onlyAir().test(block.getServerLocation().add(0, 1, 0).asLocatableBlock());
+            }
+            return false;
+        }
+
     }
 
 }

@@ -4,30 +4,51 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jump;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.jump.commands.JumpCommand;
+import io.github.nucleuspowered.nucleus.modules.jump.commands.ThruCommand;
+import io.github.nucleuspowered.nucleus.modules.jump.commands.TopCommand;
+import io.github.nucleuspowered.nucleus.modules.jump.commands.UnstuckCommand;
 import io.github.nucleuspowered.nucleus.modules.jump.config.JumpConfig;
-import io.github.nucleuspowered.nucleus.modules.jump.config.JumpConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = JumpModule.ID, name = "Jump")
-public class JumpModule extends ConfigurableModule<JumpConfig, JumpConfigAdapter> {
+public final class JumpModule implements IModule.Configurable<JumpConfig> {
 
     public final static String ID = "jump";
 
-    @Inject
-    public JumpModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
     }
 
     @Override
-    public JumpConfigAdapter createAdapter() {
-        return new JumpConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                JumpCommand.class,
+                ThruCommand.class,
+                TopCommand.class,
+                UnstuckCommand.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(JumpPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<JumpConfig> getConfigClass() {
+        return JumpConfig.class;
     }
 }

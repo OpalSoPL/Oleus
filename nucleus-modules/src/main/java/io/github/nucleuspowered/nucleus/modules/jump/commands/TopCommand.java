@@ -15,15 +15,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.blockray.BlockRay;
-import org.spongepowered.api.util.blockray.BlockRayHit;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 
 @Command(
@@ -39,47 +35,35 @@ import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 )
 public class TopCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-            GenericArguments.flags().flag("f").buildWith(
-                    serviceCollection.commandElementSupplier()
-                        .createOnlyOtherUserPermissionElement(true, JumpPermissions.OTHERS_TOP)
-            )
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("f", "force")
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player playerToTeleport = context.getPlayerFromArgs();
+    @Override
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.commandElementSupplier().createOnlyOtherPlayerPermissionElement(JumpPermissions.OTHERS_TOP)
+        };
+    }
 
-        // Get the topmost block for the subject.
-        final Location<World> location = playerToTeleport.getLocation();
-        final double x = location.getX();
-        final double z = location.getZ();
-        final Location<World> start = new Location<>(location.getExtent(), x, location.getExtent().getBlockMax().getY(), z);
-        final BlockRayHit<World> end = BlockRay.from(start).stopFilter(BlockRay.onlyAirFilter())
-            .to(playerToTeleport.getLocation().getPosition().sub(0, 1, 0)).end()
-            .orElseThrow(() -> context.createException("command.top.nothingfound"));
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer playerToTeleport = context.getPlayerFromArgs();
+        final ServerLocation location = playerToTeleport.getServerLocation().asHighestLocation().add(0, 1, 0);
 
-        if (playerToTeleport.getLocation().getBlockPosition().equals(end.getBlockPosition())) {
-            if (!context.is(playerToTeleport)) {
-                return context.errorResult(
-                        "command.top.attop.other",
-                        context.getDisplayName(playerToTeleport.getUniqueId()));
-            } else {
-                return context.errorResult("command.top.attop.self");
-            }
-        }
-
-        final boolean isSafe = !context.hasAny("f");
+        final boolean isSafe = !context.hasFlag("f");
         final TeleportResult result = context.getServiceCollection()
                 .teleportService()
                 .teleportPlayer(
                         playerToTeleport,
-                        end.getLocation(),
+                        location,
                         playerToTeleport.getRotation(),
                         false,
                         TeleportScanners.NO_SCAN.get(),
-                        isSafe ? TeleportHelperFilters.SURFACE_ONLY : NucleusTeleportHelperFilters.NO_CHECK.get()
+                        isSafe ? TeleportHelperFilters.SURFACE_ONLY.get() : NucleusTeleportHelperFilters.NO_CHECK.get()
                 );
 
         if (result.isSuccessful()) {
