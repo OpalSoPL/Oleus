@@ -120,7 +120,7 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
             if (!home.isPresent()) {
                 return context.errorResult("args.home.nohome", NucleusHomeService.DEFAULT_HOME_NAME);
             }
-            wl = home.get();;
+            wl = home.get();
         }
 
         Sponge.getServer().getWorldManager().getWorld(wl.getWorldProperties().get().getKey())

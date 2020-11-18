@@ -25,7 +25,7 @@ import javax.annotation.Nullable;
 public class SingleKit implements Kit {
 
     private final String name;
-    private final List<ItemStackSnapshot> stacks = Lists.newArrayList();
+    private final List<ItemStackSnapshot> stacks = new ArrayList<>();
     private final List<String> commands = new ArrayList<>();
     @Nullable private Duration interval;
     private double cost = 0;

@@ -13,9 +13,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 @EssentialsEquivalent("heal")
@@ -32,8 +32,8 @@ import org.spongepowered.api.entity.living.player.Player;
 )
 public class HealCommand implements ICommandExecutor { // extends AbstractCommand.SimpleTargetOtherPlayer {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 serviceCollection.commandElementSupplier()
                         .createOnlyOtherUserPermissionElement(true, MiscPermissions.OTHERS_HEAL)
         };

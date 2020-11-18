@@ -30,9 +30,7 @@ import java.util.UUID;
 @Command(
         aliases = "checkjail",
         basePermission = JailPermissions.BASE_CHECKJAIL,
-        commandDescriptionKey = "checkjail",
-        async = true
-)
+        commandDescriptionKey = "checkjail")
 public class CheckJailCommand implements ICommandExecutor {
 
     private final JailService handler;

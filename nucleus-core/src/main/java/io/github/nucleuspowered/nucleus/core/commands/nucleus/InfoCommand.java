@@ -25,6 +25,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -38,8 +39,7 @@ import java.util.stream.Collectors;
         basePermission = CorePermissions.BASE_NUCLEUS_INFO,
         commandDescriptionKey = "nucleus.info",
         parentCommand = NucleusCommand.class,
-        async = true
-)
+        )
 public final class InfoCommand implements ICommandExecutor {
 
     private final IPluginInfo pluginInfo;
@@ -52,7 +52,7 @@ public final class InfoCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Sponge versions
-        final List<String> information = Lists.newArrayList();
+        final List<String> information = new ArrayList<>();
 
         final String separator = "------------";
         information.add(separator);

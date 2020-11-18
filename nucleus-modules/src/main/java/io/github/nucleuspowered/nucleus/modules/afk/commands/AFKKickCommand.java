@@ -23,8 +23,6 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import java.util.Collection;
 import java.util.Optional;
 
-;
-
 @Command(aliases = {"afkkick", "kickafk"}, basePermission = AFKPermissions.BASE_AFKKICK, commandDescriptionKey = "afkkick")
 public class AFKKickCommand implements ICommandExecutor {
 
@@ -38,7 +36,7 @@ public class AFKKickCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Optional<Component> reason = context
-                .getOne(NucleusParameters.Keys.REASON, TypeTokens.STRING)
+                .getOne(NucleusParameters.REASON)
                 .map(LegacyComponentSerializer.legacyAmpersand()::deserialize);
 
         final Collection<ServerPlayer> playersToKick = context.getServiceCollection().getServiceUnchecked(AFKHandler.class)

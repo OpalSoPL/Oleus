@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.Text;

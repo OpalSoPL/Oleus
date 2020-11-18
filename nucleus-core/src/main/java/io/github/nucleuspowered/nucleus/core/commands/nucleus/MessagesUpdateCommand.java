@@ -24,8 +24,7 @@ import java.util.List;
         aliases = "update-messages",
         basePermission = CorePermissions.BASE_NUCLEUS_UPDATE_MESSAGES,
         commandDescriptionKey = "nucleus.update-messages",
-        async = true
-)
+        )
 public class MessagesUpdateCommand implements ICommandExecutor {
 
     @Override

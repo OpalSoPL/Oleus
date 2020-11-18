@@ -6,9 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.kit.storage;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
-import io.github.nucleuspowered.nucleus.modules.kit.serialiser.SingleKitTypeSerilaiser;
+import io.github.nucleuspowered.nucleus.modules.kit.serialiser.SingleKitTypeSerialiser;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
-import ninja.leaping.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class KitDataObject extends AbstractConfigurateBackedDataObject implement
     public ImmutableMap<String, Kit> getKitMap() {
         if (this.cached == null) {
             try {
-                final Map<String, Kit> map = SingleKitTypeSerilaiser.INSTANCE.deserialize(this.backingNode);
+                final Map<String, Kit> map = SingleKitTypeSerialiser.INSTANCE.deserialize(this.backingNode);
                 if (map == null) {
                     this.cached = ImmutableMap.of();
                 } else {
@@ -38,7 +38,7 @@ public class KitDataObject extends AbstractConfigurateBackedDataObject implement
 
     @Override
     public void setKitMap(final Map<String, Kit> map) throws Exception {
-        SingleKitTypeSerilaiser.INSTANCE.serialize(map, this.backingNode);
+        SingleKitTypeSerialiser.INSTANCE.serialize(map, this.backingNode);
         this.cached = ImmutableMap.copyOf(map);
     }
 

@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -22,9 +22,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
         aliases = { "set", "#setjail", "#createjail" },
         basePermission = JailPermissions.BASE_JAILS_SET,
         commandDescriptionKey = "jails.set",
-        parentCommand = JailsCommand.class,
-        async = true
-)
+        parentCommand = JailsCommand.class)
 public class SetJailCommand implements ICommandExecutor {
 
     private final Parameter.Value<String> parameter = Parameter.string().setKey("jail").build();

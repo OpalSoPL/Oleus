@@ -12,9 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -23,15 +23,13 @@ import org.spongepowered.api.text.serializer.TextSerializers;
         aliases = "setdisplayname",
         basePermission = WarpPermissions.BASE_CATEGORY_DISPLAYNAME,
         commandDescriptionKey = "warp.category.setdisplayname",
-        parentCommand = CategoryCommand.class,
-        async = true
-)
+        parentCommand = CategoryCommand.class)
 public class CategoryDisplayNameCommand implements ICommandExecutor {
 
     private final String DISPLAY_NAME_KEY = "display name";
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpCategoryElement(),
                 GenericArguments.onlyOne(GenericArguments.string(Text.of(DISPLAY_NAME_KEY)))
         };

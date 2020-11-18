@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kit.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
@@ -21,10 +22,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 import java.time.Duration;
 
 /**
@@ -51,18 +52,26 @@ public class KitCommand implements ICommandExecutor, IReloadableService.Reloadab
     private boolean isDrop;
     private boolean mustGetAll;
 
+    private final Parameter.Value<Kit> kitParameter;
+
+    @Inject
+    public KitCommand(final INucleusServiceCollection serviceCollection) {
+        this.kitParameter = serviceCollection.getServiceUnchecked(KitService.class).kitParameterWithPermission();
+    }
+
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.getServiceUnchecked(KitService.class).createKitElement(true)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                this.kitParameter
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer player = context.requirePlayer();
+        final Kit kit = context.requireOne(this.kitParameter);
 
         final KitService kitService = context.getServiceCollection().getServiceUnchecked(KitService.class);
-        final Player player = context.getCommandSourceAsPlayerUnchecked();
         final IEconomyServiceProvider econHelper = context.getServiceCollection().economyServiceProvider();
         double cost = econHelper.serviceExists() ? kit.getCost() : 0;
         if (context.testPermission(KitPermissions.KIT_EXEMPT_COST)) {
@@ -71,17 +80,17 @@ public class KitCommand implements ICommandExecutor, IReloadableService.Reloadab
         }
 
         // If we have a cost for the kit, check we have funds.
-        if (cost > 0 && !econHelper.hasBalance(player, cost)) {
+        if (cost > 0 && !econHelper.hasBalance(player.getUniqueId(), cost)) {
             return context.errorResult("command.kit.notenough", kit.getName(), econHelper.getCurrencySymbol(cost));
         }
 
-        final KitRedeemResult redeemResult = kitService.redeemKit(kit, player, true, this.mustGetAll);
+        final KitRedeemResult redeemResult = kitService.redeemKit(kit, player, true, true, this.mustGetAll, false);
         if (redeemResult.isSuccess()) {
             if (!redeemResult.rejectedItems().isEmpty()) {
                 // If we drop them, tell the user
                 if (this.isDrop) {
                     context.sendMessage("command.kit.itemsdropped");
-                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.getLocation()));
+                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.getServerLocation()));
                 } else {
                     context.sendMessage("command.kit.fullinventory");
                 }
@@ -93,7 +102,7 @@ public class KitCommand implements ICommandExecutor, IReloadableService.Reloadab
 
             // Charge, if necessary
             if (cost > 0 && econHelper.serviceExists()) {
-                econHelper.withdrawFromPlayer(player, cost);
+                econHelper.withdrawFromPlayer(player.getUniqueId(), cost);
             }
 
             return context.successResult();
@@ -108,7 +117,7 @@ public class KitCommand implements ICommandExecutor, IReloadableService.Reloadab
                 case PRE_EVENT_CANCELLED:
                     return redeemResult
                             .getMessage()
-                            .map(x -> context.errorResultLiteral(Text.of(x)))
+                            .map(context::errorResultLiteral)
                             .orElseGet(() -> context.errorResult("command.kit.cancelledpre", kit.getName()));
                 case NO_SPACE:
                     return context.errorResult("command.kit.fullinventorynosave", kit.getName());

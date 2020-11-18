@@ -14,12 +14,12 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -36,15 +36,14 @@ import javax.annotation.Nullable;
         aliases = {"setcategory"},
         basePermission = WarpPermissions.BASE_WARP_SETCATEGORY,
         commandDescriptionKey = "warp.setcategory",
-        async = true,
         parentCommand = WarpCommand.class
 )
 public class SetCategoryCommand implements ICommandExecutor {
 
     private static final TypeToken<Tuple<String, Boolean>> TUPLE_TYPE_TOKEN = new TypeToken<Tuple<String, Boolean>>() {};
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
             GenericArguments.flags().flag("r", "-remove", "-delete").flag("n", "-new").buildWith(
                 GenericArguments.seq(
                         serviceCollection.getServiceUnchecked(WarpService.class).warpElement(false),

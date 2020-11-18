@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
         basePermission = HomePermissions.BASE_HOME_LIST,
         commandDescriptionKey = "home.list",
         parentCommand = HomeCommand.class,
-        async = true,
         associatedPermissions = HomePermissions.OTHERS_LIST_HOME
 )
 public class ListHomeCommand implements ICommandExecutor, IReloadableService.Reloadable {

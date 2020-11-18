@@ -31,7 +31,7 @@ public class ServerListConfig {
 
     @NoMergeIfPresent
     @Setting(value = "whitelist-server-list-messages", comment = "config.serverlist.whitelistmessages")
-    public List<NucleusTextTemplateImpl> whitelist = Lists.newArrayList();
+    public List<NucleusTextTemplateImpl> whitelist = new ArrayList<>();
 
     public boolean isModifyServerList() {
         return this.modifyServerList == ServerListSelection.TRUE;

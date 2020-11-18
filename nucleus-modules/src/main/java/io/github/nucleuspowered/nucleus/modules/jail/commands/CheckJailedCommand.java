@@ -28,12 +28,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-;
-
 @Command(
         aliases = "checkjailed",
         basePermission = JailPermissions.BASE_CHECKJAILED,
-        async = true,
         commandDescriptionKey = "checkjailed"
 )
 public class CheckJailedCommand implements ICommandExecutor {

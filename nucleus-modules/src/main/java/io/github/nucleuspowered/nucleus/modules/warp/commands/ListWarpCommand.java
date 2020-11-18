@@ -16,9 +16,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -41,7 +41,6 @@ import javax.annotation.Nullable;
         aliases = {"list", "#warps"},
         basePermission = WarpPermissions.BASE_WARP_LIST,
         commandDescriptionKey = "warp.list",
-        async = true,
         parentCommand = WarpCommand.class,
         associatedPermissions = WarpPermissions.PERMISSIONS_WARPS
 )
@@ -53,8 +52,8 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
     private boolean isSeparatePerms = true;
     private boolean isCategorise = false;
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
             GenericArguments.flags().flag("u").buildWith(GenericArguments.none())
         };
     }

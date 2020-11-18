@@ -4,70 +4,74 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kit.commands.command;
 
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
 import io.github.nucleuspowered.nucleus.modules.kit.commands.KitCommand;
-import io.github.nucleuspowered.nucleus.modules.kit.parameters.KitParameter;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Command(
         aliases = { "command", "commands" },
         basePermission = KitPermissions.BASE_KIT_COMMAND,
         commandDescriptionKey = "kit.command",
-        async = true,
         parentCommand = KitCommand.class
 )
 public class KitCommandCommand implements ICommandExecutor {
 
-    /*private final String removePermission = Nucleus.getNucleus().getPermissionRegistry()
-            .getPermissionsForNucleusCommand(KitRemoveCommandCommand.class).getBase(); */
-    private final TextComponent removeIcon = Text.of(TextColors.WHITE, "[", TextColors.DARK_RED, "X", TextColors.WHITE, "]");
+    private final Component removeIcon = LinearComponents.linear(
+            Component.text("[", NamedTextColor.WHITE),
+            Component.text("X", NamedTextColor.DARK_RED),
+            Component.text("]", NamedTextColor.WHITE)
+    );
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.getServiceUnchecked(KitService.class).createKitElement(true)
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.getServiceUnchecked(KitService.class).kitParameterWithPermission()
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // List all commands on a kit.
-        final Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
+        final Kit kit = context.requireOne(KitService.KIT_KEY);
         final List<String> commands = kit.getCommands();
 
         if (commands.isEmpty()) {
             context.sendMessage("command.kit.command.nocommands", kit.getName());
         } else {
-            final List<Text> cc = Lists.newArrayList();
+            final List<Component> cc = new ArrayList<>();
             for (int i = 0; i < commands.size(); i++) {
-                TextComponent t = context.getMessage("command.kit.command.commands.entry", i + 1, commands.get(i));
+                Component t = context.getMessage("command.kit.command.commands.entry", i + 1, commands.get(i));
                 if (context.testPermission(KitPermissions.BASE_KIT_COMMAND_REMOVE)) {
-                    t = Text.of(
-                            Text.builder().append(this.removeIcon)
-                                .onClick(TextActions.runCommand("/nucleus:kit command remove " + kit.getName() + " " + commands.get(i)))
-                                .onHover(TextActions.showText(context.getMessage("command.kit.command.removehover"))).build(), " ", t);
+                    t = LinearComponents.linear(
+                            this.removeIcon
+                                    .clickEvent(ClickEvent.runCommand("/nucleus:kit command remove " + kit.getName() + " " + commands.get(i)))
+                                    .hoverEvent(HoverEvent.showText(context.getMessage("command.kit.command.removehover"))),
+                            Component.space(),
+                            t);
                 }
 
                 cc.add(t);
             }
 
-            Util.getPaginationBuilder(context.getCommandSourceRoot())
+            Util.getPaginationBuilder(context.getAudience())
                 .title(context.getMessage("command.kit.command.commands.title", kit.getName()))
                 .contents(cc)
-                .sendTo(context.getCommandSourceRoot());
+                .sendTo(context.getAudience());
         }
 
         return context.successResult();

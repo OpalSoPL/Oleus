@@ -16,8 +16,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
         basePermission = CorePermissions.BASE_NUCLEUS_SAVE,
         commandDescriptionKey = "nucleus.save",
         parentCommand = NucleusCommand.class,
-        async = true
-)
+        )
 public class SaveCommand implements ICommandExecutor {
 
     @Override

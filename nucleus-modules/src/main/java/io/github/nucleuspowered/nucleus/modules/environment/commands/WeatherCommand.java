@@ -20,7 +20,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.server.ServerWorld;

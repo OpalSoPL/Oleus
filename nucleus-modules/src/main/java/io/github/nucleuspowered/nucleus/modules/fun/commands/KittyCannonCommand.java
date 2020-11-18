@@ -44,7 +44,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 // import io.leangen.geantyref.TypeToken;
-;
+
 
 @Command(
         aliases = {"kittycannon", "kc"},

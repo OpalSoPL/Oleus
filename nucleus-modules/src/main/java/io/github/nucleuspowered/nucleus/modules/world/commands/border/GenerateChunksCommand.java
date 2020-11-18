@@ -15,9 +15,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.parameter.BoundedIntege
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.TimespanParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
@@ -37,8 +37,8 @@ public class GenerateChunksCommand implements ICommandExecutor {
     private static final String saveTimeKey = "time between saves";
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 GenericArguments.flags()
                     .flag("a")
                     .flag("r")

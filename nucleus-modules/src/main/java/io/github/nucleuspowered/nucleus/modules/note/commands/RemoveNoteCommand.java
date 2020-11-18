@@ -14,9 +14,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
@@ -25,18 +25,16 @@ import java.util.List;
 @Command(
         aliases = {"removenote", "deletenote", "delnote"},
         basePermission = NotePermissions.BASE_REMOVENOTE,
-        commandDescriptionKey = "removenote",
-        async = true
-)
+        commandDescriptionKey = "removenote")
 public class RemoveNoteCommand implements ICommandExecutor {
 
     private final String noteKey = "note";
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         final NoteHandler handler = serviceCollection.getServiceUnchecked(NoteHandler.class);
         final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
-        return new CommandElement[] {
+        return new Parameter[] {
                 GenericArguments.onlyOne(new NoteArgument(Text.of(this.noteKey), handler, messageProviderService))
         };
     }

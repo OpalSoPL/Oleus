@@ -22,9 +22,7 @@ import java.util.Optional;
 @Command(
         aliases = {"lockweather", "killweather" },
         basePermission = EnvironmentPermissions.BASE_LOCKWEATHER,
-        commandDescriptionKey = "lockweather",
-        async = true
-)
+        commandDescriptionKey = "lockweather")
 public class LockWeatherCommand implements ICommandExecutor {
 
     @Override

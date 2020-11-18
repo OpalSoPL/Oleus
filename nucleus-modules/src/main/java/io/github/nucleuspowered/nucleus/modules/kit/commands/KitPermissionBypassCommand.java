@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.kit.commands;
 
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
-import io.github.nucleuspowered.nucleus.modules.kit.parameters.KitParameter;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -14,12 +13,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+
 @Command(
         aliases = { "permissionbypass" },
-        async = true,
         basePermission = KitPermissions.BASE_KIT_PERMISSIONBYPASS,
         commandDescriptionKey = "kit.permissionbypass",
         parentCommand = KitCommand.class
@@ -27,16 +25,16 @@ import org.spongepowered.api.command.args.CommandElement;
 public class KitPermissionBypassCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false),
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.getServiceUnchecked(KitService.class).kitParameterWithoutPermission(),
                 NucleusParameters.ONE_TRUE_FALSE
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        final boolean b = context.requireOne(NucleusParameters.Keys.BOOL, Boolean.class);
+        final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
+        final boolean b = context.requireOne(NucleusParameters.ONE_TRUE_FALSE);
 
         // This Kit is a reference back to the version in list, so we don't need
         // to update it explicitly

@@ -10,13 +10,12 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
 @Command(
         aliases = { "del", "rm" },
         basePermission = SpawnPermissions.BASE_SETFIRSTSPAWN_DEL,
         commandDescriptionKey = "setfirstspawn.del",
-        async = true,
         parentCommand = SetFirstSpawnCommand.class
 )
 public class RemoveFirstSpawnCommand implements ICommandExecutor {

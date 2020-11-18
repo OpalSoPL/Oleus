@@ -22,7 +22,6 @@ import org.spongepowered.api.entity.living.player.User;
         aliases = {"freezeplayer", "freeze"},
         basePermission = FreezePlayerPermissions.BASE_FREEZEPLAYER,
         commandDescriptionKey = "freezeplayer",
-        async = true,
         modifiers = {
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = FreezePlayerPermissions.EXEMPT_COOLDOWN_FREEZEPLAYER),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission =  FreezePlayerPermissions.EXEMPT_WARMUP_FREEZEPLAYER),

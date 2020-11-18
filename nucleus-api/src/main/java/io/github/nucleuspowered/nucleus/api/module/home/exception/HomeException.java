@@ -55,7 +55,7 @@ public final class HomeException extends ComponentMessageException {
         /**
          * An unknown error occurred.
          */
-        UNKNOWN;
+        UNKNOWN
     }
 
 }

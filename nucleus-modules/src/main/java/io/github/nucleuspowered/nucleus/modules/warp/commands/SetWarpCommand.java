@@ -18,8 +18,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
@@ -55,8 +55,8 @@ public class SetWarpCommand implements ICommandExecutor {
     private final String overwriteKey = "overwrite";
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 GenericArguments.flags().valueFlag(
                         serviceCollection.commandElementSupplier().createPermissionParameter(
                                 GenericArguments.markTrue(Text.of(this.overwriteKey)),

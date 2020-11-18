@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -42,7 +43,7 @@ public interface NucleusKitService {
      * @param player The player
      * @return The items.
      */
-    Collection<ItemStack> getItemsForPlayer(Kit kit, Player player);
+    Collection<ItemStack> getItemsForPlayer(Kit kit, UUID player);
 
     /**
      * Returns whether the given {@link Kit} has previously been
@@ -55,7 +56,7 @@ public interface NucleusKitService {
      * @param player The {@link User}
      * @return Whether the kit has been redeemed before.
      */
-    CompletableFuture<Boolean> hasPreviouslyRedeemed(Kit kit, User player);
+    CompletableFuture<Boolean> hasPreviouslyRedeemed(Kit kit, UUID player);
 
     /**
      * Gets whether a {@link Player} can redeem the given {@link Kit}
@@ -65,7 +66,7 @@ public interface NucleusKitService {
      * @param player The {@link User}
      * @return true if so
      */
-    CompletableFuture<Boolean> isRedeemable(Kit kit, User player);
+    CompletableFuture<Boolean> isRedeemable(Kit kit, UUID player);
 
     /**
      * If a {@link Player} is unable to redeem the given {@link Kit} as
@@ -78,7 +79,7 @@ public interface NucleusKitService {
      * @return The {@link Instant} the cooldown expires, if there is a
      *          cooldown in effect.
      */
-    CompletableFuture<Optional<Instant>> getCooldownExpiry(Kit kit, User player);
+    CompletableFuture<Optional<Instant>> getCooldownExpiry(Kit kit, UUID player);
 
     /**
      * Redeems a kit on a player. Whether the player must get all items is controlled
@@ -89,7 +90,7 @@ public interface NucleusKitService {
      * @param performChecks Whether to perform standard permission and cooldown checks
      * @return The {@link KitRedeemResult}
      */
-    KitRedeemResult redeemKit(Kit kit, Player player, boolean performChecks);
+    KitRedeemResult redeemKit(Kit kit, UUID player, boolean performChecks);
 
     /**
      * Redeems a kit on a player.
@@ -100,7 +101,7 @@ public interface NucleusKitService {
      * @param mustRedeemAll Whether all items must be redeemed to count as a success
      * @return The {@link KitRedeemResult}
      */
-    KitRedeemResult redeemKit(Kit kit, Player player, boolean performChecks, boolean mustRedeemAll);
+    KitRedeemResult redeemKit(Kit kit, UUID player, boolean performChecks, boolean mustRedeemAll);
 
     /**
      * Removes the requested kit.

@@ -115,7 +115,7 @@ public class SanityTests {
     public void testThatAnyServicesHaveANoArgsOrInjectableCtor() throws IOException {
         Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
                 .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");
-        List<Class<?>> fails = Lists.newArrayList();
+        List<Class<?>> fails = new ArrayList<>();
         ci.stream().map(ClassPath.ClassInfo::load)
                 .filter(ServiceBase.class::isAssignableFrom)
                 .map(x -> (Class<? extends ServiceBase>)x)

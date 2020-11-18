@@ -66,7 +66,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
     private Pattern pattern;
     private int min = 3;
     private int max = 16;
-    private final List<UUID> cached = Lists.newArrayList();
+    private final List<UUID> cached = new ArrayList<>();
     private final BiMap<UUID, String> cache = HashBiMap.create();
     private final BiMap<UUID, TextComponent> textCache = HashBiMap.create();
     private final TreeMap<String, UUID> reverseLowerCaseCache = new TreeMap<>();

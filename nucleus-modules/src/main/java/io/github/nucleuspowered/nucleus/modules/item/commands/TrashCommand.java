@@ -17,8 +17,6 @@ import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
-;
-
 @Command(
         aliases = {"trash"},
         basePermission = ItemPermissions.BASE_TRASH,

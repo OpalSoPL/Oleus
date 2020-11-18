@@ -24,6 +24,7 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -58,12 +59,12 @@ public final class TextFileController {
     /**
      * Holds the file information.
      */
-    private final List<String> fileContents = Lists.newArrayList();
+    private final List<String> fileContents = new ArrayList<>();
 
     /**
      * Holds the {@link NucleusTextTemplateImpl} information.
      */
-    private final List<NucleusTextTemplateImpl> textTemplates = Lists.newArrayList();
+    private final List<NucleusTextTemplateImpl> textTemplates = new ArrayList<>();
     private final boolean getTitle;
     private final INucleusTextTemplateFactory textTemplateFactory;
 
@@ -97,7 +98,7 @@ public final class TextFileController {
             this.asset.copyToFile(this.fileLocation);
         }
 
-        final List<String> fileContents = Lists.newArrayList();
+        final List<String> fileContents = new ArrayList<>();
 
         // Load the file into the list.
         MalformedInputException exception = null;

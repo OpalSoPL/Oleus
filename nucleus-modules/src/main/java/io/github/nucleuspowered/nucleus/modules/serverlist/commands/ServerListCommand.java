@@ -15,21 +15,21 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import java.util.List;
 
-@Command(aliases = {"serverlist", "sl"}, basePermission = ServerListPermissions.BASE_SERVERLIST, commandDescriptionKey = "serverlist", async = true)
+@Command(aliases = {"serverlist", "sl"}, basePermission = ServerListPermissions.BASE_SERVERLIST, commandDescriptionKey = "serverlist", )
 public class ServerListCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private ServerListConfig slc = new ServerListConfig();
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 GenericArguments.flags()
                     .flag("m", "-messages")
                     .flag("w", "-whitelist")
@@ -95,7 +95,7 @@ public class ServerListCommand implements ICommandExecutor, IReloadableService.R
         }
 
         final CommandSource source = context.getCommandSourceRoot();
-        final List<Text> m = Lists.newArrayList();
+        final List<Text> m = new ArrayList<>();
         messages.stream().map(x -> x.getForObject(source)).forEach(x -> {
             if (!m.isEmpty()) {
                 m.add(Util.SPACE);

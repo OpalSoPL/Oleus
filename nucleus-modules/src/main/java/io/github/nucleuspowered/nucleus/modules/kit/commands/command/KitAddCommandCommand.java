@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.kit.commands.command;
 
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
-import io.github.nucleuspowered.nucleus.modules.kit.parameters.KitParameter;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -14,29 +13,28 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+
 @Command(
         aliases = { "add", "+" },
         basePermission = KitPermissions.BASE_KIT_COMMAND_ADD,
         commandDescriptionKey = "kit.command.add",
-        async = true,
         parentCommand = KitCommandCommand.class
 )
 public class KitAddCommandCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false),
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.getServiceUnchecked(KitService.class).kitParameterWithoutPermission(),
                 NucleusParameters.COMMAND
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        final String c = context.requireOne(NucleusParameters.Keys.COMMAND, String.class)
+        final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
+        final String c = context.requireOne(NucleusParameters.COMMAND)
                 .replace(" {player} ", " {{player}} ");
         kitInfo.addCommand(c);
         context.getServiceCollection().getServiceUnchecked(KitService.class).saveKit(kitInfo);

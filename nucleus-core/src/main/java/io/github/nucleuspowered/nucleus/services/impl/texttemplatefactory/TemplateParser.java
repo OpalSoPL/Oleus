@@ -26,6 +26,7 @@ import org.spongepowered.api.util.Nameable;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,7 +73,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
     @Override
     public NucleusTextTemplateImpl createFromAmpersandString(final String string, final Component prefix, final Component suffix) {
         final Matcher mat = pattern.matcher(string);
-        final List<String> map = Lists.newArrayList();
+        final List<String> map = new ArrayList<>();
 
         final List<String> s = Lists.newArrayList(pattern.split(string));
         int index = 0;

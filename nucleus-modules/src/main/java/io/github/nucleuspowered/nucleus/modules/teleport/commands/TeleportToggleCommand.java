@@ -14,22 +14,21 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
 @EssentialsEquivalent("tptoggle")
 @Command(
         aliases = "tptoggle",
         basePermission = TeleportPermissions.BASE_TPTOGGLE,
         commandDescriptionKey = "tptoggle",
-        async = true,
         associatedPermissions = TeleportPermissions.TPTOGGLE_EXEMPT
 )
 public class TeleportToggleCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection service) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection service) {
+        return new Parameter[] {
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }

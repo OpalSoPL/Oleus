@@ -23,8 +23,6 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.Optional;
 
-;
-
 @Command(aliases = {"exp", "experience", "xp"},
         basePermission = ExperiencePermissions.BASE_EXP,
         commandDescriptionKey = "exp")

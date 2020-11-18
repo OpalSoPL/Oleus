@@ -21,8 +21,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-;
-
 abstract class LoreModifyBaseCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> loreLine =

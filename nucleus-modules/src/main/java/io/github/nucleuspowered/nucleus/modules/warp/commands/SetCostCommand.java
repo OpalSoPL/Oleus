@@ -14,16 +14,15 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 @Command(
         aliases = {"cost", "setcost"},
         basePermission = WarpPermissions.BASE_WARP_COST,
         commandDescriptionKey = "warp.cost",
-        async = true,
         parentCommand = WarpCommand.class
 )
 public class SetCostCommand implements ICommandExecutor, IReloadableService.Reloadable {
@@ -32,8 +31,8 @@ public class SetCostCommand implements ICommandExecutor, IReloadableService.Relo
     private double defaultCost = 0;
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpElement(false),
                 GenericArguments.onlyOne(new PositiveDoubleArgument(Text.of(this.costKey), serviceCollection))
         };

@@ -73,7 +73,7 @@ public class ListConfig {
 
         @NoMergeIfPresent
         @Setting(value = "group-order", comment = "config.playerinfo.list.grouporder")
-        private List<String> groupPriority = Lists.newArrayList();
+        private List<String> groupPriority = new ArrayList<>();
 
         @Setting(value = "default-group-name", comment = "config.playerinfo.list.defaultname")
         private String defaultGroupName = "Default";

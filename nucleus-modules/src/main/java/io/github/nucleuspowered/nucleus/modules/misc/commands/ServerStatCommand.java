@@ -15,9 +15,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
@@ -41,8 +41,8 @@ public class ServerStatCommand implements ICommandExecutor {
     private static final DecimalFormat TPS_FORMAT = new DecimalFormat("#0.00");
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 GenericArguments.flags().flag("c", "s", "-compact", "-summary").buildWith(GenericArguments.none())
         };
     }
@@ -50,7 +50,7 @@ public class ServerStatCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Duration uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime());
 
-        final List<Text> messages = Lists.newArrayList();
+        final List<Text> messages = new ArrayList<>();
 
         messages.add(context.getMessage("command.serverstat.tps", getTPS(Sponge.getServer().getTicksPerSecond())));
 

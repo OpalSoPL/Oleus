@@ -16,6 +16,7 @@ import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -94,7 +95,7 @@ public class ConfigFileMessagesRepository extends AbstractMessageRepository impl
 
     public List<String> walkThroughForMismatched() {
         final Matcher keyMatcher = KEYS.matcher("");
-        final List<String> keysToFix = Lists.newArrayList();
+        final List<String> keysToFix = new ArrayList<>();
         final PropertiesMessageRepository propertiesMessageRepository = this.messageRepositorySupplier.get();
         propertiesMessageRepository.getKeys().forEach(x -> {
             final String resKey = propertiesMessageRepository.getEntry(x);

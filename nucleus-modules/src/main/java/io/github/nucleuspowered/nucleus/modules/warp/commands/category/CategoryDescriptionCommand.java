@@ -13,9 +13,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 @Command(
@@ -26,8 +26,8 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 )
 public class CategoryDescriptionCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpCategoryElement(),
                 NucleusParameters.DESCRIPTION
         };

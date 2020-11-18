@@ -23,7 +23,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -42,7 +42,6 @@ import java.util.stream.Collectors;
 
 @EssentialsEquivalent({"list", "who", "playerlist", "online", "plist"})
 @Command(
-        async = true,
         aliases = {"list", "listplayers", "ls"},
         basePermission = PlayerInfoPermissions.BASE_LIST,
         commandDescriptionKey = "list",
@@ -91,7 +90,7 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
 
     private List<Text> listByPermissionGroup(final ICommandContext context, final boolean showVanished) {
         // Messages
-        final List<Text> messages = Lists.newArrayList();
+        final List<Text> messages = new ArrayList<>();
 
         final String defName = this.listConfig.getDefaultGroupName();
         final Map<String, List<Player>> groupToPlayer = playerList(

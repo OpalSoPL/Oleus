@@ -14,8 +14,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
 @Command(
         aliases = {"toggleviewstaffchat", "vsc", "togglevsc"},
@@ -25,8 +25,8 @@ import org.spongepowered.api.entity.living.player.Player;
 public class ToggleStaffChatCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }

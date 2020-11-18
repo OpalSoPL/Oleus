@@ -20,7 +20,6 @@ import org.spongepowered.api.entity.living.player.User;
         basePermission = HomePermissions.BASE_HOME_LIMIT,
         commandDescriptionKey = "home.limit",
         parentCommand = HomeCommand.class,
-        async = true,
         associatedPermissions = HomePermissions.OTHERS_LIMIT
 )
 public class HomeLimitCommand implements ICommandExecutor {

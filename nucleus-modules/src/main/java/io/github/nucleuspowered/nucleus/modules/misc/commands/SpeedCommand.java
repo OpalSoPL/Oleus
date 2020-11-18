@@ -15,9 +15,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
@@ -60,7 +60,7 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
     private int maxSpeed = 5;
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         final Map<String, SpeedType> keysMap = new HashMap<>();
         keysMap.put("fly", SpeedType.FLYING);
         keysMap.put("flying", SpeedType.FLYING);
@@ -69,7 +69,7 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
         keysMap.put("walk", SpeedType.WALKING);
         keysMap.put("w", SpeedType.WALKING);
 
-        return new CommandElement[] {
+        return new Parameter[] {
                 serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, MiscPermissions.OTHERS_SPEED),
                 GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.choices(Text.of(this.typeKey), keysMap, true))),
                 GenericArguments.optional(

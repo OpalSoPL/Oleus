@@ -115,7 +115,7 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
 
         // Set it to subject skull type and set the owner to the specified subject
         if (skullStack.offer(Keys.GAME_PROFILE, user.getProfile()).isSuccessful()) {
-            final List<ItemStack> itemStackList = Lists.newArrayList();
+            final List<ItemStack> itemStackList = new ArrayList<>();
 
             // If there were stacks, create as many as needed.
             if (fullStacks > 0) {

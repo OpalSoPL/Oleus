@@ -14,9 +14,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.world.Location;
@@ -35,8 +35,8 @@ import org.spongepowered.api.world.World;
 )
 public class GetPosCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(false, PlayerInfoPermissions.GETPOS_OTHERS)
         };
     }

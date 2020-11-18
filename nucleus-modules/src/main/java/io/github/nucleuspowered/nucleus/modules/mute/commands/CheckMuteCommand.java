@@ -14,9 +14,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -24,14 +24,14 @@ import org.spongepowered.api.text.Text;
 import java.time.Instant;
 import java.util.Optional;
 
-@Command(async = true, aliases = "checkmute", basePermission = MutePermissions.BASE_CHECKMUTE, commandDescriptionKey = "checkmute")
+@Command( aliases = "checkmute", basePermission = MutePermissions.BASE_CHECKMUTE, commandDescriptionKey = "checkmute")
 public class CheckMuteCommand implements ICommandExecutor {
 
     private final String playerKey = "user/UUID";
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
             GenericArguments.firstParsing(
                 GenericArguments.user(Text.of(this.playerKey)),
                     new UUIDArgument<>(Text.of(this.playerKey), u -> Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(u),

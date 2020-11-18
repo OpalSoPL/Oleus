@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kit.commands;
 
-import com.google.common.collect.Lists;
+import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitKeys;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
@@ -14,27 +14,26 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Nullable;
-
 @Command(
         aliases = { "list", "ls", "#kits" },
-        async = true,
         basePermission = KitPermissions.BASE_KIT_LIST,
         commandDescriptionKey = "kit.list",
         parentCommand = KitCommand.class,
@@ -42,15 +41,16 @@ import javax.annotation.Nullable;
 )
 public class KitListCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
         final Set<String> kits = service.getKitNames();
         if (kits.isEmpty()) {
             return context.errorResult("command.kit.list.empty");
         }
 
-        final PaginationService paginationService = Sponge.getServiceManager().provideUnchecked(PaginationService.class);
-        final ArrayList<Text> kitTextComponent = Lists.newArrayList();
+        final PaginationList.Builder paginationService = Util.getPaginationBuilder(context.getAudience());
+        final ArrayList<Component> kitText = new ArrayList<>();
 
         final Map<String, Instant> redeemed =
                 context.is(Player.class) ? context.getServiceCollection()
@@ -62,27 +62,27 @@ public class KitListCommand implements ICommandExecutor {
         final boolean showHidden = context.testPermission(KitPermissions.KIT_SHOWHIDDEN);
         service.getKitNames(showHidden).stream()
                 .filter(kit -> context.testPermission(KitPermissions.getKitPermission(kit.toLowerCase())))
-                .forEach(kit -> kitText.add(createKit(context, redeemed, kit, service.getKit(kit).get())));
+                .forEach(kit -> kitText.add(this.createKit(context, redeemed, kit, service.getKit(kit).get())));
 
-        final PaginationList.Builder paginationBuilder = paginationService.builder().contents(kitText)
+        final PaginationList.Builder paginationBuilder = paginationService.contents(kitText)
                 .title(context.getMessage("command.kit.list.kits"))
-                .padding(Text.of(TextColors.GREEN, "-"));
-        paginationBuilder.sendTo(context.getCommandSourceRoot());
+                .padding(Component.text("-", NamedTextColor.GREEN));
+        paginationBuilder.sendTo(context.getAudience());
 
         return context.successResult();
     }
 
-    private TextComponent createKit(final ICommandContext context, @Nullable final Map<String, Instant> user, final String kitName, final Kit kitObj) {
-        final Text.Builder tb = Text.builder(kitName);
+    private Component createKit(final ICommandContext context, @Nullable final Map<String, Instant> user, final String kitName, final Kit kitObj) {
+        final TextComponent.Builder tb = Component.text().content(kitName);
 
         if (user != null) {
             final Instant lastRedeem = user.get(kitName.toLowerCase());
             if (lastRedeem != null) {
                 // If one time used...
                 if (kitObj.isOneTime() && !context.testPermission(KitPermissions.KIT_EXEMPT_ONETIME)) {
-                    return tb.color(TextColors.RED)
-                            .onHover(TextActions.showText(context.getMessage("command.kit.list.onetime", kitName)))
-                            .style(TextStyles.STRIKETHROUGH).build();
+                    return tb.color(NamedTextColor.RED)
+                            .hoverEvent(HoverEvent.showText(context.getMessage("command.kit.list.onetime", kitName)))
+                            .style(Style.style(TextDecoration.STRIKETHROUGH)).build();
                 }
 
                 // If an intervalOld is used...
@@ -94,22 +94,21 @@ public class KitListCommand implements ICommandExecutor {
                     if (next.isAfter(Instant.now())) {
                         // Get the time to next usage.
                         final String time = context.getTimeString(Duration.between(Instant.now(), next));
-                        return tb.color(TextColors.RED)
-                                .onHover(TextActions.showText(context.getMessage("command.kit.list.interval", kitName, time)))
-                                .style(TextStyles.STRIKETHROUGH).build();
+                        return tb.color(NamedTextColor.RED)
+                                .hoverEvent(HoverEvent.showText(context.getMessage("command.kit.list.interval", kitName, time)))
+                                .style(Style.style(TextDecoration.STRIKETHROUGH)).build();
                     }
                 }
             }
         }
 
         // Can use.
-        Text.Builder builder = tb.color(TextColors.AQUA).onClick(TextActions.runCommand("/kit \"" + kitName + "\""))
-                .onHover(TextActions.showText(context.getMessage("command.kit.list.text", kitName)))
-                .style(TextStyles.ITALIC);
+        final TextComponent.Builder builder = tb.color(NamedTextColor.AQUA).clickEvent(ClickEvent.runCommand("/kit \"" + kitName + "\""))
+                .hoverEvent(HoverEvent.showText(context.getMessage("command.kit.list.text", kitName)))
+                .style(Style.style(TextDecoration.ITALIC));
         final IEconomyServiceProvider economyServiceProvider = context.getServiceCollection().economyServiceProvider();
         if (kitObj.getCost() > 0 && economyServiceProvider.serviceExists() && !context.testPermission(KitPermissions.KIT_EXEMPT_COST)) {
-            builder = Text.builder().append(builder.build())
-                .append(context.getMessage("command.kit.list.cost", economyServiceProvider.getCurrencySymbol(kitObj.getCost())));
+            builder.append(context.getMessage("command.kit.list.cost", economyServiceProvider.getCurrencySymbol(kitObj.getCost())));
         }
 
         return builder.build();

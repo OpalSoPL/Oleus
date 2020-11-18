@@ -7,34 +7,32 @@ package io.github.nucleuspowered.nucleus.modules.kit.commands.command;
 import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
-import io.github.nucleuspowered.nucleus.modules.kit.parameters.KitParameter;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+
 @Command(
         aliases = { "clear" },
         basePermission = KitPermissions.BASE_KIT_COMMAND_REMOVE,
         commandDescriptionKey = "kit.command.clear",
-        async = true,
         parentCommand = KitCommandCommand.class
 )
 public class KitClearCommandCommand implements ICommandExecutor {
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false)
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                serviceCollection.getServiceUnchecked(KitService.class).kitParameterWithoutPermission()
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        kitInfo.setCommands(Lists.newArrayList());
+        final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
+        kitInfo.setCommands(new ArrayList<>());
         context.getServiceCollection().getServiceUnchecked(KitService.class).saveKit(kitInfo);
 
         context.sendMessage("command.kit.command.clear.command", kitInfo.getName());

@@ -80,13 +80,6 @@ public @interface Command {
     String commandDescriptionKey();
 
     /**
-     * Determines whether to run the command async
-     *
-     * @return true if so
-     */
-    boolean async() default false;
-
-    /**
      * For documentation purposes: documents other permissions that might be
      * associated with this command.
      */

@@ -13,9 +13,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.parameter.BoundedIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 import java.time.Instant;
@@ -26,15 +26,14 @@ import java.util.Optional;
         aliases = { "message", "m" },
         basePermission = ServerListPermissions.BASE_SERVERLIST_MESSAGE,
         commandDescriptionKey = "serverlist.message",
-        async = true,
         parentCommand = ServerListCommand.class
 )
 public class TemporaryMessageCommand implements ICommandExecutor {
 
     private final String line = "line";
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
             GenericArguments.flags()
                 .flag("r", "-remove")
                 .valueFlag(new BoundedIntegerArgument(Text.of(this.line), 1, 2, serviceCollection),"l", "-line")

@@ -33,9 +33,7 @@ import java.util.stream.Collectors;
 @Command(
         aliases = { "jails" },
         basePermission = JailPermissions.BASE_JAILS_LIST,
-        commandDescriptionKey = "jails",
-        async = true
-)
+        commandDescriptionKey = "jails")
 public class JailsCommand implements ICommandExecutor {
 
     @Override

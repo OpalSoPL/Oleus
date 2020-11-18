@@ -10,15 +10,13 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 
 @Command(
         aliases = { "clear" },
         basePermission = MailPermissions.BASE_MAIL,
         commandDescriptionKey = "mail.clear",
-        parentCommand = MailCommand.class,
-        async = true
-)
+        parentCommand = MailCommand.class)
 public class ClearMailCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {

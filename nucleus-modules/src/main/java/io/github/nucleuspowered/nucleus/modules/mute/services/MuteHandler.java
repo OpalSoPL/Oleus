@@ -51,7 +51,7 @@ public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteServi
     private final Context mutedContext = new Context(NucleusMuteService.MUTED_CONTEXT, "true");
 
     private boolean globalMuteEnabled = false;
-    private final List<UUID> voicedUsers = Lists.newArrayList();
+    private final List<UUID> voicedUsers = new ArrayList<>();
 
     @Inject
     public MuteHandler(final INucleusServiceCollection serviceCollection) {

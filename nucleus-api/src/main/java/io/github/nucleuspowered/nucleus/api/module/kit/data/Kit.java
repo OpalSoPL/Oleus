@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Represents a kit in Nucleus.
@@ -54,7 +55,7 @@ public interface Kit {
      */
     @Deprecated
     default Duration getInterval() {
-        return getCooldown().orElse(Duration.ZERO);
+        return this.getCooldown().orElse(Duration.ZERO);
     }
 
     /**
@@ -72,8 +73,8 @@ public interface Kit {
      * @deprecated Use {@link #setCooldown(Duration)} instead.
      */
     @Deprecated
-    default Kit setInterval(Duration interval) {
-        return setCooldown(interval);
+    default Kit setInterval(final Duration interval) {
+        return this.setCooldown(interval);
     }
 
     /**
@@ -150,10 +151,10 @@ public interface Kit {
      * @param command The command to add.
      * @return This {@link Kit} for chaining.
      */
-    default Kit addCommand(String command) {
-        List<String> commands = getCommands();
+    default Kit addCommand(final String command) {
+        final List<String> commands = this.getCommands();
         commands.add(command);
-        return setCommands(commands);
+        return this.setCommands(commands);
     }
 
     /**
@@ -175,25 +176,25 @@ public interface Kit {
     /**
      * Obtains a collection of items that a player would obtain when redeeming the kit.
      *
-     * @see NucleusKitService#getItemsForPlayer(Kit, Player)
+     * @see NucleusKitService#getItemsForPlayer(Kit, UUID)
      *
-     * @param player The player
+     * @param uuid The {@link UUID} of the player
      * @return The items
      */
-    default Collection<ItemStack> getItemsForPlayer(Player player) {
-        return NucleusAPI.getKitService().orElseThrow(() -> new IllegalStateException("No Kit module")).getItemsForPlayer(this, player);
+    default Collection<ItemStack> getItemsForPlayer(final UUID uuid) {
+        return NucleusAPI.getKitService().orElseThrow(() -> new IllegalStateException("No Kit module")).getItemsForPlayer(this, uuid);
     }
 
     /**
      * Attempts to redeem this kit, saving it beforehand.
      *
-     * @param player The player to redeem the kit for
+     * @param uuid The {@link UUID} of the player to redeem the kit for
      * @return The result
      */
-    default KitRedeemResult redeem(Player player) {
-        save();
-        NucleusKitService kitService = NucleusAPI.getKitService().orElseThrow(() -> new IllegalStateException("No Kit module"));
-        return kitService.redeemKit(this, player, true);
+    default KitRedeemResult redeem(final UUID uuid) {
+        this.save();
+        final NucleusKitService kitService = NucleusAPI.getKitService().orElseThrow(() -> new IllegalStateException("No Kit module"));
+        return kitService.redeemKit(this, uuid, true);
     }
 
     /**

@@ -8,78 +8,68 @@ import com.google.common.collect.ImmutableList;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
+import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.ArgumentParseException;
-import org.spongepowered.api.command.args.CommandArgs;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.ValueParameter;
+import org.spongepowered.api.service.permission.Subject;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+public final class KitParameter implements ValueParameter<Kit> {
 
-public class KitParameter extends CommandElement {
-
-    public final static String KIT_PARAMETER_KEY = "kit";
     private final KitService kitService;
     private final IPermissionService permissionService;
     private final IMessageProviderService messageProviderService;
     private boolean permissionCheck;
 
-    public KitParameter(final KitService handler,
-            final IMessageProviderService messageProviderService,
-            final IPermissionService permissionService,
-            final boolean permissionCheck) {
-        super(Text.of(KIT_PARAMETER_KEY));
-        this.kitService = handler;
-        this.messageProviderService = messageProviderService;
+    public KitParameter(final INucleusServiceCollection serviceCollection, final boolean permissionCheck) {
+        this.kitService = serviceCollection.getServiceUnchecked(KitService.class);
+        this.messageProviderService = serviceCollection.messageProvider();
+        this.permissionService = serviceCollection.permissionService();
         this.permissionCheck = permissionCheck;
-        this.permissionService = permissionService;
     }
 
-    @Nullable
     @Override
-    protected Object parseValue(@NonNull final CommandSource source, final CommandArgs args) throws ArgumentParseException {
-        final String kitName = args.next();
+    public List<String> complete(final CommandContext context, final String currentInput) {
+        final boolean showhidden = this.permissionService.hasPermission(context, KitPermissions.KIT_SHOWHIDDEN);
+        return this.kitService.getKitNames().stream()
+                .filter(s -> s.toLowerCase().startsWith(currentInput.toLowerCase()))
+                .limit(20)
+                .map(x -> this.kitService.getKit(x).get())
+                .filter(x -> this.checkPermission(context, x))
+                .filter(x -> this.permissionCheck && (showhidden || !x.isHiddenFromList()))
+                .map(x -> x.getName().toLowerCase())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<? extends Kit> getValue(final Parameter.Key<? super Kit> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
+            throws ArgumentParseException {
+        final String kitName = reader.parseString();
         if (kitName.isEmpty()) {
-            throw args.createError(this.messageProviderService.getMessageFor(source, "args.kit.noname"));
+            throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "args.kit.noname"));
         }
 
         final Kit kit = this.kitService.getKit(kitName)
-                .orElseThrow(() -> args.createError(this.messageProviderService.getMessageFor(source,"args.kit.noexist")));
+                .orElseThrow(() -> reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(),"args.kit.noexist")));
 
-        if (!checkPermission(source, kit)) {
-            throw args.createError(this.messageProviderService.getMessageFor(source,"args.kit.noperms"));
+        if (!this.checkPermission(context.getCause(), kit)) {
+            throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(),"args.kit.noperms"));
         }
 
-        return kit;
+        return Optional.of(kit);
     }
 
-    @Override
-    @NonNull
-    public List<String> complete(@NonNull final CommandSource src, final CommandArgs args, @NonNull final CommandContext context) {
-        try {
-            final boolean showhidden = this.permissionService.hasPermission(src, KitPermissions.KIT_SHOWHIDDEN);
-            final String name = args.peek().toLowerCase();
-            return this.kitService.getKitNames().stream()
-                    .filter(s -> s.toLowerCase().startsWith(name))
-                    .limit(20)
-                    .map(x -> this.kitService.getKit(x).get())
-                    .filter(x -> checkPermission(src, x))
-                    .filter(x -> this.permissionCheck && (showhidden || !x.isHiddenFromList()))
-                    .map(x -> x.getName().toLowerCase())
-                    .collect(Collectors.toList());
-        } catch (final ArgumentParseException e) {
-            return ImmutableList.of();
-        }
-    }
-
-    private boolean checkPermission(final CommandSource src, final Kit kit) {
+    private boolean checkPermission(final Subject src, final Kit kit) {
         if (!this.permissionCheck) {
             return true;
         }
@@ -87,5 +77,4 @@ public class KitParameter extends CommandElement {
         // No permissions, no entry!
         return this.permissionService.hasPermission(src, KitPermissions.getKitPermission(kit.getName()));
     }
-
 }

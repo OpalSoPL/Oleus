@@ -16,6 +16,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -28,7 +29,7 @@ public abstract class AbstractLoggingHandler implements IReloadableService.Reloa
     private final IMessageProviderService messageProviderService;
     private final Logger slogger;
     protected DateRotatableFileLogger logger;
-    private final List<String> queueEntry = Lists.newArrayList();
+    private final List<String> queueEntry = new ArrayList<>();
     private final String directoryName;
     private final String filePrefix;
     private final Object locking = new Object();

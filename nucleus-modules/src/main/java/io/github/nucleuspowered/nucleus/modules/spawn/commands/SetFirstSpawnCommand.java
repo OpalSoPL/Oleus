@@ -11,14 +11,12 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
 @Command(
         aliases = { "setfirstspawn" },
         basePermission = SpawnPermissions.BASE_SETFIRSTSPAWN,
-        commandDescriptionKey = "setfirstspawn",
-        async = true
-)
+        commandDescriptionKey = "setfirstspawn")
 public class SetFirstSpawnCommand implements ICommandExecutor {
 
     @Override

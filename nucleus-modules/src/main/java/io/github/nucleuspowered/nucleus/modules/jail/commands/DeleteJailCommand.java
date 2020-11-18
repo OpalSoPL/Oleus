@@ -18,13 +18,10 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 
-;
-
 @EssentialsEquivalent({"deljail", "remjail", "rmjail"})
 @Command(
         aliases = {"delete", "del", "remove", "#deljail", "#rmjail", "#deletejail" },
         basePermission = JailPermissions.BASE_JAILS_DELETE,
-        async = true,
         commandDescriptionKey = "jails.delete",
         parentCommand = JailsCommand.class
 )

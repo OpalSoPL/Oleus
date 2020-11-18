@@ -15,9 +15,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -33,8 +33,8 @@ import java.util.List;
 public class BorderCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection)
         };
     }
@@ -42,7 +42,7 @@ public class BorderCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
-        final List<Text> worldBorderInfo = Lists.newArrayList();
+        final List<Text> worldBorderInfo = new ArrayList<>();
 
         final Vector3d centre = wp.getWorldBorderCenter();
         final int currentDiameter = (int)wp.getWorldBorderDiameter();

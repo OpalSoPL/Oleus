@@ -19,8 +19,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICooldownService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
@@ -60,8 +60,8 @@ import java.util.function.Consumer;
 public class TeleportAskHereCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
             GenericArguments.flags()
                     .permissionFlag(TeleportPermissions.TELEPORT_HERE_FORCE, "f")
                     .buildWith(NucleusParameters.ONE_PLAYER.get(serviceCollection))

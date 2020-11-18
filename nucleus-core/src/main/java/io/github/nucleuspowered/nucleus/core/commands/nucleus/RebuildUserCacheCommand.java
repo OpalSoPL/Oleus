@@ -15,8 +15,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
         aliases = "rebuildusercache",
         basePermission = CorePermissions.BASE_NUCLEUS_REBUILDUSERCACHE,
         commandDescriptionKey = "nucleus.rebuildusercache",
-        parentCommand = NucleusCommand.class,
-        async = true
+        parentCommand = NucleusCommand.class
 )
 public class RebuildUserCacheCommand implements ICommandExecutor {
 

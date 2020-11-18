@@ -23,9 +23,9 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerInformationSe
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
 import io.github.nucleuspowered.nucleus.util.functional.TriFunction;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -57,7 +57,6 @@ import javax.annotation.Nullable;
         aliases = {"seen", "seenplayer", "lookup"},
         basePermission = PlayerInfoPermissions.BASE_SEEN,
         commandDescriptionKey = "seen",
-        async = true,
         associatedPermissions = {
             PlayerInfoPermissions.SEEN_EXTENDEDPERMS_UUID,
             PlayerInfoPermissions.SEEN_EXTENDEDPERMS_IP,
@@ -187,8 +186,8 @@ public class SeenCommand implements ICommandExecutor {
     }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
             GenericArguments.firstParsing(
                 NucleusParameters.ONE_USER_UUID.get(serviceCollection),
                 NucleusParameters.ONE_USER.get(serviceCollection)

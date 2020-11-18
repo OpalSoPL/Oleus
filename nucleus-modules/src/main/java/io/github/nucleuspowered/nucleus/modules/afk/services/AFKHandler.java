@@ -26,6 +26,8 @@ import io.github.nucleuspowered.nucleus.util.Tuples;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.lock.qual.GuardedBy;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -47,9 +49,6 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.GuardedBy;
 
 @APIService(NucleusAFKService.class)
 public class AFKHandler implements NucleusAFKService, IReloadableService.Reloadable, ServiceBase {

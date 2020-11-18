@@ -14,22 +14,21 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.text.Text;
 @Command(
         aliases = {"nameunban", "namepardon"},
         basePermission = NameBanPermissions.BASE_NAMEUNBAN,
-        commandDescriptionKey = "nameunban",
-        async = true)
+        commandDescriptionKey = "nameunban")
 public class NameUnbanCommand implements ICommandExecutor {
 
     private final String nameKey = "name";
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
             new RegexArgument(Text.of(this.nameKey), Util.usernameRegexPattern, "command.nameban.notvalid", serviceCollection)
         };
     }

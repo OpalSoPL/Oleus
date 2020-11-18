@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.text.Text;
@@ -85,7 +85,7 @@ public class ListWorldCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the worlds
         final Collection<WorldProperties> cwp = Sponge.getServer().getAllWorldProperties();
-        final List<Text> listContent = Lists.newArrayList();
+        final List<Text> listContent = new ArrayList<>();
 
         final boolean canSeeSeeds = context.testPermission(WorldPermissions.WORLD_SEED);
         cwp.stream().sorted(Comparator.comparing(WorldProperties::getWorldName)).forEach(x -> getWorldInfo(context, listContent, x, canSeeSeeds));

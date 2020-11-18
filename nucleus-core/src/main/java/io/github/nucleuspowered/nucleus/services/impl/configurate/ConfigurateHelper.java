@@ -74,7 +74,9 @@ public class ConfigurateHelper implements IConfigurateHelper {
 
     @Override
     public void addTypeSerialiser(@Nullable final TypeSerializerCollection collection) {
-        Preconditions.checkState(this.withModules == null, "Modules have been initialised.");
+        if (this.withModules != null) {
+            throw new IllegalStateException("Modules have been initialised.");
+        }
         if (collection != null) {
             this.moduleBuilderTSC.registerAll(collection);
         }

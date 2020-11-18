@@ -17,9 +17,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateMessageSender;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.TypeTokens;
 @Command(aliases = {"broadcast", "bcast", "bc"}, basePermission = NotificationPermissions.BASE_BROADCAST, commandDescriptionKey = "broadcast")
@@ -28,8 +28,8 @@ public class BroadcastCommand implements ICommandExecutor, IReloadableService.Re
     private BroadcastConfig bc = new BroadcastConfig();
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.MESSAGE
         };
     }

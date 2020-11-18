@@ -9,7 +9,6 @@ import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
 import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
-import io.github.nucleuspowered.nucleus.modules.kit.parameters.KitParameter;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -17,13 +16,14 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.args.GenericArguments;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+
 import java.time.Duration;
 
 /**
@@ -42,35 +42,41 @@ public class KitGiveCommand implements ICommandExecutor, IReloadableService.Relo
     private boolean isDrop;
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                GenericArguments.flags().permissionFlag(KitPermissions.KIT_GIVE_OVERRIDE, "i", "-ignore")
-                    .buildWith(GenericArguments.seq(
-                        NucleusParameters.ONE_PLAYER.get(serviceCollection),
-                        serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false)
-                ))
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        return new Flag[] {
+                Flag.builder().alias("i").alias("ignore").setRequirement(cause -> permissionService.hasPermission(cause,
+                        KitPermissions.KIT_GIVE_OVERRIDE)).build()
+        };
+    }
+
+    @Override
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.ONE_PLAYER,
+                serviceCollection.getServiceUnchecked(KitService.class).kitParameterWithoutPermission()
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
-        final Kit kit = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        final Player player = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
-        final boolean skip = context.hasAny("i");
+        final Kit kit = context.requireOne(KitService.KIT_KEY);
+        final Player player = context.requireOne(NucleusParameters.ONE_PLAYER);
+        final boolean skip = context.hasFlag("i");
         if (context.is(player)) {
             return context.errorResult("command.kit.give.self");
         }
 
-        final TextComponent playerName = context.getDisplayName(player.getUniqueId());
-        final TextComponent kitName = Text.of(kit.getName());
-        final KitRedeemResult redeemResult = service.redeemKit(kit, player, !skip, this.mustGetAll);
+        final Component playerName = context.getDisplayName(player.getUniqueId());
+        final Component kitName = Component.text(kit.getName());
+        final KitRedeemResult redeemResult = service.redeemKit(kit, player.getUniqueId(), !skip, this.mustGetAll);
         if (redeemResult.isSuccess()) {
             if (!redeemResult.rejectedItems().isEmpty()) {
                 // If we drop them, tell the user
                 if (this.isDrop) {
                     context.sendMessage("command.kit.give.itemsdropped", playerName);
-                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.getLocation()));
+                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.getServerLocation()));
                 } else {
                     context.sendMessage("command.kit.give.fullinventory", playerName);
                 }

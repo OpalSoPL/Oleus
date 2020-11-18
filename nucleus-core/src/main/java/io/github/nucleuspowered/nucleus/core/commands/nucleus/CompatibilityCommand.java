@@ -22,8 +22,7 @@ import java.util.Comparator;
         basePermission = CorePermissions.BASE_NUCLEUS_COMPATIBILITY,
         commandDescriptionKey = "nucleus.compatibility",
         parentCommand = NucleusCommand.class,
-        async = true
-)
+        )
 public class CompatibilityCommand implements ICommandExecutor {
 
     @Override

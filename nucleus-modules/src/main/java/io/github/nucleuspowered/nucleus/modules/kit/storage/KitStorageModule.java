@@ -18,7 +18,7 @@ import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 
-public final class KitStorageModule implements IStorageModule<IKitDataObject, IStorageService.Single<IKitDataObject>,
+public final class KitStorageModule implements IStorageModule<IKitDataObject, IStorageService.SingleCached<IKitDataObject>,
         IStorageRepository.Single<JsonObject>, IConfigurateBackedDataTranslator<IKitDataObject>> {
 
     private final INucleusServiceCollection serviceCollection;
@@ -49,7 +49,7 @@ public final class KitStorageModule implements IStorageModule<IKitDataObject, IS
     }
 
     @Override
-    public IStorageService.Single<IKitDataObject> getService() {
+    public IStorageService.SingleCached<IKitDataObject> getService() {
         return this.kitsService;
     }
 

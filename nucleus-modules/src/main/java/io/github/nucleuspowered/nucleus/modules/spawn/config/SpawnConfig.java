@@ -30,7 +30,7 @@ public class SpawnConfig {
     private boolean redirectBedSpawn = true;
 
     @Setting(value = "spawn-on-login-exempt-worlds", comment = "config.spawn.onloginsameworld")
-    private List<String> spawnOnLoginExemptWorld = Lists.newArrayList();
+    private List<String> spawnOnLoginExemptWorld = new ArrayList<>();
 
     @Setting(value = "per-world-permissions", comment = "config.spawn.worlds")
     private boolean perWorldPerms = false;

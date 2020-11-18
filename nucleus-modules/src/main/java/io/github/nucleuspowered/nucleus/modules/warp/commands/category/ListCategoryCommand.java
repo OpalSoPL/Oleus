@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -39,7 +39,7 @@ public class ListCategoryCommand implements ICommandExecutor {
         Util.getPaginationBuilder(src).contents(
                 handler.getWarpsWithCategories().keySet().stream().filter(Objects::nonNull)
                 .sorted(Comparator.comparing(WarpCategory::getId)).map(x -> {
-            final List<Text> t = Lists.newArrayList();
+            final List<Text> t = new ArrayList<>();
             t.add(context.getMessage("command.warp.category.listitem.simple", Text.of(x.getId()), x.getDisplayName()));
             x.getDescription().ifPresent(y -> t.add(context.getMessage("command.warp.category.listitem.description", y)));
             return t;

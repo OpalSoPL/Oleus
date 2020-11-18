@@ -24,9 +24,9 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvi
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
@@ -69,8 +69,8 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
 
     // flag,
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 GenericArguments.onlyOne(GenericArguments
                         .optionalWeak(GenericArguments.flags()
                                 .flag("y", "a", "-accept")

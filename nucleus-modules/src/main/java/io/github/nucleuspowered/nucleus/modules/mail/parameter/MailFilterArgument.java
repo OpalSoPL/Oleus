@@ -13,7 +13,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
@@ -44,11 +44,11 @@ public class MailFilterArgument extends CommandElement {
     @Override
     protected Object parseValue(final CommandSource source, final CommandArgs args) throws ArgumentParseException {
         // Get all the arguments in list.
-        final List<UUID> players = Lists.newArrayList();
+        final List<UUID> players = new ArrayList<>();
         boolean console = false;
         Instant ea = null;
         Instant l = null;
-        final List<String> message = Lists.newArrayList();
+        final List<String> message = new ArrayList<>();
         while (args.hasNext()) {
             final String toParse = args.next();
             try {
@@ -85,7 +85,7 @@ public class MailFilterArgument extends CommandElement {
             }
         }
 
-        final List<NucleusMailService.MailFilter> lmf = Lists.newArrayList();
+        final List<NucleusMailService.MailFilter> lmf = new ArrayList<>();
         if (console || !players.isEmpty()) {
             lmf.add(this.handler.createSenderFilter(console, players));
         }
@@ -103,7 +103,7 @@ public class MailFilterArgument extends CommandElement {
 
     @Override
     public List<String> complete(final CommandSource src, final CommandArgs args, final CommandContext context) {
-        return Lists.newArrayList();
+        return new ArrayList<>();
     }
 
     private Optional<UUID> player(final String text) {

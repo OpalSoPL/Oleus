@@ -15,9 +15,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -34,14 +34,12 @@ import java.util.stream.Collectors;
 @Command(
         aliases = {"checknotes", "notes"},
         basePermission = NotePermissions.BASE_NOTE,
-        commandDescriptionKey = "checknotes",
-        async = true
-)
+        commandDescriptionKey = "checknotes")
 public class CheckNotesCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.ONE_USER.get(serviceCollection)
         };
     }

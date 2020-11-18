@@ -16,23 +16,22 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.event.cause.Cause;
 @EssentialsEquivalent({"delwarp", "remwarp", "rmwarp"})
 @Command(
         aliases = {"delete", "del", "#delwarp", "#remwarp", "#rmwarp"},
         basePermission = WarpPermissions.BASE_WARP_DELETE,
         commandDescriptionKey = "warp.list",
-        async = true,
         parentCommand = WarpCommand.class
 )
 public class DeleteWarpCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpElement(false)
         };
     }

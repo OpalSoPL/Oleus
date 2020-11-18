@@ -22,7 +22,7 @@ public class BlockSpawnsConfig {
     @NoMergeIfPresent
     @Setting(value = "block-mobs-with-ids", comment = "config.blockspawn.ids")
     @ProcessSetting(LowercaseListSettingProcessor.class)
-    private List<String> idsToBlock = Lists.newArrayList();
+    private List<String> idsToBlock = new ArrayList<>();
 
     public boolean isBlockVanillaMobs() {
         return this.blockVanillaMobs;

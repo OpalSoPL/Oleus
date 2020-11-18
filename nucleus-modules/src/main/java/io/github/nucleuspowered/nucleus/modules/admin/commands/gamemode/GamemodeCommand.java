@@ -24,8 +24,6 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.Optional;
 
-;
-
 @Command(aliases = {"gamemode", "gm"},
         basePermission = AdminPermissions.BASE_GAMEMODE,
         commandDescriptionKey = "gamemode",

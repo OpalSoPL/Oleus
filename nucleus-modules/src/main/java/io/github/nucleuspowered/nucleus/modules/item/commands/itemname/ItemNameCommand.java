@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 
 @Command(aliases = "itemname", basePermission = ItemPermissions.BASE_ITEMNAME, commandDescriptionKey = "itemname", hasExecutor = false)
 public class ItemNameCommand implements ICommandExecutor {

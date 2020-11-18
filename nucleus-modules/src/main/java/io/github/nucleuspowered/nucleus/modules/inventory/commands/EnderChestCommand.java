@@ -32,8 +32,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
-;
-
 @Command(
         aliases = {"enderchest", "ec", "echest"},
         basePermission = InventoryPermissions.BASE_ENDERCHEST,

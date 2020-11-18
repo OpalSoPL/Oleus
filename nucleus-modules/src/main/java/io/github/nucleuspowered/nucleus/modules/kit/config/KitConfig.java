@@ -4,19 +4,24 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kit.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class KitConfig {
-
-    @Setting(value = "must-get-all-items", comment = "config.kits.mustgetall")
+    
+    @Setting(value = "must-get-all-items")
+    @LocalisedComment("config.kits.mustgetall")
     private boolean mustGetAll = false;
-
-    @Setting(value = "drop-items-if-inventory-full", comment = "config.kits.full")
+    
+    @Setting(value = "drop-items-if-inventory-full")
+    @LocalisedComment("config.kits.full")
     private boolean dropKitIfFull = false;
 
-    @Setting(value = "process-tokens-in-lore", comment = "config.kits.process-tokens")
+    
+    @Setting(value = "process-tokens-in-lore")
+    @LocalisedComment("config.kits.process-tokens")
     private boolean processTokens = false;
 
     @Setting(value = "auto-redeem")
@@ -43,19 +48,23 @@ public class KitConfig {
     }
 
     public boolean isEnableAutoredeem() {
-        return getAutoRedeem().enableAutoRedeem;
+        return this.getAutoRedeem().enableAutoRedeem;
     }
 
     public boolean isLogAutoredeem() {
-        return getAutoRedeem().logAutoredeem;
+        return this.getAutoRedeem().logAutoredeem;
     }
 
     @ConfigSerializable
     public static class AutoRedeem {
-        @Setting(value = "log", comment = "config.kits.logauto")
+        
+        @Setting(value = "log")
+        @LocalisedComment("config.kits.logauto")
         private boolean logAutoredeem = false;
 
-        @Setting(value = "enable", comment = "config.kits.enableauto")
+        
+        @Setting(value = "enable")
+        @LocalisedComment("config.kits.enableauto")
         private boolean enableAutoRedeem = false;
     }
 

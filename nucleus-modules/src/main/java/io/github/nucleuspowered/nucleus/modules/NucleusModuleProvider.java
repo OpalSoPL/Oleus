@@ -86,16 +86,12 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(BanModule.ID, "Ban", BanModule.class, BanConfig.class));
         containers.add(NucleusModuleProvider.createContainer(ChatModule.ID, "Chat", ChatModule.class, ChatConfig.class));
         containers.add(NucleusModuleProvider.createContainer(ChatLoggerModule.ID, "Chat Logger", ChatLoggerModule.class));
-        containers.add(NucleusModuleProvider.createContainer(
-                CommandLoggerModule.ID, "Command Logger", CommandLoggerModule.class, CommandLoggerConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(
-                CommandSpyModule.ID, "Command Spy", CommandSpyModule.class, CommandSpyConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(CommandLoggerModule.ID, "Command Logger", CommandLoggerModule.class, CommandLoggerConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(CommandSpyModule.ID, "Command Spy", CommandSpyModule.class, CommandSpyConfig.class));
         containers.add(NucleusModuleProvider.createContainer(ConnectionModule.ID, "Connection", ConnectionModule.class, ConnectionConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(ConnectionMessagesModule.ID, "Connection Messages",
-                ConnectionMessagesModule.class, ConnectionMessagesConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(ConnectionMessagesModule.ID, "Connection Messages", ConnectionMessagesModule.class, ConnectionMessagesConfig.class));
         containers.add(NucleusModuleProvider.createContainer(CraftingGuiModule.ID, "Crafting GUI", CraftingGuiModule.class));
-        containers.add(NucleusModuleProvider.createContainer(DeathMessageModule.ID, "Death Message",
-                DeathMessageModule.class, DeathMessageConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(DeathMessageModule.ID, "Death Message", DeathMessageModule.class, DeathMessageConfig.class));
         containers.add(NucleusModuleProvider.createContainer(EnvironmentModule.ID, "Environment", EnvironmentModule.class, EnvironmentConfig.class));
         containers.add(NucleusModuleProvider.createContainer(ExperienceModule.ID, "Experience", ExperienceModule.class));
         containers.add(NucleusModuleProvider.createContainer(FlyModule.ID, "Flying", FlyModule.class, FlyConfig.class));

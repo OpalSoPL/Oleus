@@ -168,10 +168,6 @@ public final class Util {
         return plb;
     }
 
-    public static Inventory.Builder.EndStep getKitInventoryBuilder() {
-        return Inventory.builder().grid(9, 4).completeStructure();
-    }
-
     public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final ServerLocation location) {
         return dropItemOnFloorAtLocation(itemStackSnapshotToDrop, location.getWorld(), location.getPosition());
     }

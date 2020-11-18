@@ -60,7 +60,7 @@ public class ProtectionConfig {
 
         @Setting(value = "whitelist")
         @ProcessSetting(MobTypeSettingProcessor.class)
-        private List<EntityType> whitelist = Lists.newArrayList();
+        private List<EntityType> whitelist = new ArrayList<>();
 
 
     }

@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.modules.kit.misc;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.text.Text;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -18,13 +17,13 @@ public class KitRedeemResultImpl implements io.github.nucleuspowered.nucleus.api
     private final Collection<ItemStackSnapshot> rejected;
     private final Status status;
     @Nullable private final Instant nextCooldown;
-    @Nullable private final TextComponent message;
+    @Nullable private final Component message;
 
     public KitRedeemResultImpl(
             final Status status,
             final Collection<ItemStackSnapshot> rejected,
             @Nullable final Instant nextCooldown,
-            @Nullable final TextComponent message) {
+            @Nullable final Component message) {
         this.rejected = rejected;
         this.status = status;
         this.nextCooldown = nextCooldown;

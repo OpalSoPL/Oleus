@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Command(aliases = "checkmuted", basePermission = MutePermissions.BASE_CHECKMUTED, commandDescriptionKey = "checkmuted", async = true)
+@Command(aliases = "checkmuted", basePermission = MutePermissions.BASE_CHECKMUTED, commandDescriptionKey = "checkmuted", )
 public class CheckMutedCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {

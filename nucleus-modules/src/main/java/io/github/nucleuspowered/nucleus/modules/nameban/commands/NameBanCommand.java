@@ -18,15 +18,15 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.text.Text;
 import java.util.stream.Collectors;
 
-@Command(aliases = "nameban", basePermission = NameBanPermissions.BASE_NAMEBAN, commandDescriptionKey = "nameban", async = true)
+@Command(aliases = "nameban", basePermission = NameBanPermissions.BASE_NAMEBAN, commandDescriptionKey = "nameban", )
 public class NameBanCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final String nameKey = "name";
@@ -34,8 +34,8 @@ public class NameBanCommand implements ICommandExecutor, IReloadableService.Relo
     private String defaultReason = "Your name is inappropriate";
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
             new RegexArgument(Text.of(this.nameKey),
                     Util.usernameRegexPattern, "command.nameban.notvalid", ((commandSource, commandArgs, commandContext) -> {
                 try {
@@ -44,7 +44,7 @@ public class NameBanCommand implements ICommandExecutor, IReloadableService.Relo
                         .map(User::getName)
                         .collect(Collectors.toList());
                 } catch (final Exception e) {
-                    return Lists.newArrayList();
+                    return new ArrayList<>();
                 }
             }), serviceCollection),
             NucleusParameters.OPTIONAL_REASON

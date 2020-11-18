@@ -51,7 +51,7 @@ public class SeenHandler implements NucleusSeenService, ServiceBase {
         if (this.pluginInformationProviders.containsKey(name)) {
             providers = this.pluginInformationProviders.get(name);
         } else {
-            providers = Lists.newArrayList();
+            providers = new ArrayList<>();
             this.pluginInformationProviders.put(name, providers);
         }
 
@@ -73,7 +73,7 @@ public class SeenHandler implements NucleusSeenService, ServiceBase {
     }
 
     public List<Text> getText(final CommandSource requester, final User user) {
-        final List<Text> information = Lists.newArrayList();
+        final List<Text> information = new ArrayList<>();
 
         final Collection<IPlayerInformationService.Provider> providers = this.serviceCollection.playerInformationService().getProviders();
         for (final IPlayerInformationService.Provider provider : providers) {

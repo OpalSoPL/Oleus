@@ -16,6 +16,7 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -111,7 +112,7 @@ abstract class AbstractMessageRepository implements IMessageRepository {
     final Template templateCreator(final String string) {
         // regex!
         final Matcher mat = Pattern.compile("\\{([\\d]+)}").matcher(string);
-        final List<Integer> map = Lists.newArrayList();
+        final List<Integer> map = new ArrayList<>();
 
         while (mat.find()) {
             map.add(Integer.parseInt(mat.group(1)));
@@ -119,7 +120,7 @@ abstract class AbstractMessageRepository implements IMessageRepository {
 
         final String[] s = string.split("\\{([\\d]+)}");
 
-        final List<TextElement> objects = Lists.newArrayList();
+        final List<TextElement> objects = new ArrayList<>();
         final Component t = this.textStyleService.oldLegacy(s[0]);
         ITextStyleService.TextFormat tuple = this.textStyleService.getLastColourAndStyle(t, null);
         objects.add(input -> t);

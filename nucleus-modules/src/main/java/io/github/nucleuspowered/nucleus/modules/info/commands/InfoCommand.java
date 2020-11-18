@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 
 @Command(
         aliases = {"info", "einfo"},
-        async = true,
         basePermission = InfoPermissions.BASE_INFO,
         commandDescriptionKey = "info",
         associatedPermissions = InfoPermissions.INFO_LIST

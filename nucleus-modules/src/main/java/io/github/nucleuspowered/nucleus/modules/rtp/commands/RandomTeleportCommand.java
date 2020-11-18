@@ -25,9 +25,9 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -73,11 +73,11 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
 
     @Inject
     public RandomTeleportCommand(final INucleusServiceCollection serviceCollection) {
-        TIMINGS = Timings.of(serviceCollection.pluginContainer(), "RTP task");;
+        TIMINGS = Timings.of(serviceCollection.pluginContainer(), "RTP task");
     }
 
-    @Override public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, RTPPermissions.OTHERS_RTP),
                 GenericArguments.optionalWeak(NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection))
         };

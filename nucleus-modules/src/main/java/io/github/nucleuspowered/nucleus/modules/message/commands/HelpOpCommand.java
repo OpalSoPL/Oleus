@@ -23,8 +23,8 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatte
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.message.MessageChannelEvent;
@@ -36,7 +36,6 @@ import com.google.inject.Inject;
         aliases = { "helpop" },
         basePermission = MessagePermissions.BASE_HELPOP,
         commandDescriptionKey = "helpop",
-        async = true,
         modifiers = {
                 @CommandModifier(value = CommandModifiers.HAS_COOLDOWN, exemptPermission = MessagePermissions.EXEMPT_COOLDOWN_HELPOP),
                 @CommandModifier(value = CommandModifiers.HAS_WARMUP, exemptPermission = MessagePermissions.EXEMPT_WARMUP_HELPOP),
@@ -55,8 +54,8 @@ public class HelpOpCommand implements ICommandExecutor, IReloadableService.Reloa
     }
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
                 NucleusParameters.MESSAGE
         };
     }

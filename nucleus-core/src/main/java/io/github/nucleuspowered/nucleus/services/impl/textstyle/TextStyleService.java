@@ -395,7 +395,7 @@ public class TextStyleService implements ITextStyleService {
             return LegacyComponentSerializer.legacyAmpersand().deserialize(message);
         }
 
-        final List<Component> texts = Lists.newArrayList();
+        final List<Component> texts = new ArrayList<>();
         String remaining = message;
         ITextStyleService.TextFormat st = EMPTY;
         do {
@@ -517,7 +517,7 @@ public class TextStyleService implements ITextStyleService {
 
     @Override
     public Component joinTextsWithColoursFlowing(final TextComponent... texts) {
-        final List<TextComponent> result = Lists.newArrayList();
+        final List<TextComponent> result = new ArrayList<>();
         TextComponent last = null;
         for (final TextComponent n : texts) {
             if (last != null) {

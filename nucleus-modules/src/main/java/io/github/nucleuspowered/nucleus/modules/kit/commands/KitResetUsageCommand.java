@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.modules.kit.commands;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitKeys;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
-import io.github.nucleuspowered.nucleus.modules.kit.parameters.KitParameter;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -17,16 +16,15 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
-import org.spongepowered.api.command.exception.CommandException;;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
+
 import java.time.Instant;
 import java.util.Map;
 
 @Command(
         aliases = { "resetusage", "reset" },
-        async = true,
         basePermission = KitPermissions.BASE_KIT_RESETUSAGE,
         commandDescriptionKey = "kit.resetusage",
         parentCommand = KitCommand.class
@@ -34,16 +32,16 @@ import java.util.Map;
 public class KitResetUsageCommand implements ICommandExecutor {
 
     @Override
-    public CommandElement[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new CommandElement[] {
-                NucleusParameters.ONE_USER.get(serviceCollection),
-                serviceCollection.getServiceUnchecked(KitService.class).createKitElement(false)
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.ONE_USER,
+                serviceCollection.getServiceUnchecked(KitService.class).kitParameterWithoutPermission()
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Kit kitInfo = context.requireOne(KitParameter.KIT_PARAMETER_KEY, Kit.class);
-        final User u = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
+        final User u = context.requireOne(NucleusParameters.ONE_USER);
         final IStorageManager storageManager = context.getServiceCollection().storageManager();
         final IUserDataObject userDataObject = storageManager.getUserService().getOrNewOnThread(u.getUniqueId());
         final Map<String, Instant> data = userDataObject.getNullable(KitKeys.REDEEMED_KITS);

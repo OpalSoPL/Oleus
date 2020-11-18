@@ -30,12 +30,13 @@ public interface IStorageManager {
     IStorageRepositoryFactory getFlatFileRepositoryFactory();
 
     // ugh
-    <T extends IDataObject> void register(Class<T> clazz, IStorageModule<T, ? extends IStorageService<T>,
-            ? extends IStorageRepository, ? extends IDataTranslator<T, JsonObject>> module);
+    <T extends IDataObject, S extends IStorageService<T>> void register(
+            final IStorageModule<T, S, ? extends IStorageRepository, ? extends IDataTranslator<T, JsonObject>> module);
 
     IStorageService.SingleCached<IGeneralDataObject> getGeneralService();
 
-    <T extends IDataObject> Optional<IStorageService<T>> getAdditionalStorageServiceForDataObject(Class<T> clazz);
+    <T extends IDataObject, S extends IStorageService<T>, M extends IStorageModule<T, S, ?, ?>> Optional<S> getAdditionalStorageServiceForDataObject(
+            final Class<M> clazz);
 
     IStorageService.Keyed.KeyedData<UUID, IUserQueryObject, IUserDataObject> getUserService();
 

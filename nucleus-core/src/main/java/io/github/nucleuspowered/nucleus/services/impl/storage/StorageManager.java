@@ -60,7 +60,7 @@ public final class StorageManager implements IStorageManager {
     private final UserService userService;
     private final WorldService worldService;
 
-    private final Map<Class<? extends IDataObject>, IStorageModule<?, ?, ?, ?>> additionalStorageServices = new HashMap<>();
+    private final Map<Class<? extends IStorageModule<?, ?, ?, ?>>, IStorageModule<?, ?, ?, ?>> additionalStorageServices = new HashMap<>();
 
     @Inject
     public StorageManager(@DataDirectory final Supplier<Path> dataDirectory,
@@ -89,8 +89,10 @@ public final class StorageManager implements IStorageManager {
 
     // ugh
     @Override
-    public <T extends IDataObject> void register(final Class<T> clazz, final IStorageModule<T, ? extends IStorageService<T>,
+    @SuppressWarnings("unchecked")
+    public <T extends IDataObject, S extends IStorageService<T>> void register(final IStorageModule<T, S,
             ? extends IStorageRepository, ? extends IDataTranslator<T, JsonObject>> module) {
+        final Class<? extends IStorageModule<?, ?, ?, ?>> clazz = (Class<? extends IStorageModule<?, ?, ?, ?>>) module.getClass();
         if (this.additionalStorageServices.containsKey(clazz)) {
             throw new IllegalArgumentException("Class is already registered");
         }
@@ -144,8 +146,8 @@ public final class StorageManager implements IStorageManager {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends IDataObject> Optional<IStorageService<T>> getAdditionalStorageServiceForDataObject(final Class<T> clazz) {
-        return Optional.ofNullable(this.additionalStorageServices.get(clazz)).map(x -> (IStorageService<T>) x.getService());
+    public <T extends IDataObject, S extends IStorageService<T>, M extends IStorageModule<T, S, ?, ?>> Optional<S> getAdditionalStorageServiceForDataObject(final Class<M> clazz) {
+        return Optional.ofNullable(this.additionalStorageServices.get(clazz)).map(x -> (S) x.getService());
     }
 
     @Override

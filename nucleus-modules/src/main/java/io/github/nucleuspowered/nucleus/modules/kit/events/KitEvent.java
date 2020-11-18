@@ -8,16 +8,15 @@ import com.google.common.collect.ImmutableList;
 import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.api.module.kit.event.NucleusKitEvent;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
+import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.text.Text;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent {
 
@@ -26,11 +25,12 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
         private final Cause cause;
         private final Kit kit;
         @Nullable private final Instant lastTime;
-        private final Player targetPlayer;
+        private final ServerPlayer targetPlayer;
         private final Collection<ItemStackSnapshot> original;
         private final Collection<String> commands;
 
-        public Redeem(final Cause cause, @Nullable final Instant lastTime, final Kit kit, final Player targetPlayer, final Collection<ItemStackSnapshot> original,
+        public Redeem(final Cause cause, @Nullable final Instant lastTime, final Kit kit, final ServerPlayer targetPlayer,
+                final Collection<ItemStackSnapshot> original,
                 final Collection<String> commands) {
             this.cause = cause;
             this.kit = kit;
@@ -56,7 +56,7 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
             return this.original;
         }
 
-        @Override public Player getTargetEntity() {
+        @Override public ServerPlayer getRedeemingPlayer() {
             return this.targetPlayer;
         }
 
@@ -71,12 +71,13 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
 
     public static class PreRedeem extends Redeem implements NucleusKitEvent.Redeem.Pre {
 
-        @Nullable private TextComponent cancelMessage = null;
+        @Nullable private Component cancelMessage = null;
         private boolean isCancelled;
         @Nullable private Collection<ItemStackSnapshot> toRedeem = null;
         @Nullable private Collection<String> commandRedeem = null;
 
-        public PreRedeem(final Cause cause, @Nullable final Instant lastTime, final Kit kit, final Player targetPlayer, final Collection<ItemStackSnapshot> original,
+        public PreRedeem(final Cause cause, @Nullable final Instant lastTime, final Kit kit, final ServerPlayer targetPlayer,
+                final Collection<ItemStackSnapshot> original,
                 final Collection<String> originalCommands) {
             super(cause, lastTime, kit, targetPlayer, original, originalCommands);
         }
@@ -89,11 +90,11 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
             this.isCancelled = cancel;
         }
 
-        @Override public Optional<Text> getCancelMessage() {
+        @Override public Optional<Component> getCancelMessage() {
             return Optional.ofNullable(this.cancelMessage);
         }
 
-        @Override public void setCancelMessage(@Nullable final TextComponent message) {
+        @Override public void setCancelMessage(@Nullable final Component message) {
             this.cancelMessage = message;
         }
 
@@ -127,7 +128,8 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
         @Nullable private final Collection<ItemStackSnapshot> redeemed;
         @Nullable private final Collection<String> commands;
 
-        public PostRedeem(final Cause cause, @Nullable final Instant lastTime, final Kit kit, final Player targetPlayer, final Collection<ItemStackSnapshot> original,
+        public PostRedeem(final Cause cause, @Nullable final Instant lastTime, final Kit kit, final ServerPlayer targetPlayer,
+                final Collection<ItemStackSnapshot> original,
                 @Nullable final Collection<ItemStackSnapshot> redeemed, final Collection<String> originalCommands, @Nullable final Collection<String> commands) {
             super(cause, lastTime, kit, targetPlayer, original, originalCommands);
             this.redeemed = redeemed;
@@ -149,7 +151,8 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
         @Nullable private final Collection<String> commands;
         private final KitRedeemResult.Status ex;
 
-        public FailedRedeem(final Cause cause, @Nullable final Instant lastTime, final Kit kit, final Player targetPlayer, final Collection<ItemStackSnapshot> original,
+        public FailedRedeem(final Cause cause, @Nullable final Instant lastTime, final Kit kit, final ServerPlayer targetPlayer,
+                final Collection<ItemStackSnapshot> original,
                 @Nullable final Collection<ItemStackSnapshot> redeemed, final Collection<String> originalCommands, @Nullable final Collection<String> commands,
                 final KitRedeemResult.Status ex) {
             super(cause, lastTime, kit, targetPlayer, original, originalCommands);
