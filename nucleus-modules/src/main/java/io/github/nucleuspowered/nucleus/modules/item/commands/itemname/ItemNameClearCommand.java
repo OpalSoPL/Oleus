@@ -48,7 +48,7 @@ public class ItemNameClearCommand implements ICommandExecutor {
             return context.errorResult("command.lore.clear.none");
         }
 
-        if (stack.remove(Keys.DISPLAY_NAME).isSuccessful()) {
+        if (stack.remove(Keys.CUSTOM_NAME).isSuccessful()) {
             src.setItemInHand(HandTypes.MAIN_HAND, stack);
             context.sendMessage("command.itemname.clear.success");
             return context.successResult();
