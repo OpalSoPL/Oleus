@@ -5,11 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.mail.data;
 
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -19,6 +17,7 @@ import java.util.UUID;
 public class MailData implements MailMessage {
 
     @Setting
+    @Nullable
     private UUID uuid;
 
     @Setting
@@ -47,15 +46,15 @@ public class MailData implements MailMessage {
         return this.uuid;
     }
 
-    @Override public Optional<User> getSender() {
-        return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(this.uuid);
+    @Override public Optional<UUID> getSender() {
+        return Optional.ofNullable(this.uuid);
     }
 
     @Override public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
 
@@ -64,13 +63,18 @@ public class MailData implements MailMessage {
         if (this.date != mailData.date) {
             return false;
         }
+        if (this.uuid == null) {
+            return mailData.uuid == null;
+        }
         return this.uuid.equals(mailData.uuid) && this.message.equals(mailData.message);
     }
 
     @Override public int hashCode() {
-        int result = this.uuid.hashCode();
+        int result = this.message.hashCode();
         result = 31 * result + (int) (this.date ^ (this.date >>> 32));
-        result = 31 * result + this.message.hashCode();
+        if (this.uuid != null) {
+            result = 31 * result + this.uuid.hashCode();
+        }
         return result;
     }
 }

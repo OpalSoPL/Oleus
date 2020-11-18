@@ -5,24 +5,24 @@
 package io.github.nucleuspowered.nucleus.modules.mail.events;
 
 import io.github.nucleuspowered.nucleus.api.module.mail.event.NucleusSendMailEvent;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
+
 import java.util.Optional;
+import java.util.UUID;
 
-import javax.annotation.Nullable;
+public final class InternalNucleusSendMailEvent extends AbstractEvent implements NucleusSendMailEvent {
 
-public class InternalNucleusSendMailEvent extends AbstractEvent implements NucleusSendMailEvent {
-
-    @Nullable private final User from;
-    private final User to;
+    @Nullable private final UUID from;
+    private final UUID to;
     private final String message;
     private final Cause cause;
     private boolean cancelled = false;
 
-    public InternalNucleusSendMailEvent(@Nullable final User from, final User to, final String message) {
-        this.cause = CauseStackHelper.createCause(from == null ? Sponge.getServer().getConsole() : from);
+    public InternalNucleusSendMailEvent(@Nullable final UUID from, final UUID to, final String message) {
+        this.cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
         this.from = from;
         this.to = to;
         this.message = message;
@@ -44,12 +44,12 @@ public class InternalNucleusSendMailEvent extends AbstractEvent implements Nucle
     }
 
     @Override
-    public Optional<User> getSender() {
+    public Optional<UUID> getSender() {
         return Optional.ofNullable(this.from);
     }
 
     @Override
-    public User getRecipient() {
+    public UUID getRecipient() {
         return this.to;
     }
 

@@ -8,20 +8,26 @@ import io.github.nucleuspowered.nucleus.modules.mail.services.MailHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.plugin.PluginContainer;
 
 public class MailListener implements ListenerBase {
 
@@ -37,23 +43,34 @@ public class MailListener implements ListenerBase {
     }
 
     @Listener
-    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
-        Sponge.getScheduler().createAsyncExecutor(this.pluginContainer).schedule(() -> {
-            final int mailCount = this.handler.getMailInternal(event.getTargetEntity()).size();
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+        final UUID uuid = player.getUniqueId();
+        Sponge.getAsyncScheduler().createExecutor(this.pluginContainer).schedule(() -> {
+            final int mailCount = this.handler.getMailInternal(uuid).size();
             if (mailCount > 0) {
                 this.messageProvider.sendMessageTo(player, "mail.login", String.valueOf(mailCount));
-                player.sendMessage(Text.builder()
-                        .append(Text.builder("/mail").color(TextColors.AQUA).style(TextStyles.UNDERLINE).onClick(TextActions.runCommand("/mail"))
-                                .onHover(TextActions.showText(Text.of("Click here to read your mail."))).build())
-                        .append(Text.builder().append(Text.of(TextColors.YELLOW, " ")).append(
-                                this.messageProvider.getMessageFor(player, "mail.toread"))
-                                .append(Text.of(" ")).build())
-                        .append(Text.builder("/mail clear").color(TextColors.AQUA).style(TextStyles.UNDERLINE)
-                                .onClick(TextActions.runCommand("/mail clear"))
-                                .onHover(TextActions.showText(Text.of("Click here to delete your mail."))).build())
-                        .append(Text.builder().append(Text.of(TextColors.YELLOW, " ")).append(
-                                this.messageProvider.getMessageFor(player, "mail.toclear")).build())
-                        .build());
+                player.sendMessage(
+                        Identity.nil(),
+                        LinearComponents.linear(
+                                Component.text().content("/nucleus:mail")
+                                        .color(NamedTextColor.AQUA)
+                                        .style(Style.style(TextDecoration.UNDERLINED))
+                                        .clickEvent(ClickEvent.runCommand("/nucleus:mail"))
+                                        .hoverEvent(HoverEvent.showText(this.messageProvider.getMessage("mail.readhint")))
+                                        .build(),
+                                Component.space(),
+                                this.messageProvider.getMessageFor(player, "mail.toread"),
+                                Component.space(),
+                                Component.text()
+                                        .content("/nucleus:mail clear")
+                                        .color(NamedTextColor.AQUA)
+                                        .style(Style.style(TextDecoration.UNDERLINED))
+                                        .clickEvent(ClickEvent.runCommand("/nucleus:mail clear"))
+                                        .hoverEvent(HoverEvent.showText(this.messageProvider.getMessage("mail.deletehint")))
+                                        .build(),
+                                Component.space(),
+                                this.messageProvider.getMessageFor(player, "mail.toclear")));
+
             }
         } , 1, TimeUnit.SECONDS);
     }

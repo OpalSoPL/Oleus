@@ -20,7 +20,7 @@ import org.spongepowered.api.command.exception.CommandException;
 public class ClearMailCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        if (context.getServiceCollection().getServiceUnchecked(MailHandler.class).clearUserMail(context.getIfPlayer())) {
+        if (context.getServiceCollection().getServiceUnchecked(MailHandler.class).clearUserMail(context.requirePlayer().getUniqueId())) {
             context.sendMessage("command.mail.clear.success");
         } else {
             context.sendMessage("command.mail.clear.nomail");

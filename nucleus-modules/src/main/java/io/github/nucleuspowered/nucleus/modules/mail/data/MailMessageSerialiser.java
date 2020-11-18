@@ -4,45 +4,42 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mail.data;
 
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
-import io.github.nucleuspowered.nucleus.util.TypeTokens;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.util.Identifiable;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.configurate.serialize.TypeSerializer;
 
+import java.lang.reflect.Type;
 import java.time.Instant;
 
 public class MailMessageSerialiser implements TypeSerializer<MailMessage> {
 
-    @Nullable
     @Override
-    public MailMessage deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
-        if (value.isVirtual()) {
+    public MailMessage deserialize(final Type type, final ConfigurationNode node) throws SerializationException {
+        if (node.virtual()) {
             return null;
         }
 
         try {
             return new MailData(
-                    value.getNode("uuid").getValue(TypeTokens.UUID),
-                    Instant.ofEpochMilli(value.getNode("date").getLong()),
-                    value.getNode("message").getString()
+                    node.node("uuid").get(GeAnTyRefTypeTokens.UUID),
+                    Instant.ofEpochMilli(node.node("date").getLong()),
+                    node.node("message").getString()
             );
         } catch (final IllegalArgumentException e) {
-            throw new ObjectMappingException("Could not create a mail message.", e);
+            throw new SerializationException(type, "Could not create a mail message.", e);
         }
     }
 
     @Override
-    public void serialize(@NonNull final TypeToken<?> type, @Nullable final MailMessage obj, @NonNull final ConfigurationNode value) {
+    public void serialize(final Type type, @Nullable final MailMessage obj, final ConfigurationNode node) throws SerializationException {
         if (obj != null) {
-            value.getNode("uuid").setValue(obj.getSender().map(Identifiable::getUniqueId).orElse(Util.CONSOLE_FAKE_UUID));
-            value.getNode("date").setValue(obj.getDate().toEpochMilli());
-            value.getNode("message").setValue(obj.getMessage());
+            node.node("uuid").set(obj.getSender().orElse(Util.CONSOLE_FAKE_UUID));
+            node.node("date").set(obj.getDate().toEpochMilli());
+            node.node("message").set(obj.getMessage());
         }
     }
 }

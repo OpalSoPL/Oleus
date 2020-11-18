@@ -71,9 +71,9 @@ public class IgnoreListener implements ListenerBase {
     }
 
     @Listener(order = Order.FIRST)
-    public void onMail(final NucleusSendMailEvent event, @Root final Player player) {
+    public void onMail(final NucleusSendMailEvent event, @Root final ServerPlayer player) {
         try {
-            event.setCancelled(this.service.isIgnored(event.getRecipient().getUniqueId(), player.getUniqueId()));
+            event.setCancelled(this.service.isIgnored(event.getRecipient(), player.getUniqueId()));
         } catch (final Exception e) {
             e.printStackTrace();
         }

@@ -30,7 +30,7 @@ public interface NucleusSendMailEvent extends Event, Cancellable {
      *
      * @return The recipient.
      */
-    User getRecipient();
+    UUID getRecipient();
 
     /**
      * The message that was sent.

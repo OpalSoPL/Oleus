@@ -48,7 +48,7 @@ public interface NucleusMailService {
      * @param playerTo The {@link UUID} of the player to send the message to.
      * @param message The message.
      */
-    void sendMail(UUID playerFrom, User playerTo, String message);
+    void sendMail(UUID playerFrom, UUID playerTo, String message);
 
     /**
      * Sends mail to a player, addressed from the console.
