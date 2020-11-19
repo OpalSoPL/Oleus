@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.message;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.message.config.MessageConfig;
+import io.github.nucleuspowered.nucleus.modules.message.listener.MessageListener;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
@@ -17,6 +18,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public final class MessageModule implements IModule.Configurable<MessageConfig> {
@@ -35,17 +37,12 @@ public final class MessageModule implements IModule.Configurable<MessageConfig> 
 
     @Override
     public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(MessagePermissions.class);
     }
 
     @Override
     public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
-    }
-
-    @Override
-    public Collection<Class<? extends TaskBase>> getAsyncTasks() {
-        return null;
+        return Collections.singleton(MessageListener.class);
     }
 
     @Override
@@ -55,23 +52,8 @@ public final class MessageModule implements IModule.Configurable<MessageConfig> 
 
     @Listener
     public void onPreferenceKeyRegistration(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
-        event.register(
-                new PreferenceKeyImpl.BooleanKey(
-                        NucleusKeysProvider.MESSAGE_TOGGLE_KEY,
-                        true,
-                        MessagePermissions.MSGTOGGLE_BYPASS,
-                        "userpref.messagetoggle"
-                )
-        );
-        event.register(
-                new PreferenceKeyImpl.BooleanKey(
-                        NucleusKeysProvider.SOCIAL_SPY_KEY,
-                        true,
-                        ((serviceCollection, user) -> serviceCollection.permissionService().hasPermission(user, MessagePermissions.BASE_SOCIALSPY)
-                                && !serviceCollection.permissionService().hasPermission(user, MessagePermissions.SOCIALSPY_FORCE)),
-                        "userpref.socialspy"
-                )
-        );
+        event.register(MessageKeys.MESSAGE_TOGGLE);
+        event.register(MessageKeys.SOCIAL_SPY);
     }
 
 }

@@ -4,45 +4,49 @@
  */
 package io.github.nucleuspowered.nucleus.modules.message.services;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.message.NucleusPrivateMessagingService;
+import io.github.nucleuspowered.nucleus.api.module.message.target.CustomMessageTarget;
+import io.github.nucleuspowered.nucleus.api.module.message.target.MessageTarget;
+import io.github.nucleuspowered.nucleus.api.module.message.target.SystemMessageTarget;
+import io.github.nucleuspowered.nucleus.api.module.message.target.UserMessageTarget;
+import io.github.nucleuspowered.nucleus.modules.message.MessageKeys;
 import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
 import io.github.nucleuspowered.nucleus.modules.message.config.MessageConfig;
 import io.github.nucleuspowered.nucleus.modules.message.events.InternalNucleusMessageEvent;
+import io.github.nucleuspowered.nucleus.modules.message.services.target.AbstractMessageTarget;
+import io.github.nucleuspowered.nucleus.modules.message.services.target.PlayerMessageTarget;
+import io.github.nucleuspowered.nucleus.modules.message.services.target.SystemSubjectMessageTarget;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import net.kyori.adventure.identity.Identified;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.util.Tristate;
+
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-import com.google.inject.Inject;
 
 @APIService(NucleusPrivateMessagingService.class)
 public class MessageHandler implements NucleusPrivateMessagingService, IReloadableService.Reloadable, ServiceBase {
@@ -53,14 +57,16 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
     private int serverLevel = 0;
 
     private final INucleusServiceCollection serviceCollection;
-    private final Map<UUID, UUID> messagesReceived = Maps.newHashMap();
-    private final Map<UUID, CustomMessageTarget<Object>> targets = Maps.newHashMap();
-    private final Map<String, UUID> targetNames = Maps.newHashMap();
+    private final SystemMessageTarget systemMessageTarget;
+    private final Map<UUID, PlayerMessageTarget> players = new HashMap<>();
+    private final Map<String, CustomMessageTarget> targetNames = new HashMap<>();
 
     @Inject
     public MessageHandler(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
-        onReload(serviceCollection);
+        this.systemMessageTarget =
+                new SystemSubjectMessageTarget(serviceCollection.playerDisplayNameService().getDisplayName(Util.CONSOLE_FAKE_UUID));
+        this.onReload(serviceCollection);
     }
 
     @Override
@@ -72,10 +78,10 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
     }
 
     @Override
-    public boolean isSocialSpy(final User user) {
-        final Tristate ts = forcedSocialSpyState(user);
+    public boolean isSocialSpy(final UUID user) {
+        final Tristate ts = this.forcedSocialSpyState(user);
         if (ts == Tristate.UNDEFINED) {
-            return this.serviceCollection.userPreferenceService().getUnwrapped(user.getUniqueId(), NucleusKeysProvider.SOCIAL_SPY);
+            return this.serviceCollection.userPreferenceService().getUnwrapped(user, MessageKeys.SOCIAL_SPY);
         }
 
         return ts.asBoolean();
@@ -97,11 +103,18 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
         return this.serverLevel;
     }
 
-    @Override public int getSocialSpyLevel(final User user) {
-        return this.useLevels ? this.serviceCollection.permissionService().getPositiveIntOptionFromSubject(user, MessagePermissions.SOCIALSPY_LEVEL_KEY).orElse(0) : 0;
+    @Override
+    public int getSocialSpyLevel(final UUID uuid) {
+        if (this.useLevels) {
+            final User user = Sponge.getServer().getUserManager().get(uuid).orElseThrow(() -> new IllegalArgumentException("Cannot get user with "
+                    + "UUID " + uuid.toString()));
+            return this.serviceCollection.permissionService().getPositiveIntOptionFromSubject(user, MessagePermissions.SOCIALSPY_LEVEL_KEY).orElse(0);
+        }
+        return 0;
     }
 
-    @Override public Tristate forcedSocialSpyState(final User user) {
+    @Override
+    public Tristate forcedSocialSpyState(final UUID user) {
         final IPermissionService permissionService = this.serviceCollection.permissionService();
         if (permissionService.hasPermission(user, MessagePermissions.BASE_SOCIALSPY)) {
             if (this.messageConfig.isSocialSpyAllowForced() &&
@@ -116,32 +129,32 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
     }
 
     @Override
-    public boolean setSocialSpy(final User user, final boolean isSocialSpy) {
-        if (forcedSocialSpyState(user) != Tristate.UNDEFINED) {
+    public boolean setSocialSpy(final UUID user, final boolean isSocialSpy) {
+        if (this.forcedSocialSpyState(user) != Tristate.UNDEFINED) {
             return false;
         }
 
-        this.serviceCollection.userPreferenceService().set(user.getUniqueId(), NucleusKeysProvider.SOCIAL_SPY, isSocialSpy);
+        this.serviceCollection.userPreferenceService().set(user, MessageKeys.SOCIAL_SPY, isSocialSpy);
         return true;
     }
 
     @Override
-    public boolean canSpyOn(final User spyingUser, final CommandSource... sourceToSpyOn) throws IllegalArgumentException {
+    public boolean canSpyOn(final UUID spyingUser, final MessageTarget... sourceToSpyOn) throws IllegalArgumentException {
         if (sourceToSpyOn.length == 0) {
             throw new IllegalArgumentException("sourceToSpyOn must have at least one CommandSource");
         }
 
-        if (isSocialSpy(spyingUser)) {
-            if (Arrays.stream(sourceToSpyOn).anyMatch(x -> x instanceof User && spyingUser.getUniqueId().equals(((User)x).getUniqueId()))) {
+        if (this.isSocialSpy(spyingUser)) {
+            if (Arrays.stream(sourceToSpyOn).anyMatch(x -> x instanceof Identified && spyingUser.equals(((Identified) x).identity().uuid()))) {
                 return false;
             }
 
             if (this.useLevels) {
                 final int target = Arrays.stream(sourceToSpyOn).mapToInt(this::getSocialSpyLevelForSource).max().orElse(0);
                 if (this.sameLevel) {
-                    return target <= getSocialSpyLevel(spyingUser);
+                    return target <= this.getSocialSpyLevel(spyingUser);
                 } else {
-                    return target < getSocialSpyLevel(spyingUser);
+                    return target < this.getSocialSpyLevel(spyingUser);
                 }
             }
 
@@ -152,269 +165,242 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
     }
 
     @Override
-    public Set<CommandSource> onlinePlayersCanSpyOn(final boolean includeConsole, final CommandSource... sourceToSpyOn)
+    public Set<UUID> onlinePlayersCanSpyOn(final boolean includeConsole, final MessageTarget... sourceToSpyOn)
             throws IllegalArgumentException {
         if (sourceToSpyOn.length == 0) {
             throw new IllegalArgumentException("sourceToSpyOn must have at least one CommandSource");
         }
 
         // Get the users to scan.
-        final List<CommandSource> toSpyOn = Arrays.asList(sourceToSpyOn);
-        final Set<UUID> uuidsToSpyOn = toSpyOn.stream().map(x -> x instanceof User ? ((User)x).getUniqueId() : Util.CONSOLE_FAKE_UUID)
+        final List<MessageTarget> toSpyOn = Arrays.asList(sourceToSpyOn);
+        final Set<UUID> uuidsToSpyOn = toSpyOn.stream()
+                .filter(x -> x instanceof UserMessageTarget)
+                .map(x -> ((UserMessageTarget) x).getUserUUID())
                 .collect(Collectors.toSet());
 
         // Get those who aren't the subjects and have social spy on.
-        Set<CommandSource> sources = Sponge.getServer().getOnlinePlayers().stream()
+        final Set<ServerPlayer> sources = Sponge.getServer().getOnlinePlayers()
+                .stream()
                 .filter(x -> !uuidsToSpyOn.contains(x.getUniqueId()))
-                .filter(this::isSocialSpy)
+                .filter(x -> this.isSocialSpy(x.getUniqueId()))
                 .collect(Collectors.toSet());
 
         if (!this.useLevels) {
-            if (includeConsole) {
-                sources.add(Sponge.getServer().getConsole());
-            }
-
-            return sources;
+            return sources.stream().map(Identifiable::getUniqueId).collect(Collectors.toSet());
         }
 
         // Get the highest level from the sources to spy on.
         final int highestLevel = toSpyOn.stream().mapToInt(this::getSocialSpyLevelForSource).max().orElse(0);
-        sources = sources.stream()
-            .filter(x -> this.sameLevel ? getSocialSpyLevelForSource(x) >= highestLevel : getSocialSpyLevelForSource(x) > highestLevel)
+        return sources.stream()
+            .filter(x -> this.sameLevel ? this.getSocialSpyLevel(x.getUniqueId()) >= highestLevel :
+                    this.getSocialSpyLevel(x.getUniqueId()) > highestLevel)
+            .map(Identifiable::getUniqueId)
             .collect(Collectors.toSet());
-
-        if (includeConsole) {
-            sources.add(Sponge.getServer().getConsole());
-        }
-
-        return sources;
     }
 
     @Override
-    public boolean sendMessage(final CommandSource sender, final CommandSource receiver, final String message) {
+    public boolean sendMessage(final MessageTarget sender, final MessageTarget receiver, final String message) {
         // Message is about to be sent. Send the event out. If canceled, then that's that.
         boolean isBlocked = false;
-        boolean isCancelled = Sponge.getEventManager().post(new InternalNucleusMessageEvent(sender, receiver, message));
-        if (isCancelled) {
-            this.serviceCollection.messageProvider().sendMessageTo(sender, "message.cancel");
-
-            // Only continue to show Social Spy messages if the subject is muted.
-            if (!this.messageConfig.isShowMessagesInSocialSpyWhileMuted()) {
-                return false;
+        this.checkValid(sender);
+        this.checkValid(receiver);
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            @Nullable final ServerPlayer senderAsPlayer = sender instanceof UserMessageTarget ?
+                    Sponge.getServer().getPlayer(((UserMessageTarget) sender).getUserUUID()).orElseThrow(() -> new IllegalArgumentException("Sender"
+                            + " is not online")) : null;
+            if (sender instanceof AbstractMessageTarget) {
+                ((AbstractMessageTarget) sender).pushCauseToFrame(frame);
+            } else {
+                frame.pushCause(sender);
             }
-        }
+            boolean isCancelled = Sponge.getEventManager().post(new InternalNucleusMessageEvent(frame.getCurrentCause(), sender, receiver, message));
+            if (isCancelled) {
 
-        // What about msgtoggle?
-        final IUserPreferenceService userPreferenceService = this.serviceCollection.userPreferenceService();
-        // Cancel message if the reciever has message toggle false
-        if (receiver instanceof Player && !this.serviceCollection.permissionService().hasPermission(sender, MessagePermissions.MSGTOGGLE_BYPASS) &&
-                !userPreferenceService.getUnwrapped(((Player) receiver).getUniqueId(), NucleusKeysProvider.RECEIVING_MESSAGES)) {
+                sender.getRepresentedAudience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, "message.cancel"));
 
-            isCancelled = true;
-            isBlocked = true;
-            this.serviceCollection.messageProvider().sendMessageTo(sender,
-                    "message.blocked",
-                    this.serviceCollection.playerDisplayNameService().getDisplayName(receiver));
-
-            if (!this.messageConfig.isShowMessagesInSocialSpyWhileMuted()) {
-                return false;
+                // Only continue to show Social Spy messages if the subject is muted.
+                if (!this.messageConfig.isShowMessagesInSocialSpyWhileMuted()) {
+                    return false;
+                }
             }
-        }
 
-        // Social Spies.
-        final UUID uuidSender = getUUID(sender);
-        final UUID uuidReceiver = getUUID(receiver);
+            // Cancel message if the receiver has message toggle false
+            if (!sender.isAvailableForMessages() && !receiver.canBypassMessageToggle()) {
 
-        final Map<String, Object> variables = Maps.newHashMap();
-        variables.put("from", sender);
-        variables.put("to", receiver);
+                isCancelled = true;
+                isBlocked = true;
+                sender.getRepresentedAudience().ifPresent(x ->
+                        this.serviceCollection.messageProvider().sendMessageTo(x,
+                        "message.blocked",
+                        receiver.getDisplayName()));
 
-        // Create the tokens.
-        final Map<String, Function<CommandSource, Optional<Text>>> tokens = Maps.newHashMap();
-        final IPlayerDisplayNameService displayNameService = this.serviceCollection.playerDisplayNameService();
-        tokens.put("from", cs -> getNameFromCommandSource(sender, displayNameService::getName));
-        tokens.put("to", cs -> getNameFromCommandSource(receiver, displayNameService::getName));
-        tokens.put("fromdisplay", cs -> getNameFromCommandSource(sender, displayNameService::getDisplayName));
-        tokens.put("todisplay", cs -> getNameFromCommandSource(receiver, displayNameService::getDisplayName));
-
-        final TextComponent tm = useMessage(sender, message);
-        final INucleusTextTemplateFactory textTemplateFactory = this.serviceCollection.textTemplateFactory();
-
-        if (!isCancelled) {
-            sender.sendMessage(constructMessage(sender, tm, this.messageConfig.getMessageSenderPrefix(textTemplateFactory), tokens, variables));
-            receiver.sendMessage(constructMessage(sender, tm, this.messageConfig.getMessageReceiverPrefix(textTemplateFactory), tokens, variables));
-        }
-
-        NucleusTextTemplateImpl prefix = this.messageConfig.getMessageSocialSpyPrefix(textTemplateFactory);
-        if (isBlocked) {
-            prefix = textTemplateFactory.createFromAmpersandString(this.messageConfig.getBlockedTag() + prefix.getRepresentation());
-        } if (isCancelled) {
-            prefix = textTemplateFactory.createFromAmpersandString(this.messageConfig.getMutedTag() + prefix.getRepresentation());
-        }
-
-        final MessageConfig.Targets targets = this.messageConfig.spyOn();
-        if (sender instanceof Player && targets.isPlayer() || sender instanceof ConsoleSource && targets.isCustom() || targets.isCustom()) {
-            final Set<CommandSource> lm = onlinePlayersCanSpyOn(
-                !uuidSender.equals(Util.CONSOLE_FAKE_UUID) && !uuidReceiver.equals(Util.CONSOLE_FAKE_UUID), sender, receiver
-            );
-
-            final MessageChannel mc = MessageChannel.fixed(lm);
-            if (!mc.getMembers().isEmpty()) {
-                mc.send(constructMessage(sender, tm, prefix, tokens, variables));
+                if (!this.messageConfig.isShowMessagesInSocialSpyWhileMuted()) {
+                    return false;
+                }
             }
-        }
 
-        // Add the UUIDs to the reply list - the receiver will now reply to the sender.
-        if (!isCancelled) {
-            this.messagesReceived.put(uuidReceiver, uuidSender);
-        }
+            // Social Spies.
+            final UUID uuidSender = this.getUUID(sender);
+            final UUID uuidReceiver = this.getUUID(receiver);
 
-        return !isCancelled;
+            // Create the tokens.
+            final Map<String, Function<Object, Optional<ComponentLike>>> tokens = Maps.newHashMap();
+            tokens.put("from", cs -> Optional.of(Component.text(sender.getName())));
+            tokens.put("to", cs -> Optional.of(Component.text(receiver.getName())));
+            tokens.put("fromdisplay", cs -> Optional.of(sender.getDisplayName()));
+            tokens.put("todisplay", cs -> Optional.of(receiver.getDisplayName()));
+
+            final Component tm = this.useMessage(senderAsPlayer, message);
+            final INucleusTextTemplateFactory textTemplateFactory = this.serviceCollection.textTemplateFactory();
+
+            if (!isCancelled) {
+                sender.getRepresentedAudience().ifPresent(x ->
+                        x.sendMessage(this.constructMessage(sender, tm, this.messageConfig.getMessageSenderPrefix(textTemplateFactory), tokens)));
+                receiver.receiveMessageFrom(sender,
+                        this.constructMessage(sender, tm, this.messageConfig.getMessageReceiverPrefix(textTemplateFactory), tokens));
+            }
+
+            NucleusTextTemplateImpl prefix = this.messageConfig.getMessageSocialSpyPrefix(textTemplateFactory);
+            if (isBlocked) {
+                prefix = textTemplateFactory.createFromAmpersandString(this.messageConfig.getBlockedTag() + prefix.asComponent());
+            }
+            if (isCancelled) {
+                prefix = textTemplateFactory.createFromAmpersandString(this.messageConfig.getMutedTag() + prefix.asComponent());
+            }
+
+            final MessageConfig.Targets targets = this.messageConfig.spyOn();
+            if (sender instanceof PlayerMessageTarget && targets.isPlayer() || sender instanceof SystemMessageTarget && targets.isServer() || targets.isCustom()) {
+                final Set<UUID> lm = this.onlinePlayersCanSpyOn(
+                        !uuidSender.equals(Util.CONSOLE_FAKE_UUID) && !uuidReceiver.equals(Util.CONSOLE_FAKE_UUID), sender, receiver
+                );
+
+                if (!lm.isEmpty()) {
+                    final Component socialSpyToSend = this.constructMessage(sender, tm, prefix, tokens);
+                    for (final UUID uuid : lm) {
+                        Sponge.getServer().getPlayer(uuid).ifPresent(x -> x.sendMessage(socialSpyToSend));
+                    }
+                }
+            }
+
+            return !isCancelled;
+        }
     }
 
-    private Optional<Text> getNameFromCommandSource(final CommandSource source, final Function<CommandSource, Text> standardFn) {
-        if (source instanceof Identifiable) {
-            final CustomMessageTarget<Object> target = this.targets.get(((Identifiable) source).getUniqueId());
-            if (target != null) {
-                return Optional.of(target.getDisplayName());
-            }
-        }
-
-        return Optional.of(standardFn.apply(source));
+    @Override
+    public SystemMessageTarget getSystemMessageTarget() {
+        return this.systemMessageTarget;
     }
 
-    public boolean replyMessage(final CommandSource sender, final String message) {
-        final Optional<CommandSource> cs = getLastMessageFrom(getUUID(sender));
-        if (cs.isPresent()) {
-            return sendMessage(sender, cs.get(), message);
+    @Override
+    public Optional<UserMessageTarget> getUserMessageTarget(final UUID uuid) {
+        return Optional.ofNullable(this.players.get(uuid));
+    }
+
+    @Override
+    public Optional<CustomMessageTarget> getCustomMessageTarget(final String identifier) {
+        return Optional.ofNullable(this.targetNames.get(identifier));
+    }
+
+    @Override
+    public Optional<MessageTarget> getCurrentReplyTarget(final MessageTarget target) {
+        return target.replyTarget().map(Function.identity());
+    }
+
+    @Override
+    public void setReplyTarget(final MessageTarget source, final MessageTarget newTarget) {
+        this.checkValid(source);
+        this.checkValid(newTarget);
+        source.setReplyTarget(newTarget);
+    }
+
+    @Override
+    public void clearReplyTarget(final MessageTarget source) {
+        this.checkValid(source);
+        source.setReplyTarget(null);
+    }
+
+    @Override
+    public void registerMessageTarget(final CustomMessageTarget messageTarget)
+            throws NullPointerException, IllegalArgumentException, IllegalStateException {
+        if (this.targetNames.containsKey(messageTarget.getIdentifier())) {
+            throw new IllegalArgumentException("Message target identifier " + messageTarget.getIdentifier() + " already in use.");
+        }
+        this.targetNames.put(messageTarget.getIdentifier(), messageTarget);
+    }
+
+    public boolean replyMessage(final UUID sender, final String message) {
+        @Nullable final MessageTarget mt;
+        if (sender == Util.CONSOLE_FAKE_UUID) {
+            mt = this.systemMessageTarget;
+        } else {
+            mt = this.players.get(sender);
         }
 
-        this.serviceCollection.messageProvider().sendMessageTo(sender, "message.noreply");
+        if (mt != null) {
+            if (mt.replyTarget().map(x -> this.sendMessage(mt, x, message)).isPresent()) {
+                return true;
+            }
+
+            mt.getRepresentedAudience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, "message.noreply"));
+        }
         return false;
     }
 
-    @Override public Optional<CommandSource> getConsoleReplyTo() {
-        return getLastMessageFrom(Util.CONSOLE_FAKE_UUID);
+    public Optional<MessageTarget> getTarget(final String target) {
+        return Optional.ofNullable(this.targetNames.get(target));
     }
 
-    @Override public Optional<CommandSource> getReplyTo(final User user) {
-        return getLastMessageFrom(user.getUniqueId());
+    public Set<String> getCustomTargets() {
+        return this.targetNames.keySet();
     }
 
-    @Override public <T extends CommandSource & Identifiable> Optional<CommandSource> getCommandSourceReplyTo(final T from) {
-        return getLastMessageFrom(from.getUniqueId());
+    public void addPlayer(final UUID uuid) {
+        this.players.put(uuid, new PlayerMessageTarget(uuid,
+                this.serviceCollection.userPreferenceService(),
+                this.serviceCollection.permissionService(),
+                this.serviceCollection.playerDisplayNameService()));
     }
 
-    @Override public void setReplyTo(final User user, final CommandSource toReplyTo) {
-        this.messagesReceived.put(user.getUniqueId(), getUUID(Preconditions.checkNotNull(toReplyTo)));
+    public void removePlayer(final UUID uuid) {
+        this.players.remove(uuid);
     }
 
-    @Override public void setConsoleReplyTo(final CommandSource toReplyTo) {
-        this.messagesReceived.put(Util.CONSOLE_FAKE_UUID, getUUID(Preconditions.checkNotNull(toReplyTo)));
+    private UUID getUUID(final MessageTarget sender) {
+        return sender instanceof UserMessageTarget ? ((UserMessageTarget) sender).getUserUUID() : Util.CONSOLE_FAKE_UUID;
     }
 
-    @Override public <T extends CommandSource & Identifiable> void setCommandSourceReplyTo(final T source, final CommandSource replyTo) {
-        this.messagesReceived.put(source.getUniqueId(), getUUID(replyTo));
+    private Component constructMessage(final MessageTarget sender, final Component message, final NucleusTextTemplateImpl template,
+            final Map<String, Function<Object, Optional<ComponentLike>>> tokens) {
+        return this.serviceCollection.textStyleService().joinTextsWithColoursFlowing(
+                template.getForObjectWithTokens(sender.getRepresentedAudience().orElseGet(Sponge::getSystemSubject), tokens),
+                message);
     }
 
-    @Override public void clearReplyTo(final User user) {
-        this.messagesReceived.remove(user.getUniqueId());
-    }
-
-    @Override public <T extends CommandSource & Identifiable> void clearCommandSourceReplyTo(final T user) {
-        this.messagesReceived.remove(user.getUniqueId());
-    }
-
-    @Override public void clearConsoleReplyTo() {
-        this.messagesReceived.remove(Util.CONSOLE_FAKE_UUID);
-    }
-
-    @Override
-    public <T extends CommandSource & Identifiable> void registerMessageTarget(final UUID uniqueId, final String targetName, @Nullable final TextComponent displayName,
-            final Supplier<T> target) {
-        Preconditions.checkNotNull(uniqueId);
-        Preconditions.checkNotNull(targetName);
-        Preconditions.checkNotNull(target);
-        Preconditions.checkArgument(!uniqueId.equals(Util.CONSOLE_FAKE_UUID), "Cannot use the zero UUID");
-        Preconditions.checkArgument(targetName.toLowerCase().matches("[a-z0-9_-]{3,}"),
-                "Target name must only contain letters, numbers, hyphens and underscores. and must be at least three characters long.");
-        Preconditions.checkState(!this.targets.containsKey(uniqueId), "UUID already registered");
-        Preconditions.checkState(!this.targetNames.containsKey(targetName.toLowerCase()), "Target name already registered.");
-
-        // Create it
-        this.targets.put(uniqueId, new CustomMessageTarget<>(uniqueId, displayName, target));
-        this.targetNames.put(targetName.toLowerCase(), uniqueId);
-    }
-
-    private Optional<CommandSource> getLastMessageFrom(final UUID from) {
-        Preconditions.checkNotNull(from);
-        final UUID to = this.messagesReceived.get(from);
-        if (to == null) {
-            return Optional.empty();
+    private Component useMessage(@Nullable final ServerPlayer player, final String m) {
+        if (player != null) {
+            this.serviceCollection.textStyleService().stripPermissionless(
+                    MessagePermissions.MESSAGE_COLOUR,
+                    MessagePermissions.MESSAGE_STYLE,
+                    player,
+                    m
+            );
         }
 
-        if (to.equals(Util.CONSOLE_FAKE_UUID)) {
-            return Optional.of(Sponge.getServer().getConsole());
-        }
-
-        if (this.targets.containsKey(to)) {
-            final Optional<Object> om = this.targets.get(to).get();
-            if (om.isPresent()) {
-                return om.map(x -> x);
-            }
-        }
-
-        return Sponge.getServer().getOnlinePlayers().stream().filter(x -> x.getUniqueId().equals(to)).map(y -> (CommandSource) y).findFirst();
-    }
-
-    public Optional<CommandSource> getTarget(final String target) {
-        final UUID u = this.targetNames.get(target.toLowerCase());
-        if (u != null) {
-            final CustomMessageTarget<Object> cmt = this.targets.get(u);
-            if (cmt != null) {
-                return cmt.get().map(x -> x);
-            }
-        }
-
-        return Optional.empty();
-    }
-
-    public ImmutableMap<String, UUID> getTargetNames() {
-        return ImmutableMap.copyOf(this.targetNames);
-    }
-
-    private UUID getUUID(final CommandSource sender) {
-        return sender instanceof Identifiable ? ((Identifiable) sender).getUniqueId() : Util.CONSOLE_FAKE_UUID;
-    }
-
-    private TextComponent constructMessage(final CommandSource sender, final TextComponent message, final NucleusTextTemplateImpl template,
-            final Map<String, Function<CommandSource, Optional<Text>>> tokens, final Map<String, Object> variables) {
-        return this.serviceCollection.textStyleService().joinTextsWithColoursFlowing(template.getForObject(sender, tokens), message);
-    }
-
-    private TextComponent useMessage(final CommandSource player, final String m) {
-        this.serviceCollection.textStyleService().stripPermissionless(
-                MessagePermissions.MESSAGE_COLOUR,
-                MessagePermissions.MESSAGE_STYLE,
-                player,
-                m
-        );
-
-        final TextComponent result;
-        if (this.serviceCollection.permissionService().hasPermission(player, MessagePermissions.MESSAGE_URLS)) {
+        final Component result;
+        if (player == null || this.serviceCollection.permissionService().hasPermission(player, MessagePermissions.MESSAGE_URLS)) {
             result = this.serviceCollection.textStyleService().addUrls(m);
         } else {
-            result = TextSerializers.FORMATTING_CODE.deserialize(m);
+            result = LegacyComponentSerializer.legacyAmpersand().deserialize(m);
         }
 
         return result;
     }
 
-    private int getSocialSpyLevelForSource(final CommandSource source) {
+    private int getSocialSpyLevelForSource(final MessageTarget source) {
         if (this.useLevels) {
-            if (source instanceof User) {
-               return getSocialSpyLevel((User) source);
-            } else if (source instanceof Identifiable && this.targets.containsKey(((Identifiable) source).getUniqueId())) {
+            if (source instanceof UserMessageTarget) {
+               return this.getSocialSpyLevel(((UserMessageTarget) source).getUserUUID());
+            } else if (source instanceof CustomMessageTarget) {
                 return this.messageConfig.getCustomTargetLevel();
             }
 
@@ -424,33 +410,13 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
         return 0;
     }
 
-    private static class CustomMessageTarget<T extends CommandSource & Identifiable> implements Identifiable {
-
-        private final UUID uuid;
-        @Nullable private final TextComponent displayName;
-        private final Supplier<T> supplier;
-
-        private CustomMessageTarget(final UUID uuid, @Nullable final TextComponent displayName, final Supplier<T> supplier) {
-            this.uuid = uuid;
-            this.displayName = displayName;
-            this.supplier = supplier;
+    private void checkValid(final MessageTarget messageTarget) {
+        if ((messageTarget == this.systemMessageTarget) ||
+                (messageTarget instanceof PlayerMessageTarget && this.players.containsValue(messageTarget)) ||
+                (messageTarget instanceof CustomMessageTarget && this.targetNames.containsValue(messageTarget))) {
+            return;
         }
-
-        private Optional<T> get() {
-            final T t = this.supplier.get();
-            if (t.getUniqueId().equals(this.uuid)) {
-                return Optional.of(t);
-            }
-
-            return Optional.empty();
-        }
-
-        private TextComponent getDisplayName() {
-            return this.displayName == null ? Text.of(this.supplier.get().getName()) : this.displayName;
-        }
-
-        @Override public UUID getUniqueId() {
-            return this.uuid;
-        }
+        throw new IllegalStateException("Target is not online or not registered.");
     }
+
 }

@@ -4,19 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.message.events;
 
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.cause.Cause;
+import io.github.nucleuspowered.nucleus.api.module.message.event.NucleusHelpOpEvent;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
-public class InternalNucleusHelpOpEvent extends AbstractEvent implements Cancellable {
+public class InternalNucleusHelpOpEvent extends AbstractEvent implements NucleusHelpOpEvent {
 
     private final String message;
     private final Cause cause;
     private boolean isCancelled = false;
 
-    public InternalNucleusHelpOpEvent(final CommandSource from, final String message) {
-        this.cause = CauseStackHelper.createCause(from);
+    public InternalNucleusHelpOpEvent(final String message) {
+        this.cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
         this.message = message;
     }
 
@@ -35,6 +35,7 @@ public class InternalNucleusHelpOpEvent extends AbstractEvent implements Cancell
         this.isCancelled = cancel;
     }
 
+    @Override
     public String getMessage() {
         return this.message;
     }

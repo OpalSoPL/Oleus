@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.message.commands;
 
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -11,7 +12,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.UserPreferenceService;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
@@ -35,13 +35,16 @@ public class MsgToggleCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final UserPreferenceService userPreferenceService = context.getServiceCollection().getServiceUnchecked(UserPreferenceService.class);
         final UUID player = context.getIfPlayer().getUniqueId();
-        final boolean flip = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
-                .orElseGet(() -> userPreferenceService.getUnwrapped(player, NucleusKeysProvider.RECEIVING_MESSAGES));
+        final NucleusUserPreferenceService.PreferenceKey<Boolean> key =
+                context.getServiceCollection().userPreferenceService().keys().messageReceivingEnabled().orElseThrow(IllegalStateException::new);
+        final boolean flip = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE)
+                .orElseGet(() -> userPreferenceService.getUnwrapped(player, key));
 
-        userPreferenceService.set(player, NucleusKeysProvider.RECEIVING_MESSAGES, flip);
+        userPreferenceService.set(player, key, flip);
         context.sendMessage("command.msgtoggle.success." + flip);
 
         return context.successResult();

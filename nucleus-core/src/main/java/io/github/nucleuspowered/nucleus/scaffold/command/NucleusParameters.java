@@ -177,11 +177,21 @@ public final class NucleusParameters {
                 NucleusParameters.ONE_USER,
                 NucleusParameters.GAME_PROFILE
         );
+        public static final Parameter PLAYER_OR_CONSOLE = Parameter.firstOf(
+                NucleusParameters.CONSOLE_FROM_DASH,
+                NucleusParameters.ONE_PLAYER
+        );
 
         public static Either<User, GameProfile> parseUserOrGameProfile(final ICommandContext context) {
             return context.getOne(NucleusParameters.ONE_USER)
                     .<Either<User, GameProfile>>map(Either::left)
                     .orElseGet(() -> Either.right(context.requireOne(NucleusParameters.GAME_PROFILE)));
+        }
+
+        public static Either<SystemSubject, ServerPlayer> parsePlayerOrConsole(final ICommandContext context) {
+            return context.getOne(NucleusParameters.CONSOLE_FROM_DASH)
+                    .<Either<SystemSubject, ServerPlayer>>map(Either::left)
+                    .orElseGet(() -> Either.right(context.requireOne(NucleusParameters.ONE_PLAYER)));
         }
     }
 

@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.ignore.listeners;
 
 import com.google.common.collect.Lists;
-import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.mail.event.NucleusSendMailEvent;
 import io.github.nucleuspowered.nucleus.api.module.message.event.NucleusMessageEvent;
 import io.github.nucleuspowered.nucleus.modules.ignore.IgnorePermissions;
@@ -16,13 +15,10 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatte
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.PlayerChatEvent;
 
 import java.util.Collection;
@@ -61,9 +57,9 @@ public class IgnoreListener implements ListenerBase {
 
     @Listener(order = Order.FIRST)
     public void onMessage(final NucleusMessageEvent event, @Root final ServerPlayer player) {
-        if (event.getRecipient().isPresent()) {
+        if (event.getReceiver().isPresent()) {
             try {
-                event.setCancelled(this.service.isIgnored(event.getRecipient().get(), player.getUniqueId()));
+                event.setCancelled(this.service.isIgnored(event.getReceiver().get(), player.getUniqueId()));
             } catch (final Exception e) {
                 e.printStackTrace();
             }

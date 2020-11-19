@@ -516,13 +516,13 @@ public class TextStyleService implements ITextStyleService {
     }
 
     @Override
-    public Component joinTextsWithColoursFlowing(final TextComponent... texts) {
-        final List<TextComponent> result = new ArrayList<>();
-        TextComponent last = null;
-        for (final TextComponent n : texts) {
+    public Component joinTextsWithColoursFlowing(final Component... texts) {
+        final List<Component> result = new ArrayList<>();
+        Component last = null;
+        for (final Component n : texts) {
             if (last != null) {
                 final TextFormat st = this.getLastColourAndStyle(last, null);
-                final TextComponent.Builder builder = n.toBuilder();
+                final TextComponent.Builder builder = Component.text().append(n);
                 st.colour().ifPresent(builder::color);
                 builder.style(st.style());
                 result.add(builder.build());

@@ -5,19 +5,20 @@
 package io.github.nucleuspowered.nucleus.modules.message.events;
 
 import io.github.nucleuspowered.nucleus.api.module.message.event.NucleusMessageEvent;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.event.cause.Cause;
+import io.github.nucleuspowered.nucleus.api.module.message.target.MessageTarget;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
+
 public class InternalNucleusMessageEvent extends AbstractEvent implements NucleusMessageEvent {
 
     private final Cause cause;
-    private final CommandSource from;
-    private final CommandSource to;
+    private final MessageTarget from;
+    private final MessageTarget to;
     private final String message;
     private boolean isCancelled = false;
 
-    public InternalNucleusMessageEvent(final CommandSource from, final CommandSource to, final String message) {
-        this.cause = CauseStackHelper.createCause(from);
+    public InternalNucleusMessageEvent(final Cause cause, final MessageTarget from, final MessageTarget to, final String message) {
+        this.cause = cause;
         this.from = from;
         this.to = to;
         this.message = message;
@@ -29,12 +30,12 @@ public class InternalNucleusMessageEvent extends AbstractEvent implements Nucleu
     }
 
     @Override
-    public CommandSource getSender() {
+    public MessageTarget getSender() {
         return this.from;
     }
 
     @Override
-    public CommandSource getRecipient() {
+    public MessageTarget getReceiver() {
         return this.to;
     }
 

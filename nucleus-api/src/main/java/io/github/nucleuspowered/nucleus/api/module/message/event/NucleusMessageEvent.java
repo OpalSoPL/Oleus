@@ -4,8 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.message.event;
 
+import io.github.nucleuspowered.nucleus.api.module.message.target.MessageTarget;
+import io.github.nucleuspowered.nucleus.api.module.message.target.UserMessageTarget;
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 
@@ -21,10 +25,21 @@ public interface NucleusMessageEvent extends Event, Cancellable {
     /**
      * The sender.
      *
-     * @return The {@link UUID} of the user that sent the message,
-     *  or {@link Optional#empty()} for the {@link SystemSubject}.
+     * @return The {@link MessageTarget} of the user that sent the message.
      */
-    Optional<UUID> getSender();
+    MessageTarget getSender();
+
+    /**
+     * The sender, if it is a player.
+     *
+     * @return The sender as a player.
+     */
+    default Optional<ServerPlayer> getSenderAsPlayer() {
+        if (this.getSender() instanceof UserMessageTarget) {
+            return Sponge.getServer().getPlayer(((UserMessageTarget) this.getSender()).getUserUUID());
+        }
+        return Optional.empty();
+    }
 
     /**
      * The recipient.
@@ -32,7 +47,19 @@ public interface NucleusMessageEvent extends Event, Cancellable {
      * @return The {@link UUID} that receives the message, or
      *  {@link Optional#empty()} for the {@link SystemSubject}.
      */
-    Optional<UUID> getRecipient();
+    MessageTarget getReceiver();
+
+    /**
+     * The receiver, if it is a player.
+     *
+     * @return The reciever as a player.
+     */
+    default Optional<ServerPlayer> getReceiverAsPlayer() {
+        if (this.getReceiver() instanceof UserMessageTarget) {
+            return Sponge.getServer().getPlayer(((UserMessageTarget) this.getReceiver()).getUserUUID());
+        }
+        return Optional.empty();
+    }
 
     /**
      * The message that was sent.

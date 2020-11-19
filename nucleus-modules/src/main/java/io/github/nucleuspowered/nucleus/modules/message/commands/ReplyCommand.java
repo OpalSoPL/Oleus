@@ -4,6 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.message.commands;
 
+import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
 import io.github.nucleuspowered.nucleus.modules.message.services.MessageHandler;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -45,10 +47,12 @@ public class ReplyCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final boolean b = context.getServiceCollection().getServiceUnchecked(MessageHandler.class)
-                .replyMessage(context.getCommandSourceRoot(), context.requireOne(NucleusParameters.Keys.MESSAGE, String.class));
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final MessageHandler messageHandler = context.getServiceCollection().getServiceUnchecked(MessageHandler.class);
+        final boolean b = messageHandler.replyMessage(context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID), context.requireOne(NucleusParameters.MESSAGE));
         if (b) {
+            NucleusAPI.getAFKService().map(x -> x.isAFK())
             // For Notify on AFK - TODO: Better way to do this
             /* UUID uuid = context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID);
             this.handler.getLastMessageFrom(uuid).ifPresent(x -> args.putArg(NucleusParameters.Keys.PLAYER, x)); */

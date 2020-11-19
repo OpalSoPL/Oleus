@@ -94,7 +94,7 @@ public interface ITextStyleService {
 
     Component oldLegacy(String message);
 
-    Component joinTextsWithColoursFlowing(TextComponent... texts);
+    Component joinTextsWithColoursFlowing(Component... texts);
 
     interface TextFormat {
 

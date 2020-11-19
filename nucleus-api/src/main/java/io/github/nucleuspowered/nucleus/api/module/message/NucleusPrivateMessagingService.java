@@ -150,7 +150,7 @@ public interface NucleusPrivateMessagingService {
      *
      * @return The {@link UserMessageTarget}
      */
-    UserMessageTarget getUserMessageTarget(UUID uuid);
+    Optional<UserMessageTarget> getUserMessageTarget(UUID uuid);
 
     /**
      * Gets the {@link CustomMessageTarget} for the given identifier.
@@ -159,7 +159,7 @@ public interface NucleusPrivateMessagingService {
      *
      * @return The {@link CustomMessageTarget}
      */
-    CustomMessageTarget getCustomMessageTarget(String identifier);
+    Optional<CustomMessageTarget> getCustomMessageTarget(String identifier);
 
     /**
      * Gets the current {@link MessageTarget} that the given
@@ -178,7 +178,7 @@ public interface NucleusPrivateMessagingService {
      * @return The target to reply to, if any.
      */
     default Optional<MessageTarget> getCurrentReplyTarget(final UUID user) {
-        return this.getCurrentReplyTarget(this.getUserMessageTarget(user));
+        return this.getUserMessageTarget(user).flatMap(this::getCurrentReplyTarget);
     }
 
     /**

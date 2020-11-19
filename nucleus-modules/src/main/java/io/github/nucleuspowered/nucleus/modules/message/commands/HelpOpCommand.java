@@ -4,9 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.message.commands;
 
-import io.github.nucleuspowered.nucleus.api.EventContexts;
-import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
-import io.github.nucleuspowered.nucleus.modules.message.HelpOpMessageChannel;
+import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
 import io.github.nucleuspowered.nucleus.modules.message.config.MessageConfig;
 import io.github.nucleuspowered.nucleus.modules.message.events.InternalNucleusHelpOpEvent;
@@ -19,17 +17,17 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
+import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
+import io.github.nucleuspowered.nucleus.util.PermissionMessageChannel;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.text.Text;
-import com.google.inject.Inject;
 
 @EssentialsEquivalent({"helpop", "amsg", "ac"})
 @Command(
@@ -45,13 +43,7 @@ import com.google.inject.Inject;
 )
 public class HelpOpCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private final IChatMessageFormatterService chatMessageFormatterService;
-    @Nullable private HelpOpMessageChannel channel;
-
-    @Inject
-    public HelpOpCommand(final INucleusServiceCollection serviceCollection) {
-        this.chatMessageFormatterService = serviceCollection.chatMessageFormatter();
-    }
+    private NucleusTextTemplate prefix = NucleusTextTemplateImpl.empty();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -60,39 +52,44 @@ public class HelpOpCommand implements ICommandExecutor, IReloadableService.Reloa
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final String message = context.requireOne(NucleusParameters.Keys.MESSAGE, String.class);
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final String message = context.requireOne(NucleusParameters.MESSAGE);
+        final ServerPlayer player = context.requirePlayer();
 
-        // Message is about to be sent. Send the event out. If canceled, then
-        // that's that.
-        if (Sponge.getEventManager().post(new InternalNucleusHelpOpEvent(context.getCommandSourceRoot(), message))) {
-            return context.errorResult("message.cancel");
-        }
-
-        final Player player = context.getIfPlayer();
-
-        final MessageChannelEvent.Chat chat;
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame();
-                final NoExceptionAutoClosable c = this.chatMessageFormatterService.setPlayerNucleusChannelTemporarily(player.getUniqueId(), this.channel)) {
-            frame.addContext(EventContexts.SHOULD_FORMAT_CHANNEL, false);
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(player);
-            chat = player.simulateChat(Text.of(message), Sponge.getCauseStackManager().getCurrentCause());
+            // Message is about to be sent. Send the event out. If canceled, then
+            // that's that.
+            if (Sponge.getEventManager().post(new InternalNucleusHelpOpEvent(message))) {
+                return context.errorResult("message.cancel");
+            }
         }
 
-        if (chat.isCancelled()) {
-            context.sendMessage("command.helpop.fail");
-        } else {
-            context.sendMessage("command.helpop.success");
-        }
+        new PermissionMessageChannel(context.getServiceCollection().permissionService(), MessagePermissions.HELPOP_RECEIVE)
+                .sendMessage(player, this.formatMessage(context, Component.text(message)));
 
+        context.sendMessage("command.helpop.success");
         return context.successResult();
     }
 
-    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.channel = new HelpOpMessageChannel(
-                serviceCollection.configProvider().getModuleConfig(MessageConfig.class).getHelpOpPrefix(serviceCollection.textTemplateFactory()),
-                serviceCollection.permissionService(),
-                serviceCollection.textStyleService()
+    private Component formatMessage(final ICommandContext source, final Component body) {
+        final Component prefixComponent;
+        if (this.prefix != null) {
+            prefixComponent = this.prefix.getForObject(source);
+        } else {
+            prefixComponent = Component.empty();
+        }
+
+        final ITextStyleService.TextFormat format = source.getServiceCollection().textStyleService().getLastColourAndStyle(prefixComponent, null);
+        return LinearComponents.linear(
+                prefixComponent,
+                Component.text().color(format.colour().orElse(null)).style(format.style()).append(body).build()
         );
+    }
+
+    @Override
+    public void onReload(final INucleusServiceCollection serviceCollection) {
+        this.prefix = serviceCollection.configProvider().getModuleConfig(MessageConfig.class).getHelpOpPrefix(serviceCollection.textTemplateFactory());
     }
 }
