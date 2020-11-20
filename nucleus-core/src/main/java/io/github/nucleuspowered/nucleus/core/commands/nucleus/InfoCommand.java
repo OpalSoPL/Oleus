@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.core.commands.nucleus;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.IPluginInfo;
 import io.github.nucleuspowered.nucleus.core.CorePermissions;
@@ -28,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,8 +37,8 @@ import java.util.stream.Collectors;
         aliases = "info",
         basePermission = CorePermissions.BASE_NUCLEUS_INFO,
         commandDescriptionKey = "nucleus.info",
-        parentCommand = NucleusCommand.class,
-        )
+        parentCommand = NucleusCommand.class
+)
 public final class InfoCommand implements ICommandExecutor {
 
     private final IPluginInfo pluginInfo;
@@ -87,8 +86,8 @@ public final class InfoCommand implements ICommandExecutor {
         information.add("Registered Commands");
         information.add(separator);
 
-        final Map<String, String> commands = Maps.newHashMap();
-        final Map<String, String> plcmds = Maps.newHashMap();
+        final Map<String, String> commands = new HashMap<>();
+        final Map<String, String> plcmds = new HashMap<>();
         final CommandManager manager = Sponge.getCommandManager();
         manager.getKnownAliases().stream()
                 .map(x -> manager.getCommandMapping(x).orElse(null))

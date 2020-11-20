@@ -55,6 +55,12 @@ import io.github.nucleuspowered.nucleus.modules.kick.config.KickConfig;
 import io.github.nucleuspowered.nucleus.modules.kit.KitModule;
 import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
 import io.github.nucleuspowered.nucleus.modules.mail.MailModule;
+import io.github.nucleuspowered.nucleus.modules.message.MessageModule;
+import io.github.nucleuspowered.nucleus.modules.message.config.MessageConfig;
+import io.github.nucleuspowered.nucleus.modules.misc.MiscModule;
+import io.github.nucleuspowered.nucleus.modules.misc.config.MiscConfig;
+import io.github.nucleuspowered.nucleus.modules.mob.MobModule;
+import io.github.nucleuspowered.nucleus.modules.mob.config.MobConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -111,6 +117,9 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(KickModule.ID, "Kick", KickModule.class, KickConfig.class));
         containers.add(NucleusModuleProvider.createContainer(KitModule.ID, "Kit", KitModule.class, KitConfig.class));
         containers.add(NucleusModuleProvider.createContainer(MailModule.ID, "Mail", MailModule.class));
+        containers.add(NucleusModuleProvider.createContainer(MessageModule.ID, "Private Message", MessageModule.class, MessageConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(MiscModule.ID, "Miscellaneous", MiscModule.class, MiscConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(MobModule.ID, "Mob", MobModule.class, MobConfig.class));
         return containers;
     }
 

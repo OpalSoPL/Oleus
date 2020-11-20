@@ -4,24 +4,23 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mob.config;
 
-import com.google.common.collect.Lists;
-import io.github.nucleuspowered.neutrino.annotations.ProcessSetting;
-import io.github.nucleuspowered.neutrino.settingprocessor.LowercaseListSettingProcessor;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import uk.co.drnaylor.quickstart.config.NoMergeIfPresent;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ConfigSerializable
 public class BlockSpawnsConfig {
 
-    @Setting(value = "block-vanilla-mobs", comment = "config.blockspawn.vanilla")
+    @Setting(value = "block-vanilla-mobs")
+    @LocalisedComment("config.blockspawn.vanilla")
     private boolean blockVanillaMobs = false;
 
-    @NoMergeIfPresent
-    @Setting(value = "block-mobs-with-ids", comment = "config.blockspawn.ids")
-    @ProcessSetting(LowercaseListSettingProcessor.class)
+    @Setting(value = "block-mobs-with-ids")
+    @LocalisedComment("config.blockspawn.ids")
     private List<String> idsToBlock = new ArrayList<>();
 
     public boolean isBlockVanillaMobs() {
@@ -29,6 +28,6 @@ public class BlockSpawnsConfig {
     }
 
     public List<String> getIdsToBlock() {
-        return this.idsToBlock;
+        return this.idsToBlock.stream().map(String::toLowerCase).collect(Collectors.toList());
     }
 }

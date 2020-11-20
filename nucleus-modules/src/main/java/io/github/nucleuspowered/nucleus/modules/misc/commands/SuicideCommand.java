@@ -12,8 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+
 @EssentialsEquivalent("suicide")
 @Command(aliases = { "suicide" }, basePermission = MiscPermissions.BASE_SUICIDE, commandDescriptionKey = "suicide")
 public class SuicideCommand implements ICommandExecutor {

@@ -5,10 +5,10 @@
 package io.github.nucleuspowered.nucleus.modules.mob.config;
 
 import com.google.common.collect.ImmutableMap;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.world.World;
-import uk.co.drnaylor.quickstart.config.NoMergeIfPresent;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,19 +17,24 @@ import java.util.Optional;
 @ConfigSerializable
 public class MobConfig {
 
-    @Setting(value = "max-mobs-to-spawn", comment = "config.mobspawn.maxamt")
+    @Setting(value = "max-mobs-to-spawn")
+    @LocalisedComment("config.mobspawn.maxamt")
     private int maxMobsToSpawn = 20;
 
-    @NoMergeIfPresent
-    @Setting(value = "spawning-blocks", comment = "config.blockspawn.category")
-    private Map<String, BlockSpawnsConfig> blockSpawnsConfig = new HashMap<String, BlockSpawnsConfig>() {{
-        put("world", new BlockSpawnsConfig());
-        put("DIM-1", new BlockSpawnsConfig());
-        put("DIM1", new BlockSpawnsConfig());
-    }};
+    @Setting(value = "spawning-blocks")
+    @LocalisedComment("config.blockspawn.category")
+    private Map<String, BlockSpawnsConfig> blockSpawnsConfig;
 
-    @Setting(value = "separate-mob-spawning-permissions", comment = "config.mobspawn.permob")
+    @Setting(value = "separate-mob-spawning-permissions")
+    @LocalisedComment("config.mobspawn.permob")
     private boolean perMobPermission = false;
+
+    public MobConfig() {
+        this.blockSpawnsConfig = new HashMap<>();
+        this.blockSpawnsConfig.put("world", new BlockSpawnsConfig());
+        this.blockSpawnsConfig.put("DIM-1", new BlockSpawnsConfig());
+        this.blockSpawnsConfig.put("DIM1", new BlockSpawnsConfig());
+    }
 
     public int getMaxMobsToSpawn() {
         return Math.max(1, this.maxMobsToSpawn);
@@ -39,8 +44,8 @@ public class MobConfig {
         return ImmutableMap.copyOf(this.blockSpawnsConfig);
     }
 
-    public Optional<BlockSpawnsConfig> getBlockSpawnsConfigForWorld(final World world) {
-        return Optional.ofNullable(this.blockSpawnsConfig.get(world.getName()));
+    public Optional<BlockSpawnsConfig> getBlockSpawnsConfigForWorld(final ServerWorld world) {
+        return Optional.ofNullable(this.blockSpawnsConfig.get(world.getKey().asString()));
     }
 
     public boolean isPerMobPermission() {

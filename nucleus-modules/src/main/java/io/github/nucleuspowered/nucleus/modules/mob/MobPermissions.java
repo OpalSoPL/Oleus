@@ -31,8 +31,8 @@ public final class MobPermissions {
     @PermissionMetadata(descriptionKey = "permission.others", replacements = { "spawnmob" }, level = SuggestedLevel.ADMIN)
     public static final String OTHERS_SPAWNMOB = "nucleus.spawnmob.others";
 
-    public static String getSpawnMobPermissionFor(final EntityType entityType) {
-        return SPAWNMOB_MOB + "." + entityType.getId().toLowerCase().replace(":", ".");
+    public static String getSpawnMobPermissionFor(final EntityType<?> entityType) {
+        return SPAWNMOB_MOB + "." + entityType.getKey().asString().toLowerCase().replace(":", ".");
     }
 
 }

@@ -14,10 +14,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.Ticks;
+
 @EssentialsEquivalent("heal")
 @Command(
         aliases = {"heal"},
@@ -32,17 +33,19 @@ import org.spongepowered.api.entity.living.player.Player;
 )
 public class HealCommand implements ICommandExecutor { // extends AbstractCommand.SimpleTargetOtherPlayer {
 
-    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+    @Override
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
                 serviceCollection.commandElementSupplier()
-                        .createOnlyOtherUserPermissionElement(true, MiscPermissions.OTHERS_HEAL)
+                        .createOnlyOtherPlayerPermissionElement(MiscPermissions.OTHERS_HEAL)
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player pl = context.getPlayerFromArgs();
-        if (pl.offer(Keys.HEALTH, pl.get(Keys.MAX_HEALTH).get()).isSuccessful()) {
-            pl.offer(Keys.FIRE_TICKS, 0);
+        if (pl.offer(Keys.HEALTH, pl.get(Keys.MAX_HEALTH).orElse(20.0)).isSuccessful()) {
+            pl.offer(Keys.FIRE_TICKS, Ticks.zero());
             context.sendMessageTo(pl, "command.heal.success.self");
             if (!context.is(pl)) {
                 context.sendMessage("command.heal.success.other", pl.getName());

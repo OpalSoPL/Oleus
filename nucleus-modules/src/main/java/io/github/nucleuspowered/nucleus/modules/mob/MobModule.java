@@ -4,30 +4,35 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mob;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.mob.config.MobConfig;
-import io.github.nucleuspowered.nucleus.modules.mob.config.MobConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = MobModule.ID, name = "Mob")
-public class MobModule extends ConfigurableModule<MobConfig, MobConfigAdapter> {
+public class MobModule implements IModule.Configurable<MobConfig> {
 
     public final static String ID = "mob";
 
-    @Inject
-    public MobModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override public void init(final INucleusServiceCollection serviceCollection) {
     }
 
-    @Override
-    public MobConfigAdapter createAdapter() {
-        return new MobConfigAdapter();
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
     }
 
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override public Class<MobConfig> getConfigClass() {
+        return null;
+    }
 }

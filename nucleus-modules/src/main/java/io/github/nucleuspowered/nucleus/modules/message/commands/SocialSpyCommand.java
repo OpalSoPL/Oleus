@@ -16,6 +16,8 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 @EssentialsEquivalent("socialspy")
 @Command(
         aliases = {"socialspy"},
@@ -33,15 +35,16 @@ public class SocialSpyCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player src = context.getCommandSourceRoot();
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer src = context.requirePlayer();
         final MessageHandler handler = context.getServiceCollection().getServiceUnchecked(MessageHandler.class);
-        if (handler.forcedSocialSpyState(src).asBoolean()) {
+        if (handler.forcedSocialSpyState(src.getUniqueId()).asBoolean()) {
             return context.errorResult("command.socialspy.forced");
         }
 
-        final boolean spy = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElseGet(() -> !handler.isSocialSpy(src));
-        if (handler.setSocialSpy(src, spy)) {
+        final boolean spy = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !handler.isSocialSpy(src.getUniqueId()));
+        if (handler.setSocialSpy(src.getUniqueId(), spy)) {
             context.sendMessage(spy ? "command.socialspy.on" : "command.socialspy.off");
             return context.successResult();
         }

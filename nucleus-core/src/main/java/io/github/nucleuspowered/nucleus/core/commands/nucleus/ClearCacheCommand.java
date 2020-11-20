@@ -15,8 +15,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
         aliases = "nucleus",
         basePermission = CorePermissions.BASE_NUCLEUS_CLEARCACHE,
         commandDescriptionKey = "nucleus.clearcache",
-        parentCommand = NucleusCommand.class,
-        )
+        parentCommand = NucleusCommand.class
+)
 public class ClearCacheCommand implements ICommandExecutor {
 
     @Override

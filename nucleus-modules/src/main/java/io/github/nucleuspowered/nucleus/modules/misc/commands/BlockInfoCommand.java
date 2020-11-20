@@ -12,24 +12,21 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.util.TypeTokens;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.CommandFlags;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.blockray.BlockRay;
-import org.spongepowered.api.util.blockray.BlockRayHit;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.state.StateProperty;
+import org.spongepowered.api.util.blockray.RayTrace;
+import org.spongepowered.api.util.blockray.RayTraceResult;
+import org.spongepowered.api.world.LocatableBlock;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,73 +42,71 @@ import java.util.Optional;
 public class BlockInfoCommand implements ICommandExecutor {
 
     @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        return new Flag[] {
+                Flag.builder().alias("e").alias("extended").setRequirement(commandCause -> permissionService.hasPermission(commandCause,
+                        MiscPermissions.BLOCKINFO_EXTENDED)).build()
+        };
+    }
+
+    @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            GenericArguments.flags()
-                    .setUnknownShortFlagBehavior(CommandFlags.UnknownFlagBehavior.IGNORE)
-                    .permissionFlag(MiscPermissions.BLOCKINFO_EXTENDED, "e", "-extended")
-                    .buildWith(NucleusParameters.OPTIONAL_LOCATION)
+            NucleusParameters.OPTIONAL_LOCATION
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        Location<World> loc = null;
-        if (context.hasAny(NucleusParameters.Keys.LOCATION)) {
+        final Optional<LocatableBlock> loc;
+        if (context.hasAny(NucleusParameters.OPTIONAL_LOCATION)) {
             // get the location
-            loc = context.getOne(NucleusParameters.Keys.LOCATION, TypeTokens.LOCATION_WORLD)
-                    .filter(x -> x.getBlockType() != BlockTypes.AIR).orElse(null);
+            loc = context.getOne(NucleusParameters.OPTIONAL_LOCATION)
+                    .filter(x -> !x.getBlockType().isAnyOf(
+                            BlockTypes.CAVE_AIR.get(),
+                            BlockTypes.AIR.get(),
+                            BlockTypes.VOID_AIR.get()
+                    ))
+                    .map(ServerLocation::asLocatableBlock);
         } else {
-            if (!context.is(Player.class)) {
-                return context.errorResult("command.blockinfo.player");
-            }
-            final BlockRay<World> bl =
-                    BlockRay.from(context.getIfPlayer())
-                            .distanceLimit(10).stopFilter(BlockRay.continueAfterFilter(BlockRay.onlyAirFilter(), 1)).build();
-            final Optional<BlockRayHit<World>> ob = bl.end();
-
-            // If the last block is not air...
-            if (ob.isPresent() && ob.get().getLocation().getBlockType() != BlockTypes.AIR) {
-                final BlockRayHit<World> brh = ob.get();
-                loc = brh.getLocation();
-            }
+            final ServerPlayer serverPlayer = context.requirePlayer();
+            loc = RayTrace.block().sourceEyePosition(serverPlayer).direction(serverPlayer)
+                    .select(RayTrace.nonAir())
+                    .continueWhileBlock(RayTrace.onlyAir())
+                    .execute().map(RayTraceResult::getSelectedObject);
         }
 
-        if (loc != null) {
+        if (loc.isPresent()) {
             // get the information.
-            final BlockState b = loc.getBlock();
-            final BlockType it = b.getType();
+            final LocatableBlock block = loc.get();
+            final BlockState blockState = block.getBlockState();
+            final List<Component> lt = new ArrayList<>();
+            lt.add(context.getMessage("command.blockinfo.id",
+                    blockState.getType().getKey().asString(),
+                    blockState.getType().asComponent()));
+            lt.add(context.getMessage("command.iteminfo.extendedid", blockState.toString()));
 
-            final List<Text> lt = new ArrayList<>();
-            lt.add(context.getMessage("command.blockinfo.id", it.getId(), it.getTranslation().get()));
-            lt.add(context.getMessage("command.iteminfo.extendedid", b.getId()));
-
-            if (context.hasAny("e") || context.hasAny("extended")) {
-                final Collection<Property<?, ?>> cp = b.getApplicableProperties();
+            if (context.hasFlag("e")) {
+                final Collection<StateProperty<?>> cp = blockState.getStateProperties();
                 if (!cp.isEmpty()) {
-                    cp.forEach(x -> {
-                        if (x.getValue() != null) {
-                            DataScanner.getInstance(context.getServiceCollection().messageProvider())
-                                    .getText(context.getCommandSourceAsPlayerUnchecked(), "command.blockinfo.property.item", x.getKey().toString(), x.getValue()).ifPresent(lt::add);
-                        }
-                    });
-                }
-
-                final Collection<BlockTrait<?>> cb = b.getTraits();
-                if (!cb.isEmpty()) {
-                    cb.forEach(x -> b.getTraitValue(x).flatMap(
-                            v -> DataScanner.getInstance(context.getServiceCollection().messageProvider())
-                                    .getText(context.getCommandSourceAsPlayerUnchecked(), "command.blockinfo.traits.item", x.getName(), v))
-                                    .ifPresent(lt::add));
+                    cp.forEach(x -> blockState.getStateProperty(x).map(String::valueOf)
+                        .ifPresent(y -> context.getServiceCollection().messageProvider().getMessageFor(
+                                context.getAudience(),
+                                "command.blockinfo.property.item",
+                                x.getKey().asString(),
+                                y)));
                 }
             }
 
-            Util.getPaginationBuilder(context.getCommandSourceRoot()).contents(lt).padding(Text.of(TextColors.GREEN, "-"))
+            final Vector3i pos = block.getBlockPosition();
+            Util.getPaginationBuilder(context.getAudience()).contents(lt)
+                    .padding(Component.text("-", NamedTextColor.GREEN))
                     .title(context.getMessage("command.blockinfo.list.header",
-                            String.valueOf(loc.getBlockX()),
-                            String.valueOf(loc.getBlockY()),
-                            String.valueOf(loc.getBlockZ())))
-                    .sendTo(context.getCommandSourceRoot());
+                            pos.getX(),
+                            pos.getY(),
+                            pos.getZ()))
+                    .sendTo(context.getAudience());
 
             return context.successResult();
         }

@@ -6,6 +6,11 @@ package io.github.nucleuspowered.nucleus.modules.message;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.message.commands.HelpOpCommand;
+import io.github.nucleuspowered.nucleus.modules.message.commands.MessageCommand;
+import io.github.nucleuspowered.nucleus.modules.message.commands.MsgToggleCommand;
+import io.github.nucleuspowered.nucleus.modules.message.commands.ReplyCommand;
+import io.github.nucleuspowered.nucleus.modules.message.commands.SocialSpyCommand;
 import io.github.nucleuspowered.nucleus.modules.message.config.MessageConfig;
 import io.github.nucleuspowered.nucleus.modules.message.listener.MessageListener;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -17,6 +22,7 @@ import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImp
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -32,7 +38,13 @@ public final class MessageModule implements IModule.Configurable<MessageConfig> 
 
     @Override
     public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Arrays.asList(
+                HelpOpCommand.class,
+                MessageCommand.class,
+                MsgToggleCommand.class,
+                ReplyCommand.class,
+                SocialSpyCommand.class
+        );
     }
 
     @Override

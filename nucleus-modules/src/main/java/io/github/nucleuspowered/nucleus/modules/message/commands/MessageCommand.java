@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.message.commands;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import io.github.nucleuspowered.nucleus.api.module.message.target.MessageTarget;
+import io.github.nucleuspowered.nucleus.api.module.message.target.UserMessageTarget;
 import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
 import io.github.nucleuspowered.nucleus.modules.message.config.MessageConfig;
 import io.github.nucleuspowered.nucleus.modules.message.parameter.CustomTargetParameter;
@@ -82,10 +83,7 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
             if (context.is(target.fold(Function.identity(), Function.identity()))) {
                 return context.errorResult("command.message.self");
             }
-            if (target.isRight() && NucleusAPI.getAFKService().map(x -> x.isAFK(target.get().getUniqueId())).orElse(false)) {
-                // AFK message
-                context.sendMessage("command.message.afknotify", target.get().getName());
-            }
+
             messageTarget = target.fold(
                     x -> this.messageHandler.getSystemMessageTarget(),
                     x -> this.messageHandler.getUserMessageTarget(x.getUniqueId()).get());
@@ -98,9 +96,18 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
             sender = this.messageHandler.getSystemMessageTarget();
         }
 
-        final boolean b = context.getServiceCollection()
-                .getServiceUnchecked(MessageHandler.class)
-                .sendMessage(sender, messageTarget, context.requireOne(NucleusParameters.MESSAGE));
+        return MessageCommand.executeCommon(this.messageHandler, context, sender, messageTarget);
+    }
+
+    static ICommandResult executeCommon(final MessageHandler messageHandler, final ICommandContext context, final MessageTarget sender,
+            final MessageTarget receiver) {
+
+        if (receiver instanceof UserMessageTarget && NucleusAPI.getAFKService().map(x -> x.isAFK(((UserMessageTarget) receiver).getUserUUID())).orElse(false)) {
+            // AFK message
+            context.sendMessage("command.message.afknotify", context.getDisplayName(((UserMessageTarget) receiver).getUserUUID()));
+        }
+
+        final boolean b = messageHandler.sendMessage(sender, receiver, context.requireOne(NucleusParameters.MESSAGE));
         return b ? context.successResult() : context.failResult();
     }
 

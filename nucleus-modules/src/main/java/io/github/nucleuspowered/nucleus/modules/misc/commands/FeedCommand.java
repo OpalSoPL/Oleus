@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.misc.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.misc.MiscPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -14,11 +15,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 @Command(
         aliases = {"feed", "eat"},
         basePermission = MiscPermissions.BASE_FEED,
@@ -33,22 +34,27 @@ import org.spongepowered.api.entity.living.player.Player;
 @EssentialsEquivalent({"feed", "eat"})
 public class FeedCommand implements ICommandExecutor {
 
+    private final Parameter.Value<ServerPlayer> parameter;
+
+    @Inject
+    public FeedCommand(final INucleusServiceCollection serviceCollection) {
+        this.parameter = serviceCollection.commandElementSupplier()
+                .createOnlyOtherPlayerPermissionElement(MiscPermissions.OTHERS_FEED);
+    }
+
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                serviceCollection.commandElementSupplier()
-                        .createOnlyOtherUserPermissionElement(true, MiscPermissions.OTHERS_FEED)
+                this.parameter
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player pl = context.getPlayerFromArgs();
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer pl = context.getPlayerFromArgs();
         // Get the food data and modify it.
-        final FoodData foodData = pl.getFoodData();
-        final Value<Integer> f = foodData.foodLevel().set(foodData.foodLevel().getDefault());
-        final Value<Double> d = foodData.saturation().set(foodData.saturation().getDefault());
-        foodData.set(f, d);
-
-        if (pl.offer(foodData).isSuccessful()) {
+        pl.offer(Keys.EXHAUSTION, pl.get(Keys.MAX_EXHAUSTION).orElse(40.0));
+        pl.offer(Keys.SATURATION, pl.get(Keys.MAX_SATURATION).orElse(40.0));
+        if (pl.offer(Keys.FOOD_LEVEL, pl.get(Keys.MAX_FOOD_LEVEL).orElse(20)).isSuccessful()) {
             context.sendMessageTo(pl, "command.feed.success.self");
             if (!context.is(pl)) {
                 context.sendMessage("command.feed.success.other", pl.getName());

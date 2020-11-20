@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.misc.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.misc.MiscPermissions;
 import io.github.nucleuspowered.nucleus.modules.misc.config.MiscConfig;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -15,17 +16,19 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
 import org.spongepowered.api.data.DataTransactionResult;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,10 +50,6 @@ import java.util.Map;
 )
 public class SpeedCommand implements ICommandExecutor, IReloadableService.Reloadable { //extends AbstractCommand.SimpleTargetOtherPlayer
 
-    private final String speedKey = "speed";
-    private final String resetKey = "reset";
-    private final String typeKey = "type";
-
     /**
      * As the standard flying speed is 0.05 and the standard walking speed is
      * 0.1, we multiply it by 20 and use integers. Standard walking speed is
@@ -59,8 +58,18 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
     public static final int multiplier = 20;
     private int maxSpeed = 5;
 
-    @Override
-    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+    private final Parameter.Value<SpeedType> speedTypeParameter;
+    private final Parameter.Value<Double> speed = Parameter.builder(Double.class)
+            .parser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .setKey("speed")
+            .build();
+    private final Parameter.Value<Boolean> reset = Parameter.builder(Boolean.class)
+            .setKey("reset")
+            .parser(VariableValueParameters.literalBuilder(Boolean.class).setLiteral(Collections.singleton("reset")).build())
+            .build();
+
+    @Inject
+    public SpeedCommand() {
         final Map<String, SpeedType> keysMap = new HashMap<>();
         keysMap.put("fly", SpeedType.FLYING);
         keysMap.put("flying", SpeedType.FLYING);
@@ -69,25 +78,29 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
         keysMap.put("walk", SpeedType.WALKING);
         keysMap.put("w", SpeedType.WALKING);
 
+        this.speedTypeParameter = Parameter.builder(SpeedType.class)
+                .setKey("type")
+                .optional()
+                .parser(VariableValueParameters.staticChoicesBuilder(SpeedType.class).choices(keysMap).build())
+                .build();
+    }
+
+    @Override
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, MiscPermissions.OTHERS_SPEED),
-                GenericArguments.optionalWeak(GenericArguments.onlyOne(GenericArguments.choices(Text.of(this.typeKey), keysMap, true))),
-                GenericArguments.optional(
-                        GenericArguments.firstParsing(
-                            GenericArguments.doubleNum(Text.of(this.speedKey)),
-                            GenericArguments.literal(Text.of(this.resetKey), this.resetKey)
-                        )
-            )
+                serviceCollection.commandElementSupplier().createOnlyOtherPlayerPermissionElement(MiscPermissions.OTHERS_SPEED),
+                this.speedTypeParameter,
+                Parameter.firstOfBuilder(this.speed).or(this.reset).optional().build()
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player pl = context.getPlayerFromArgs();
-        final SpeedType key = context.getOne(this.typeKey, SpeedType.class)
+        final SpeedType key = context.getOne(this.speedTypeParameter)
                 .orElseGet(() -> pl.get(Keys.IS_FLYING).orElse(false) ? SpeedType.FLYING : SpeedType.WALKING);
-        final Double speed = context.getOne(this.speedKey, Double.class).orElseGet(() -> {
-            if (context.hasAny(this.resetKey)) {
+        final Double speed = context.getOne(this.speed).orElseGet(() -> {
+            if (context.hasAny(this.reset)) {
                 return key == SpeedType.WALKING ? 2.0d : 1.0d;
             }
 
@@ -95,12 +108,14 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
         });
 
         if (speed == null) {
-            final TextComponent t = Text.builder().append(context.getMessage("command.speed.walk")).append(Text.of(" "))
-                    .append(Text.of(TextColors.YELLOW, Math.round(pl.get(Keys.WALKING_SPEED).orElse(0.1d) * SpeedCommand.multiplier)))
-                    .append(Text.builder().append(Text.of(TextColors.GREEN, ", "))
-                            .append(context.getMessage("command.speed.flying")).build())
-                    .append(Text.of(" ")).append(Text.of(TextColors.YELLOW, pl.get(Keys.FLYING_SPEED).orElse(0.05d) * multiplier))
-                    .append(Text.of(TextColors.GREEN, ".")).build();
+            final Component t = LinearComponents.linear(
+                    context.getMessage("command.speed.walk"),
+                    Component.space(),
+                    Component.text(pl.get(Keys.WALKING_SPEED).orElse(0.1d) * SpeedCommand.multiplier, NamedTextColor.YELLOW),
+                    Component.text(", ", NamedTextColor.GREEN),
+                    context.getMessage("command.speed.flying").color(NamedTextColor.GREEN),
+                    Component.text(pl.get(Keys.FLYING_SPEED).orElse(0.1d) * SpeedCommand.multiplier, NamedTextColor.YELLOW),
+                    Component.text(".", NamedTextColor.GREEN));
 
             context.sendMessageText(t);
 
@@ -136,8 +151,8 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
     }
 
     private enum SpeedType {
-        WALKING(Keys.WALKING_SPEED, "loc:standard.walking"),
-        FLYING(Keys.FLYING_SPEED, "loc:standard.flying");
+        WALKING(Keys.WALKING_SPEED.get(), "loc:standard.walking"),
+        FLYING(Keys.FLYING_SPEED.get(), "loc:standard.flying");
 
         final Key<Value<Double>> speedKey;
         final String name;

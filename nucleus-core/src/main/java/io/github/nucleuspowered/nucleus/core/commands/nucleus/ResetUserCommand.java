@@ -50,8 +50,8 @@ import java.util.function.Consumer;
         aliases = "resetuser",
         basePermission = CorePermissions.BASE_NUCLEUS_RESETUSER,
         commandDescriptionKey = "nucleus.resetuser",
-        parentCommand = NucleusCommand.class,
-        )
+        parentCommand = NucleusCommand.class
+)
 public class ResetUserCommand implements ICommandExecutor {
 
     private final String userKey = "user";

@@ -16,18 +16,18 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.CatalogTypes;
+import io.leangen.geantyref.TypeToken;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.managed.ValueParameter;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.Optional;
 
@@ -46,44 +46,50 @@ import java.util.Optional;
                 MobPermissions.SPAWNMOB_MOB
         }
 )
-public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Reloadable { //extends AbstractCommand.SimpleTargetOtherPlayer implements
-    // SimpleReloadable {
+public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private final String amountKey = "amount";
-    private final String mobTypeKey = "mob";
+    @SuppressWarnings("unchecked")
+    private final Parameter.Value<EntityType<?>> entityTypeParameter = Parameter.builder(new TypeToken<EntityType<?>>() {})
+            .parser((ValueParameter<EntityType<?>>) (Object) VariableValueParameters.catalogedElementParameterBuilder(EntityType.class).build())
+            .setKey("entity type")
+            .build();
+
+    private final Parameter.Value<Integer> amount = Parameter.builder(Integer.class)
+            .setKey("amount")
+            .parser(VariableValueParameters.integerRange().setMin(1).build())
+            .optional()
+            .build();
 
     private MobConfig mobConfig = new MobConfig();
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, MobPermissions.OTHERS_SPAWNMOB),
-                new ImprovedCatalogTypeArgument(Text.of(this.mobTypeKey), CatalogTypes.ENTITY_TYPE, serviceCollection),
-                GenericArguments.optional(new PositiveIntegerArgument(Text.of(this.amountKey), serviceCollection), 1)
+                serviceCollection.commandElementSupplier().createOnlyOtherPlayerPermissionElement(MobPermissions.OTHERS_SPAWNMOB),
+                this.entityTypeParameter,
+                this.amount
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player pl = context.getPlayerFromArgs();
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final ServerPlayer pl = context.getPlayerFromArgs();
         // Get the amount
-        final int amount = context.requireOne(this.amountKey, Integer.class);
-        final EntityType et = context.requireOne(this.mobTypeKey, EntityType.class);
+        final int amount = context.getOne(this.amount).orElse(1);
+        final EntityType<?> et = context.requireOne(this.entityTypeParameter);
 
-        if (!Living.class.isAssignableFrom(et.getEntityClass())) {
-            return context.errorResult("command.spawnmob.livingonly", et.getTranslation().get());
-        }
-
-        final String id = et.getId().toLowerCase();
         if (this.mobConfig.isPerMobPermission() && !context.isConsoleAndBypass() && !context.testPermission(MobPermissions.getSpawnMobPermissionFor(et))) {
-            return context.errorResult("command.spawnmob.mobnoperm", et.getTranslation().get());
+            return context.errorResult("command.spawnmob.mobnoperm", et.asComponent());
         }
 
+        final String id = et.getKey().asString().toLowerCase();
         final Optional<BlockSpawnsConfig> config = this.mobConfig.getBlockSpawnsConfigForWorld(pl.getWorld());
         if (config.isPresent() && (config.get().isBlockVanillaMobs() && id.startsWith("minecraft:") || config.get().getIdsToBlock().contains(id))) {
-            return context.errorResult("command.spawnmob.blockedinconfig", et.getTranslation().get());
+            return context.errorResult("command.spawnmob.blockedinconfig", et.asComponent());
         }
 
-        final Location<World> loc = pl.getLocation();
-        final World w = loc.getExtent();
+
+        final ServerLocation loc = pl.getServerLocation();
+        final ServerWorld w = loc.getWorld();
 
         // Count the number of entities spawned.
         int i = 0;
@@ -91,8 +97,13 @@ public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Rel
         Entity entityone = null;
         do {
             final Entity e = w.createEntity(et, loc.getPosition());
+            if (!(e instanceof Living)) {
+                e.remove();
+                return context.errorResult("command.spawnmob.livingonly", et.asComponent());
+            }
+
             if (!w.spawnEntity(e)) {
-                return context.errorResult("command.spawnmob.fail", Text.of(e));
+                return context.errorResult("command.spawnmob.fail", et.asComponent());
             }
 
             if (entityone == null) {
@@ -107,13 +118,13 @@ public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Rel
         }
 
         if (i == 0) {
-            return context.errorResult("command.spawnmob.fail", et.getTranslation().get());
+            return context.errorResult("command.spawnmob.fail", et.asComponent());
         }
 
         if (i == 1) {
-            context.sendMessage("command.spawnmob.success.singular", Text.of(i), Text.of(entityone));
+            context.sendMessage("command.spawnmob.success.singular", Component.text(i), et.asComponent().hoverEvent(entityone.asHoverEvent()));
         } else {
-            context.sendMessage("command.spawnmob.success.plural", Text.of(i), Text.of(entityone));
+            context.sendMessage("command.spawnmob.success.plural", Component.text(i), et.asComponent().hoverEvent(entityone));
         }
 
         return context.successResult();

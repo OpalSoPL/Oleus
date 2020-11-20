@@ -328,24 +328,6 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
         this.targetNames.put(messageTarget.getIdentifier(), messageTarget);
     }
 
-    public boolean replyMessage(final UUID sender, final String message) {
-        @Nullable final MessageTarget mt;
-        if (sender == Util.CONSOLE_FAKE_UUID) {
-            mt = this.systemMessageTarget;
-        } else {
-            mt = this.players.get(sender);
-        }
-
-        if (mt != null) {
-            if (mt.replyTarget().map(x -> this.sendMessage(mt, x, message)).isPresent()) {
-                return true;
-            }
-
-            mt.getRepresentedAudience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, "message.noreply"));
-        }
-        return false;
-    }
-
     public Optional<MessageTarget> getTarget(final String target) {
         return Optional.ofNullable(this.targetNames.get(target));
     }

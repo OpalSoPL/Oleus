@@ -4,13 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.modules.misc.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class MiscConfig {
 
-    @Setting(value = "max-speed", comment = "config.misc.speed.max")
+    @Setting(value = "max-speed")
+    @LocalisedComment("config.misc.speed.max")
     private int maxSpeed = 5;
 
     public int getMaxSpeed() {

@@ -12,21 +12,19 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.block.BlockState;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,63 +40,54 @@ public class ItemInfoCommand implements ICommandExecutor {
 
     private final String key = "key";
 
+    private final Parameter.Value<ItemStackSnapshot> itemTypeParameter = Parameter.itemStackSnapshot().optional().setKey("item").build();
+
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        return new Flag[] {
+                Flag.builder().alias("e").alias("extended").setRequirement(commandCause -> permissionService.hasPermission(commandCause,
+                        MiscPermissions.ITEMINFO_EXTENDED)).build()
+        };
+    }
+
+
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                GenericArguments.flags().permissionFlag(MiscPermissions.ITEMINFO_EXTENDED, "e", "-extended")
-                    .buildWith(GenericArguments.optional(new ImprovedCatalogTypeArgument(Text.of(this.key), ItemType.class, serviceCollection)))
+                this.itemTypeParameter
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Optional<CatalogType> catalogTypeOptional = context.getOne(this.key, CatalogType.class);
-        final ItemStack it;
+        final Optional<ItemStackSnapshot> catalogTypeOptional = context.getOne(this.itemTypeParameter);
+        final ItemStackSnapshot is;
         if (catalogTypeOptional.isPresent()) {
-            final CatalogType ct = catalogTypeOptional.get();
-            if (ct instanceof ItemType) {
-                it = ((ItemType) ct).getTemplate().createStack();
-            } else {
-                final BlockState bs = ((BlockState) ct);
-                it = bs.getType().getItem().orElseThrow(() -> context.createException("command.iteminfo.invalidblockstate")).getTemplate().createStack();
-                it.offer(Keys.ITEM_BLOCKSTATE, bs);
-            }
-        } else if (context.is(Player.class) && context.getIfPlayer().getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
-            it = context.getIfPlayer().getItemInHand(HandTypes.MAIN_HAND).get();
+            is = catalogTypeOptional.get();
+        } else if (context.is(ServerPlayer.class) && !context.requirePlayer().getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+            is = context.getIfPlayer().getItemInHand(HandTypes.MAIN_HAND).createSnapshot();
         } else {
             return context.errorResult("command.iteminfo.none");
         }
 
-        final List<Text> lt = new ArrayList<>();
-        lt.add(context.getMessage("command.iteminfo.id", it.getType().getId(), it.getTranslation().get()));
+        final ItemType it = is.getType();
+        final List<Component> lt = new ArrayList<>();
+        lt.add(context.getMessage("command.iteminfo.id", it.getKey(), it.asComponent()));
 
-        final Optional<BlockState> obs = it.get(Keys.ITEM_BLOCKSTATE);
-        obs.ifPresent(blockState -> lt.add(context.getMessage("command.iteminfo.extendedid", blockState.getId())));
+        it.getBlock().ifPresent(block -> lt.add(context.getMessage("command.iteminfo.extendedid", block.getKey().asString())));
 
-        if (context.hasAny("e") || context.hasAny("extended")) {
-            // For each key, see if the item supports it. If so, get and
-            // print the value.
-            DataScanner.getInstance(context.getServiceCollection().messageProvider())
-                    .getKeysForHolder(it).entrySet().stream().filter(x -> x.getValue() != null).filter(x -> {
-                // Work around a Sponge bug.
-                try {
-                    return it.supports(x.getValue());
-                } catch (final Exception e) {
-                    return false;
-                }
-            }).forEach(x -> {
-                final Key<? extends BaseValue<Object>> k = (Key<? extends BaseValue<Object>>) x.getValue();
-                if (it.get(k).isPresent()) {
-                    DataScanner.getInstance(context.getServiceCollection().messageProvider())
-                            .getText(context.getCommandSourceRoot(),
-                                "command.iteminfo.key",
-                                x.getKey(),
-                                it.get(k).get()).ifPresent(lt::add);
-                }
-            });
+        if (context.hasFlag("e")) {
+            for (final Key<? extends Value<?>> key : is.getKeys()) {
+                final Optional<?> value = is.get((Key) key); // this is the only way I could get this to work
+                value.ifPresent(o -> lt.add(context.getMessage("command.iteminfo.key", key.getKey(), String.valueOf(o))));
+            }
         }
 
-        Util.getPaginationBuilder(context.getCommandSourceRoot()).contents(lt).padding(Text.of(TextColors.GREEN, "-"))
-                .title(context.getMessage("command.iteminfo.list.header")).sendTo(context.getCommandSourceRoot());
+        Util.getPaginationBuilder(context.getAudience())
+                .contents(lt)
+                .padding(Component.text("-", NamedTextColor.GREEN))
+                .title(context.getMessage("command.iteminfo.list.header"))
+                .sendTo(context.getAudience());
         return context.successResult();
     }
 }

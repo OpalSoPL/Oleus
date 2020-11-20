@@ -5,15 +5,15 @@
 package io.github.nucleuspowered.nucleus.modules.message.infoprovider;
 
 import com.google.common.collect.Lists;
+import io.github.nucleuspowered.nucleus.modules.message.MessageKeys;
 import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
 import io.github.nucleuspowered.nucleus.modules.message.services.MessageHandler;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.spongepowered.api.command.CommandSource;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,31 +25,31 @@ public class MessageInfoProvider implements NucleusProvider {
         return "message";
     }
 
-    @Override public Optional<Text> get(final User user, final CommandSource source,
-            final INucleusServiceCollection serviceCollection) {
+    @Override
+    public Optional<Component> get(final User user, final CommandCause source, final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, MessagePermissions.BASE_SOCIALSPY)) {
             final MessageHandler handler = serviceCollection.getServiceUnchecked(MessageHandler.class);
-            final boolean socialSpy = handler.isSocialSpy(user);
+            final boolean socialSpy = handler.isSocialSpy(user.getUniqueId());
             final boolean msgToggle = serviceCollection.userPreferenceService()
-                    .getUnwrapped(user.getUniqueId(), NucleusKeysProvider.RECEIVING_MESSAGES);
+                    .getUnwrapped(user.getUniqueId(), MessageKeys.MESSAGE_TOGGLE);
             final IMessageProviderService mp = serviceCollection.messageProvider();
-            final List<Text> lt = Lists.newArrayList(
-                    mp.getMessageFor(source, "seen.socialspy",
-                            mp.getMessageFor(source, "standard.yesno." + Boolean.toString(socialSpy).toLowerCase())));
+            final String yesOrNo = socialSpy ? "standard.yesno.true" : "standard.yesno.false";
+            final List<Component> lt = Lists.newArrayList(
+                    mp.getMessageFor(source.getAudience(), "seen.socialspy", mp.getMessageFor(source.getAudience(), yesOrNo)));
 
             /*this.serviceCollection.moduleConfigProvider()
                     .getModuleConfig(MessageConfig.class)*/
             lt.add(
-                    mp.getMessageFor(source,
+                    mp.getMessageFor(source.getAudience(),
                             "seen.socialspylevel",
                             serviceCollection.permissionService()
                                     .getPositiveIntOptionFromSubject(user, MessagePermissions.SOCIALSPY_LEVEL_KEY).orElse(0))
             );
 
-            lt.add(mp.getMessageFor(source, "seen.msgtoggle",
-                    mp.getMessageFor(source, "standard.yesno." + Boolean.toString(msgToggle).toLowerCase())));
+            final String msgToggleText = msgToggle ? "standard.yesno.true" : "standard.yesno.false";
+            lt.add(mp.getMessageFor(source.getAudience(), "seen.msgtoggle", mp.getMessageFor(source.getAudience(), msgToggleText)));
 
-            return Optional.of(Text.joinWith(Text.NEW_LINE, lt));
+            return Optional.of(Component.join(Component.newline(), lt));
         }
 
         return Optional.empty();

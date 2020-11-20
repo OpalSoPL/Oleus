@@ -4,8 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.message.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import io.github.nucleuspowered.nucleus.api.module.message.target.MessageTarget;
 import io.github.nucleuspowered.nucleus.modules.message.MessagePermissions;
 import io.github.nucleuspowered.nucleus.modules.message.services.MessageHandler;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -19,8 +18,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.NotifyIfAFK;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
+
+import java.util.function.Function;
+
 /**
  * Replies to the last player who sent a message.
  */
@@ -50,15 +51,12 @@ public class ReplyCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final MessageHandler messageHandler = context.getServiceCollection().getServiceUnchecked(MessageHandler.class);
-        final boolean b = messageHandler.replyMessage(context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID), context.requireOne(NucleusParameters.MESSAGE));
-        if (b) {
-            NucleusAPI.getAFKService().map(x -> x.isAFK())
-            // For Notify on AFK - TODO: Better way to do this
-            /* UUID uuid = context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID);
-            this.handler.getLastMessageFrom(uuid).ifPresent(x -> args.putArg(NucleusParameters.Keys.PLAYER, x)); */
-            return context.successResult();
-        }
+        final MessageTarget sender =
+                context.getUniqueId().<MessageTarget>flatMap(x -> messageHandler.getUserMessageTarget(x).map(Function.identity()))
+                        .orElseGet(messageHandler::getSystemMessageTarget);
+        final MessageTarget receiver =
+                sender.replyTarget().orElseThrow(() -> context.createException("message.noreply"));
 
-        return context.failResult();
+        return MessageCommand.executeCommon(messageHandler, context, sender, receiver);
     }
 }

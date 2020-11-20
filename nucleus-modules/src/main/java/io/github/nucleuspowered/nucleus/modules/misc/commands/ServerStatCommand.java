@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.misc.commands;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.misc.MiscPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -14,23 +13,21 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.lang.management.ManagementFactory;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,29 +38,30 @@ public class ServerStatCommand implements ICommandExecutor {
     private static final DecimalFormat TPS_FORMAT = new DecimalFormat("#0.00");
 
     @Override
-    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new Parameter[] {
-                GenericArguments.flags().flag("c", "s", "-compact", "-summary").buildWith(GenericArguments.none())
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("c", "s", "compact", "summary")
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Duration uptime = Duration.ofMillis(ManagementFactory.getRuntimeMXBean().getUptime());
 
-        final List<Text> messages = new ArrayList<>();
+        final List<Component> messages = new ArrayList<>();
 
-        messages.add(context.getMessage("command.serverstat.tps", getTPS(Sponge.getServer().getTicksPerSecond())));
+        messages.add(context.getMessage("command.serverstat.tps", this.getTPS(Sponge.getServer().getTicksPerSecond())));
 
         final Optional<Instant> oi = context.getServiceCollection().platformService().gameStartedTime();
         oi.ifPresent(instant -> {
             final Duration duration = Duration.between(instant, Instant.now());
             final double averageTPS = Math.min(20, ((double) Sponge.getServer().getRunningTimeTicks() / ((double) (duration.toMillis() + 50) / 1000.0d)));
-            messages.add(context.getMessage("command.serverstat.averagetps", getTPS(averageTPS)));
-            messages.add(createText(context, "command.serverstat.uptime.main", "command.serverstat.uptime.hover",
+            messages.add(context.getMessage("command.serverstat.averagetps", this.getTPS(averageTPS)));
+            messages.add(this.createText(context, "command.serverstat.uptime.main", "command.serverstat.uptime.hover",
                     context.getTimeString(duration.getSeconds())));
         });
 
-        messages.add(createText(context, "command.serverstat.jvmuptime.main", "command.serverstat.jvmuptime.hover", context.getTimeString(uptime.getSeconds())));
+        messages.add(this.createText(context, "command.serverstat.jvmuptime.main", "command.serverstat.jvmuptime.hover", context.getTimeString(uptime.getSeconds())));
 
         messages.add(Util.SPACE);
 
@@ -71,58 +69,56 @@ public class ServerStatCommand implements ICommandExecutor {
         final long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
         final long free = Runtime.getRuntime().freeMemory() / 1024 / 1024;
 
-        messages.add(createText(context, "command.serverstat.maxmem.main", "command.serverstat.maxmem.hover", String.valueOf(max)));
-        messages.add(createText(context, "command.serverstat.totalmem.main", "command.serverstat.totalmem.hover", String.valueOf(total)));
+        messages.add(this.createText(context, "command.serverstat.maxmem.main", "command.serverstat.maxmem.hover", String.valueOf(max)));
+        messages.add(this.createText(context, "command.serverstat.totalmem.main", "command.serverstat.totalmem.hover", String.valueOf(total)));
 
         final long allocated = total - free;
-        messages.add(createText(context, "command.serverstat.allocated.main", "command.serverstat.allocated.hover",
+        messages.add(this.createText(context, "command.serverstat.allocated.main", "command.serverstat.allocated.hover",
                 String.valueOf(allocated), String.valueOf((allocated * 100)/total), String.valueOf((allocated * 100)/max)));
-        messages.add(createText(context, "command.serverstat.freemem.main", "command.serverstat.freemem.hover", String.valueOf(free)));
+        messages.add(this.createText(context, "command.serverstat.freemem.main", "command.serverstat.freemem.hover", String.valueOf(free)));
 
-        if (!context.hasAny("c")) {
-            for (final World world : Sponge.getServer().getWorlds()) {
+        if (!context.hasFlag("c")) {
+            for (final ServerWorld world : Sponge.getServer().getWorldManager().getWorlds()) {
                 final int numOfEntities = world.getEntities().size();
                 final int loadedChunks = Iterables.size(world.getLoadedChunks());
                 messages.add(Util.SPACE);
-                messages.add(context.getMessage("command.serverstat.world.title", world.getName()));
+                messages.add(context.getMessage("command.serverstat.world.title", world.getKey().asString()));
 
                 // https://github.com/NucleusPowered/Nucleus/issues/888
-                final GeneratorType genType = world.getDimension().getGeneratorType();
                 messages.add(context.getMessage(
                         "command.serverstat.world.info",
-                        world.getDimension().getType().getName(),
-                        genType == null ? context.getMessage("standard.unknown") : genType.getName(),
+                        world.getDimensionType().getKey().asString(),
+                        world.getProperties().getGeneratorModifierType().getKey().asString(),
                         String.valueOf(numOfEntities),
                         String.valueOf(loadedChunks)));
             }
         }
 
-        final PaginationList.Builder plb = Util.getPaginationBuilder(context.getCommandSourceRoot())
-                .title(context.getMessage("command.serverstat.title")).padding(Text.of("="))
+        final PaginationList.Builder plb = Util.getPaginationBuilder(context.getAudience())
+                .title(context.getMessage("command.serverstat.title")).padding(Component.text("="))
                 .contents(messages);
 
-        plb.sendTo(context.getCommandSourceRoot());
+        plb.sendTo(context.getAudience());
         return context.successResult();
     }
 
-    private TextComponent getTPS(final double currentTps) {
+    private Component getTPS(final double currentTps) {
         final TextColor colour;
 
         if (currentTps > 18) {
-            colour = TextColors.GREEN;
+            colour = NamedTextColor.GREEN;
         } else if (currentTps > 15) {
-            colour = TextColors.YELLOW;
+            colour = NamedTextColor.YELLOW;
         } else {
-            colour = TextColors.RED;
+            colour = NamedTextColor.RED;
         }
 
-        return Text.of(colour, TPS_FORMAT.format(currentTps));
+        return Component.text(ServerStatCommand.TPS_FORMAT.format(currentTps), colour);
     }
 
-    @SuppressWarnings("RedundantCast")
-    private TextComponent createText(final ICommandContext context, final String mainKey, final String hoverKey, final String... subs) {
-        final Text.Builder tb = context.getMessage(mainKey, (Object[]) subs).toBuilder();
-        return tb.onHover(TextActions.showText(context.getMessage(hoverKey))).build();
+    private Component createText(final ICommandContext context, final String mainKey, final String hoverKey, final String... subs) {
+        final Component tb = context.getMessage(mainKey, (Object[]) subs);
+        return tb.hoverEvent(HoverEvent.showText(context.getMessage(hoverKey)));
     }
 
 }

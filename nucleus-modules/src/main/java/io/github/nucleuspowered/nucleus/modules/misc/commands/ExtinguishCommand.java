@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.misc.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.misc.MiscPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -13,10 +14,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.Ticks;
+
 @Command(
         aliases = {"extinguish", "ext"},
         basePermission = MiscPermissions.BASE_EXTINGUISH,
@@ -30,18 +32,26 @@ import org.spongepowered.api.entity.living.player.Player;
 )
 public class ExtinguishCommand implements ICommandExecutor {
 
+    private final Parameter.Value<ServerPlayer> parameter;
+
+    @Inject
+    public ExtinguishCommand(final INucleusServiceCollection serviceCollection) {
+        this.parameter = serviceCollection.commandElementSupplier()
+                .createOnlyOtherPlayerPermissionElement(MiscPermissions.OTHERS_EXTINGUISH);
+    }
+
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                serviceCollection.commandElementSupplier()
-                    .createOnlyOtherUserPermissionElement(true, MiscPermissions.OTHERS_EXTINGUISH)
+                this.parameter
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player target = context.getPlayerFromArgs();
+        final ServerPlayer target = context.getPlayerFromArgs();
                 // this.getUserFromArgs(Player.class, src, NucleusParameters.Keys.PLAYER, args);
-        if (target.get(Keys.FIRE_TICKS).orElse(-1) > 0 && target.offer(Keys.FIRE_TICKS, 0).isSuccessful()) {
+        final Ticks ticks = target.get(Keys.FIRE_TICKS).orElseGet(Ticks::zero);
+        if (ticks.getTicks() > 0 && target.offer(Keys.FIRE_TICKS, Ticks.zero()).isSuccessful()) {
             context.sendMessage("command.extinguish.success", target.getName());
             return context.successResult();
         }
