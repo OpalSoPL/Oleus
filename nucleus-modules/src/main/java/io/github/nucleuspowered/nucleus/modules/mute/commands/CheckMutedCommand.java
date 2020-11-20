@@ -10,18 +10,19 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Command(aliases = "checkmuted", basePermission = MutePermissions.BASE_CHECKMUTED, commandDescriptionKey = "checkmuted", )
+@Command(aliases = "checkmuted", basePermission = MutePermissions.BASE_CHECKMUTED, commandDescriptionKey = "checkmuted")
 public class CheckMutedCommand implements ICommandExecutor {
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
 
         // Using the cache, tell us who is jailed.
         final List<UUID> usersInMute = context.getServiceCollection().userCacheService().getMuted();
@@ -32,15 +33,14 @@ public class CheckMutedCommand implements ICommandExecutor {
         }
 
         // Get the users in this jail, or all jails
-        Util.getPaginationBuilder(context.getCommandSourceRoot())
+        Util.getPaginationBuilder(context.getAudience())
             .title(context.getMessage("command.checkmuted.header"))
             .contents(usersInMute.stream().map(x -> {
-                final TextComponent name = context.getServiceCollection().playerDisplayNameService().getDisplayName(x);
-                return name.toBuilder()
-                    .onHover(TextActions.showText(context.getMessage("command.checkmuted.hover")))
-                    .onClick(TextActions.runCommand("/nucleus:checkmute " + x.toString()))
-                    .build();
-            }).collect(Collectors.toList())).sendTo(context.getCommandSourceRoot());
+                final Component name = context.getServiceCollection().playerDisplayNameService().getDisplayName(x);
+                return name
+                    .hoverEvent(HoverEvent.showText(context.getMessage("command.checkmuted.hover")))
+                    .clickEvent(ClickEvent.runCommand("/nucleus:checkmute " + x.toString()));
+            }).collect(Collectors.toList())).sendTo(context.getAudience());
         return context.successResult();
     }
 }

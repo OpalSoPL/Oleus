@@ -4,12 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mute.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
-import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
-import io.github.nucleuspowered.nucleus.modules.mute.services.MuteHandler;
+import io.github.nucleuspowered.nucleus.modules.mute.services.MuteService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -18,18 +17,18 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.vavr.control.Either;
+import net.kyori.adventure.audience.Audience;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
+import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.profile.GameProfile;
+
 import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.function.Function;
 
 @EssentialsEquivalent(value = {"mute", "silence"}, isExact = false, notes = "Unmuting a player should be done via the /unmute command.")
 @Command(
@@ -49,26 +48,24 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
     private long maxMute = Long.MAX_VALUE;
     private CommonPermissionLevelConfig levelConfig = new CommonPermissionLevelConfig();
 
-    // seemuted
-
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            NucleusParameters.ONE_USER.get(serviceCollection),
-            NucleusParameters.OPTIONAL_WEAK_DURATION.get(serviceCollection),
+            NucleusParameters.Composite.USER_OR_GAME_PROFILE,
+            NucleusParameters.OPTIONAL_DURATION,
             NucleusParameters.OPTIONAL_REASON
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final MuteHandler handler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
+        final MuteService handler = context.getServiceCollection().getServiceUnchecked(MuteService.class);
         // Get the user.
-        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
-                //args.<User>getOne(NucleusParameters.Keys.USER).get();
+        final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
 
-        final Optional<Long> time = context.getOne(NucleusParameters.Keys.DURATION, Long.class);
-        final Optional<MuteData> omd = handler.getPlayerMuteData(user);
-        final Optional<String> reas = context.getOne(NucleusParameters.Keys.REASON, String.class);
+        final Optional<Duration> time = context.getOne(NucleusParameters.DURATION);
+        final User user = either.fold(Function.identity(), Sponge.getServer().getUserManager()::getOrCreate);
+        final Optional<Mute> omd = handler.getPlayerMuteInfo(user.getUniqueId());
+        final Optional<String> reas = context.getOne(NucleusParameters.OPTIONAL_REASON);
 
         if (!context.isConsoleAndBypass() && context.testPermissionFor(user, MutePermissions.MUTE_EXEMPT_TARGET)) {
             return context.errorResult("command.mute.exempt", user.getName());
@@ -85,50 +82,38 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
 
         // Do we have a reason?
         final String rs = reas.orElseGet(() -> context.getMessageString("command.mute.defaultreason"));
-        UUID ua = Util.CONSOLE_FAKE_UUID;
-        if (context.is(Player.class)) {
-            ua = context.getIfPlayer().getUniqueId();
-        }
-
-        if (this.maxMute > 0 && time.orElse(Long.MAX_VALUE) > this.maxMute && !context.testPermission(MutePermissions.MUTE_EXEMPT_TARGET)) {
+        if (this.maxMute > 0 && time.map(Duration::getSeconds).orElse(Long.MAX_VALUE) > this.maxMute &&
+                !context.testPermission(MutePermissions.MUTE_EXEMPT_TARGET)) {
             return context.errorResult("command.mute.length.toolong", context.getTimeString(this.maxMute));
         }
 
-        final MuteData data;
-        if (time.isPresent()) {
-            if (!user.isOnline()) {
-                data = new MuteData(ua, rs, Duration.ofSeconds(time.get()));
-            } else {
-                data = new MuteData(ua, rs, Instant.now().plus(time.get(), ChronoUnit.SECONDS));
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            context.getAsPlayer().ifPresent(frame::pushCause);
+            if (handler.mutePlayer(user.getUniqueId(), rs, time.orElse(null))) {
+                // Success.
+                final Audience mc =
+                        context.getServiceCollection().permissionService().permissionMessageChannel(MutePermissions.MUTE_NOTIFY);
+                final Audience toSendTo = Audience.audience(mc, context.getAudience());
+                final Mute mute = handler.getPlayerMuteInfo(user.getUniqueId()).get(); // we know it exists
+
+                if (time.isPresent()) {
+                    this.timedMute(context, user, mute, toSendTo);
+                } else {
+                    this.permMute(context, user, mute, toSendTo);
+                }
+
+                return context.successResult();
             }
-        } else {
-            data = new MuteData(ua, rs);
-        }
-
-        final CommandSource src = context.getCommandSourceRoot();
-        if (handler.mutePlayer(user, data)) {
-            // Success.
-            final MutableMessageChannel mc =
-                    context.getServiceCollection().permissionService().permissionMessageChannel(MutePermissions.MUTE_NOTIFY).asMutable();
-            mc.addMember(src);
-
-            if (time.isPresent()) {
-                timedMute(context, user, data, time.get(), mc);
-            } else {
-                permMute(context, user, data, mc);
-            }
-
-            return context.successResult();
         }
 
         return context.errorResult("command.mute.fail", user.getName());
     }
 
     private void timedMute(
-            final ICommandContext context, final User user, final MuteData data, final long time, final MessageChannel mc) {
-        final String ts = context.getTimeString(time);
-        mc.send(context.getMessage("command.mute.success.time", user.getName(), context.getName(), ts));
-        mc.send(context.getMessage("standard.reasoncoloured", data.getReason()));
+            final ICommandContext context, final User user, final Mute data, final Audience mc) {
+        final String ts = context.getTimeString(data.getRemainingTime().get());
+        mc.sendMessage(context.getMessage("command.mute.success.time", user.getName(), context.getName(), ts));
+        mc.sendMessage(context.getMessage("standard.reasoncoloured", data.getReason()));
 
         if (user.isOnline()) {
             context.sendMessageTo(user.getPlayer().get(), "mute.playernotify.time", ts);
@@ -136,9 +121,9 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
         }
     }
 
-    private void permMute(final ICommandContext context, final User user, final MuteData data, final MessageChannel mc) {
-        mc.send(context.getMessage("command.mute.success.norm", user.getName(), context.getName()));
-        mc.send(context.getMessage("standard.reasoncoloured", data.getReason()));
+    private void permMute(final ICommandContext context, final User user, final Mute data, final Audience mc) {
+        mc.sendMessage(context.getMessage("command.mute.success.norm", user.getName(), context.getName()));
+        mc.sendMessage(context.getMessage("standard.reasoncoloured", data.getReason()));
 
         if (user.isOnline()) {
             context.sendMessageTo(user.getPlayer().get(), "mute.playernotify.standard");

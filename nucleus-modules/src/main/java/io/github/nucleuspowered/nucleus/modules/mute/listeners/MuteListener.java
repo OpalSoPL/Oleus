@@ -4,52 +4,47 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mute.listeners;
 
-import io.github.nucleuspowered.nucleus.Util;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.message.event.NucleusMessageEvent;
-import io.github.nucleuspowered.nucleus.datatypes.EndTimestamp;
+import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
 import io.github.nucleuspowered.nucleus.modules.message.events.InternalNucleusHelpOpEvent;
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
-import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
-import io.github.nucleuspowered.nucleus.modules.mute.services.MuteHandler;
+import io.github.nucleuspowered.nucleus.modules.mute.services.MuteService;
+import io.github.nucleuspowered.nucleus.modules.mute.services.MutedEntry;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.event.message.PlayerChatEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
-import com.google.inject.Inject;
 
 public class MuteListener implements IReloadableService.Reloadable, ListenerBase {
 
-    private final MuteHandler handler;
+    private final MuteService handler;
     private final IMessageProviderService messageProvider;
     private final IPermissionService permissionService;
     private MuteConfig muteConfig = new MuteConfig();
-    private final PluginContainer pluginContainer;
 
     @Inject
     public MuteListener(final INucleusServiceCollection serviceCollection) {
-        this.handler = serviceCollection.getServiceUnchecked(MuteHandler.class);
+        this.handler = serviceCollection.getServiceUnchecked(MuteService.class);
         this.messageProvider = serviceCollection.messageProvider();
         this.permissionService = serviceCollection.permissionService();
-        this.pluginContainer = serviceCollection.pluginContainer();
     }
 
     /**
@@ -58,92 +53,91 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
      * @param event The event.
      */
     @Listener
-    public void onPlayerLogin(final ClientConnectionEvent.Join event) {
-        // Kick off a scheduled task.
-        Sponge.getScheduler().createTaskBuilder().async().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
-            final Player user = event.getTargetEntity();
-            final Optional<MuteData> omd = this.handler.getPlayerMuteData(user);
-            if (omd.isPresent()) {
-                final MuteData md = omd.get();
-                md.nextLoginToTimestamp();
+    public void onPlayerLogin(final ServerSideConnectionEvent.Join event) {
+        this.handler.onPlayerLogin(event.getPlayer());
+    }
 
-                if (isMuted(user)) {
-                    this.handler.onMute(md, event.getTargetEntity());
-                }
-            }
-        }).submit(this.pluginContainer);
+    @Listener
+    public void onPlayerLogout(final ServerSideConnectionEvent.Disconnect event) {
+        this.handler.clearCacheFor(event.getPlayer().getUniqueId());
     }
 
     @Listener(order = Order.LATE)
-    public void onChat(final MessageChannelEvent.Chat event) {
-        Util.onPlayerSimulatedOrPlayer(event, this::onChat);
-    }
-
-    private void onChat(final MessageChannelEvent.Chat event, final Player player) {
+    public void onChat(final PlayerChatEvent event, @Root final ServerPlayer player) {
         boolean cancel = false;
-        if (isMuted(player)) {
-            this.handler.onMute(player);
-            MessageChannel.TO_CONSOLE.send(Text.builder().append(Text.of(player.getName() + " (")).append(
-                this.messageProvider.getMessageFor(Sponge.getServer().getConsole(), "standard.muted"))
-                    .append(Text.of("): ")).append(event.getRawMessage()).build());
+        if (this.isMutedNotify(player)) {
+            Sponge.getSystemSubject().sendMessage(player,
+                    LinearComponents.linear(
+                            Component.text(player.getName()),
+                            Component.text(" ("),
+                            this.messageProvider.getMessageFor(Sponge.getSystemSubject(), "standard.muted"),
+                            Component.text("): "),
+                            event.getOriginalMessage()
+                    ));
             cancel = true;
         }
 
-        if (cancelOnGlobalMute(player, false)) {
+        if (this.cancelOnGlobalMute(player, false)) {
             cancel = true;
         }
 
         if (cancel) {
             if (this.muteConfig.isShowMutedChat()) {
                 // Send it to admins only.
-                final String m = this.muteConfig.getCancelledTag();
-                if (!m.isEmpty()) {
-                    event.getFormatter().setHeader(
-                        Text.join(TextSerializers.FORMATTING_CODE.deserialize(m), event.getFormatter().getHeader().toText()));
+                final Component m = LegacyComponentSerializer.legacyAmpersand().deserialize(this.muteConfig.getCancelledTag());
+                final Component mutedMessage;
+                if (m != Component.empty()) {
+                    mutedMessage = LinearComponents.linear(m, event.getOriginalMessage());
+                } else {
+                    mutedMessage = LinearComponents.linear(
+                            Component.text(player.getName()),
+                            Component.text(" (muted): ", NamedTextColor.GRAY),
+                            event.getOriginalMessage());
                 }
 
                 this.permissionService.permissionMessageChannel(MutePermissions.MUTE_SEEMUTEDCHAT)
-                    .send(player, event.getMessage(), ChatTypes.SYSTEM);
+                        .sendMessage(player, mutedMessage, MessageType.SYSTEM);
             }
 
             event.setCancelled(true);
         }
     }
 
-    @Listener
-    public void onPlayerMessage(final NucleusMessageEvent event, @Getter("getSender") final Player source) {
-        boolean isCancelled = false;
-        if (isMuted(source)) {
-            if (source.isOnline()) {
-                this.handler.onMute(source);
-            }
+    private boolean isMutedNotify(final ServerPlayer player) {
+        final Optional<Mute> mute = this.handler.getPlayerMuteInfo(player.getUniqueId());
+        if (mute.filter(x -> x instanceof MutedEntry).isPresent()) {
+            this.handler.onMute((MutedEntry) mute.get(), player);
+            return true;
+        }
+        return false;
+    }
 
+    @Listener
+    public void onPlayerMessage(final NucleusMessageEvent event, @Getter("getSenderAsPlayer") final ServerPlayer source) {
+        boolean isCancelled = false;
+        if (this.isMutedNotify(source)) {
             isCancelled = true;
         }
 
-        if (cancelOnGlobalMute(source, isCancelled)) {
+        if (this.cancelOnGlobalMute(source, isCancelled)) {
             isCancelled = true;
         }
         event.setCancelled(isCancelled);
     }
 
     @Listener
-    public void onPlayerHelpOp(final InternalNucleusHelpOpEvent event, @Root final Player source) {
-        if (isMuted(source)) {
-            if (source.isOnline()) {
-                this.handler.onMute(source);
-            }
-
+    public void onPlayerHelpOp(final InternalNucleusHelpOpEvent event, @Root final ServerPlayer source) {
+        if (this.isMutedNotify(source)) {
             event.setCancelled(true);
         }
 
         //noinspection IsCancelled
-        if (cancelOnGlobalMute(source, event.isCancelled())) {
+        if (this.cancelOnGlobalMute(source, event.isCancelled())) {
             event.setCancelled(true);
         }
     }
 
-    private boolean cancelOnGlobalMute(final Player player, final boolean isCancelled) {
+    private boolean cancelOnGlobalMute(final ServerPlayer player, final boolean isCancelled) {
         if (isCancelled || !this.handler.isGlobalMuteEnabled() || this.permissionService.hasPermission(player, MutePermissions.VOICE_AUTO)) {
             return false;
         }
@@ -161,14 +155,4 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
         this.muteConfig = serviceCollection.configProvider().getModuleConfig(MuteConfig.class);
     }
 
-    private boolean isMuted(final Player player) {
-        if (!this.handler.isMutedCached(player)) {
-            return false;
-        } else if (this.handler.getPlayerMuteData(player).map(EndTimestamp::expired).orElse(true)) { // true indicates expiry
-            this.handler.unmutePlayer(player);
-            return false;
-        }
-
-        return true;
-    }
 }

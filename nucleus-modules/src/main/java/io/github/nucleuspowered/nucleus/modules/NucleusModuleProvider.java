@@ -60,6 +60,8 @@ import io.github.nucleuspowered.nucleus.modules.misc.MiscModule;
 import io.github.nucleuspowered.nucleus.modules.misc.config.MiscConfig;
 import io.github.nucleuspowered.nucleus.modules.mob.MobModule;
 import io.github.nucleuspowered.nucleus.modules.mob.config.MobConfig;
+import io.github.nucleuspowered.nucleus.modules.mute.MuteModule;
+import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,6 +121,7 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(MessageModule.ID, "Private Message", MessageModule.class, MessageConfig.class));
         containers.add(NucleusModuleProvider.createContainer(MiscModule.ID, "Miscellaneous", MiscModule.class, MiscConfig.class));
         containers.add(NucleusModuleProvider.createContainer(MobModule.ID, "Mob", MobModule.class, MobConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(MuteModule.ID, "Mute", MuteModule.class, MuteConfig.class));
         return containers;
     }
 

@@ -4,15 +4,14 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mute;
 
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
+import io.leangen.geantyref.TypeToken;
 
 public final class MuteKeys {
 
-    public static final TypeToken<MuteData> MUTE_DATA_KEY = TypeToken.of(MuteData.class);
+    public static final TypeToken<MuteData> MUTE_DATA_KEY = TypeToken.get(MuteData.class);
 
-    public static final DataKey<MuteData, IUserDataObject> MUTE_DATA =
-            DataKey.of(MuteKeys.MUTE_DATA_KEY, IUserDataObject.class, "muteData");
+    public static final DataKey<MuteData, IUserDataObject> MUTE_DATA = DataKey.of(MuteKeys.MUTE_DATA_KEY, IUserDataObject.class, "muteData");
 }

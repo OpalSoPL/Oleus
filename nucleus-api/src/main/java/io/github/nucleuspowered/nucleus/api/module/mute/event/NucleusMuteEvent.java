@@ -13,10 +13,6 @@ import java.util.UUID;
 
 /**
  * Events that occur whilst muted.
- *
- * <p>
- *     These events might occur async!
- * </p>
  */
 public interface NucleusMuteEvent {
 

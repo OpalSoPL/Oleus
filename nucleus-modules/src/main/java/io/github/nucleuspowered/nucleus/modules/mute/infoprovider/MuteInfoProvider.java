@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.mute.infoprovider;
 
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
 import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
-import io.github.nucleuspowered.nucleus.modules.mute.services.MuteHandler;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;

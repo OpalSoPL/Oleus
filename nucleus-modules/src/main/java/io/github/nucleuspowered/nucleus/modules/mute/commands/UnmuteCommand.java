@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.mute.commands;
 import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
-import io.github.nucleuspowered.nucleus.modules.mute.services.MuteHandler;
+import io.github.nucleuspowered.nucleus.modules.mute.services.MuteService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -15,12 +15,15 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.vavr.control.Either;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.profile.GameProfile;
+
+import java.util.function.Function;
 
 @Command(
         aliases = { "unmute" },
@@ -35,14 +38,15 @@ public class UnmuteCommand implements ICommandExecutor, IReloadableService.Reloa
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.ONE_USER.get(serviceCollection)
+                NucleusParameters.Composite.USER_OR_GAME_PROFILE
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        final MuteHandler handler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
+        final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
+        final User user = either.fold(Function.identity(), Sponge.getServer().getUserManager()::getOrCreate);
+        final MuteService handler = context.getServiceCollection().getServiceUnchecked(MuteService.class);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
                         MutePermissions.MUTE_LEVEL_KEY,
@@ -52,13 +56,13 @@ public class UnmuteCommand implements ICommandExecutor, IReloadableService.Reloa
             return context.errorResult("command.modifiers.level.insufficient", user.getName());
         }
 
-        if (!handler.isMuted(user)) {
+        if (!handler.isMuted(user.getUniqueId())) {
             return context.errorResult("command.unmute.notmuted", user.getName());
         }
         // Unmute.
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
-            handler.unmutePlayer(user, frame.getCurrentCause(), false);
+            handler.unmutePlayer(user.getUniqueId());
             context.sendMessage("command.unmute.success", user.getName(), context.getName());
             return context.successResult();
         }

@@ -5,27 +5,28 @@
 package io.github.nucleuspowered.nucleus.modules.mute.events;
 
 import io.github.nucleuspowered.nucleus.api.module.mute.event.NucleusMuteEvent;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
+import net.kyori.adventure.text.Component;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.text.Text;
+
 import java.time.Duration;
 import java.util.Optional;
-
-import javax.annotation.Nullable;
+import java.util.UUID;
 
 public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEvent {
 
     private final Cause cause;
-    private final User target;
+    private final UUID mutedUser;
 
-    public MuteEvent(final Cause cause, final User target) {
+    public MuteEvent(final Cause cause, final UUID mutedUser) {
         this.cause = cause;
-        this.target = target;
+        this.mutedUser = mutedUser;
     }
 
-    @Override public User getTargetUser() {
-        return this.target;
+    @Override
+    public UUID getMutedUser() {
+        return this.mutedUser;
     }
 
     @Override public Cause getCause() {
@@ -35,9 +36,9 @@ public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEven
     public static class Muted extends MuteEvent implements NucleusMuteEvent.Muted {
 
         @Nullable public final Duration duration;
-        public final TextComponent reason;
+        public final Component reason;
 
-        public Muted(final Cause cause, final User target, @Nullable final Duration duration, final TextComponent reason) {
+        public Muted(final Cause cause, final UUID target, @Nullable final Duration duration, final Component reason) {
             super(cause, target);
             this.duration = duration;
             this.reason = reason;
@@ -47,7 +48,7 @@ public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEven
             return Optional.ofNullable(this.duration);
         }
 
-        @Override public TextComponent getReason() {
+        @Override public Component getReason() {
             return this.reason;
         }
     }
@@ -56,7 +57,7 @@ public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEven
 
         private final boolean expired;
 
-        public Unmuted(final Cause cause, final User target, final boolean expired) {
+        public Unmuted(final Cause cause, final UUID target, final boolean expired) {
             super(cause, target);
             this.expired = expired;
         }

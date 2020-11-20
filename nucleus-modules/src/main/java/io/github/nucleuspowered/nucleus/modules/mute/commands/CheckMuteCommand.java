@@ -5,77 +5,67 @@
 package io.github.nucleuspowered.nucleus.modules.mute.commands;
 
 import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
-import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
-import io.github.nucleuspowered.nucleus.modules.mute.services.MuteHandler;
+import io.github.nucleuspowered.nucleus.modules.mute.services.MuteService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.Sponge;
+import io.vavr.control.Either;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
-import java.time.Instant;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.util.Identifiable;
+
 import java.util.Optional;
+import java.util.UUID;
 
 @Command( aliases = "checkmute", basePermission = MutePermissions.BASE_CHECKMUTE, commandDescriptionKey = "checkmute")
 public class CheckMuteCommand implements ICommandExecutor {
 
-    private final String playerKey = "user/UUID";
-
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            GenericArguments.firstParsing(
-                GenericArguments.user(Text.of(this.playerKey)),
-                    new UUIDArgument<>(Text.of(this.playerKey), u -> Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(u),
-                            serviceCollection)
-            )
+                NucleusParameters.Composite.USER_OR_GAME_PROFILE
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the user.
-        final User user = context.requireOne(this.playerKey, User.class);
-        final MuteHandler muteHandler = context.getServiceCollection().getServiceUnchecked(MuteHandler.class);
+        final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
+        final UUID uuid = either.fold(Identifiable::getUniqueId, GameProfile::uuid);
+        final Component name = context.getServiceCollection().playerDisplayNameService().getName(uuid);
+        final MuteService muteHandler = context.getServiceCollection().getServiceUnchecked(MuteService.class);
 
-        final Optional<MuteData> omd = muteHandler.getPlayerMuteData(user);
+        final Optional<Mute> omd = muteHandler.getPlayerMuteInfo(uuid);
         if (!omd.isPresent()) {
-            context.sendMessage("command.checkmute.none", user.getName());
+            context.sendMessage("command.checkmute.none", name);
             return context.successResult();
         }
 
         // Muted, get information.
-        final MuteData md = omd.get();
-        final String name;
-        if (!md.getMuter().isPresent()) {
-            name = Sponge.getServer().getConsole().getName();
-        } else {
-            name = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(md.getMuter().get())
-                    .map(User::getName)
-                    .orElseGet(() -> context.getMessageString("standard.unknown"));
-        }
-
+        final Mute md = omd.get();
+        final Component muterName = context.getServiceCollection().playerDisplayNameService().getName(md.getMuter().orElse(Util.CONSOLE_FAKE_UUID));
         if (md.getRemainingTime().isPresent()) {
-            context.sendMessage("command.checkmute.mutedfor", user.getName(),
-                    name,
+            context.sendMessage("command.checkmute.mutedfor", name,
+                    muterName,
                     context.getTimeString(md.getRemainingTime().get().getSeconds()));
         } else {
-            context.sendMessage("command.checkmute.mutedperm", user.getName(), name);
+            context.sendMessage("command.checkmute.mutedperm", name, muterName);
         }
 
-        if (md.getCreationTime() > 0) {
+        if (md.getCreationInstant().isPresent()) {
             context.sendMessage("command.checkmute.created",
-                    Util.FULL_TIME_FORMATTER.withLocale(context.getCommandSourceRoot().getLocale())
-                            .format(Instant.ofEpochSecond(md.getCreationTime())));
+                    Util.FULL_TIME_FORMATTER.withLocale(context.getLocale())
+                            .format(md.getCreationInstant().get()));
         } else {
-            context.sendMessage("command.checkmute.created", "loc:standard.unknown");
+            context.sendMessage("command.checkmute.created", context.getMessage("standard.unknown"));
         }
 
         context.sendMessage("standard.reasoncoloured", md.getReason());

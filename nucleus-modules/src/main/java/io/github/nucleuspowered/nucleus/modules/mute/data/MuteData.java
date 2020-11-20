@@ -4,22 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mute.data;
 
-import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
-import io.github.nucleuspowered.nucleus.datatypes.EndTimestamp;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
-
 @ConfigSerializable
-public final class MuteData extends EndTimestamp implements Mute {
+public final class MuteData {
 
     @Setting
     private UUID muter;
@@ -28,80 +22,48 @@ public final class MuteData extends EndTimestamp implements Mute {
     private String reason;
 
     @Setting
-    private long creationTime = Instant.now().getEpochSecond();
+    private long creationTime;
+
+    @Setting
+    private Long absoluteTime;
+
+    @Setting
+    private Long timeFromNextLogin;
 
     // For Configurate
     public MuteData() { }
 
-    public MuteData(final UUID muter, final String reason) {
+    public MuteData(@Nullable final UUID muter, final String reason, @Nullable final Instant creationInstant, @Nullable final Duration timeFromNextLogin,
+            @Nullable final Instant endtimestamp) {
         this.muter = muter;
         this.reason = reason;
-    }
-
-    /**
-     * Creates the data.
-     *
-     * @param muter The UUID of the muter
-     * @param endtimestamp The end timestamp
-     * @param reason The reason
-     */
-    public MuteData(final UUID muter, final String reason, final Instant endtimestamp) {
-        this(muter, reason);
-        this.endtimestamp = endtimestamp.getEpochSecond();
-    }
-
-    /**
-     * Creates the data.
-     *
-     * @param muter The UUID of the muter
-     * @param reason The reason
-     * @param timeFromNextLogin The time to mute for from next login.
-     */
-    public MuteData(final UUID muter, final String reason, @Nullable final Duration timeFromNextLogin) {
-        this(muter, reason);
+        if (creationInstant != null) {
+            this.creationTime = creationInstant.getEpochSecond();
+        }
         if (timeFromNextLogin != null) {
             this.timeFromNextLogin = timeFromNextLogin.getSeconds();
+        } else if (endtimestamp != null) {
+            this.absoluteTime = endtimestamp.getEpochSecond();
         }
     }
 
-    @Override public String getReason() {
+    public UUID getMuter() {
+        return this.muter;
+    }
+
+    public String getReason() {
         return this.reason;
-    }
-
-    /**
-     * Gets the timestamp for the end of the mute.
-     *
-     * @return An {@link Instant}
-     */
-    public Optional<Instant> getEndTimestamp() {
-        if (this.endtimestamp == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(Instant.ofEpochSecond(this.endtimestamp));
-    }
-
-    public Optional<Instant> getCreationInstant() {
-        return this.creationTime > 0 ? Optional.of(Instant.ofEpochSecond(this.creationTime)) : Optional.empty();
     }
 
     public long getCreationTime() {
         return this.creationTime;
     }
 
-    @Override public Optional<UUID> getMuter() {
-        return this.muter.equals(Util.CONSOLE_FAKE_UUID) ? Optional.empty() : Optional.of(this.muter);
+    public Long getAbsoluteTime() {
+        return this.absoluteTime;
     }
 
-    public UUID getMuterInternal() {
-        return this.muter;
-    }
-
-    public Optional<Duration> getTimeFromNextLogin() {
-        if (this.timeFromNextLogin == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(Duration.of(this.timeFromNextLogin, ChronoUnit.SECONDS));
+    public Long getTimeFromNextLogin() {
+        return this.timeFromNextLogin;
     }
 }
