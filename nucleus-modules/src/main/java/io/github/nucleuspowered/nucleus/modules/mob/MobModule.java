@@ -5,12 +5,15 @@
 package io.github.nucleuspowered.nucleus.modules.mob;
 
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.mob.commands.SpawnMobCommand;
 import io.github.nucleuspowered.nucleus.modules.mob.config.MobConfig;
+import io.github.nucleuspowered.nucleus.modules.mob.listeners.BlockLivingSpawnListener;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public class MobModule implements IModule.Configurable<MobConfig> {
@@ -21,18 +24,18 @@ public class MobModule implements IModule.Configurable<MobConfig> {
     }
 
     @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Collections.singletonList(SpawnMobCommand.class);
     }
 
     @Override public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(MobPermissions.class);
     }
 
     @Override public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
+        return Collections.singleton(BlockLivingSpawnListener.class);
     }
 
     @Override public Class<MobConfig> getConfigClass() {
-        return null;
+        return MobConfig.class;
     }
 }
