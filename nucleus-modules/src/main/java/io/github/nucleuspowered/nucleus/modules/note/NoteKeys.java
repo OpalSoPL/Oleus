@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.modules.note;
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.modules.note.data.NoteData;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
-import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class NoteKeys {

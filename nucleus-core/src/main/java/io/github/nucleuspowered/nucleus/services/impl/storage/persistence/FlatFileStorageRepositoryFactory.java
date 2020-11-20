@@ -11,7 +11,6 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.queryobjects.IWorl
 import io.github.nucleuspowered.storage.exceptions.DataQueryException;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
-import io.github.nucleuspowered.storage.queryobjects.IQueryObject;
 
 import java.nio.file.Path;
 import java.util.Collection;

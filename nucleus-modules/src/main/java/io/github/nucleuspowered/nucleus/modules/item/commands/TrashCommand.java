@@ -14,7 +14,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ContainerTypes;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
 @Command(

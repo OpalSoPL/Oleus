@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.afk.listeners;
 
-import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.afk.config.AFKConfig;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
@@ -12,7 +11,6 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.message.MessageChannelEvent;
 
 import com.google.inject.Inject;
 import org.spongepowered.api.event.message.PlayerChatEvent;

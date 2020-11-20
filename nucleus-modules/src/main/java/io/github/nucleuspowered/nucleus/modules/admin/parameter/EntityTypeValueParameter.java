@@ -17,7 +17,6 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.Monster;
 import org.spongepowered.api.entity.living.player.Player;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

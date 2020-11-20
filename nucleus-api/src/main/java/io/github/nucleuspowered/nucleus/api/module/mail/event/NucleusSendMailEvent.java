@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.api.module.mail.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 

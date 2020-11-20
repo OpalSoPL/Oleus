@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.textfilecontroller;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.io.TextFileController;
@@ -13,13 +12,14 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextFileControllerCollection;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @Singleton
 public class TextFileControllerCollection implements ITextFileControllerCollection, IReloadableService.Reloadable {
 
-    private final Map<String, TextFileController> textFileControllers = Maps.newHashMap();
+    private final Map<String, TextFileController> textFileControllers = new HashMap<>();
 
     @Inject
     public TextFileControllerCollection(final INucleusServiceCollection serviceCollection) {

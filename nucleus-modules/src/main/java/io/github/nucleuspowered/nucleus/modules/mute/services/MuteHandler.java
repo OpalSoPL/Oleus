@@ -5,8 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.mute.services;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.mute.NucleusMuteService;
 import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
@@ -22,24 +20,23 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Identifiable;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
 import com.google.inject.Inject;
+import org.spongepowered.plugin.PluginContainer;
 
 @APIService(NucleusMuteService.class)
 public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteService, ServiceBase {
@@ -47,7 +44,7 @@ public class MuteHandler implements ContextCalculator<Subject>, NucleusMuteServi
     private final IMessageProviderService messageProviderService;
     private final IStorageManager storageManager;
     private final PluginContainer pluginContainer;
-    private final Map<UUID, Boolean> muteContextCache = Maps.newHashMap();
+    private final Map<UUID, Boolean> muteContextCache = new HashMap<>();
     private final Context mutedContext = new Context(NucleusMuteService.MUTED_CONTEXT, "true");
 
     private boolean globalMuteEnabled = false;

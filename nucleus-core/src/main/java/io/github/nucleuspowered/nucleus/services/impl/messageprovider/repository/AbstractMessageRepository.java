@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.ArgumentElement;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.Template;
 import io.github.nucleuspowered.nucleus.services.impl.messageprovider.template.TextElement;
@@ -101,7 +99,7 @@ abstract class AbstractMessageRepository implements IMessageRepository {
             return template.create();
         }
 
-        final Map<String, Component> objs = Maps.newHashMap();
+        final Map<String, Component> objs = new HashMap<>();
         for (int i = 0; i < textList.size(); i++) {
             objs.put(String.valueOf(i), textList.get(i));
         }

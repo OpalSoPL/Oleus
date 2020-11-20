@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandspy.listeners;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.commandspy.CommandSpyPermissions;
 import io.github.nucleuspowered.nucleus.modules.commandspy.config.CommandSpyConfig;

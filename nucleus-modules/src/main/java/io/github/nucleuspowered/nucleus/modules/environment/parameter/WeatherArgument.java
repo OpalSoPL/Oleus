@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.environment.parameter;
 
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
@@ -14,6 +13,7 @@ import org.spongepowered.api.command.parameter.managed.ValueParameter;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 public class WeatherArgument implements ValueParameter<Weather> {
 
-    private static final Map<String, Weather> WEATHERS = Maps.newHashMap();
+    private static final Map<String, Weather> WEATHERS = new HashMap<>();
 
     static {
         WEATHERS.put("clear", Weathers.CLEAR.get());

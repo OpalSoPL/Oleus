@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.api.text.event.NucleusTextTemplateEvent;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
-import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.text.Component;

@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.info.services;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.io.TextFileController;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
@@ -17,6 +16,7 @@ import org.spongepowered.plugin.PluginContainer;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
 
-    private final Map<String, TextFileController> infoFiles = Maps.newHashMap();
+    private final Map<String, TextFileController> infoFiles = new HashMap<>();
     private final Pattern validFile = Pattern.compile("[a-zA-Z0-9_.\\-]+\\.txt", Pattern.CASE_INSENSITIVE);
 
     public Set<String> getInfoSections() {
@@ -82,7 +82,7 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
         }
 
         // Collect them and put the resultant controllers into a temporary map.
-        final Map<String, TextFileController> mst = Maps.newHashMap();
+        final Map<String, TextFileController> mst = new HashMap<>();
         files.forEach(x -> {
             try {
                 String name = x.getFileName().toString();

@@ -11,8 +11,6 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.config
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
 import io.github.nucleuspowered.storage.exceptions.DataLoadException;
 import io.github.nucleuspowered.storage.exceptions.DataSaveException;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.gson.GsonConfigurationLoader;

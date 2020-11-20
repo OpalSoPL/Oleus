@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.api.module.mail;
 import com.google.common.base.Preconditions;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.entity.living.player.User;
 
 import java.time.Instant;
 import java.util.Arrays;

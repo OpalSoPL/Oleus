@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.freezeplayer.listeners;
 
-import com.google.common.collect.Maps;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.freezeplayer.services.FreezePlayerService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
@@ -15,21 +15,20 @@ import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import com.google.inject.Inject;
 
 public class FreezePlayerListener implements ListenerBase {
 
     private final IMessageProviderService messageProviderService;
     private final FreezePlayerService service;
 
-    private final Map<UUID, Instant> lastFreezeNotification = Maps.newHashMap();
+    private final Map<UUID, Instant> lastFreezeNotification = new HashMap<>();
 
     @Inject
     public FreezePlayerListener(final INucleusServiceCollection serviceCollection) {
@@ -39,22 +38,22 @@ public class FreezePlayerListener implements ListenerBase {
 
     @Listener
     public void onPlayerMovement(final MoveEntityEvent event, @Root final Player player) {
-        event.setCancelled(checkForFrozen(player, "freeze.cancelmove"));
+        event.setCancelled(this.checkForFrozen(player, "freeze.cancelmove"));
     }
 
     @Listener
     public void onPlayerInteractBlock(final InteractEvent event, @Root final Player player) {
-        event.setCancelled(checkForFrozen(player, "freeze.cancelinteract"));
+        event.setCancelled(this.checkForFrozen(player, "freeze.cancelinteract"));
     }
 
     @Listener
     public void onPlayerInteractBlock(final InteractBlockEvent event, @Root final Player player) {
-        event.setCancelled(checkForFrozen(player, "freeze.cancelinteractblock"));
+        event.setCancelled(this.checkForFrozen(player, "freeze.cancelinteractblock"));
     }
 
     @Listener
-    public void onPlayerDisconnect(final ClientConnectionEvent.Disconnect event) {
-        this.service.invalidate(event.getTargetEntity().getUniqueId());
+    public void onPlayerDisconnect(final ServerSideConnectionEvent.Disconnect event) {
+        this.service.invalidate(event.getPlayer().getUniqueId());
     }
 
     private boolean checkForFrozen(final Player player, final String message) {

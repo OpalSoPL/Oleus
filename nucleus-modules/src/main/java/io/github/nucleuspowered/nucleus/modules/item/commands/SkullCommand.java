@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.item.commands;
 
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.item.ItemPermissions;
 import io.github.nucleuspowered.nucleus.modules.item.config.ItemConfig;

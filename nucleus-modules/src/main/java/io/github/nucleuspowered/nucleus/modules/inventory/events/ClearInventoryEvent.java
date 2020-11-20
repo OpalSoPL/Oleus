@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.inventory.events;
 
 import io.github.nucleuspowered.nucleus.api.module.inventory.NucleusClearInventoryEvent;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 

@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.message.services;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.message.NucleusPrivateMessagingService;
@@ -244,7 +243,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
             final UUID uuidReceiver = this.getUUID(receiver);
 
             // Create the tokens.
-            final Map<String, Function<Object, Optional<ComponentLike>>> tokens = Maps.newHashMap();
+            final Map<String, Function<Object, Optional<ComponentLike>>> tokens = new HashMap<>();
             tokens.put("from", cs -> Optional.of(Component.text(sender.getName())));
             tokens.put("to", cs -> Optional.of(Component.text(receiver.getName())));
             tokens.put("fromdisplay", cs -> Optional.of(sender.getDisplayName()));

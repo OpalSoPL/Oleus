@@ -12,9 +12,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.module.ModuleContainer;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICompatibilityService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IModuleReporter;
-import org.spongepowered.api.util.Tristate;
 
 import java.util.ArrayList;
 import java.util.Collection;

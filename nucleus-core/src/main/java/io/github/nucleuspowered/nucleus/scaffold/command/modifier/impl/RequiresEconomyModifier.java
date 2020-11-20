@@ -10,8 +10,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.control.CommandControl;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.ICommandModifier;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
-import org.spongepowered.api.command.exception.CommandException;
 
 import java.util.Optional;
 

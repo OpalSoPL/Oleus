@@ -13,7 +13,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.util.TypeTokens;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
@@ -21,13 +20,9 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.CommonParameters;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.BlockChangeFlags;
-import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.api.world.World;
 
 @Command(aliases = {"blockzap", "zapblock"},
         basePermission = AdminPermissions.BASE_BLOCKZAP,

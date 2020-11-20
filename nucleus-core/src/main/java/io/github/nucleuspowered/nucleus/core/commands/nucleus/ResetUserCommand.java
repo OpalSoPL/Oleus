@@ -20,7 +20,6 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderServ
 import io.github.nucleuspowered.storage.services.IStorageService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.spongepowered.api.Sponge;

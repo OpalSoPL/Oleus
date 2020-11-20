@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.services.impl.messageprovider.repository;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import org.apache.logging.log4j.Logger;

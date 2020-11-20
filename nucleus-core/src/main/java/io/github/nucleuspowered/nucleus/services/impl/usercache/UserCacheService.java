@@ -4,7 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.services.impl.usercache;
 
-import com.google.common.collect.Maps;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.configurate.datatypes.UserCacheDataNode;
 import io.github.nucleuspowered.nucleus.configurate.datatypes.UserCacheVersionNode;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
@@ -18,9 +19,12 @@ import io.github.nucleuspowered.storage.services.IStorageService;
 import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.util.Identifiable;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.gson.GsonConfigurationLoader;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,11 +32,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.gson.GsonConfigurationLoader;
 
 @Singleton
 public class UserCacheService implements IUserCacheService, IReloadableService.DataLocationReloadable {
@@ -143,7 +142,7 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         }
 
         try {
-            final Map<UUID, UserCacheDataNode> data = Maps.newHashMap();
+            final Map<UUID, UserCacheDataNode> data = new HashMap<>();
             final List<UUID> knownUsers = Sponge.getServer().getUserManager().streamAll()
                     .map(Identifiable::getUniqueId).collect(Collectors.toList());
 

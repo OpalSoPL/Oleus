@@ -11,7 +11,6 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Represents a location that has a name attached to it.

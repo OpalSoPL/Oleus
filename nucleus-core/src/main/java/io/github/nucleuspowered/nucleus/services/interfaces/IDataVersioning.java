@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.services.interfaces;
 
 import com.google.inject.ImplementedBy;
-import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.services.impl.dataversioning.DataVersioning;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;

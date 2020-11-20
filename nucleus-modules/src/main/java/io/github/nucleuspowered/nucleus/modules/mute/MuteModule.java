@@ -6,8 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.mute;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.module.IModule;
-import io.github.nucleuspowered.nucleus.modules.jail.JailKeys;
-import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfigAdapter;
 import io.github.nucleuspowered.nucleus.modules.mute.services.MuteHandler;
@@ -21,9 +19,6 @@ import uk.co.drnaylor.quickstart.annotations.ModuleData;
 import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
 import java.util.Map;
-import java.util.function.Supplier;
-
-import com.google.inject.Inject;
 
 @ModuleData(id = MuteModule.ID, name = "Mute")
 public class MuteModule implements IModule.Configurable<MuteConfig> { // ConfigurableModule<MuteConfig, MuteConfigAdapter> {

@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.api.module.mute;
 
 import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cause;
 
 import java.time.Duration;

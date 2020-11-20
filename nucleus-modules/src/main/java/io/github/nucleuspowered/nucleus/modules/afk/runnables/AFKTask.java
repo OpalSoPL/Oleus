@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.afk.runnables;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.scheduler.Task;
+
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 

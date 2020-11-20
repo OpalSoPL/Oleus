@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
-import com.google.common.reflect.TypeParameter;
 import io.leangen.geantyref.TypeFactory;
 import io.leangen.geantyref.TypeToken;
 

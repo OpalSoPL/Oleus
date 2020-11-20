@@ -7,10 +7,8 @@ package io.github.nucleuspowered.nucleus.modules.home.services;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.api.core.exception.NoSuchPlayerException;
 import io.github.nucleuspowered.nucleus.api.module.home.NucleusHomeService;
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
 import io.github.nucleuspowered.nucleus.api.module.home.exception.HomeException;
@@ -24,7 +22,6 @@ import io.github.nucleuspowered.nucleus.modules.home.events.CreateHomeEvent;
 import io.github.nucleuspowered.nucleus.modules.home.events.DeleteHomeEvent;
 import io.github.nucleuspowered.nucleus.modules.home.events.ModifyHomeEvent;
 import io.github.nucleuspowered.nucleus.modules.home.events.UseHomeEvent;
-import io.github.nucleuspowered.nucleus.modules.home.parameters.HomeParameter;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
@@ -35,7 +32,6 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
@@ -45,6 +41,7 @@ import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -124,7 +121,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
 
     @Override
     public void modifyHome(final UUID user, final String name, final ServerLocation location, final Vector3d rotation)
-            throws HomeException, NoSuchPlayerException {
+            throws HomeException {
         final Home home = this.getHome(user, name)
                 .orElseThrow(() -> new HomeException(Component.text("That home does not exist"), HomeException.Reasons.DOES_NOT_EXIST));
         this.modifyHomeInternal(home, location, rotation);
@@ -268,9 +265,9 @@ public class HomeService implements NucleusHomeService, ServiceBase {
         final Pattern warpName = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]{1,15}$");
 
         if (m == null) {
-            m = Maps.newHashMap();
+            m = new HashMap<>();
         } else {
-            m = Maps.newHashMap(m);
+            m = new HashMap<>(m);
         }
 
         final Optional<String> os = Util.getKeyIgnoreCase(m, home);
@@ -306,7 +303,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
 
         final Optional<String> os = Util.getKeyIgnoreCase(m, home);
         if (os.isPresent()) {
-            m = Maps.newHashMap(m);
+            m = new HashMap<>(m);
             m.remove(os.get());
             this.setAndSave(uuid, m);
             return true;

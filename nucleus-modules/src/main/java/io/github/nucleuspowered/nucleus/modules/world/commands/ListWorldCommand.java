@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.world.commands;
 
 import org.spongepowered.math.vector.Vector3i;
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;

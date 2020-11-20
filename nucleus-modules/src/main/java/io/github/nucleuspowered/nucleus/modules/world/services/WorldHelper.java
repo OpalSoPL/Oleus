@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.world.services;
 
 import org.spongepowered.math.GenericMath;
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.modules.world.WorldKeys;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.config.WorldConfig;
@@ -23,6 +22,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -41,7 +41,7 @@ public class WorldHelper implements IReloadableService.Reloadable, ServiceBase {
     private static final DecimalFormat PERCENT_FORMAT = new DecimalFormat("0.##");
     private static final String TIME_FORMAT = "s's 'S'ms'";
 
-    private final Map<UUID, ChunkPreGenerate> pregen = Maps.newHashMap();
+    private final Map<UUID, ChunkPreGenerate> pregen = new HashMap<>();
 
     @Inject
     public WorldHelper(final INucleusServiceCollection serviceCollection) {

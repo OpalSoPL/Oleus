@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.tests.sanity;
 
-import com.google.common.collect.Lists;
 import com.google.common.reflect.ClassPath;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;

@@ -106,7 +106,7 @@ public interface NucleusHomeService {
      * @throws HomeException if the home could not be found or if a plugin cancelled
      *                      the event.
      */
-    void modifyHome(final UUID user, final String name, final ServerLocation location, final Vector3d rotation) throws HomeException, NoSuchPlayerException;
+    void modifyHome(final UUID user, final String name, final ServerLocation location, final Vector3d rotation) throws HomeException;
 
     /**
      * Modifies a home's location.

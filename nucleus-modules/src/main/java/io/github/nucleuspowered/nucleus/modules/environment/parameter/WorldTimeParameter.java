@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.environment.parameter;
 
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.Sponge;
@@ -45,7 +44,7 @@ import java.util.stream.Collectors;
  */
 public class WorldTimeParameter implements ValueParameter<MinecraftDayTime> {
 
-    private static final HashMap<String, MinecraftDayTime> TICK_ALIASES = Maps.newHashMap();
+    private static final HashMap<String, MinecraftDayTime> TICK_ALIASES = new HashMap<>();
     private static final Pattern tfh = Pattern.compile("^(\\d{1,2})[hH]$");
     private static final Pattern ampm = Pattern.compile("^(\\d{1,2})(a[m]?|p[m]?)$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Pattern ticks = Pattern.compile("^(\\d+)$");

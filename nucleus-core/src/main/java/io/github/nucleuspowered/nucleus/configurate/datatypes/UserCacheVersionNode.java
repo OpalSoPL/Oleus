@@ -4,10 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.configurate.datatypes;
 
-import com.google.common.collect.Maps;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -18,7 +18,7 @@ public class UserCacheVersionNode {
     private int version = 1;
 
     @Setting
-    private Map<UUID, UserCacheDataNode> node = Maps.newHashMap();
+    private Map<UUID, UserCacheDataNode> node = new HashMap<>();
 
     public int getVersion() {
         return this.version;

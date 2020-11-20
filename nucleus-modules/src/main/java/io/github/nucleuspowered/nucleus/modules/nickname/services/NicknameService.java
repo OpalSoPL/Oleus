@@ -8,8 +8,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.github.nucleuspowered.nucleus.api.module.nickname.NucleusNicknameService;
 import io.github.nucleuspowered.nucleus.api.module.nickname.exception.NicknameException;
 import io.github.nucleuspowered.nucleus.modules.nickname.NicknameKeys;
@@ -20,7 +18,6 @@ import io.github.nucleuspowered.nucleus.modules.nickname.events.ChangeNicknameEv
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
@@ -38,6 +35,7 @@ import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.permission.Subject;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -110,7 +108,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
     }
 
     public Map<String, UUID> getAllCached() {
-        return Maps.newHashMap(this.cache.inverse());
+        return new HashMap<>(this.cache.inverse());
     }
 
     public Map<Player, Component> getFromSubstring(final String search) {

@@ -4,11 +4,9 @@
  */
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
-import com.google.common.reflect.TypeParameter;
 import io.leangen.geantyref.TypeFactory;
 import io.leangen.geantyref.TypeToken;
 
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 

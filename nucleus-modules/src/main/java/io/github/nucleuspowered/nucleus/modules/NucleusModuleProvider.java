@@ -21,7 +21,6 @@ import io.github.nucleuspowered.nucleus.modules.chatlogger.ChatLoggerModule;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.CommandLoggerModule;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.config.CommandLoggerConfig;
 import io.github.nucleuspowered.nucleus.modules.commandspy.CommandSpyModule;
-import io.github.nucleuspowered.nucleus.modules.commandspy.commands.CommandSpyCommand;
 import io.github.nucleuspowered.nucleus.modules.commandspy.config.CommandSpyConfig;
 import io.github.nucleuspowered.nucleus.modules.connection.ConnectionModule;
 import io.github.nucleuspowered.nucleus.modules.connection.config.ConnectionConfig;

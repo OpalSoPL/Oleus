@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.serverlist.commands;
 
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.serverlist.ServerListPermissions;
 import io.github.nucleuspowered.nucleus.modules.serverlist.config.ServerListConfig;

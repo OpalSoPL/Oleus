@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.teleport.commands;
 
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.modules.teleport.TeleportPermissions;
 import io.github.nucleuspowered.nucleus.modules.teleport.events.RequestEvent;
 import io.github.nucleuspowered.nucleus.modules.teleport.services.PlayerTeleporterService;

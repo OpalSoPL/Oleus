@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.serverlist.config;
 
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.neutrino.annotations.Default;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;

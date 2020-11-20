@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
-import com.google.common.reflect.TypeToken;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.lang.reflect.Type;

@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.api.core;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Locale;

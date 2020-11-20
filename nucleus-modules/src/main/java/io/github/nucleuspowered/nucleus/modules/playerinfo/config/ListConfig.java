@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.playerinfo.config;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.neutrino.annotations.Default;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import ninja.leaping.configurate.objectmapping.Setting;

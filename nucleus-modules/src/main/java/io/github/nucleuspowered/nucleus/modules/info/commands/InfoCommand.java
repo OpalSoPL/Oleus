@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.info.commands;
 
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.io.TextFileController;
