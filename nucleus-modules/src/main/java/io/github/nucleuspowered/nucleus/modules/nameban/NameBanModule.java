@@ -4,27 +4,37 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nameban;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.nameban.config.NameBanConfig;
-import io.github.nucleuspowered.nucleus.modules.nameban.config.NameBanConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
+public final class NameBanModule implements IModule.Configurable<NameBanConfig> {
 
-@ModuleData(id = "nameban", name = "Name Banning")
-public class NameBanModule extends ConfigurableModule<NameBanConfig, NameBanConfigAdapter> {
+    public static final String ID = "nameban";
 
-    @Inject
-    public NameBanModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+
     }
 
-    @Override public NameBanConfigAdapter createAdapter() {
-        return new NameBanConfigAdapter();
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return null;
     }
 
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return null;
+    }
+
+    @Override public Class<NameBanConfig> getConfigClass() {
+        return null;
+    }
 }

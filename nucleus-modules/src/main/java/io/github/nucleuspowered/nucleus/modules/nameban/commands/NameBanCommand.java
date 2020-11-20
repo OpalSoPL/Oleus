@@ -18,14 +18,12 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.text.Text;
 import java.util.stream.Collectors;
 
-@Command(aliases = "nameban", basePermission = NameBanPermissions.BASE_NAMEBAN, commandDescriptionKey = "nameban", )
+@Command(aliases = "nameban", basePermission = NameBanPermissions.BASE_NAMEBAN, commandDescriptionKey = "nameban")
 public class NameBanCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final String nameKey = "name";
@@ -50,7 +48,8 @@ public class NameBanCommand implements ICommandExecutor, IReloadableService.Relo
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final String name = context.requireOne(this.nameKey, String.class).toLowerCase();
         final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class).orElse(this.defaultReason);
         final NameBanHandler handler = context.getServiceCollection().getServiceUnchecked(NameBanHandler.class);
@@ -67,7 +66,8 @@ public class NameBanCommand implements ICommandExecutor, IReloadableService.Relo
     }
 
 
-    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+    @Override
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.defaultReason = serviceCollection.configProvider().getModuleConfig(NameBanConfig.class).getDefaultReason();
     }
 }
