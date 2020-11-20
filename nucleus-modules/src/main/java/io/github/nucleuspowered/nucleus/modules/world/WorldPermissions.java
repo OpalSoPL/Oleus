@@ -18,12 +18,6 @@ public final class WorldPermissions {
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "world border" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_WORLD_BORDER = "nucleus.world.border.base";
 
-    @PermissionMetadata(descriptionKey = "permission.base", replacements = { "border gen" }, level = SuggestedLevel.ADMIN)
-    public static final String BASE_BORDER_GEN = "nucleus.world.border.gen.base";
-
-    @PermissionMetadata(descriptionKey = "permission.world.border.gen.notify", level = SuggestedLevel.ADMIN)
-    public static final String WORLD_BORDER_GEN_NOTIFY = "nucleus.world.border.gen.notify";
-
     @PermissionMetadata(descriptionKey = "permission.base", replacements = { "border set" }, level = SuggestedLevel.ADMIN)
     public static final String BASE_BORDER_SET = "nucleus.world.border.set.base";
 
