@@ -12,33 +12,39 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.scaffold.command.parameter.RegexParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.text.Text;
+
+import java.util.regex.Pattern;
+
 @Command(
         aliases = {"nameunban", "namepardon"},
         basePermission = NameBanPermissions.BASE_NAMEUNBAN,
         commandDescriptionKey = "nameunban")
 public class NameUnbanCommand implements ICommandExecutor {
 
-    private final String nameKey = "name";
+    private final Parameter.Value<String> regexParameter;
+
+    public NameUnbanCommand(final INucleusServiceCollection serviceCollection) {
+        this.regexParameter = Parameter.builder(String.class)
+                .setKey("name")
+                .parser(new RegexParameter(Pattern.compile(Util.usernameRegexPattern), "command.nameban.notvalid", serviceCollection.messageProvider()))
+                .build();
+    }
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            new RegexArgument(Text.of(this.nameKey), Util.usernameRegexPattern, "command.nameban.notvalid", serviceCollection)
+            this.regexParameter
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final String name = context.requireOne(this.nameKey, String.class).toLowerCase();
+        final String name = context.requireOne(this.regexParameter).toLowerCase();
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSourceRoot());
-            context.getServiceCollection().getServiceUnchecked(NameBanHandler.class).removeName(name, frame.getCurrentCause());
+        try {
+            context.getServiceCollection().getServiceUnchecked(NameBanHandler.class).removeName(name);
             context.sendMessage("command.nameban.pardon.success", name);
             return context.successResult();
         } catch (final NameBanException ex) {

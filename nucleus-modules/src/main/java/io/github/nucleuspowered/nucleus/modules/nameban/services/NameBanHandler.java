@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nameban.services;
 
-import com.google.common.base.Preconditions;
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.nameban.NucleusNameBanService;
@@ -16,13 +14,22 @@ import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.leangen.geantyref.TypeToken;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationOptions;
+import org.spongepowered.configurate.gson.GsonConfigurationLoader;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -42,47 +49,49 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
         this.configurateOptions = serviceCollection.configurateHelper();
     }
 
-    @Override public void addName(final String name, final String reason, final Cause cause) throws NameBanException {
+    @Override
+    public void addName(final String name, final String reason) throws NameBanException {
         if (Util.usernameRegex.matcher(name).matches()) {
             this.entries.put(name.toLowerCase(), reason);
-            Sponge.getEventManager().post(new NameBanEvent.Banned(name, reason, cause));
+            Sponge.getEventManager().post(new NameBanEvent.Banned(name, reason, Sponge.getServer().getCauseStackManager().getCurrentCause()));
             Sponge.getServer().getOnlinePlayers().stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst()
-                    .ifPresent(x -> x.kick(TextSerializers.FORMATTING_CODE.deserialize(reason)));
-            Task.builder().execute(this::save).submit(this.pluginContainer);
+                    .ifPresent(x -> x.kick(LegacyComponentSerializer.legacyAmpersand().deserialize(reason)));
+            Sponge.getServer().getScheduler().submit(Task.builder().execute(this::save).plugin(this.pluginContainer).build());
         }
 
         throw new NameBanException(
-                Text.of("That is not a valid username."), NameBanException.Reason.DISALLOWED_NAME);
+                Component.text("That is not a valid username."), NameBanException.Reason.DISALLOWED_NAME);
     }
 
     @Override public Optional<String> getReasonForBan(final String name) {
-        Preconditions.checkNotNull(name);
+        Objects.requireNonNull(name);
         return Optional.ofNullable(this.entries.get(name.toLowerCase()));
     }
 
-    @Override public void removeName(final String name, final Cause cause) throws NameBanException {
+    @Override
+    public void removeName(final String name) throws NameBanException {
         if (Util.usernameRegex.matcher(name).matches()) {
-            final Optional<String> reason = getReasonForBan(name);
+            final Optional<String> reason = this.getReasonForBan(name);
             if (reason.isPresent() && this.entries.remove(name.toLowerCase()) != null) {
-                Sponge.getEventManager().post(new NameBanEvent.Unbanned(name, reason.get(), cause));
+                Sponge.getEventManager().post(new NameBanEvent.Unbanned(name, reason.get(), Sponge.getServer().getCauseStackManager().getCurrentCause()));
             }
 
-            throw new NameBanException(Text.of("Entry does not exist."), NameBanException.Reason.DOES_NOT_EXIST);
+            throw new NameBanException(Component.text("Entry does not exist."), NameBanException.Reason.DOES_NOT_EXIST);
         }
 
-        throw new NameBanException(Text.of("That is not a valid username."), NameBanException.Reason.DISALLOWED_NAME);
+        throw new NameBanException(Component.text("That is not a valid username."), NameBanException.Reason.DISALLOWED_NAME);
     }
 
     public void load() {
         try {
-            final ConfigurationNode node = createLoader().load();
+            final ConfigurationNode node = this.createLoader().load();
             // Lowercase the keys.
             this.entries.clear();
-            node.getChildrenMap()
+            node.childrenMap()
                     .forEach((k, v) -> {
                         final String lower = k.toString().toLowerCase();
                         if (!k.equals(lower)) {
-                            entries.put(lower, v.getString());
+                            this.entries.put(lower, v.getString());
                         }
                     });
         } catch (final IOException e) {
@@ -92,10 +101,10 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
 
     public void save() {
         try {
-            final ConfigurationNode node = SimpleConfigurationNode.root(this.configurateOptions.setOptions(ConfigurationOptions.defaults()));
-            node.setValue(new TypeToken<Map<String, String>>() {}, this.entries);
-            createLoader().save(node);
-        } catch (final IOException | ObjectMappingException e) {
+            final ConfigurationNode node = CommentedConfigurationNode.root(this.configurateOptions.setOptions(ConfigurationOptions.defaults()));
+            node.set(new TypeToken<Map<String, String>>() {}, this.entries);
+            this.createLoader().save(node);
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
@@ -103,13 +112,13 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
     @Override public void onDataFileLocationChange(final INucleusServiceCollection serviceCollection) {
         // The path changes
         this.currentPath = this.dataPath.get().resolve("namebans.conf");
-        load();
+        this.load();
     }
 
     private GsonConfigurationLoader createLoader() {
         return GsonConfigurationLoader.builder()
-                .setPath(this.currentPath)
-                .setDefaultOptions(this.configurateOptions.setOptions(ConfigurationOptions.defaults()))
+                .path(this.currentPath)
+                .defaultOptions(this.configurateOptions.setOptions(ConfigurationOptions.defaults()))
                 .build();
     }
 }

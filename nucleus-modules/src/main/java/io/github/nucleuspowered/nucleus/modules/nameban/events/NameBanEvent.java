@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.nameban.events;
 
 import io.github.nucleuspowered.nucleus.api.module.nameban.event.NucleusNameBanEvent;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 public abstract class NameBanEvent extends AbstractEvent implements NucleusNameBanEvent {

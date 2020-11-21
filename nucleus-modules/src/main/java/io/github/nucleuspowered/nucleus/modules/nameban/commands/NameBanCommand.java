@@ -14,53 +14,47 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.scaffold.command.parameter.RegexParameter;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.CauseStackManager;
-import java.util.stream.Collectors;
+
+import java.util.regex.Pattern;
 
 @Command(aliases = "nameban", basePermission = NameBanPermissions.BASE_NAMEBAN, commandDescriptionKey = "nameban")
 public class NameBanCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private final String nameKey = "name";
+    private final Parameter.Value<String> regexParameter;
+
+    public NameBanCommand(final INucleusServiceCollection serviceCollection) {
+        this.regexParameter = Parameter.builder(String.class)
+                .setKey("name")
+                .parser(new RegexParameter(Pattern.compile(Util.usernameRegexPattern), "command.nameban.notvalid", serviceCollection.messageProvider()))
+                .build();
+    }
 
     private String defaultReason = "Your name is inappropriate";
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            new RegexArgument(Text.of(this.nameKey),
-                    Util.usernameRegexPattern, "command.nameban.notvalid", ((commandSource, commandArgs, commandContext) -> {
-                try {
-                    final String arg = commandArgs.peek().toLowerCase();
-                    return Sponge.getServer().getOnlinePlayers().stream().filter(x -> x.getName().toLowerCase().startsWith(arg))
-                        .map(User::getName)
-                        .collect(Collectors.toList());
-                } catch (final Exception e) {
-                    return new ArrayList<>();
-                }
-            }), serviceCollection),
+            this.regexParameter,
             NucleusParameters.OPTIONAL_REASON
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final String name = context.requireOne(this.nameKey, String.class).toLowerCase();
-        final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class).orElse(this.defaultReason);
+        final String name = context.requireOne(this.regexParameter).toLowerCase();
+        final String reason = context.getOne(NucleusParameters.OPTIONAL_REASON).orElse(this.defaultReason);
         final NameBanHandler handler = context.getServiceCollection().getServiceUnchecked(NameBanHandler.class);
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(context.getCommandSourceRoot());
-                handler.addName(name, reason, frame.getCurrentCause());
-                context.sendMessage("command.nameban.success", name);
-                return context.successResult();
+        try {
+            handler.addName(name, reason);
+            context.sendMessage("command.nameban.success", name);
+            return context.successResult();
         } catch (final NameBanException ex) {
-            ex.printStackTrace();
             return context.errorResult("command.nameban.failed", name);
         }
     }
