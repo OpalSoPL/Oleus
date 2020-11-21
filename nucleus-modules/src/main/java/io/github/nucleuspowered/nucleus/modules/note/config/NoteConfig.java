@@ -4,13 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.note.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class NoteConfig {
 
-    @Setting(value = "show-login", comment = "config.note.showonlogin")
+    @Setting(value = "show-login")
+    @LocalisedComment("config.note.showonlogin")
     private boolean showOnLogin = true;
 
     public boolean isShowOnLogin() {

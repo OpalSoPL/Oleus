@@ -110,6 +110,8 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<String> MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).build();
 
+    public static final Parameter.Value<Component> MESSAGE_COMPONENT = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.MESSAGE).build();
+
     public static final Parameter.Value<String> OPTIONAL_MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).optional().build();
 
     public static final Parameter.Value<String> REASON = Parameter.remainingJoinedStrings().setKey(Keys.REASON).build();

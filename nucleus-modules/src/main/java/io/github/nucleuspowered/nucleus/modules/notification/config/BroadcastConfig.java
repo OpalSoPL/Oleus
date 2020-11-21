@@ -4,26 +4,23 @@
  */
 package io.github.nucleuspowered.nucleus.modules.notification.config;
 
-import io.github.nucleuspowered.neutrino.annotations.Default;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class BroadcastConfig {
 
     @Setting
-    @Default(value = "&a[Broadcast] ", saveDefaultIfNull = true)
-    private NucleusTextTemplateImpl prefix;
+    private String prefix = "&a[Broadcast] ";
 
     @Setting
-    @Default(value = "", saveDefaultIfNull = true)
-    private NucleusTextTemplateImpl suffix;
+    private String suffix = "";
 
-    public NucleusTextTemplateImpl getPrefix() {
-        return this.prefix;
+    public String getPrefix() {
+        return this.prefix == null ? "" : this.prefix;
     }
 
-    public NucleusTextTemplateImpl getSuffix() {
-        return this.suffix;
+    public String getSuffix() {
+        return this.suffix == null ? "" : this.suffix;
     }
 }

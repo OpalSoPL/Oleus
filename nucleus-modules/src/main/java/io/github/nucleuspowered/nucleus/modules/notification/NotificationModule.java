@@ -4,31 +4,53 @@
  */
 package io.github.nucleuspowered.nucleus.modules.notification;
 
-import static io.github.nucleuspowered.nucleus.modules.notification.NotificationModule.ID;
-
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.notification.command.BasicActionbarCommand;
+import io.github.nucleuspowered.nucleus.modules.notification.command.BasicSubtitleCommand;
+import io.github.nucleuspowered.nucleus.modules.notification.command.BasicTitleCommand;
+import io.github.nucleuspowered.nucleus.modules.notification.command.BroadcastCommand;
+import io.github.nucleuspowered.nucleus.modules.notification.command.PlainBroadcastCommand;
 import io.github.nucleuspowered.nucleus.modules.notification.config.NotificationConfig;
-import io.github.nucleuspowered.nucleus.modules.notification.config.NotificationConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = ID, name = "Notification")
-public class NotificationModule extends ConfigurableModule<NotificationConfig, NotificationConfigAdapter> {
+public final class NotificationModule implements IModule.Configurable<NotificationConfig> {
 
     public static final String ID = "notification";
 
-    @Inject
-    public NotificationModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
     }
 
     @Override
-    public NotificationConfigAdapter createAdapter() {
-        return new NotificationConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                BasicActionbarCommand.class,
+                BasicSubtitleCommand.class,
+                BasicTitleCommand.class,
+                BroadcastCommand.class,
+                PlainBroadcastCommand.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(NotificationPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<NotificationConfig> getConfigClass() {
+        return NotificationConfig.class;
     }
 }

@@ -6,8 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.note.commands;
 
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.note.NotePermissions;
-import io.github.nucleuspowered.nucleus.modules.note.data.NoteData;
 import io.github.nucleuspowered.nucleus.modules.note.services.NoteHandler;
+import io.github.nucleuspowered.nucleus.modules.note.services.UserNote;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
@@ -15,11 +15,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -37,32 +37,35 @@ public class NoteCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.ONE_USER.get(serviceCollection),
+                NucleusParameters.ONE_USER,
                 NucleusParameters.MESSAGE
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        final String note = context.requireOne(NucleusParameters.Keys.MESSAGE, String.class);
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final User user = context.requireOne(NucleusParameters.ONE_USER);
+        final String note = context.requireOne(NucleusParameters.MESSAGE);
 
         final UUID noter = context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID);
-        final NoteData noteData = new NoteData(Instant.now(), noter, note);
+        final UserNote noteData = new UserNote(noter, note, Instant.now());
 
-        if (context.getServiceCollection().getServiceUnchecked(NoteHandler.class).addNote(user, noteData)) {
-            final MutableMessageChannel messageChannel =
-                    context.getServiceCollection().permissionService().permissionMessageChannel(NotePermissions.NOTE_NOTIFY).asMutable();
-            messageChannel.addMember(context.getCommandSourceRoot());
-            final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
-            messageChannel.getMembers().forEach(messageReceiver ->
-                    messageProviderService
-                            .sendMessageTo(messageReceiver, "command.note.success", context.getName(), noteData.getNote(), user.getName())
-            );
+        context.getServiceCollection().getServiceUnchecked(NoteHandler.class).addNote(user.getUniqueId(), noteData).thenAccept(x -> {
+            if (x) {
+                final Audience messageChannel =
+                        Audience.audience(
+                                context.getServiceCollection().permissionService().permissionMessageChannel(NotePermissions.NOTE_NOTIFY),
+                                context.getAudience());
+                final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
+                context.getServiceCollection().schedulerService().runOnMainThread(() -> {
+                        messageProviderService.sendMessageTo(messageChannel, "command.note.success", context.getName(), noteData.getNote(),
+                                user.getName());
+                });
+            } else {
+                context.sendMessage("command.warn.fail", user.getName());
+            }
+        });
 
-            return context.successResult();
-        }
-
-        context.sendMessage("command.warn.fail", user.getName());
         return context.successResult();
     }
 }

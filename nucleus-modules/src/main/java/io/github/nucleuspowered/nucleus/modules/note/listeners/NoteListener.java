@@ -4,27 +4,24 @@
  */
 package io.github.nucleuspowered.nucleus.modules.note.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.note.NotePermissions;
 import io.github.nucleuspowered.nucleus.modules.note.config.NoteConfig;
-import io.github.nucleuspowered.nucleus.modules.note.data.NoteData;
 import io.github.nucleuspowered.nucleus.modules.note.services.NoteHandler;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.channel.MutableMessageChannel;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.google.inject.Inject;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.plugin.PluginContainer;
 
 public class NoteListener implements ListenerBase.Conditional {
 
@@ -49,23 +46,20 @@ public class NoteListener implements ListenerBase.Conditional {
      * @param player The {@link Player} that has just logged in.
      */
     @Listener
-    public void onPlayerLogin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
-        Sponge.getScheduler().createTaskBuilder().async().delay(500, TimeUnit.MILLISECONDS).execute(() -> {
-            final List<NoteData> notes = this.noteHandler.getNotesInternal(player);
+    public void onPlayerLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+        this.noteHandler.getNotes(player.getUniqueId()).thenAccept(notes -> {
             if (notes != null && !notes.isEmpty()) {
-                final MutableMessageChannel messageChannel =
-                        this.permissionService.permissionMessageChannel(NotePermissions.NOTE_SHOWONLOGIN).asMutable();
-                messageChannel.send(
-                        this.messageService.getMessage("note.login.notify", player.getName(), String.valueOf(notes.size())).toBuilder()
-                        .onHover(TextActions.showText(this.messageService.getMessage("note.login.view", player.getName())))
-                        .onClick(TextActions.runCommand("/checknotes " + player.getName()))
-                        .build());
-
+                final Audience audience = this.permissionService.permissionMessageChannel(NotePermissions.NOTE_SHOWONLOGIN);
+                Sponge.getServer().getScheduler().createExecutor(this.pluginContainer).execute(() ->
+                        audience.sendMessage(this.messageService.getMessage("note.login.notify", player.getName(), String.valueOf(notes.size()))
+                            .hoverEvent(HoverEvent.showText(this.messageService.getMessage("note.login.view", player.getName())))
+                            .clickEvent(ClickEvent.runCommand("/nucleus:checknotes " + player.getName()))));
             }
-        }).submit(this.pluginContainer);
+        });
     }
 
-    @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
+    @Override
+    public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.configProvider().getModuleConfig(NoteConfig.class).isShowOnLogin();
     }
 

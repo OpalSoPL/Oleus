@@ -4,16 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.notification.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class NotificationConfig {
 
-    @Setting(value = "broadcast-message-template", comment = "config.broadcast.template")
+    @Setting(value = "broadcast-message-template")
+    @LocalisedComment("config.broadcast.template")
     private BroadcastConfig broadcastMessage = new BroadcastConfig();
 
-    @Setting(value = "title-defaults", comment = "config.title.defaults")
+    @Setting(value = "title-defaults")
+    @LocalisedComment("config.title.defaults")
     private TitleConfig titleConfig = new TitleConfig();
 
     public BroadcastConfig getBroadcastMessage() {

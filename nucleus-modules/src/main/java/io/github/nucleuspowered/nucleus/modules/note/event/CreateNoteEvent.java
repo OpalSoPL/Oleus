@@ -5,25 +5,22 @@
 package io.github.nucleuspowered.nucleus.modules.note.event;
 
 import io.github.nucleuspowered.nucleus.api.module.note.event.NucleusNoteEvent;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.plugin.meta.util.NonnullByDefault;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.event.Cause;
 
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
-
 public class CreateNoteEvent implements NucleusNoteEvent.Created {
 
     @Nullable private final UUID author;
     private final String note;
-    private final User targetUser;
+    private final UUID targetUser;
     private final Cause cause;
     private final Instant instant;
 
-    public CreateNoteEvent(@Nullable final UUID author, final String note, final Instant date, final User targetUser, final Cause cause) {
+    public CreateNoteEvent(@Nullable final UUID author, final String note, final Instant date, final UUID targetUser, final Cause cause) {
         this.author = author;
         this.note = note;
         this.instant = date;
@@ -47,7 +44,7 @@ public class CreateNoteEvent implements NucleusNoteEvent.Created {
     }
 
     @Override
-    public User getTargetUser() {
+    public UUID getTargetUser() {
         return this.targetUser;
     }
 

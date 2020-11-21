@@ -5,6 +5,8 @@
 package io.github.nucleuspowered.nucleus.api.module.note.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
+import org.spongepowered.api.event.Event;
+
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,7 +15,7 @@ import java.util.UUID;
  * Events for when notes are added to users.
  */
 @MightOccurAsync
-public interface NucleusNoteEvent {
+public interface NucleusNoteEvent extends Event {
 
     /**
      * Gets the {@link UUID} of the player who added the note,

@@ -4,10 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.api.module.note;
 
-import com.google.common.collect.ImmutableList;
 import io.github.nucleuspowered.nucleus.api.module.note.data.Note;
 
+import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A service that determines whether a subject has notes.
@@ -20,31 +21,31 @@ public interface NucleusNoteService {
      * @param user The {@link UUID} to check.
      * @return A list of {@link Note}s.
      */
-    ImmutableList<Note> getNotes(UUID user);
+    CompletableFuture<Collection<Note>> getNotes(UUID user);
 
     /**
      * Adds a note to a subject.
      *
      * @param user The {@link UUID} of a user to add a note to.
      * @param note The note to add.
-     * @return <code>true</code> if the note was added.
+     * @return A {@link CompletableFuture} indicating success.
      */
-    boolean addNote(UUID user, String note);
+    CompletableFuture<Boolean> addNote(UUID user, String note);
 
     /**
      * Removes a note from a subject.
      *
      * @param user The {@link UUID} of a user to remove a note from.
      * @param note The {@link Note} to remove.
-     * @return <code>true</code> if the note was removed.
+     * @return A {@link CompletableFuture} indicating success.
      */
-    boolean removeNote(UUID user, Note note);
+    CompletableFuture<Boolean> removeNote(UUID user, Note note);
 
     /**
      * Clears all notes from a subject.
      *
      * @param user The {@link UUID} of the user to remove all notes from.
-     * @return <code>true</code> if all notes were removed.
+     * @return A {@link CompletableFuture} indicating success.
      */
-    boolean clearNotes(UUID user);
+    CompletableFuture<Boolean> clearNotes(UUID user);
 }

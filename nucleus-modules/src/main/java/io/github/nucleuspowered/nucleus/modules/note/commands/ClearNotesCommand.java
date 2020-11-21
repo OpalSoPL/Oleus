@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.note.commands;
 
 import io.github.nucleuspowered.nucleus.modules.note.NotePermissions;
-import io.github.nucleuspowered.nucleus.modules.note.data.NoteData;
 import io.github.nucleuspowered.nucleus.modules.note.services.NoteHandler;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -13,11 +12,13 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.ISchedulerService;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.entity.living.player.User;
-import java.util.List;
+import org.spongepowered.api.util.Identifiable;
+
+import java.util.UUID;
 
 @Command(
         aliases = {"clearnotes", "removeallnotes"},
@@ -28,25 +29,25 @@ public class ClearNotesCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.ONE_USER.get(serviceCollection)
+                NucleusParameters.Composite.USER_OR_GAME_PROFILE
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final User user = context.requireOne(NucleusParameters.Keys.USER, User.class);
+        final UUID user = NucleusParameters.Composite.parseUserOrGameProfile(context).fold(Identifiable::getUniqueId, Identifiable::getUniqueId);
+        final Component name = context.getDisplayName(user);
         final NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
 
-        final List<NoteData> notes = handler.getNotesInternal(user);
-        if (notes.isEmpty()) {
-            context.sendMessage("command.checknotes.none", user.getName());
-            return context.successResult();
-        }
-
-        if (handler.clearNotes(user)) {
-            context.sendMessage("command.clearnotes.success", user.getName());
-            return context.successResult();
-        }
-
-        return context.errorResult("command.clearnotes.failure", user.getName());
+        handler.getNotes(user).thenAccept(x -> {
+            final ISchedulerService service = context.getServiceCollection().schedulerService();
+            if (x.isEmpty()) {
+                service.runOnMainThread(() -> context.sendMessage("command.checknotes.none", name));
+            } else if (handler.clearNotes(user).join()) {
+                service.runOnMainThread(() -> context.sendMessage("command.clearnotes.success", name));
+            } else {
+                service.runOnMainThread(() -> context.sendMessage("command.clearnotes.failure", name));
+            }
+        });
+        return context.successResult();
     }
 }

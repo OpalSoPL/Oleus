@@ -8,10 +8,11 @@ import io.github.nucleuspowered.nucleus.modules.note.NotePermissions;
 import io.github.nucleuspowered.nucleus.modules.note.services.NoteHandler;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
-import org.spongepowered.api.command.CommandSource;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 
 import java.util.Optional;
 
@@ -23,17 +24,16 @@ public class NoteInfoProvider implements NucleusProvider {
     }
 
     @Override
-    public Optional<Text> get(final User user, final CommandSource source, final INucleusServiceCollection serviceCollection) {
+    public Optional<Component> get(final User user, final CommandCause source, final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, NotePermissions.BASE_CHECKNOTES)) {
-            final int active = serviceCollection.getServiceUnchecked(NoteHandler.class).getNotesInternal(user).size();
+            final int active = serviceCollection.getServiceUnchecked(NoteHandler.class).getNotes(user.getUniqueId()).join().size();
 
-            final TextComponent r = serviceCollection.messageProvider().getMessageFor(source, "seen.notes", active);
+            final Component r = serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.notes", active);
             if (active > 0) {
                 return Optional.of(
-                        r.toBuilder().onClick(TextActions.runCommand("/checknotes " + user.getName()))
-                                .onHover(TextActions.showText(
-                                        serviceCollection.messageProvider().getMessageFor(source, "standard.clicktoseemore")))
-                                .build());
+                        r.clickEvent(ClickEvent.runCommand("/nucleus:checknotes " + user.getName()))
+                                .hoverEvent(HoverEvent.showText(
+                                        serviceCollection.messageProvider().getMessageFor(source.getAudience(), "standard.clicktoseemore"))));
             }
 
             return Optional.of(r);

@@ -4,10 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.note.services;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import io.github.nucleuspowered.nucleus.Util;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.note.NucleusNoteService;
 import io.github.nucleuspowered.nucleus.api.module.note.data.Note;
 import io.github.nucleuspowered.nucleus.modules.note.NoteKeys;
@@ -16,17 +14,19 @@ import io.github.nucleuspowered.nucleus.modules.note.event.CreateNoteEvent;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-
-import com.google.inject.Inject;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @APIService(NucleusNoteService.class)
 public class NoteHandler implements NucleusNoteService, ServiceBase {
@@ -38,74 +38,74 @@ public class NoteHandler implements NucleusNoteService, ServiceBase {
         this.serviceCollection = serviceCollection;
     }
 
-    public List<NoteData> getNotesInternal(final User user) {
-        final Optional<IUserDataObject> userDataObject = this.serviceCollection.storageManager()
-                .getUserService().getOnThread(user.getUniqueId());
-        return userDataObject.flatMap(udo -> udo.get(NoteKeys.NOTE_DATA)).orElseGet(ImmutableList::of);
+    @Override
+    public CompletableFuture<Collection<Note>> getNotes(final UUID uuid) {
+        return this.serviceCollection.storageManager()
+                .getUserService().get(uuid)
+                .thenApply(result -> result
+                        .<Collection<Note>>flatMap(udo -> udo.get(NoteKeys.NOTE_DATA).map(x -> x.stream().map(UserNote::fromNoteData).collect(Collectors.toList())))
+                        .orElseGet(Collections::emptyList));
     }
 
-    @Override public ImmutableList<Note> getNotes(final User user) {
-        return ImmutableList.copyOf(getNotesInternal(user));
+    @Override public CompletableFuture<Boolean> addNote(@Nullable final UUID uuid, final String note) {
+        return this.addNote(uuid, new UserNote(uuid, note, Instant.now()));
     }
 
-    @Override public boolean addNote(final User user, final String note) {
-        return addNote(user, new NoteData(Instant.now(), Util.getUUID(source), note));
-    }
-
-    public boolean addNote(final User user, final NoteData note) {
-        Preconditions.checkNotNull(user);
-        Preconditions.checkNotNull(note);
-
-        final IUserDataObject udo = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(user.getUniqueId());
-        try (final IKeyedDataObject.Value<List<NoteData>> v = udo.getAndSet(NoteKeys.NOTE_DATA)) {
-            final List<NoteData> data = v.getValue().orElseGet(Lists::newArrayList);
-            data.add(note);
-            v.setValue(data);
-        }
+    public CompletableFuture<Boolean> addNote(final UUID user, final UserNote note) {
+        Objects.requireNonNull(user);
+        Objects.requireNonNull(note);
 
         // Create the note event.
         final CreateNoteEvent event = new CreateNoteEvent(
-                note.getNoterInternal(),
+                note.getNoter().orElse(null),
                 note.getNote(),
                 note.getDate(),
                 user,
-                Sponge.getCauseStackManager().getCurrentCause()
+                Sponge.getServer().getCauseStackManager().getCurrentCause()
         );
         Sponge.getEventManager().post(event);
-        this.serviceCollection.storageManager().getUserService().save(user.getUniqueId(), udo);
-        return true;
-    }
 
-    @Override
-    public boolean removeNote(final User user, final Note note) {
-        final Optional<IUserDataObject> udo = this.serviceCollection.storageManager().getUserService()
-                .getOnThread(user.getUniqueId());
-        if (udo.isPresent()) {
-            final boolean res;
-            try (final IKeyedDataObject.Value<List<NoteData>> v = udo.get().getAndSet(NoteKeys.NOTE_DATA)) {
+        return this.serviceCollection.storageManager().getUserService().getOrNew(user).thenApply(x -> {
+            try (final IKeyedDataObject.Value<List<NoteData>> v = x.getAndSet(NoteKeys.NOTE_DATA)) {
                 final List<NoteData> data = v.getValue().orElseGet(Lists::newArrayList);
-                res = data.removeIf(x -> x.getNoterInternal().equals(note.getNoter().orElse(Util.CONSOLE_FAKE_UUID))
-                        && x.getNote().equals(note.getNote()));
+                data.add(note.toNoteData());
                 v.setValue(data);
             }
-
-            this.serviceCollection.storageManager().getUserService().save(user.getUniqueId(), udo.get());
-            return res;
-        }
-
-        return false;
+            this.serviceCollection.storageManager().getUserService().save(user, x);
+            return true;
+        });
     }
 
     @Override
-    public boolean clearNotes(final User user) {
-        final Optional<IUserDataObject> udo = this.serviceCollection.storageManager().getUserService()
-                .getOnThread(user.getUniqueId());
-        if (udo.isPresent()) {
-            udo.get().remove(NoteKeys.NOTE_DATA);
-            this.serviceCollection.storageManager().getUserService().save(user.getUniqueId(), udo.get());
-            return true;
-        }
+    public CompletableFuture<Boolean> removeNote(final UUID uuid, final Note note) {
+        return this.serviceCollection.storageManager().getUserService().get(uuid).thenApply(udo -> {
+            if (udo.isPresent()) {
+                try (final IKeyedDataObject.Value<List<NoteData>> v = udo.get().getAndSet(NoteKeys.NOTE_DATA)) {
+                    if (v.getValue().isPresent()) {
+                        final List<NoteData> data = new ArrayList<>(v.getValue().get());
+                        if (data.removeIf(x -> note.equals(UserNote.fromNoteData(x)))) {
+                            v.setValue(data);
+                            this.serviceCollection.storageManager().getUserService().save(uuid, udo.get());
+                            return true;
+                        }
+                    }
+                }
+            }
 
-        return false;
+            return false;
+        });
+    }
+
+    @Override
+    public CompletableFuture<Boolean> clearNotes(final UUID uuid) {
+        return this.serviceCollection.storageManager().getUserService().get(uuid).thenApply(udo -> {
+            if (udo.isPresent()) {
+                udo.get().remove(NoteKeys.NOTE_DATA);
+                this.serviceCollection.storageManager().getUserService().save(uuid, udo.get());
+                return true;
+            }
+
+            return false;
+        });
     }
 }

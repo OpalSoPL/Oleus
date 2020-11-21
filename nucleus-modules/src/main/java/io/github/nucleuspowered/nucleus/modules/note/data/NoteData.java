@@ -4,18 +4,17 @@
  */
 package io.github.nucleuspowered.nucleus.modules.note.data;
 
-import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.api.module.note.data.Note;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
-import java.time.Instant;
-import java.util.Optional;
 import java.util.UUID;
 
 @ConfigSerializable
-public class NoteData implements Note {
+public class NoteData {
+
     @Setting
+    @Nullable
     private UUID noter;
 
     @Setting
@@ -26,25 +25,22 @@ public class NoteData implements Note {
 
     public NoteData() { }
 
-    public NoteData(final Instant date, final UUID noter, final String note) {
+    public NoteData(final long date, @Nullable final UUID noter, final String note) {
         this.noter = noter;
         this.note = note;
-        this.date = date.toEpochMilli();
+        this.date = date;
     }
 
-    @Override public String getNote() {
-        return this.note;
-    }
-
-    @Override public Optional<UUID> getNoter() {
-        return this.noter.equals(Util.CONSOLE_FAKE_UUID) ? Optional.empty() : Optional.of(this.noter);
-    }
-
-    public UUID getNoterInternal() {
+    public UUID getNoter() {
         return this.noter;
     }
 
-    @Override public Instant getDate() {
-        return Instant.ofEpochMilli(this.date);
+    public String getNote() {
+        return this.note;
     }
+
+    public long getDate() {
+        return this.date;
+    }
+
 }

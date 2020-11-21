@@ -13,8 +13,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateMessageSender;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
+
 @Command(aliases = { "plainbroadcast", "pbcast", "pbc" },
         basePermission = NotificationPermissions.BASE_PLAINBROADCAST,
         commandDescriptionKey = "plainbroadcast")
@@ -33,10 +33,9 @@ public class PlainBroadcastCommand implements ICommandExecutor {
             new NucleusTextTemplateMessageSender(
                     context.getServiceCollection().textTemplateFactory(),
                     context.getServiceCollection().textTemplateFactory()
-                        .createFromString(context.requireOne(NucleusParameters.Keys.MESSAGE, String.class)),
-                    context.getServiceCollection().placeholderService(),
+                        .createFromAmpersandString(context.requireOne(NucleusParameters.MESSAGE)),
                     context.getCommandSourceRoot())
-                    .send(context.getCause());
+                    .send(context.getCause().getAudience());
             
         } catch (final Throwable throwable) {
             throwable.printStackTrace();

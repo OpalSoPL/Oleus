@@ -7,8 +7,8 @@ package io.github.nucleuspowered.nucleus.modules.notification.command;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.notification.NotificationPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.title.Title;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 
 @Command(
         aliases = "basictitle",
@@ -16,7 +16,7 @@ import org.spongepowered.api.text.title.Title;
         commandDescriptionKey = "basictitle",
         associatedPermissions = NotificationPermissions.BASICTITLE_MULTI
 )
-public class BasicTitleCommand extends TitleBase {
+public final class BasicTitleCommand extends TitleBase {
 
     @Inject
     public BasicTitleCommand() {
@@ -24,8 +24,7 @@ public class BasicTitleCommand extends TitleBase {
     }
 
     @Override
-    protected Title.Builder applyToBuilder(final Title.Builder builder, final TextComponent text) {
-        return builder.title(text);
+    protected Title createTitle(final Component text, final Title.Times times) {
+        return Title.title(text, Component.empty(), times);
     }
-
 }

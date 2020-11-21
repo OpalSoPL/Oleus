@@ -4,14 +4,14 @@
  */
 package io.github.nucleuspowered.nucleus.modules.note;
 
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.modules.note.data.NoteData;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
+import io.leangen.geantyref.TypeToken;
 
 public final class NoteKeys {
 
-    public static final TypeToken<NoteData> NOTE_DATA_KEY = TypeToken.of(NoteData.class);
+    public static final TypeToken<NoteData> NOTE_DATA_KEY = TypeToken.get(NoteData.class);
 
     public final static DataKey.ListKey<NoteData, IUserDataObject> NOTE_DATA =
             DataKey.ofList(NoteKeys.NOTE_DATA_KEY, IUserDataObject.class, "notes");
