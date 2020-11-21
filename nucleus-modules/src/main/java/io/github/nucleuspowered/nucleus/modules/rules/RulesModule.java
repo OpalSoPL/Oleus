@@ -5,42 +5,46 @@
 package io.github.nucleuspowered.nucleus.modules.rules;
 
 import io.github.nucleuspowered.nucleus.io.TextFileController;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.rules.commands.RulesCommand;
 import io.github.nucleuspowered.nucleus.modules.rules.config.RulesConfig;
-import io.github.nucleuspowered.nucleus.modules.rules.config.RulesConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
+public class RulesModule implements IModule.Configurable<RulesConfig> {
 
-@ModuleData(id = "rules", name = "Rules")
-public class RulesModule extends ConfigurableModule<RulesConfig, RulesConfigAdapter> {
-
-    public static final String RULES_KEY = "rules";
-
-    @Inject
-    public RulesModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
-    }
+    public static final String ID = "rules";
 
     @Override
-    public RulesConfigAdapter createAdapter() {
-        return new RulesConfigAdapter();
-    }
-
-    @Override public void performPreTasks(final INucleusServiceCollection serviceCollection) throws Exception {
-        super.performPreTasks(serviceCollection);
-
+    public void init(final INucleusServiceCollection serviceCollection) {
         serviceCollection.textFileControllerCollection()
-                .register(RULES_KEY,
+                .register(ID,
                         new TextFileController(
                                 serviceCollection.textTemplateFactory(),
                                 Sponge.getAssetManager().getAsset(serviceCollection.pluginContainer(), "rules.txt").get(),
                                 serviceCollection.configDir().resolve("rules.txt")
                         ));
+    }
+
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.singleton(RulesCommand.class);
+    }
+
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.of(RulesPermissions.class);
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.emptyList();
+    }
+
+    @Override public Class<RulesConfig> getConfigClass() {
+        return RulesConfig.class;
     }
 }

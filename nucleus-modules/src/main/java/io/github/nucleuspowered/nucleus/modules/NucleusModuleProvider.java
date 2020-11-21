@@ -77,6 +77,8 @@ import io.github.nucleuspowered.nucleus.modules.protection.ProtectionModule;
 import io.github.nucleuspowered.nucleus.modules.protection.config.ProtectionConfig;
 import io.github.nucleuspowered.nucleus.modules.rtp.RTPModule;
 import io.github.nucleuspowered.nucleus.modules.rtp.config.RTPConfig;
+import io.github.nucleuspowered.nucleus.modules.rules.RulesModule;
+import io.github.nucleuspowered.nucleus.modules.rules.config.RulesConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -145,6 +147,7 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(PowertoolModule.ID, "Powertools", PowertoolModule.class));
         containers.add(NucleusModuleProvider.createContainer(ProtectionModule.ID, "Protection", ProtectionModule.class, ProtectionConfig.class));
         containers.add(NucleusModuleProvider.createContainer(RTPModule.ID, "RTP", RTPModule.class, RTPConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(RulesModule.ID, "Rules", RulesModule.class, RulesConfig.class));
         return containers;
     }
 

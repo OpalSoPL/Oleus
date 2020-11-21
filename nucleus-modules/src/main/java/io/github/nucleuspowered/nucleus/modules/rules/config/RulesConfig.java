@@ -4,13 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.rules.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class RulesConfig {
 
-    @Setting(value = "rules-title", comment = "config.rules.title")
+    @Setting(value = "rules-title")
+    @LocalisedComment("config.rules.title")
     private String rulesTitle = "&6Server Rules";
 
     public String getRulesTitle() {
