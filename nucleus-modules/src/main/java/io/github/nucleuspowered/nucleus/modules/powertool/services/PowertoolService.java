@@ -12,6 +12,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import org.spongepowered.api.item.ItemType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class PowertoolService implements ServiceBase {
     }
 
     public Optional<List<String>> getPowertoolForItem(final UUID uuid, final ItemType item) {
-        final List<String> tools = getPowertools(uuid).get(item.getId());
+        final List<String> tools = this.getPowertools(uuid).get(item.getKey().asString());
         if (tools != null) {
             return Optional.of(ImmutableList.copyOf(tools));
         }
@@ -56,22 +57,22 @@ public class PowertoolService implements ServiceBase {
     }
 
     public void setPowertool(final UUID uuid, final ItemType type, final List<String> commands) {
-        getPowertools(uuid).put(type.getId(), commands);
-        setBack(uuid);
+        this.getPowertools(uuid).put(type.getKey().asString(), new ArrayList<>(commands));
+        this.setBack(uuid);
     }
 
     public void clearPowertool(final UUID uuid, final ItemType type) {
-        clearPowertool(uuid, type.getId());
+        this.clearPowertool(uuid, type.getKey().asString());
     }
 
     public void clearPowertool(final UUID uuid, final String type) {
-        getPowertools(uuid).remove(type);
-        setBack(uuid);
+        this.getPowertools(uuid).remove(type);
+        this.setBack(uuid);
     }
 
     public void reset(final UUID uuid) {
         this.powertools.remove(uuid);
-        setBack(uuid);
+        this.setBack(uuid);
     }
 
     private void setBack(final UUID uuid) {

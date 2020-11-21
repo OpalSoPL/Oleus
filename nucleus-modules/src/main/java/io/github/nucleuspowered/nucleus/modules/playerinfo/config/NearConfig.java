@@ -4,12 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.playerinfo.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
+
 @ConfigSerializable
 public class NearConfig {
 
-    @Setting(value = "max-radius", comment = "config.playerinfo.near.maxradius")
+    @Setting(value = "max-radius")
+    @LocalisedComment("config.playerinfo.near.maxradius")
     private int maxRadius = 200;
 
     public int getMaxRadius() {

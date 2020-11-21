@@ -5,22 +5,25 @@
 package io.github.nucleuspowered.nucleus.modules.powertool.commands;
 
 import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolKeys;
 import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolPermissions;
 import io.github.nucleuspowered.nucleus.modules.powertool.services.PowertoolService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.adventure.SpongeComponents;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.ClickAction;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,9 +39,10 @@ import java.util.stream.Collectors;
 public class ListPowertoolCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final UUID uuid = context.getUniqueId().get();
+        final ServerPlayer serverPlayer = context.requirePlayer();
+        final UUID uuid = serverPlayer.getUniqueId();
         final boolean toggle = context.getServiceCollection().userPreferenceService()
-                .getUnwrapped(uuid, NucleusKeysProvider.POWERTOOL_ENABLED);
+                .getUnwrapped(uuid, PowertoolKeys.POWERTOOL_ENABLED);
 
         final PowertoolService service = context.getServiceCollection().getServiceUnchecked(PowertoolService.class);
         final Map<String, List<String>> powertools = service.getPowertools(uuid);
@@ -48,48 +52,49 @@ public class ListPowertoolCommand implements ICommandExecutor {
         }
 
         // Generate powertools.
-        final List<Text> mesl = powertools.entrySet().stream().sorted((a, b) -> a.getKey()
+        final List<Component> mesl = powertools.entrySet().stream().sorted((a, b) -> a.getKey()
                 .compareToIgnoreCase(b.getKey()))
-                .map(k -> from(service, context, k.getKey(), k.getValue())).collect(Collectors.toList());
+                .map(k -> this.from(service, serverPlayer, context, k.getKey(), k.getValue())).collect(Collectors.toList());
 
         // Paginate the tools.
-        Util.getPaginationBuilder(context.getCommandSourceRoot()).title(
+        Util.getPaginationBuilder(context.getAudience()).title(
                 context.getMessage("command.powertool.list.header", toggle ? "&aenabled" : "&cdisabled"))
-                .padding(Text.of(TextColors.YELLOW, "-")).contents(mesl)
-                .sendTo(context.getCommandSourceRoot());
+                .padding(Component.text("-", NamedTextColor.YELLOW))
+                .contents(mesl)
+                .sendTo(context.getAudience());
 
         return context.successResult();
     }
 
-    private TextComponent from(
+    private Component from(
             final PowertoolService service,
+            final ServerPlayer src,
             final ICommandContext context,
             final String powertool,
             final List<String> commands) {
 
-        final Optional<ItemType> oit = Sponge.getRegistry().getType(ItemType.class, powertool);
-
-        final Player src = context.getCommandSourceRoot();
+        final Optional<ItemType> oit = Sponge.getRegistry().getCatalogRegistry().get(ItemType.class, ResourceKey.resolve(powertool));
         final UUID uuid = src.getUniqueId();
 
         // Create the click actions.
-        final ClickAction viewAction = TextActions.executeCallback(pl -> Util.getPaginationBuilder(src)
+        final ClickEvent viewAction = SpongeComponents.executeCallback(pl -> Util.getPaginationBuilder(src)
                 .title(context.getMessage("command.powertool.ind.header", powertool))
-                .padding(Text.of(TextColors.GREEN, "-"))
-                .contents(commands.stream().map(x -> Text.of(TextColors.YELLOW, x)).collect(Collectors.toList())).sendTo(src));
+                .padding(Component.text("-", NamedTextColor.GREEN))
+                .contents(commands.stream().map(x -> Component.text(x, NamedTextColor.YELLOW)).collect(Collectors.toList())).sendTo(src));
 
-        final ClickAction deleteAction = TextActions.executeCallback(pl -> {
+        final ClickEvent deleteAction = SpongeComponents.executeCallback(pl -> {
             service.clearPowertool(uuid, powertool);
             context.sendMessage("command.powertool.removed", powertool);
         });
 
-        final TextColor tc = oit.map(itemType -> TextColors.YELLOW).orElse(TextColors.GRAY);
+        final TextColor tc = oit.map(itemType -> NamedTextColor.YELLOW).orElse(NamedTextColor.GRAY);
 
         // id - [View] - [Delete]
-        return Text.builder().append(Text.of(tc, powertool)).append(Text.of(" - "))
-                .append(context.getMessage("standard.view").toBuilder().color(TextColors.YELLOW).onClick(viewAction).build())
-                .append(Text.of(" - "))
-                .append(context.getMessage("standard.delete").toBuilder().color(TextColors.DARK_RED).onClick(deleteAction).build())
-                .build();
+        return LinearComponents.linear(
+                Component.text(powertool, tc),
+                Component.text(" - "),
+                context.getMessage("standard.view").color(NamedTextColor.YELLOW).clickEvent(viewAction),
+                Component.text(" - "),
+                context.getMessage("standard.delete").color(NamedTextColor.DARK_RED).clickEvent(deleteAction));
     }
 }

@@ -12,15 +12,14 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -58,9 +57,9 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
         }
     }
 
-    public boolean isOnline(final CommandSource src, final User player) {
+    public boolean isOnline(@Nullable final ServerPlayer src, final User player) {
         if (player.isOnline()) {
-            if (isVanished(player)) {
+            if (src != null && this.isVanished(player.getUniqueId())) {
                 return this.permissionService.hasPermission(src, VanishPermissions.VANISH_SEE);
             }
 
@@ -70,11 +69,11 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
         return false;
     }
 
-    public Optional<Instant> lastSeen(final CommandSource src, final User player) {
-        if (isOnline(src, player) || !player.isOnline() || !getLastVanishTime(player.getUniqueId()).isPresent()) {
+    public Optional<Instant> lastSeen(@Nullable final ServerPlayer src, final User player) {
+        if (src == null || this.isOnline(src, player) || !player.isOnline() || !this.getLastVanishTime(player.getUniqueId()).isPresent()) {
             return player.get(Keys.LAST_DATE_PLAYED);
         } else {
-            return getLastVanishTime(player.getUniqueId());
+            return this.getLastVanishTime(player.getUniqueId());
         }
 
     }
@@ -97,16 +96,16 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
 
         if (player instanceof Player) {
             if (delay) {
-                Task.builder().execute(() -> vanishPlayerInternal((Player) player)).delayTicks(0).name("Nucleus Vanish runnable").submit(this.pluginContainer);
+                Task.builder().execute(() -> this.vanishPlayerInternal((Player) player)).delayTicks(0).name("Nucleus Vanish runnable").submit(this.pluginContainer);
             } else {
                 this.lastVanish.put(player.getUniqueId(), Instant.now());
-                vanishPlayerInternal((Player) player);
+                this.vanishPlayerInternal((Player) player);
             }
         }
     }
 
     private void vanishPlayerInternal(final Player player) {
-        vanishPlayerInternal(player,
+        this.vanishPlayerInternal(player,
                 this.storageManager.getUserService()
                         .getOrNewOnThread(player.getUniqueId())
                         .get(VanishKeys.VANISH_STATUS)

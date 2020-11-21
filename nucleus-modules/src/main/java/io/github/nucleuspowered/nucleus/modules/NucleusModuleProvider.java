@@ -70,6 +70,9 @@ import io.github.nucleuspowered.nucleus.modules.note.NoteModule;
 import io.github.nucleuspowered.nucleus.modules.note.config.NoteConfig;
 import io.github.nucleuspowered.nucleus.modules.notification.NotificationModule;
 import io.github.nucleuspowered.nucleus.modules.notification.config.NotificationConfig;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.PlayerInfoModule;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.config.PlayerInfoConfig;
+import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolModule;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,6 +137,8 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(NicknameModule.ID, "Nickname", NicknameModule.class, NicknameConfig.class));
         containers.add(NucleusModuleProvider.createContainer(NoteModule.ID, "Notes", NoteModule.class, NoteConfig.class));
         containers.add(NucleusModuleProvider.createContainer(NotificationModule.ID, "Nickname", NotificationModule.class, NotificationConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(PlayerInfoModule.ID, "Player Info", PlayerInfoModule.class, PlayerInfoConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(PowertoolModule.ID, "Powertools", PowertoolModule.class));
         return containers;
     }
 

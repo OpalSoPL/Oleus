@@ -6,8 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.playerinfo.commands;
 
 import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import io.github.nucleuspowered.nucleus.api.module.afk.NucleusAFKService;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
-import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.PlayerInfoPermissions;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.config.ListConfig;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.config.PlayerInfoConfig;
@@ -22,22 +23,23 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.serializer.TextSerializers;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @EssentialsEquivalent({"list", "who", "playerlist", "online", "plist"})
@@ -61,11 +63,11 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final boolean showVanished = context.testPermission(PlayerInfoPermissions.LIST_SEEVANISHED);
 
-        final Collection<Player> players = Sponge.getServer().getOnlinePlayers();
+        final Collection<ServerPlayer> players = Sponge.getServer().getOnlinePlayers();
         final long playerCount = players.size();
         final long hiddenCount = players.stream().filter(x -> x.get(Keys.VANISH).orElse(false)).count();
 
-        final TextComponent header;
+        final Component header;
         if (showVanished && hiddenCount > 0) {
             header = context.getMessage("command.list.playercount.hidden", String.valueOf(playerCount),
                     String.valueOf(Sponge.getServer().getMaxPlayers()), String.valueOf(hiddenCount));
@@ -74,37 +76,36 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
                     String.valueOf(Sponge.getServer().getMaxPlayers()));
         }
 
-        final PaginationList.Builder builder = Util.getPaginationBuilder(context.getCommandSourceRoot()).title(header);
+        final PaginationList.Builder builder = Util.getPaginationBuilder(context.getAudience()).title(header);
 
-        final Optional<PermissionService> optPermissionService = Sponge.getServiceManager().provide(PermissionService.class);
-        if (this.listConfig.isGroupByPermissionGroup() && optPermissionService.isPresent()) {
-            builder.contents(listByPermissionGroup(context, showVanished));
+        if (this.listConfig.isGroupByPermissionGroup()) {
+            builder.contents(this.listByPermissionGroup(context, showVanished));
         } else {
             // If we have players, send them on.
-            builder.contents(getPlayerList(players, showVanished, context));
+            builder.contents(this.getPlayerList(players, showVanished, context));
         }
 
-        builder.sendTo(context.getCommandSourceRoot());
+        builder.sendTo(context.getAudience());
         return context.successResult();
     }
 
-    private List<Text> listByPermissionGroup(final ICommandContext context, final boolean showVanished) {
+    private List<Component> listByPermissionGroup(final ICommandContext context, final boolean showVanished) {
         // Messages
-        final List<Text> messages = new ArrayList<>();
+        final List<Component> messages = new ArrayList<>();
 
         final String defName = this.listConfig.getDefaultGroupName();
-        final Map<String, List<Player>> groupToPlayer = playerList(
+        final Map<String, List<ServerPlayer>> groupToPlayer = this.playerList(
                 context,
                 showVanished,
                 defName
         );
 
         this.listConfig.getOrder().forEach(alias -> {
-            final List<Player> plList = groupToPlayer.get(alias);
+            final List<ServerPlayer> plList = groupToPlayer.get(alias);
             if (plList != null && !plList.isEmpty()) {
                 // Get and put the player list into the map, if there is a
                 // player to show. There might not be, they might be vanished!
-                getList(plList, showVanished, messages, alias, context);
+                this.getList(plList, showVanished, messages, alias, context);
             }
 
             groupToPlayer.remove(alias);
@@ -114,25 +115,25 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
                 .filter(x -> !x.getValue().isEmpty())
                 .filter(x -> !x.getKey().equals(defName))
                 .sorted((x, y) -> x.getKey().compareToIgnoreCase(y.getKey()))
-                .forEach(x -> getList(x.getValue(), showVanished, messages, x.getKey(), context));
+                .forEach(x -> this.getList(x.getValue(), showVanished, messages, x.getKey(), context));
 
-        final List<Player> pl = groupToPlayer.get(defName);
+        final List<ServerPlayer> pl = groupToPlayer.get(defName);
         if (pl != null && !pl.isEmpty()) {
-            getList(pl, showVanished, messages, defName, context);
+            this.getList(pl, showVanished, messages, defName, context);
         }
 
         return messages;
     }
 
-    private Map<String, List<Player>> playerList(
+    private Map<String, List<ServerPlayer>> playerList(
             final ICommandContext context,
             final boolean showVanished,
             final String def) {
         final IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
         final IPermissionService permissionService = context.getServiceCollection().permissionService();
-        final Map<String, List<Player>> map = new HashMap<>();
-        for (final Player player : Sponge.getServer().getOnlinePlayers()) {
-            if (showVanished || playerOnlineService.isOnline(context.getCommandSourceRoot(), player)) {
+        final Map<String, List<ServerPlayer>> map = new HashMap<>();
+        for (final ServerPlayer player : Sponge.getServer().getOnlinePlayers()) {
+            if (showVanished || context.getAsPlayer().map(x -> playerOnlineService.isOnline(x, player.getUser())).orElse(true)) {
                 String perm = permissionService.getOptionFromSubject(player, LIST_OPTION).orElse(def);
                 if (perm.trim().isEmpty()) {
                     perm = def;
@@ -148,47 +149,38 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
         this.listConfig = serviceCollection.configProvider().getModuleConfig(PlayerInfoConfig.class).getList();
     }
 
-    private void getList(final Collection<Player> player, final boolean showVanished, final List<Text> messages, final String groupName,
+    private void getList(final Collection<ServerPlayer> player, final boolean showVanished, final List<Component> messages, final String groupName,
             final ICommandContext context) {
-        final TextComponent groupNameTextComponent = TextSerializers.FORMATTING_CODE.deserialize(groupName);
-        final List<Text> m = getPlayerList(player, showVanished, context);
+        final Component groupNameTextComponent = LegacyComponentSerializer.legacyAmpersand().deserialize(groupName);
+        final List<Component> m = this.getPlayerList(player, showVanished, context);
         if (this.listConfig.isCompact()) {
             boolean isFirst = true;
-            for (final TextComponent y : m) {
-                final Text.Builder tb = Text.builder();
+            for (final Component y : m) {
+                final TextComponent.Builder tb = Component.text();
                 if (isFirst) {
-                    tb.append(Text.of(TextColors.YELLOW, groupNameText, ": "));
+                    tb.append(Component.text(": ", NamedTextColor.YELLOW));
                 }
                 isFirst = false;
                 messages.add(tb.append(y).build());
             }
         } else {
-            messages.add(Text.of(TextColors.YELLOW, groupNameText, ":"));
+            messages.add(LinearComponents.linear(groupNameTextComponent, Component.text(":", NamedTextColor.YELLOW)));
             messages.addAll(m);
         }
     }
 
-    /**
-     * Gets {@link Text} that represents the provided player list.
-     *
-     * @param playersToList The {@link Player}s to list.
-     * @param showVanished <code>true</code> if those who are vanished are to be
-     *        shown.
-     * @return An {@link Optional} of {@link Text} objects, returning
-     *         <code>empty</code> if the player list is of zero length.
-     */
-    @SuppressWarnings("ConstantConditions")
-    private List<Text> getPlayerList(final Collection<Player> playersToList, final boolean showVanished, final ICommandContext context) {
-        final NucleusTextTemplate template = this.listConfig.getListTemplate();
-        final AFKHandler handler = context.getServiceCollection().getService(AFKHandler.class).orElse(null);
-        final TextComponent afk = context.getMessage("command.list.afk");
-        final TextComponent hidden = context.getMessage("command.list.hidden");
+    private List<Component> getPlayerList(final Collection<ServerPlayer> playersToList, final boolean showVanished, final ICommandContext context) {
+        final NucleusTextTemplate template =
+                context.getServiceCollection().textTemplateFactory().createFromAmpersandString(this.listConfig.getListTemplate());
+        @Nullable final NucleusAFKService afkService = NucleusAPI.getAFKService().orElse(null);
+        final Component afk = context.getMessage("command.list.afk");
+        final Component hidden = context.getMessage("command.list.hidden");
 
-        final List<Text> playerList = playersToList.stream().filter(x -> showVanished || !x.get(Keys.VANISH).orElse(false))
+        final List<Component> playerList = playersToList.stream().filter(x -> showVanished || !x.get(Keys.VANISH).orElse(false))
                 .sorted((x, y) -> x.getName().compareToIgnoreCase(y.getName())).map(x -> {
-                    final Text.Builder tb = Text.builder();
+                    final TextComponent.Builder tb = Component.text();
                     boolean appendSpace = false;
-                    if (handler != null && handler.isAFK(x)) {
+                    if (afkService != null && afkService.isAFK(x.getUniqueId())) {
                         tb.append(afk);
                         appendSpace = true;
                     }
@@ -199,25 +191,25 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
                     }
 
                     if (appendSpace) {
-                        tb.append(Text.of(" "));
+                        tb.append(Component.space());
                     }
 
                     if (template != null) { // it shouldn't be, but if it is, fallback...
-                        return tb.append(template.getForSource(x)).build();
+                        return tb.append(template.getForObject(x)).build();
                     } else {
                         return tb.append(context.getDisplayName(x.getUniqueId())).build();
                     }
                 }).collect(Collectors.toList());
 
         if (this.listConfig.isCompact() && !playerList.isEmpty()) {
-            final List<Text> toReturn = new ArrayList<>();
-            final List<List<Text>> parts = Lists.partition(playerList, this.listConfig.getMaxPlayersPerLine());
-            for (final List<Text> p : parts) {
-                final Text.Builder tb = Text.builder();
+            final List<Component> toReturn = new ArrayList<>();
+            final List<List<Component>> parts = Lists.partition(playerList, this.listConfig.getMaxPlayersPerLine());
+            for (final List<Component> p : parts) {
+                final TextComponent.Builder tb = Component.text();
                 boolean isFirst = true;
-                for (final TextComponent text : p) {
+                for (final Component text : p) {
                     if (!isFirst) {
-                        tb.append(Text.of(TextColors.WHITE, ", "));
+                        tb.append(Component.text(", ", NamedTextColor.WHITE));
                     }
 
                     tb.append(text);

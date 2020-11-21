@@ -14,6 +14,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
@@ -71,7 +72,7 @@ public class ServerListCommand implements ICommandExecutor, IReloadableService.R
         final ServerListService ss = context.getServiceCollection().getServiceUnchecked(ServerListService.class);
         ss.getMessage().ifPresent(
                 t -> {
-                    context.sendMessageText(Util.SPACE);
+                    context.sendMessageText(Component.empty());
                     context.sendMessage("command.serverlist.tempheader");
                     context.sendMessageText(t);
                     context.sendMessage("command.serverlist.message.expiry",
@@ -97,7 +98,7 @@ public class ServerListCommand implements ICommandExecutor, IReloadableService.R
         final List<Text> m = new ArrayList<>();
         messages.stream().map(x -> x.getForObject(source)).forEach(x -> {
             if (!m.isEmpty()) {
-                m.add(Util.SPACE);
+                m.add(Component.empty());
             }
 
             m.add(x);

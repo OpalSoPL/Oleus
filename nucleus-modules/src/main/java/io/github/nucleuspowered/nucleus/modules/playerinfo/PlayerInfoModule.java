@@ -4,31 +4,51 @@
  */
 package io.github.nucleuspowered.nucleus.modules.playerinfo;
 
-import io.github.nucleuspowered.nucleus.modules.afk.AFKModule;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.GetFromIpCommand;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.GetPosCommand;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.ListPlayerCommand;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.NearCommand;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.SeenCommand;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.config.PlayerInfoConfig;
-import io.github.nucleuspowered.nucleus.modules.playerinfo.config.PlayerInfoConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.listeners.CommandListener;
+import io.github.nucleuspowered.nucleus.modules.playerinfo.services.SeenHandler;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = PlayerInfoModule.ID, name = "Player Info", softDependencies = AFKModule.ID)
-public class PlayerInfoModule extends ConfigurableModule<PlayerInfoConfig, PlayerInfoConfigAdapter> {
+public final class PlayerInfoModule implements IModule.Configurable<PlayerInfoConfig> {
 
     public static final String ID = "playerinfo";
 
-    @Inject
-    public PlayerInfoModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(SeenHandler.class, new SeenHandler(serviceCollection), false);
     }
 
-    @Override
-    public PlayerInfoConfigAdapter createAdapter() {
-        return new PlayerInfoConfigAdapter();
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                GetFromIpCommand.class,
+                GetPosCommand.class,
+                ListPlayerCommand.class,
+                NearCommand.class,
+                SeenCommand.class
+        );
     }
 
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.of(PlayerInfoPermissions.class);
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(CommandListener.class);
+    }
+
+    @Override public Class<PlayerInfoConfig> getConfigClass() {
+        return PlayerInfoConfig.class;
+    }
 }

@@ -4,6 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.playerinfo.commands;
 
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.PlayerInfoPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -15,12 +19,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 @Command(
         aliases = {"getpos", "coords", "position", "whereami", "getlocation", "getloc"},
@@ -37,23 +37,19 @@ public class GetPosCommand implements ICommandExecutor {
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(false, PlayerInfoPermissions.GETPOS_OTHERS)
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(PlayerInfoPermissions.GETPOS_OTHERS)
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.getUserFromArgs();
-        final Location<World> location;
+        final ServerLocation location;
         if (user.isOnline()) {
-            location = user.getPlayer().get().getLocation();
+            location = user.getPlayer().get().getServerLocation();
         } else {
-            final World w =
-                    user.getWorldUniqueId().flatMap(x -> Sponge.getServer().getWorld(x))
+            final ServerWorld w = Sponge.getServer().getWorldManager().getWorld(user.getWorldKey())
                             .orElseThrow(() -> context.createException("command.getpos.location.nolocation", user.getName()));
-            location = new Location<>(
-                    w,
-                    user.getPosition()
-            );
+            location = ServerLocation.of(w, user.getPosition());
         }
 
         final boolean isSelf = context.is(user);
@@ -61,7 +57,7 @@ public class GetPosCommand implements ICommandExecutor {
         if (isSelf) {
             context.sendMessage(
                             "command.getpos.location.self",
-                            location.getExtent().getName(),
+                            location.getWorldKey().getFormatted(),
                             String.valueOf(blockPos.getX()),
                             String.valueOf(blockPos.getY()),
                             String.valueOf(blockPos.getZ())
@@ -70,19 +66,18 @@ public class GetPosCommand implements ICommandExecutor {
             context.getMessage(
                             "command.getpos.location.other",
                             context.getDisplayName(user.getUniqueId()),
-                            location.getExtent().getName(),
+                            location.getWorldKey().getFormatted(),
                             String.valueOf(blockPos.getX()),
                             String.valueOf(blockPos.getY()),
                             String.valueOf(blockPos.getZ())
-                    ).toBuilder().onClick(TextActions.runCommand(String.join(" ",
+                    ).clickEvent(ClickEvent.runCommand(String.join(" ",
                         "/nucleus:tppos",
-                        location.getExtent().getName(),
-                        String.valueOf(blockPos.getX()),
-                        String.valueOf(blockPos.getY()),
-                        String.valueOf(blockPos.getZ()))))
-                        .onHover(TextActions.showText(
-                                context.getMessage("command.getpos.hover")))
-                        .build();
+                            location.getWorldKey().asString(),
+                            String.valueOf(blockPos.getX()),
+                            String.valueOf(blockPos.getY()),
+                            String.valueOf(blockPos.getZ()))))
+                        .hoverEvent(HoverEvent.showText(
+                                context.getMessage("command.getpos.hover")));
         }
 
         return context.successResult();

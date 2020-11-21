@@ -63,7 +63,7 @@ public class ServerStatCommand implements ICommandExecutor {
 
         messages.add(this.createText(context, "command.serverstat.jvmuptime.main", "command.serverstat.jvmuptime.hover", context.getTimeString(uptime.getSeconds())));
 
-        messages.add(Util.SPACE);
+        messages.add(Component.empty());
 
         final long max = Runtime.getRuntime().maxMemory() / 1024 / 1024;
         final long total = Runtime.getRuntime().totalMemory() / 1024 / 1024;
@@ -81,7 +81,7 @@ public class ServerStatCommand implements ICommandExecutor {
             for (final ServerWorld world : Sponge.getServer().getWorldManager().getWorlds()) {
                 final int numOfEntities = world.getEntities().size();
                 final int loadedChunks = Iterables.size(world.getLoadedChunks());
-                messages.add(Util.SPACE);
+                messages.add(Component.empty());
                 messages.add(context.getMessage("command.serverstat.world.title", world.getKey().asString()));
 
                 // https://github.com/NucleusPowered/Nucleus/issues/888

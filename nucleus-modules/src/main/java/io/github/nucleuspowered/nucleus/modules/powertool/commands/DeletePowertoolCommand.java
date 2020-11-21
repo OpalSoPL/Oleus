@@ -12,10 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-import java.util.Optional;
 import java.util.UUID;
 
 @Command(
@@ -27,19 +26,19 @@ import java.util.UUID;
 public class DeletePowertoolCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Optional<ItemStack> itemStack = context.getCommandSourceRoot().getItemInHand(HandTypes.MAIN_HAND);
-        if (!itemStack.isPresent()) {
+        final ServerPlayer player = context.requirePlayer();
+        final ItemStack itemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+        if (itemStack.isEmpty()) {
             return context.errorResult("command.powertool.noitem");
         }
 
-        final ItemStack inHand = itemStack.get();
-        final ItemType type = inHand.getType();
+        final ItemType type = itemStack.getType();
         final UUID uuid = context.getUniqueId().get();
         final PowertoolService service = context.getServiceCollection().getServiceUnchecked(PowertoolService.class);
         service.getPowertoolForItem(uuid, type)
-                .orElseThrow(() -> context.createException("command.powertool.nocmds", Text.of(inHand)));
+                .orElseThrow(() -> context.createException("command.powertool.nocmds", itemStack.getType().asComponent()));
         service.clearPowertool(uuid, type);
-        context.sendMessage("command.powertool.removed", Text.of(inHand));
+        context.sendMessage("command.powertool.removed", itemStack.getType().asComponent());
         return context.successResult();
     }
 }

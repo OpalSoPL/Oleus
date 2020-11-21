@@ -9,14 +9,13 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.source.ConsoleSource;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.command.SendCommandEvent;
+import org.spongepowered.api.event.command.ExecuteCommandEvent;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.plugin.PluginContainer;
 
 import com.google.inject.Inject;
+import org.spongepowered.plugin.PluginContainer;
 
 public class CommandListener implements ListenerBase.Conditional {
 
@@ -31,13 +30,16 @@ public class CommandListener implements ListenerBase.Conditional {
     }
 
     @Listener
-    public void onCommandPreProcess(final SendCommandEvent event, @Root final ConsoleSource source, @Getter("getCommand") final String command) {
-        if (command.equalsIgnoreCase("list")) {
-            event.setCommand("minecraft:list");
-            if (!this.messageShown) {
-                this.messageShown = true;
-                Sponge.getScheduler().createSyncExecutor(this.pluginContainer).submit(() ->
-                        this.messageProviderService.sendMessageTo(source, "list.listener.multicraftcompat"));
+    public void onCommandPreProcess(final ExecuteCommandEvent.Pre event, @Getter("getCommand") final String command) {
+        final Cause cause = event.getCause();
+        if (cause.root() == Sponge.getSystemSubject() || cause.root() == Sponge.getServer()) {
+            if (command.equalsIgnoreCase("list")) {
+                event.setCommand("minecraft:list");
+                if (!this.messageShown) {
+                    this.messageShown = true;
+                    Sponge.getServer().getScheduler().createExecutor(this.pluginContainer).submit(() ->
+                            this.messageProviderService.sendMessageTo(Sponge.getSystemSubject(), "list.listener.multicraftcompat"));
+                }
             }
         }
     }

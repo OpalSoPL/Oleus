@@ -6,6 +6,12 @@ package io.github.nucleuspowered.nucleus.modules.powertool;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.powertool.commands.DeletePowertoolCommand;
+import io.github.nucleuspowered.nucleus.modules.powertool.commands.ListPowertoolCommand;
+import io.github.nucleuspowered.nucleus.modules.powertool.commands.PowertoolCommand;
+import io.github.nucleuspowered.nucleus.modules.powertool.commands.TogglePowertoolCommand;
+import io.github.nucleuspowered.nucleus.modules.powertool.listeners.PowertoolListener;
+import io.github.nucleuspowered.nucleus.modules.powertool.services.PowertoolService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
@@ -15,7 +21,9 @@ import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImp
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public class PowertoolModule implements IModule {
@@ -24,34 +32,28 @@ public class PowertoolModule implements IModule {
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
-
+        serviceCollection.registerService(PowertoolService.class, new PowertoolService(serviceCollection), false);
     }
 
     @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Arrays.asList(
+                DeletePowertoolCommand.class,
+                ListPowertoolCommand.class,
+                PowertoolCommand.class,
+                TogglePowertoolCommand.class
+        );
     }
 
     @Override public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(PowertoolPermissions.class);
     }
 
     @Override public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
-    }
-
-    @Override public Collection<Class<? extends TaskBase>> getAsyncTasks() {
-        return null;
+        return Collections.singleton(PowertoolListener.class);
     }
 
     @Listener
     public void onPreferenceKeyRegistration(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
-        event.register(
-                new PreferenceKeyImpl.BooleanKey(
-                        NucleusKeysProvider.POWERTOOL_ENABLED_KEY,
-                        true,
-                        PowertoolPermissions.BASE_POWERTOOL,
-                        "userpref.powertooltoggle"
-                )
-        );
+        event.register(PowertoolKeys.POWERTOOL_ENABLED);
     }
 }

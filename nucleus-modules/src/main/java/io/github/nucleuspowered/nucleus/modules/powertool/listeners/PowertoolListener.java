@@ -4,27 +4,28 @@
  */
 package io.github.nucleuspowered.nucleus.modules.powertool.listeners;
 
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolKeys;
 import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolPermissions;
 import io.github.nucleuspowered.nucleus.modules.powertool.services.PowertoolService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.type.Exclude;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.item.ItemType;
-
-import com.google.inject.Inject;
 
 public class PowertoolListener implements ListenerBase {
 
@@ -42,32 +43,32 @@ public class PowertoolListener implements ListenerBase {
     }
 
     @Listener
-    public void onLogout(final ClientConnectionEvent.Disconnect event) {
-        this.service.reset(event.getTargetEntity().getUniqueId());
+    public void onLogout(final ServerSideConnectionEvent.Disconnect event) {
+        this.service.reset(event.getPlayer().getUniqueId());
     }
 
     @Listener
     @Exclude(InteractBlockEvent.class)
-    public void onUserInteract(final InteractEvent event, @Root final Player player) {
+    public void onUserInteract(final InteractEvent event, @Root final ServerPlayer player) {
         // No item in hand or no permission -> no powertool.
-        if (!this.permissionService.hasPermission(player, PowertoolPermissions.BASE_POWERTOOL)
-                || !player.getItemInHand(HandTypes.MAIN_HAND).isPresent()) {
+        if (player.getItemInHand(HandTypes.MAIN_HAND).isEmpty() ||
+                !this.permissionService.hasPermission(player, PowertoolPermissions.BASE_POWERTOOL)) {
             return;
         }
 
         // Get the item and the user.
-        final ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).get().getType();
+        final ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).getType();
 
         // If the powertools are toggled on.
-        if (this.userPreferenceService.get(player.getUniqueId(), NucleusKeysProvider.POWERTOOL_ENABLED).orElse(true)) {
+        if (this.userPreferenceService.get(player.getUniqueId(), PowertoolKeys.POWERTOOL_ENABLED).orElse(true)) {
             // Execute all powertools if they exist.
             this.service.getPowertoolForItem(player.getUniqueId(), item).ifPresent(x -> {
                 // Cancel the interaction.
                 event.setCancelled(true);
 
                 final Player interacting;
-                if (event instanceof InteractEntityEvent && ((InteractEntityEvent) event).getTargetEntity() instanceof Player) {
-                    interacting = (Player)((InteractEntityEvent) event).getTargetEntity();
+                if (event instanceof InteractEntityEvent && ((InteractEntityEvent) event).getEntity() instanceof ServerPlayer) {
+                    interacting = (Player) ((InteractEntityEvent) event).getEntity();
                 } else {
                     interacting = null;
                 }
@@ -88,7 +89,11 @@ public class PowertoolListener implements ListenerBase {
                         }
                     }
 
-                    Sponge.getCommandManager().process(player, s);
+                    try {
+                        Sponge.getCommandManager().process(s);
+                    } catch (final CommandException e) {
+                        // ignored
+                    }
                 });
             });
         }

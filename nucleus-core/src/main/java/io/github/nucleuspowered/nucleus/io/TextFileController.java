@@ -146,7 +146,7 @@ public final class TextFileController {
         if (title != null && !AdventureUtils.isEmpty(title)) {
             pb.title(title).padding(padding);
         } else {
-            pb.padding(Util.SPACE);
+            pb.padding(Component.space());
         }
 
         pb.sendTo(src);

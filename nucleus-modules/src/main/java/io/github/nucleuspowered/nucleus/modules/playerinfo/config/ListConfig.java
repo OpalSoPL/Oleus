@@ -5,12 +5,11 @@
 package io.github.nucleuspowered.nucleus.modules.playerinfo.config;
 
 import com.google.common.collect.ImmutableList;
-import io.github.nucleuspowered.neutrino.annotations.Default;
-import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import uk.co.drnaylor.quickstart.config.NoMergeIfPresent;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ConfigSerializable
@@ -19,17 +18,20 @@ public class ListConfig {
     @Setting("list-grouping-by-permission")
     private GroupConfig groupByPermissionGroup = new GroupConfig();
 
-    @Setting(value = "server-panel-compatibility", comment = "config.playerinfo.list.panel")
+    @Setting(value = "server-panel-compatibility")
+    @LocalisedComment("config.playerinfo.list.panel")
     private boolean panelCompatibility = false;
 
-    @Setting(value = "template", comment = "config.playerinfo.list.template")
-    @Default(value = "{{displayname}}", saveDefaultIfNull = true, useDefaultIfEmpty = true)
-    private NucleusTextTemplateImpl template;
+    @Setting(value = "template")
+    @LocalisedComment("config.playerinfo.list.template")
+    private String template = "{{displayname}}";
 
-    @Setting(value = "compact-list", comment = "config.playerinfo.list.compact")
+    @Setting(value = "compact-list")
+    @LocalisedComment("config.playerinfo.list.compact")
     private boolean compact = true;
 
-    @Setting(value = "compact-max-players", comment = "config.playerinfo.list.compactmax")
+    @Setting(value = "compact-max-players")
+    @LocalisedComment("config.playerinfo.list.compactmax")
     private int maxPlayersPerLine = 20;
 
     public boolean isGroupByPermissionGroup() {
@@ -52,7 +54,7 @@ public class ListConfig {
         return this.panelCompatibility;
     }
 
-    public NucleusTextTemplate getListTemplate() {
+    public String getListTemplate() {
         return this.template;
     }
 
@@ -67,14 +69,16 @@ public class ListConfig {
     @ConfigSerializable
     public static class GroupConfig {
 
-        @Setting(value = "enabled", comment = "config.playerinfo.list.groups")
+        @Setting(value = "enabled")
+        @LocalisedComment("config.playerinfo.list.groups")
         private boolean enabled = false;
 
-        @NoMergeIfPresent
-        @Setting(value = "group-order", comment = "config.playerinfo.list.grouporder")
+        @Setting(value = "group-order")
+        @LocalisedComment("config.playerinfo.list.grouporder")
         private List<String> groupPriority = new ArrayList<>();
 
-        @Setting(value = "default-group-name", comment = "config.playerinfo.list.defaultname")
+        @Setting(value = "default-group-name")
+        @LocalisedComment("config.playerinfo.list.defaultname")
         private String defaultGroupName = "Default";
     }
 }

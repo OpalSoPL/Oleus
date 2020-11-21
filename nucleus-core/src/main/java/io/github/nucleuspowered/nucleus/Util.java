@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -54,10 +53,8 @@ public final class Util {
     public static final DateTimeFormatter FULL_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)
             .withZone(ZoneId.systemDefault());
 
-    public static final Component SPACE = Component.space();
-
-    public static final String usernameRegexPattern = "[0-9a-zA-Z_]{3,16}";
-    public static final Pattern usernameRegex = Pattern.compile(usernameRegexPattern);
+    public static final String USERNAME_REGEX_STRING = "[0-9a-zA-Z_]{3,16}";
+    public static final Pattern USERNAME_REGEX_PATTERN = Pattern.compile(USERNAME_REGEX_STRING);
 
     public static final UUID CONSOLE_FAKE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 

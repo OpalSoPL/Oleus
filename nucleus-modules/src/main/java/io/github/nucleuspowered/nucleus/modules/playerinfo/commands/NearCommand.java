@@ -4,6 +4,14 @@
  */
 package io.github.nucleuspowered.nucleus.modules.playerinfo.commands;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.PlayerInfoPermissions;
@@ -20,16 +28,9 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerOnlineService
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import java.text.NumberFormat;
 import java.util.Comparator;
@@ -52,7 +53,11 @@ public class NearCommand implements ICommandExecutor, IReloadableService.Reloada
         // SimpleReloadable {
 
     private static final NumberFormat formatter =  NumberFormat.getInstance();
-    private final String radiusKey = "radius";
+    private final Parameter.Value<Integer> radiusParameter = Parameter.builder(Integer.class)
+            .parser(VariableValueParameters.integerRange().setMin(1).build())
+            .setKey("radius")
+            .optional()
+            .build();
     private int maxRadius;
 
     static {
@@ -63,28 +68,28 @@ public class NearCommand implements ICommandExecutor, IReloadableService.Reloada
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
                 serviceCollection.commandElementSupplier()
-                    .createOtherUserPermissionElement(false, PlayerInfoPermissions.OTHERS_NEAR),
-                GenericArguments.optionalWeak(GenericArguments.integer(Text.of(this.radiusKey)))
+                    .createOnlyOtherUserPermissionElement(PlayerInfoPermissions.OTHERS_NEAR),
+                this.radiusParameter
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.getUserFromArgs();
-        final Location<World> location;
+        final ServerLocation location;
         final Vector3d position;
         if (user.isOnline()) {
-            location = user.getPlayer().get().getLocation();
+            location = user.getPlayer().get().getServerLocation();
             position = location.getPosition();
         } else {
-            final World world = user.getWorldUniqueId()
-                    .flatMap(x -> Sponge.getServer().getWorld(x))
+            final ServerWorld world = Sponge.getServer().getWorldManager().getWorld(user.getWorldKey())
                     .orElseThrow((() -> context.createException("command.near.location.nolocation", user.getName())));
             position = user.getPosition();
-            location = new Location<>(world, position);
+            location = ServerLocation.of(world, position);
         }
 
         int radius = this.maxRadius;
-        final Optional<Integer> radiusOpt = context.getOne(this.radiusKey, Integer.class);
+        final Optional<Integer> radiusOpt = context.getOne(this.radiusParameter);
         if (radiusOpt.isPresent()) {
             final int inputRadius = radiusOpt.get();
             // Check if executor has max radius override permission
@@ -95,35 +100,35 @@ public class NearCommand implements ICommandExecutor, IReloadableService.Reloada
             }
         }
 
-        final CommandSource src = context.getCommandSourceRoot();
+        final Optional<ServerPlayer> src = context.getAsPlayer();
         final IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
-        final List<Text> messagesToSend =
-                location.getExtent()
+        final List<Component> messagesToSend =
+                location.getWorld()
                         .getNearbyEntities(location.getPosition(), radius)
                         .stream()
-                        .filter(Player.class::isInstance)
-                        .map(Player.class::cast)
-                        .filter(e -> e.getUniqueId() != user.getUniqueId() && playerOnlineService.isOnline(src, e))
+                        .filter(ServerPlayer.class::isInstance)
+                        .map(ServerPlayer.class::cast)
+                        .filter(e -> e.getUniqueId() != user.getUniqueId() && src.map(x -> playerOnlineService.isOnline(x, e.getUser())).orElse(true))
                         .map(x -> Tuple.of(x, position.distance(x.getPosition())))
                         .sorted(Comparator.comparingDouble(Tuple::getSecond))
-                        .map(tuple -> createPlayerLine(context, tuple))
+                        .map(tuple -> this.createPlayerLine(context, tuple))
                         .collect(Collectors.toList());
 
-        Util.getPaginationBuilder(src)
+        Util.getPaginationBuilder(context.getAudience())
                         .title(context.getMessage("command.near.playersnear", user.getName()))
                         .contents(messagesToSend)
-                        .sendTo(src);
+                        .sendTo(context.getAudience());
 
         return context.successResult();
     }
 
-    private TextComponent createPlayerLine(final ICommandContext context, final Tuple<Player, Double> player) {
-        final Text.Builder line = Text.builder();
+    private Component createPlayerLine(final ICommandContext context, final Tuple<ServerPlayer, Double> player) {
+        final TextComponent.Builder line = Component.text();
         context.getMessage("command.near.playerdistancefrom", player.getFirst().getName());
         line.append(context.getMessage("command.near.playerdistancefrom", player.getFirst().getName(),
                 formatter.format(Math.abs(player.getSecond()))))
-                .onClick(TextActions.runCommand("/tp " + player.getFirst().getName()))
-                .onHover(TextActions.showText(context.getMessage("command.near.tpto", player.getFirst().getName())));
+                .clickEvent(ClickEvent.runCommand("/tp " + player.getFirst().getName()))
+                .hoverEvent(HoverEvent.showText(context.getMessage("command.near.tpto", player.getFirst().getName())));
         return line.build();
     }
 

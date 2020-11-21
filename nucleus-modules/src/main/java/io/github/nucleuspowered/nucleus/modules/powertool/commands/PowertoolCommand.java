@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.powertool.commands;
 
-import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolPermissions;
 import io.github.nucleuspowered.nucleus.modules.powertool.services.PowertoolService;
@@ -15,14 +14,17 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -43,26 +45,29 @@ public class PowertoolCommand implements ICommandExecutor {
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player src = context.getCommandSourceRoot();
-        final ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND)
-                .orElseThrow(() -> context.createException("command.powertool.noitem"));
+        final ServerPlayer src = context.requirePlayer();
+        final ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND);
+        if (itemStack.isEmpty()) {
+            return context.errorResult("command.powertool.noitem");
+        }
 
-        final Optional<String> command = context.getOne(NucleusParameters.Keys.COMMAND, String.class);
+        final Optional<String> command = context.getOne(NucleusParameters.COMMAND);
         return command
-                .map(s -> setPowertool(context, src, itemStack.getType(), s))
-                .orElseGet(() -> viewPowertool(context, src, itemStack));
+                .map(s -> this.setPowertool(context, src, itemStack.getType(), s))
+                .orElseGet(() -> this.viewPowertool(context, src, itemStack));
     }
 
-    private ICommandResult viewPowertool(final ICommandContext context, final Player src, final ItemStack item) {
+    private ICommandResult viewPowertool(final ICommandContext context, final ServerPlayer src, final ItemStack item) {
         final Optional<List<String>> cmds = context.getServiceCollection().getServiceUnchecked(PowertoolService.class)
                 .getPowertoolForItem(src.getUniqueId(), item.getType());
         if (cmds.isPresent() && !cmds.get().isEmpty()) {
-            Util.getPaginationBuilder(src)
-                    .contents(cmds.get().stream().map(f -> Text.of(TextColors.YELLOW, f)).collect(Collectors.toList()))
-                    .title(context.getMessage("command.powertool.viewcmdstitle", Text.of(item), Text.of(item.getType().getId())))
-                    .sendTo(src);
+            Util.getPaginationBuilder(context.getAudience())
+                    .contents(cmds.get().stream().map(f -> Component.text(f, NamedTextColor.YELLOW)).collect(Collectors.toList()))
+                    .title(context.getMessage("command.powertool.viewcmdstitle", item.getType().asComponent(),
+                            Component.text(item.getType().getKey().asString())))
+                    .sendTo(context.getAudience());
         } else {
-            src.sendMessage(context.getMessage("command.powertool.nocmds", Text.of(item)));
+            src.sendMessage(context.getMessage("command.powertool.nocmds", item.getType().asComponent()));
         }
 
         return context.successResult();
@@ -75,8 +80,8 @@ public class PowertoolCommand implements ICommandExecutor {
             command = command.substring(1);
         }
 
-        context.getServiceCollection().getServiceUnchecked(PowertoolService.class).setPowertool(src.getUniqueId(), item, Lists.newArrayList(command));
-        context.sendMessage("command.powertool.set", item.getId(), command);
+        context.getServiceCollection().getServiceUnchecked(PowertoolService.class).setPowertool(src.getUniqueId(), item, Collections.singletonList(command));
+        context.sendMessage("command.powertool.set", item.asComponent(), command);
         return context.successResult();
     }
 }

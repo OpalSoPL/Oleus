@@ -11,15 +11,16 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import java.util.Arrays;
+import org.spongepowered.api.user.UserManager;
+
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,26 +31,24 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "getfromip")
 public class GetFromIpCommand implements ICommandExecutor {
 
-    private final String ipKey = "IP Address";
+    private final Parameter.Value<InetAddress> ip = Parameter.ip().setKey("IP address").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            new RegexArgument(Text.of(this.ipKey), "^(\\d{1,3}\\.){3}\\d{1,3}$", "command.getfromip.notvalid", serviceCollection)
+            this.ip
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final String ip = context.requireOne(this.ipKey, String.class);
-        if (Arrays.stream(ip.split("\\.")).anyMatch(x -> Integer.parseInt(x) > 255)) {
-            return context.errorResult("command.getfromip.notvalid");
-        }
+        final InetAddress ip = context.requireOne(this.ip);
 
-        final UserStorageService uss = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+        final UserManager uss = Sponge.getServer().getUserManager();
         final List<User> users = context
                 .getServiceCollection()
                 .userCacheService()
-                .getForIp(ip).stream().map(uss::get).filter(Optional::isPresent)
+                .getForIp(ip.toString())
+                .stream().map(uss::get).filter(Optional::isPresent)
                 .map(Optional::get).collect(Collectors.toList());
 
         if (users.isEmpty()) {
@@ -57,17 +56,17 @@ public class GetFromIpCommand implements ICommandExecutor {
             return context.successResult();
         }
 
-        Util.getPaginationBuilder(context.getCommandSourceRoot())
+        Util.getPaginationBuilder(context.getAudience())
                 .title(context.getMessage("command.getfromip.title", ip))
                 .contents(
                     users.stream().map(y -> {
-                        final TextComponent n = context.getDisplayName(y.getUniqueId());
-                        return n.toBuilder().onClick(TextActions.runCommand("/nucleus:seen " + y.getName()))
-                            .onHover(TextActions.showText(context.getMessage("command.getfromip.hover", n)))
-                            .build();
+                        final Component name = context.getDisplayName(y.getUniqueId());
+                        return name
+                                .clickEvent(ClickEvent.runCommand("/nucleus:seen " + y.getName()))
+                                .hoverEvent(HoverEvent.showText(context.getMessage("command.getfromip.hover", name)));
                     }).collect(Collectors.toList())
                 )
-                .sendTo(context.getCommandSourceRoot());
+                .sendTo(context.getAudience());
         return context.successResult();
     }
 }
