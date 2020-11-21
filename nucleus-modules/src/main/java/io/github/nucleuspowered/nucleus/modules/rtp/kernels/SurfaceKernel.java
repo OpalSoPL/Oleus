@@ -4,32 +4,32 @@
  */
 package io.github.nucleuspowered.nucleus.modules.rtp.kernels;
 
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 
-import javax.annotation.Nullable;
-
 public class SurfaceKernel extends DefaultKernel {
+
+    private static final ResourceKey SURFACE_KERNEL_KEY = ResourceKey.of("nucleus", "surface_only");
+
+    @Override
+    public ResourceKey getKey() {
+        return SurfaceKernel.SURFACE_KERNEL_KEY;
+    }
 
     @Nullable
     @Override
-    Location<World> getStartingLocation(final Location<World> world) {
+    ServerLocation getStartingLocation(final ServerLocation location) {
         return super.getStartingLocation(
-                new Location<>(world.getExtent(), world.getBlockX(), world.getExtent().getBlockMax().getY(), world.getBlockZ()));
+                ServerLocation.of(location.getWorld(), location.getBlockX(), location.getWorld().getHighestYAt(location.getBlockX(), location.getBlockZ()),
+                        location.getBlockZ()));
     }
 
     @Override
     TeleportHelperFilter filterToUse() {
-        return TeleportHelperFilters.SURFACE_ONLY;
+        return TeleportHelperFilters.SURFACE_ONLY.get();
     }
 
-    @Override public String getId() {
-        return "nucleus:surface_only";
-    }
-
-    @Override public String getName() {
-        return "Surface Only Kernel";
-    }
 }

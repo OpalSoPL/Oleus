@@ -4,30 +4,68 @@
  */
 package io.github.nucleuspowered.nucleus.modules.rtp;
 
+import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.rtp.commands.RandomTeleportCommand;
 import io.github.nucleuspowered.nucleus.modules.rtp.config.RTPConfig;
-import io.github.nucleuspowered.nucleus.modules.rtp.config.RTPConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.rtp.kernels.AroundPlayerAndSurfaceKernel;
+import io.github.nucleuspowered.nucleus.modules.rtp.kernels.AroundPlayerKernel;
+import io.github.nucleuspowered.nucleus.modules.rtp.kernels.DefaultKernel;
+import io.github.nucleuspowered.nucleus.modules.rtp.kernels.SurfaceKernel;
+import io.github.nucleuspowered.nucleus.modules.rtp.services.RTPService;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogRegistryEvent;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = RTPModule.ID, name = "rtp")
-public class RTPModule extends ConfigurableModule<RTPConfig, RTPConfigAdapter> {
+public class RTPModule implements IModule.Configurable<RTPConfig> {
 
     public static final String ID = "rtp";
+    private static final ResourceKey CATALOG_KEY = ResourceKey.of("nucleus", "rtp_kernel");
 
-    @Inject
-    public RTPModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(RTPService.class, new RTPService(serviceCollection), false);
     }
 
     @Override
-    public RTPConfigAdapter createAdapter() {
-        return new RTPConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.singletonList(RandomTeleportCommand.class);
     }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(RTPPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Class<RTPConfig> getConfigClass() {
+        return RTPConfig.class;
+    }
+
+    @Listener
+    public void onCatalogTypeRegistration(final RegisterCatalogRegistryEvent event) {
+        event.register(RTPKernel.class, RTPModule.CATALOG_KEY);
+    }
+
+    @Listener
+    public void onRTPKernelRegistration(final RegisterCatalogEvent<RTPKernel> event) {
+        event.register(new DefaultKernel());
+        event.register(new SurfaceKernel());
+        event.register(new AroundPlayerKernel());
+        event.register(new AroundPlayerAndSurfaceKernel());
+    }
+
 }

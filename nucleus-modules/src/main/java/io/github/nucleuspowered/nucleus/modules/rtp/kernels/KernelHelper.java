@@ -19,11 +19,11 @@ public class KernelHelper {
     private final Random random = new Random();
 
     public int getRandomBetween(final int min, final int max) {
-        return random.nextInt(max - min) + min;
+        return this.random.nextInt(max - min) + min;
     }
 
     public int randomSign(final int in) {
-        return random.nextInt(2) == 0 ? -in : in;
+        return this.random.nextInt(2) == 0 ? -in : in;
     }
 
     public Vector3d getLocationWithOffset(final Vector3i centre, final NucleusRTPService.RTPOptions options) {

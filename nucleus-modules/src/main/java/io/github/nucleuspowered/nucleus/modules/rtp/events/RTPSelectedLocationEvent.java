@@ -5,27 +5,26 @@
 package io.github.nucleuspowered.nucleus.modules.rtp.events;
 
 import io.github.nucleuspowered.nucleus.api.module.rtp.event.NucleusRTPEvent;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 
 public class RTPSelectedLocationEvent extends AbstractEvent implements NucleusRTPEvent.SelectedLocation {
 
-    private final Location<World> location;
-    private final Player player;
+    private final ServerLocation location;
+    private final ServerPlayer player;
     private final Cause cause;
     private boolean isCancelled = false;
 
-    public RTPSelectedLocationEvent(final Location<World> location, final Player player, final Cause cause) {
+    public RTPSelectedLocationEvent(final ServerLocation location, final ServerPlayer player, final Cause cause) {
         this.location = location;
         this.player = player;
         this.cause = cause;
     }
 
     @Override
-    public Location<World> getLocation() {
+    public ServerLocation getLocation() {
         return this.location;
     }
 
@@ -40,7 +39,7 @@ public class RTPSelectedLocationEvent extends AbstractEvent implements NucleusRT
     }
 
     @Override
-    public Player getTargetEntity() {
+    public ServerPlayer getTargetPlayer() {
         return this.player;
     }
 

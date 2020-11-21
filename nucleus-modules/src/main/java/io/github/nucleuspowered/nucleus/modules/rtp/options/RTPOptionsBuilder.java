@@ -20,25 +20,33 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
     final Set<BiomeType> prohibitedBiomes = new HashSet<>();
 
     @Override public NucleusRTPService.RTPOptions.Builder setMaxRadius(final int max) {
-        Preconditions.checkArgument(max > 0, "Max must be positive");
+        if (max <= 0) {
+            throw new IllegalArgumentException("Max must be positive");
+        }
         this.max = max;
         return this;
     }
 
     @Override public NucleusRTPService.RTPOptions.Builder setMinRadius(final int min) {
-        Preconditions.checkArgument(min >= 0, "Min cannot be negative");
+        if (min < 0) {
+            throw new IllegalArgumentException("Min cannot be negative");
+        }
         this.min = min;
         return this;
     }
 
     @Override public NucleusRTPService.RTPOptions.Builder setMinHeight(final int min) throws IllegalArgumentException {
-        Preconditions.checkArgument(min >= 0, "Min must be non-negative");
+        if (min < 0) {
+            throw new IllegalArgumentException("Min must be non-negative");
+        }
         this.minheight = min;
         return this;
     }
 
     @Override public NucleusRTPService.RTPOptions.Builder setMaxHeight(final int max) throws IllegalArgumentException {
-        Preconditions.checkArgument(min <= 255, "Max must be less than 255");
+        if (max > 255) {
+            throw new IllegalArgumentException("Max must be less than 255");
+        }
         this.maxheight = max;
         return this;
     }
@@ -49,15 +57,19 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
     }
 
     @Override public NucleusRTPService.RTPOptions.Builder from(final NucleusRTPService.RTPOptions options) {
-        return setMinRadius(options.minRadius())
+        return this.setMinRadius(options.minRadius())
                 .setMaxRadius(options.maxRadius())
                 .setMaxHeight(options.maxHeight())
                 .setMinHeight(options.minHeight());
     }
 
     @Override public NucleusRTPService.RTPOptions build() {
-        Preconditions.checkState(this.min < this.max, "Minimum is bigger than maximum");
-        Preconditions.checkState(this.minheight < this.maxheight, "Minimum height is bigger than maximum height");
+        if (this.min >= this.max) {
+            throw new IllegalStateException("Minimum is bigger than maximum");
+        }
+        if (this.minheight >= this.maxheight) {
+            throw new IllegalStateException("Minimum height is bigger than maximum height");
+        }
         return new RTPOptions(this);
     }
 

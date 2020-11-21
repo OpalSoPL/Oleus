@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.rtp.commands;
 
 import co.aikar.timings.Timing;
 import co.aikar.timings.Timings;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
 import io.github.nucleuspowered.nucleus.modules.rtp.RTPPermissions;
@@ -23,28 +24,26 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.scaffold.task.CostCancellableTask;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.WeakHashMap;
-
-import com.google.inject.Inject;
 
 @Command(
         aliases = {"rtp", "randomteleport", "rteleport"},
@@ -67,26 +66,26 @@ import com.google.inject.Inject;
 public class RandomTeleportCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private RTPConfig rc = new RTPConfig();
-    private final Map<Task, UUID> cachedTasks = new WeakHashMap<>();
+    private final Map<ScheduledTask, UUID> cachedTasks = new WeakHashMap<>();
 
-    private final Timing TIMINGS;
+    private final Timing timings;
 
     @Inject
     public RandomTeleportCommand(final INucleusServiceCollection serviceCollection) {
-        TIMINGS = Timings.of(serviceCollection.pluginContainer(), "RTP task");
+        this.timings = Timings.of(serviceCollection.pluginContainer(), "RTP task");
     }
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                serviceCollection.commandElementSupplier().createOtherUserPermissionElement(true, RTPPermissions.OTHERS_RTP),
-                GenericArguments.optionalWeak(NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection))
+                serviceCollection.commandElementSupplier().createOnlyOtherPlayerPermissionElement(RTPPermissions.OTHERS_RTP),
+                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player player = context.getPlayerFromArgs();
+        final ServerPlayer player = context.getPlayerFromArgs();
         synchronized (this.cachedTasks) {
-            this.cachedTasks.keySet().removeIf(task -> !Sponge.getScheduler().getTaskById(task.getUniqueId()).isPresent());
+            this.cachedTasks.keySet().removeIf(task -> !Sponge.getServer().getScheduler().getTaskById(task.getUniqueId()).isPresent());
             if (this.cachedTasks.containsValue(player.getUniqueId())) {
                 return context.errorResult("command.rtp.inprogress", player.getName());
             }
@@ -95,37 +94,35 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
         // Get the current world.
         final WorldProperties wp;
         if (this.rc.getDefaultWorld().isPresent()) {
-            wp = context.getOne(NucleusParameters.Keys.WORLD, WorldProperties.class).orElseGet(() -> this.rc.getDefaultWorld().get());
+            wp = context.getOne(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY).orElseGet(() -> this.rc.getDefaultWorld().get());
         } else {
-            wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD).get();
+            wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.getKey()).get();
         }
 
         if (this.rc.isPerWorldPermissions()) {
-            final String name = wp.getWorldName();
+            final String name = wp.getKey().asString();
             if (!context.testPermission(RTPPermissions.RTP_WORLDS + "." + name.toLowerCase())) {
                 return context.errorResult("command.rtp.worldnoperm", name);
             }
         }
 
-        World currentWorld = Sponge.getServer().loadWorld(wp.getUniqueId()).orElse(null);
-        if (currentWorld == null) {
-            currentWorld = Sponge.getServer().loadWorld(wp).orElseThrow(() -> context.createException("command.rtp.worldnoload", wp.getWorldName()));
-        }
+        final ServerWorld currentWorld = Sponge.getServer().getWorldManager().getWorld(wp.getKey())
+                .orElseThrow(() -> context.createException("command.rtp.worldnoload", wp.getKey().asString()));
 
         context.sendMessage("command.rtp.searching");
 
-        final RTPOptions options = new RTPOptions(this.rc, currentWorld.getName());
+        final RTPOptions options = new RTPOptions(this.rc, currentWorld.getKey().asString());
         final RTPTask rtask = new RTPTask(
                 context.getServiceCollection().pluginContainer(),
                 currentWorld,
                 context,
-                player,
+                player.getUniqueId(),
                 this.rc.getNoOfAttempts(),
                 options,
                 context.getServiceCollection().getServiceUnchecked(RTPService.class).getKernel(wp),
                 context.is(player) ? context.getCost() : 0);
-        final Task task = Sponge.getScheduler().createTaskBuilder().execute(rtask).submit(context.getServiceCollection().pluginContainer());
-        this.cachedTasks.put(task, player.getUniqueId());
+        final Task task = Task.builder().execute(rtask).plugin(context.getServiceCollection().pluginContainer()).build();
+        this.cachedTasks.put(Sponge.getServer().getScheduler().submit(task), player.getUniqueId());
 
         return context.successResult();
     }
@@ -141,13 +138,13 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
      * large area to check, we opt for smaller areas, but to try multiple times. We separate each check by a couple of ticks so that the server
      * still gets to keep ticking, avoiding timeouts and too much lag.
      */
-    private class RTPTask extends CostCancellableTask {
+    private final class RTPTask extends CostCancellableTask {
 
         private final PluginContainer pluginContainer;
         private final Cause cause;
-        private final World targetWorld;
+        private final ServerWorld targetWorld;
         private final ICommandContext source;
-        private final Player target;
+        private final UUID target;
         private final boolean isSelf;
         private final Logger logger;
         private int count;
@@ -157,9 +154,9 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
 
         private RTPTask(
                 final PluginContainer pluginContainer,
-                final World target,
+                final ServerWorld target,
                 final ICommandContext source,
-                final Player target1,
+                final UUID target1,
                 final int maxCount,
                 final NucleusRTPService.RTPOptions options,
                 final RTPKernel kernel,
@@ -167,58 +164,59 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
             super(source.getServiceCollection(), target1, cost);
             this.logger = source.getServiceCollection().logger();
             this.pluginContainer = pluginContainer;
-            this.cause = Sponge.getCauseStackManager().getCurrentCause();
+            this.cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
             this.targetWorld = target;
             this.source = source;
             this.target = target1;
-            this.isSelf = source instanceof Player && ((Player) source).getUniqueId().equals(target1.getUniqueId());
+            this.isSelf = source.getAsPlayer().filter(x -> x.getUniqueId().equals(target1)).isPresent();
             this.maxCount = maxCount;
             this.count = maxCount;
             this.options = options;
             this.kernel = kernel;
         }
 
-        @Override public void accept(final Task task) {
+        @Override public void accept(final ScheduledTask task) {
             this.count--;
-            if (!this.target.isOnline()) {
-                onCancel();
+            final ServerPlayer serverPlayer = Sponge.getServer().getPlayer(this.target).orElse(null);
+            if (serverPlayer == null) {
+                this.onCancel();
                 return;
             }
 
-            try (final Timing dummy = TIMINGS.startTiming()) {
-                this.logger.debug(String.format("RTP of %s, attempt %s of %s", this.target.getName(), this.maxCount - this.count, this.maxCount));
+            try (final Timing dummy = RandomTeleportCommand.this.timings.startTiming()) {
+                this.logger.debug(String.format("RTP of %s, attempt %s of %s", serverPlayer.getName(), this.maxCount - this.count, this.maxCount));
 
                 int counter = 0;
                 while (++counter <= 10) {
                     try {
-                        final Optional<Location<World>> optionalLocation =
-                                this.kernel.getLocation(this.target.getLocation(), this.targetWorld, this.options);
+                        final Optional<ServerLocation> optionalLocation =
+                                this.kernel.getLocation(serverPlayer.getServerLocation(), this.targetWorld, this.options);
                         if (optionalLocation.isPresent()) {
-                            final Location<World> targetLocation = optionalLocation.get();
+                            final ServerLocation targetLocation = optionalLocation.get();
                             if (Sponge.getEventManager().post(new RTPSelectedLocationEvent(
                                     targetLocation,
-                                    this.target,
+                                    serverPlayer,
                                     this.cause
                             ))) {
                                 continue;
                             }
 
                             this.source.getServiceCollection().logger().debug(String.format("RTP of %s, found location %s, %s, %s",
-                                    this.target.getName(),
-                                    String.valueOf(targetLocation.getBlockX()),
-                                    String.valueOf(targetLocation.getBlockY()),
-                                    String.valueOf(targetLocation.getBlockZ())));
-                            if (this.source.getServiceCollection().teleportService().setLocation(this.target, targetLocation)) {
+                                    serverPlayer.getName(),
+                                    targetLocation.getBlockX(),
+                                    targetLocation.getBlockY(),
+                                    targetLocation.getBlockZ()));
+                            if (serverPlayer.setLocation(targetLocation)) {
                                 if (!this.isSelf) {
-                                    this.source.sendMessageTo(this.target, "command.rtp.other");
+                                    this.source.sendMessageTo(serverPlayer, "command.rtp.other");
                                     this.source.sendMessage("command.rtp.successother",
-                                            this.target.getName(),
+                                            serverPlayer.getName(),
                                             targetLocation.getBlockX(),
                                             targetLocation.getBlockY(),
                                             targetLocation.getBlockZ());
                                 }
 
-                                this.source.sendMessageTo(this.target, "command.rtp.success",
+                                this.source.sendMessageTo(serverPlayer, "command.rtp.success",
                                         targetLocation.getBlockX(),
                                         targetLocation.getBlockY(),
                                         targetLocation.getBlockZ());
@@ -227,12 +225,12 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
                                             .cooldownService()
                                             .setCooldown(
                                                     this.source.getCommandKey(),
-                                                    this.target,
+                                                    serverPlayer,
                                                     Duration.ofSeconds(this.source.getServiceCollection()
                                                             .commandMetadataService()
                                                             .getControl(RandomTeleportCommand.class)
                                                             .orElseThrow(IllegalStateException::new)
-                                                            .getCooldown(this.target))
+                                                            .getCooldown(serverPlayer))
                                             );
                                     synchronized (RandomTeleportCommand.this.cachedTasks) {
                                         RandomTeleportCommand.this.cachedTasks.remove(task);
@@ -241,7 +239,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
                                 return;
                             } else {
                                 this.source.sendMessage("command.rtp.cancelled");
-                                onCancel();
+                                this.onCancel();
                                 return;
                             }
                         }
@@ -250,23 +248,24 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
                     }
                 }
 
-                onUnsuccesfulAttempt(task);
+                this.onUnsuccesfulAttempt(task, serverPlayer);
             }
         }
 
-        private void onUnsuccesfulAttempt(final Task task) {
+        private void onUnsuccesfulAttempt(final ScheduledTask task, final ServerPlayer serverPlayer) {
             synchronized (RandomTeleportCommand.this.cachedTasks) {
                 if (this.count <= 0) {
                     this.source.getServiceCollection().logger()
-                            .debug(String.format("RTP of %s was unsuccessful", this.target.getName()));
+                            .debug(String.format("RTP of %s was unsuccessful", serverPlayer.getName()));
                     this.source.sendMessage("command.rtp.error");
-                    onCancel();
+                    this.onCancel();
                 } else {
                     // We're using a scheduler to allow some ticks to go by between attempts to find a
                     // safe place.
+                    final Task t = Task.builder().delay(Ticks.of(2)).execute(this).plugin(this.pluginContainer).build();
                     RandomTeleportCommand.this.cachedTasks.put(
-                            Sponge.getScheduler().createTaskBuilder().delayTicks(2).execute(this).submit(this.pluginContainer),
-                            target.getUniqueId()
+                            Sponge.getServer().getScheduler().submit(t),
+                            serverPlayer.getUniqueId()
                     );
                 }
 

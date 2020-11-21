@@ -7,11 +7,10 @@ package io.github.nucleuspowered.nucleus.modules.rtp.options;
 import com.google.common.collect.ImmutableSet;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import io.github.nucleuspowered.nucleus.modules.rtp.config.RTPConfig;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.world.biome.BiomeType;
 
 import java.util.Set;
-
-import javax.annotation.Nullable;
 
 public class RTPOptions implements NucleusRTPService.RTPOptions {
 

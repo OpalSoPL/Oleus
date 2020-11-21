@@ -101,13 +101,6 @@ public interface NucleusRTPService {
     RTPKernel getKernel(String world);
 
     /**
-     * Registers a kernel for use in Nucleus.
-     *
-     * @param kernel The kernel.
-     */
-    void registerKernel(RTPKernel kernel);
-
-    /**
      * The RTP options to pass to the routines
      */
     interface RTPOptions {

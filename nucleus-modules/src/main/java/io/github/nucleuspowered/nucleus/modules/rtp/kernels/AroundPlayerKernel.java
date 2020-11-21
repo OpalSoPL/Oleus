@@ -4,27 +4,27 @@
  */
 package io.github.nucleuspowered.nucleus.modules.rtp.kernels;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3i;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-import javax.annotation.Nullable;
 
 public class AroundPlayerKernel extends DefaultKernel {
 
-    @Override Vector3i getCentralLocation(@Nullable final Location<World> currentLocation, final World world) {
-        if (currentLocation != null && world.getUniqueId().equals(currentLocation.getExtent().getUniqueId())) {
+    private static final ResourceKey AROUND_PLAYER_KERNEL_KEY = ResourceKey.of("nucleus", "around_player");
+
+    @Override
+    public ResourceKey getKey() {
+        return AroundPlayerKernel.AROUND_PLAYER_KERNEL_KEY;
+    }
+
+    @Override Vector3i getCentralLocation(@Nullable final ServerLocation currentLocation, final ServerWorld world) {
+        if (currentLocation != null && world.getKey().equals(currentLocation.getWorldKey())) {
             return currentLocation.getBlockPosition();
         }
 
         return super.getCentralLocation(currentLocation, world);
     }
 
-    @Override public String getId() {
-        return "nucleus:around_player";
-    }
-
-    @Override public String getName() {
-        return "Around Player Kernel";
-    }
 }

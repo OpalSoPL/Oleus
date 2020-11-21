@@ -4,29 +4,36 @@
  */
 package io.github.nucleuspowered.nucleus.modules.rtp.kernels;
 
-import org.spongepowered.math.vector.Vector3d;
-import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.TeleportHelper;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.teleport.TeleportHelper;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
 
 public class DefaultKernel implements RTPKernel {
 
     public static final DefaultKernel INSTANCE = new DefaultKernel();
 
+    private static final ResourceKey DEFAULT_KERNEL_KEY = ResourceKey.of("nucleus", "default");
+
     @Override
-    public Optional<ServerLocation> getLocation(@Nullable final Location<World> currentLocation, final World target, final NucleusRTPService.RTPOptions options) {
+    public ResourceKey getKey() {
+        return DefaultKernel.DEFAULT_KERNEL_KEY;
+    }
+
+    @Override
+    public Optional<ServerLocation> getLocation(@Nullable final ServerLocation currentLocation, final ServerWorld target, final NucleusRTPService.RTPOptions options) {
         // from world spawn
         Vector3d location;
         int count = 25;
@@ -36,20 +43,20 @@ public class DefaultKernel implements RTPKernel {
                 return Optional.empty();
             }
 
-            location = KernelHelper.INSTANCE.getLocationWithOffset(getCentralLocation(currentLocation, target), options);
+            location = KernelHelper.INSTANCE.getLocationWithOffset(this.getCentralLocation(currentLocation, target), options);
         } while (!Util.isLocationInWorldBorder(location.toDouble(), target));
 
-        final Location<World> worldLocation = getStartingLocation(new Location<>(target, location));
+        final ServerLocation worldLocation = this.getStartingLocation(ServerLocation.of(target, location));
         if (worldLocation == null) {
             return Optional.empty();
         }
 
-        final Optional<Location<World>> targetLocation = Sponge.getTeleportHelper().getSafeLocation(worldLocation,
+        final Optional<ServerLocation> targetLocation = Sponge.getServer().getTeleportHelper().getSafeLocation(worldLocation,
                 TeleportHelper.DEFAULT_HEIGHT,
                 TeleportHelper.DEFAULT_WIDTH,
                 TeleportHelper.DEFAULT_FLOOR_CHECK_DISTANCE,
-                TeleportHelperFilters.CONFIG,
-                filterToUse());
+                TeleportHelperFilters.CONFIG.get(),
+                this.filterToUse());
         if (targetLocation.isPresent()) {
             // Is it in the world border?
             if (!Util.isLocationInWorldBorder(worldLocation)
@@ -59,22 +66,22 @@ public class DefaultKernel implements RTPKernel {
                 return Optional.empty();
             }
 
-            return verifyLocation(targetLocation.get()) ? targetLocation : Optional.empty();
+            return this.verifyLocation(targetLocation.get()) ? targetLocation : Optional.empty();
         }
 
         return Optional.empty();
     }
 
     TeleportHelperFilter filterToUse() {
-        return TeleportHelperFilters.DEFAULT;
+        return TeleportHelperFilters.DEFAULT.get();
     }
 
-    Vector3i getCentralLocation(@Nullable final Location<World> currentLocation, final World world) {
-        return world.getSpawnLocation().getBlockPosition();
+    Vector3i getCentralLocation(@Nullable final ServerLocation currentLocation, final ServerWorld world) {
+        return world.getProperties().getSpawnPosition();
     }
 
-    @Nullable Location<World> getStartingLocation(Location<World> world) {
-        while (world.getBlockType() == BlockTypes.AIR) {
+    @Nullable ServerLocation getStartingLocation(ServerLocation world) {
+        while (world.getBlockType() == BlockTypes.AIR.get()) {
             if (world.getY() < 1) {
                 return null;
             }
@@ -84,15 +91,8 @@ public class DefaultKernel implements RTPKernel {
         return world;
     }
 
-    boolean verifyLocation(final Location<World> world) {
+    boolean verifyLocation(final ServerLocation location) {
         return true;
     }
 
-    @Override public String getId() {
-        return "nucleus:default";
-    }
-
-    @Override public String getName() {
-        return "Default Kernel";
-    }
 }

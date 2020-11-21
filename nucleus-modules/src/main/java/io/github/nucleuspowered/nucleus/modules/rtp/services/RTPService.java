@@ -4,26 +4,25 @@
  */
 package io.github.nucleuspowered.nucleus.modules.rtp.services;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernels;
 import io.github.nucleuspowered.nucleus.modules.rtp.config.RTPConfig;
 import io.github.nucleuspowered.nucleus.modules.rtp.options.RTPOptionsBuilder;
-import io.github.nucleuspowered.nucleus.modules.rtp.registry.RTPRegistryModule;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.WeakHashMap;
-
-import com.google.inject.Inject;
 
 @APIService(NucleusRTPService.class)
 public class RTPService implements NucleusRTPService, IReloadableService.Reloadable, ServiceBase {
@@ -40,7 +39,7 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
 
     @Override
     public RTPOptions options(@Nullable final WorldProperties world) {
-        @Nullable final String name = world == null ? null : world.getWorldName();
+        @Nullable final String name = world == null ? null : world.getKey().asString();
         return new io.github.nucleuspowered.nucleus.modules.rtp.options.RTPOptions(this.config, name);
     }
 
@@ -55,10 +54,10 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
             // does the kernel exist?
             String kernelId = this.config.getDefaultRTPKernel();
             kernelId = kernelId.contains(":") ? kernelId : "nucleus:" + kernelId;
-            final Optional<RTPKernel> rtpKernel = Sponge.getRegistry().getType(RTPKernel.class, kernelId);
+            final Optional<RTPKernel> rtpKernel = Sponge.getRegistry().getCatalogRegistry().get(RTPKernel.class, ResourceKey.resolve(kernelId));
             if (!rtpKernel.isPresent()) {
-                this.logger.warn("Kernel with ID {} could not be found. Falling back to the default.", RTPKernels.DEFAULT.getId());
-                this.lazyLoadedKernel = RTPKernels.DEFAULT;
+                this.logger.warn("Kernel with ID {} could not be found. Falling back to the default.", RTPKernels.DEFAULT.get().getKey().asString());
+                this.lazyLoadedKernel = RTPKernels.DEFAULT.get();
             } else {
                 this.lazyLoadedKernel = rtpKernel.get();
             }
@@ -68,7 +67,7 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
     }
 
     @Override public RTPKernel getKernel(final WorldProperties world) {
-        return getKernel(world.getWorldName());
+        return this.getKernel(world.getKey().asString());
     }
 
     @Override public RTPKernel getKernel(final String world) {
@@ -78,11 +77,11 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
                 // does the kernel exist?
                 String kernelId = x.getDefaultRTPKernel();
                 kernelId = kernelId.contains(":") ? kernelId : "nucleus:" + kernelId;
-                final Optional<RTPKernel> rtpKernel = Sponge.getRegistry().getType(RTPKernel.class, kernelId);
+                final Optional<RTPKernel> rtpKernel = Sponge.getRegistry().getCatalogRegistry().get(RTPKernel.class, ResourceKey.resolve(kernelId));
                 if (!rtpKernel.isPresent()) {
                     this.logger.warn("Kernel with ID {} for world {} could not be found. Falling back to the default.",
                             kernelId, world);
-                    this.perWorldLazyLoadedKernel.put(x, RTPKernels.DEFAULT);
+                    this.perWorldLazyLoadedKernel.put(x, RTPKernels.DEFAULT.get());
                 } else {
                     this.perWorldLazyLoadedKernel.put(x, rtpKernel.get());
                 }
@@ -90,11 +89,6 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
 
             return this.perWorldLazyLoadedKernel.get(x);
         }).orElseGet(this::getDefaultKernel);
-    }
-
-    @Override
-    public void registerKernel(final RTPKernel kernel) {
-        RTPRegistryModule.getInstance().registerAdditionalCatalog(kernel);
     }
 
     @Override
