@@ -11,6 +11,7 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
@@ -20,12 +21,12 @@ import java.util.List;
 
 public class MobProtectionListener implements IReloadableService.Reloadable, ListenerBase.Conditional {
 
-    private List<EntityType> whitelistedTypes;
+    private List<EntityType<?>> whitelistedTypes;
 
     @Listener
     @Exclude({ChangeBlockEvent.Grow.class, ChangeBlockEvent.Decay.class})
     public void onMobChangeBlock(final ChangeBlockEvent event, @Root final Living living) {
-        if (living instanceof Player || whitelistedTypes.contains(living.getType())) {
+        if (living instanceof ServerPlayer || this.whitelistedTypes.contains(living.getType())) {
             return;
         }
 

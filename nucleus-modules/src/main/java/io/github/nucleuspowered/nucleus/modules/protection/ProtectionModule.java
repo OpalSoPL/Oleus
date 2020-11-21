@@ -4,29 +4,49 @@
  */
 package io.github.nucleuspowered.nucleus.modules.protection;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.protection.config.ProtectionConfig;
-import io.github.nucleuspowered.nucleus.modules.protection.config.ProtectionConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.protection.listeners.CropTrampleListener;
+import io.github.nucleuspowered.nucleus.modules.protection.listeners.MobProtectionListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = ProtectionModule.ID, name = "Protection")
-public class ProtectionModule extends ConfigurableModule<ProtectionConfig, ProtectionConfigAdapter> {
+public final class ProtectionModule implements IModule.Configurable<ProtectionConfig> {
 
     public static final String ID = "protection";
 
-    @Inject
-    public ProtectionModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+
     }
 
     @Override
-    public ProtectionConfigAdapter createAdapter() {
-        return new ProtectionConfigAdapter();
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.emptyList();
     }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Arrays.asList(
+                CropTrampleListener.class,
+                MobProtectionListener.class
+        );
+    }
+
+    @Override
+    public Class<ProtectionConfig> getConfigClass() {
+        return ProtectionConfig.class;
+    }
+
 }

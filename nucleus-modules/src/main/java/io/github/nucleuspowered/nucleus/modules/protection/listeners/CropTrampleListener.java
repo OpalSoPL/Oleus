@@ -12,6 +12,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.Root;
@@ -25,13 +26,13 @@ public class CropTrampleListener implements IReloadableService.Reloadable, Liste
     @Listener
     public void onBlockChange(final ChangeBlockEvent.Place breakEvent, @Root final Entity entity) {
         // If player or entity and the corresponding option is added
-        final boolean isPlayer = entity instanceof Player;
+        final boolean isPlayer = entity instanceof ServerPlayer;
         if (this.cropplayer && isPlayer || this.cropentity && !isPlayer) {
             // Go from Farmland to Dirt.
             breakEvent.getTransactions().stream()
                     .filter(Transaction::isValid)
-                    .filter(x -> x.getOriginal().getState().getType().equals(BlockTypes.FARMLAND))
-                    .filter(x -> x.getFinal().getState().getType().equals(BlockTypes.DIRT))
+                    .filter(x -> x.getOriginal().getState().getType().equals(BlockTypes.FARMLAND.get()))
+                    .filter(x -> x.getFinal().getState().getType().equals(BlockTypes.DIRT.get()))
                     .forEach(x -> x.setValid(false));
         }
     }

@@ -73,6 +73,8 @@ import io.github.nucleuspowered.nucleus.modules.notification.config.Notification
 import io.github.nucleuspowered.nucleus.modules.playerinfo.PlayerInfoModule;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.config.PlayerInfoConfig;
 import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolModule;
+import io.github.nucleuspowered.nucleus.modules.protection.ProtectionModule;
+import io.github.nucleuspowered.nucleus.modules.protection.config.ProtectionConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -139,6 +141,7 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(NotificationModule.ID, "Nickname", NotificationModule.class, NotificationConfig.class));
         containers.add(NucleusModuleProvider.createContainer(PlayerInfoModule.ID, "Player Info", PlayerInfoModule.class, PlayerInfoConfig.class));
         containers.add(NucleusModuleProvider.createContainer(PowertoolModule.ID, "Powertools", PowertoolModule.class));
+        containers.add(NucleusModuleProvider.createContainer(ProtectionModule.ID, "Protection", ProtectionModule.class, ProtectionConfig.class));
         return containers;
     }
 

@@ -4,18 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.protection.config;
 
-import io.github.nucleuspowered.neutrino.annotations.ProcessSetting;
-import io.github.nucleuspowered.nucleus.configurate.settingprocessor.MobTypeSettingProcessor;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @ConfigSerializable
 public class ProtectionConfig {
 
-    @Setting(value = "disable-crop-trample", comment = "config.protection.disablecrop")
+    @Setting(value = "disable-crop-trample")
+    @LocalisedComment("config.protection.disablecrop")
     private CropTrample disableCropTrample = new CropTrample();
 
     @Setting(value = "mob-griefing")
@@ -37,7 +38,7 @@ public class ProtectionConfig {
         return this.blockBreaking.enableProtection;
     }
 
-    public List<EntityType> getWhitelistedEntities() {
+    public List<EntityType<?>> getWhitelistedEntities() {
         return this.blockBreaking.whitelist;
     }
 
@@ -54,12 +55,12 @@ public class ProtectionConfig {
     @ConfigSerializable
     public static class BlockBreaking {
 
-        @Setting(value = "enable-protection", comment = "config.protection.mobgriefing.flag")
+        @Setting(value = "enable-protection")
+        @LocalisedComment("config.protection.mobgriefing.flag")
         private boolean enableProtection = false;
 
         @Setting(value = "whitelist")
-        @ProcessSetting(MobTypeSettingProcessor.class)
-        private List<EntityType> whitelist = new ArrayList<>();
+        private List<EntityType<?>> whitelist = new ArrayList<>();
 
 
     }
