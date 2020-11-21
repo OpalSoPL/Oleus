@@ -15,14 +15,13 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.serializer.TextSerializers;
+
 @Command(
         aliases = {"nick", "nickname"},
         basePermission = NicknamePermissions.BASE_NICK,
@@ -42,29 +41,35 @@ import org.spongepowered.api.text.serializer.TextSerializers;
         notes = "To remove a nickname, use '/delnick'")
 public class NicknameCommand implements ICommandExecutor {
 
-    private final String nickName = "nickname";
+    private final Parameter.Value<Component> nicknameParameter = Parameter.formattingCodeText().setKey("nickname").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
                 serviceCollection.commandElementSupplier()
-                    .createOtherUserPermissionElement(false, NicknamePermissions.OTHERS_NICK),
-                GenericArguments.onlyOne(GenericArguments.string(Text.of(this.nickName)))};
+                    .createOnlyOtherUserPermissionElement(NicknamePermissions.OTHERS_NICK),
+                this.nicknameParameter
+        };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User pl = context.getUserFromArgs();
-        final TextComponent name = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(this.nickName, String.class));
+        final Component name = context.requireOne(this.nicknameParameter);
 
         try {
-            context.getServiceCollection().getServiceUnchecked(NicknameService.class).setNick(pl, context.getCommandSourceRoot(), name, false);
+            context.getServiceCollection().getServiceUnchecked(NicknameService.class).setNick(pl.getUniqueId(), name, false);
         } catch (final NicknameException e) {
-            return context.errorResultLiteral(e.getTextMessage());
+            return context.errorResultLiteral(e.componentMessage());
         }
 
         if (!context.is(pl)) {
             context.sendMessageText(
-                    Text.builder().append(context.getMessage("command.nick.success.other", pl.getName())).append(Text.of(" - ", TextColors.RESET, name)).build());
+                    LinearComponents.linear(
+                            context.getMessage("command.nick.success.other", pl.getName()),
+                            Component.text(" - "),
+                            name.color(NamedTextColor.WHITE)
+                    ));
         }
 
         return context.successResult();

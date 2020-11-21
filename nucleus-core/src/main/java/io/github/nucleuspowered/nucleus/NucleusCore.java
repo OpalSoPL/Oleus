@@ -387,6 +387,9 @@ public final class NucleusCore {
             // Register permissions in the description builder
             module.getPermissions().ifPresent(x -> this.serviceCollection.permissionService().register(container.getId(), x));
         }
+
+        // Once everything is said and done, run post-init on the loaded modules
+        modules.forEach(tuple -> tuple.getSecond().postLoad(this.serviceCollection));
     }
 
     private Collection<ModuleContainer> filterModules(final Collection<ModuleContainer> moduleContainers) {

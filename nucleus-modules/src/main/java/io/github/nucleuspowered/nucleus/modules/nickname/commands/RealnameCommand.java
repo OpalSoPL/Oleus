@@ -13,14 +13,13 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,20 +33,20 @@ import java.util.Map;
 )
 public class RealnameCommand implements ICommandExecutor {
 
-    private final String playerKey = "name";
+    private final Parameter.Value<String> parameter = Parameter.string().setKey("name").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            GenericArguments.string(Text.of(playerKey))
+            this.parameter
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final String argname = context.requireOne(this.playerKey, String.class);
+        final String argname = context.requireOne(this.parameter);
 
         final NicknameService service = context.getServiceCollection().getServiceUnchecked(NicknameService.class);
-        final Map<Player, Text> names = service.getFromSubstring(argname.toLowerCase());
+        final Map<Player, Component> names = service.getFromSubstring(argname.toLowerCase());
         names.forEach((player, text) -> {
 
         });
@@ -55,16 +54,19 @@ public class RealnameCommand implements ICommandExecutor {
         if (names.isEmpty()) {
             context.sendMessage("command.realname.nonames", argname);
         } else {
-            final List<Text> realNames = new ArrayList<>();
-            for (final Map.Entry<Player, Text> entry : names.entrySet()) {
-                realNames.add(Text.of(entry.getKey().getName(), TextColors.GRAY, " -> ", TextColors.WHITE, entry.getValue()));
+            final List<Component> realNames = new ArrayList<>();
+            for (final Map.Entry<Player, Component> entry : names.entrySet()) {
+                realNames.add(LinearComponents.linear(
+                        Component.text(entry.getKey().getName()),
+                        Component.text(" -> ", NamedTextColor.GRAY),
+                        entry.getValue().color(NamedTextColor.WHITE)));
             }
 
-            final PaginationList.Builder plb = Util.getPaginationBuilder(context.getCommandSourceRoot())
+            final PaginationList.Builder plb = Util.getPaginationBuilder(context.getAudience())
                     .contents(realNames)
-                    .padding(Text.of(TextColors.GREEN, "-"))
+                    .padding(Component.text(" - ", NamedTextColor.GREEN))
                     .title(context.getMessage("command.realname.title", argname));
-            plb.sendTo(context.getCommandSourceRoot());
+            plb.sendTo(context.getAudience());
         }
 
         return context.successResult();

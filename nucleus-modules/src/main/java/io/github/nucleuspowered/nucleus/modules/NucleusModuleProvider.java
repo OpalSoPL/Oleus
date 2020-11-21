@@ -64,6 +64,8 @@ import io.github.nucleuspowered.nucleus.modules.mute.MuteModule;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
 import io.github.nucleuspowered.nucleus.modules.nameban.NameBanModule;
 import io.github.nucleuspowered.nucleus.modules.nameban.config.NameBanConfig;
+import io.github.nucleuspowered.nucleus.modules.nickname.NicknameModule;
+import io.github.nucleuspowered.nucleus.modules.nickname.config.NicknameConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -125,6 +127,7 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(MobModule.ID, "Mob", MobModule.class, MobConfig.class));
         containers.add(NucleusModuleProvider.createContainer(MuteModule.ID, "Mute", MuteModule.class, MuteConfig.class));
         containers.add(NucleusModuleProvider.createContainer(NameBanModule.ID, "Name Ban", NameBanModule.class, NameBanConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(NicknameModule.ID, "Nickname", NicknameModule.class, NicknameConfig.class));
         return containers;
     }
 

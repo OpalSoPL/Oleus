@@ -23,6 +23,9 @@ public interface IModule {
 
     void init(INucleusServiceCollection serviceCollection);
 
+    default void postLoad(INucleusServiceCollection serviceCollection) {
+    }
+
     default Collection<ICommandInterceptor> getCommandInterceptors() {
         return Collections.emptyList();
     }

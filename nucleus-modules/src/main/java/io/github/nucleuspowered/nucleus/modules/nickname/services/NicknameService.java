@@ -8,6 +8,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.nickname.NucleusNicknameService;
 import io.github.nucleuspowered.nucleus.api.module.nickname.exception.NicknameException;
 import io.github.nucleuspowered.nucleus.modules.nickname.NicknameKeys;
@@ -24,8 +25,12 @@ import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.services.interfaces.ITextStyleService;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -34,6 +39,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.permission.Subject;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -44,20 +50,20 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.google.inject.Inject;
-
 @APIService(NucleusNicknameService.class)
 public class NicknameService implements NucleusNicknameService, IReloadableService.Reloadable, ServiceBase {
 
     private final IMessageProviderService messageProviderService;
     private final IStorageManager storageManager;
     private final ITextStyleService textStyleService;
+    private final IPlayerDisplayNameService playerDisplayNameService;
 
     @Inject
     public NicknameService(final INucleusServiceCollection serviceCollection) {
         this.messageProviderService = serviceCollection.messageProvider();
         this.storageManager = serviceCollection.storageManager();
         this.textStyleService = serviceCollection.textStyleService();
+        this.playerDisplayNameService = serviceCollection.playerDisplayNameService();
     }
 
     private Component prefix = Component.empty();
@@ -66,7 +72,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
     private int max = 16;
     private final List<UUID> cached = new ArrayList<>();
     private final BiMap<UUID, String> cache = HashBiMap.create();
-    private final BiMap<UUID, TextComponent> textCache = HashBiMap.create();
+    private final BiMap<UUID, Component> textCache = HashBiMap.create();
     private final TreeMap<String, UUID> reverseLowerCaseCache = new TreeMap<>();
 
     public void injectResolver(final INucleusServiceCollection serviceCollection) {
@@ -74,7 +80,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         serviceCollection.playerDisplayNameService().provideDisplayNameQuery(
                 new IPlayerDisplayNameService.DisplayNameQuery() {
                     @Override public Optional<User> resolve(final String name) {
-                        return NicknameService.this.getFromCache(name).map(x -> x);
+                        return NicknameService.this.getFromCache(name).map(ServerPlayer::getUser);
                     }
 
                     @Override public Map<UUID, String> startsWith(final String name) {
@@ -88,7 +94,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         this.cached.add(player);
     }
 
-    public void updateCache(final UUID player, final TextComponent text) {
+    public void updateCache(final UUID player, final Component text) {
         this.cache.put(player, text.toString());
         this.textCache.put(player, text);
     }
@@ -126,7 +132,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         Sponge.getServer().getOnlinePlayers().stream()
                 .filter(x -> !this.cache.containsKey(x.getUniqueId()))
                 .filter(x -> x.getName().toLowerCase().startsWith(prefix))
-                .forEach(player -> mapToReturn.put(player, player.get(Keys.DISPLAY_NAME).orElseGet(
+                .forEach(player -> mapToReturn.put(player, player.get(Keys.CUSTOM_NAME).orElseGet(
                         () -> Component.text(player.getName() + "*"))));
 
         for (final UUID uuid : uuidCollection) {
@@ -162,12 +168,12 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
 
     @Override
     public Optional<Component> getNicknameWithPrefix(final UUID user) {
-        return this.getNickname(user).map(x -> TextComponent.join(this.prefix, x));
+        return this.getNickname(user).map(x -> Component.join(this.prefix, x));
     }
 
     @Override
     public Optional<Component> getNicknameWithPrefix(final User user) {
-        return this.getNickname(user).map(x -> TextComponent.join(this.prefix, x));
+        return this.getNickname(user).map(x -> Component.join(this.prefix, x));
     }
 
     @Override
@@ -183,54 +189,51 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         return this.storageManager.getUserService()
                 .getOnThread(user)
                 .flatMap(x -> x.get(NicknameKeys.USER_NICKNAME_JSON))
-                .map(TextSerializers.JSON::deserialize);
+                .map(GsonComponentSerializer.colorDownsamplingGson()::deserialize);
     }
 
     @Override
-    public void setNickname(final UUID user, @Nullable final TextComponent nickname, final boolean bypassRestrictions) throws NicknameException {
-        final Cause cause = Sponge.getCauseStackManager().getCurrentCause();
+    public void setNickname(final UUID user, @Nullable final Component nickname, final boolean bypassRestrictions) throws NicknameException {
         if (nickname != null) {
-            this.setNick(user, cause, nickname, bypassRestrictions);
+            this.setNick(user, nickname, bypassRestrictions);
         } else {
-            this.removeNick(user, cause);
+            this.removeNick(user);
         }
 
     }
 
-    public void removeNick(final User user, final CommandSource src) throws NicknameException {
-        removeNick(user, CauseStackHelper.createCause(src));
-    }
+    public void removeNick(final UUID uuid) throws NicknameException {
+        final Component currentNickname = this.getNickname(uuid).orElse(null);
+        final Component name = this.playerDisplayNameService.getName(uuid);
+        final Cause cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
 
-    private void removeNick(User user, final Cause cause) throws NicknameException {
-        final TextComponent currentNickname = this.getNickname(user).orElse(null);
-        if (!(user instanceof Player) && user.getPlayer().isPresent()) {
-            user = user.getPlayer().get();
-        }
-
-        final ChangeNicknameEventPre cne = new ChangeNicknameEventPre(cause, currentNickname, null, user);
+        final ChangeNicknameEventPre cne = new ChangeNicknameEventPre(cause, currentNickname, null, uuid);
         if (Sponge.getEventManager().post(cne)) {
+
             throw new NicknameException(
-                    this.messageProviderService.getMessage("command.nick.eventcancel", user.getName()),
+                    this.messageProviderService.getMessage("command.nick.eventcancel", name),
                     NicknameException.Type.EVENT_CANCELLED
             );
         }
 
-        this.storageManager.getUserService().removeAndSave(user.getUniqueId(), NicknameKeys.USER_NICKNAME_JSON);
-        this.removeFromCache(user.getUniqueId());
-        Sponge.getEventManager().post(new ChangeNicknameEventPost(cause, currentNickname, null, user));
+        this.storageManager.getUserService().removeAndSave(uuid, NicknameKeys.USER_NICKNAME_JSON);
+        this.removeFromCache(uuid);
+        Sponge.getEventManager().post(new ChangeNicknameEventPost(cause, currentNickname, null, uuid));
 
-        if (user.isOnline()) {
-            user.getPlayer().ifPresent(x ->
-                    this.messageProviderService.sendMessageTo(x, "command.delnick.success.base"));
+        final Optional<User> user = Sponge.getServer().getUserManager().get(uuid);
+        if (user.isPresent()) {
+            final Optional<ServerPlayer> player = user.get().getPlayer();
+            if (player.isPresent()) {
+                this.messageProviderService.sendMessageTo(player.get(), "command.delnick.success.base");
+                player.get().remove(Keys.CUSTOM_NAME);
+            } else {
+                user.get().remove(Keys.CUSTOM_NAME);
+            }
         }
     }
 
-    public void setNick(final User pl, final CommandSource src, final TextComponent nickname, final boolean bypass) throws NicknameException {
-        setNick(pl, CauseStackHelper.createCause(src), nickname, bypass);
-    }
-
-    private void setNick(User pl, final Cause cause, final TextComponent nickname, final boolean bypass) throws NicknameException {
-        final String plain = nickname.toPlain().trim();
+    public void setNick(final UUID pl, final Component nickname, final boolean bypass) throws NicknameException {
+        final String plain = PlainComponentSerializer.plain().serialize(nickname).trim();
         if (plain.isEmpty()) {
             throw new NicknameException(
                     this.messageProviderService.getMessage("command.nick.tooshort"),
@@ -240,11 +243,10 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
 
         // Does the user exist?
         try {
-            final Optional<User> match =
-                    Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(nickname.toPlain().trim());
+            final Optional<User> match = Sponge.getServer().getUserManager().get(plain);
 
             // The only person who can use such a name is oneself.
-            if (match.isPresent() && !match.get().getUniqueId().equals(pl.getUniqueId())) {
+            if (match.isPresent() && !match.get().getUniqueId().equals(pl)) {
                 // Fail - cannot use another's name.
                 throw new NicknameException(
                         this.messageProviderService.getMessage("command.nick.nameinuse", plain),
@@ -254,10 +256,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
             // We allow some other nicknames too.
         }
 
-        if (!(pl instanceof Player) && pl.getPlayer().isPresent()) {
-            pl = pl.getPlayer().get();
-        }
-
+        final Cause cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
         if (!bypass) {
             // Giving subject must have the colour permissions and whatnot. Also,
             // colour and color are the two spellings we support. (RULE BRITANNIA!)
@@ -291,24 +290,36 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
             }
         }
 
+        final Component name = this.playerDisplayNameService.getName(pl);
+
         // Send an event
-        final TextComponent currentNickname = this.getNickname(pl).orElse(null);
+        final Component currentNickname = this.getNickname(pl).orElse(null);
         final ChangeNicknameEventPre cne = new ChangeNicknameEventPre(cause, currentNickname, nickname, pl);
         if (Sponge.getEventManager().post(cne)) {
             throw new NicknameException(
-                    this.messageProviderService.getMessage("command.nick.eventcancel", pl.getName()),
+                    this.messageProviderService.getMessage("command.nick.eventcancel", name),
                     NicknameException.Type.EVENT_CANCELLED
             );
         }
 
-        this.storageManager.getUserService().setAndSave(pl.getUniqueId(), NicknameKeys.USER_NICKNAME_JSON, TextSerializers.JSON.serialize(nickname));
-        this.updateCache(pl.getUniqueId(), nickname);
+        this.storageManager.getUserService().setAndSave(pl, NicknameKeys.USER_NICKNAME_JSON, GsonComponentSerializer.gson().serialize(nickname));
+        this.updateCache(pl, nickname);
 
-        Sponge.getEventManager().post(new ChangeNicknameEventPost(cause, currentNickname, nickname, pl));
-        pl.getPlayer().ifPresent(player -> player.sendMessage(Text.builder().append(
-                this.messageProviderService.getMessage("command.nick.success.base"))
-                    .append(Text.of(" - ", TextColors.RESET, nickname)).build()));
-
+        Sponge.getEventManager().post(new ChangeNicknameEventPost(Sponge.getServer().getCauseStackManager().getCurrentCause(),
+                currentNickname, nickname, pl));
+        final Optional<User> user = Sponge.getServer().getUserManager().get(pl);
+        if (user.isPresent()) {
+            final Optional<ServerPlayer> player = user.get().getPlayer();
+            if (player.isPresent()) {
+                player.get().sendMessage(LinearComponents.linear(
+                        this.messageProviderService.getMessage("command.nick.success.base"),
+                        Component.text(" - "),
+                        nickname.color(NamedTextColor.WHITE)));
+                player.get().offer(Keys.CUSTOM_NAME, nickname);
+            } else {
+                user.get().offer(Keys.CUSTOM_NAME, nickname);
+            }
+        }
     }
 
     @Override
@@ -320,7 +331,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         this.prefix = LegacyComponentSerializer.legacyAmpersand().deserialize(nc.getPrefix());
     }
 
-    private void stripPermissionless(final Subject source, final TextComponent message) throws NicknameException {
+    private void stripPermissionless(final Subject source, final Component message) throws NicknameException {
         final Collection<String> strings = this.textStyleService.wouldStrip(
                 ImmutableList.of(NicknamePermissions.NICKNAME_COLOUR, NicknamePermissions.NICKNAME_COLOR),
                 NicknamePermissions.NICKNAME_STYLE,
@@ -332,7 +343,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         }
     }
 
-    public TextComponent getNickPrefix() {
+    public Component getNickPrefix() {
         return this.prefix;
     }
 }

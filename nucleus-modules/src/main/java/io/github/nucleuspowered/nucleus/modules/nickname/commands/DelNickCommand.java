@@ -13,9 +13,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
+
 @Command(
         aliases = {"delnick", "delnickname", "deletenick"},
         basePermission = NicknamePermissions.BASE_NICK,
@@ -27,17 +27,18 @@ public class DelNickCommand implements ICommandExecutor {
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[]{
                 serviceCollection.commandElementSupplier()
-                        .createOnlyOtherUserPermissionElement(false, NicknamePermissions.OTHERS_NICK)
+                        .createOnlyOtherUserPermissionElement(NicknamePermissions.OTHERS_NICK)
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User pl = context.getUserFromArgs();
         try {
-            context.getServiceCollection().getServiceUnchecked(NicknameService.class).removeNick(pl, context.getCommandSourceRoot());
+            context.getServiceCollection().getServiceUnchecked(NicknameService.class).removeNick(pl.getUniqueId());
         } catch (final NicknameException e) {
             e.printStackTrace();
-            return context.errorResultLiteral(e.getTextMessage());
+            return context.errorResultLiteral(e.componentMessage());
         }
 
         if (!context.is(pl)) {

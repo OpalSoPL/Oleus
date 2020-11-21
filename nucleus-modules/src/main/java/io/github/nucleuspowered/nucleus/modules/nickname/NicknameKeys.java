@@ -4,14 +4,14 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nickname;
 
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
+import io.leangen.geantyref.TypeToken;
 
 public final class NicknameKeys {
 
     public static final DataKey<String, IUserDataObject> USER_NICKNAME_JSON = DataKey.of(
-            TypeToken.of(String.class),
+            TypeToken.get(String.class),
             IUserDataObject.class,
             "nickname-text"
     );

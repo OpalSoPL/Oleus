@@ -4,20 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nickname.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.nickname.services.NicknameService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 import java.util.Optional;
-
-import com.google.inject.Inject;
 
 public class NicknameListener implements ListenerBase {
 
@@ -29,19 +28,19 @@ public class NicknameListener implements ListenerBase {
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerJoin(final ClientConnectionEvent.Join event, @Root final Player player) {
-        final Optional<Text> nickname = this.nicknameService.getNickname(player);
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+        final Optional<Component> nickname = this.nicknameService.getNickname(player.getUniqueId());
         this.nicknameService.markRead(player.getUniqueId());
-        nickname.ifPresent(text -> {
-            this.nicknameService.updateCache(player.getUniqueId(), text);
-        });
-        player.offer(
-                Keys.DISPLAY_NAME,
-                nickname.orElseGet(() -> Text.of(player.getName())));
+        if (nickname.isPresent()) {
+            this.nicknameService.updateCache(player.getUniqueId(), nickname.get());
+            player.offer(Keys.CUSTOM_NAME, nickname.get());
+        } else {
+            player.remove(Keys.CUSTOM_NAME);
+        }
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerQuit(final ClientConnectionEvent.Disconnect event, @Root final Player player) {
+    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer player) {
         this.nicknameService.removeFromCache(player.getUniqueId());
     }
 

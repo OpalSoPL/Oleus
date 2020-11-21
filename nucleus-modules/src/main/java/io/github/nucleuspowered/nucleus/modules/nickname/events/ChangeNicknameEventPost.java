@@ -6,35 +6,34 @@ package io.github.nucleuspowered.nucleus.modules.nickname.events;
 
 import io.github.nucleuspowered.nucleus.api.module.nickname.event.NucleusChangeNicknameEvent;
 import net.kyori.adventure.text.Component;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class ChangeNicknameEventPost extends AbstractEvent implements NucleusChangeNicknameEvent.Post {
 
     private final Cause cause;
-    private final User target;
-    @Nullable private final TextComponent previousNickname;
-    @Nullable private final TextComponent newNickname;
+    private final UUID target;
+    @Nullable private final Component previousNickname;
+    @Nullable private final Component newNickname;
 
-    public ChangeNicknameEventPost(final Cause cause, @Nullable final TextComponent previousNickname, @Nullable final TextComponent newNickname, final User target) {
+    public ChangeNicknameEventPost(final Cause cause, @Nullable final Component previousNickname, @Nullable final Component newNickname,
+            final UUID target) {
         this.cause = cause;
         this.previousNickname = previousNickname;
         this.newNickname = newNickname;
         this.target = target;
     }
 
-    @Override public User getUser() {
+    @Override public UUID getUser() {
         return this.target;
     }
 
     @Override
-    public Optional<Text> getPreviousNickname() {
+    public Optional<Component> getPreviousNickname() {
         return Optional.ofNullable(this.previousNickname);
     }
 
