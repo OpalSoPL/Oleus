@@ -128,6 +128,16 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         return new NucleusTextTemplateImpl(this.serviceCollection, texts, prefix, suffix);
     }
 
+    @Override
+    public Optional<NucleusTextTemplateImpl> createFromAmpersandStringIgnoringExceptions(final String string) {
+        try {
+            return Optional.of(this.createFromAmpersandString(string));
+        } catch (final Exception e) {
+            this.serviceCollection.logger().warn("Could not parse \"{}\", ignoring.", string);
+            return Optional.empty();
+        }
+    }
+
     public Optional<ITextStyleService.TextFormat> createTextTemplateFragmentWithLinks(final String message,
             final List<BiFunction<Object, Map<String, Function<Object, Optional<ComponentLike>>>, Component>> elements,
             final ITextStyleService.TextFormat format) {

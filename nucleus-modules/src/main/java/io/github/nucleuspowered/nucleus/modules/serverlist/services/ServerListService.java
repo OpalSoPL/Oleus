@@ -9,19 +9,20 @@ import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import net.kyori.adventure.text.Component;
 
 import java.time.Instant;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
 import com.google.inject.Inject;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "OptionalAssignedToNull"})
 public class ServerListService implements ServiceBase {
 
-    @Nullable private Optional<Text> messageCache = null;
+    @Nullable private Optional<Component> messageCache = null;
     private Instant expiry = Instant.MAX;
     private final IStorageManager storageManager;
 
@@ -41,20 +42,20 @@ public class ServerListService implements ServiceBase {
     }
 
     public void updateLineOne(@Nullable final String line1) {
-        if (checkMessage()) {
+        if (this.checkMessage()) {
             this.storageManager.getGeneralService().getOrNew().thenAccept(x -> x.set(ServerListKeys.LINE_ONE, line1));
         }
     }
 
     public void updateLineTwo(@Nullable final String line2) {
-        if (checkMessage()) {
+        if (this.checkMessage()) {
             this.storageManager.getGeneralService().getOrNew().thenAccept(x -> x.set(ServerListKeys.LINE_TWO, line2));
         }
     }
 
     private boolean checkMessage() {
         if (this.messageCache == null) {
-            constructMessage();
+            this.constructMessage();
         }
 
         return this.messageCache.isPresent();
@@ -72,29 +73,29 @@ public class ServerListService implements ServiceBase {
     private void constructMessage() {
         final IGeneralDataObject dataObject = this.storageManager.getGeneralService().getOrNewOnThread();
         this.expiry = dataObject.get(ServerListKeys.EXPIRY).orElse(Instant.MAX);
-        constructMessage(
-                dataObject.get(ServerListKeys.LINE_ONE).map(TextSerializers.FORMATTING_CODE::deserialize).orElse(null),
-                dataObject.get(ServerListKeys.LINE_TWO).map(TextSerializers.FORMATTING_CODE::deserialize).orElse(null));
+        this.constructMessage(
+                dataObject.get(ServerListKeys.LINE_ONE).map(LegacyComponentSerializer.legacyAmpersand()::deserialize).orElse(null),
+                dataObject.get(ServerListKeys.LINE_TWO).map(LegacyComponentSerializer.legacyAmpersand()::deserialize).orElse(null));
     }
 
-    private void constructMessage(final TextComponent lineOne, final TextComponent lineTwo) {
+    private void constructMessage(final Component lineOne, final Component lineTwo) {
         if (lineOne != null || lineTwo != null) {
             this.messageCache =
-                    Optional.of(Text.of(lineOne == null ? Text.EMPTY : lineOne,
-                            Text.NEW_LINE,
-                            lineTwo == null ? Text.EMPTY : lineTwo));
+                    Optional.of(LinearComponents.linear(lineOne == null ? Component.empty() : lineOne,
+                            Component.newline(),
+                            lineTwo == null ? Component.empty() : lineTwo));
         } else {
             this.messageCache = Optional.empty();
         }
     }
 
-    public Optional<Text> getMessage() {
+    public Optional<Component> getMessage() {
         if (this.expiry.isBefore(Instant.now())) {
-            clearMessage();
+            this.clearMessage();
         }
 
         if (this.messageCache != null) {
-            constructMessage();
+            this.constructMessage();
         }
 
         return this.messageCache;

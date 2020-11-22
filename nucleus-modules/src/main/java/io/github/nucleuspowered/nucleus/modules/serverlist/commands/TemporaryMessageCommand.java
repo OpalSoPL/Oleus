@@ -11,15 +11,14 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.BoundedIntegerArgument;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Command(
@@ -30,15 +29,23 @@ import java.util.Optional;
 )
 public class TemporaryMessageCommand implements ICommandExecutor {
 
-    private final String line = "line";
+    private final Parameter.Value<Integer> lines = Parameter.builder(Integer.class)
+            .parser(VariableValueParameters.integerRange().setMin(1).setMax(2).build())
+            .setKey("line")
+            .build();
+
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("r", "remove"),
+                Flag.of(this.lines, "l", "line"),
+                Flag.of(NucleusParameters.DURATION, "t", "time")
+        };
+    }
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            GenericArguments.flags()
-                .flag("r", "-remove")
-                .valueFlag(new BoundedIntegerArgument(Text.of(this.line), 1, 2, serviceCollection),"l", "-line")
-                .valueFlag(NucleusParameters.DURATION.get(serviceCollection), "t", "-time")
-                .buildWith(NucleusParameters.OPTIONAL_MESSAGE)
+            NucleusParameters.OPTIONAL_MESSAGE
         };
     }
 
@@ -46,7 +53,7 @@ public class TemporaryMessageCommand implements ICommandExecutor {
         // Get the temporary message item.
         final ServerListService mod = context.getServiceCollection().getServiceUnchecked(ServerListService.class);
 
-        if (context.hasAny("r")) {
+        if (context.hasFlag("r")) {
             if (mod.getMessage().isPresent()) {
                 // Remove
                 mod.clearMessage();
@@ -60,9 +67,9 @@ public class TemporaryMessageCommand implements ICommandExecutor {
         }
 
         // Which line?
-        final boolean linetwo = context.getOne(this.line, Integer.class).map(x -> x == 2).orElse(false);
+        final boolean linetwo = context.getOne(this.lines).map(x -> x == 2).orElse(false);
 
-        final Optional<String> onMessage = context.getOne(NucleusParameters.Keys.MESSAGE, String.class);
+        final Optional<String> onMessage = context.getOne(NucleusParameters.MESSAGE);
 
         if (!onMessage.isPresent()) {
             final boolean isValid = mod.getExpiry().map(x -> x.isAfter(Instant.now())).orElse(false);
@@ -76,7 +83,7 @@ public class TemporaryMessageCommand implements ICommandExecutor {
                 mod.updateLineOne(null);
             }
 
-            final Optional<Text> newMessage = mod.getMessage();
+            final Optional<Component> newMessage = mod.getMessage();
 
             if (newMessage.isPresent()) {
                 // Send message
@@ -92,7 +99,7 @@ public class TemporaryMessageCommand implements ICommandExecutor {
         final String nMessage = onMessage.get();
 
         // If the expiry is null or before now, and there is no timespan, then it's an hour.
-        final Instant endTime = context.getOne(NucleusParameters.Keys.DURATION, Long.class).map(x -> Instant.now().plus(x, ChronoUnit.SECONDS))
+        final Instant endTime = context.getOne(NucleusParameters.DURATION).map(x -> Instant.now().plus(x))
                 .orElseGet(() -> mod.getExpiry().map(x -> x.isBefore(Instant.now()) ? x.plusSeconds(3600) : x)
                 .orElseGet(() -> Instant.now().plusSeconds(3600)));
 
@@ -103,7 +110,7 @@ public class TemporaryMessageCommand implements ICommandExecutor {
             mod.setMessage(nMessage, null, endTime);
         }
 
-        final Optional<Text> newMessage = mod.getMessage();
+        final Optional<Component> newMessage = mod.getMessage();
 
         if (newMessage.isPresent()) {
             // Send message

@@ -14,36 +14,37 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import java.util.List;
+import org.spongepowered.api.command.parameter.managed.Flag;
 
-@Command(aliases = {"serverlist", "sl"}, basePermission = ServerListPermissions.BASE_SERVERLIST, commandDescriptionKey = "serverlist", )
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@Command(aliases = {"serverlist", "sl"}, basePermission = ServerListPermissions.BASE_SERVERLIST, commandDescriptionKey = "serverlist")
 public class ServerListCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private ServerListConfig slc = new ServerListConfig();
 
-    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new Parameter[] {
-                GenericArguments.flags()
-                    .flag("m", "-messages")
-                    .flag("w", "-whitelist")
-                    .buildWith(GenericArguments.none())
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("m", "messages"),
+                Flag.of("w", "whitelist")
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Display current information
-        if (context.hasAny("m")) {
-            onMessage(context, this.slc.getMessages(), "command.serverlist.head.messages");
+        if (context.hasFlag("m")) {
+            this.onMessage(context, this.slc.getMessages(), "command.serverlist.head.messages");
             return context.successResult();
-        } else if (context.hasAny("w")) {
-            onMessage(context, this.slc.getWhitelist(), "command.serverlist.head.whitelist");
+        } else if (context.hasFlag("w")) {
+            this.onMessage(context, this.slc.getWhitelist(), "command.serverlist.head.whitelist");
             return  context.successResult();
         }
 
@@ -51,19 +52,19 @@ public class ServerListCommand implements ICommandExecutor, IReloadableService.R
             context.sendMessage("command.serverlist.modify.true");
             if (!this.slc.getMessages().isEmpty()) {
                 context.sendMessageText(context.getMessage("command.serverlist.messages.click")
-                        .toBuilder().onClick(TextActions.runCommand("/nucleus:serverlist -m")).toText());
+                        .clickEvent(ClickEvent.runCommand("/nucleus:serverlist -m")));
             }
 
             if (!this.slc.getWhitelist().isEmpty()) {
                 context.sendMessageText(context.getMessage("command.serverlist.whitelistmessages.click")
-                        .toBuilder().onClick(TextActions.runCommand("/nucleus:serverlist -w")).toText());
+                        .clickEvent(ClickEvent.runCommand("/nucleus:serverlist -w")));
             }
         } else if (this.slc.getModifyServerList() == ServerListConfig.ServerListSelection.WHITELIST) {
             context.sendMessage("command.serverlist.modify.whitelist");
 
             if (!this.slc.getWhitelist().isEmpty()) {
                 context.sendMessageText(context.getMessage("command.serverlist.whitelistmessages.click")
-                                .toBuilder().onClick(TextActions.runCommand("/nucleus:serverlist -w")).toText());
+                                .clickEvent(ClickEvent.runCommand("/nucleus:serverlist -w")));
             }
         } else {
             context.sendMessage("command.serverlist.modify.false");
@@ -89,20 +90,27 @@ public class ServerListCommand implements ICommandExecutor, IReloadableService.R
         return context.successResult();
     }
 
-    private void onMessage(final ICommandContext context, final List<NucleusTextTemplateImpl> messages, final String key) throws CommandException {
+    private void onMessage(final ICommandContext context, final List<String> messages, final String key) throws CommandException {
         if (messages.isEmpty()) {
             throw context.createException("command.serverlist.nomessages");
         }
 
-        final CommandSource source = context.getCommandSourceRoot();
-        final List<Text> m = new ArrayList<>();
-        messages.stream().map(x -> x.getForObject(source)).forEach(x -> {
+        final Audience source = context.getAudience();
+        final List<Component> m = new ArrayList<>();
+        messages.stream()
+                .map(x -> context.getServiceCollection().textTemplateFactory().createFromAmpersandStringIgnoringExceptions(x).orElse(null))
+                .filter(Objects::nonNull)
+                .map(x -> x.getForObject(source)).forEach(x -> {
             if (!m.isEmpty()) {
                 m.add(Component.empty());
             }
 
             m.add(x);
         });
+
+        if (m.isEmpty()) {
+            throw context.createException("command.serverlist.nomessages");
+        }
 
         Util.getPaginationBuilder(source).contents(m).title(context.getMessage(key)).sendTo(source);
     }

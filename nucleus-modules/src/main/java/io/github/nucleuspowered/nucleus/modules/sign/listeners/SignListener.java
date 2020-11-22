@@ -4,18 +4,20 @@
  */
 package io.github.nucleuspowered.nucleus.modules.sign.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.sign.SignPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
-import org.spongepowered.api.entity.living.player.Player;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.block.entity.ChangeSignEvent;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.text.serializer.TextSerializers;
-
-import com.google.inject.Inject;
 
 public class SignListener implements ListenerBase {
 
@@ -26,13 +28,13 @@ public class SignListener implements ListenerBase {
         this.permissionService = serviceCollection.permissionService();
     }
 
-    @Listener
-    public void onPlayerChangeSign(final ChangeSignEvent event, @Root final Player player) {
-        SignData signData = event.getText();
-
+    @Listener(order = Order.EARLY)
+    public void onPlayerChangeSign(final ChangeSignEvent event, @Root final ServerPlayer player) {
         if (this.permissionService.hasPermission(player, SignPermissions.SIGN_FORMATTING)) {
-            for (int i = 0; i < signData.lines().size(); i++) {
-                signData = signData.set(signData.lines().set(i, TextSerializers.FORMATTING_CODE.deserialize(signData.lines().get(i).toPlain())));
+            final ListValue.Mutable<Component> signText = event.getText();
+            for (int i = 0; i < signText.size(); i++) {
+                signText.set(i, LegacyComponentSerializer.legacyAmpersand().deserialize(
+                        PlainComponentSerializer.plain().serialize(signText.get(i))));
             }
         }
     }

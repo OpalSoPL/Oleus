@@ -4,28 +4,53 @@
  */
 package io.github.nucleuspowered.nucleus.modules.serverlist;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.serverlist.commands.ServerListCommand;
+import io.github.nucleuspowered.nucleus.modules.serverlist.commands.TemporaryMessageCommand;
 import io.github.nucleuspowered.nucleus.modules.serverlist.config.ServerListConfig;
-import io.github.nucleuspowered.nucleus.modules.serverlist.config.ServerListConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.serverlist.listener.ServerListListener;
+import io.github.nucleuspowered.nucleus.modules.serverlist.listener.WhitelistServerListListener;
+import io.github.nucleuspowered.nucleus.modules.serverlist.services.ServerListService;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = ServerListModule.ID, name = "Server List")
-public class ServerListModule extends ConfigurableModule<ServerListConfig, ServerListConfigAdapter> {
+public class ServerListModule implements IModule.Configurable<ServerListConfig> {
 
     public static final String ID = "server-list";
 
-    @Inject
-    public ServerListModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder, final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override 
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(ServerListService.class, new ServerListService(serviceCollection), false);
     }
 
-    @Override public ServerListConfigAdapter createAdapter() {
-        return new ServerListConfigAdapter();
+    @Override 
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                ServerListCommand.class,
+                TemporaryMessageCommand.class
+        );
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(ServerListPermissions.class);
+    }
+
+    @Override 
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Arrays.asList(
+                ServerListListener.class,
+                WhitelistServerListListener.class
+        );
+    }
+
+    @Override 
+    public Class<ServerListConfig> getConfigClass() {
+        return ServerListConfig.class;
     }
 }

@@ -4,33 +4,37 @@
  */
 package io.github.nucleuspowered.nucleus.modules.serverlist.config;
 
-import io.github.nucleuspowered.neutrino.annotations.Default;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import uk.co.drnaylor.quickstart.config.NoMergeIfPresent;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+import java.util.Collections;
 import java.util.List;
 
 @ConfigSerializable
 public class ServerListConfig {
 
-    @Setting(value = "modify-server-list-messages", comment = "config.serverlist.modify")
+    @Setting(value = "modify-server-list-messages")
+    @LocalisedComment("config.serverlist.modify")
     private ServerListSelection modifyServerList = ServerListSelection.FALSE;
 
-    @Setting(value = "hide-vanished-players", comment = "config.serverlist.hidevanished")
+    @Setting(value = "hide-vanished-players")
+    @LocalisedComment("config.serverlist.hidevanished")
     private boolean hideVanishedPlayers = false;
 
-    @Setting(value = "hide-player-count", comment = "config.serverlist.hideall")
+    @Setting(value = "hide-player-count")
+    @LocalisedComment("config.serverlist.hideall")
     private boolean hidePlayerCount = false;
 
-    @NoMergeIfPresent
-    @Default("&bWelcome to the server!\n&cCome join us!")
-    @Setting(value = "server-list-messages", comment = "config.serverlist.messages")
-    public List<NucleusTextTemplateImpl> messages;
+    @Setting(value = "server-list-messages")
+    @LocalisedComment("config.serverlist.messages")
+    public List<String> messages = Collections.singletonList(
+            "&bWelcome to the server!\n&cCome join us!"
+    );
 
-    @NoMergeIfPresent
-    @Setting(value = "whitelist-server-list-messages", comment = "config.serverlist.whitelistmessages")
-    public List<NucleusTextTemplateImpl> whitelist = new ArrayList<>();
+    @Setting(value = "whitelist-server-list-messages")
+    @LocalisedComment("config.serverlist.whitelistmessages")
+    public List<String> whitelist = Collections.emptyList();
 
     public boolean isModifyServerList() {
         return this.modifyServerList == ServerListSelection.TRUE;
@@ -44,11 +48,11 @@ public class ServerListConfig {
         return this.hidePlayerCount;
     }
 
-    public List<NucleusTextTemplateImpl> getMessages() {
+    public List<String> getMessages() {
         return this.messages;
     }
 
-    public List<NucleusTextTemplateImpl> getWhitelist() {
+    public List<String> getWhitelist() {
         return this.whitelist;
     }
 

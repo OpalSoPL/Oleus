@@ -4,21 +4,36 @@
  */
 package io.github.nucleuspowered.nucleus.modules.sign;
 
-import io.github.nucleuspowered.nucleus.quickstart.module.StandardModule;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.sign.listeners.SignListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
+public final class SignModule implements IModule {
 
-@ModuleData(id = "sign", name = "Sign")
-public class SignModule extends StandardModule {
+    public static final String ID = "sign";
 
-    @Inject
-    public SignModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
+    }
+
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<Class<?>> getPermissions() {
+        return Optional.of(SignPermissions.class);
+    }
+
+    @Override
+    public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(SignListener.class);
     }
 }
