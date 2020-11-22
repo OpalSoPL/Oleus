@@ -4,31 +4,30 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn.commands;
 
-import io.github.nucleuspowered.nucleus.api.EventContexts;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
+import io.github.nucleuspowered.nucleus.modules.spawn.SpawnKeys;
 import io.github.nucleuspowered.nucleus.modules.spawn.SpawnPermissions;
 import io.github.nucleuspowered.nucleus.modules.spawn.config.GlobalSpawnConfig;
 import io.github.nucleuspowered.nucleus.modules.spawn.config.SpawnConfig;
-import io.github.nucleuspowered.nucleus.modules.spawn.events.SendToSpawnEvent;
-import io.github.nucleuspowered.nucleus.modules.spawn.helpers.SpawnHelper;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -52,82 +51,92 @@ import java.util.Optional;
 )
 public class SpawnCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
+    private final Parameter.Value<WorldProperties> worldPropertiesValueParameter;
+
     private SpawnConfig sc = new SpawnConfig();
 
-    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+    @Inject
+    public SpawnCommand(final IPermissionService permissionService) {
+        this.worldPropertiesValueParameter = Parameter.worldProperties(true)
+                .setKey("world")
+                .optional()
+                .setRequirements(cause -> permissionService.hasPermission(cause, SpawnPermissions.SPAWN_OTHERWORLDS))
+                .build();
+    }
+
+    @Override
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.sc = serviceCollection.configProvider().getModuleConfig(SpawnConfig.class);
+    }
+
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.builder()
+                        .setRequirement(cause -> serviceCollection.permissionService().hasPermission(cause, SpawnPermissions.SPAWN_FORCE))
+                        .alias("f")
+                        .alias("force")
+                        .build()
+        };
     }
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            GenericArguments.flags().permissionFlag(
-                    SpawnPermissions.SPAWN_FORCE, "f", "-force").buildWith(
-                            serviceCollection.commandElementSupplier()
-                                .createPermissionParameter(
-                                        NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection),
-                                        SpawnPermissions.SPAWN_OTHERWORLDS, true))
+            this.worldPropertiesValueParameter
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final boolean force = context.hasAny("f");
-        final Player src = context.getIfPlayer();
+        final ServerPlayer src = context.requirePlayer();
+        final boolean force = context.hasFlag("f");
         final GlobalSpawnConfig gsc = this.sc.getGlobalSpawn();
-        final WorldProperties wp = context.getOne(NucleusParameters.Keys.WORLD, WorldProperties.class)
-            .orElseGet(() -> gsc.isOnSpawnCommand() ?
-                    gsc.getWorld().orElse(src.getWorld().getProperties()) : src.getWorld().getProperties());
+        final WorldProperties wp = context.getOne(this.worldPropertiesValueParameter)
+            .orElseGet(() -> {
+                if (gsc.isOnSpawnCommand()) {
+                    return gsc.getWorld().orElseGet(() -> src.getWorld().getProperties());
+                } else {
+                    return src.getWorld().getProperties();
+                }
+            });
 
-        final Optional<World> ow = Sponge.getServer().loadWorld(wp.getUniqueId());
-
+        final Optional<ServerWorld> ow = Sponge.getServer().getWorldManager().getWorld(wp.getKey());
         if (!ow.isPresent()) {
             return context.errorResult("command.spawn.noworld");
         } else if (this.sc.isPerWorldPerms() &&
-                !context.testPermission(SpawnPermissions.SPAWN_WORLDS + "." + ow.get().getName().toLowerCase())) {
-            return context.errorResult("command.spawn.nopermsworld", ow.get().getName());
+                !context.testPermission(SpawnPermissions.SPAWN_WORLDS + "." + ow.get().getKey().asString().toLowerCase())) {
+            return context.errorResult("command.spawn.nopermsworld", ow.get().getKey().asString().toLowerCase());
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.addContext(EventContexts.SPAWN_EVENT_TYPE, SendToSpawnEvent.Type.COMMAND);
-            final SendToSpawnEvent event =
-                    new SendToSpawnEvent(
-                            SpawnHelper.getSpawn(
-                                    ow.get().getProperties(),
-                                    src,
-                                    context),
-                            src,
-                            frame.getCurrentCause());
-            if (Sponge.getEventManager().post(event)) {
-                if (event.getCancelReason().isPresent()) {
-                    return context.errorResult("command.spawnother.self.failed.reason", event.getCancelReason().get());
-                } else {
-                    return context.errorResult("command.spawnother.self.failed.noreason");
-                }
-            }
+        final ServerWorld targetWorld = ow.get();
+        final Vector3d rotation = context.getServiceCollection().storageManager()
+                .getOrCreateWorldOnThread(ow.get().getKey())
+                .get(SpawnKeys.WORLD_SPAWN_ROTATION)
+                .orElseGet(src::getRotation);
 
-            // If we don't have a rotation, then use the current rotation
-            final TeleportResult result = context
-                    .getServiceCollection()
-                    .teleportService()
-                    .teleportPlayerSmart(
-                            src,
-                            event.getTransformTo(),
-                            Vector3d.ZERO, true,
-                            !force && this.sc.isSafeTeleport(),
-                            TeleportScanners.NO_SCAN.get()
-                    );
+        // If we don't have a rotation, then use the current rotation
+        final TeleportResult result = context
+                .getServiceCollection()
+                .teleportService()
+                .teleportPlayerSmart(
+                        src,
+                        ServerLocation.of(targetWorld, targetWorld.getProperties().getSpawnPosition()),
+                        rotation,
+                        true,
+                        !force && this.sc.isSafeTeleport(),
+                        TeleportScanners.NO_SCAN.get()
+                );
 
-            if (result.isSuccessful()) {
-                context.sendMessage("command.spawn.success", wp.getWorldName());
-                return context.successResult();
-            }
-
-            if (result == TeleportResult.FAIL_NO_LOCATION) {
-                return context.errorResult("command.spawn.fail", wp.getWorldName());
-            }
-
-            return context.errorResult("command.spawn.cancelled", wp.getWorldName());
+        if (result.isSuccessful()) {
+            context.sendMessage("command.spawn.success", wp.getKey().asString());
+            return context.successResult();
         }
+
+        if (result == TeleportResult.FAIL_NO_LOCATION) {
+            return context.errorResult("command.spawn.fail", wp.getKey().asString());
+        }
+
+        return context.errorResult("command.spawn.cancelled", wp.getKey().asString());
     }
 }

@@ -19,8 +19,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
@@ -41,22 +40,27 @@ public class FirstSpawnCommand implements ICommandExecutor, IReloadableService.R
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
 
-        final Optional<Transform<World>> olwr =
+        final Optional<LocationNode> olwr =
                 context.getServiceCollection().storageManager()
                         .getGeneralService()
                         .getOrNewOnThread()
-                        .get(SpawnKeys.FIRST_SPAWN_LOCATION)
-                        .flatMap(LocationNode::getTransformIfExists);
+                        .get(SpawnKeys.FIRST_SPAWN_LOCATION);
         if (!olwr.isPresent()) {
             return context.errorResult("command.firstspawn.notset");
+        }
+
+        final Optional<ServerLocation> serverLocation = olwr.get().getLocationIfExists();
+        if (!serverLocation.isPresent()) {
+            return context.errorResult("command.firstspawn.notloaded", olwr.get().getWorld().asString());
         }
 
         final TeleportResult result = context.getServiceCollection()
                 .teleportService()
                 .teleportPlayerSmart(
                         context.getIfPlayer(),
-                        olwr.get(),
-                        Vector3d.ZERO, true,
+                        serverLocation.get(),
+                        Vector3d.ZERO,
+                        true,
                         this.isSafeTeleport,
                         TeleportScanners.NO_SCAN.get()
                 );

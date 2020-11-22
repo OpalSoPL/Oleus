@@ -4,34 +4,39 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn.config;
 
-import com.google.common.collect.ImmutableList;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @ConfigSerializable
 public class SpawnConfig {
 
-    @Setting(value = "spawn-on-login", comment = "config.spawn.onlogin")
+    @Setting(value = "spawn-on-login")
+    @LocalisedComment("config.spawn.onlogin")
     private boolean spawnOnLogin = false;
 
-    @Setting(value = "use-safe-spawn", comment = "config.spawn.safe")
+    @Setting(value = "use-safe-spawn")
+    @LocalisedComment("config.spawn.safe")
     private boolean safeTeleport = true;
 
-    @Setting(value = "force-first-spawn", comment = "config.spawn.forcefirstspawn")
-    private boolean forceFirstSpawn = false;
-
-    @Setting(value = "global-spawn", comment = "config.spawn.global.base")
+    @Setting(value = "global-spawn")
+    @LocalisedComment("config.spawn.global.base")
     private GlobalSpawnConfig globalSpawn = new GlobalSpawnConfig();
 
-    @Setting(value = "affect-bed-spawn", comment = "config.spawn.bedspawn")
+    @Setting(value = "affect-bed-spawn")
+    @LocalisedComment("config.spawn.bedspawn")
     private boolean redirectBedSpawn = true;
 
-    @Setting(value = "spawn-on-login-exempt-worlds", comment = "config.spawn.onloginsameworld")
+    @Setting(value = "spawn-on-login-exempt-worlds")
+    @LocalisedComment("config.spawn.onloginsameworld")
     private List<String> spawnOnLoginExemptWorld = new ArrayList<>();
 
-    @Setting(value = "per-world-permissions", comment = "config.spawn.worlds")
+    @Setting(value = "per-world-permissions")
+    @LocalisedComment("config.spawn.worlds")
     private boolean perWorldPerms = false;
 
     public boolean isSpawnOnLogin() {
@@ -40,10 +45,6 @@ public class SpawnConfig {
 
     public boolean isSafeTeleport() {
         return this.safeTeleport;
-    }
-
-    public boolean isForceFirstSpawn() {
-        return this.forceFirstSpawn;
     }
 
     public GlobalSpawnConfig getGlobalSpawn() {
@@ -55,7 +56,7 @@ public class SpawnConfig {
     }
 
     public List<String> getOnLoginExemptWorlds() {
-        return this.spawnOnLoginExemptWorld == null ? ImmutableList.of() : this.spawnOnLoginExemptWorld;
+        return this.spawnOnLoginExemptWorld == null ? Collections.emptyList() : this.spawnOnLoginExemptWorld;
     }
 
     public boolean isPerWorldPerms() {

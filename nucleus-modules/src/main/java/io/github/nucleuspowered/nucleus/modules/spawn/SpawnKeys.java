@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn;
 
+import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.configurate.datatypes.LocationNode;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
@@ -14,12 +15,12 @@ import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 public final class SpawnKeys {
 
     public static DataKey<LocationNode, IGeneralDataObject> FIRST_SPAWN_LOCATION = DataKey.of(
-            TypeTokens.LOCATION_NODE,
+            GeAnTyRefTypeTokens.LOCATION_NODE,
             IGeneralDataObject.class,
             "firstSpawn");
 
     public static DataKey<Vector3d, IWorldDataObject> WORLD_SPAWN_ROTATION = DataKey.of(
-            TypeTokens.VECTOR_3D,
+            GeAnTyRefTypeTokens.VECTOR_3D,
             IWorldDataObject.class,
             "s[pawn-rotation");
 }

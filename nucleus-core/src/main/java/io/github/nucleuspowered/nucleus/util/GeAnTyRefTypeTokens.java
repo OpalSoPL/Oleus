@@ -10,6 +10,7 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.config
 import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.util.MinecraftDayTime;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.time.Instant;
 import java.util.List;
@@ -47,6 +48,8 @@ public final class GeAnTyRefTypeTokens {
     public static final TypeToken<List<java.util.UUID>> UUID_LIST = new TypeToken<List<UUID>>() {};
 
     public static final TypeToken<NamedLocation> NAMEDLOCATION = TypeToken.get(NamedLocation.class);
+
+    public static final TypeToken<Vector3d> VECTOR_3D = TypeToken.get(Vector3d.class);
 
     private GeAnTyRefTypeTokens() {
         // no-op

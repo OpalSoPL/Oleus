@@ -4,31 +4,51 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn;
 
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.spawn.commands.FirstSpawnCommand;
+import io.github.nucleuspowered.nucleus.modules.spawn.commands.RemoveFirstSpawnCommand;
+import io.github.nucleuspowered.nucleus.modules.spawn.commands.SetFirstSpawnCommand;
+import io.github.nucleuspowered.nucleus.modules.spawn.commands.SetSpawnCommand;
+import io.github.nucleuspowered.nucleus.modules.spawn.commands.SpawnCommand;
+import io.github.nucleuspowered.nucleus.modules.spawn.commands.SpawnOtherCommand;
 import io.github.nucleuspowered.nucleus.modules.spawn.config.SpawnConfig;
-import io.github.nucleuspowered.nucleus.modules.spawn.config.SpawnConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.spawn.listeners.SpawnListener;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = SpawnModule.ID, name = "Spawn")
-public class SpawnModule extends ConfigurableModule<SpawnConfig, SpawnConfigAdapter> {
+public final class SpawnModule implements IModule.Configurable<SpawnConfig> {
 
     public static final String ID = "spawn";
 
-    @Inject
-    public SpawnModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
+    @Override public void init(final INucleusServiceCollection serviceCollection) {
     }
 
-    @Override
-    public SpawnConfigAdapter createAdapter() {
-        return new SpawnConfigAdapter();
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                FirstSpawnCommand.class,
+                RemoveFirstSpawnCommand.class,
+                SetFirstSpawnCommand.class,
+                SetSpawnCommand.class,
+                SpawnCommand.class,
+                SpawnOtherCommand.class
+        );
     }
 
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.of(SpawnPermissions.class);
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.singleton(SpawnListener.class);
+    }
+
+    @Override public Class<SpawnConfig> getConfigClass() {
+        return SpawnConfig.class;
+    }
 }

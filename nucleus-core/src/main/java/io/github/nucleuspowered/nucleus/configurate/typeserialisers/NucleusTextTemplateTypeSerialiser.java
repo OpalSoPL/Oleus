@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.configurate.typeserialisers;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.serialize.TypeSerializer;
@@ -33,7 +34,7 @@ public class NucleusTextTemplateTypeSerialiser implements TypeSerializer<Nucleus
     @Override
     public void serialize(final Type type, final NucleusTextTemplate obj, final ConfigurationNode value) throws SerializationException {
         if (obj != null) {
-            value.set(obj.asComponent());
+            value.set(LegacyComponentSerializer.legacyAmpersand().serialize(obj.asComponent()));
         }
     }
 }

@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn.commands;
 
-import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.modules.spawn.SpawnKeys;
 import io.github.nucleuspowered.nucleus.modules.spawn.SpawnPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -13,7 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.math.vector.Vector3d;
+
 @EssentialsEquivalent("setspawn")
 @Command(
         aliases = { "setspawn" },
@@ -23,17 +24,17 @@ import org.spongepowered.api.entity.living.player.Player;
 public class SetSpawnCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player src = context.getIfPlayer();
+        final ServerPlayer src = context.requirePlayer();
         // Minecraft does not set the rotation of the player at the spawn point, so we'll do it for them!
         final Vector3d rotation = src.getRotation();
         context.getServiceCollection()
                 .storageManager()
                 .getWorldService()
-                .getOrNew(src.getUniqueId())
+                .getOrNew(src.getWorld().getKey())
                 .thenAccept(x -> x.set(SpawnKeys.WORLD_SPAWN_ROTATION, rotation));
 
         src.getWorld().getProperties().setSpawnPosition(src.getLocation().getBlockPosition());
-        context.sendMessage("command.setspawn.success", src.getWorld().getName());
+        context.sendMessage("command.setspawn.success", src.getWorld().getKey().asString());
         return context.successResult();
     }
 }

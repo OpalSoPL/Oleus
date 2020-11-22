@@ -13,6 +13,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 @Command(
         aliases = { "setfirstspawn" },
         basePermission = SpawnPermissions.BASE_SETFIRSTSPAWN,
@@ -21,10 +23,10 @@ public class SetFirstSpawnCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player player = context.getIfPlayer();
+        final ServerPlayer player = context.requirePlayer();
         context.getServiceCollection().storageManager().getGeneralService().getOrNewOnThread()
                 .set(SpawnKeys.FIRST_SPAWN_LOCATION,
-                        new LocationNode(player.getLocation(), player.getRotation()));
+                        new LocationNode(player.getServerLocation(), player.getRotation()));
         context.sendMessage("command.setfirstspawn.success");
         context.sendMessage("command.setfirstspawn.success2");
 

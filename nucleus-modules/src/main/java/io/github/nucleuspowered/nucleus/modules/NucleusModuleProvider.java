@@ -82,6 +82,8 @@ import io.github.nucleuspowered.nucleus.modules.rules.config.RulesConfig;
 import io.github.nucleuspowered.nucleus.modules.serverlist.ServerListModule;
 import io.github.nucleuspowered.nucleus.modules.serverlist.config.ServerListConfig;
 import io.github.nucleuspowered.nucleus.modules.sign.SignModule;
+import io.github.nucleuspowered.nucleus.modules.spawn.SpawnModule;
+import io.github.nucleuspowered.nucleus.modules.spawn.config.SpawnConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -153,6 +155,7 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(RulesModule.ID, "Rules", RulesModule.class, RulesConfig.class));
         containers.add(NucleusModuleProvider.createContainer(ServerListModule.ID, "Server List module", ServerListModule.class, ServerListConfig.class));
         containers.add(NucleusModuleProvider.createContainer(SignModule.ID, "Sign", SignModule.class));
+        containers.add(NucleusModuleProvider.createContainer(SpawnModule.ID, "Spawn", SpawnModule.class, SpawnConfig.class));
         return containers;
     }
 

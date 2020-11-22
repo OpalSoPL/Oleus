@@ -4,9 +4,14 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn.listeners;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
@@ -41,6 +46,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.google.inject.Inject;
+import org.spongepowered.math.vector.Vector3i;
 
 public class SpawnListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -55,36 +61,37 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
     }
 
     @Listener
-    public void onJoin(ServerSideConnectionEvent.Login loginEvent) {
-        UUID pl = loginEvent.getProfile().getUniqueId();
-        IStorageManager storageManager = this.serviceCollection.storageManager();
-        IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
+    public void onJoin(final ServerSideConnectionEvent.Login loginEvent) {
+        final UUID pl = loginEvent.getProfile().getUniqueId();
+        final IStorageManager storageManager = this.serviceCollection.storageManager();
+        final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         final boolean first;
         if (!storageManager.getOrCreateUserOnThread(pl).get(CoreKeys.FIRST_JOIN_PROCESSED).orElse(false)) {
-            first = !this.checkSponge || !Util.hasPlayedBeforeSponge(loginEvent.getTargetUser());
+            first = !this.checkSponge || !Util.hasPlayedBeforeSponge(loginEvent.getUser());
         } else {
             first = false;
         }
-        IGeneralDataObject generalDataObject = storageManager.getGeneralService().getOrNew().join();
+        final IGeneralDataObject generalDataObject = storageManager.getGeneralService().getOrNew().join();
 
         try {
             if (first) {
                 // first spawn.
-                final Optional<Transform<World>> ofs = generalDataObject.get(SpawnKeys.FIRST_SPAWN_LOCATION)
-                        .flatMap(LocationNode::getTransformIfExists);
+                final Optional<LocationNode> locationNode = generalDataObject.get(SpawnKeys.FIRST_SPAWN_LOCATION);
+                final Optional<ServerLocation> ofs = locationNode.flatMap(LocationNode::getLocationIfExists);
 
                 // Bit of an odd line, but what what is going on here is checking for first spawn, and if it exists, then
                 // setting the location the player safely. If this cannot be done in either case, send them to world spawn.
                 if (ofs.isPresent()) {
-                    @Nullable final Location<World> location;
+                    @Nullable final ServerLocation location;
                     if (this.spawnConfig.isSafeTeleport()) {
-                        location = Sponge.getTeleportHelper().getSafeLocation(ofs.get().getLocation()).orElse(null);
+                        location = Sponge.getServer().getTeleportHelper().getSafeLocation(ofs.get()).orElse(null);
                     } else {
-                        location = ofs.get().getLocation();
+                        location = ofs.get();
                     }
 
                     if (location != null) {
-                        loginEvent.setToTransform(new Transform<>(location.getExtent(), process(location.getPosition()), ofs.get().getRotation()));
+                        loginEvent.setToLocation(location);
+                        loginEvent.setToRotation(locationNode.get().getRotation());
                         return;
                     }
 
@@ -102,62 +109,40 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
         }
 
         // Throw them to the default world spawn if the config suggests so.
-        final User user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(loginEvent.getProfile());
+        final User user = Sponge.getServer().getUserManager().getOrCreate(loginEvent.getProfile());
         if (this.spawnConfig.isSpawnOnLogin() && !this.serviceCollection.permissionService().hasPermission(user, SpawnPermissions.SPAWN_EXEMPT_LOGIN)) {
 
-            World world = loginEvent.getFromTransform().getExtent();
-            final String worldName = world.getName();
-            final String uuid = world.getUniqueId().toString();
-            if (this.spawnConfig.getOnLoginExemptWorlds().stream().anyMatch(x -> x.equalsIgnoreCase(worldName) || x.equalsIgnoreCase(uuid))) {
+            ServerWorld world = loginEvent.getFromLocation().getWorld();
+            final ResourceKey worldName = world.getKey();
+            if (this.spawnConfig.getOnLoginExemptWorlds().stream().anyMatch(x -> x.equalsIgnoreCase(worldName.asString()))) {
                 // we don't do this, exempt
                 return;
             }
 
             final GlobalSpawnConfig sc = this.spawnConfig.getGlobalSpawn();
-            if (sc.isOnLogin() && sc.getWorld().isPresent()) {
-                world = Sponge.getServer().getWorld(sc.getWorld().get().getUniqueId()).orElse(world);
+            if (sc.isOnLogin()) {
+                world = sc.getWorld().flatMap(WorldProperties::getWorld).orElse(world);
             }
 
-            final Location<World> lw = world.getSpawnLocation().add(0.5, 0, 0.5);
-            final Optional<Location<World>> safe = this.serviceCollection.teleportService()
+            final ServerLocation lw = ServerLocation.of(world.getKey(), world.getProperties().getSpawnPosition().add(0.5, 0, 0.5));
+            final Optional<ServerLocation> safe = this.serviceCollection.teleportService()
                     .getSafeLocation(
                             lw,
                             TeleportScanners.ASCENDING_SCAN.get(),
-                            this.spawnConfig.isSafeTeleport() ? TeleportHelperFilters.DEFAULT : NucleusTeleportHelperFilters.NO_CHECK.get()
+                            this.spawnConfig.isSafeTeleport() ? TeleportHelperFilters.DEFAULT.get() : NucleusTeleportHelperFilters.NO_CHECK.get()
                     );
 
             if (safe.isPresent()) {
+                loginEvent.setToLocation(SpawnListener.process(safe.get()));
                 try {
-                    final Optional<Vector3d> ov = storageManager
+                    storageManager
                             .getWorldService()
-                            .getOrNewOnThread(world.getUniqueId())
-                            .get(SpawnKeys.WORLD_SPAWN_ROTATION);
-                    if (ov.isPresent()) {
-                        loginEvent.setToTransform(new Transform<>(safe.get().getExtent(),
-                                process(safe.get().getPosition()),
-                                ov.get()));
-                        return;
-                    }
+                            .getOrNewOnThread(world.getKey())
+                            .get(SpawnKeys.WORLD_SPAWN_ROTATION)
+                            .ifPresent(loginEvent::setToRotation);
                 } catch (final Exception e) {
                     //
                 }
-
-                loginEvent.setToTransform(new Transform<>(process(safe.get())));
-            }
-        }
-    }
-
-    @Listener(order = Order.EARLY)
-    public void onPlayerWorldTransfer(final MoveEntityEvent.Teleport event) {
-        if (event.getTargetEntity() instanceof Player && !event.getFromTransform().getExtent().equals(event.getToTransform().getExtent())) {
-            // Are we heading TO a spawn?
-            final Transform<World> to = event.getToTransform();
-            if (to.getLocation().getBlockPosition().equals(to.getExtent().getSpawnLocation().getBlockPosition())) {
-                this.serviceCollection.storageManager()
-                        .getWorldService()
-                        .getOrNewOnThread(to.getExtent().getUniqueId())
-                        .get(SpawnKeys.WORLD_SPAWN_ROTATION)
-                        .ifPresent(y -> event.setToTransform(to.setRotation(y)));
             }
         }
     }
@@ -175,42 +160,24 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
         }
 
         final GlobalSpawnConfig sc = this.spawnConfig.getGlobalSpawn();
-        World world = event.getToTransform().getExtent();
+        ServerWorld world = event.getToLocation().getWorld();
 
         // Get the world.
         if (sc.isOnRespawn()) {
             final Optional<WorldProperties> oworld = sc.getWorld();
             if (oworld.isPresent()) {
-                world = Sponge.getServer().getWorld(oworld.get().getUniqueId()).orElse(world);
+                world = Sponge.getServer().getWorldManager().getWorld(oworld.get().getKey()).orElse(world);
             }
         }
 
-        final Location<World> spawn = world.getSpawnLocation().add(0.5, 0, 0.5);
-        final Transform<World> to = new Transform<>(spawn);
+        event.setToLocation(ServerLocation.of(world.getKey(), SpawnListener.process(world.getProperties().getSpawnPosition())));
 
-        final SendToSpawnEvent sEvent;
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.addContext(EventContexts.SPAWN_EVENT_TYPE, SendToSpawnEvent.Type.DEATH);
-            frame.pushCause(player);
-            sEvent = new SendToSpawnEvent(to, player, frame.getCurrentCause());
-        }
-
-        if (Sponge.getEventManager().post(sEvent)) {
-            if (sEvent.getCancelReason().isPresent()) {
-                this.serviceCollection.messageProvider().sendMessageTo(player, "command.spawnother.self.failed.reason", sEvent.getCancelReason().get());
-                return;
-            }
-
-            this.serviceCollection.messageProvider().sendMessageTo(player, "command.spawnother.self.failed.noreason");
-            return;
-        }
-
-        // Compare current transform to spawn - set rotation.
+        // Set rotation.
         this.serviceCollection.storageManager()
                 .getWorldService()
-                .getOrNewOnThread(world.getUniqueId())
+                .getOrNewOnThread(world.getKey())
                 .get(SpawnKeys.WORLD_SPAWN_ROTATION)
-                .ifPresent(y -> event.setToTransform(sEvent.isRedirected() ? sEvent.getTransformTo() : to.setRotation(y)));
+                .ifPresent(event::setToRotation);
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
@@ -218,8 +185,11 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
         this.checkSponge = serviceCollection.configProvider().getCoreConfig().isCheckFirstDatePlayed();
     }
 
-    private static Location<World> process(final Location<World> v3d) {
-        return new Location<>(v3d.getExtent(), process(v3d.getPosition()));
+    private static ServerLocation process(final ServerLocation v3d) {
+        return ServerLocation.of(v3d.getWorld(), SpawnListener.process(v3d.getPosition()));
+    }
+    private static Vector3d process(final Vector3i v3i) {
+        return SpawnListener.process(v3i.toDouble());
     }
 
     private static Vector3d process(final Vector3d v3d) {
