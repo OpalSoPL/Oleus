@@ -84,6 +84,8 @@ import io.github.nucleuspowered.nucleus.modules.serverlist.config.ServerListConf
 import io.github.nucleuspowered.nucleus.modules.sign.SignModule;
 import io.github.nucleuspowered.nucleus.modules.spawn.SpawnModule;
 import io.github.nucleuspowered.nucleus.modules.spawn.config.SpawnConfig;
+import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatModule;
+import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -156,6 +158,7 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(ServerListModule.ID, "Server List module", ServerListModule.class, ServerListConfig.class));
         containers.add(NucleusModuleProvider.createContainer(SignModule.ID, "Sign", SignModule.class));
         containers.add(NucleusModuleProvider.createContainer(SpawnModule.ID, "Spawn", SpawnModule.class, SpawnConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(StaffChatModule.ID, "Staff Chat", StaffChatModule.class, StaffChatConfig.class));
         return containers;
     }
 
