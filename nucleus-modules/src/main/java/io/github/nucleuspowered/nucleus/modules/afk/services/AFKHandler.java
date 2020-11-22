@@ -10,14 +10,17 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.afk.NucleusAFKService;
+import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
 import io.github.nucleuspowered.nucleus.modules.afk.AFKPermissions;
 import io.github.nucleuspowered.nucleus.modules.afk.config.AFKConfig;
+import io.github.nucleuspowered.nucleus.modules.afk.config.MessagesConfig;
 import io.github.nucleuspowered.nucleus.modules.afk.events.AFKEvents;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
+import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.util.AdventureUtils;
@@ -36,6 +39,7 @@ import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Identifiable;
+import org.spongepowered.api.util.Nameable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -67,6 +71,12 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
 
     private final String afkOption = "nucleus.afk.toggletime";
     private final String afkKickOption = "nucleus.afk.kicktime";
+
+    private NucleusTextTemplate afkNotifyCommandMessage = NucleusTextTemplateImpl.empty();
+    private NucleusTextTemplate afkMessage = NucleusTextTemplateImpl.empty();
+    private NucleusTextTemplate returnAfkMessage = NucleusTextTemplateImpl.empty();
+    private NucleusTextTemplate onKick = NucleusTextTemplateImpl.empty();
+    private NucleusTextTemplate kickMessage = NucleusTextTemplateImpl.empty();
 
     @Inject
     public AFKHandler(final INucleusServiceCollection serviceCollection) {
@@ -110,15 +120,14 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
             if (now - e.getValue().lastActivityTime > e.getValue().timeToKick) {
                 // Kick them
                 e.getValue().willKick = true;
-                final NucleusTextTemplateImpl message = this.config.getMessages().getKickMessage();
                 final Component t;
-                if (message == null || message.isEmpty()) {
+                if (this.kickMessage == null || this.kickMessage.isEmpty()) {
                     t = this.serviceCollection.messageProvider().getMessageForDefault("afk.kickreason");
                 } else {
-                    t = message.asComponent();
+                    t = this.kickMessage.asComponent();
                 }
 
-                final NucleusTextTemplateImpl messageToServer = this.config.getMessages().getOnKick();
+                final NucleusTextTemplate messageToServer = this.onKick == null ? NucleusTextTemplateImpl.empty() : this.onKick;
 
                 Sponge.getServer().getPlayer(e.getKey()).ifPresent(player -> {
                     final Audience mc;
@@ -129,7 +138,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
                     }
 
                     // TODO: CSM for thread
-                    final AFKEvents.Kick events = new AFKEvents.Kick(player, messageToServer.getForObject(player), mc,
+                    final AFKEvents.Kick events = new AFKEvents.Kick(player.getUniqueId(), messageToServer.getForObject(player), mc,
                             Sponge.getServer().getCauseStackManager().getCurrentCause());
                     if (Sponge.getEventManager().post(events)) {
                         // Cancelled.
@@ -182,7 +191,8 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
             }
 
             final Tuples.NullableTuple<Component, Audience> ttmc = this.getAFKMessage(Sponge.getServer().getPlayer(uuid).get(), true);
-            final AFKEvents.To event = new AFKEvents.To(Sponge.getServer().getPlayer(uuid).get(), ttmc.getFirstUnwrapped(), ttmc.getSecondUnwrapped(), Sponge.getServer().getCauseStackManager()
+            final AFKEvents.To event = new AFKEvents.To(uuid, ttmc.getFirstUnwrapped(), ttmc.getSecondUnwrapped(),
+                    Sponge.getServer().getCauseStackManager()
                     .getCurrentCause());
             Sponge.getEventManager().post(event);
             this.actionEvent(event, "command.afk.to.nobc", "command.afk.to.console");
@@ -197,6 +207,18 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
         this.config = serviceCollection.configProvider().getModuleConfig(AFKConfig.class);
+        final MessagesConfig messages = this.config.getMessages();
+        final INucleusTextTemplateFactory factory = serviceCollection.textTemplateFactory();
+        if (this.config.isAlertSenderOnAfk()) {
+            this.afkNotifyCommandMessage =
+                    factory.createFromAmpersandStringIgnoringExceptions(messages.getOnCommand()).orElseGet(NucleusTextTemplateImpl::empty);
+        } else {
+            this.afkNotifyCommandMessage = NucleusTextTemplateImpl.empty();
+        }
+        this.afkMessage = factory.createFromAmpersandStringIgnoringExceptions(messages.getAfkMessage()).orElseGet(NucleusTextTemplateImpl::empty);
+        this.returnAfkMessage = factory.createFromAmpersandStringIgnoringExceptions(messages.getReturnAfkMessage()).orElseGet(NucleusTextTemplateImpl::empty);
+        this.onKick = factory.createFromAmpersandStringIgnoringExceptions(messages.getOnKick()).orElseGet(NucleusTextTemplateImpl::empty);
+        this.kickMessage = factory.createFromAmpersandStringIgnoringExceptions(messages.getKickMessage()).orElseGet(NucleusTextTemplateImpl::empty);
     }
 
     private AFKData updateActivity(final UUID uuid, final AFKData data) {
@@ -210,7 +232,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
             data.willKick = false;
             Sponge.getServer().getPlayer(uuid).ifPresent(x -> {
                 final Tuples.NullableTuple<Component, Audience> ttmc = this.getAFKMessage(x, false);
-                final AFKEvents.From event = new AFKEvents.From(x, ttmc.getFirstUnwrapped(), ttmc.getSecondUnwrapped(), cause);
+                final AFKEvents.From event = new AFKEvents.From(x.getUniqueId(), ttmc.getFirstUnwrapped(), ttmc.getSecondUnwrapped(), cause);
                 Sponge.getEventManager().post(event);
                 this.actionEvent(event, "command.afk.from.nobc", "command.afk.from.console");
             });
@@ -228,14 +250,15 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
             event.getAudience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, key));
             if (consoleKey != null) {
                 this.serviceCollection.messageProvider()
-                        .sendMessageTo(Sponge.getSystemSubject(), consoleKey, event.getPlayer().getName());
+                        .sendMessageTo(Sponge.getSystemSubject(), consoleKey, Sponge.getServer()
+                                .getPlayer(event.getTargetPlayer()).map(Nameable::getName).orElse("unknown"));
             }
         }
     }
 
     private Tuples.NullableTuple<Component, Audience> getAFKMessage(final Player player, final boolean isAfk) {
         if (this.config.isBroadcastAfkOnVanish() || !player.get(Keys.VANISH).orElse(false)) {
-            final NucleusTextTemplateImpl template = isAfk ? this.config.getMessages().getAfkMessage() : this.config.getMessages().getReturnAfkMessage();
+            final NucleusTextTemplate template = isAfk ? this.afkMessage : this.returnAfkMessage;
             return Tuples.ofNullable(template.getForObject(player), Audience.audience(Sponge.getServer()));
         } else {
             return Tuples.ofNullable(null, Audience.empty());
@@ -284,6 +307,25 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public AFKNotificationResult notifyIsAfk(final Audience audience, final UUID potentialAfkUser) {
+        if (this.isAFK(potentialAfkUser)) {
+            final ServerPlayer player = Sponge.getServer().getPlayer(potentialAfkUser).orElse(null);
+            if (player != null) {
+                final Component messageToSend = this.afkNotifyCommandMessage.getForObject(player);
+                final AFKEvents.Notify event = new AFKEvents.Notify(player.getUniqueId(), messageToSend, audience,
+                        Sponge.getServer().getCauseStackManager().getCurrentCause());
+                Sponge.getEventManager().post(event);
+                if (event.getMessage() != null && !AdventureUtils.isEmpty(event.getMessage())) {
+                    audience.sendMessage(this.afkNotifyCommandMessage);
+                    return AFKNotificationResult.AFK_NOTIFIED;
+                }
+                return AFKNotificationResult.AFK_NOT_NOTIFIED;
+            }
+        }
+        return AFKNotificationResult.NOT_AFK;
     }
 
     @Override public void invalidateCachedPermissions() {

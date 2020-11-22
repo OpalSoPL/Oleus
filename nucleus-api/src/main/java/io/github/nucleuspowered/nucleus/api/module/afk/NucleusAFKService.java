@@ -5,6 +5,8 @@
 package io.github.nucleuspowered.nucleus.api.module.afk;
 
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
+import net.kyori.adventure.audience.Audience;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -98,6 +100,16 @@ public interface NucleusAFKService {
     Optional<Duration> timeForKick(UUID user);
 
     /**
+     * Checks if the {@code potentialAfkUser} is AFK and, if so,
+     * attempts to notify the {@code userToNotify}.
+     *
+     * @param audience The {@link Audience} to notify
+     * @param potentialAfkUser The {@link UUID} of the player that might be AFK.
+     * @return true if a notification was sent
+     */
+    AFKNotificationResult notifyIsAfk(Audience audience, UUID potentialAfkUser);
+
+    /**
      * Invalidates cached permissions, used to resync a player's exemption status.
      */
     void invalidateCachedPermissions();
@@ -176,5 +188,31 @@ public interface NucleusAFKService {
      * @return The {@link AutoCloseable} that will re-enable the tracking when done.
      */
     NoExceptionAutoClosable disableTrackingForPlayer(UUID player, Duration time);
+
+    enum AFKNotificationResult {
+
+        NOT_AFK {
+            @Override
+            public boolean isAFK() {
+                return false;
+            }
+        },
+        AFK_NOTIFIED {
+            @Override
+            public boolean isNotified() {
+                return true;
+            }
+        },
+        AFK_NOT_NOTIFIED;
+
+        public boolean isAFK() {
+            return true;
+        }
+
+        public boolean isNotified() {
+            return false;
+        }
+
+    }
 
 }

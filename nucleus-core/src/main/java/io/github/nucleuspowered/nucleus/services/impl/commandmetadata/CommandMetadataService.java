@@ -7,12 +7,10 @@ package io.github.nucleuspowered.nucleus.services.impl.commandmetadata;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandInterceptor;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
@@ -65,7 +63,6 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
     private CommentedConfigurationNode commandsConfConfigNode;
     private boolean registrationComplete = false;
-    private final List<ICommandInterceptor> interceptors = new ArrayList<>();
     private final List<String> registeredAliases = new ArrayList<>();
     private final Map<CommandMetadata, CommandControl> registeredCommands = new HashMap<>();
 
@@ -379,26 +376,9 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         return this.controlToExecutorClass.values();
     }
 
-    @Override public void registerInterceptors(final Collection<ICommandInterceptor> commandInterceptors) {
-        for (final ICommandInterceptor interceptor : commandInterceptors) {
-            this.registerInterceptor(interceptor);
-        }
-    }
-
     @Override
     public CommandControl getControl(final String primaryAlias) {
         return this.registeredCommands.get(this.commandMetadataMap.get(primaryAlias));
-    }
-
-    @Override public void registerInterceptor(final ICommandInterceptor impl) {
-        if (impl instanceof IReloadableService.Reloadable) {
-            this.reloadableService.registerReloadable((IReloadableService.Reloadable) impl);
-        }
-        this.interceptors.add(impl);
-    }
-
-    @Override public Collection<ICommandInterceptor> interceptors() {
-        return ImmutableList.copyOf(this.interceptors);
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {

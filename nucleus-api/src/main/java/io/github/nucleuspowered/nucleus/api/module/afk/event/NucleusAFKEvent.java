@@ -5,15 +5,24 @@
 package io.github.nucleuspowered.nucleus.api.module.afk.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
+import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 
+import java.util.UUID;
+
 public interface NucleusAFKEvent extends MessageEvent, MessageChannelEvent, Event {
 
-    ServerPlayer getPlayer();
+    /**
+     * The {@link UUID} of the player whose AFK status is being inspected or
+     * updated.
+     *
+     * @return The {@link UUID} of the player.
+     */
+    UUID getTargetPlayer();
 
     /**
      * Fired when a player goes AFK.
@@ -54,9 +63,5 @@ public interface NucleusAFKEvent extends MessageEvent, MessageChannelEvent, Even
      * as one that should notify the sender.
      */
     @MightOccurAsync
-    interface NotifyCommand extends MessageEvent, Event {
-
-        ServerPlayer getPlayer();
-
-    }
+    interface NotifyCommand extends NucleusAFKEvent, MessageEvent, Event { }
 }

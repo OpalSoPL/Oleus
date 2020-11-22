@@ -4,25 +4,24 @@
  */
 package io.github.nucleuspowered.nucleus.modules.teleport.services;
 
-import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.scaffold.task.CancellableTask;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
+import net.kyori.adventure.audience.Audience;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.scheduler.ScheduledTask;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.UUID;
 import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
 
 public class TeleportTask implements CancellableTask {
 
@@ -34,8 +33,9 @@ public class TeleportTask implements CancellableTask {
     @Nullable private final UUID requester;
     private final boolean silentSource;
     private final boolean silentTarget;
-    @Nullable private final Transform<World> requestLocation;
-    @Nullable private Consumer<Player> successCallback;
+    @Nullable private final ServerLocation requestLocation;
+    @Nullable private final Vector3d rotation;
+    @Nullable private final Consumer<Player> successCallback;
     private final INucleusServiceCollection serviceCollection;
 
     public TeleportTask(
@@ -47,7 +47,8 @@ public class TeleportTask implements CancellableTask {
             final boolean safe,
             final boolean silentSource,
             final boolean silentTarget,
-            @Nullable final Transform<World> requestLocation,
+            @Nullable final ServerLocation requestLocation,
+            @Nullable final Vector3d rotation,
             @Nullable final UUID requester,
             @Nullable final Consumer<Player> successCallback) {
         this.toTeleport = toTeleport;
@@ -60,6 +61,7 @@ public class TeleportTask implements CancellableTask {
         this.requester = requester;
         this.successCallback = successCallback;
         this.requestLocation = requestLocation;
+        this.rotation = rotation;
         this.serviceCollection = serviceCollection;
     }
 
@@ -69,29 +71,30 @@ public class TeleportTask implements CancellableTask {
     }
 
     @Override
-    public void accept(final Task task) {
-        run();
+    public void accept(final ScheduledTask task) {
+        this.run();
     }
 
     public void run() {
         // Teleport them
-        final Player teleportingPlayer = Sponge.getServer().getPlayer(this.toTeleport).orElse(null);
-        final Player targetPlayer = Sponge.getServer().getPlayer(this.target).orElse(null);
-        @Nullable final User source = Util.getUserFromUUID(this.requester).orElse(null);
-        final CommandSource receiver = source != null && source.isOnline() ? source.getPlayer().get() : Sponge.getServer().getConsole();
+        final ServerPlayer teleportingPlayer = Sponge.getServer().getPlayer(this.toTeleport).orElse(null);
+        final ServerPlayer targetPlayer = Sponge.getServer().getPlayer(this.target).orElse(null);
+        @Nullable final User source = Sponge.getServer().getUserManager().get(this.requester).orElse(null);
+        final Audience receiver = source != null ? source.getPlayer().map(x -> (Audience) x).orElseGet(Sponge::getSystemSubject) : Sponge.getSystemSubject();
         if (teleportingPlayer != null && targetPlayer != null) {
             // If safe, get the teleport mode
             final INucleusLocationService tpHandler = this.serviceCollection.teleportService();
-            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
                 if (source == null) {
-                    frame.pushCause(Sponge.getServer().getConsole());
+                    frame.pushCause(Sponge.getSystemSubject());
                 } else {
                     frame.pushCause(source);
                 }
 
                 final TeleportResult result = tpHandler.teleportPlayerSmart(
                         teleportingPlayer,
-                        this.requestLocation == null ? targetPlayer.getTransform() : this.requestLocation,
+                        this.requestLocation == null ? targetPlayer.getServerLocation() : this.requestLocation,
+                        this.rotation,
                         false,
                         this.safe,
                         TeleportScanners.NO_SCAN.get()
@@ -104,7 +107,7 @@ public class TeleportTask implements CancellableTask {
                                         "teleport.nosafe" : "teleport.cancelled");
                     }
 
-                    onCancel();
+                    this.onCancel();
                     return;
                 }
 
@@ -119,7 +122,7 @@ public class TeleportTask implements CancellableTask {
                 }
 
                 if (this.successCallback != null && source != null) {
-                    source.getPlayer().ifPresent(x -> this.successCallback.accept(x));
+                    source.getPlayer().ifPresent(this.successCallback);
                 }
             }
         } else {
@@ -127,7 +130,7 @@ public class TeleportTask implements CancellableTask {
                 this.serviceCollection.messageProvider().sendMessageTo(receiver, "teleport.fail.offline");
             }
 
-            onCancel();
+            this.onCancel();
         }
     }
 }

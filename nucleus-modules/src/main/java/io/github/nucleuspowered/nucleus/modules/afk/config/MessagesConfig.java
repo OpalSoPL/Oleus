@@ -8,44 +8,45 @@ import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.Nucleu
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
 import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class MessagesConfig {
 
-    @DefaultValueSetting(key = "on-afk", defaultValue = "&7*&f{{displayname}} &7has gone AFK.")
-    private NucleusTextTemplateImpl afkMessage;
+    @Setting(value = "on-afk")
+    private String afkMessage = "&7*&f{{displayname}} &7has gone AFK.";
 
-    @DefaultValueSetting(key = "on-return", defaultValue = "&7*&f{{displayname}} &7is no longer AFK.")
-    private NucleusTextTemplateImpl returnAfkMessage;
+    @Setting(value = "on-return")
+    private String returnAfkMessage = "&7*&f{{displayname}} &7has is no longer AFK.";
 
-    @DefaultValueSetting(key = "on-command", defaultValue = "&f{{displayname}} &7is currently AFK and may not respond quickly.")
-    private NucleusTextTemplateImpl onCommand;
+    @Setting(value = "on-command")
+    private String onCommand = "&f{{displayname}} &7is currently AFK and may not respond quickly.";
 
-    @DefaultValueSetting(key = "on-kick", defaultValue = "&f{{displayname}} &7has been kicked for being AFK too long.")
+    @Setting(value = "on-kick")
     @LocalisedComment("config.afk.messagetobroadcastonkick")
-    private NucleusTextTemplateImpl onKick;
+    private String onKick = "&f{{displayname}} &7has been kicked for being AFK too long.";
 
-    @DefaultValueSetting(key = "kick-message-to-subject", defaultValue = "You have been kicked for being AFK for too long.")
+    @Setting(value = "kick-message-to-subject")
     @LocalisedComment("config.afk.playerkicked")
-    private NucleusTextTemplateImpl kickMessage;
+    private String kickMessage = "You have been kicked for being AFK for too long.";
 
-    public NucleusTextTemplateImpl getAfkMessage() {
+    public String getAfkMessage() {
         return this.afkMessage;
     }
 
-    public NucleusTextTemplateImpl getReturnAfkMessage() {
+    public String getReturnAfkMessage() {
         return this.returnAfkMessage;
     }
 
-    public NucleusTextTemplateImpl getOnCommand() {
+    public String getOnCommand() {
         return this.onCommand;
     }
 
-    public NucleusTextTemplateImpl getOnKick() {
+    public String getOnKick() {
         return this.onKick;
     }
 
-    public NucleusTextTemplateImpl getKickMessage() {
+    public String getKickMessage() {
         return this.kickMessage;
     }
 }

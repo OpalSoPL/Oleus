@@ -14,38 +14,36 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
 @EssentialsEquivalent("tpall")
 @Command(aliases = {"tpall", "tpallhere"}, basePermission = TeleportPermissions.BASE_TPALL, commandDescriptionKey = "tpall")
 public class TeleportAllHereCommand implements ICommandExecutor {
 
-    @Override
-    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new Parameter[] {
-                GenericArguments.flags().flag("f").buildWith(GenericArguments.none())
+    @Override public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("f", "force")
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        MessageChannel.TO_ALL.getMembers()
-                .forEach(x -> context.sendMessageTo(x, "command.tpall.broadcast", context.getName()));
-        final Transform<World> toTransform = context.getIfPlayer().getTransform();
+        final ServerPlayer serverPlayer = context.requirePlayer();
+        final ServerLocation toLocation = serverPlayer.getServerLocation();
+        final Vector3d toRotation = serverPlayer.getRotation();
+        context.sendMessageTo(Sponge.getServer(), "command.tpall.broadcast", context.getName());
         Sponge.getServer().getOnlinePlayers().forEach(x -> {
             if (!context.is(x)) {
                 context.getServiceCollection()
                         .teleportService()
                         .teleportPlayerSmart(x,
-                            toTransform,
-                                Vector3d.ZERO, false,
-                            !context.getOne("f", Boolean.class).orElse(false),
-                            TeleportScanners.NO_SCAN.get()
+                                toLocation,
+                                toRotation, false,
+                                !context.hasFlag("f"),
+                                TeleportScanners.NO_SCAN.get()
                 );
             }
         });

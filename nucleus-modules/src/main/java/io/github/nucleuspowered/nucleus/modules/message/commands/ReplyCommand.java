@@ -26,7 +26,6 @@ import java.util.function.Function;
  * Replies to the last player who sent a message.
  */
 @EssentialsEquivalent({"r", "reply"})
-@NotifyIfAFK(NucleusParameters.Keys.PLAYER) // TODO: Better way to do this
 @Command(
         aliases = {"reply", "r"},
         basePermission = MessagePermissions.BASE_MESSAGE,

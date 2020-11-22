@@ -79,23 +79,23 @@ public class AFKConfig {
     public static class Triggers {
 
         @Setting(value = "on-chat")
-    @LocalisedComment("config.afk.triggers.onchat")
+        @LocalisedComment("config.afk.triggers.onchat")
         private boolean onChat = true;
 
         @Setting(value = "on-command")
-    @LocalisedComment("config.afk.triggers.oncommand")
+        @LocalisedComment("config.afk.triggers.oncommand")
         private boolean onCommand = true;
 
         @Setting(value = "on-movement")
-    @LocalisedComment("config.afk.triggers.onmove")
+        @LocalisedComment("config.afk.triggers.onmove")
         private boolean onMovement = true;
 
         @Setting(value = "on-rotation")
-    @LocalisedComment("config.afk.triggers.onrotation")
+        @LocalisedComment("config.afk.triggers.onrotation")
         private boolean onRotation = true;
 
         @Setting(value = "on-interact")
-    @LocalisedComment("config.afk.triggers.oninteract")
+        @LocalisedComment("config.afk.triggers.oninteract")
         private boolean onInteract = true;
 
         public boolean isOnChat() {

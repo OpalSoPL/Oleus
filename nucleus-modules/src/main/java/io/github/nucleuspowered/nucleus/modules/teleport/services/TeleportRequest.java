@@ -5,20 +5,20 @@
 package io.github.nucleuspowered.nucleus.modules.teleport.services;
 
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-
 // Managing teleport requests.
-public class TeleportRequest extends TeleportTask {
+public final class TeleportRequest extends TeleportTask {
 
     private final Instant expiry;
     private boolean forcedExpired;
@@ -35,25 +35,26 @@ public class TeleportRequest extends TeleportTask {
             final boolean safe,
             final boolean silentTarget,
             final boolean silentSource,
-            @Nullable final Transform<World> requestLocation,
+            @Nullable final ServerLocation requestLocation,
+            @Nullable final Vector3d rotation,
             @Nullable final Consumer<Player> successCallback) {
-        super(serviceCollection, toTeleport, target, cost, warmup, safe, silentSource, silentTarget, requestLocation, requester, successCallback);
+        super(serviceCollection, toTeleport, target, cost, warmup, safe, silentSource, silentTarget, requestLocation, rotation, requester, successCallback);
         this.expiry = expiry;
     }
 
-    public Optional<Player> getToBeTeleported() {
+    public Optional<ServerPlayer> getToBeTeleported() {
         return Sponge.getServer().getPlayer(this.toTeleport);
     }
 
-    public Optional<Player> getTarget() {
+    public Optional<ServerPlayer> getTarget() {
         return Sponge.getServer().getPlayer(this.target);
     }
 
     public void forceExpire(final boolean callback) {
-        if (!callback || isActive()) {
+        if (!callback || this.isActive()) {
             this.forcedExpired = true;
             if (callback) {
-                onCancel();
+                this.onCancel();
             }
         }
     }
@@ -62,7 +63,7 @@ public class TeleportRequest extends TeleportTask {
         if (!this.expired) {
             this.expired = (this.forcedExpired && Instant.now().isAfter(this.expiry));
             if (this.expired) {
-                onCancel();
+                this.onCancel();
             }
         }
 

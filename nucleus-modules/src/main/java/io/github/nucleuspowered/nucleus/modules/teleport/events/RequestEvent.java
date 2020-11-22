@@ -12,6 +12,7 @@ import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public abstract class RequestEvent extends AbstractEvent implements NucleusTeleportEvent.Request {
 
@@ -19,9 +20,9 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
     private boolean isCancelled = false;
 
     private final Cause cause;
-    private final ServerPlayer targetEntity;
+    private final UUID targetEntity;
 
-    private RequestEvent(final Cause cause, final ServerPlayer targetEntity) {
+    private RequestEvent(final Cause cause, final UUID targetEntity) {
         this.cause = cause;
         this.targetEntity = targetEntity;
     }
@@ -35,7 +36,7 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
     }
 
     @Override
-    public ServerPlayer getPlayer() {
+    public UUID getPlayer() {
         return this.targetEntity;
     }
 
@@ -53,14 +54,14 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
 
     public static class CauseToPlayer extends RequestEvent implements NucleusTeleportEvent.Request.CauseToPlayer {
 
-        public CauseToPlayer(final Cause cause, final ServerPlayer targetEntity) {
+        public CauseToPlayer(final Cause cause, final UUID targetEntity) {
             super(cause, targetEntity);
         }
     }
 
     public static class PlayerToCause extends RequestEvent implements NucleusTeleportEvent.Request.PlayerToCause {
 
-        public PlayerToCause(final Cause cause, final ServerPlayer targetEntity) {
+        public PlayerToCause(final Cause cause, final UUID targetEntity) {
             super(cause, targetEntity);
         }
     }

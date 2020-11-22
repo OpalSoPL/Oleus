@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.staffchat;
 
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.staffchat.commands.StaffChatCommand;
 import io.github.nucleuspowered.nucleus.modules.staffchat.commands.ToggleStaffChatCommand;
@@ -12,6 +13,8 @@ import io.github.nucleuspowered.nucleus.modules.staffchat.services.StaffChatServ
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -44,6 +47,11 @@ public class StaffChatModule implements IModule.Configurable<StaffChatConfig> {
 
     @Override public Class<StaffChatConfig> getConfigClass() {
         return StaffChatConfig.class;
+    }
+
+    @Listener
+    public void onRegisterNucleusPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+        event.register(StaffChatKeys.VIEW_STAFF_CHAT);
     }
 
 }

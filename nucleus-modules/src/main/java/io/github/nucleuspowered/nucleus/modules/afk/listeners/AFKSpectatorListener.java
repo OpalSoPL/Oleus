@@ -31,7 +31,7 @@ public class AFKSpectatorListener implements ListenerBase.Conditional {
 
 
     @Listener
-    public void onAfk(final NucleusAFKEvent event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onAfk(final NucleusAFKEvent event, @Getter("getTargetPlayer") final ServerPlayer player) {
         if (player.gameMode().get().equals(GameModes.SPECTATOR)) {
             if (event.getAudience().filter(x -> Sponge.getSystemSubject().equals(x)).isPresent()) {
                 event.setAudience(this.permissionService.permissionMessageChannel(AFKPermissions.AFK_NOTIFY));
@@ -41,7 +41,7 @@ public class AFKSpectatorListener implements ListenerBase.Conditional {
     }
 
     @Listener(order = Order.FIRST)
-    public void onAfk(final NucleusAFKEvent.Kick event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onAfk(final NucleusAFKEvent.Kick event, @Getter("getTargetPlayer") final ServerPlayer player) {
         if (player.gameMode().get().equals(GameModes.SPECTATOR)) {
             event.setCancelled(true);
         }

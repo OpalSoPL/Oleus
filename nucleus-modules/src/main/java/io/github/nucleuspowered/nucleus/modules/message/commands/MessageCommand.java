@@ -102,9 +102,8 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
     static ICommandResult executeCommon(final MessageHandler messageHandler, final ICommandContext context, final MessageTarget sender,
             final MessageTarget receiver) {
 
-        if (receiver instanceof UserMessageTarget && NucleusAPI.getAFKService().map(x -> x.isAFK(((UserMessageTarget) receiver).getUserUUID())).orElse(false)) {
-            // AFK message
-            context.sendMessage("command.message.afknotify", context.getDisplayName(((UserMessageTarget) receiver).getUserUUID()));
+        if (receiver instanceof UserMessageTarget) {
+            NucleusAPI.getAFKService().ifPresent(x -> x.notifyIsAfk(context.getAudience(), ((UserMessageTarget) receiver).getUserUUID()));
         }
 
         final boolean b = messageHandler.sendMessage(sender, receiver, context.requireOne(NucleusParameters.MESSAGE));

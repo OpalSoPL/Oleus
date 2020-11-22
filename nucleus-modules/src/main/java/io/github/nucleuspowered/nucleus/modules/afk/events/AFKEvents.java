@@ -8,24 +8,23 @@ import com.google.common.base.Preconditions;
 import io.github.nucleuspowered.nucleus.api.module.afk.event.NucleusAFKEvent;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 
 import java.util.Optional;
-
-import javax.annotation.Nullable;
+import java.util.UUID;
 
 public abstract class AFKEvents extends AbstractEvent implements NucleusAFKEvent {
 
-    private final ServerPlayer target;
+    private final UUID target;
     private final Cause cause;
     private final Audience original;
     private Audience channel;
     private final Component originalMessage;
     private Component message;
 
-    AFKEvents(final ServerPlayer target, @Nullable final Component message, @Nullable final Audience original, final Cause cause) {
+    AFKEvents(final UUID target, @Nullable final Component message, @Nullable final Audience original, final Cause cause) {
         this.target = target;
         this.cause = cause;
         this.originalMessage = message == null ? Component.empty() : message;
@@ -35,7 +34,7 @@ public abstract class AFKEvents extends AbstractEvent implements NucleusAFKEvent
     }
 
     @Override
-    public ServerPlayer getPlayer() {
+    public UUID getTargetPlayer() {
         return this.target;
     }
 
@@ -80,14 +79,14 @@ public abstract class AFKEvents extends AbstractEvent implements NucleusAFKEvent
 
     public static class From extends AFKEvents implements NucleusAFKEvent.ReturningFromAFK {
 
-        public From(final ServerPlayer target, @Nullable final Component message, @Nullable final Audience original, final Cause cause) {
+        public From(final UUID target, @Nullable final Component message, @Nullable final Audience original, final Cause cause) {
             super(target, message, original, cause);
         }
     }
 
     public static class To extends AFKEvents implements NucleusAFKEvent.GoingAFK {
 
-        public To(final ServerPlayer target, @Nullable final Component message, @Nullable final Audience original, final Cause cause) {
+        public To(final UUID target, @Nullable final Component message, @Nullable final Audience original, final Cause cause) {
             super(target, message, original, cause);
         }
     }
@@ -96,7 +95,7 @@ public abstract class AFKEvents extends AbstractEvent implements NucleusAFKEvent
 
         private boolean cancelled = false;
 
-        public Kick(final ServerPlayer target, final Component message, final Audience original, final Cause cause) {
+        public Kick(final UUID target, final Component message, final Audience original, final Cause cause) {
             super(target, message, original, cause);
         }
 
@@ -109,22 +108,15 @@ public abstract class AFKEvents extends AbstractEvent implements NucleusAFKEvent
         }
     }
 
-    public static class Notify implements NucleusAFKEvent.NotifyCommand {
+    public static class Notify extends AFKEvents implements NucleusAFKEvent.NotifyCommand {
 
-        private final ServerPlayer target;
-        private final Cause cause;
         @Nullable private final Component originalMessage;
         @Nullable private Component message;
 
-        public Notify(final ServerPlayer target, @Nullable final Component message, final Cause cause) {
-            this.target = target;
-            this.originalMessage = message == null ? Component.empty() : message;
-            this.message = this.originalMessage;
-            this.cause = cause;
-        }
-
-        @Override public Cause getCause() {
-            return this.cause;
+        public Notify(final UUID target, @Nullable final Component message, final Audience audience, final Cause cause) {
+            super(target, message, audience, cause);
+            this.originalMessage = message;
+            this.message = message;
         }
 
         @Override public Component getOriginalMessage() {
@@ -136,13 +128,9 @@ public abstract class AFKEvents extends AbstractEvent implements NucleusAFKEvent
         }
 
         @Override
-        public ServerPlayer getPlayer() {
-            return this.target;
-        }
-
-        @Override
         public void setMessage(@Nullable final Component message) {
             this.message = message;
         }
+
     }
 }

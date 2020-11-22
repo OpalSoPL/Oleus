@@ -10,7 +10,6 @@ import io.github.nucleuspowered.nucleus.modules.afk.commands.AFKKickCommand;
 import io.github.nucleuspowered.nucleus.modules.afk.commands.AFKRefresh;
 import io.github.nucleuspowered.nucleus.modules.afk.config.AFKConfig;
 import io.github.nucleuspowered.nucleus.modules.afk.infoprovider.AFKInfoProvider;
-import io.github.nucleuspowered.nucleus.modules.afk.interceptors.AFKCommandInterceptor;
 import io.github.nucleuspowered.nucleus.modules.afk.listeners.AFKChatListener;
 import io.github.nucleuspowered.nucleus.modules.afk.listeners.AFKCommandListener;
 import io.github.nucleuspowered.nucleus.modules.afk.listeners.AFKFullMoveListener;
@@ -23,7 +22,6 @@ import io.github.nucleuspowered.nucleus.modules.afk.runnables.AFKRefreshPermsTas
 import io.github.nucleuspowered.nucleus.modules.afk.runnables.AFKTask;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandInterceptor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
@@ -101,11 +99,6 @@ public class AFKModule implements IModule.Configurable<AFKConfig> {
     @Override
     public Class<AFKConfig> getConfigClass() {
         return AFKConfig.class;
-    }
-
-    @Override
-    public Collection<ICommandInterceptor> getCommandInterceptors() {
-        return Collections.singleton(new AFKCommandInterceptor());
     }
 
     @Override

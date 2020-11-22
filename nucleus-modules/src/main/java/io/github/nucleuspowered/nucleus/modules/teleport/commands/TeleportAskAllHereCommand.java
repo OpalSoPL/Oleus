@@ -15,10 +15,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.Nameable;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,25 +27,24 @@ import java.util.stream.Collectors;
 @Command(aliases = {"tpaall", "tpaskall"}, basePermission = TeleportPermissions.BASE_TPAALL, commandDescriptionKey = "tpaall")
 public class TeleportAskAllHereCommand implements ICommandExecutor {
 
-    @Override
-    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new Parameter[] {
-                GenericArguments.flags().flag("f").buildWith(GenericArguments.none())
+    @Override public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("f", "force")
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final List<Player> cancelled = new ArrayList<>();
+        final List<ServerPlayer> cancelled = new ArrayList<>();
         final PlayerTeleporterService playerTeleporterService = context
                 .getServiceCollection()
                 .getServiceUnchecked(PlayerTeleporterService.class);
-        for (final Player x : Sponge.getServer().getOnlinePlayers()) {
+        for (final ServerPlayer x : Sponge.getServer().getOnlinePlayers()) {
             if (context.is(x)) {
                 continue;
             }
 
             // Before we do all this, check the event.
-            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(Sponge.getCauseStackManager().getCurrentCause(), x);
+            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(Sponge.getServer().getCauseStackManager().getCurrentCause(), x.getUniqueId());
             if (Sponge.getEventManager().post(event)) {
                 cancelled.add(x);
                 continue;
@@ -57,7 +57,7 @@ public class TeleportAskAllHereCommand implements ICommandExecutor {
                     0,
                     x,
                     context.getIfPlayer(),
-                    !context.getOne("f", Boolean.class).orElse(false),
+                    !context.hasFlag("f"),
                     false,
                     true,
                     p -> {},
@@ -68,7 +68,7 @@ public class TeleportAskAllHereCommand implements ICommandExecutor {
         context.sendMessage("command.tpaall.success");
         if (!cancelled.isEmpty()) {
             context.sendMessage("command.tpall.cancelled",
-                    cancelled.stream().map(User::getName).collect(Collectors.joining(", ")));
+                    cancelled.stream().map(Nameable::getName).collect(Collectors.joining(", ")));
         }
 
         return context.successResult();

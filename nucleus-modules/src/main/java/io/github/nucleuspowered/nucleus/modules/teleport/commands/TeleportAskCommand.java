@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.teleport.commands;
 
+import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import io.github.nucleuspowered.nucleus.modules.teleport.TeleportPermissions;
 import io.github.nucleuspowered.nucleus.modules.teleport.config.TeleportConfig;
 import io.github.nucleuspowered.nucleus.modules.teleport.events.RequestEvent;
@@ -15,20 +16,20 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.NotifyIfAFK;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 import java.time.Duration;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-@NotifyIfAFK(NucleusParameters.Keys.PLAYER)
 @Command(
         aliases = {"tpa", "teleportask", "call", "tpask"},
         basePermission = TeleportPermissions.BASE_TPA,
@@ -60,34 +61,42 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
 
     private boolean isCooldownOnAsk = false;
 
-    @Override
-    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new Parameter[] {
-                GenericArguments.flags().permissionFlag(TeleportPermissions.TELEPORT_ASK_FORCE, "f").buildWith(NucleusParameters.ONE_PLAYER.get(serviceCollection))
+    @Override public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.builder().alias("f").setRequirement(cause ->
+                        serviceCollection.permissionService().hasPermission(cause, TeleportPermissions.TELEPORT_ASK_FORCE)).build()
         };
     }
 
-    @Override public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
-        final boolean canTeleport = context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
-                .canTeleportTo(
-                        context.getIfPlayer(),
-                        context.requireOne(NucleusParameters.Keys.PLAYER, Player.class)
-                );
-        if (canTeleport) {
-            return Optional.empty();
-        }
+    @Override
+    public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
+        return new Parameter[] {
+                NucleusParameters.ONE_PLAYER
+        };
+    }
 
-        return Optional.of(context.failResult());
+    @Override
+    public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
+        if (context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
+                .canTeleportTo(
+                        context.requirePlayer(),
+                        context.requireOne(NucleusParameters.ONE_PLAYER).getUser()
+                )) {
+            return Optional.of(context.failResult());
+        }
+        return Optional.empty();
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player target = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
+        final ServerPlayer target = context.requireOne(NucleusParameters.ONE_PLAYER);
+
+
         if (context.is(target)) {
             return context.errorResult("command.teleport.self");
         }
 
-        final RequestEvent.CauseToPlayer event = new RequestEvent.CauseToPlayer(context.getCause(), target);
+        final RequestEvent.CauseToPlayer event = new RequestEvent.CauseToPlayer(Sponge.getServer().getCauseStackManager().getCurrentCause(), target.getUniqueId());
         if (Sponge.getEventManager().post(event)) {
             if (event.getCancelMessage().isPresent()) {
                 return context.errorResultLiteral(event.getCancelMessage().get());
@@ -98,9 +107,9 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
 
         Consumer<Player> cooldownSetter = player -> {};
         if (this.isCooldownOnAsk) {
-            setCooldown(context);
+            this.setCooldown(context);
         } else {
-            cooldownSetter = player -> setCooldown(context);
+            cooldownSetter = player -> this.setCooldown(context);
         }
 
         context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class).requestTeleport(
@@ -110,12 +119,14 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
                 context.getWarmup(),
                 context.getIfPlayer(),
                 target,
-                !context.getOne("f", boolean.class).orElse(false),
+                !context.hasFlag("f"),
                 false,
                 false,
                 cooldownSetter,
                 "command.tpa.question"
         );
+
+        NucleusAPI.getAFKService().ifPresent(x -> x.notifyIsAfk(context.getAudience(), target.getUniqueId()));
 
         return context.successResult();
     }

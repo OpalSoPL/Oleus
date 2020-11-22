@@ -14,6 +14,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,13 +24,18 @@ import java.util.function.Function;
 
 public class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
+    private static final class Holder {
+
+        private static final NucleusTextTemplateImpl EMPTY = new NucleusTextTemplateImpl(null, Collections.emptyList(), null, null);
+    }
+
     private final List<BiFunction<Object, Map<String, Function<Object, Optional<ComponentLike>>>, Component>> texts;
     @Nullable private final Component prefix;
     @Nullable private final Component suffix;
-    private final INucleusServiceCollection serviceCollection;
+    @Nullable private final INucleusServiceCollection serviceCollection;
 
     public NucleusTextTemplateImpl(
-            final INucleusServiceCollection serviceCollection,
+            @Nullable final INucleusServiceCollection serviceCollection,
             final List<BiFunction<Object, Map<String, Function<Object, Optional<ComponentLike>>>, Component>> texts,
             @Nullable final Component prefix,
             @Nullable final Component suffix) {
@@ -38,27 +45,37 @@ public class NucleusTextTemplateImpl implements NucleusTextTemplate {
         this.serviceCollection = serviceCollection;
     }
 
+    @NonNull
     public static NucleusTextTemplateImpl empty() {
-        return null;
+        return NucleusTextTemplateImpl.Holder.EMPTY;
     }
 
     @Override
     public boolean isEmpty() {
-        return this.texts.isEmpty();
+        return this.serviceCollection == null || this.texts.isEmpty();
     }
 
     @Override
     public Optional<Component> getPrefix() {
+        if (this.serviceCollection == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(this.prefix);
     }
 
     @Override
     public Optional<Component> getSuffix() {
+        if (this.serviceCollection == null) {
+            return Optional.empty();
+        }
         return Optional.ofNullable(this.suffix);
     }
 
     @Override
     public boolean containsTokens() {
+        if (this.serviceCollection == null) {
+            return false;
+        }
         return this.texts.stream().anyMatch(x -> x instanceof TemplateParser.PlaceholderElement);
     }
 
@@ -69,6 +86,9 @@ public class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
     @Override
     public Component getForObjectWithSenderToken(final Object source, final Object sender) {
+        if (this.serviceCollection == null) {
+            return Component.empty();
+        }
         final Optional<ComponentLike> s =
                 Optional.of(this.serviceCollection.placeholderService().parse(sender, "displayname"));
         return this.getForObjectWithSenderToken(source,
@@ -79,6 +99,10 @@ public class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
     @Override
     public Component getForObjectWithTokens(final Object source, @Nullable final Map<String, Function<Object, Optional<ComponentLike>>> tokensArray) {
+        if (this.serviceCollection == null) {
+            return Component.empty();
+        }
+
         final TextComponent.Builder builder = Component.text();
         if (this.prefix != null) {
             builder.append(this.prefix);

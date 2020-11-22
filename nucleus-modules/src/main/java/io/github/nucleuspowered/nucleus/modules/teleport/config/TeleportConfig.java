@@ -4,34 +4,43 @@
  */
 package io.github.nucleuspowered.nucleus.modules.teleport.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class TeleportConfig {
 
-    @Setting(value = "use-safe-teleportation", comment = "config.teleport.safe")
+    @Setting(value = "use-safe-teleportation")
+    @LocalisedComment("config.teleport.safe")
     private boolean useSafeTeleport = true;
 
-    @Setting(value = "default-quiet", comment = "config.teleport.quiet")
+    @Setting(value = "default-quiet")
+    @LocalisedComment("config.teleport.quiet")
     private boolean defaultQuiet = true;
 
-    @Setting(value = "refund-on-deny", comment = "config.teleport.refundondeny")
+    @Setting(value = "refund-on-deny")
+    @LocalisedComment("config.teleport.refundondeny")
     private boolean refundOnDeny = true;
 
-    @Setting(value = "only-same-dimension", comment = "config.teleport.onlySameDimension")
+    @Setting(value = "only-same-dimension")
+    @LocalisedComment("config.teleport.onlySameDimension")
     private boolean onlySameDimension = false;
 
-    @Setting(value = "start-cooldown-when-asking", comment = "config.teleport.cooldownOnAsk")
+    @Setting(value = "start-cooldown-when-asking")
+    @LocalisedComment("config.teleport.cooldownOnAsk")
     private boolean cooldownOnAsk = false;
 
-    @Setting(value = "show-clickable-tpa-accept-deny", comment = "config.teleport.clickableAcceptDeny")
+    @Setting(value = "show-clickable-tpa-accept-deny")
+    @LocalisedComment("config.teleport.clickableAcceptDeny")
     private boolean showClickableAcceptDeny = false;
 
-    @Setting(value = "use-commands-when-clicking-tpa-accept-deny", comment = "config.teleport.useCommandOnClick")
+    @Setting(value = "use-commands-when-clicking-tpa-accept-deny")
+    @LocalisedComment("config.teleport.useCommandOnClick")
     private boolean useCommandOnClickAcceptOrDeny = false;
 
-    @Setting(value = "use-request-location-on-tp-requests", comment = "config.teleport.useRequestLocation")
+    @Setting(value = "use-request-location-on-tp-requests")
+    @LocalisedComment("config.teleport.useRequestLocation")
     private boolean useRequestLocation = false;
 
     public boolean isDefaultQuiet() {
@@ -43,15 +52,15 @@ public class TeleportConfig {
     }
 
     public boolean isRefundOnDeny() {
-        return refundOnDeny;
+        return this.refundOnDeny;
     }
 
     public boolean isOnlySameDimension() {
-        return onlySameDimension;
+        return this.onlySameDimension;
     }
 
     public boolean isCooldownOnAsk() {
-        return cooldownOnAsk;
+        return this.cooldownOnAsk;
     }
 
     public boolean isUseCommandsOnClickAcceptOrDeny() {

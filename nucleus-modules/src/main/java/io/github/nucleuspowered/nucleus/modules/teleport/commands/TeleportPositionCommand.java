@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.teleport.commands;
 
-import org.spongepowered.math.vector.Vector3d;
-import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.modules.teleport.TeleportPermissions;
@@ -17,17 +15,15 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
-import org.spongepowered.api.Sponge;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.CommandFlags;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3i;
 
 @EssentialsEquivalent("tppos")
 @Command(
@@ -41,47 +37,39 @@ import org.spongepowered.api.world.storage.WorldProperties;
 )
 public class TeleportPositionCommand implements ICommandExecutor {
 
-    private final String location = "world";
-//    private final String p = "pitch";
-//    private final String yaw = "yaw";
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        return new Flag[] {
+                Flag.of("f", "force"),
+                Flag.of("c", "chunk"),
+                Flag.builder().setRequirement(cause -> permissionService.hasPermission(cause, TeleportPermissions.TPPOS_BORDER))
+                        .aliases("b", "border").build()
+        };
+    }
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                GenericArguments.flags()
-                    .setUnknownShortFlagBehavior(CommandFlags.UnknownFlagBehavior.IGNORE)
-                    .flag("f", "-force")
-                    .flag("c", "-chunk")
-//                    .valueFlag(GenericArguments.doubleNum(Text.of(this.p)), "p", "-pitch")
-//                    .valueFlag(GenericArguments.doubleNum(Text.of(this.yaw)), "y", "-yaw")
-                    .permissionFlag(TeleportPermissions.TPPOS_BORDER,"b", "-border")
-                    .buildWith(
-                        GenericArguments.seq(
-                            // Actual arguments
-                                serviceCollection.commandElementSupplier()
-                                    .createOtherUserPermissionElement(true, TeleportPermissions.OTHERS_TPPOS),
-                            GenericArguments.onlyOne(GenericArguments.optionalWeak(GenericArguments.world(Text.of(this.location)))),
-                            NucleusParameters.POSITION
-                        )
-                )
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(TeleportPermissions.OTHERS_TPPOS),
+                NucleusParameters.LOCATION
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player pl = context.getPlayerFromArgs();
-        final WorldProperties wp = context.getOne(this.location, WorldProperties.class).orElseGet(() -> pl.getWorld().getProperties());
-        final World world = Sponge.getServer().loadWorld(wp.getUniqueId()).get();
-        final Vector3d location = context.requireOne(NucleusParameters.Keys.XYZ, Vector3d.class);
+        final User pl = context.getUserFromArgs();
+        final ServerLocation location = context.requireOne(NucleusParameters.LOCATION);
+        final ServerWorld world = location.getWorld();
 
         double xx = location.getX();
-        double  zz = location.getZ();
-        double  yy = location.getY();
+        double zz = location.getZ();
+        double yy = location.getY();
         if (yy < 0) {
             return context.errorResult("command.tppos.ysmall");
         }
 
         // Chunks are 16 in size, chunk 0 is from 0 - 15, -1 from -1 to -16.
-        if (context.hasAny("c")) {
+        if (context.hasFlag("c")) {
             xx = xx * 16 + 8;
             yy = yy * 16 + 8;
             zz = zz * 16 + 8;
@@ -90,21 +78,28 @@ public class TeleportPositionCommand implements ICommandExecutor {
 
         final Vector3i max = world.getBlockMax();
         final Vector3i min = world.getBlockMin();
-        if (!(isBetween(xx, max.getX(), min.getX()) && isBetween(yy, max.getY(), min.getY()) && isBetween(zz, max.getZ(), min.getZ()))) {
+        if (!(this.isBetween(xx, max.getX(), min.getX()) && this.isBetween(yy, max.getY(), min.getY()) && this.isBetween(zz, max.getZ(), min.getZ()))) {
             return context.errorResult("command.tppos.invalid");
         }
 
         // Create the location
-        final Location<World> loc = new Location<>(world, xx, yy, zz);
+        final ServerLocation loc = ServerLocation.of(world, xx, yy, zz);
         final INucleusLocationService teleportHandler = context.getServiceCollection().teleportService();
 
-        final boolean safe = context.getOne("f", Boolean.class).orElse(false);
-        final boolean border = context.hasAny("b");
+        final boolean safe = context.hasFlag("f");
+        final boolean border = context.hasFlag("b");
 
+        if (!pl.isOnline()) {
+            pl.setLocation(loc.getWorldKey(), loc.getPosition());
+            context.sendMessage("command.tppos.success.other", pl.getName());
+            return context.successResult();
+        }
+
+        final ServerPlayer player = pl.getPlayer().get();
         try (final INucleusLocationService.BorderDisableSession ac =
-                teleportHandler.temporarilyDisableBorder(!safe && border, loc.getExtent())) {
+                teleportHandler.temporarilyDisableBorder(!safe && border, loc.getWorld())) {
             final TeleportResult result = teleportHandler.teleportPlayerSmart(
-                    pl,
+                    player,
                     loc,
                     false,
                     safe,
@@ -112,7 +107,7 @@ public class TeleportPositionCommand implements ICommandExecutor {
             );
 
             if (result.isSuccessful()) {
-                context.sendMessageTo(pl, "command.tppos.success.self");
+                context.sendMessageTo(player, "command.tppos.success.self");
                 if (!context.is(pl)) {
                     context.sendMessage("command.tppos.success.other", pl.getName());
                 }

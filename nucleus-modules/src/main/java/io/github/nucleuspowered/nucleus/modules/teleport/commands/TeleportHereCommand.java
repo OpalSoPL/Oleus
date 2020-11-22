@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.teleport.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.modules.teleport.TeleportPermissions;
 import io.github.nucleuspowered.nucleus.modules.teleport.config.TeleportConfig;
@@ -11,16 +12,17 @@ import io.github.nucleuspowered.nucleus.modules.teleport.services.PlayerTeleport
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 /**
  * NOTE: TeleportHere is considered an admin command, as there is a potential
  * for abuse for non-admin players trying to pull players. No cost or warmups
@@ -41,7 +43,25 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
 
     private boolean isDefaultQuiet = false;
 
-    @Override public void onReload(final INucleusServiceCollection serviceCollection) {
+    private final Parameter.Value<Boolean> quietOption = Parameter.bool().setKey("quiet").orDefault(true).build();
+
+    private final Parameter.Value<User> userToWarp;
+    private final Parameter.Value<ServerPlayer> playerToWarp;
+
+    @Inject
+    public TeleportHereCommand(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        this.userToWarp = Parameter.user()
+                .setKey("Offline player to warp")
+                .setRequirements(cause -> permissionService.hasPermission(cause, TeleportPermissions.TPHERE_OFFLINE))
+                .build();
+        this.playerToWarp = Parameter.player()
+                .setKey("Player to warp")
+                .build();
+    }
+
+    @Override
+    public void onReload(final INucleusServiceCollection serviceCollection) {
         this.isDefaultQuiet =
                 serviceCollection.configProvider()
                         .getModuleConfig(TeleportConfig.class)
@@ -49,40 +69,42 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
     }
 
     @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("f"),
+                Flag.builder().alias("q").setParameter(this.quietOption).build()
+        };
+    }
+
+    @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                GenericArguments.flags().flag("q", "-quiet").buildWith(
-                        IfConditionElseArgument.permission(
-                                serviceCollection.permissionService(),
-                                TeleportPermissions.TPHERE_OFFLINE,
-                                NucleusParameters.ONE_USER_PLAYER_KEY.get(serviceCollection),
-                                NucleusParameters.ONE_PLAYER.get(serviceCollection)))
+                Parameter.firstOf(
+                        this.userToWarp,
+                        this.playerToWarp
+                )
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final boolean beQuiet = context.getOne("q", Boolean.class).orElse(this.isDefaultQuiet);
-        final User target = context.requireOne(NucleusParameters.Keys.PLAYER, User.class);
+        final ServerPlayer source = context.requirePlayer();
+        final boolean beQuiet = context.getOne(this.quietOption).orElse(this.isDefaultQuiet);
+        final User target = context.getOne(this.userToWarp).orElseGet(() -> context.requireOne(this.playerToWarp).getUser());
         final PlayerTeleporterService sts = context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class);
         if (target.getPlayer().isPresent()) {
-            final Player to = target.getPlayer().get();
             final TeleportResult result = sts.teleportWithMessage(
-                    context.getIfPlayer(),
-                    to,
-                    context.getIfPlayer(),
+                    source,
+                    target.getPlayer().get(),
+                    source,
                     false,
                     false,
                     beQuiet
             );
             return result.isSuccessful() ? context.successResult() : context.failResult();
         } else {
-            if (!context.testPermission(TeleportPermissions.TPHERE_OFFLINE)) {
-                return context.errorResult("command.tphere.noofflineperms");
-            }
-
-            final Player src = context.getIfPlayer();
             // Update the offline player's next location
-            target.setLocation(src.getPosition(), src.getWorld().getUniqueId());
+            target.setLocation(source.getWorld().getKey(), source.getPosition());
+            target.setRotation(source.getRotation());
             context.sendMessage("command.tphere.offlinesuccess", target.getName());
         }
 

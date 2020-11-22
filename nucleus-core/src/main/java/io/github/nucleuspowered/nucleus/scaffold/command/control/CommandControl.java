@@ -10,7 +10,6 @@ import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandInterceptor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
@@ -222,27 +221,10 @@ public final class CommandControl {
 
     private ICommandResult execute(@NonNull final ICommandContext context) throws CommandException {
         Preconditions.checkState(this.executor != null, "executor");
-        for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
-            commandInterceptor.onPreCommand(
-                    this.executor.getClass(),
-                    this,
-                    context
-            );
-        }
-
         final ICommandResult result;
         // Anything else to go here?
         result = this.executor.execute(context);
         this.onResult(context, result);
-        for (final ICommandInterceptor commandInterceptor : context.getServiceCollection().commandMetadataService().interceptors()) {
-            commandInterceptor.onPostCommand(
-                    this.executor.getClass(),
-                    this,
-                    context,
-                    result
-            );
-        }
-
         return result;
     }
 

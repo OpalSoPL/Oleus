@@ -18,13 +18,14 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.NotifyIfAFK;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.ICooldownService;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.plugin.meta.util.NonnullByDefault;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -59,33 +60,42 @@ import java.util.function.Consumer;
 )
 public class TeleportAskHereCommand implements ICommandExecutor {
 
+    @Override public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        return new Flag[] {
+                Flag.builder()
+                        .setRequirement(commandCause -> permissionService.hasPermission(commandCause, TeleportPermissions.TELEPORT_HERE_FORCE))
+                        .aliases("f", "force")
+                        .build()
+        };
+    }
+
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            GenericArguments.flags()
-                    .permissionFlag(TeleportPermissions.TELEPORT_HERE_FORCE, "f")
-                    .buildWith(NucleusParameters.ONE_PLAYER.get(serviceCollection))
+            NucleusParameters.ONE_PLAYER
         };
     }
 
     @Override public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
+        final ServerPlayer target = context.requireOne(NucleusParameters.ONE_PLAYER);
         final boolean cont = context.getServiceCollection()
                 .getServiceUnchecked(PlayerTeleporterService.class)
-                .canTeleportTo(context.getIfPlayer(), context.requireOne(NucleusParameters.Keys.PLAYER, Player.class));
+                .canTeleportTo(context.requirePlayer(), target.getUser());
         return cont ? Optional.empty() : Optional.of(context.failResult());
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player target = context.requireOne(NucleusParameters.Keys.PLAYER, Player.class);
+        final ServerPlayer src = context.requirePlayer();
+        final ServerPlayer target = context.requireOne(NucleusParameters.ONE_PLAYER);
         if (context.is(target)) {
             return context.errorResult("command.teleport.self");
         }
 
-        final Player src = context.getCommandSourceRoot();
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(src);
             // Before we do all this, check the event.
-            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(frame.getCurrentCause(), target);
+            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(frame.getCurrentCause(), target.getUniqueId());
             if (Sponge.getEventManager().post(event)) {
                 return event.getCancelMessage()
                         .map(context::errorResultLiteral)
@@ -109,7 +119,7 @@ public class TeleportAskHereCommand implements ICommandExecutor {
                         context.getWarmup(),
                         target,
                         src,
-                        !context.getOne("f", Boolean.class).orElse(false),
+                        !context.hasFlag("f"),
                         false,
                         false,
                         cooldownSetter,

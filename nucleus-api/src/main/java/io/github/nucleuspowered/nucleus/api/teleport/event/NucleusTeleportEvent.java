@@ -13,6 +13,8 @@ import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
+import java.util.UUID;
+
 /**
  * These events are fired <em>before</em> teleportation actually happens.
  */
@@ -25,11 +27,11 @@ public interface NucleusTeleportEvent extends CancelMessageEvent {
     interface Request extends NucleusTeleportEvent {
 
         /**
-         * The recipient of the request.
+         * The UUID of the recipient of the request.
          *
          * @return The {@link Player} in question.
          */
-        ServerPlayer getPlayer();
+        UUID getPlayer();
 
         /**
          * Called when the root cause wants to teleport to the target player (like /tpa).
@@ -64,11 +66,11 @@ public interface NucleusTeleportEvent extends CancelMessageEvent {
         Vector3d getRotation();
 
         /**
-         * The {@link ServerPlayer} to be teleported.
+         * The {@link UUID} of the player to be teleported.
          *
-         * @return The {@link ServerPlayer} in question.
+         * @return The {@link UUID} in question.
          */
-        ServerPlayer getPlayer();
+        UUID getPlayer();
     }
 
 }

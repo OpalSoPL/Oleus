@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.module;
 
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandInterceptor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.SyncTaskBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
@@ -23,11 +22,7 @@ public interface IModule {
 
     void init(INucleusServiceCollection serviceCollection);
 
-    default void postLoad(INucleusServiceCollection serviceCollection) {
-    }
-
-    default Collection<ICommandInterceptor> getCommandInterceptors() {
-        return Collections.emptyList();
+    default void postLoad(final INucleusServiceCollection serviceCollection) {
     }
 
     Collection<Class<? extends ICommandExecutor>> getCommands();

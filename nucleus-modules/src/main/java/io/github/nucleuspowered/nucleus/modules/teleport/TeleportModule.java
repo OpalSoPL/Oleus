@@ -7,16 +7,17 @@ package io.github.nucleuspowered.nucleus.modules.teleport;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.teleport.config.TeleportConfig;
+import io.github.nucleuspowered.nucleus.modules.teleport.runnables.TeleportAsyncTask;
+import io.github.nucleuspowered.nucleus.modules.teleport.services.PlayerTeleporterService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public final class TeleportModule implements IModule.Configurable<TeleportConfig> {
@@ -24,7 +25,7 @@ public final class TeleportModule implements IModule.Configurable<TeleportConfig
     public static final String ID = "teleport";
 
     @Override public void init(final INucleusServiceCollection serviceCollection) {
-
+        serviceCollection.registerService(PlayerTeleporterService.class, new PlayerTeleporterService(serviceCollection), false);
     }
 
     @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
@@ -32,15 +33,15 @@ public final class TeleportModule implements IModule.Configurable<TeleportConfig
     }
 
     @Override public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(TeleportPermissions.class);
     }
 
     @Override public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override public Collection<Class<? extends TaskBase>> getAsyncTasks() {
-        return null;
+        return Collections.singleton(TeleportAsyncTask.class);
     }
 
     @Override public Class<TeleportConfig> getConfigClass() {
@@ -49,13 +50,6 @@ public final class TeleportModule implements IModule.Configurable<TeleportConfig
 
     @Listener
     public void onRegisterNucleusPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
-        event.register(
-            new PreferenceKeyImpl.BooleanKey(
-                NucleusKeysProvider.TELEPORT_TARGETABLE_KEY,
-                true,
-                TeleportPermissions.BASE_TPTOGGLE,
-                "userpref.teleporttarget"
-            )
-        );
+        event.register(TeleportKeys.TELEPORT_TOGGLE);
     }
 }
