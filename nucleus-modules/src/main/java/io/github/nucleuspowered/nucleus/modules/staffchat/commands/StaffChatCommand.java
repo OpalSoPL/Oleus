@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.staffchat.commands;
 
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
+import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatKeys;
 import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatMessageChannel;
 import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatPermissions;
 import io.github.nucleuspowered.nucleus.modules.staffchat.services.StaffChatService;
@@ -19,14 +20,14 @@ import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvi
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.event.cause.EventContextKeys;
 import java.util.Optional;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.event.EventContextKeys;
 
 @Command(
         aliases = {"staffchat", "sc", "a"},
@@ -51,34 +52,33 @@ public class StaffChatCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Optional<String> toSend = context.getOne(NucleusParameters.Keys.MESSAGE, String.class);
+        final Optional<String> toSend = context.getOne(NucleusParameters.OPTIONAL_MESSAGE);
         if (toSend.isPresent()) {
-            try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.SHOULD_FORMAT_CHANNEL, StaffChatMessageChannel.getInstance().formatMessages());
-                if (context.is(Player.class)) {
-                    final Player pl = context.getIfPlayer();
+                if (context.is(ServerPlayer.class)) {
+                    final ServerPlayer pl = context.requirePlayer();
                     frame.pushCause(pl);
-                    frame.addContext(EventContextKeys.PLAYER_SIMULATED, pl.getProfile());
+                    frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.getProfile());
 
                     try (final NoExceptionAutoClosable c = this.chatMessageFormatterService
                             .setPlayerNucleusChannelTemporarily(pl.getUniqueId(), StaffChatMessageChannel.getInstance())) {
                         pl.simulateChat(
                                 context.getServiceCollection()
                                         .textStyleService()
-                                        .addUrls(toSend.get()), Sponge.getCauseStackManager().getCurrentCause());
+                                        .addUrls(toSend.get()), Sponge.getServer().getCauseStackManager().getCurrentCause());
                     }
 
                     // If you send a message, you're viewing it again.
                     context.getServiceCollection()
                             .userPreferenceService()
-                            .setPreferenceFor(pl, NucleusKeysProvider.VIEW_STAFF_CHAT, true);
+                            .setPreferenceFor(pl.getUniqueId(), StaffChatKeys.VIEW_STAFF_CHAT, true);
                 } else {
-                    frame.pushCause(context.getCommandSourceUnchecked());
                     // mostly to allow plugins to know that's what we're doing.
-                    try (NoExceptionAutoClosable c = this.chatMessageFormatterService
-                            .setAudienceNucleusChannelTemporarily(context.getCommandSource(), StaffChatMessageChannel.getInstance())) {
+                    try (final NoExceptionAutoClosable c = this.chatMessageFormatterService
+                            .setAudienceNucleusChannelTemporarily(context.getAudience(), StaffChatMessageChannel.getInstance())) {
                         StaffChatMessageChannel.getInstance()
-                                .sendMessageFrom(context.getCommandSource(),
+                                .sendMessageFrom(context.getAudience(),
                                         context.getServiceCollection().textStyleService().addUrls(toSend.get()));
                     }
                 }
@@ -87,11 +87,11 @@ public class StaffChatCommand implements ICommandExecutor {
             }
         }
 
-        if (!(context.is(Player.class))) {
+        if (!(context.is(ServerPlayer.class))) {
             return context.errorResult("command.staffchat.consoletoggle");
         }
 
-        final Player player = context.getIfPlayer();
+        final ServerPlayer player = context.getIfPlayer();
 
         final StaffChatService service = context.getServiceCollection().getServiceUnchecked(StaffChatService.class);
         final boolean result = service.isToggledChat(player);

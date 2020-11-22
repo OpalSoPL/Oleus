@@ -4,25 +4,26 @@
  */
 package io.github.nucleuspowered.nucleus.modules.staffchat.config;
 
-import io.github.nucleuspowered.neutrino.annotations.Default;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class StaffChatConfig {
 
-    @Setting(value = "include-standard-chat-formatting", comment = "config.staffchat.includestd")
+    @Setting(value = "include-standard-chat-formatting")
+    @LocalisedComment("config.staffchat.includestd")
     private boolean includeStandardChatFormatting = false;
 
-    @Setting(value = "message-template", comment = "config.staffchat.template")
-    @Default(value = "&b[STAFF] &r{{displayname}}&b: ", saveDefaultIfNull = true)
-    private NucleusTextTemplateImpl messageTemplate;
+    @Setting(value = "message-template")
+    @LocalisedComment("config.staffchat.template")
+    private String messageTemplate = "&b[STAFF] &r{{displayname}}&b: ";
 
-    @Setting(value = "message-colour", comment = "config.staffchat.colour")
+    @Setting(value = "message-colour")
+    @LocalisedComment("config.staffchat.colour")
     private String messageColour = "b";
 
-    public NucleusTextTemplateImpl getMessageTemplate() {
+    public String getMessageTemplate() {
         return this.messageTemplate;
     }
 

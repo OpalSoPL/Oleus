@@ -4,12 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.staffchat;
 
-import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
@@ -35,8 +33,11 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
     private boolean formatting = false;
 
     public static StaffChatMessageChannel getInstance() {
-        Preconditions.checkState(INSTANCE != null, "StaffChatMessageChannel#Instance");
-        return INSTANCE;
+        if (StaffChatMessageChannel.INSTANCE != null) {
+            throw new IllegalStateException("StaffChatMessageChannel#Instance");
+        }
+
+        return StaffChatMessageChannel.INSTANCE;
     }
 
     private final IPermissionService permissionService;
@@ -50,7 +51,7 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
         this.permissionService = serviceCollection.permissionService();
         this.userPreferenceService = serviceCollection.userPreferenceService();
         this.onReload(serviceCollection);
-        INSTANCE = this;
+        StaffChatMessageChannel.INSTANCE = this;
     }
 
     @Override
@@ -104,7 +105,7 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
     private boolean test(final ServerPlayer player) {
         if (this.permissionService.hasPermission(player, StaffChatPermissions.BASE_STAFFCHAT)) {
             return this.userPreferenceService
-                    .getPreferenceFor(player.getUniqueId(), NucleusKeysProvider.VIEW_STAFF_CHAT)
+                    .getPreferenceFor(player.getUniqueId(), StaffChatKeys.VIEW_STAFF_CHAT)
                     .orElse(true);
         }
 
@@ -113,8 +114,8 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
 
     public void onReload(final INucleusServiceCollection serviceCollection) {
         final StaffChatConfig sc = serviceCollection.configProvider().getModuleConfig(StaffChatConfig.class);
+        this.template = serviceCollection.textTemplateFactory().createFromAmpersandString(sc.getMessageTemplate());
         this.formatting = sc.isIncludeStandardChatFormatting();
-        this.template = sc.getMessageTemplate();
         this.colour = serviceCollection.textStyleService().getColourFromString(sc.getMessageColour()).orElse(null);
     }
 

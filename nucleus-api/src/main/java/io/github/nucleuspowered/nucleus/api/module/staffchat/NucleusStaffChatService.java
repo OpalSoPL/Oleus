@@ -49,7 +49,7 @@ public interface NucleusStaffChatService {
      *
      * @return The {@link Audience}s who are members of the channel.
      */
-    Collection<Audience> getStaffChannelMembers();
+    Audience getStaffChannelMembers();
 
     /**
      * Sends a message to the Staff Chat channel.

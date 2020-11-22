@@ -5,17 +5,18 @@
 package io.github.nucleuspowered.nucleus.modules.staffchat.services;
 
 import io.github.nucleuspowered.nucleus.api.module.staffchat.NucleusStaffChatService;
+import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatKeys;
 import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatMessageChannel;
 import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 
 import java.util.Collection;
@@ -60,7 +61,7 @@ public class StaffChatService implements NucleusStaffChatService, ServiceBase {
     }
 
     @Override
-    public Collection<Audience> getStaffChannelMembers() {
+    public Audience getStaffChannelMembers() {
         return StaffChatMessageChannel.getInstance().receivers();
     }
 
@@ -68,12 +69,12 @@ public class StaffChatService implements NucleusStaffChatService, ServiceBase {
         return this.chatMessageFormatService.getNucleusChannel(player.getUniqueId()).filter(x -> x instanceof StaffChatMessageChannel).isPresent();
     }
 
-    public void toggle(final Player player, final boolean toggle) {
+    public void toggle(final ServerPlayer player, final boolean toggle) {
         if (toggle) {
             this.chatMessageFormatService.setPlayerNucleusChannel(player.getUniqueId(), StaffChatMessageChannel.getInstance());
 
             // If you switch, you're switching to the staff chat channel so you should want to listen to it.
-            this.userPreferenceService.setPreferenceFor(player, NucleusKeysProvider.VIEW_STAFF_CHAT, true);
+            this.userPreferenceService.setPreferenceFor(player.getUniqueId(), StaffChatKeys.VIEW_STAFF_CHAT, true);
         } else {
             this.chatMessageFormatService.setPlayerNucleusChannel(player.getUniqueId(), null);
         }

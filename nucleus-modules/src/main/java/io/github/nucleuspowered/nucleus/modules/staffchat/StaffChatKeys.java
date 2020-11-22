@@ -1,0 +1,18 @@
+package io.github.nucleuspowered.nucleus.modules.staffchat;
+
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
+
+public final class StaffChatKeys {
+
+    private StaffChatKeys() { }
+
+    public static final NucleusUserPreferenceService.PreferenceKey<Boolean> VIEW_STAFF_CHAT = new PreferenceKeyImpl.BooleanKey(
+            NucleusKeysProvider.VIEW_STAFF_CHAT_KEY,
+            true,
+            StaffChatPermissions.BASE_STAFFCHAT,
+            "userpref.viewstaffchat"
+    );
+
+}
