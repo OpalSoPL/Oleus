@@ -10,19 +10,18 @@ import io.github.nucleuspowered.nucleus.modules.vanish.services.VanishService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 @EssentialsEquivalent({"vanish", "v"})
 @Command(
         aliases = {"vanish", "v"},
@@ -35,20 +34,18 @@ import org.spongepowered.api.text.Text;
 )
 public class VanishCommand implements ICommandExecutor {
 
-    private final String b = "toggle";
-
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                serviceCollection.commandElementSupplier().createOtherUserPermissionElement(false, VanishPermissions.OTHERS_VANISH),
-                GenericArguments.optional(GenericArguments.onlyOne(GenericArguments.bool(Text.of(this.b))))
+                serviceCollection.commandElementSupplier().createOnlyOtherUserPermissionElement(VanishPermissions.OTHERS_VANISH),
+                NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User ou = context.getUserFromArgs();
         if (ou.getPlayer().isPresent()) {
-            return onPlayer(context, ou.getPlayer().get());
+            return this.onPlayer(context, ou.getPlayer().get());
         }
 
         if (!context.testPermissionFor(ou, "persist")) {
@@ -62,7 +59,7 @@ public class VanishCommand implements ICommandExecutor {
                 .getUserService()
                 .getOrNewOnThread(ou.getUniqueId())
                 .getAndSet(VanishKeys.VANISH_STATUS)) {
-            result = context.getOne(this.b, Boolean.class).orElseGet(() -> !value.getValue().orElse(false));
+            result = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !value.getValue().orElse(false));
             value.setValue(result);
             final VanishService service = context.getServiceCollection().getServiceUnchecked(VanishService.class);
             if (result) {
@@ -80,18 +77,18 @@ public class VanishCommand implements ICommandExecutor {
         return context.successResult();
     }
 
-    private ICommandResult onPlayer(final ICommandContext context, final Player playerToVanish) throws CommandException {
-        if (playerToVanish.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.SPECTATOR)) {
+    private ICommandResult onPlayer(final ICommandContext context, final ServerPlayer playerToVanish) throws CommandException {
+        if (playerToVanish.get(Keys.GAME_MODE).orElseGet(GameModes.NOT_SET).equals(GameModes.SPECTATOR.get())) {
             return context.errorResult("command.vanish.fail");
         }
 
         // If we don't specify whether to vanish, toggle
-        final boolean toVanish = context.getOne(this.b, Boolean.class).orElse(!playerToVanish.get(Keys.VANISH).orElse(false));
+        final boolean toVanish = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElse(!playerToVanish.get(Keys.VANISH).orElse(false));
         final VanishService service = context.getServiceCollection().getServiceUnchecked(VanishService.class);
         if (toVanish) {
-            service.vanishPlayer(playerToVanish);
+            service.vanishPlayer(playerToVanish.getUser());
         } else {
-            service.unvanishPlayer(playerToVanish);
+            service.unvanishPlayer(playerToVanish.getUser());
         }
 
         context.sendMessageTo(

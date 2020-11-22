@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.vanish.services;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.vanish.VanishKeys;
 import io.github.nucleuspowered.nucleus.modules.vanish.VanishPermissions;
 import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfig;
@@ -11,7 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.services.interfaces.ISchedulerService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
@@ -19,7 +22,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
-import org.spongepowered.api.scheduler.Task;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -27,21 +29,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import com.google.inject.Inject;
-
 public class VanishService implements IReloadableService.Reloadable, ServiceBase {
 
     private boolean isAlter = false;
     private final Map<UUID, Instant> lastVanish = new HashMap<>();
     private final IPermissionService permissionService;
     private final IStorageManager storageManager;
-    private final PluginContainer pluginContainer;
+    private final ISchedulerService schedulerService;
 
     @Inject
     public VanishService(final INucleusServiceCollection serviceCollection) {
         this.permissionService = serviceCollection.permissionService();
         this.storageManager = serviceCollection.storageManager();
-        this.pluginContainer = serviceCollection.pluginContainer();
+        this.schedulerService = serviceCollection.schedulerService();
     }
 
     @Override
@@ -94,9 +94,9 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
                 .getOrNewOnThread(player.getUniqueId())
                 .set(VanishKeys.VANISH_STATUS, true);
 
-        if (player instanceof Player) {
+        if (player.isOnline()) {
             if (delay) {
-                Task.builder().execute(() -> this.vanishPlayerInternal((Player) player)).delayTicks(0).name("Nucleus Vanish runnable").submit(this.pluginContainer);
+                this.schedulerService.runOnMainThread(() -> this.vanishPlayerInternal(player.getPlayer().get()));
             } else {
                 this.lastVanish.put(player.getUniqueId(), Instant.now());
                 this.vanishPlayerInternal((Player) player);
@@ -134,12 +134,12 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
         user.offer(Keys.VANISH_IGNORES_COLLISION, false);
         user.offer(Keys.VANISH_PREVENTS_TARGETING, false);
 
-        if (this.isAlter && user instanceof Player) {
-            final Player player = (Player) user;
+        if (this.isAlter && user.isOnline()) {
+            final ServerPlayer player = user.getPlayer().get();
             Sponge.getServer().getOnlinePlayers().forEach(x -> {
                 if (!x.getTabList().getEntry(player.getUniqueId()).isPresent()) {
                     x.getTabList().addEntry(TabListEntry.builder()
-                            .displayName(Text.of(player.getName()))
+                            .displayName(Component.text(player.getName()))
                             .profile(player.getProfile())
                             .gameMode(player.gameMode().get())
                             .latency(player.getConnection().getLatency())

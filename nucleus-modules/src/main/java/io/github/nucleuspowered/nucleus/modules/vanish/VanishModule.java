@@ -6,14 +6,14 @@ package io.github.nucleuspowered.nucleus.modules.vanish;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.vanish.commands.ToggleVanishOnLoginCommand;
+import io.github.nucleuspowered.nucleus.modules.vanish.commands.VanishCommand;
 import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfig;
+import io.github.nucleuspowered.nucleus.modules.vanish.listener.VanishListener;
 import io.github.nucleuspowered.nucleus.modules.vanish.services.VanishService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.ResourceKey;
@@ -22,7 +22,9 @@ import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.util.Identifiable;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public final class VanishModule implements IModule.Configurable<VanishConfig> {
@@ -49,23 +51,22 @@ public final class VanishModule implements IModule.Configurable<VanishConfig> {
     }
 
     @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Arrays.asList(
+                ToggleVanishOnLoginCommand.class,
+                VanishCommand.class
+        );
     }
 
     @Override public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(VanishPermissions.class);
     }
 
     @Override public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
-    }
-
-    @Override public Collection<Class<? extends TaskBase>> getAsyncTasks() {
-        return null;
+        return Collections.singleton(VanishListener.class);
     }
 
     @Override public Class<VanishConfig> getConfigClass() {
-        return null;
+        return VanishConfig.class;
     }
 
     @Listener

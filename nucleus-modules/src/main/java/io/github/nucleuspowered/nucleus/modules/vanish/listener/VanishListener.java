@@ -4,38 +4,33 @@
  */
 package io.github.nucleuspowered.nucleus.modules.vanish.listener;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.vanish.VanishKeys;
 import io.github.nucleuspowered.nucleus.modules.vanish.VanishPermissions;
 import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfig;
 import io.github.nucleuspowered.nucleus.modules.vanish.services.VanishService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
-import com.google.inject.Inject;
 
 public class VanishListener implements IReloadableService.Reloadable, ListenerBase {
 
     private VanishConfig vanishConfig = new VanishConfig();
-    private final PluginContainer pluginContainer;
     private final VanishService service;
     private final IPermissionService permissionService;
     private final IMessageProviderService messageProviderService;
@@ -44,7 +39,6 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
 
     @Inject
     public VanishListener(final INucleusServiceCollection serviceCollection) {
-        this.pluginContainer = serviceCollection.pluginContainer();
         this.service = serviceCollection.getServiceUnchecked(VanishService.class);
         this.permissionService = serviceCollection.permissionService();
         this.messageProviderService = serviceCollection.messageProvider();
@@ -52,64 +46,55 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
         this.storageManager = serviceCollection.storageManager();
     }
 
-    @Listener
-    public void onAuth(final ClientConnectionEvent.Auth auth) {
+    @Listener(order = Order.LAST)
+    public void onAuth(final ServerSideConnectionEvent.Auth auth) {
         if (this.vanishConfig.isTryHidePlayers()) {
             final UUID uuid = auth.getProfile().getUniqueId();
-            final CompletableFuture<Void> future = new CompletableFuture<>();
-            Task.builder().execute(
-                    () -> {
-                        Sponge.getServiceManager()
-                                .provideUnchecked(UserStorageService.class)
+            Sponge.getServer().getUserManager()
                                 .get(uuid)
                                 .flatMap(x -> x.get(Keys.LAST_DATE_PLAYED))
                                 .ifPresent(y -> this.service.setLastVanishedTime(uuid, y));
-                        future.complete(null);
-                    }
-            ).submit(this.pluginContainer);
-
-            future.join();
         }
     }
 
     @Listener
-    public void onLogin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
-        final boolean persist = this.service.isVanished(player);
+    public void onLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+        final boolean persist = this.service.isVanished(player.getUniqueId());
 
         final boolean shouldVanish = (this.permissionService.hasPermission(player, VanishPermissions.VANISH_ONLOGIN)
-                && this.userPreferenceService.get(player.getUniqueId(), NucleusKeysProvider.VANISH_ON_LOGIN).orElse(false))
+                && this.userPreferenceService.get(player.getUniqueId(), VanishKeys.VANISH_ON_LOGIN).orElse(false))
                 || persist;
 
         if (shouldVanish) {
             if (!this.permissionService.hasPermission(player, VanishPermissions.VANISH_PERSIST)) {
                 // No permission, no vanish.
-                this.service.unvanishPlayer(player);
+                this.service.unvanishPlayer(player.getUser());
                 return;
             } else if (this.vanishConfig.isSuppressMessagesOnVanish()) {
                 event.setMessageCancelled(true);
             }
 
-            this.service.vanishPlayer(player, true);
+            this.service.vanishPlayer(player.getUser(), true);
             this.messageProviderService.sendMessageTo(player, "vanish.login");
 
             if (!persist) {
                 // on login
-                player.sendMessage(this.messageProviderService.getMessageFor(player, "vanish.onlogin.prefs").toBuilder()
-                        .onClick(TextActions.runCommand("/nuserprefs vanish-on-login false")).build());
+                player.sendMessage(this.messageProviderService.getMessageFor(player, "vanish.onlogin.prefs")
+                    .clickEvent(ClickEvent.runCommand("/nuserprefs vanish-on-login false")));
             }
         } else if (this.vanishConfig.isForceNucleusVanish()) {
             // unvanish
-            this.service.unvanishPlayer(player);
+            this.service.unvanishPlayer(player.getUser());
         }
     }
 
     @Listener
-    public void onQuit(final ClientConnectionEvent.Disconnect event, @Getter("getTargetEntity") final Player player) {
+    public void onQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer player) {
         if (player.get(Keys.VANISH).orElse(false)) {
             this.storageManager.getUserService().get(player.getUniqueId())
                     .thenAccept(x -> x.ifPresent(t -> t.set(VanishKeys.VANISH_STATUS, false)));
             if (this.vanishConfig.isSuppressMessagesOnVanish()) {
-                event.setMessageCancelled(true);
+                event.setAudience(Audience.empty());
             }
         }
 
