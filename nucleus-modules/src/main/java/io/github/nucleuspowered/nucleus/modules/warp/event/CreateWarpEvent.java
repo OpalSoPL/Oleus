@@ -5,20 +5,19 @@
 package io.github.nucleuspowered.nucleus.modules.warp.event;
 
 import io.github.nucleuspowered.nucleus.api.module.warp.event.NucleusWarpEvent;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.world.ServerLocation;
 
 public class CreateWarpEvent extends AbstractWarpEvent implements NucleusWarpEvent.Create {
 
-    private final Location<World> location;
+    private final ServerLocation location;
 
-    public CreateWarpEvent(final Cause cause, final String name, final Location<World> location) {
+    public CreateWarpEvent(final Cause cause, final String name, final ServerLocation location) {
         super(cause, name);
         this.location = location;
     }
 
-    @Override public Location<World> getLocation() {
+    @Override public ServerLocation getLocation() {
         return this.location;
     }
 }

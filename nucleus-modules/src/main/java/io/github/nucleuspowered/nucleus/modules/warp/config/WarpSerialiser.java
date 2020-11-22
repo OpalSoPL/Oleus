@@ -4,40 +4,41 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.config;
 
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.configurate.typeserialisers.NamedLocationSerialiser;
 import io.github.nucleuspowered.nucleus.modules.warp.data.WarpData;
+import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.configurate.serialize.TypeSerializer;
+
+import java.lang.reflect.Type;
 
 public final class WarpSerialiser implements TypeSerializer<Warp> {
 
     public static final WarpSerialiser INSTANCE = new WarpSerialiser();
 
     private WarpSerialiser() {
-        NamedLocationSerialiser.register(TypeToken.of(Warp.class), this);
+        NamedLocationSerialiser.register(TypeToken.get(Warp.class), this);
     }
 
-    @Nullable
     @Override
-    public Warp deserialize(@NonNull final TypeToken<?> type, @NonNull final ConfigurationNode value) throws ObjectMappingException {
-        final String desc = value.getNode("description").getString();
+    public Warp deserialize(@NonNull final Type type, @NonNull final ConfigurationNode value) throws SerializationException {
+        final String desc = value.node("description").getString();
         Component res = null;
         if (desc != null) {
             res = GsonComponentSerializer.gson().deserialize(desc);
         }
 
         return new WarpData(
-                value.getNode("category").getString(),
-                value.getNode("cost").getDouble(0d),
+                value.node("category").getString(),
+                value.node("cost").getDouble(0d),
                 res,
-                NamedLocationSerialiser.getWorldUUID(value),
+                NamedLocationSerialiser.getWorldResourceKey(value),
                 NamedLocationSerialiser.getPosition(value),
                 NamedLocationSerialiser.getRotation(value),
                 NamedLocationSerialiser.getName(value)
@@ -45,12 +46,16 @@ public final class WarpSerialiser implements TypeSerializer<Warp> {
     }
 
     @Override
-    public void serialize(@NonNull final TypeToken<?> type, @Nullable final Warp obj, @NonNull final ConfigurationNode value) throws ObjectMappingException {
+    public void serialize(@NonNull final Type type, @Nullable final Warp obj, @NonNull final ConfigurationNode value) throws SerializationException {
         if (obj == null) {
             return;
         }
         NamedLocationSerialiser.serializeLocation(obj, value);
-        obj.getCategory().ifPresent(x -> value.getNode("category").setValue(x));
-        obj.getCost().ifPresent(x -> value.getNode("cost").setValue(x));
+        if (obj.getCategory().isPresent()) {
+            value.node("category").set(obj.getCategory().get());
+        }
+        if (obj.getCost().isPresent()) {
+            value.node("cost").set(obj.getCost().get());
+        }
     }
 }

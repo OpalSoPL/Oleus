@@ -17,13 +17,13 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModif
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -52,25 +52,29 @@ public class SetWarpCommand implements ICommandExecutor {
 
 //    private final WarpService qs = getServiceUnchecked(WarpService.class);
     private final Pattern warpRegex = Pattern.compile("^[A-Za-z][A-Za-z0-9]{0,25}$");
-    private final String overwriteKey = "overwrite";
+
+    private final Parameter.Value<String> warpParameter = Parameter.string().setKey("warp").build();
+
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        final IPermissionService permissionService = serviceCollection.permissionService();
+        return new Flag[] {
+                Flag.builder().setRequirement(cause -> permissionService.hasPermission(cause, WarpPermissions.BASE_WARP_DELETE))
+                    .aliases("o", "overwrite")
+                    .build()
+        };
+    }
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                GenericArguments.flags().valueFlag(
-                        serviceCollection.commandElementSupplier().createPermissionParameter(
-                                GenericArguments.markTrue(Text.of(this.overwriteKey)),
-                                WarpPermissions.BASE_WARP_DELETE,
-                                false
-                        ), "o")
-                        .buildWith(GenericArguments.onlyOne(GenericArguments.string(Text.of(WarpService.WARP_KEY)))
-                )
+                this.warpParameter
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final String warp = context.requireOne(WarpService.WARP_KEY, String.class);
+        final String warp = context.requireOne(this.warpParameter);
 
         // Needs to match the name...
         if (!this.warpRegex.matcher(warp).matches()) {
@@ -82,12 +86,12 @@ public class SetWarpCommand implements ICommandExecutor {
         // Get the service, does the warp exist?
         final Optional<Warp> exists = warpService.getWarp(warp);
         if (exists.isPresent()) {
-            if (!context.hasAny(this.overwriteKey)) {
+            if (!context.hasFlag("o")) {
                 // You have to delete to set the same name
                 return context.errorResult("command.warps.nooverwrite");
             }
 
-            final DeleteWarpEvent event = new DeleteWarpEvent(context.getCause(), exists.get());
+            final DeleteWarpEvent event = new DeleteWarpEvent(Sponge.getServer().getCauseStackManager().getCurrentCause(), exists.get());
             if (Sponge.getEventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
@@ -103,26 +107,23 @@ public class SetWarpCommand implements ICommandExecutor {
             }
         }
 
-        final Player src = context.getIfPlayer();
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-            frame.pushCause(src);
-            final CreateWarpEvent event = new CreateWarpEvent(frame.getCurrentCause(), warp, src.getLocation());
-            if (Sponge.getEventManager().post(event)) {
-                return event.getCancelMessage()
-                        .map(context::errorResultLiteral)
-                        .orElseGet(() -> context.errorResult("nucleus.eventcancelled")
-                );
-            }
-
-            // OK! Set it.
-            if (warpService.setWarp(warp, src.getLocation(), src.getRotation())) {
-                // Worked. Tell them.
-                context.sendMessage("command.warps.set", warp);
-                return context.successResult();
-            }
-
-            // Didn't work. Tell them.
-            return context.errorResult("command.warps.seterror");
+        final ServerPlayer src = context.requirePlayer();
+        final CreateWarpEvent event = new CreateWarpEvent(Sponge.getServer().getCauseStackManager().getCurrentCause(), warp, src.getServerLocation());
+        if (Sponge.getEventManager().post(event)) {
+            return event.getCancelMessage()
+                    .map(context::errorResultLiteral)
+                    .orElseGet(() -> context.errorResult("nucleus.eventcancelled")
+            );
         }
+
+        // OK! Set it.
+        if (warpService.setWarp(warp, src.getServerLocation(), src.getRotation())) {
+            // Worked. Tell them.
+            context.sendMessage("command.warps.set", warp);
+            return context.successResult();
+        }
+
+        // Didn't work. Tell them.
+        return context.errorResult("command.warps.seterror");
     }
 }

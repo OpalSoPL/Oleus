@@ -14,7 +14,6 @@ import io.github.nucleuspowered.nucleus.modules.warp.services.WarpService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
@@ -23,14 +22,14 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.parameter.managed.Flag;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
-import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
@@ -67,28 +66,25 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
         this.isSafeTeleport = wc.isSafeTeleport();
     }
 
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("y", "a", "accept"),
+                Flag.of("f", "force")
+        };
+    }
+
     // flag,
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                GenericArguments.onlyOne(GenericArguments
-                        .optionalWeak(GenericArguments.flags()
-                                .flag("y", "a", "-accept")
-                                .flag("f", "-force")
-                                .setAnchorFlags(false)
-                                .buildWith(GenericArguments.none()))),
-                GenericArguments.optionalWeak(serviceCollection.commandElementSupplier()
-                        .createPermissionParameter(
-                                NucleusParameters.OPTIONAL_ONE_PLAYER.get(serviceCollection),
-                                WarpPermissions.OTHERS_WARP, false)),
-
-                GenericArguments.onlyOne(serviceCollection.getServiceUnchecked(WarpService.class)
-                        .warpElement(true))
+                serviceCollection.commandElementSupplier().createOnlyOtherPlayerPermissionElement(WarpPermissions.OTHERS_WARP),
+                serviceCollection.getServiceUnchecked(WarpService.class).warpElement(true)
         };
     }
 
     @Override public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
-        final Player target = context.getPlayerFromArgs();
+        final ServerPlayer target = context.getPlayerFromArgs();
         final IEconomyServiceProvider economyServiceProvider = context.getServiceCollection().economyServiceProvider();
         if (!context.is(target)) {
             // Don't cooldown
@@ -98,11 +94,12 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
 
         if (!economyServiceProvider.serviceExists() ||
                 context.testPermission(WarpPermissions.EXEMPT_COST_WARP) ||
-                context.hasAny("y")) {
+                context.hasFlag("y")) {
             return Optional.empty();
         }
 
-        final Warp wd = context.requireOne(WarpService.WARP_KEY, Warp.class);
+        final WarpService service = context.getServiceCollection().getServiceUnchecked(WarpService.class);
+        final Warp wd = context.requireOne(service.warpElement(true));
         final Optional<Double> i = wd.getCost();
         final double cost = i.orElse(this.defaultCost);
 
@@ -111,14 +108,14 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
         }
 
         final String costWithUnit = economyServiceProvider.getCurrencySymbol(cost);
-        if (economyServiceProvider.hasBalance(target, cost)) {
-            final String command = String.format("/warp -y %s", wd.getName());
+        if (economyServiceProvider.hasBalance(target.getUniqueId(), cost)) {
+            final String command = String.format("/nucleus:warp -y %s", wd.getName());
             context.sendMessage("command.warp.cost.details", wd.getName(), costWithUnit);
             context.sendMessageText(
-                    context.getMessage("command.warp.cost.clickaccept").toBuilder()
-                            .onClick(TextActions.runCommand(command)).onHover(
-                                    TextActions.showText(context.getMessage("command.warp.cost.clickhover", command)))
-                            .append(context.getMessage("command.warp.cost.alt")).build());
+                    context.getMessage("command.warp.cost.clickaccept")
+                            .clickEvent(ClickEvent.runCommand(command)).hoverEvent(
+                                    HoverEvent.showText(context.getMessage("command.warp.cost.clickhover", command)))
+                            .append(context.getMessage("command.warp.cost.alt")));
         } else {
             context.sendMessage("command.warp.cost.nomoney", wd.getName(), costWithUnit);
         }
@@ -127,24 +124,24 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player player = context.getPlayerFromArgs();
+        final ServerPlayer player = context.getPlayerFromArgs();
         final boolean isOther = !context.is(player);
 
         // Permission checks are done by the parser.
-        final Warp wd = context.requireOne(WarpService.WARP_KEY, Warp.class);
+        final WarpService service = context.getServiceCollection().getServiceUnchecked(WarpService.class);
+        final Warp wd = context.requireOne(service.warpElement(true));
         final WorldProperties worldProperties = wd.getWorldProperties().orElseThrow(() -> context.createException(
                 "command.warp.worlddoesnotexist"
         ));
 
         // Load the world in question
-        if (!wd.getTransform().isPresent()) {
-            Sponge.getServer().loadWorld(worldProperties.getUniqueId())
-                .orElseThrow(() -> context.createException("command.warp.worldnotloaded"));
+        if (!wd.getLocation().isPresent()) {
+            return context.errorResult("command.warp.worldnotloaded");
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
-            final UseWarpEvent event = new UseWarpEvent(frame.getCurrentCause(), player, wd);
+            final UseWarpEvent event = new UseWarpEvent(frame.getCurrentCause(), player.getUniqueId(), wd);
             if (Sponge.getEventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
@@ -157,7 +154,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
             final IEconomyServiceProvider economyServiceProvider = context.getServiceCollection().economyServiceProvider();
             if (!isOther && economyServiceProvider.serviceExists() && cost > 0 &&
                     !context.testPermission(WarpPermissions.EXEMPT_COST_WARP)) {
-                if (economyServiceProvider.withdrawFromPlayer(player, cost, false)) {
+                if (economyServiceProvider.withdrawFromPlayer(player.getUniqueId(), cost, false)) {
                     charge = true; // only true for a warp by the current subject.
                 } else {
                     return context.errorResult("command.warp.cost.nomoney", wd.getName(),
@@ -175,7 +172,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
             }
 
             // Warp them.
-            final boolean isSafe = !context.hasAny("f") && this.isSafeTeleport;
+            final boolean isSafe = !context.hasFlag("f") && this.isSafeTeleport;
 
             final INucleusLocationService safeLocationService = context.getServiceCollection().teleportService();
             final TeleportHelperFilter filter = safeLocationService.getAppropriateFilter(player, isSafe);
@@ -191,7 +188,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
 
             if (!result.isSuccessful()) {
                 if (charge) {
-                    economyServiceProvider.depositInPlayer(player, cost, false);
+                    economyServiceProvider.depositInPlayer(player.getUniqueId(), cost, false);
                 }
 
                 // Don't add the cooldown if enabled.

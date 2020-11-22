@@ -6,9 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.warp.event;
 
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.api.module.warp.event.NucleusWarpEvent;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.Optional;
 
@@ -25,7 +24,7 @@ public class DeleteWarpEvent extends AbstractWarpEvent implements NucleusWarpEve
         return this.warp;
     }
 
-    @Override public Optional<Location<World>> getLocation() {
+    @Override public Optional<ServerLocation> getLocation() {
         return this.warp.getLocation();
     }
 }

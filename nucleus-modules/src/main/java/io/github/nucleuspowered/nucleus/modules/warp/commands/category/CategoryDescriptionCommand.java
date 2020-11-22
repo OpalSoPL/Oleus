@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.commands.category;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;
 import io.github.nucleuspowered.nucleus.modules.warp.WarpPermissions;
 import io.github.nucleuspowered.nucleus.modules.warp.services.WarpService;
@@ -13,10 +14,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 @Command(
         aliases = "setdescription",
@@ -33,11 +33,12 @@ public class CategoryDescriptionCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WarpCategory category = context.requireOne(WarpService.WARP_CATEGORY_KEY, WarpCategory.class);
-        final String d = context.requireOne(NucleusParameters.Keys.DESCRIPTION, String.class);
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WarpCategory category = context.requireOne(context.getServiceCollection().getServiceUnchecked(WarpService.class).warpCategoryElement());
+        final String d = context.requireOne(NucleusParameters.DESCRIPTION);
         context.getServiceCollection().getServiceUnchecked(WarpService.class)
-                .setWarpCategoryDescription(category.getId(), TextSerializers.FORMATTING_CODE.deserialize(d));
+                .setWarpCategoryDescription(category.getId(), LegacyComponentSerializer.legacySection().deserialize(d));
         context.sendMessage("command.warp.category.description.set", category.getId(), d);
         return context.successResult();
     }

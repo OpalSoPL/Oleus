@@ -44,6 +44,7 @@ public final class NucleusParameters {
         public static final String COMMAND = "command";
         public static final String CONSOLE = "-";
         public static final String DESCRIPTION = "description";
+        public static final String DISPLAY_NAME = "display name";
         public static final String DURATION = "duration";
         public static final String GAME_PROFILE = "game profile";
         public static final String LOCATION = "location";
@@ -98,6 +99,8 @@ public final class NucleusParameters {
     public static final Parameter.Value<Collection<GameProfile>> MANY_GAME_PROFILES =
             Parameter.builder(new TypeToken<Collection<GameProfile>>() {}).setKey(Keys.GAME_PROFILE).parser(CatalogedValueParameters.MANY_GAME_PROFILES).build();
 
+    public static final Parameter.Value<Component> DISPLAY_NAME_COMPONENT = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.DISPLAY_NAME).build();
+
     public static final Parameter.Value<String> COMMAND = Parameter.remainingJoinedStrings().setKey(Keys.COMMAND).build();
 
     public static final Parameter.Value<String> OPTIONAL_COMMAND = Parameter.remainingJoinedStrings().setKey(Keys.COMMAND).optional().build();
@@ -105,6 +108,9 @@ public final class NucleusParameters {
     public static final Parameter.Value<String> DESCRIPTION = Parameter.remainingJoinedStrings().setKey(Keys.DESCRIPTION).build();
 
     public static final Parameter.Value<String> OPTIONAL_DESCRIPTION = Parameter.remainingJoinedStrings().setKey(Keys.DESCRIPTION).optional().build();
+
+    public static final Parameter.Value<Component> OPTIONAL_DESCRIPTION_COMPONENT =
+            Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.DESCRIPTION).optional().build();;
 
     public static final Parameter.Value<Component> LORE = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.LORE).build();
 
@@ -170,6 +176,9 @@ public final class NucleusParameters {
     public static final Parameter.Value<String> STRING_NAME = Parameter.string().setKey(Keys.NAME).build();
 
     public static final Parameter.Value<Component> OPTIONAL_REASON_COMPONENT = Parameter.formattingCodeText().setKey("reason").optional().build();
+
+    public static final Parameter.Value<Double> COST =
+            Parameter.builder(Double.class).parser(VariableValueParameters.doubleRange().setMin(0.0).build()).setKey("cost").build();
 
     public static final class Composite {
 

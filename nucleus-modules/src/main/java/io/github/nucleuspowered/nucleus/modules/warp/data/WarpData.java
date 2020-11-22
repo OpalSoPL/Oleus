@@ -4,25 +4,22 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.data;
 
-import net.kyori.adventure.text.Component;
-import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class WarpData implements Warp {
 
     private final String category;
     private final Double cost;
     private final Component description;
-    private final UUID worldPropertiesUUID;
+    private final ResourceKey worldKey;
     private final Vector3d position;
     private final Vector3d rotation;
     private final String name;
@@ -30,14 +27,14 @@ public class WarpData implements Warp {
     public WarpData(final String category,
                     final double cost,
                     final Component description,
-                    final UUID worldPropertiesUUID,
+                    final ResourceKey worldKey,
                     final Vector3d position,
                     final Vector3d rotation,
                     final String name) {
         this.category = category;
         this.cost = cost == 0 ? null : cost;
         this.description = description;
-        this.worldPropertiesUUID = worldPropertiesUUID;
+        this.worldKey = worldKey;
         this.position = position;
         this.rotation = rotation;
         this.name = name;
@@ -59,13 +56,13 @@ public class WarpData implements Warp {
     }
 
     @Override
-    public UUID getResourceKey() {
-        return this.worldPropertiesUUID;
+    public ResourceKey getResourceKey() {
+        return this.worldKey;
     }
 
     @Override
     public Optional<WorldProperties> getWorldProperties() {
-        return Sponge.getServer().getWorldProperties(this.worldPropertiesUUID);
+        return Sponge.getServer().getWorldManager().getProperties(this.worldKey);
     }
 
     @Override
@@ -80,7 +77,7 @@ public class WarpData implements Warp {
 
     @Override
     public Optional<ServerLocation> getLocation() {
-        return Sponge.getServer().getWorld(this.worldPropertiesUUID).map(x -> new Location<>(x, this.position));
+        return Sponge.getServer().getWorldManager().getWorld(this.worldKey).map(x -> ServerLocation.of(x, this.position));
     }
 
     @Override

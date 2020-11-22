@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.commands;
 
-import io.github.nucleuspowered.nucleus.api.module.warp.NucleusWarpService;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.modules.warp.WarpPermissions;
 import io.github.nucleuspowered.nucleus.modules.warp.event.DeleteWarpEvent;
@@ -17,9 +16,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.event.cause.Cause;
+
 @EssentialsEquivalent({"delwarp", "remwarp", "rmwarp"})
 @Command(
         aliases = {"delete", "del", "#delwarp", "#remwarp", "#rmwarp"},
@@ -38,17 +36,10 @@ public class DeleteWarpCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Warp warp = context.requireOne(WarpService.WARP_KEY, Warp.class);
-        final NucleusWarpService qs = Sponge.getServiceManager().provideUnchecked(NucleusWarpService.class);
+        final WarpService qs = context.getServiceCollection().getServiceUnchecked(WarpService.class);
+        final Warp warp = context.requireOne(qs.warpElement(false));
 
-        final Cause cause;
-        if (context.getCause().root() == context.getCommandSourceRoot()) {
-            cause = context.getCause();
-        } else {
-            cause = context.getCause().with(context.getCommandSourceRoot());
-        }
-
-        final DeleteWarpEvent event = new DeleteWarpEvent(cause, warp);
+        final DeleteWarpEvent event = new DeleteWarpEvent(Sponge.getServer().getCauseStackManager().getCurrentCause(), warp);
         if (Sponge.getEventManager().post(event)) {
             return event.getCancelMessage().map(context::errorResultLiteral)
                     .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));

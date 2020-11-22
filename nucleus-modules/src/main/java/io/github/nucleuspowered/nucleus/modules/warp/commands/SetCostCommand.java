@@ -11,14 +11,13 @@ import io.github.nucleuspowered.nucleus.modules.warp.services.WarpService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
+
 @Command(
         aliases = {"cost", "setcost"},
         basePermission = WarpPermissions.BASE_WARP_COST,
@@ -27,25 +26,24 @@ import org.spongepowered.api.text.Text;
 )
 public class SetCostCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private final String costKey = "cost";
     private double defaultCost = 0;
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
                 serviceCollection.getServiceUnchecked(WarpService.class).warpElement(false),
-                GenericArguments.onlyOne(new PositiveDoubleArgument(Text.of(this.costKey), serviceCollection))
+                NucleusParameters.COST
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Warp warpData = context.requireOne(WarpService.WARP_KEY, Warp.class);
-        final double cost = context.requireOne(this.costKey, Double.class);
+        final WarpService warpService = context.getServiceCollection().getServiceUnchecked(WarpService.class);
+        final Warp warpData = context.requireOne(warpService.warpElement(false));
+        final double cost = context.requireOne(NucleusParameters.COST);
         if (cost < -1) {
             return context.errorResult("command.warp.costset.arg");
         }
 
-        final WarpService warpService = context.getServiceCollection().getServiceUnchecked(WarpService.class);
         if (cost == -1 && warpService.setWarpCost(warpData.getName(), -1)) {
             context.sendMessage("command.warp.costset.reset", warpData.getName(), String.valueOf(this.defaultCost));
             return context.successResult();

@@ -13,7 +13,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 
 @Command(
@@ -30,7 +29,7 @@ public class CategoryRemoveDescriptionCommand implements ICommandExecutor {
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WarpCategory category = context.requireOne(WarpService.WARP_CATEGORY_KEY, WarpCategory.class);
+        final WarpCategory category = context.requireOne(context.getServiceCollection().getServiceUnchecked(WarpService.class).warpCategoryElement());
         context.getServiceCollection()
                 .getServiceUnchecked(WarpService.class)
                 .setWarpCategoryDescription(category.getId(), null);

@@ -16,14 +16,18 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.adventure.SpongeComponents;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -35,8 +39,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
-
 @Command(
         aliases = {"list", "#warps"},
         basePermission = WarpPermissions.BASE_WARP_LIST,
@@ -46,15 +48,17 @@ import javax.annotation.Nullable;
 )
 public class ListWarpCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
+    private static final Component DASH = Component.text("-", NamedTextColor.GREEN);
     private boolean isDescriptionInList = true;
     private double defaultCost = 0;
     private String defaultName = "unknown";
     private boolean isSeparatePerms = true;
     private boolean isCategorise = false;
 
-    @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
-        return new Parameter[] {
-            GenericArguments.flags().flag("u").buildWith(GenericArguments.none())
+    @Override
+    public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("u")
         };
     }
 
@@ -64,7 +68,7 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
             return context.errorResult("command.warps.list.nowarps");
         }
 
-        return !context.hasAny("u") && this.isCategorise ? categories(service, context) : noCategories(service, context);
+        return !context.hasFlag("u") && this.isCategorise ? this.categories(service, context) : this.noCategories(service, context);
     }
 
     private boolean canView(final ICommandContext context, final String warp) {
@@ -73,65 +77,66 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
 
     private ICommandResult categories(final WarpService service, final ICommandContext context) {
         // Get the warp list.
-        final Map<WarpCategory, List<Warp>> warps = service.getWarpsWithCategories(x -> canView(context, x.getName()));
-        createMain(context, warps);
+        final Map<WarpCategory, List<Warp>> warps = service.getWarpsWithCategories(x -> this.canView(context, x.getName()));
+        this.createMain(context, warps);
         return context.successResult();
     }
 
     private void createMain(final ICommandContext context, final Map<WarpCategory, List<Warp>> warps) {
-        final List<Text> lt = warps.keySet().stream().filter(Objects::nonNull)
+        final List<Component> lt = warps.keySet().stream().filter(Objects::nonNull)
                 .sorted(Comparator.comparing(WarpCategory::getId))
                 .map(s -> {
-                    final Text.Builder t = Text.builder("> ").color(TextColors.GREEN).style(TextStyles.ITALIC)
+                    final TextComponent.Builder t = Component.text().content("> ").color(NamedTextColor.GREEN)
+                            .style(Style.style(TextDecoration.ITALIC))
                             .append(s.getDisplayName())
-                            .onClick(TextActions.executeCallback(source -> createSub(context, s, warps)));
-                    s.getDescription().ifPresent(x -> t.append(Text.of(" - ")).append(Text.of(TextColors.RESET, TextStyles.NONE, x)));
+                            .clickEvent(SpongeComponents.executeCallback(source -> this.createSub(context, s, warps)));
+                    s.getDescription().ifPresent(x -> t.append(Component.text(" - ")).append(x));
                     return t.build();
                 })
                 .collect(Collectors.toList());
 
         // Uncategorised
         if (warps.containsKey(null)) {
-            lt.add(Text.builder("> " + this.defaultName).color(TextColors.GREEN).style(TextStyles.ITALIC)
-                .onClick(TextActions.executeCallback(source -> createSub(context, null, warps))).build());
+            lt.add(Component.text().content("> " + this.defaultName).color(NamedTextColor.GREEN).style(Style.style(TextDecoration.ITALIC))
+                .clickEvent(SpongeComponents.executeCallback(source -> this.createSub(context, null, warps))).build());
         }
 
-        Util.getPaginationBuilder(context.getCommandSourceRoot())
+        Util.getPaginationBuilder(context.getAudience())
             .header(context.getMessage("command.warps.list.headercategory"))
-            .title(context.getMessage("command.warps.list.maincategory")).padding(Text.of(TextColors.GREEN, "-"))
+            .title(context.getMessage("command.warps.list.maincategory")).padding(ListWarpCommand.DASH)
             .contents(lt)
-            .sendTo(context.getCommandSourceRoot());
+            .sendTo(context.getAudience());
     }
 
     private void createSub(final ICommandContext context,
             @Nullable final WarpCategory category, final Map<WarpCategory, List<Warp>> warpDataList) {
         final boolean econExists = context.getServiceCollection().economyServiceProvider().serviceExists();
-        final TextComponent name = category == null ? Text.of(this.defaultName) : category.getDisplayName();
+        final Component name = category == null ? Component.text(this.defaultName) : category.getDisplayName();
 
-        final List<Text> lt = warpDataList.get(category).stream().sorted(Comparator.comparing(Warp::getName))
-            .map(s -> createWarp(s, s.getName(), econExists, this.defaultCost, context)).collect(Collectors.toList());
+        final List<Component> lt = warpDataList.get(category).stream().sorted(Comparator.comparing(Warp::getName))
+            .map(s -> this.createWarp(s, s.getName(), econExists, this.defaultCost, context)).collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getCommandSourceRoot())
-            .title(context.getMessage("command.warps.list.category", name)).padding(Text.of(TextColors.GREEN, "-"))
+        Util.getPaginationBuilder(context.getAudience())
+            .title(context.getMessage("command.warps.list.category", name)).padding(ListWarpCommand.DASH)
             .contents(lt)
-            .footer(context.getMessage("command.warps.list.back").toBuilder()
-                .onClick(TextActions.executeCallback(s -> createMain(context, warpDataList))).build())
-            .sendTo(context.getCommandSourceRoot());
+            .footer(context.getMessage("command.warps.list.back")
+                .clickEvent(SpongeComponents.executeCallback(s -> this.createMain(context, warpDataList))))
+            .sendTo(context.getAudience());
     }
 
     private ICommandResult noCategories(final WarpService service, final ICommandContext context) {
         // Get the warp list.
         final Set<String> ws = service.getWarpNames();
         final boolean econExists = context.getServiceCollection().economyServiceProvider().serviceExists();
-        final List<Text> lt = ws.stream().filter(s -> canView(context, s.toLowerCase())).sorted(String::compareTo).map(s -> {
+        final List<Component> lt = ws.stream().filter(s -> this.canView(context, s.toLowerCase())).sorted(String::compareTo).map(s -> {
             final Optional<Warp> wd = service.getWarp(s);
-            return createWarp(wd.orElse(null), s, econExists, this.defaultCost, context);
+            return this.createWarp(wd.orElse(null), s, econExists, this.defaultCost, context);
         }).collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getCommandSourceRoot())
-            .title(context.getMessage("command.warps.list.header")).padding(Text.of(TextColors.GREEN, "-"))
+        Util.getPaginationBuilder(context.getAudience())
+            .title(context.getMessage("command.warps.list.header")).padding(ListWarpCommand.DASH)
             .contents(lt)
-            .sendTo(context.getCommandSourceRoot());
+            .sendTo(context.getAudience());
 
         return context.successResult();
     }
@@ -139,23 +144,23 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
     private TextComponent createWarp(@Nullable final Warp data, final String name, final boolean econExists, final double defaultCost,
             final ICommandContext context) {
         if (data == null || !data.getWorldProperties().map(WorldProperties::isEnabled).orElse(false)) {
-            return Text.builder(name).color(TextColors.RED)
-                    .onHover(TextActions.showText(
+            return Component.text().content(name).color(NamedTextColor.RED)
+                    .hoverEvent(HoverEvent.showText(
                             context.getMessage("command.warps.unavailable"))).build();
         }
 
         final String pos = data.getLocation().map(Location::getBlockPosition).orElseGet(() -> data.getPosition().toInt()).toString();
-        final String worldName = data.getWorldProperties().get().getWorldName();
+        final String worldName = data.getResourceKey().asString();
 
-        final Text.Builder inner = Text.builder(name).color(TextColors.GREEN).style(TextStyles.ITALIC)
-                .onClick(TextActions.runCommand("/warp \"" + name + "\""));
+        final TextComponent.Builder inner = Component.text().content(name).color(NamedTextColor.GREEN).style(Style.style(TextDecoration.ITALIC))
+                .clickEvent(ClickEvent.runCommand("/warp \"" + name + "\""));
 
-        final Text.Builder tb;
-        final Optional<Text> description = data.getDescription();
+        final TextComponent.Builder tb;
+        final Optional<Component> description = data.getDescription();
         if (this.isDescriptionInList) {
-            final Text.Builder hoverBuilder = Text.builder()
+            final TextComponent.Builder hoverBuilder = Component.text()
                     .append(context.getMessage("command.warps.warpprompt", name))
-                    .append(Text.NEW_LINE)
+                    .append(Component.newline())
                     .append(context.getMessage("command.warps.warplochover",
                             worldName,
                             pos));
@@ -164,27 +169,27 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
                 final double cost = data.getCost().orElse(defaultCost);
                 if (cost > 0) {
                     hoverBuilder
-                        .append(Text.NEW_LINE)
+                        .append(Component.newline())
                         .append(context.getMessage("command.warps.list.costhover",
                             context.getServiceCollection().economyServiceProvider().getCurrencySymbol(cost)));
                 }
             }
 
-            tb = Text.builder().append(inner.onHover(TextActions.showText(hoverBuilder.build())).build());
-            description.ifPresent(text -> tb.append(Text.of(TextColors.WHITE, " - ")).append(text));
+            tb = Component.text().append(inner.hoverEvent(HoverEvent.showText(hoverBuilder.build())).build());
+            description.ifPresent(text -> tb.append(Component.text(" - ", NamedTextColor.WHITE)).append(text));
         } else {
             if (description.isPresent()) {
-                inner.onHover(TextActions.showText(
-                        Text.of(
+                inner.hoverEvent(HoverEvent.showText(
+                        LinearComponents.linear(
                                 context.getMessage("command.warps.warpprompt", name),
-                                Text.NEW_LINE,
+                                Component.newline(),
                                 description.get()
                         )));
             } else {
-                inner.onHover(TextActions.showText(context.getMessage("command.warps.warpprompt", name)));
+                inner.hoverEvent(HoverEvent.showText(context.getMessage("command.warps.warpprompt", name)));
             }
 
-            tb = Text.builder().append(inner.build())
+            tb = Component.text().append(inner.build())
                             .append(context.getMessage("command.warps.warploc",
                                     worldName,
                                     pos

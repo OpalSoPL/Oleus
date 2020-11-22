@@ -4,29 +4,74 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp;
 
+import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
+import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;
+import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.DeleteWarpCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.ListWarpCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.SetCategoryCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.SetCostCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.SetDescriptionCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.SetWarpCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.WarpCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.category.CategoryCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.category.CategoryDescriptionCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.category.CategoryDisplayNameCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.category.CategoryRemoveDescriptionCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.category.CategoryRemoveDisplayNameCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.commands.category.ListCategoryCommand;
+import io.github.nucleuspowered.nucleus.modules.warp.config.WarpCategorySerialiser;
 import io.github.nucleuspowered.nucleus.modules.warp.config.WarpConfig;
-import io.github.nucleuspowered.nucleus.modules.warp.config.WarpConfigAdapter;
-import io.github.nucleuspowered.nucleus.quickstart.module.ConfigurableModule;
+import io.github.nucleuspowered.nucleus.modules.warp.config.WarpSerialiser;
+import io.github.nucleuspowered.nucleus.modules.warp.services.WarpService;
+import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import uk.co.drnaylor.quickstart.annotations.ModuleData;
-import uk.co.drnaylor.quickstart.holders.DiscoveryModuleHolder;
+import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 
-import java.util.function.Supplier;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
-import com.google.inject.Inject;
-
-@ModuleData(id = "warp", name = "Warp")
-public class WarpModule extends ConfigurableModule<WarpConfig, WarpConfigAdapter> {
-
-    @Inject
-    public WarpModule(final Supplier<DiscoveryModuleHolder<?, ?>> moduleHolder,
-            final INucleusServiceCollection collection) {
-        super(moduleHolder, collection);
-    }
+public final class WarpModule implements IModule.Configurable<WarpConfig> {
 
     @Override
-    public WarpConfigAdapter createAdapter() {
-        return new WarpConfigAdapter();
+    public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(WarpService.class, new WarpService(serviceCollection), false);
+        serviceCollection.configurateHelper().addTypeSerialiser(TypeSerializerCollection.builder()
+                .register(WarpCategory.class, new WarpCategorySerialiser())
+                .register(Warp.class, WarpSerialiser.INSTANCE)
+                .build());
     }
 
+    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+        return Arrays.asList(
+                CategoryCommand.class,
+                CategoryDescriptionCommand.class,
+                CategoryDisplayNameCommand.class,
+                CategoryRemoveDescriptionCommand.class,
+                CategoryRemoveDisplayNameCommand.class,
+                ListCategoryCommand.class,
+                DeleteWarpCommand.class,
+                ListWarpCommand.class,
+                SetCategoryCommand.class,
+                SetCostCommand.class,
+                SetDescriptionCommand.class,
+                SetWarpCommand.class,
+                WarpCommand.class
+        );
+    }
+
+    @Override public Optional<Class<?>> getPermissions() {
+        return Optional.of(WarpPermissions.class);
+    }
+
+    @Override public Collection<Class<? extends ListenerBase>> getListeners() {
+        return Collections.emptyList();
+    }
+
+    @Override public Class<WarpConfig> getConfigClass() {
+        return WarpConfig.class;
+    }
 }

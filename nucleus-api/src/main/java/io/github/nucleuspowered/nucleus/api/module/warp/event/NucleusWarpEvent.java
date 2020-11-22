@@ -15,6 +15,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
 
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Events when a server warp changes.
@@ -64,9 +65,9 @@ public interface NucleusWarpEvent extends Cancellable, CancelMessageEvent, Event
     }
 
     /**
-     * Fired when a {@link User} tries to teleport to a warp. The {@link Cause} of the event
-     * is who requests the warp, and is not necessarily the {@link #getTargetUser()} who is
-     * being warped.
+     * Fired when a player with the given {@link UUID} tries to teleport to a warp. The
+     * {@link Cause} of the event is who requests the warp, and is not necessarily the
+     * {@link #getTargetUser()} who is being warped.
      *
      * <p>
      *     Note that the user does not necessarily need to be online.
@@ -79,7 +80,7 @@ public interface NucleusWarpEvent extends Cancellable, CancelMessageEvent, Event
          *
          * @return The {@link User}
          */
-        User getTargetUser();
+        UUID getTargetUser();
 
         /**
          * Gets the {@link Warp}

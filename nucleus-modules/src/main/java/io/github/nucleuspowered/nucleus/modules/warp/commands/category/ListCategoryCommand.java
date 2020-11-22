@@ -12,11 +12,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -33,19 +33,18 @@ public class ListCategoryCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the categories.
-        final CommandSource src = context.getCommandSourceRoot();
         final WarpService handler = context.getServiceCollection().getServiceUnchecked(WarpService.class);
-        Util.getPaginationBuilder(src).contents(
+        Util.getPaginationBuilder(context.getAudience()).contents(
                 handler.getWarpsWithCategories().keySet().stream().filter(Objects::nonNull)
                 .sorted(Comparator.comparing(WarpCategory::getId)).map(x -> {
-            final List<Text> t = new ArrayList<>();
-            t.add(context.getMessage("command.warp.category.listitem.simple", Text.of(x.getId()), x.getDisplayName()));
+            final List<Component> t = new ArrayList<>();
+            t.add(context.getMessage("command.warp.category.listitem.simple", Component.text(x.getId()), x.getDisplayName()));
             x.getDescription().ifPresent(y -> t.add(context.getMessage("command.warp.category.listitem.description", y)));
             return t;
         }).flatMap(Collection::stream).collect(Collectors.toList()))
         .title(context.getMessage("command.warp.category.listitem.title"))
-        .padding(Text.of("-", TextColors.GREEN))
-        .sendTo(src);
+        .padding(Component.text("-", NamedTextColor.GREEN))
+        .sendTo(context.getAudience());
 
         return context.successResult();
     }

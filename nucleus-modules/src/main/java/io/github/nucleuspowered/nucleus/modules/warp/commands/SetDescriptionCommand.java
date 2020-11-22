@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.commands;
 
-import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.modules.warp.WarpPermissions;
 import io.github.nucleuspowered.nucleus.modules.warp.services.WarpService;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -13,12 +12,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.command.parameter.managed.Flag;
+
 @Command(
         aliases = {"setdescription"},
         basePermission = WarpPermissions.BASE_WARP_SETDESCRIPTION,
@@ -27,21 +25,23 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 )
 public class SetDescriptionCommand implements ICommandExecutor {
 
+    @Override public Flag[] flags(final INucleusServiceCollection serviceCollection) {
+        return new Flag[] {
+                Flag.of("r", "remove", "delete")
+        };
+    }
+
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            GenericArguments.flags().flag("r", "-remove", "-delete").buildWith(
-                GenericArguments.seq(
-                        serviceCollection.getServiceUnchecked(WarpService.class).warpElement(false),
-                        NucleusParameters.OPTIONAL_DESCRIPTION
-                )
-            )
+                serviceCollection.getServiceUnchecked(WarpService.class).warpElement(false),
+                NucleusParameters.OPTIONAL_DESCRIPTION_COMPONENT
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final WarpService handler = context.getServiceCollection().getServiceUnchecked(WarpService.class);
-        final String warpName = context.requireOne(WarpService.WARP_KEY, Warp.class).getName();
-        if (context.hasAny("r")) {
+        final String warpName = context.requireOne(handler.warpElement(false)).getName();
+        if (context.hasFlag("r")) {
             // Remove the desc.
             if (handler.setWarpDescription(warpName, null)) {
                 context.sendMessage("command.warp.description.removed", warpName);
@@ -52,12 +52,12 @@ public class SetDescriptionCommand implements ICommandExecutor {
         }
 
         // Add the category.
-        final TextComponent message = TextSerializers.FORMATTING_CODE.deserialize(context.requireOne(NucleusParameters.Keys.DESCRIPTION, String.class));
+        final Component message = context.requireOne(NucleusParameters.OPTIONAL_DESCRIPTION_COMPONENT);
         if (handler.setWarpDescription(warpName, message)) {
-            context.sendMessage("command.warp.description.added", message, Text.of(warpName));
+            context.sendMessage("command.warp.description.added", message, Component.text(warpName));
             return context.successResult();
         }
 
-        return context.errorResult("command.warp.description.couldnotadd", Text.of(warpName));
+        return context.errorResult("command.warp.description.couldnotadd", Component.text(warpName));
     }
 }

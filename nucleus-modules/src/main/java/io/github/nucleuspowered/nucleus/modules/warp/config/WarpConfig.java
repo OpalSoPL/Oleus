@@ -4,28 +4,34 @@
  */
 package io.github.nucleuspowered.nucleus.modules.warp.config;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class WarpConfig {
 
-    @Setting(value = "default-warp-cost", comment = "config.warps.cost")
+    @Setting(value = "default-warp-cost")
+    @LocalisedComment("config.warps.cost")
     private double defaultWarpCost = 0;
 
-    @Setting(value = "separate-permissions", comment = "config.warps.separate")
+    @Setting(value = "separate-permissions")
+    @LocalisedComment("config.warps.separate")
     private boolean separatePermissions = false;
 
-    @Setting(value = "use-safe-warp", comment = "config.warps.safe")
+    @Setting(value = "use-safe-warp")
+    @LocalisedComment("config.warps.safe")
     private boolean safeTeleport = true;
 
-    @Setting(value = "list-warps-by-category", comment = "config.warps.categories")
+    @Setting(value = "list-warps-by-category")
+    @LocalisedComment("config.warps.categories")
     private boolean categoriseWarps = false;
 
     @Setting(value = "default-category-name")
     private String defaultName = "Uncategorised";
 
-    @Setting(value = "show-warp-description-in-list", comment = "config.warps.descinlist")
+    @Setting(value = "show-warp-description-in-list")
+    @LocalisedComment("config.warps.descinlist")
     private boolean descriptionInList = false;
 
     public boolean isSeparatePermissions() {
