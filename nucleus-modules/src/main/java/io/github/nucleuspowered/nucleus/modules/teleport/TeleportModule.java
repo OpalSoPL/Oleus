@@ -6,6 +6,16 @@ package io.github.nucleuspowered.nucleus.modules.teleport;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportAcceptCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportAllHereCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportAskAllHereCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportAskCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportAskHereCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportDenyCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportHereCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportPositionCommand;
+import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportToggleCommand;
 import io.github.nucleuspowered.nucleus.modules.teleport.config.TeleportConfig;
 import io.github.nucleuspowered.nucleus.modules.teleport.runnables.TeleportAsyncTask;
 import io.github.nucleuspowered.nucleus.modules.teleport.services.PlayerTeleporterService;
@@ -16,6 +26,7 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -29,7 +40,18 @@ public final class TeleportModule implements IModule.Configurable<TeleportConfig
     }
 
     @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Arrays.asList(
+                TeleportAcceptCommand.class,
+                TeleportAllHereCommand.class,
+                TeleportAskAllHereCommand.class,
+                TeleportAskCommand.class,
+                TeleportAskHereCommand.class,
+                TeleportCommand.class,
+                TeleportDenyCommand.class,
+                TeleportHereCommand.class,
+                TeleportPositionCommand.class,
+                TeleportToggleCommand.class
+        );
     }
 
     @Override public Optional<Class<?>> getPermissions() {

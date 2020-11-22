@@ -70,14 +70,7 @@ public final class VanishModule implements IModule.Configurable<VanishConfig> {
 
     @Listener
     public void onRegisterNucleusPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
-        event.register(
-                new PreferenceKeyImpl.BooleanKey(
-                        NucleusKeysProvider.VANISH_ON_LOGIN_KEY,
-                        false,
-                        VanishPermissions.VANISH_ONLOGIN,
-                        "userpref.vanishonlogin"
-                )
-        );
+        event.register(VanishKeys.VANISH_ON_LOGIN);
     }
 
 }
