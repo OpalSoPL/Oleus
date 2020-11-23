@@ -226,7 +226,7 @@ public final class MuteService implements NucleusMuteService, IReloadableService
         this.mutes.invalidateAll();
     }
 
-    public void onMute(final MutedEntry md, final ServerPlayer user) {
+    public void onMute(final Mute md, final ServerPlayer user) {
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         if (md.getRemainingTime().isPresent()) {
             messageProviderService.sendMessageTo(user, "mute.playernotify.time",

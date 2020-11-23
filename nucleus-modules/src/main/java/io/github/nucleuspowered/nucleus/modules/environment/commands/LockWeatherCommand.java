@@ -45,7 +45,7 @@ public class LockWeatherCommand implements ICommandExecutor {
                 .getOrCreateWorldOnThread(wp.getKey())
                 .getAndSet(EnvironmentKeys.LOCKED_WEATHER)) {
             final boolean current = vb.getValue().orElse(false);
-            final boolean toggle = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!current);
+            final boolean toggle = context.getOne(NucleusParameters.ONE_TRUE_FALSE).orElse(!current);
             vb.setValue(toggle);
             if (toggle) {
                 context.sendMessage("command.lockweather.locked", wp.getKey().asString());

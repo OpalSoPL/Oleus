@@ -5,19 +5,21 @@
 package io.github.nucleuspowered.nucleus.modules.mute.listeners;
 
 import com.google.common.collect.Sets;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
-import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
+import io.github.nucleuspowered.nucleus.modules.mute.services.MuteService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandMapping;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.manager.CommandMapping;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.command.SendCommandEvent;
+import org.spongepowered.api.event.command.ExecuteCommandEvent;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,35 +27,27 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.inject.Inject;
-
 public class MuteCommandListener implements ListenerBase.Conditional {
 
     private final List<String> blockedCommands = new ArrayList<>();
 
     private final INucleusServiceCollection serviceCollection;
-    private final MuteHandler handler;
+    private final MuteService handler;
 
     @Inject
     public MuteCommandListener(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
-        this.handler = serviceCollection.getServiceUnchecked(MuteHandler.class);
+        this.handler = serviceCollection.getServiceUnchecked(MuteService.class);
     }
 
-    /**
-     * Checks for blocked commands when muted.
-     *
-     * @param event The {@link SendCommandEvent} containing the command.
-     * @param player The {@link Player} who executed the command.
-     */
     @Listener(order = Order.FIRST)
-    public void onPlayerSendCommand(final SendCommandEvent event, @Root final Player player) {
-        if (!this.handler.isMutedCached(player)) {
+    public void onPlayerSendCommand(final ExecuteCommandEvent.Pre event, @Root final ServerPlayer player) {
+        if (!this.handler.isMuted(player.getUniqueId())) {
             return;
         }
 
         final String command = event.getCommand().toLowerCase();
-        final Optional<? extends CommandMapping> oc = Sponge.getCommandManager().get(command, player);
+        final Optional<? extends CommandMapping> oc = Sponge.getCommandManager().getCommandMapping(command);
         final Set<String> cmd;
 
         // If the command exists, then get all aliases.
@@ -62,14 +56,17 @@ public class MuteCommandListener implements ListenerBase.Conditional {
 
         // If the command is in the list, block it.
         if (this.blockedCommands.stream().map(String::toLowerCase).anyMatch(cmd::contains)) {
-            final MuteData muteData = this.handler.getPlayerMuteData(player).orElse(null);
+            final Mute muteData = this.handler.getPlayerMuteInfo(player.getUniqueId()).orElse(null);
             if (muteData == null || muteData.expired()) {
-                this.handler.unmutePlayer(player);
+                this.handler.unmutePlayer(player.getUniqueId());
             } else {
                 this.handler.onMute(muteData, player);
-                MessageChannel.TO_CONSOLE.send(Text.builder().append(Text.of(player.getName() + " ("))
-                        .append(this.serviceCollection.messageProvider().getMessageFor(player, "standard.muted"))
-                        .append(Text.of("): ")).append(Text.of("/" + event.getCommand() + " " + event.getArguments())).build());
+                Sponge.getSystemSubject().sendMessage(LinearComponents.linear(
+                        Component.text(player.getName() + "("),
+                        this.serviceCollection.messageProvider().getMessage("standard.muted"),
+                        Component.text("): "),
+                        Component.text("/" + event.getCommand() + " " + event.getArguments())
+                ));
                 event.setCancelled(true);
             }
         }

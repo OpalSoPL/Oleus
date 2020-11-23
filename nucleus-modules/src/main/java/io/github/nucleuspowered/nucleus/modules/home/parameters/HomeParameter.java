@@ -4,10 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.home.parameters;
 
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
 import io.github.nucleuspowered.nucleus.modules.home.services.HomeService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class HomeParameter implements ValueParameter<Home> {
 
-    public static final Parameter.Key<User> OTHER_PLAYER_KEY = Parameter.key("other player", TypeToken.of(User.class));
+    public static final Parameter.Key<User> OTHER_PLAYER_KEY = Parameter.key("other player", TypeToken.get(User.class));
 
     private final HomeService homeService;
     protected final IMessageProviderService messageProviderService;

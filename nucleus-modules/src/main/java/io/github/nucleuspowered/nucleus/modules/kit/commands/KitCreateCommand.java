@@ -67,7 +67,7 @@ public final class KitCreateCommand implements ICommandExecutor {
             // if we have a clone request, clone.
             final ServerPlayer player = context.requirePlayer();
             if (context.hasFlag("c")) {
-                service.saveKit(service.createKit(kitName).updateKitInventory(player));
+                service.saveKit(service.createKit(kitName).updateKitInventory(player.getInventory()));
                 context.sendMessage("command.kit.add.success", kitName);
             } else {
                 final InventoryMenu inventory = KitUtil.getKitInventoryBuilder().asMenu();

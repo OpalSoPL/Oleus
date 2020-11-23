@@ -20,9 +20,11 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.weather.Weather;
@@ -96,12 +98,16 @@ public class WeatherCommand implements ICommandExecutor, IReloadableService.Relo
 
         if (oi.isPresent()) {
             // YES! I should get a job at the weather service and show them how it's done!
-            Task.builder().execute(() -> w.setWeather(we, oi.get() * 20L)).submit(context.getServiceCollection().pluginContainer());
-            context.sendMessage("command.weather.time", we.getName(), w.getName(), context.getTimeString(oi.get()));
+            Sponge.getServer().getScheduler().submit(Task.builder()
+                    .execute(() -> w.setWeather(we, Ticks.ofWallClockSeconds(Sponge.getServer(), oi.get().intValue())))
+                    .plugin(context.getServiceCollection().pluginContainer()).build());
+            context.sendMessage("command.weather.time", we.getKey().asString(), w.getKey().asString(), context.getTimeString(oi.get()));
         } else {
             // No, probably because I've already gotten a job at the weather service...
-            Task.builder().execute(() -> w.setWeather(we)).submit(context.getServiceCollection().pluginContainer());
-            context.sendMessage("command.weather.set", we.getName(), w.getName());
+            Sponge.getServer().getScheduler().submit(
+                    Task.builder().execute(() -> w.setWeather(we)).plugin(context.getServiceCollection().pluginContainer()).build()
+            );
+            context.sendMessage("command.weather.set", we.getKey().asString(), w.getKey().asString());
         }
 
         // The weather control device has been activated!

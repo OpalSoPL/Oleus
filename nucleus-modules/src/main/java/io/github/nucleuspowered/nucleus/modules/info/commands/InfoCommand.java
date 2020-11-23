@@ -52,8 +52,6 @@ public class InfoCommand implements ICommandExecutor, IReloadableService.Reloada
 
     private InfoConfig infoConfig = new InfoConfig();
 
-    private final String key = "section";
-
     @Inject
     public InfoCommand(final INucleusServiceCollection serviceCollection) {
         this.infoService = serviceCollection.getServiceUnchecked(InfoHandler.class);
@@ -87,7 +85,7 @@ public class InfoCommand implements ICommandExecutor, IReloadableService.Reloada
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        Optional<InfoValueParameter.Result> oir = context.getOne(this.key, InfoValueParameter.Result.class);
+        Optional<InfoValueParameter.Result> oir = context.getOne(this.parameter);
         if (this.infoConfig.isUseDefaultFile() && !oir.isPresent() && !context.hasFlag("l")) {
             // Do we have a default?
             final String def = this.infoConfig.getDefaultInfoSection();

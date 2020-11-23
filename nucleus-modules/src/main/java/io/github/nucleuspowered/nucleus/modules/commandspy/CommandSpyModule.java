@@ -50,11 +50,6 @@ public final class CommandSpyModule implements IModule.Configurable<CommandSpyCo
 
     @Listener
     public void registerUserPreferenceKey(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
-        event.register(new PreferenceKeyImpl.BooleanKey(
-                NucleusKeysProvider.COMMAND_SPY_KEY,
-                true,
-                CommandSpyPermissions.BASE_COMMANDSPY,
-                "userpref.commandspy"
-        ));
+        event.register(CommandSpyKeys.COMMAND_SPY);
     }
 }

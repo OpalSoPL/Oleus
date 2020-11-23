@@ -7,19 +7,19 @@ package io.github.nucleuspowered.nucleus.modules.connectionmessages.listeners;
 import io.github.nucleuspowered.nucleus.modules.connectionmessages.config.ConnectionMessagesConfig;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.event.message.MessageChannelEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 public class ConnectionMessagesForceListener implements ListenerBase.Conditional {
 
-    @Listener(order = Order.FIRST)
-    @Include({ClientConnectionEvent.Disconnect.class, ClientConnectionEvent.Join.class})
+    @Listener(order = Order.LAST)
+    @Include({ServerSideConnectionEvent.Disconnect.class, ServerSideConnectionEvent.Join.class})
     public void onPlayerLogin(final MessageChannelEvent joinEvent) {
-        joinEvent.setChannel(MessageChannel.TO_ALL);
+        joinEvent.setAudience(Sponge.getServer());
     }
 
     @Override

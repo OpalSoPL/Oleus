@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.admin.parameter;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
@@ -53,7 +54,7 @@ public class EntityTypeValueParameter implements ValueParameter<Predicate<Entity
             final CommandContext.Builder context) throws ArgumentParseException {
         final Predicate<Entity> predicate = this.map.get(reader.toString().toLowerCase());
         if (predicate == null) {
-            throw reader.createException(TextComponent.of("Entity type selection is invalid."));
+            throw reader.createException(Component.text("Entity type selection is invalid."));
         }
         return Optional.of(predicate);
     }

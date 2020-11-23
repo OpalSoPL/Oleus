@@ -20,6 +20,8 @@ import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.Ticks;
 
 @EssentialsEquivalent("burn")
 @Command(
@@ -49,14 +51,14 @@ public class IgniteCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player target = context.getPlayerFromArgs();
+        final ServerPlayer target = context.getPlayerFromArgs();
         final int ticksInput = context.requireOne(this.ticks);
         final GameMode gm = target.get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL);
         if (gm == GameModes.CREATIVE.get() || gm == GameModes.SPECTATOR.get()) {
             return context.errorResult("command.ignite.gamemode", target.getName());
         }
 
-        if (target.offer(Keys.FIRE_TICKS, ticksInput).isSuccessful()) {
+        if (target.offer(Keys.FIRE_TICKS, Ticks.of(ticksInput)).isSuccessful()) {
             context.sendMessage("command.ignite.success", target.getName(), String.valueOf(ticksInput));
             return context.successResult();
         } else {

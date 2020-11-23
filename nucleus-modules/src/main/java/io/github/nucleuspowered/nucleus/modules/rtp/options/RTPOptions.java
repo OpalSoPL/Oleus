@@ -10,6 +10,7 @@ import io.github.nucleuspowered.nucleus.modules.rtp.config.RTPConfig;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.world.biome.BiomeType;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class RTPOptions implements NucleusRTPService.RTPOptions {
@@ -18,14 +19,14 @@ public class RTPOptions implements NucleusRTPService.RTPOptions {
     private final int max;
     private final int minHeight;
     private final int maxHeight;
-    private final ImmutableSet<BiomeType> prohibitedBiomes;
+    private final Set<BiomeType> prohibitedBiomes;
 
     public RTPOptions(final RTPConfig config, @Nullable final String worldName) {
         this.min = config.getMinRadius(worldName);
         this.max = config.getRadius(worldName);
         this.maxHeight = config.getMaxY(worldName);
         this.minHeight = config.getMinY(worldName);
-        this.prohibitedBiomes = config.getProhibitedBiomes();
+        this.prohibitedBiomes = Collections.unmodifiableSet(config.getProhibitedBiomes());
     }
 
     RTPOptions(final RTPOptionsBuilder builder) {

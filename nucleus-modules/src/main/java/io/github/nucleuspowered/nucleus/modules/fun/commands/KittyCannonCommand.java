@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.fun.commands;
 
-import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.fun.FunPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
@@ -14,6 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
@@ -29,6 +29,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.explosion.Explosion;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.imaginary.Quaterniond;
@@ -42,9 +43,6 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
-
-// import io.leangen.geantyref.TypeToken;
-
 
 @Command(
         aliases = {"kittycannon", "kc"},
@@ -102,7 +100,7 @@ public class KittyCannonCommand implements ICommandExecutor {
     }
 
     private void getACat(final ICommandContext context, final ServerPlayer spawnAt, final boolean damageEntities, final boolean breakBlocks,
-            final boolean causeFire) throws CommandException {
+            final boolean causeFire) {
         // Fire it in the direction that the subject is facing with a speed of 0.5 to 3.5, plus the subject's current velocity.
         final Vector3d headRotation = spawnAt.getHeadDirection();
         final Quaterniond rot = Quaterniond.fromAxesAnglesDeg(headRotation.getX(), -headRotation.getY(), headRotation.getZ());
@@ -115,9 +113,8 @@ public class KittyCannonCommand implements ICommandExecutor {
         cat.offer(Keys.CAT_TYPE, catTypes.get(this.random.nextInt(catTypes.size())));
 
         Sponge.getServer().getScheduler().submit(
-                Task.builder().
-                        intervalTicks(5)
-                        .delayTicks(5)
+                Task.builder().interval(Ticks.of(5))
+                        .delay(Ticks.of(5))
                         .execute(new CatTimer(world.getKey(),
                                 cat.getUniqueId(),
                                 spawnAt,

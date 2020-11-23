@@ -59,13 +59,13 @@ public class GiveExperience implements ICommandExecutor {
 
         final int extra;
         if (context.hasAny(this.experienceLevelParameter)) {
-            final int lvl = pl.get(Keys.EXPERIENCE_LEVEL).orElse(0) + context.requireOne(ExperienceCommand.levelKey, int.class);
+            final int lvl = pl.get(Keys.EXPERIENCE_LEVEL).orElse(0) + context.requireOne(this.experienceLevelParameter);
             extra = pl.get(Keys.EXPERIENCE_SINCE_LEVEL).orElse(0);
 
             // Offer level, then we offer the extra experience.
             pl.tryOffer(Keys.EXPERIENCE_LEVEL, lvl);
         } else {
-            extra = context.requireOne(ExperienceCommand.experienceKey, int.class);
+            extra = context.requireOne(this.experienceValueParameter);
         }
 
         final int exp = pl.get(Keys.EXPERIENCE).orElse(0) + extra;

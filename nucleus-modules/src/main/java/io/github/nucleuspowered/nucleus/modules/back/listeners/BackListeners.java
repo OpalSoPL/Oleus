@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.back.listeners;
 
+import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import io.github.nucleuspowered.nucleus.api.module.jail.NucleusJailService;
 import io.github.nucleuspowered.nucleus.modules.back.BackPermissions;
 import io.github.nucleuspowered.nucleus.modules.back.config.BackConfig;
@@ -12,6 +13,7 @@ import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -21,7 +23,6 @@ import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.type.Exclude;
 
-import javax.annotation.Nullable;
 import com.google.inject.Inject;
 import org.spongepowered.api.world.ServerLocation;
 
@@ -35,7 +36,7 @@ public class BackListeners implements IReloadableService.Reloadable, ListenerBas
     @Inject
     public BackListeners(final INucleusServiceCollection serviceCollection) {
         // TODO: Pluggable stuff.
-        this.jailService = serviceCollection.getService(JailHandler.class).orElse(null);
+        this.jailService = NucleusAPI.getJailService().orElse(null);
         this.handler = serviceCollection.getServiceUnchecked(BackHandler.class);
         this.permissionService = serviceCollection.permissionService();
     }

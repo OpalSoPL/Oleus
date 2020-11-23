@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.admin.parameter;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.Entity;
 

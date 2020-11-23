@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandspy.commands;
 
+import io.github.nucleuspowered.nucleus.modules.commandspy.CommandSpyKeys;
 import io.github.nucleuspowered.nucleus.modules.commandspy.CommandSpyPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -13,9 +14,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.text.Text;
 import java.util.UUID;
 
 @Command(
@@ -33,13 +34,13 @@ public class CommandSpyCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final IUserPreferenceService userPreferenceService = context.getServiceCollection().userPreferenceService();
-        final UUID uuid = context.getUniqueId().orElseThrow(() -> new CommandException(Text.of("No UUID was found")));
+        final UUID uuid = context.getUniqueId().orElseThrow(() -> new CommandException(Component.text("No UUID was found")));
         final boolean to =
-                context.getOne(NucleusParameters.Keys.BOOL, Boolean.class)
+                context.getOne(NucleusParameters.ONE_TRUE_FALSE)
                     .orElseGet(() -> !userPreferenceService.getUnwrapped(
                             uuid,
-                            NucleusKeysProvider.COMMAND_SPY));
-        userPreferenceService.set(uuid, NucleusKeysProvider.COMMAND_SPY, to);
+                            CommandSpyKeys.COMMAND_SPY));
+        userPreferenceService.set(uuid, CommandSpyKeys.COMMAND_SPY, to);
         // "loc:" indicates to the engine that the text in the key is localisable
         context.sendMessage("command.commandspy.success", to ? "loc:standard.enabled" : "loc:standard.disabled");
 

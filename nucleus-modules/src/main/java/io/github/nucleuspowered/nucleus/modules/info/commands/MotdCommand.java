@@ -15,10 +15,10 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.Optional;
 
 @Command(
@@ -29,16 +29,17 @@ import java.util.Optional;
 @EssentialsEquivalent("motd")
 public class MotdCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private TextComponent title = Text.EMPTY;
+    private Component title = Component.empty();
     private boolean usePagination = true;
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Optional<TextFileController> otfc = context.getServiceCollection().textFileControllerCollection().get(InfoModule.MOTD_KEY);
         if (!otfc.isPresent()) {
             return context.errorResult("command.motd.nocontroller");
         }
 
-        final CommandSource src = context.getCommandSourceRoot();
+        final Audience src = context.getAudience();
         if (this.usePagination) {
             otfc.get().sendToAudience(src, this.title);
         } else {
@@ -52,9 +53,9 @@ public class MotdCommand implements ICommandExecutor, IReloadableService.Reloada
         final InfoConfig config = serviceCollection.configProvider().getModuleConfig(InfoConfig.class);
         final String title = config.getMotdTitle();
         if (title.isEmpty()) {
-            this.title = Text.EMPTY;
+            this.title = Component.empty();
         } else {
-            this.title = TextSerializers.FORMATTING_CODE.deserialize(title);
+            this.title = LegacyComponentSerializer.legacySection().deserialize(title);
         }
 
         this.usePagination = config.isMotdUsePagination();

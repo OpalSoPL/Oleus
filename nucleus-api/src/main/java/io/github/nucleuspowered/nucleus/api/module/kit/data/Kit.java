@@ -8,6 +8,7 @@ import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.NucleusKitService;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -171,7 +172,7 @@ public interface Kit {
      * @param player The player to get the kit from.
      * @return This {@link Kit} for chaining.
      */
-    Kit updateKitInventory(Player player);
+    Kit updateKitInventory(UUID player);
 
     /**
      * Obtains a collection of items that a player would obtain when redeeming the kit.
@@ -200,9 +201,9 @@ public interface Kit {
     /**
      * Redeems the commands in the kit, without redeeming the items.
      *
-     * @param player The {@link Player} that should redeem the commands.
+     * @param player The {@link UUID} that should redeem the commands.
      */
-    void redeemKitCommands(Player player);
+    void redeemKitCommands(UUID player);
 
     /**
      * Gets whether a message is displayed to the player when a kit is redeemed.

@@ -68,7 +68,7 @@ public class MeCommand implements ICommandExecutor, IReloadableService.Reloadabl
                 ChatPermissions.CHAT_COLOR,
                 ChatPermissions.CHAT_STYLE,
                 player,
-                context.requireOne(NucleusParameters.Keys.MESSAGE, String.class));
+                context.requireOne(NucleusParameters.MESSAGE));
 
         final Component header = this.config.getMePrefix().getForObject(context.getCommandSourceRoot());
         final ITextStyleService.TextFormat t = textStyleService.getLastColourAndStyle(header, null);

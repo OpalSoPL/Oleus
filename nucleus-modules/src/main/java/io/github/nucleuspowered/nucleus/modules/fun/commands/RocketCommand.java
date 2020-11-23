@@ -83,6 +83,7 @@ public class RocketCommand implements ICommandExecutor {
 
         if (context.hasFlag("e")) {
             final Explosion ex = Explosion.builder()
+                    .location(target.getServerLocation())
                     .canCauseFire(false)
                     .location(target.getServerLocation())
                     .shouldBreakBlocks(false)
@@ -90,8 +91,8 @@ public class RocketCommand implements ICommandExecutor {
                     .shouldDamageEntities(false)
                     .radius((float) v * 2.0f)
                     .build();
-            // TODO: how to spawn an explosion?
-            target.getServerLocation().spawnEntity(ex);
+
+            target.getServerLocation().getWorld().triggerExplosion(ex);
             Sponge.getServer().getScheduler().submit(
                     Task.builder()
                             .plugin(context.getServiceCollection().pluginContainer())

@@ -2,23 +2,21 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.modules.teleport;
+package io.github.nucleuspowered.nucleus.modules.commandspy;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
 
-public final class TeleportKeys {
+public final class CommandSpyKeys {
 
-    public static final NucleusUserPreferenceService.PreferenceKey<Boolean> TELEPORT_TOGGLE = new PreferenceKeyImpl.BooleanKey(
-            NucleusKeysProvider.TELEPORT_TARGETABLE_KEY,
+    private CommandSpyKeys() {}
+
+    public static final NucleusUserPreferenceService.PreferenceKey<Boolean> COMMAND_SPY = new PreferenceKeyImpl.BooleanKey(
+            NucleusKeysProvider.COMMAND_SPY_KEY,
             true,
-            TeleportPermissions.BASE_TPTOGGLE,
-            "userpref.teleporttarget"
+            CommandSpyPermissions.BASE_COMMANDSPY,
+            "userpref.commandspy"
     );
-
-    private TeleportKeys() {}
-
-
 
 }

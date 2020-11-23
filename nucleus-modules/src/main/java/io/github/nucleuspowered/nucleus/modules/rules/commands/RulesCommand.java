@@ -27,7 +27,7 @@ public class RulesCommand implements ICommandExecutor, IReloadableService.Reload
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         context.getServiceCollection()
                 .textFileControllerCollection()
-                .get(RulesModule.RULES_KEY)
+                .get(RulesModule.ID)
                 .orElseThrow(() -> context.createException("command.rules.empty"))
                 .sendToAudience(context.getAudience(), this.title);
         return context.successResult();

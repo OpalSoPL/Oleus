@@ -34,7 +34,7 @@ public class KitSetCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player player = context.getIfPlayer();
         final Kit kitInfo =  context.requireOne(KitService.KIT_KEY);
-        kitInfo.updateKitInventory(player);
+        kitInfo.updateKitInventory(player.getInventory());
         context.getServiceCollection().getServiceUnchecked(KitService.class).saveKit(kitInfo);
         context.sendMessage("command.kit.set.success", kitInfo.getName());
         return context.successResult();

@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.util;
 
+import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import io.github.nucleuspowered.nucleus.configurate.datatypes.LocationNode;
 import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
@@ -50,6 +51,8 @@ public final class GeAnTyRefTypeTokens {
     public static final TypeToken<NamedLocation> NAMEDLOCATION = TypeToken.get(NamedLocation.class);
 
     public static final TypeToken<Vector3d> VECTOR_3D = TypeToken.get(Vector3d.class);
+
+    public static final TypeToken<MailMessage> MAIL_MESSAGE = TypeToken.get(MailMessage.class);
 
     private GeAnTyRefTypeTokens() {
         // no-op

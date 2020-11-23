@@ -7,10 +7,12 @@ package io.github.nucleuspowered.nucleus.modules.kit.misc;
 import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -18,9 +20,8 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 public class SingleKit implements Kit {
 
@@ -146,23 +147,32 @@ public class SingleKit implements Kit {
     public Kit updateKitInventory(final Inventory inventory) {
         final List<Inventory> slots = Lists.newArrayList(inventory.slots());
         final List<ItemStackSnapshot> stacks = slots.stream()
-                .filter(x -> x.peek().isPresent() && x.peek().get().getType() != ItemTypes.NONE)
-                .map(x -> x.peek().get().createSnapshot()).collect(Collectors.toList());
+                .filter(x -> !x.peek().isEmpty())
+                .map(x -> x.peek().createSnapshot()).collect(Collectors.toList());
 
         // Add all the stacks into the kit list.
-        return setStacks(stacks);
+        return this.setStacks(stacks);
     }
 
     @Override
-    public Kit updateKitInventory(final Player player) {
-        return updateKitInventory(Util.getStandardInventory(player));
+    public Kit updateKitInventory(final UUID player) {
+        return this.updateKitInventory(Util.getStandardInventory(Sponge.getServer().getPlayer(player).get()));
     }
 
     @Override
-    public void redeemKitCommands(final Player player) {
-        final ConsoleSource source = Sponge.getServer().getConsole();
-        final String playerName = player.getName();
-        getCommands().forEach(x -> Sponge.getCommandManager().process(source, x.replace("{{player}}", playerName)));
+    public void redeemKitCommands(final UUID player) {
+        final SystemSubject source = Sponge.getSystemSubject();
+        final ServerPlayer pl = Sponge.getServer().getPlayer(player).get();
+        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            frame.pushCause(pl);
+            for (final String x : this.getCommands()) {
+                try {
+                    Sponge.getCommandManager().process(source, x.replace("{{player}}", pl.getName()));
+                } catch (final CommandException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override

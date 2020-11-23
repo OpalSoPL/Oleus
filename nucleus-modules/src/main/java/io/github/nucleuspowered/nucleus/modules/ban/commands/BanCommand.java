@@ -89,7 +89,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         Sponge.getAsyncScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
             final GameProfileManager gpm = Sponge.getServer().getGameProfileManager();
             try {
-                final GameProfile gp = gpm.get(userToFind).get();
+                final GameProfile gp = gpm.getProfile(userToFind).get();
 
                 // Ban the user sync.
                 Sponge.getServer().getScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {

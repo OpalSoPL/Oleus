@@ -45,7 +45,7 @@ public class FlyCommand implements ICommandExecutor { // extends AbstractCommand
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer player = context.getPlayerFromArgs();
-        final boolean fly = context.getOne(NucleusParameters.Keys.BOOL, Boolean.class).orElse(!player.get(Keys.CAN_FLY).orElse(false));
+        final boolean fly = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElse(!player.get(Keys.CAN_FLY).orElse(false));
 
         if (!this.setFlying(player, fly)) {
             return context.errorResult("command.fly.error");

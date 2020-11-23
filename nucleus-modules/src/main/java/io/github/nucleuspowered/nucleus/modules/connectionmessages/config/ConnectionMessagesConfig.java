@@ -4,52 +4,58 @@
  */
 package io.github.nucleuspowered.nucleus.modules.connectionmessages.config;
 
-import io.github.nucleuspowered.neutrino.annotations.Default;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 @ConfigSerializable
 public class ConnectionMessagesConfig {
 
-    @Setting(value = "show-first-login-message", comment = "config.connectionmessages.enablefirst")
+    @Setting(value = "show-first-login-message")
+    @LocalisedComment("config.connectionmessages.enablefirst")
     private boolean showFirstTimeMessage = true;
 
-    @Setting(value = "first-login-message", comment = "config.connectionmessages.firsttime")
-    @Default(value = "&dWelcome &f{{name}} &dto the server!",  saveDefaultIfNull = true)
-    private NucleusTextTemplateImpl firstTimeMessage;
+    @Setting(value = "first-login-message")
+    @LocalisedComment("config.connectionmessages.firsttime")
+    private String firstTimeMessage = "&dWelcome &f{{name}} &dto the server!";
 
-    @Setting(value = "modify-login-message", comment = "config.connectionmessages.enablelogin")
+    @Setting(value = "modify-login-message")
+    @LocalisedComment("config.connectionmessages.enablelogin")
     private boolean modifyLoginMessage = false;
 
-    @Setting(value = "modify-logout-message", comment = "config.connectionmessages.enablelogout")
+    @Setting(value = "modify-logout-message")
+    @LocalisedComment("config.connectionmessages.enablelogout")
     private boolean modifyLogoutMessage = false;
 
-    @Setting(value = "login-message", comment = "config.connectionmessages.loginmessage")
-    @Default(value = "&8[&a+&8] &f{{name}}", saveDefaultIfNull = true)
-    private NucleusTextTemplateImpl loginMessage;
+    @Setting(value = "login-message")
+    @LocalisedComment("config.connectionmessages.loginmessage")
+    private String loginMessage = "&8[&a+&8] &f{{name}}";
 
-    @Setting(value = "logout-message", comment = "config.connectionmessages.logoutmessage")
-    @Default(value = "&8[&c-&8] &f{{name}}", saveDefaultIfNull = true)
-    private NucleusTextTemplateImpl logoutMessage;
+    @Setting(value = "logout-message")
+    @LocalisedComment("config.connectionmessages.logoutmessage")
+    private String logoutMessage = "&8[&c-&8] &f{{name}}";
 
-    @Setting(value = "disable-with-permission", comment = "config.connectionmessages.disablepermission")
+    @Setting(value = "disable-with-permission")
+    @LocalisedComment("config.connectionmessages.disablepermission")
     private boolean disableWithPermission = false;
 
-    @Setting(value = "display-name-change-if-changed", comment = "config.connectionmessages.displayprior")
+    @Setting(value = "display-name-change-if-changed")
+    @LocalisedComment("config.connectionmessages.displayprior")
     private boolean displayPriorName = true;
 
-    @Setting(value = "changed-name-message", comment = "config.connectionmessages.displaypriormessage")
-    @Default(value = "&f{{name}} &ewas previously known by a different name - they were known as &f{{previousname}}", saveDefaultIfNull = true)
-    private NucleusTextTemplateImpl priorNameMessage;
+    @Setting(value = "changed-name-message")
+    @LocalisedComment("config.connectionmessages.displaypriormessage")
+    private String priorNameMessage = "&f{{name}} &ewas previously known by a different name - they were known as &f{{previousname}}";
 
-    @Setting(value = "force-show-all-connection-messages", comment = "config.connectionmessages.showall")
+    @Setting(value = "force-show-all-connection-messages")
+    @LocalisedComment("config.connectionmessages.showall")
     private boolean forceForAll = true;
 
     public boolean isShowFirstTimeMessage() {
         return this.showFirstTimeMessage;
     }
 
-    public NucleusTextTemplateImpl getFirstTimeMessage() {
+    public String getFirstTimeMessage() {
         return this.firstTimeMessage;
     }
 
@@ -61,11 +67,11 @@ public class ConnectionMessagesConfig {
         return this.modifyLogoutMessage;
     }
 
-    public NucleusTextTemplateImpl getLoginMessage() {
+    public String getLoginMessage() {
         return this.loginMessage;
     }
 
-    public NucleusTextTemplateImpl getLogoutMessage() {
+    public String getLogoutMessage() {
         return this.logoutMessage;
     }
 
@@ -77,7 +83,7 @@ public class ConnectionMessagesConfig {
         return this.displayPriorName;
     }
 
-    public NucleusTextTemplateImpl getPriorNameMessage() {
+    public String getPriorNameMessage() {
         return this.priorNameMessage;
     }
 

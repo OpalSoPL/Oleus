@@ -54,10 +54,10 @@ public class SetExperience implements ICommandExecutor {
             return r.get();
         }
 
-        final Optional<Integer> l = context.getOne(ExperienceCommand.levelKey, int.class);
+        final Optional<Integer> l = context.getOne(this.experienceLevelParameter);
         final DataTransactionResult dtr;
         dtr = l.map(integer -> pl.offer(Keys.EXPERIENCE_LEVEL, integer))
-                .orElseGet(() -> pl.offer(Keys.EXPERIENCE, context.requireOne(ExperienceCommand.experienceKey, int.class)));
+                .orElseGet(() -> pl.offer(Keys.EXPERIENCE, context.requireOne(this.experienceValueParameter)));
 
         return ExperienceCommand.tellUserAboutExperience(context, pl, dtr.isSuccessful());
     }

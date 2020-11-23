@@ -24,6 +24,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifie
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
@@ -154,7 +155,7 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
                     this.isSafeTeleport
             );
         } catch (final HomeException ex) {
-            return context.errorResultLiteral(ex.getText());
+            return context.errorResultLiteral(Component.text(ex.getMessage()));
         }
 
         if (isOther) {

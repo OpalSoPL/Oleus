@@ -35,6 +35,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.query.QueryTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @EssentialsEquivalent({"skull", "playerskull", "head"})

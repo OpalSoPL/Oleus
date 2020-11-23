@@ -25,8 +25,8 @@ import org.spongepowered.api.service.ban.Ban;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.ban.BanTypes;
 
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Command(
         aliases = "tempban",
@@ -59,9 +59,9 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final User u = context.requireOne(NucleusParameters.Keys.USER, User.class);
-        final long time = context.requireOne(NucleusParameters.Keys.DURATION, long.class);
-        final String reason = context.getOne(NucleusParameters.Keys.REASON, String.class)
+        final User u = context.requireOne(NucleusParameters.ONE_USER);
+        final Duration time = context.requireOne(NucleusParameters.DURATION);
+        final String reason = context.getOne(NucleusParameters.OPTIONAL_REASON)
                 .orElseGet(() -> context.getMessageString("ban.defaultreason"));
 
         if (!context.isConsoleAndBypass() && context.testPermissionFor(u, BanPermissions.TEMPBAN_EXEMPT_TARGET)) {
@@ -72,7 +72,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
             return context.errorResult("command.tempban.offline.noperms");
         }
 
-        if (time > this.banConfig.getMaximumTempBanLength()
+        if (time.getSeconds() > this.banConfig.getMaximumTempBanLength()
                 && this.banConfig.getMaximumTempBanLength() != -1 &&
                 !context.testPermission(BanPermissions.TEMPBAN_EXEMPT_LENGTH)) {
             return context.errorResult("command.tempban.length.toolong",
@@ -95,7 +95,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
         }
 
         // Expiration date
-        final Instant date = Instant.now().plus(time, ChronoUnit.SECONDS);
+        final Instant date = Instant.now().plus(time);
 
         // Create the ban.
         final Component src = context.getDisplayName();

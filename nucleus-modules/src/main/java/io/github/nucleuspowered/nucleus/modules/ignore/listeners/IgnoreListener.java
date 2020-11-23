@@ -4,9 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.ignore.listeners;
 
-import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.mail.event.NucleusSendMailEvent;
 import io.github.nucleuspowered.nucleus.api.module.message.event.NucleusMessageEvent;
+import io.github.nucleuspowered.nucleus.api.module.message.target.UserMessageTarget;
 import io.github.nucleuspowered.nucleus.modules.ignore.IgnorePermissions;
 import io.github.nucleuspowered.nucleus.modules.ignore.services.IgnoreService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
@@ -19,13 +20,11 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.cause.Root;
-import org.spongepowered.api.event.message.PlayerChatEvent;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
-import com.google.inject.Inject;
 
 public class IgnoreListener implements ListenerBase {
 
@@ -40,26 +39,30 @@ public class IgnoreListener implements ListenerBase {
         this.chatMessageFormatterService = serviceCollection.chatMessageFormatter();
     }
 
+    /*
     @Listener(order = Order.LAST)
     private void onChat(final PlayerChatEvent event, @Root final ServerPlayer player) {
         // Reset the channel - but only if we have to.
         if (!this.chatMessageFormatterService.getNucleusChannel(player.getUniqueId())
                 .map(IChatMessageFormatterService.Channel::ignoreIgnoreList)
                 .orElse(false)) {
+
             // TODO: Chat Router doesn't tell me who is going to receive the message, so I cannot filter it. API change?
             this.checkCancels(event.getChatRouter().orElseGet(event::getOriginalChatRouter).getMembers(), player).ifPresent(x -> {
                 final MutableMessageChannel mmc = event.getChannel().orElseGet(event::getOriginalChannel).asMutable();
                 x.forEach(mmc::removeMember);
                 event.setChannel(mmc);
             });
+
         }
     }
+    */
 
     @Listener(order = Order.FIRST)
     public void onMessage(final NucleusMessageEvent event, @Root final ServerPlayer player) {
-        if (event.getReceiver().isPresent()) {
+        if (event.getReceiver() instanceof UserMessageTarget) {
             try {
-                event.setCancelled(this.service.isIgnored(event.getReceiver().get(), player.getUniqueId()));
+                event.setCancelled(this.service.isIgnored(((UserMessageTarget) event.getReceiver()).getUserUUID(), player.getUniqueId()));
             } catch (final Exception e) {
                 e.printStackTrace();
             }
@@ -87,7 +90,7 @@ public class IgnoreListener implements ListenerBase {
             return Optional.empty();
         }
 
-        final List<Audience> list = Lists.newArrayList(collection);
+        final List<Audience> list = new ArrayList<>(collection);
         list.removeIf(x -> {
             try {
                 if (!(x instanceof ServerPlayer)) {

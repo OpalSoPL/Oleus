@@ -19,6 +19,7 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEq
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
@@ -105,7 +106,7 @@ public class SetHomeCommand implements ICommandExecutor, IReloadableService.Relo
                 homeService.createHome(player.getUniqueId(), home, player.getServerLocation(), player.getRotation());
             }
         } catch (final HomeException e) {
-            return context.errorResultLiteral(e.getText());
+            return context.errorResultLiteral(Component.text(e.getMessage() == null ? "null" : e.getMessage()));
         }
 
         context.sendMessage("command.sethome.set", home);

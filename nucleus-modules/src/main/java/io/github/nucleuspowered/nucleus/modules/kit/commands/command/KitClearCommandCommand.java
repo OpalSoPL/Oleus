@@ -15,6 +15,8 @@ import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 
+import java.util.ArrayList;
+
 @Command(
         aliases = { "clear" },
         basePermission = KitPermissions.BASE_KIT_COMMAND_REMOVE,

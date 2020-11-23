@@ -4,15 +4,18 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mute.infoprovider;
 
+import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
-import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
+import io.github.nucleuspowered.nucleus.modules.mute.services.MuteService;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import org.spongepowered.api.command.CommandSource;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
 
 import java.util.Optional;
 
@@ -22,30 +25,31 @@ public class MuteInfoProvider implements NucleusProvider {
         return NucleusProvider.PUNISHMENT;
     }
 
-    @Override public Optional<Text> get(final User user, final CommandSource source, final INucleusServiceCollection serviceCollection) {
+    @Override public Optional<Component> get(final User user, final CommandCause source, final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, MutePermissions.BASE_CHECKMUTE)) {
             // If we have a ban service, then check for a ban.
-            final MuteHandler jh = serviceCollection.getServiceUnchecked(MuteHandler.class);
+            final MuteService jh = serviceCollection.getServiceUnchecked(MuteService.class);
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
-            if (jh.isMuted(user)) {
-                final MuteData jd = jh.getPlayerMuteData(user).get();
+            final Audience audience = source.getAudience();
+            if (jh.isMuted(user.getUniqueId())) {
+                final Mute jd = jh.getPlayerMuteInfo(user.getUniqueId()).get();
                 // Lightweight checkban.
-                final Text.Builder m;
+                final Component m;
                 if (jd.getRemainingTime().isPresent()) {
-                    m = messageProviderService.getMessageFor(source, "seen.ismuted.temp",
-                            messageProviderService.getTimeString(source.getLocale(), jd.getRemainingTime().get().getSeconds())).toBuilder();
+                    m = messageProviderService.getMessageFor(audience, "seen.ismuted.temp",
+                            messageProviderService.getTimeString(audience, jd.getRemainingTime().get().getSeconds()));
                 } else {
-                    m = messageProviderService.getMessageFor(source, "seen.ismuted.perm").toBuilder();
+                    m = messageProviderService.getMessageFor(audience, "seen.ismuted.perm");
                 }
 
-                return Optional.of(Text.joinWith(Text.NEW_LINE,
-                        m.onClick(TextActions.runCommand("/checkmute " + user.getName()))
-                                .onHover(TextActions.showText(
-                                        messageProviderService.getMessageFor(source, "standard.clicktoseemore"))).build(),
-                        messageProviderService.getMessageFor(source, "standard.reason", jd.getReason())));
+                return Optional.of(Component.join(Component.newline(),
+                        m.clickEvent(ClickEvent.runCommand("/checkmute " + user.getName()))
+                                .hoverEvent(HoverEvent.showText(
+                                        messageProviderService.getMessageFor(audience, "standard.clicktoseemore"))),
+                        messageProviderService.getMessageFor(audience, "standard.reason", jd.getReason())));
             }
 
-            return Optional.of(messageProviderService.getMessageFor(source, "seen.notmuted"));
+            return Optional.of(messageProviderService.getMessageFor(audience, "seen.notmuted"));
         }
         return Optional.empty();
     }

@@ -4,34 +4,32 @@
  */
 package io.github.nucleuspowered.nucleus.modules.connection.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.connection.ConnectionPermissions;
 import io.github.nucleuspowered.nucleus.modules.connection.config.ConnectionConfig;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.IsCancelled;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.service.whitelist.WhitelistService;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
-
-import javax.annotation.Nullable;
-import com.google.inject.Inject;
 
 public class ConnectionListener implements IReloadableService.Reloadable, ListenerBase {
 
     private final IPermissionService permissionService;
 
     private int reservedSlots = 0;
-    @Nullable private TextComponent whitelistMessage;
-    @Nullable private TextComponent fullMessage;
+    @Nullable private Component whitelistMessage;
+    @Nullable private Component fullMessage;
 
     @Inject
     public ConnectionListener(final IPermissionService permissionService) {
@@ -45,18 +43,18 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
      */
     @Listener(order = Order.FIRST)
     @IsCancelled(Tristate.TRUE)
-    public void onPlayerJoinAndCancelled(final ClientConnectionEvent.Login event, @Getter("getTargetUser") final User user) {
+    public void onPlayerJoinAndCancelled(final ServerSideConnectionEvent.Login event, @Getter("getUser") final User user) {
         // Don't affect the banned.
-        final BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        final BanService banService = Sponge.getServer().getServiceProvider().banService();
         if (banService.isBanned(user.getProfile()) || banService.isBanned(event.getConnection().getAddress().getAddress())) {
             return;
         }
 
         if (Sponge.getServer().hasWhitelist()
-            && !Sponge.getServiceManager().provideUnchecked(WhitelistService.class).isWhitelisted(user.getProfile())) {
+            && !Sponge.getServer().getServiceProvider().whitelistService().isWhitelisted(user.getProfile())) {
             if (this.whitelistMessage != null) {
                 event.setMessage(this.whitelistMessage);
-                event.setMessageCancelled(false);
+                event.setCancelled(true);
             }
 
             // Do not continue, whitelist should always apply.
