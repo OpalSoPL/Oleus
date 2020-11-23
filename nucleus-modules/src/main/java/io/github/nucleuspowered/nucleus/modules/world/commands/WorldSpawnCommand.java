@@ -12,6 +12,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
 import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 @Command(
         aliases = {"spawn"},
@@ -27,8 +30,9 @@ import org.spongepowered.api.command.exception.CommandException;
 public class WorldSpawnCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        context.getServiceCollection().teleportService()
-                .setLocation(context.getIfPlayer(), context.getIfPlayer().getWorld().getSpawnLocation());
+        final ServerPlayer serverPlayer = context.requirePlayer();
+        final WorldProperties properties = serverPlayer.getWorld().getProperties();
+        serverPlayer.setPosition(properties.getSpawnPosition().toDouble());
         context.sendMessage("command.world.spawn.success");
         return context.successResult();
     }

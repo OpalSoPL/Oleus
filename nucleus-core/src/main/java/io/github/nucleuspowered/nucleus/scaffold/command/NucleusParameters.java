@@ -46,6 +46,7 @@ public final class NucleusParameters {
         public static final String DESCRIPTION = "description";
         public static final String DISPLAY_NAME = "display name";
         public static final String DURATION = "duration";
+        public static final String ENABLED_WORLD = "enabled world";
         public static final String GAME_PROFILE = "game profile";
         public static final String LOCATION = "location";
         public static final String LORE = "lore";
@@ -126,7 +127,7 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_ENABLED_ONLY =
             Parameter.builder(WorldProperties.class)
-                    .setKey(Keys.WORLD)
+                    .setKey(Keys.ENABLED_WORLD)
                     .parser(new WorldPropertiesValueParameter(
                             WorldProperties::isEnabled,
                             key -> Component.text(key.getFormatted() + " is not a disabled world properties.")))

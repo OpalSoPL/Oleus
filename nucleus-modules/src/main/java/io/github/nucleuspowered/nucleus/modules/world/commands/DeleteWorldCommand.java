@@ -13,14 +13,14 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.util.Tuples;
+import io.vavr.Tuple3;
+import net.kyori.adventure.audience.Audience;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.time.Instant;
@@ -28,10 +28,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
 
 @Command(
         aliases = {"delete", "del"},
@@ -41,84 +38,80 @@ import javax.annotation.Nullable;
 )
 public class DeleteWorldCommand implements ICommandExecutor {
 
-    @Nullable private Tuples.Tri<Instant, UUID, WorldProperties> confirm = null;
+    @Nullable private Tuple3<Instant, UUID, WorldProperties> confirm = null;
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.WORLD_PROPERTIES_ALL.get(serviceCollection),
+                NucleusParameters.WORLD_PROPERTIES_ALL,
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties properties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
-        if (this.confirm != null && this.confirm.getFirst().isAfter(Instant.now()) &&
-                this.confirm.getSecond().equals(context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID)) &&
-                this.confirm.getThird().getUniqueId().equals(properties.getUniqueId())) {
+        final WorldProperties properties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_ALL.getKey());
+        if (this.confirm != null && this.confirm._1().isAfter(Instant.now()) &&
+                this.confirm._2().equals(context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID)) &&
+                this.confirm._3().getUniqueId().equals(properties.getUniqueId())) {
             try {
-                return completeDeletion(context, properties);
+                return this.completeDeletion(context, properties);
             } finally {
                 this.confirm = null;
             }
         }
 
         this.confirm = null;
-        if (Sponge.getServer().getWorld(properties.getUniqueId()).isPresent()) {
-            return context.errorResult("command.world.delete.loaded", properties.getWorldName());
+        if (properties.getWorld().isPresent()) {
+            return context.errorResult("command.world.delete.loaded", properties.getKey().asString());
         }
 
         // Scary warning.
-        this.confirm = Tuples.of(Instant.now().plus(30, ChronoUnit.SECONDS), context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID), properties);
-        context.sendMessage("command.world.delete.warning1", properties.getWorldName());
-        context.sendMessage("command.world.delete.warning3", properties.getWorldName());
+        this.confirm = new Tuple3<>(Instant.now().plus(30, ChronoUnit.SECONDS), context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID), properties);
+        context.sendMessage("command.world.delete.warning1", properties.getKey().asString());
+        context.sendMessage("command.world.delete.warning3", properties.getKey().asString());
         return context.successResult();
     }
 
     private ICommandResult completeDeletion(final ICommandContext context, final WorldProperties properties) throws CommandException {
         Preconditions.checkNotNull(this.confirm);
-        final String worldName = this.confirm.getThird().getWorldName();
-        if (Sponge.getServer().getWorld(properties.getUniqueId()).isPresent()) {
-            return context.errorResult("command.world.delete.loaded", this.confirm.getThird());
+        final String worldName = this.confirm._3().getKey().asString();
+        if (Sponge.getServer().getWorldManager().getWorld(properties.getKey()).isPresent()) {
+            return context.errorResult("command.world.delete.loaded", this.confirm._3().getKey().asString());
         }
 
-        final ConsoleSource consoleSource = Sponge.getServer().getConsole();
+        final SystemSubject consoleSource = Sponge.getSystemSubject();
         context.sendMessage("command.world.delete.confirmed", worldName);
         if (!context.is(consoleSource)) {
             context.sendMessageTo(consoleSource, "command.world.delete.confirmed", worldName);
         }
 
         // Now request deletion
-        final CompletableFuture<Boolean> completableFuture = Sponge.getServer().deleteWorld(properties);
-        final Supplier<Optional<Object>> source;
-        if (context.is(Player.class)) {
-            final UUID uuid = context.getIfPlayer().getUniqueId();
+        final CompletableFuture<Boolean> completableFuture = Sponge.getServer().getWorldManager().deleteWorld(properties.getKey());
+        final Supplier<Optional<? extends Audience>> source;
+        if (context.getAudience() instanceof ServerPlayer) {
+            final UUID uuid = ((ServerPlayer) context.getAudience()).getUniqueId();
             source = () -> Sponge.getServer().getPlayer(uuid);
         } else {
             source = Optional::empty;
         }
 
-        Task.builder().async()
-                .execute(task -> {
-                    boolean result;
-                    try {
-                        result = completableFuture.get();
-                    } catch (final InterruptedException | ExecutionException e) {
-                        result = false;
-                        e.printStackTrace();
-                    }
+        completableFuture.handle((result, exception) -> {
+            if (exception != null || !result) {
+                if (exception != null) {
+                    exception.printStackTrace();
+                }
+                source.get().ifPresent(x -> {
+                    context.sendMessageTo(x, "command.world.delete.complete.error", worldName);
+                });
 
-                    if (!result) {
-                        source.get().ifPresent(x -> {
-                            context.sendMessageTo(x, "command.world.delete.complete.error", worldName);
-                        });
+                context.sendMessageTo(consoleSource, "command.world.delete.complete.error", worldName);
+            } else {
+                source.get().ifPresent(x -> context.sendMessageTo(x, "command.world.delete.complete.success", worldName));
+                context.sendMessageTo(consoleSource, "command.world.delete.complete.success", worldName);
+            }
+            return null;
+        });
 
-                        context.sendMessageTo(consoleSource, "command.world.delete.complete.error", worldName);
-                    } else {
-                        source.get().ifPresent(x -> context.sendMessageTo(x, "command.world.delete.complete.success", worldName));
-                        context.sendMessageTo(consoleSource, "command.world.delete.complete.success", worldName);
-                    }
-                }).submit(context.getServiceCollection().pluginContainer());
         return context.successResult();
     }
 

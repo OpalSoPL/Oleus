@@ -4,28 +4,28 @@
  */
 package io.github.nucleuspowered.nucleus.modules.world.listeners;
 
-import com.google.common.collect.Sets;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.config.WorldConfig;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
+import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.plugin.PluginContainer;
 
+import java.util.HashSet;
 import java.util.Set;
-
-import com.google.inject.Inject;
 
 public class EnforceGamemodeListener implements ListenerBase.Conditional {
 
@@ -37,28 +37,40 @@ public class EnforceGamemodeListener implements ListenerBase.Conditional {
     }
 
     @Listener(order = Order.POST)
-    public void onPlayerLogin(final ClientConnectionEvent.Join event, @Getter("getTargetEntity") final Player player) {
-        Task.builder().execute(() -> enforce(player, player.getWorld())).submit(this.pluginContainer);
+    public void onPlayerLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+        Sponge.getServer().getScheduler().submit(
+                Task.builder().execute(() -> this.enforce(player, player.getWorld())).plugin(this.pluginContainer).build()
+        );
     }
 
     @Listener(order = Order.POST)
-    public void onPlayerTeleport(final MoveEntityEvent.Teleport event,
-            @Getter("getTargetEntity") final Player player,
-            @Getter("getFromTransform") final Transform<World> from,
-            @Getter("getToTransform") final Transform<World> to) {
-        if (!from.getExtent().getUniqueId().equals(to.getExtent().getUniqueId())) {
-            enforce(player, to.getExtent());
+    public void onPlayerTeleport(final ChangeEntityWorldEvent.Post event,
+            @Getter("getEntity") final ServerPlayer player,
+            @Getter("getOriginalWorld") final ServerWorld from,
+            @Getter("getDestinationWorld") final ServerWorld to) {
+        if (!from.equals(to)) {
+            this.enforce(player, to);
         }
     }
 
-    private void enforce(final Player player, final World world) {
-        if (world.getProperties().getGameMode() == GameModes.NOT_SET) {
+    @Listener(order = Order.POST)
+    public void onPlayerTeleport(final RespawnPlayerEvent.Post event,
+            @Getter("getEntity") final ServerPlayer player,
+            @Getter("getOriginalWorld") final ServerWorld from,
+            @Getter("getDestinationWorld") final ServerWorld to) {
+        if (!from.equals(to)) {
+            this.enforce(player, to);
+        }
+    }
+
+    private void enforce(final ServerPlayer player, final ServerWorld world) {
+        if (world.getProperties().getGameMode() == GameModes.NOT_SET.get()) {
             return;
         }
 
-        final Set<Context> contextSet = Sets.newHashSet(player.getActiveContexts());
+        final Set<Context> contextSet = new HashSet<>(player.getActiveContexts());
         contextSet.removeIf(x -> x.getKey().equals(Context.WORLD_KEY));
-        contextSet.add(new Context(Context.WORLD_KEY, world.getName()));
+        contextSet.add(new Context(Context.WORLD_KEY, world.getKey().asString()));
         if (!player.hasPermission(contextSet, WorldPermissions.WORLD_FORCE_GAMEMODE_OVERRIDE)) {
             // set their gamemode accordingly.
             player.offer(Keys.GAME_MODE, world.getProperties().getGameMode());

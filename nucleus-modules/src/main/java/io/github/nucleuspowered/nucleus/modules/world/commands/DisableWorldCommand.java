@@ -13,7 +13,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -28,18 +27,18 @@ public class DisableWorldCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.get(serviceCollection)
+                NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
+        final WorldProperties worldProperties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY);
         if (!worldProperties.isEnabled()) {
-            return context.errorResult("command.world.disable.alreadydisabled", worldProperties.getWorldName());
+            return context.errorResult("command.world.disable.alreadydisabled", worldProperties.getKey().asString());
         }
 
-        if (Sponge.getServer().getWorld(worldProperties.getUniqueId()).isPresent()) {
-            return context.errorResult("command.world.disable.warnloaded", worldProperties.getWorldName());
+        if (Sponge.getServer().getWorldManager().getWorld(worldProperties.getKey()).isPresent()) {
+            return context.errorResult("command.world.disable.warnloaded", worldProperties.getKey().asString());
         }
 
         return disableWorld(context, worldProperties);
@@ -48,10 +47,10 @@ public class DisableWorldCommand implements ICommandExecutor {
     static ICommandResult disableWorld(final ICommandContext context, final WorldProperties worldProperties) {
         worldProperties.setEnabled(false);
         if (worldProperties.isEnabled()) {
-            return context.errorResult("command.world.disable.couldnotdisable", worldProperties.getWorldName());
+            return context.errorResult("command.world.disable.couldnotdisable", worldProperties.getKey().asString());
         }
 
-        context.sendMessage("command.world.disable.success", worldProperties.getWorldName());
+        context.sendMessage("command.world.disable.success", worldProperties.getKey().asString());
         return context.successResult();
     }
 }

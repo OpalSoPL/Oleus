@@ -5,11 +5,42 @@
 package io.github.nucleuspowered.nucleus.modules.world;
 
 import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.world.commands.CloneWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.CreateWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.DeleteWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.DisableWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.EnableWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.GameruleCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.InfoWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.ListWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.LoadWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.RenameWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.SetDifficultyWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.SetGamemodeWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.SetGameruleCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.SetSpawnWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.TeleportWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.UnloadWorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.WorldCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.WorldSpawnCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.border.BorderCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.border.ResetBorderCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.border.SetBorderCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.lists.AvailableBaseCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.lists.AvailableModifiersCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.lists.AvailablePresetsCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetHardcoreCommand;
+import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetKeepSpawnLoaded;
+import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetLoadOnStartup;
+import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetPvpEnabled;
 import io.github.nucleuspowered.nucleus.modules.world.config.WorldConfig;
+import io.github.nucleuspowered.nucleus.modules.world.listeners.EnforceGamemodeListener;
+import io.github.nucleuspowered.nucleus.modules.world.listeners.WorldListener;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -18,23 +49,53 @@ public class WorldModule implements IModule.Configurable<WorldConfig> {
     public static final String ID = "world";
 
     @Override
-    public void init(INucleusServiceCollection serviceCollection) {
-
+    public void init(final INucleusServiceCollection serviceCollection) {
     }
 
     @Override
     public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Arrays.asList(
+                BorderCommand.class,
+                ResetBorderCommand.class,
+                SetBorderCommand.class,
+                AvailableModifiersCommand.class,
+                AvailablePresetsCommand.class,
+                SetHardcoreCommand.class,
+                SetKeepSpawnLoaded.class,
+                SetLoadOnStartup.class,
+                SetPvpEnabled.class,
+                CloneWorldCommand.class,
+                CreateWorldCommand.class,
+                DeleteWorldCommand.class,
+                DisableWorldCommand.class,
+                EnableWorldCommand.class,
+                GameruleCommand.class,
+                InfoWorldCommand.class,
+                ListWorldCommand.class,
+                LoadWorldCommand.class,
+                RenameWorldCommand.class,
+                SetDifficultyWorldCommand.class,
+                SetGamemodeWorldCommand.class,
+                SetGameruleCommand.class,
+                SetSpawnWorldCommand.class,
+                TeleportWorldCommand.class,
+                UnloadWorldCommand.class,
+                WorldCommand.class,
+                WorldSpawnCommand.class
+        );
     }
 
     @Override
     public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(WorldPermissions.class);
     }
 
     @Override
     public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
+        return Arrays.asList(
+                EnforceGamemodeListener.class,
+                WorldListener.class
+        );
     }
 
     @Override

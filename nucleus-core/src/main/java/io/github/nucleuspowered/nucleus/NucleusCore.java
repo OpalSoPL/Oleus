@@ -349,7 +349,6 @@ public final class NucleusCore {
 
             // commands
             this.serviceCollection.commandMetadataService().registerCommands(container.getId(), container.getName(), module.getCommands());
-            this.serviceCollection.commandMetadataService().registerInterceptors(module.getCommandInterceptors());
 
             // tasks
             for (final Class<? extends TaskBase> taskBaseClass : module.getAsyncTasks()) {

@@ -8,7 +8,6 @@ import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.commands.WorldCommand;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 @Command(
@@ -29,7 +28,7 @@ public class SetHardcoreCommand extends AbstractPropertiesSetCommand {
 
     @Override protected void extraLogic(final ICommandContext context, final WorldProperties worldProperties, final boolean set) {
         if (!set) {
-            context.sendMessage("command.world.sethardcore.diff", worldProperties.getDifficulty().getName());
+            context.sendMessage("command.world.sethardcore.diff", worldProperties.getDifficulty().asComponent());
         }
     }
 }

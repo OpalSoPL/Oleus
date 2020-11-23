@@ -4,17 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn.listeners;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
-import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
-import org.spongepowered.api.event.network.ServerSideConnectionEvent;
-import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.api.world.server.ServerWorld;
-import org.spongepowered.math.vector.Vector3d;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.teleport.data.NucleusTeleportHelperFilters;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.configurate.datatypes.LocationNode;
@@ -29,24 +20,25 @@ import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modula
 import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import com.google.inject.Inject;
-import org.spongepowered.math.vector.Vector3i;
 
 public class SpawnListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -148,36 +140,40 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
     }
 
     @Listener(order = Order.LAST)
-    public void onRespawn(final RespawnPlayerEvent event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onRespawn(final RespawnPlayerEvent.SelectWorld event, @Getter("getEntity") final ServerPlayer player) {
+
+        final GlobalSpawnConfig sc = this.spawnConfig.getGlobalSpawn();
+
+        // Get the world.
+        if (sc.isOnRespawn()) {
+            sc.getWorld().flatMap(WorldProperties::getWorld).ifPresent(event::setDestinationWorld);
+        }
+    }
+
+    @Listener
+    public void onRespawn(final RespawnPlayerEvent.Recreate event, @Getter("getRecreatedPlayer") final ServerPlayer player) {
         if (event.isBedSpawn() && !this.spawnConfig.isRedirectBedSpawn()) {
             // Nope, we don't care.
             return;
         }
 
-        if (!event.getFromLocation().equals(event.getToLocation())) {
+        if (!event.getOriginalDestinationPosition().equals(event.getDestinationPosition())) {
             // Something else has made a change, we do not.
             return;
         }
 
-        final GlobalSpawnConfig sc = this.spawnConfig.getGlobalSpawn();
-        ServerWorld world = event.getToLocation().getWorld();
-
-        // Get the world.
-        if (sc.isOnRespawn()) {
-            final Optional<WorldProperties> oworld = sc.getWorld();
-            if (oworld.isPresent()) {
-                world = Sponge.getServer().getWorldManager().getWorld(oworld.get().getKey()).orElse(world);
-            }
-        }
-
-        event.setToLocation(ServerLocation.of(world.getKey(), SpawnListener.process(world.getProperties().getSpawnPosition())));
+        event.setDestinationPosition(SpawnListener.process(event.getDestinationWorld().getProperties().getSpawnPosition()));
 
         // Set rotation.
         this.serviceCollection.storageManager()
                 .getWorldService()
-                .getOrNewOnThread(world.getKey())
-                .get(SpawnKeys.WORLD_SPAWN_ROTATION)
-                .ifPresent(event::setToRotation);
+                .get(event.getDestinationWorld().getKey())
+                .thenAccept(x -> {
+                    x.flatMap(y -> y.get(SpawnKeys.WORLD_SPAWN_ROTATION)).ifPresent(y -> {
+                        Sponge.getServer().getScheduler().createExecutor(this.serviceCollection.pluginContainer())
+                                .execute(() -> player.setRotation(y));
+                    });
+                });
     }
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {

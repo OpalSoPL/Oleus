@@ -22,6 +22,7 @@ import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.HashMap;
@@ -67,7 +68,7 @@ public class ExperienceListener implements ListenerBase {
     }
 
     @Listener
-    public void onPlayerRespawn(final RespawnPlayerEvent event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onPlayerRespawn(final RespawnPlayerEvent.Post event, @Getter("getEntity") final ServerPlayer player) {
         this.applyExperience(player);
     }
 
@@ -79,7 +80,8 @@ public class ExperienceListener implements ListenerBase {
     private void applyExperience(final ServerPlayer player) {
         if (this.deadExpPlayers.containsKey(player.getUniqueId())) {
             final int exp = this.deadExpPlayers.get(player.getUniqueId());
-            final Task task = Task.builder().delayTicks(1).execute(() -> player.offer(Keys.EXPERIENCE, exp)).plugin(this.pluginContainer).build();
+            final Task task =
+                    Task.builder().delay(Ticks.of(1)).execute(() -> player.offer(Keys.EXPERIENCE, exp)).plugin(this.pluginContainer).build();
             Sponge.getServer().getScheduler().submit(task);
             this.deadExpPlayers.remove(player.getUniqueId());
         }

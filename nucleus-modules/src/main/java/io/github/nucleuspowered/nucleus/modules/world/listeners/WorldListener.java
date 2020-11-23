@@ -4,33 +4,35 @@
  */
 package io.github.nucleuspowered.nucleus.modules.world.listeners;
 
-import com.google.common.collect.Sets;
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.config.WorldConfig;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import com.google.inject.Inject;
-
 public class WorldListener implements ListenerBase.Conditional {
 
-    private final Set<UUID> messageSent = Sets.newHashSet();
+    private final Set<UUID> messageSent = new HashSet<>();
     private final INucleusServiceCollection serviceCollection;
 
     @Inject
@@ -38,26 +40,29 @@ public class WorldListener implements ListenerBase.Conditional {
         this.serviceCollection = serviceCollection;
     }
 
-    @Listener
-    public void onPlayerTeleport(final MoveEntityEvent.Teleport event, @Getter("getTargetEntity") final Player player) {
-        final World target = event.getToTransform().getExtent();
-        if (player.getWorld().equals(target)) return;
+    @Listener(order = Order.LAST)
+    public void onPlayerTeleport(final ChangeEntityWorldEvent.Pre event, @Getter("getEntity") final ServerPlayer player) {
+        final ServerWorld target = event.getOriginalWorld();
+        if (player.getWorld().equals(target)) {
+            // I mean, this is a change world event, but you never know.
+            return;
+        }
 
         final IPermissionService permissionService = this.serviceCollection.permissionService();
-        if (!permissionService.isConsoleOverride(event.getCause().first(CommandSource.class).orElse(player)) &&
-                !this.serviceCollection.permissionService().hasPermission(player, WorldPermissions.getWorldAccessPermission(target.getName()))) {
+        if (!permissionService.isConsoleOverride(event.getCause().first(Subject.class).orElse(player)) &&
+                !this.serviceCollection.permissionService().hasPermission(player, WorldPermissions.getWorldAccessPermission(target.getKey().asString()))) {
             event.setCancelled(true);
             if (!this.messageSent.contains(player.getUniqueId())) {
-                this.serviceCollection.messageProvider().sendMessageTo(player, "world.access.denied", target.getName());
+                this.serviceCollection.messageProvider().sendMessageTo(player, "world.access.denied", target.getKey().asString());
             }
 
-            if (event instanceof MoveEntityEvent.Teleport.Portal) {
-                this.messageSent.add(player.getUniqueId());
-                Sponge.getScheduler().createTaskBuilder()
-                    .delayTicks(1)
-                    .execute(relocate(player))
-                    .submit(this.serviceCollection.pluginContainer());
-            }
+            this.messageSent.add(player.getUniqueId());
+            Sponge.getServer().getScheduler().submit(
+                    Task.builder()
+                            .delay(Ticks.of(1))
+                            .execute(this.relocate(player))
+                            .plugin(this.serviceCollection.pluginContainer())
+                            .build());
         }
     }
 
@@ -66,13 +71,15 @@ public class WorldListener implements ListenerBase.Conditional {
         return this.serviceCollection.configProvider().getModuleConfig(WorldConfig.class).isSeparatePermissions();
     }
 
-    private Consumer<Task> relocate(final Player player) {
+    private Consumer<ScheduledTask> relocate(final ServerPlayer player) {
         return task -> {
-            final Optional<Location<World>> location = Sponge.getTeleportHelper().getSafeLocationWithBlacklist(player.getLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL);
+            final Optional<ServerLocation> location = Sponge.getServer()
+                    .getTeleportHelper()
+                    .getSafeLocationWithBlacklist(player.getServerLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL.get());
             if (location.isPresent()) {
                 player.setLocation(location.get());
             } else {
-                player.setLocationSafely(player.getWorld().getSpawnLocation());
+                player.setPosition(player.getWorld().getProperties().getSpawnPosition().toDouble());
             }
 
             this.messageSent.remove(player.getUniqueId());

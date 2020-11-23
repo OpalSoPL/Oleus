@@ -7,7 +7,9 @@ package io.github.nucleuspowered.nucleus.modules.world.commands.lists;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.commands.WorldCommand;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import org.spongepowered.api.world.gen.WorldGeneratorModifier;
+import net.kyori.adventure.text.Component;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.world.gen.GeneratorModifierType;
 
 @Command(
         aliases = {"modifiers", "listmodifiers"},
@@ -15,10 +17,14 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
         commandDescriptionKey = "world.modifiers",
         parentCommand = WorldCommand.class
 )
-public class AvailableModifiersCommand extends AvailableBaseCommand {
+public class AvailableModifiersCommand extends AvailableBaseCommand<GeneratorModifierType> {
 
     public AvailableModifiersCommand() {
-        super(WorldGeneratorModifier.class, "command.world.modifiers.title");
+        super(GeneratorModifierType.class, "command.world.modifiers.title");
     }
 
+    @Override
+    protected Component retrieveName(final GeneratorModifierType type) {
+        return Component.text(type.getKey().asString());
+    }
 }

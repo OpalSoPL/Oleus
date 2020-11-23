@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.world.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -13,11 +12,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 @Command(
@@ -29,25 +25,25 @@ import org.spongepowered.api.world.storage.WorldProperties;
 )
 public class SetGamemodeWorldCommand implements ICommandExecutor {
 
-    private final String gamemode = "gamemode";
+    private final Parameter.Value<GameMode> gameMode = Parameter.catalogedElement(GameMode.class).setKey("gamemode").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                GenericArguments.onlyOne(new ImprovedGameModeArgument(Text.of(this.gamemode), serviceCollection)),
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.get(serviceCollection)
+                this.gameMode,
+                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final GameMode gamemodeInput = context.requireOne(this.gamemode, GameMode.class);
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
+        final GameMode gamemodeInput = context.requireOne(this.gameMode);
+        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.WORLD_PROPERTIES_ALL.getKey())
                 .orElseThrow(() -> context.createException("command.world.player"));
 
         worldProperties.setGameMode(gamemodeInput);
         context.sendMessage("command.world.setgamemode.success",
-            worldProperties.getWorldName(),
-            Util.getTranslatableIfPresent(gamemodeInput));
+            worldProperties.getKey().asString(),
+            gamemodeInput.getKey().asString());
 
         return context.successResult();
     }

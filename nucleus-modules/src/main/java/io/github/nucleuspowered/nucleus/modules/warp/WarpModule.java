@@ -36,6 +36,8 @@ import java.util.Optional;
 
 public final class WarpModule implements IModule.Configurable<WarpConfig> {
 
+    public static final String ID = "warp";
+
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
         serviceCollection.registerService(WarpService.class, new WarpService(serviceCollection), false);

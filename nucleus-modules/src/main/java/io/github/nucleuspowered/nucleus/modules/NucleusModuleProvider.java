@@ -86,6 +86,14 @@ import io.github.nucleuspowered.nucleus.modules.spawn.SpawnModule;
 import io.github.nucleuspowered.nucleus.modules.spawn.config.SpawnConfig;
 import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatModule;
 import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
+import io.github.nucleuspowered.nucleus.modules.teleport.TeleportModule;
+import io.github.nucleuspowered.nucleus.modules.teleport.config.TeleportConfig;
+import io.github.nucleuspowered.nucleus.modules.vanish.VanishModule;
+import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfig;
+import io.github.nucleuspowered.nucleus.modules.warp.WarpModule;
+import io.github.nucleuspowered.nucleus.modules.warp.config.WarpConfig;
+import io.github.nucleuspowered.nucleus.modules.world.WorldModule;
+import io.github.nucleuspowered.nucleus.modules.world.config.WorldConfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -159,6 +167,10 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(SignModule.ID, "Sign", SignModule.class));
         containers.add(NucleusModuleProvider.createContainer(SpawnModule.ID, "Spawn", SpawnModule.class, SpawnConfig.class));
         containers.add(NucleusModuleProvider.createContainer(StaffChatModule.ID, "Staff Chat", StaffChatModule.class, StaffChatConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(TeleportModule.ID, "Teleport", TeleportModule.class, TeleportConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(VanishModule.ID, "Vanish", VanishModule.class, VanishConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(WarpModule.ID, "Warp", WarpModule.class, WarpConfig.class));
+        containers.add(NucleusModuleProvider.createContainer(WorldModule.ID, "World", WorldModule.class, WorldConfig.class));
         return containers;
     }
 

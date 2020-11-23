@@ -11,18 +11,14 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Locatable;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import java.util.Optional;
+import java.time.Duration;
 
 @Command(
         aliases = { "set" },
@@ -32,83 +28,67 @@ import java.util.Optional;
 )
 public class SetBorderCommand implements ICommandExecutor {
 
-    private final String xKey = "x";
-    private final String zKey = "z";
-    private final String diameter = "diameter";
-    private final String delayKey = "delay";
+    private final Parameter.Value<Integer> xParam = Parameter.integerNumber().setKey("x").build();
+    private final Parameter.Value<Integer> zParam = Parameter.integerNumber().setKey("z").build();
+    private final Parameter.Value<Integer> diameterParameter = Parameter.rangedInteger(1, Integer.MAX_VALUE).setKey("diameter").build();
+    private final Parameter.Value<Duration> durationParameter = Parameter.duration().setKey("delay").optional().build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            GenericArguments.firstParsing(
-                // Console + player
-                GenericArguments.seq(
-                    NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.get(serviceCollection),
-                    GenericArguments.onlyOne(GenericArguments.integer(Text.of(this.xKey))),
-                    GenericArguments.onlyOne(GenericArguments.integer(Text.of(this.zKey))),
-                    GenericArguments.onlyOne(new PositiveIntegerArgument(Text.of(this.diameter), serviceCollection)),
-                    GenericArguments.onlyOne(GenericArguments.optional(GenericArguments.onlyOne(new PositiveIntegerArgument(Text.of(this.delayKey),
-                            serviceCollection))))
-                ),
-
-                // Player only
-                GenericArguments.seq(
-                    GenericArguments.onlyOne(new PositiveIntegerArgument(Text.of(this.diameter), serviceCollection)),
-                    GenericArguments.onlyOne(GenericArguments.optional(GenericArguments.onlyOne(new PositiveIntegerArgument(Text.of(this.delayKey),
-                            serviceCollection)))))
-            )
+                Parameter.seqBuilder(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL)
+                    .then(this.xParam)
+                    .then(this.zParam)
+                    .optional()
+                    .build(),
+                this.diameterParameter,
+                this.durationParameter
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.getKey())
                 .orElseThrow(() -> context.createException("command.world.player"));
         final int x;
         final int z;
-        final int dia = context.requireOne(this.diameter, Integer.class);
-        final int delay = context.getOne(this.delayKey, Integer.class).orElse(0);
+        final int dia = context.requireOne(this.diameterParameter);
+        final Duration delay = context.getOne(this.durationParameter).orElse(Duration.ZERO);
 
         if (context.is(Locatable.class)) {
-            final Location<World> lw = ((Locatable) context.getCommandSourceRoot()).getLocation();
-            if (context.hasAny(this.zKey)) {
-                x = context.requireOne(this.xKey, Integer.class);
-                z = context.requireOne(this.zKey, Integer.class);
+            final ServerLocation lw = ((Locatable) context.getCommandSourceRoot()).getServerLocation();
+            if (context.hasAny(this.zParam)) {
+                x = context.requireOne(this.xParam);
+                z = context.requireOne(this.zParam);
             } else {
                 x = lw.getBlockX();
                 z = lw.getBlockZ();
             }
         } else {
-            x = context.requireOne(this.xKey, Integer.class);
-            z = context.requireOne(this.zKey, Integer.class);
+            x = context.requireOne(this.xParam);
+            z = context.requireOne(this.zParam);
         }
 
+        final WorldBorder border = wp.getWorldBorder();
         // Now, if we have an x and a z key, get the centre from that.
-        wp.setWorldBorderCenter(x, z);
-        final Optional<World> world = Sponge.getServer().getWorld(wp.getUniqueId());
-        world.ifPresent(w -> w.getWorldBorder().setCenter(x, z));
+        border.setCenter(x, z);
 
-        wp.setWorldBorderCenter(x, z);
-
-        if (delay == 0) {
-            world.ifPresent(w -> w.getWorldBorder().setDiameter(dia));
-            wp.setWorldBorderDiameter(dia);
+        if (delay == Duration.ZERO) {
+            border.setDiameter(dia);
             context.sendMessage("command.world.setborder.set",
-                    wp.getWorldName(),
+                    wp.getKey().asString(),
                     String.valueOf(x),
                     String.valueOf(z),
                     String.valueOf(dia));
         } else {
-            world.ifPresent(w -> w.getWorldBorder().setDiameter(dia, delay * 1000L));
-            wp.setWorldBorderTimeRemaining(delay * 1000L);
-            wp.setWorldBorderTargetDiameter(dia);
+            border.setDiameter(dia, delay);
             context.sendMessage("command.world.setborder.setdelay",
-                    wp.getWorldName(),
+                    wp.getKey().asString(),
                     String.valueOf(x),
                     String.valueOf(z),
                     String.valueOf(dia),
                     String.valueOf(delay));
         }
-
 
         return context.successResult();
     }

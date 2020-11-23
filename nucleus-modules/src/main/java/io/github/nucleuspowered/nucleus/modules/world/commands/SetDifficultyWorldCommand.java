@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.world.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
@@ -12,12 +11,8 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import org.spongepowered.api.CatalogTypes;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -29,25 +24,25 @@ import org.spongepowered.api.world.storage.WorldProperties;
 )
 public class SetDifficultyWorldCommand implements ICommandExecutor {
 
-    private final String difficulty = "difficulty";
+    private final Parameter.Value<Difficulty> difficultyValue = Parameter.catalogedElement(Difficulty.class).setKey("difficulty").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                GenericArguments.onlyOne(new ImprovedCatalogTypeArgument(Text.of(this.difficulty), CatalogTypes.DIFFICULTY, serviceCollection)),
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.get(serviceCollection)
+                this.difficultyValue,
+                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Difficulty difficultyInput = context.requireOne(this.difficulty, Difficulty.class);
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
+        final Difficulty difficultyInput = context.requireOne(this.difficultyValue);
+        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.getKey())
                         .orElseThrow(() -> context.createException("command.world.player"));
 
         worldProperties.setDifficulty(difficultyInput);
         context.sendMessage("command.world.setdifficulty.success",
-                worldProperties.getWorldName(),
-                Util.getTranslatableIfPresent(difficultyInput));
+                worldProperties.getKey().asString(),
+                difficultyInput.asComponent());
 
         return context.successResult();
     }

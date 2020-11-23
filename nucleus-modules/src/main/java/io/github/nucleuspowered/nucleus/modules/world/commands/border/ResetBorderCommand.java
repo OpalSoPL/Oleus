@@ -13,9 +13,9 @@ import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
@@ -31,32 +31,33 @@ public class ResetBorderCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.get(serviceCollection),
+                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.getKey())
                 .orElseThrow(() -> context.createException("command.world.player"));
 
-        wp.setWorldBorderCenter(0, 0);
-        final Optional<World> world = Sponge.getServer().getWorld(wp.getUniqueId());
+        final WorldBorder worldBorder = wp.getWorldBorder();
+        worldBorder.setCenter(0, 0);
+        final Optional<ServerWorld> world = wp.getWorld();
 
         // A world to get defaults from.
-        final World toDiameter = world.orElseGet(() -> Sponge.getServer().getWorld(
-            Sponge.getServer().getDefaultWorld().orElseThrow(IllegalStateException::new).getUniqueId()).orElseThrow(IllegalStateException::new));
+        final ServerWorld toDiameter = world.orElseGet(() ->
+                Sponge.getServer().getWorldManager().getDefaultProperties().flatMap(WorldProperties::getWorld).orElseThrow(IllegalStateException::new));
 
         // +1 includes the final block (1 -> -1 would otherwise give 2, not 3).
-        final long diameter = Math.abs(toDiameter.getBiomeMax().getX() - toDiameter.getBiomeMin().getX()) + 1;
-        wp.setWorldBorderDiameter(diameter);
+        final long diameter = Math.abs(toDiameter.getBlockMax().getX() - toDiameter.getBlockMin().getX()) + 1;
+        worldBorder.setDiameter(diameter);
 
         world.ifPresent(w -> {
-            w.getWorldBorder().setCenter(0, 0);
-            w.getWorldBorder().setDiameter(diameter);
+            worldBorder.setCenter(0, 0);
+            worldBorder.setDiameter(diameter);
         });
 
         context.sendMessage("command.world.setborder.set",
-                wp.getWorldName(),
+                wp.getKey().asString(),
                 "0",
                 "0",
                 String.valueOf(diameter));

@@ -13,6 +13,7 @@ import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -24,9 +25,9 @@ public class AboutToTeleportEvent extends AbstractEvent implements NucleusTelepo
     private final Cause cause;
     private final ServerLocation location;
     private final Vector3d rotation;
-    private final ServerPlayer teleportingEntity;
+    private final UUID teleportingEntity;
 
-    public AboutToTeleportEvent(final Cause cause, final ServerLocation location, final Vector3d rotation, final ServerPlayer teleportingEntity) {
+    public AboutToTeleportEvent(final Cause cause, final ServerLocation location, final Vector3d rotation, final UUID teleportingEntity) {
         this.cause = cause;
         this.location = location;
         this.rotation = rotation;
@@ -49,7 +50,7 @@ public class AboutToTeleportEvent extends AbstractEvent implements NucleusTelepo
         return this.rotation;
     }
 
-    @Override public ServerPlayer getPlayer() {
+    @Override public UUID getPlayer() {
         return this.teleportingEntity;
     }
 

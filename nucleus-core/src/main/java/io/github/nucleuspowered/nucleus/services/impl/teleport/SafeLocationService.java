@@ -84,7 +84,7 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
                     cause,
                     targetLocation,
                     rotation,
-                    player
+                    player.getUniqueId()
             );
 
             if (Sponge.getEventManager().post(event)) {

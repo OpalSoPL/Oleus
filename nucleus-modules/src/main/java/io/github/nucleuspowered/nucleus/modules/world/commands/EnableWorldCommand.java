@@ -12,7 +12,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -27,18 +26,18 @@ public class EnableWorldCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.WORLD_PROPERTIES_DISABLED_ONLY.get(serviceCollection)
+                NucleusParameters.WORLD_PROPERTIES_DISABLED_ONLY
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.requireOne(NucleusParameters.Keys.WORLD, WorldProperties.class);
+        final WorldProperties worldProperties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_DISABLED_ONLY);
         if (worldProperties.isEnabled()) {
-            return context.errorResult("command.world.enable.alreadyenabled", worldProperties.getWorldName());
+            return context.errorResult("command.world.enable.alreadyenabled", worldProperties.getKey().asString());
         }
 
         worldProperties.setEnabled(true);
-        context.sendMessage("command.world.enable.success", worldProperties.getWorldName());
+        context.sendMessage("command.world.enable.success", worldProperties.getKey().asString());
         return context.successResult();
     }
 }

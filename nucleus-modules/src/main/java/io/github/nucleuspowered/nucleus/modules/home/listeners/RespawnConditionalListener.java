@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.home.listeners;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.home.NucleusHomeService;
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
+import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import io.github.nucleuspowered.nucleus.modules.home.config.HomeConfig;
 import io.github.nucleuspowered.nucleus.modules.home.services.HomeService;
 import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
@@ -15,6 +16,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
 
@@ -28,18 +30,18 @@ public class RespawnConditionalListener implements ListenerBase.Conditional {
     }
 
     @Listener
-    public void onRespawn(final RespawnPlayerEvent event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onRespawn(final RespawnPlayerEvent.SelectWorld event, @Getter("getEntity") final ServerPlayer player) {
         final Optional<Home> oh = this.homeService.getHome(player.getUniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
-
-        if (oh.isPresent()) {
-            final Home home = oh.get();
-            oh.get().getLocation().ifPresent(x -> {
-                event.setToLocation(x);
-                event.setToRotation(home.getRotation());
-            });
-        }
-
+        oh.flatMap(x -> x.getWorldProperties().flatMap(WorldProperties::getWorld)).ifPresent(event::setDestinationWorld);
     }
+
+    @Listener
+    public void onRespawn(final RespawnPlayerEvent.Recreate event, @Getter("getEntity") final ServerPlayer player) {
+        final Optional<Home> oh = this.homeService.getHome(player.getUniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
+        oh.map(NamedLocation::getPosition).ifPresent(event::setDestinationPosition);
+    }
+
+
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.configProvider().getModuleConfig(HomeConfig.class).isRespawnAtHome();

@@ -10,7 +10,6 @@ import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -24,18 +23,18 @@ abstract class AbstractPropertiesSetCommand implements ICommandExecutor {
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.get(serviceCollection),
+                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL,
                 NucleusParameters.ONE_TRUE_FALSE
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.Keys.WORLD)
+        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.getKey())
                 .orElseThrow(() -> context.createException("command.world.player"));
-        final boolean set = context.requireOne(NucleusParameters.Keys.BOOL, Boolean.class);
-        setter(worldProperties, set);
-        context.sendMessage("command.world.setproperty.success", this.name, worldProperties.getWorldName(), String.valueOf(set));
-        extraLogic(context, worldProperties, set);
+        final boolean set = context.requireOne(NucleusParameters.ONE_TRUE_FALSE);
+        this.setter(worldProperties, set);
+        context.sendMessage("command.world.setproperty.success", this.name, worldProperties.getKey().asString(), String.valueOf(set));
+        this.extraLogic(context, worldProperties, set);
         return context.successResult();
     }
 
