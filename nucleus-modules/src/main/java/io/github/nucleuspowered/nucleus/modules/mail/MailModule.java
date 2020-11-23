@@ -4,16 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mail;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.mail.commands.ClearMailCommand;
 import io.github.nucleuspowered.nucleus.modules.mail.commands.MailCommand;
 import io.github.nucleuspowered.nucleus.modules.mail.commands.MailOtherCommand;
 import io.github.nucleuspowered.nucleus.modules.mail.commands.SendMailCommand;
 import io.github.nucleuspowered.nucleus.modules.mail.listeners.MailListener;
 import io.github.nucleuspowered.nucleus.modules.mail.services.MailHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

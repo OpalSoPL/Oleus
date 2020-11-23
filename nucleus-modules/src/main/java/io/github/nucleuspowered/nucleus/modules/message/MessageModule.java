@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.message;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.message.commands.HelpOpCommand;
 import io.github.nucleuspowered.nucleus.modules.message.commands.MessageCommand;
 import io.github.nucleuspowered.nucleus.modules.message.commands.MsgToggleCommand;
@@ -13,9 +13,9 @@ import io.github.nucleuspowered.nucleus.modules.message.commands.ReplyCommand;
 import io.github.nucleuspowered.nucleus.modules.message.commands.SocialSpyCommand;
 import io.github.nucleuspowered.nucleus.modules.message.config.MessageConfig;
 import io.github.nucleuspowered.nucleus.modules.message.listener.MessageListener;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 

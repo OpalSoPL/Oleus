@@ -7,9 +7,9 @@ package io.github.nucleuspowered.nucleus.modules.chatlogger.runnables;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.config.ChatLoggingConfig;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.services.ChatLoggerHandler;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

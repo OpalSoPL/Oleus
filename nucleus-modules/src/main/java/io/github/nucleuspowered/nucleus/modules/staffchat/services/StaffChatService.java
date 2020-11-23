@@ -7,11 +7,11 @@ package io.github.nucleuspowered.nucleus.modules.staffchat.services;
 import io.github.nucleuspowered.nucleus.api.module.staffchat.NucleusStaffChatService;
 import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatKeys;
 import io.github.nucleuspowered.nucleus.modules.staffchat.StaffChatMessageChannel;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.annotations.APIService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IChatMessageFormatterService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IUserPreferenceService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
@@ -19,7 +19,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 
-import java.util.Collection;
 import java.util.UUID;
 
 import com.google.inject.Inject;

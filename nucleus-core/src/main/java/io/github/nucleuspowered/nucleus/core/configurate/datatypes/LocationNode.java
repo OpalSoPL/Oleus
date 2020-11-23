@@ -1,0 +1,91 @@
+/*
+ * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
+ * at the root of this project for more details.
+ */
+package io.github.nucleuspowered.nucleus.core.configurate.datatypes;
+
+import io.github.nucleuspowered.nucleus.api.core.exception.NoSuchWorldException;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
+import org.spongepowered.math.vector.Vector3d;
+
+import java.util.Optional;
+
+/**
+ * We use this class in order to not just accidentally delete data when a world isn't available.
+ */
+@ConfigSerializable
+public class LocationNode {
+
+    @Setting private double x;
+
+    @Setting private double y;
+
+    @Setting private double z;
+
+    @Setting private double rotx;
+
+    @Setting private double roty;
+
+    @Setting private double rotz;
+
+    @Setting
+    private ResourceKey world;
+
+    public LocationNode() { }
+
+    public LocationNode(final ServerLocation location) {
+        this(location, new Vector3d());
+    }
+
+    public LocationNode(final ServerLocation location, final Vector3d rotation) {
+        this(location.getWorldKey(), location.getPosition(), rotation);
+    }
+
+    public LocationNode(final ResourceKey world, final Vector3d length, final Vector3d rotation) {
+        this.x = length.getX();
+        this.y = length.getY();
+        this.z = length.getZ();
+        this.rotx = rotation.getX();
+        this.roty = rotation.getY();
+        this.rotz = rotation.getZ();
+        this.world = world;
+    }
+
+    public LocationNode copy() {
+        return new LocationNode(this.world, this.getPosition(), this.getRotation());
+    }
+
+    public Vector3d getPosition() {
+        return new Vector3d(this.x, this.y, this.z);
+    }
+
+    public ResourceKey getWorld() {
+        return this.world;
+    }
+
+    /**
+     * Gets a {@link Location} from the node.
+     */
+    public Optional<ServerLocation> getLocationIfExists() {
+        return Sponge.getServer().getWorldManager().getWorld(this.world).map(r -> ServerLocation.of(r, this.getPosition()));
+    }
+
+    /**
+     * Gets a {@link Location} from the node.
+     *
+     * @return The Location
+     * @throws NoSuchWorldException The world does not exist.
+     */
+    public ServerLocation getLocation() throws NoSuchWorldException {
+        return this.getLocationIfExists().orElseThrow(NoSuchWorldException::new);
+    }
+
+    public Vector3d getRotation() {
+        return new Vector3d(this.rotx, this.roty, this.rotz);
+    }
+}

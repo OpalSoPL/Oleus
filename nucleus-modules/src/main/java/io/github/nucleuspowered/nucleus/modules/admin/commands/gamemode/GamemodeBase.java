@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.admin.commands.gamemode;
 
 import io.github.nucleuspowered.nucleus.modules.admin.AdminPermissions;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.Keys;

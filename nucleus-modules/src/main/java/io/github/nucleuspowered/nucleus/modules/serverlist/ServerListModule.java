@@ -4,16 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.modules.serverlist;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.serverlist.commands.ServerListCommand;
 import io.github.nucleuspowered.nucleus.modules.serverlist.commands.TemporaryMessageCommand;
 import io.github.nucleuspowered.nucleus.modules.serverlist.config.ServerListConfig;
 import io.github.nucleuspowered.nucleus.modules.serverlist.listener.ServerListListener;
 import io.github.nucleuspowered.nucleus.modules.serverlist.listener.WhitelistServerListListener;
 import io.github.nucleuspowered.nucleus.modules.serverlist.services.ServerListService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

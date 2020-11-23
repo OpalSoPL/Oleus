@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.bootstrap;
 
-import io.github.nucleuspowered.nucleus.IPluginInfo;
+import io.github.nucleuspowered.nucleus.core.IPluginInfo;
 
 /**
  * Contains general information about the plugin.

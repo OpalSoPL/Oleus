@@ -6,10 +6,10 @@ package io.github.nucleuspowered.nucleus.modules.powertool.commands;
 
 import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolPermissions;
 import io.github.nucleuspowered.nucleus.modules.powertool.services.PowertoolService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;

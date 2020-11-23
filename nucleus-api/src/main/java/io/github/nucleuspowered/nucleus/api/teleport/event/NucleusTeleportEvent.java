@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.api.teleport.event;
 import io.github.nucleuspowered.nucleus.api.util.CancelMessageEvent;
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.world.ServerLocation;

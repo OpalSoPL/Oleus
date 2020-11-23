@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.teleport.services;
 
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;

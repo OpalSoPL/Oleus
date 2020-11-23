@@ -6,8 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.mute.runnables;
 
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.mute.services.MuteService;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

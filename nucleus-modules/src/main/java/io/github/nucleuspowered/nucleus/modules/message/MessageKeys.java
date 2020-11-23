@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.message;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.PreferenceKeyImpl;
+import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.PreferenceKeyImpl;
 
 public final class MessageKeys {
 

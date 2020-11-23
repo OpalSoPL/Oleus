@@ -6,9 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.mob.listeners;
 
 import io.github.nucleuspowered.nucleus.modules.mob.config.BlockSpawnsConfig;
 import io.github.nucleuspowered.nucleus.modules.mob.config.MobConfig;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;

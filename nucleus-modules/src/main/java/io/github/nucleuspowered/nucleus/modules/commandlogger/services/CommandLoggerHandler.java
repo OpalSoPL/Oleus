@@ -4,11 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandlogger.services;
 
-import io.github.nucleuspowered.nucleus.logging.AbstractLoggingHandler;
+import io.github.nucleuspowered.nucleus.core.logging.AbstractLoggingHandler;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.config.CommandLoggerConfig;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 
 import java.io.IOException;
 

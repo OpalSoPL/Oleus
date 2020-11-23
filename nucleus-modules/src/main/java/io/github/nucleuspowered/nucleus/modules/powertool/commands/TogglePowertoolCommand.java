@@ -6,17 +6,15 @@ package io.github.nucleuspowered.nucleus.modules.powertool.commands;
 
 import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolKeys;
 import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolPermissions;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.userprefs.NucleusKeysProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IUserPreferenceService;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 @Command(

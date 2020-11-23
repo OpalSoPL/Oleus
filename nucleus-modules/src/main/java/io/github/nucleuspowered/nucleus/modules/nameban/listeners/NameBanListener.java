@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.nameban.listeners;
 
 import io.github.nucleuspowered.nucleus.modules.nameban.services.NameBanHandler;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;

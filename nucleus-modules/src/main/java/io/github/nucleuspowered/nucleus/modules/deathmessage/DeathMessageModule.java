@@ -4,14 +4,14 @@
  */
 package io.github.nucleuspowered.nucleus.modules.deathmessage;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.deathmessage.config.DeathMessageConfig;
 import io.github.nucleuspowered.nucleus.modules.deathmessage.listeners.DisableDeathMessagesListener;
 import io.github.nucleuspowered.nucleus.modules.deathmessage.listeners.ForceAllDeathMessagesListener;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -5,11 +5,11 @@
 package io.github.nucleuspowered.nucleus.modules.misc.commands;
 
 import io.github.nucleuspowered.nucleus.modules.misc.MiscPermissions;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.EssentialsEquivalent;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.Keys;

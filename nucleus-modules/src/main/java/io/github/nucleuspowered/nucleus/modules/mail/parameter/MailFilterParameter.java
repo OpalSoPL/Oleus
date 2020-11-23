@@ -4,10 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mail.parameter;
 
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.mail.NucleusMailService;
 import io.github.nucleuspowered.nucleus.modules.mail.services.MailHandler;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;

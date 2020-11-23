@@ -5,18 +5,18 @@
 package io.github.nucleuspowered.nucleus.modules.mute.commands;
 
 import io.github.nucleuspowered.nucleus.api.module.mute.data.Mute;
-import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
+import io.github.nucleuspowered.nucleus.core.configurate.config.CommonPermissionLevelConfig;
 import io.github.nucleuspowered.nucleus.modules.mute.MutePermissions;
 import io.github.nucleuspowered.nucleus.modules.mute.config.MuteConfig;
 import io.github.nucleuspowered.nucleus.modules.mute.services.MuteService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.EssentialsEquivalent;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.vavr.control.Either;
 import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.Sponge;

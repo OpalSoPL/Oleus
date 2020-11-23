@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.playerinfo.listeners;
 
 import io.github.nucleuspowered.nucleus.modules.playerinfo.config.PlayerInfoConfig;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.Listener;

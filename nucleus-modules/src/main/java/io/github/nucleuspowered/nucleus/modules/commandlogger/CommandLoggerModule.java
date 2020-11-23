@@ -4,15 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandlogger;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.config.CommandLoggerConfig;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.listeners.CommandLoggingListener;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.runnables.CommandLoggerRunnable;
 import io.github.nucleuspowered.nucleus.modules.commandlogger.services.CommandLoggerHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Collection;
 import java.util.Collections;

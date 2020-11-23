@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jump;
 
-import io.github.nucleuspowered.nucleus.services.interfaces.annotation.PermissionMetadata;
-import io.github.nucleuspowered.nucleus.services.interfaces.data.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.PermissionMetadata;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.data.SuggestedLevel;
 
 public final class JumpPermissions {
     private JumpPermissions() {

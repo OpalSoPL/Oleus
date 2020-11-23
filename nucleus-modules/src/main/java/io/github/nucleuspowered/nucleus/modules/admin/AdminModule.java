@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.admin;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.admin.commands.BlockZapCommand;
 import io.github.nucleuspowered.nucleus.modules.admin.commands.KillCommand;
 import io.github.nucleuspowered.nucleus.modules.admin.commands.KillEntityCommand;
@@ -18,10 +18,10 @@ import io.github.nucleuspowered.nucleus.modules.admin.commands.gamemode.Gamemode
 import io.github.nucleuspowered.nucleus.modules.admin.commands.gamemode.SpectatorGamemodeCommand;
 import io.github.nucleuspowered.nucleus.modules.admin.commands.gamemode.SurvivalGamemodeCommand;
 import io.github.nucleuspowered.nucleus.modules.admin.config.AdminConfig;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.ArrayList;
 import java.util.Collection;

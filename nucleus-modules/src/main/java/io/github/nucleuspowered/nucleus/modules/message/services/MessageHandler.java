@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.message.services;
 
 import com.google.inject.Inject;
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.message.NucleusPrivateMessagingService;
 import io.github.nucleuspowered.nucleus.api.module.message.target.CustomMessageTarget;
 import io.github.nucleuspowered.nucleus.api.module.message.target.MessageTarget;
@@ -18,13 +18,13 @@ import io.github.nucleuspowered.nucleus.modules.message.events.InternalNucleusMe
 import io.github.nucleuspowered.nucleus.modules.message.services.target.AbstractMessageTarget;
 import io.github.nucleuspowered.nucleus.modules.message.services.target.PlayerMessageTarget;
 import io.github.nucleuspowered.nucleus.modules.message.services.target.SystemSubjectMessageTarget;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusTextTemplateFactory;
-import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.annotations.APIService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.INucleusTextTemplateFactory;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import net.kyori.adventure.identity.Identified;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;

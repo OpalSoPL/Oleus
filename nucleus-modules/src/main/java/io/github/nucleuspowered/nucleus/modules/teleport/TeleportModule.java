@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.teleport;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportAcceptCommand;
 import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportAllHereCommand;
 import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportAskAllHereCommand;
@@ -19,10 +19,10 @@ import io.github.nucleuspowered.nucleus.modules.teleport.commands.TeleportToggle
 import io.github.nucleuspowered.nucleus.modules.teleport.config.TeleportConfig;
 import io.github.nucleuspowered.nucleus.modules.teleport.runnables.TeleportAsyncTask;
 import io.github.nucleuspowered.nucleus.modules.teleport.services.PlayerTeleporterService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 

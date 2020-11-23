@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.storage.dataobjects.keyed;
 
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;

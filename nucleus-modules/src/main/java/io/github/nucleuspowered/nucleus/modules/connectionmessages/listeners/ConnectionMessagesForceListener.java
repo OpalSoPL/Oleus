@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.connectionmessages.listeners;
 
 import io.github.nucleuspowered.nucleus.modules.connectionmessages.config.ConnectionMessagesConfig;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;

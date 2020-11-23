@@ -5,10 +5,10 @@
 package io.github.nucleuspowered.nucleus.modules.serverlist.services;
 
 import io.github.nucleuspowered.nucleus.modules.serverlist.ServerListKeys;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
-import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IGeneralDataObject;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager;
 import net.kyori.adventure.text.Component;
 
 import java.time.Instant;

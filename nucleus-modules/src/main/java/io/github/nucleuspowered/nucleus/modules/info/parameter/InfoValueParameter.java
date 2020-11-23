@@ -4,10 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.info.parameter;
 
-import io.github.nucleuspowered.nucleus.io.TextFileController;
+import io.github.nucleuspowered.nucleus.core.io.TextFileController;
 import io.github.nucleuspowered.nucleus.modules.info.services.InfoHandler;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.CommandContext;

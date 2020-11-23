@@ -6,10 +6,10 @@ package io.github.nucleuspowered.nucleus.bootstrap;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import io.github.nucleuspowered.nucleus.IPluginInfo;
-import io.github.nucleuspowered.nucleus.NucleusCore;
+import io.github.nucleuspowered.nucleus.core.IPluginInfo;
+import io.github.nucleuspowered.nucleus.core.NucleusCore;
 import io.github.nucleuspowered.nucleus.modules.NucleusModuleProvider;
-import io.github.nucleuspowered.nucleus.startuperror.InvalidVersionErrorHandler;
+import io.github.nucleuspowered.nucleus.core.startuperror.InvalidVersionErrorHandler;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;

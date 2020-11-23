@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.vanish.infoprovider;
 
 import io.github.nucleuspowered.nucleus.modules.vanish.VanishPermissions;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.CommandCause;

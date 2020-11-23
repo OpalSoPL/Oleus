@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.afk;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.afk.commands.AFKCommand;
 import io.github.nucleuspowered.nucleus.modules.afk.commands.AFKKickCommand;
 import io.github.nucleuspowered.nucleus.modules.afk.commands.AFKRefresh;
@@ -21,11 +21,11 @@ import io.github.nucleuspowered.nucleus.modules.afk.listeners.BasicAFKListener;
 import io.github.nucleuspowered.nucleus.modules.afk.runnables.AFKRefreshPermsTask;
 import io.github.nucleuspowered.nucleus.modules.afk.runnables.AFKTask;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.ResourceKey;

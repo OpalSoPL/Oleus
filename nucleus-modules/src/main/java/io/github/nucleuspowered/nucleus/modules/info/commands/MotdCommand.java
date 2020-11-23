@@ -4,17 +4,17 @@
  */
 package io.github.nucleuspowered.nucleus.modules.info.commands;
 
-import io.github.nucleuspowered.nucleus.io.TextFileController;
+import io.github.nucleuspowered.nucleus.core.io.TextFileController;
 import io.github.nucleuspowered.nucleus.modules.info.InfoModule;
 import io.github.nucleuspowered.nucleus.modules.info.InfoPermissions;
 import io.github.nucleuspowered.nucleus.modules.info.config.InfoConfig;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.EssentialsEquivalent;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;

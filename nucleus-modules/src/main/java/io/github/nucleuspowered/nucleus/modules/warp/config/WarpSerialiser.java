@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.warp.config;
 
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
-import io.github.nucleuspowered.nucleus.configurate.typeserialisers.NamedLocationSerialiser;
+import io.github.nucleuspowered.nucleus.core.configurate.typeserialisers.NamedLocationSerialiser;
 import io.github.nucleuspowered.nucleus.modules.warp.data.WarpData;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;

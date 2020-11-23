@@ -6,8 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.ignore.services;
 
 import com.google.common.collect.ImmutableList;
 import io.github.nucleuspowered.nucleus.modules.ignore.IgnoreKeys;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.ArrayList;
 import java.util.HashMap;

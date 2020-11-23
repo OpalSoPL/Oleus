@@ -5,10 +5,10 @@
 package io.github.nucleuspowered.nucleus.modules.item.commands.lore;
 
 import io.github.nucleuspowered.nucleus.modules.item.ItemPermissions;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
 import org.spongepowered.api.command.exception.CommandException;
 
 @Command(

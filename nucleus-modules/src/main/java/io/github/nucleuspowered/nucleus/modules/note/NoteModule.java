@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.note;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.note.commands.CheckNotesCommand;
 import io.github.nucleuspowered.nucleus.modules.note.commands.ClearNotesCommand;
 import io.github.nucleuspowered.nucleus.modules.note.commands.NoteCommand;
@@ -13,10 +13,10 @@ import io.github.nucleuspowered.nucleus.modules.note.config.NoteConfig;
 import io.github.nucleuspowered.nucleus.modules.note.infoprovider.NoteInfoProvider;
 import io.github.nucleuspowered.nucleus.modules.note.listeners.NoteListener;
 import io.github.nucleuspowered.nucleus.modules.note.services.NoteHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
 
 import java.util.Arrays;
 import java.util.Collection;

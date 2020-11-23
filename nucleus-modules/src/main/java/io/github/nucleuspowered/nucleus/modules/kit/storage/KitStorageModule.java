@@ -6,9 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.kit.storage;
 
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataaccess.IConfigurateBackedDataTranslator;
-import io.github.nucleuspowered.nucleus.services.impl.storage.services.SingleCachedService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataaccess.IConfigurateBackedDataTranslator;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.services.SingleCachedService;
 import io.github.nucleuspowered.storage.IStorageModule;
 import io.github.nucleuspowered.storage.persistence.IStorageRepository;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;

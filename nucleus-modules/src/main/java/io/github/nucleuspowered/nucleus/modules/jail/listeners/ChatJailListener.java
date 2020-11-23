@@ -6,9 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.jail.listeners;
 
 import io.github.nucleuspowered.nucleus.modules.jail.config.JailConfig;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;

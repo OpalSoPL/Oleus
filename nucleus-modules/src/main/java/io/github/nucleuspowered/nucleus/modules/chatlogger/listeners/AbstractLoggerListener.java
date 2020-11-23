@@ -6,12 +6,12 @@ package io.github.nucleuspowered.nucleus.modules.chatlogger.listeners;
 
 import io.github.nucleuspowered.nucleus.modules.chatlogger.config.ChatLoggingConfig;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.services.ChatLoggerHandler;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 
 import com.google.inject.Inject;
-import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IPlayerDisplayNameService;
 
 abstract class AbstractLoggerListener implements ListenerBase.Conditional {
 

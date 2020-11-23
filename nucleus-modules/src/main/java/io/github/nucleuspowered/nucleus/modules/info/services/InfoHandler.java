@@ -5,10 +5,10 @@
 package io.github.nucleuspowered.nucleus.modules.info.services;
 
 import com.google.common.collect.ImmutableSet;
-import io.github.nucleuspowered.nucleus.io.TextFileController;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.io.TextFileController;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.AssetManager;
 import org.spongepowered.plugin.PluginContainer;

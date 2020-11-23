@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.chatlogger;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.config.ChatLoggingConfig;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.listeners.BaseLoggerListener;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.listeners.ChatLoggingListener;
@@ -12,10 +12,10 @@ import io.github.nucleuspowered.nucleus.modules.chatlogger.listeners.MailLogging
 import io.github.nucleuspowered.nucleus.modules.chatlogger.listeners.MessageLoggingListener;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.runnables.ChatLoggerRunnable;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.services.ChatLoggerHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

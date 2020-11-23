@@ -6,12 +6,12 @@ package io.github.nucleuspowered.nucleus.modules.staffchat;
 
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IUserPreferenceService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IChatMessageFormatterService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IUserPreferenceService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.audience.MessageType;

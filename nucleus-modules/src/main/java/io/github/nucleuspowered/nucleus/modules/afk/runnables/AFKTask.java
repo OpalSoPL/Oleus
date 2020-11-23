@@ -5,8 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.afk.runnables;
 
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;

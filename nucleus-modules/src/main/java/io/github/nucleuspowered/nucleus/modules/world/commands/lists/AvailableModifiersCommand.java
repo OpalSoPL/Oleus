@@ -6,9 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.world.commands.lists;
 
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.commands.WorldCommand;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
 import net.kyori.adventure.text.Component;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.world.gen.GeneratorModifierType;
 
 @Command(

@@ -6,9 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.afk.infoprovider;
 
 import io.github.nucleuspowered.nucleus.modules.afk.AFKPermissions;
 import io.github.nucleuspowered.nucleus.modules.afk.services.AFKHandler;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;

@@ -4,18 +4,18 @@
  */
 package io.github.nucleuspowered.nucleus.modules.ban;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.ban.commands.BanCommand;
 import io.github.nucleuspowered.nucleus.modules.ban.commands.CheckBanCommand;
 import io.github.nucleuspowered.nucleus.modules.ban.commands.TempBanCommand;
 import io.github.nucleuspowered.nucleus.modules.ban.commands.UnbanCommand;
 import io.github.nucleuspowered.nucleus.modules.ban.config.BanConfig;
 import io.github.nucleuspowered.nucleus.modules.ban.infoprovider.BanInfoProvider;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
 
 import java.util.Arrays;
 import java.util.Collection;

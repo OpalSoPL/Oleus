@@ -6,12 +6,12 @@ package io.github.nucleuspowered.nucleus.modules.warp.commands;
 
 import io.github.nucleuspowered.nucleus.modules.warp.WarpPermissions;
 import io.github.nucleuspowered.nucleus.modules.warp.services.WarpService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;

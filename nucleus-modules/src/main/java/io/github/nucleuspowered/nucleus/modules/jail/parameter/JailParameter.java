@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.jail.parameter;
 
 import io.github.nucleuspowered.nucleus.api.module.jail.data.Jail;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.CommandContext;

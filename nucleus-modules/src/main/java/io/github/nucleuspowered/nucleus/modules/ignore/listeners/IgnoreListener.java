@@ -10,10 +10,10 @@ import io.github.nucleuspowered.nucleus.api.module.message.event.NucleusMessageE
 import io.github.nucleuspowered.nucleus.api.module.message.target.UserMessageTarget;
 import io.github.nucleuspowered.nucleus.modules.ignore.IgnorePermissions;
 import io.github.nucleuspowered.nucleus.modules.ignore.services.IgnoreService;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IChatMessageFormatterService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IPermissionService;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IChatMessageFormatterService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
 import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;

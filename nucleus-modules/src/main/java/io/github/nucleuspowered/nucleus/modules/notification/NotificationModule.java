@@ -4,16 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.modules.notification;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.notification.command.BasicActionbarCommand;
 import io.github.nucleuspowered.nucleus.modules.notification.command.BasicSubtitleCommand;
 import io.github.nucleuspowered.nucleus.modules.notification.command.BasicTitleCommand;
 import io.github.nucleuspowered.nucleus.modules.notification.command.BroadcastCommand;
 import io.github.nucleuspowered.nucleus.modules.notification.command.PlainBroadcastCommand;
 import io.github.nucleuspowered.nucleus.modules.notification.config.NotificationConfig;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

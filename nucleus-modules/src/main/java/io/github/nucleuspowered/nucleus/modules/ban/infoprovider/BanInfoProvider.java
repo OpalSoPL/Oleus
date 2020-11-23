@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.ban.infoprovider;
 
 import io.github.nucleuspowered.nucleus.modules.ban.BanPermissions;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.LinearComponents;

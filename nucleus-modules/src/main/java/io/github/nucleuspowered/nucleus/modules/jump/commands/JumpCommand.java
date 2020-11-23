@@ -4,19 +4,19 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jump.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.modules.jump.JumpPermissions;
 import io.github.nucleuspowered.nucleus.modules.jump.config.JumpConfig;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
-import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.CommandModifier;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.EssentialsEquivalent;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandModifiers;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.util.blockray.RayTrace;

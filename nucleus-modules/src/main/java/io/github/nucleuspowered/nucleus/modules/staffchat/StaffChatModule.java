@@ -5,14 +5,14 @@
 package io.github.nucleuspowered.nucleus.modules.staffchat;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.staffchat.commands.StaffChatCommand;
 import io.github.nucleuspowered.nucleus.modules.staffchat.commands.ToggleStaffChatCommand;
 import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
 import io.github.nucleuspowered.nucleus.modules.staffchat.services.StaffChatService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 

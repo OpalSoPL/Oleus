@@ -7,8 +7,8 @@ package io.github.nucleuspowered.nucleus.modules.home.services;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
-import io.github.nucleuspowered.nucleus.configurate.datatypes.LocationNode;
-import io.github.nucleuspowered.nucleus.datatypes.LocationData;
+import io.github.nucleuspowered.nucleus.core.configurate.datatypes.LocationNode;
+import io.github.nucleuspowered.nucleus.core.datatypes.LocationData;
 
 import java.util.UUID;
 

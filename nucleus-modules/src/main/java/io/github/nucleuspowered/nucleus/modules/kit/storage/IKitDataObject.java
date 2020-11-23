@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.kit.storage;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.IConfigurateBackedDataObject;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.configurate.IConfigurateBackedDataObject;
 
 import java.util.Map;
 import java.util.Optional;

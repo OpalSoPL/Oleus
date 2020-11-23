@@ -6,9 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.teleport.services;
 
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
-import io.github.nucleuspowered.nucleus.scaffold.task.CancellableTask;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.INucleusLocationService;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.CancellableTask;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.INucleusLocationService;
 import net.kyori.adventure.audience.Audience;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;

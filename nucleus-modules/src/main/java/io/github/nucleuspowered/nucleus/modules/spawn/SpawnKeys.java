@@ -4,12 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn;
 
-import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
 import org.spongepowered.math.vector.Vector3d;
-import io.github.nucleuspowered.nucleus.configurate.datatypes.LocationNode;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IGeneralDataObject;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IWorldDataObject;
-import io.github.nucleuspowered.nucleus.util.TypeTokens;
+import io.github.nucleuspowered.nucleus.core.configurate.datatypes.LocationNode;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IGeneralDataObject;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IWorldDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class SpawnKeys {

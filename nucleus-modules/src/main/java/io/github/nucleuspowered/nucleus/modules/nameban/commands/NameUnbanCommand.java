@@ -4,16 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nameban.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.nameban.exception.NameBanException;
 import io.github.nucleuspowered.nucleus.modules.nameban.NameBanPermissions;
 import io.github.nucleuspowered.nucleus.modules.nameban.services.NameBanHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.scaffold.command.parameter.RegexParameter;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.RegexParameter;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 

@@ -6,8 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.note.infoprovider;
 
 import io.github.nucleuspowered.nucleus.modules.note.NotePermissions;
 import io.github.nucleuspowered.nucleus.modules.note.services.NoteHandler;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;

@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.rtp.kernels;
 
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
 import org.checkerframework.checker.nullness.qual.Nullable;

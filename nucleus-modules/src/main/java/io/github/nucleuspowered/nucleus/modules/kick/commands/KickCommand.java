@@ -4,17 +4,17 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kick.commands;
 
-import io.github.nucleuspowered.nucleus.configurate.config.CommonPermissionLevelConfig;
+import io.github.nucleuspowered.nucleus.core.configurate.config.CommonPermissionLevelConfig;
 import io.github.nucleuspowered.nucleus.modules.kick.KickPermissions;
 import io.github.nucleuspowered.nucleus.modules.kick.config.KickConfig;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
-import io.github.nucleuspowered.nucleus.scaffold.command.NucleusParameters;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.EssentialsEquivalent;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.EssentialsEquivalent;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;

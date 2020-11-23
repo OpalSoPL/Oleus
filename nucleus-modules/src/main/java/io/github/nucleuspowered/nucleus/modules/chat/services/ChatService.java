@@ -6,9 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.chat.services;
 
 import io.github.nucleuspowered.nucleus.modules.chat.config.ChatConfig;
 import io.github.nucleuspowered.nucleus.modules.chat.config.ChatTemplateConfig;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import org.spongepowered.api.service.permission.Subject;
 
 /**

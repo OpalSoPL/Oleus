@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.api.module.afk;
 
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
 import net.kyori.adventure.audience.Audience;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;

@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.item;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.item.commands.EnchantCommand;
 import io.github.nucleuspowered.nucleus.modules.item.commands.MoreCommand;
 import io.github.nucleuspowered.nucleus.modules.item.commands.RepairCommand;
@@ -22,9 +22,9 @@ import io.github.nucleuspowered.nucleus.modules.item.commands.lore.LoreEditComma
 import io.github.nucleuspowered.nucleus.modules.item.commands.lore.LoreInsertCommand;
 import io.github.nucleuspowered.nucleus.modules.item.commands.lore.LoreSetCommand;
 import io.github.nucleuspowered.nucleus.modules.item.config.ItemConfig;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

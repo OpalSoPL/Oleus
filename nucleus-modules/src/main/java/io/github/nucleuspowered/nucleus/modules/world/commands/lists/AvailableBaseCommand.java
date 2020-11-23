@@ -4,10 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.world.commands.lists;
 
-import io.github.nucleuspowered.nucleus.Util;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.Util;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;

@@ -5,19 +5,19 @@
 package io.github.nucleuspowered.nucleus.modules.mail.services;
 
 import com.google.inject.Inject;
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.mail.NucleusMailService;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
 import io.github.nucleuspowered.nucleus.modules.mail.MailKeys;
 import io.github.nucleuspowered.nucleus.modules.mail.data.MailData;
 import io.github.nucleuspowered.nucleus.modules.mail.events.InternalNucleusSendMailEvent;
 import io.github.nucleuspowered.nucleus.modules.mail.parameter.MailFilterParameter;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IStorageManager;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.annotations.APIService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.LinearComponents;
 import org.checkerframework.checker.nullness.qual.Nullable;

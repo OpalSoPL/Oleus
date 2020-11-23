@@ -6,8 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.jail.runnables;
 
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.time.Duration;

@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.chatlogger.listeners;
 
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.config.ChatLoggingConfig;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;

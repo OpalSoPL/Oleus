@@ -4,13 +4,13 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mail.commands;
 
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.mail.NucleusMailService;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
 import io.github.nucleuspowered.nucleus.modules.mail.data.MailData;
 import io.github.nucleuspowered.nucleus.modules.mail.services.MailHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandResult;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.LinearComponents;
 import net.kyori.adventure.text.TextComponent;

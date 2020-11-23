@@ -5,9 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.craftinggui.commands;
 
 import io.github.nucleuspowered.nucleus.modules.craftinggui.CraftingGuiPermissions;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.CommandModifier;
-import io.github.nucleuspowered.nucleus.scaffold.command.modifier.CommandModifiers;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.CommandModifier;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandModifiers;
 import org.spongepowered.api.item.inventory.ContainerType;
 import org.spongepowered.api.item.inventory.ContainerTypes;
 

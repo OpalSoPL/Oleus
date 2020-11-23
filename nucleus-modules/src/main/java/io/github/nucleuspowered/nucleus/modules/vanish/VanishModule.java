@@ -5,16 +5,15 @@
 package io.github.nucleuspowered.nucleus.modules.vanish;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.vanish.commands.ToggleVanishOnLoginCommand;
 import io.github.nucleuspowered.nucleus.modules.vanish.commands.VanishCommand;
 import io.github.nucleuspowered.nucleus.modules.vanish.config.VanishConfig;
 import io.github.nucleuspowered.nucleus.modules.vanish.listener.VanishListener;
 import io.github.nucleuspowered.nucleus.modules.vanish.services.VanishService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IPlayerDisplayNameService;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.ResourceKey;

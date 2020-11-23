@@ -234,6 +234,7 @@ tasks {
     shadowJar {
         dependsOn(":nucleus-api:build")
         dependsOn(":nucleus-core:build")
+        dependsOn(":nucleus-bootstrap:build")
         dependsOn(gitHash)
         doFirst {
             manifest {
@@ -247,11 +248,13 @@ tasks {
         dependencies {
             include(project(":nucleus-api"))
             include(project(":nucleus-core"))
+            include(project(":nucleus-modules"))
+            include(project(":nucleus-bootstrap"))
             include(dependency("io.vavr:vavr:0.10.3"))
         }
 
         if (!project.properties.containsKey("norelocate")) {
-            relocate("io.vavr", "io.github.nucleuspowered.reloate.io.vavr")
+            relocate("io.vavr", "io.github.nucleuspowered.relocate.io.vavr")
         }
 
         exclude("io/github/nucleuspowered/nucleus/api/NucleusAPIMod.class")

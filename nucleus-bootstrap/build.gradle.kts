@@ -50,6 +50,11 @@ tasks {
         dependsOn(rootProject.tasks["gitHash"])
     }
 
+    build {
+        dependsOn(":nucleus-core:build")
+        dependsOn(":nucleus-modules:build")
+    }
+
 }
 
 blossom {

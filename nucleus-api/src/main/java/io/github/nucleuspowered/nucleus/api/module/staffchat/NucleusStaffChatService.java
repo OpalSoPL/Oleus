@@ -9,7 +9,6 @@ import net.kyori.adventure.text.Component;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.message.MessageChannelEvent;
 
-import java.util.Collection;
 import java.util.UUID;
 
 /**

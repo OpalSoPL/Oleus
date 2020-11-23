@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.warp;
 
 import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
 import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.warp.commands.DeleteWarpCommand;
 import io.github.nucleuspowered.nucleus.modules.warp.commands.ListWarpCommand;
 import io.github.nucleuspowered.nucleus.modules.warp.commands.SetCategoryCommand;
@@ -24,9 +24,9 @@ import io.github.nucleuspowered.nucleus.modules.warp.config.WarpCategorySerialis
 import io.github.nucleuspowered.nucleus.modules.warp.config.WarpConfig;
 import io.github.nucleuspowered.nucleus.modules.warp.config.WarpSerialiser;
 import io.github.nucleuspowered.nucleus.modules.warp.services.WarpService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 
 import java.util.Arrays;

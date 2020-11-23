@@ -4,15 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nameban;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.nameban.commands.NameBanCommand;
 import io.github.nucleuspowered.nucleus.modules.nameban.commands.NameUnbanCommand;
 import io.github.nucleuspowered.nucleus.modules.nameban.config.NameBanConfig;
 import io.github.nucleuspowered.nucleus.modules.nameban.listeners.NameBanListener;
 import io.github.nucleuspowered.nucleus.modules.nameban.services.NameBanHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

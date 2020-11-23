@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kit.misc;
 
+import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -12,7 +13,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
 
-public class KitRedeemResultImpl implements io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult {
+public class KitRedeemResultImpl implements KitRedeemResult {
 
     private final Collection<ItemStackSnapshot> rejected;
     private final Status status;

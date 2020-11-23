@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.spawn.config;
 
-import io.github.nucleuspowered.nucleus.services.interfaces.annotation.configuratehelper.LocalisedComment;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.storage.WorldProperties;

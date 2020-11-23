@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.playerinfo;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.GetFromIpCommand;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.GetPosCommand;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.ListPlayerCommand;
@@ -13,9 +13,9 @@ import io.github.nucleuspowered.nucleus.modules.playerinfo.commands.SeenCommand;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.config.PlayerInfoConfig;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.listeners.CommandListener;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.services.SeenHandler;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

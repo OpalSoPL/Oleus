@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.kit;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.kit.commands.KitAutoRedeemCommand;
 import io.github.nucleuspowered.nucleus.modules.kit.commands.KitCommand;
 import io.github.nucleuspowered.nucleus.modules.kit.commands.KitCostCommand;
@@ -33,10 +33,10 @@ import io.github.nucleuspowered.nucleus.modules.kit.listeners.KitAutoRedeemListe
 import io.github.nucleuspowered.nucleus.modules.kit.listeners.KitListener;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.modules.kit.storage.KitStorageModule;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

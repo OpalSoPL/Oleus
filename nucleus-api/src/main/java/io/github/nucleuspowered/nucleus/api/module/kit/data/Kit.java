@@ -7,8 +7,6 @@ package io.github.nucleuspowered.nucleus.api.module.kit.data;
 import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import io.github.nucleuspowered.nucleus.api.module.kit.KitRedeemResult;
 import io.github.nucleuspowered.nucleus.api.module.kit.NucleusKitService;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;

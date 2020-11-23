@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.spawn.helpers;
 
 import io.github.nucleuspowered.nucleus.modules.spawn.SpawnKeys;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandContext;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;

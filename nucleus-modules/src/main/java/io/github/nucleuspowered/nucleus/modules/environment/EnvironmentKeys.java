@@ -4,8 +4,8 @@
  */
 package io.github.nucleuspowered.nucleus.modules.environment;
 
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IWorldDataObject;
-import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IWorldDataObject;
+import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class EnvironmentKeys {

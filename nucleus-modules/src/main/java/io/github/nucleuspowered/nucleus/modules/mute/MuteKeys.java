@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.mute;
 
 import io.github.nucleuspowered.nucleus.modules.mute.data.MuteData;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 import io.leangen.geantyref.TypeToken;
 

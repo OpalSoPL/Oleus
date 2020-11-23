@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.world.commands.properties;
 
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.commands.WorldCommand;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 @Command(

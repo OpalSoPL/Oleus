@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.environment.parameter;
 
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.ArgumentParseException;

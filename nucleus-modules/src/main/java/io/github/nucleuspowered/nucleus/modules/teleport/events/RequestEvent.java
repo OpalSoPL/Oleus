@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.modules.teleport.events;
 import io.github.nucleuspowered.nucleus.api.teleport.event.NucleusTeleportEvent;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
 

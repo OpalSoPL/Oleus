@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.chatlogger.listeners;
 
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
 

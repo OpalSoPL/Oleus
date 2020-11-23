@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.world;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.world.commands.CloneWorldCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.CreateWorldCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.DeleteWorldCommand;
@@ -26,7 +26,6 @@ import io.github.nucleuspowered.nucleus.modules.world.commands.WorldSpawnCommand
 import io.github.nucleuspowered.nucleus.modules.world.commands.border.BorderCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.border.ResetBorderCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.border.SetBorderCommand;
-import io.github.nucleuspowered.nucleus.modules.world.commands.lists.AvailableBaseCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.lists.AvailableModifiersCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.lists.AvailablePresetsCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetHardcoreCommand;
@@ -36,9 +35,9 @@ import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetPvp
 import io.github.nucleuspowered.nucleus.modules.world.config.WorldConfig;
 import io.github.nucleuspowered.nucleus.modules.world.listeners.EnforceGamemodeListener;
 import io.github.nucleuspowered.nucleus.modules.world.listeners.WorldListener;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

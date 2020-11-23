@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.notification.command;
 
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.notification.NotificationPermissions;
-import io.github.nucleuspowered.nucleus.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 

@@ -5,8 +5,6 @@
 package io.github.nucleuspowered.nucleus.api.module.afk.event;
 
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
-import net.kyori.adventure.audience.Audience;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.message.MessageChannelEvent;

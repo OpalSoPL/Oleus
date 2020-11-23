@@ -4,9 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mail.data;
 
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
-import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;

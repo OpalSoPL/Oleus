@@ -4,9 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.modules;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
-import io.github.nucleuspowered.nucleus.module.IModuleProvider;
-import io.github.nucleuspowered.nucleus.module.ModuleContainer;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModuleProvider;
+import io.github.nucleuspowered.nucleus.core.module.ModuleContainer;
 import io.github.nucleuspowered.nucleus.modules.admin.AdminModule;
 import io.github.nucleuspowered.nucleus.modules.admin.config.AdminConfig;
 import io.github.nucleuspowered.nucleus.modules.afk.AFKModule;

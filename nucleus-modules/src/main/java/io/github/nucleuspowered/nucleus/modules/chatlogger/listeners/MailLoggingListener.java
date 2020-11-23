@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.chatlogger.listeners;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.mail.event.NucleusSendMailEvent;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.config.ChatLoggingConfig;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;

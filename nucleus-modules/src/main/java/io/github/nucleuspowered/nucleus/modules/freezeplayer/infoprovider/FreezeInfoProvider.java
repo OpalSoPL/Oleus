@@ -6,8 +6,8 @@ package io.github.nucleuspowered.nucleus.modules.freezeplayer.infoprovider;
 
 import io.github.nucleuspowered.nucleus.modules.freezeplayer.FreezePlayerPermissions;
 import io.github.nucleuspowered.nucleus.modules.freezeplayer.services.FreezePlayerService;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;

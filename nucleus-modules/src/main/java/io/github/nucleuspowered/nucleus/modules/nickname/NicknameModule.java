@@ -4,16 +4,16 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nickname;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.nickname.commands.DelNickCommand;
 import io.github.nucleuspowered.nucleus.modules.nickname.commands.NicknameCommand;
 import io.github.nucleuspowered.nucleus.modules.nickname.commands.RealnameCommand;
 import io.github.nucleuspowered.nucleus.modules.nickname.config.NicknameConfig;
 import io.github.nucleuspowered.nucleus.modules.nickname.listeners.NicknameListener;
 import io.github.nucleuspowered.nucleus.modules.nickname.services.NicknameService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

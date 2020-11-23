@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.kit.storage;
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.serialiser.SingleKitTypeSerialiser;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
 import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.HashMap;

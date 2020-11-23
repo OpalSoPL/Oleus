@@ -5,15 +5,15 @@
 package io.github.nucleuspowered.nucleus.modules.nameban.services;
 
 import com.google.inject.Inject;
-import io.github.nucleuspowered.nucleus.Util;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.nameban.NucleusNameBanService;
 import io.github.nucleuspowered.nucleus.api.module.nameban.exception.NameBanException;
 import io.github.nucleuspowered.nucleus.modules.nameban.events.NameBanEvent;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.interfaces.IConfigurateHelper;
-import io.github.nucleuspowered.nucleus.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.annotations.APIService;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigurateHelper;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;

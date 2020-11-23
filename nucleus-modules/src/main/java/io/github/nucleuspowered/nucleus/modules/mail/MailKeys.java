@@ -5,9 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.mail;
 
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
-import io.github.nucleuspowered.nucleus.services.impl.storage.dataobjects.modular.IUserDataObject;
-import io.github.nucleuspowered.nucleus.util.GeAnTyRefTypeTokens;
-import io.github.nucleuspowered.nucleus.util.TypeTokens;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
+import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class MailKeys {

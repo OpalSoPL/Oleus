@@ -6,9 +6,9 @@ package io.github.nucleuspowered.nucleus.modules.back.services;
 
 import io.github.nucleuspowered.nucleus.api.module.back.NucleusBackService;
 import io.github.nucleuspowered.nucleus.api.util.WorldPositionRotation;
-import io.github.nucleuspowered.nucleus.scaffold.service.ServiceBase;
-import io.github.nucleuspowered.nucleus.scaffold.service.annotations.APIService;
-import io.github.nucleuspowered.nucleus.util.WorldPositionRotationImpl;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.annotations.APIService;
+import io.github.nucleuspowered.nucleus.core.util.WorldPositionRotationImpl;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 

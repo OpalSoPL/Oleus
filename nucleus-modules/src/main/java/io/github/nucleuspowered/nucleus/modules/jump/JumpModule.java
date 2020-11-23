@@ -4,15 +4,15 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jump;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.jump.commands.JumpCommand;
 import io.github.nucleuspowered.nucleus.modules.jump.commands.ThruCommand;
 import io.github.nucleuspowered.nucleus.modules.jump.commands.TopCommand;
 import io.github.nucleuspowered.nucleus.modules.jump.commands.UnstuckCommand;
 import io.github.nucleuspowered.nucleus.modules.jump.config.JumpConfig;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail;
 
-import io.github.nucleuspowered.nucleus.module.IModule;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.jail.commands.CheckJailCommand;
 import io.github.nucleuspowered.nucleus.modules.jail.commands.CheckJailedCommand;
 import io.github.nucleuspowered.nucleus.modules.jail.commands.DeleteJailCommand;
@@ -21,12 +21,12 @@ import io.github.nucleuspowered.nucleus.modules.jail.listeners.InterceptTeleport
 import io.github.nucleuspowered.nucleus.modules.jail.listeners.JailListener;
 import io.github.nucleuspowered.nucleus.modules.jail.runnables.JailTask;
 import io.github.nucleuspowered.nucleus.modules.jail.services.JailService;
-import io.github.nucleuspowered.nucleus.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.scaffold.task.TaskBase;
-import io.github.nucleuspowered.nucleus.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.services.impl.playerinformation.NucleusProvider;
-import io.github.nucleuspowered.nucleus.services.interfaces.IPlaceholderService;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IPlaceholderService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.ResourceKey;

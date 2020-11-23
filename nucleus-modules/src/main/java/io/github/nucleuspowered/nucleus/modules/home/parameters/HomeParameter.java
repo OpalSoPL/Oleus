@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.home.parameters;
 
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
 import io.github.nucleuspowered.nucleus.modules.home.services.HomeService;
-import io.github.nucleuspowered.nucleus.services.interfaces.IMessageProviderService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.ArgumentParseException;
