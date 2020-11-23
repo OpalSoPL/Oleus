@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.core.services.impl.configurate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
+import io.github.nucleuspowered.nucleus.core.NucleusCore;
 import io.github.nucleuspowered.nucleus.core.configurate.typeserialisers.InstantTypeSerialiser;
 import io.github.nucleuspowered.nucleus.core.configurate.typeserialisers.LocaleSerialiser;
 import io.github.nucleuspowered.nucleus.core.configurate.typeserialisers.NamedLocationSerialiser;
@@ -21,8 +22,10 @@ import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 import org.spongepowered.math.vector.Vector3d;
@@ -36,14 +39,15 @@ public class ConfigurateHelper implements IConfigurateHelper {
     private final TypeSerializerCollection baseTypeSerializerCollection;
     private final ObjectMapper.Factory objectMapperFactory;
     private final TypeSerializerCollection.Builder moduleBuilderTSC = TypeSerializerCollection.builder();
+    private final ConfigurationOptions options;
 
     @Nullable
     private TypeSerializerCollection withModules = null;
 
-    // TODO: If we can get the default Sponge ConfigurationOptions injected, do it here.
     @Inject
     public ConfigurateHelper(final INucleusServiceCollection serviceCollection,
-            @DefaultConfig(sharedRoot = false) final HoconConfigurationLoader configurationLoader) {
+            @DefaultConfig(sharedRoot = false) final ConfigurationLoader<CommentedConfigurationNode> configurationLoader) {
+        this.options = configurationLoader.defaultOptions();
         this.objectMapperFactory = ObjectMapper
                 .factoryBuilder()
                 .addProcessor(LocalisedComment.class, ObjectMapperActions.localisedComments(serviceCollection.messageProvider()))
@@ -85,6 +89,11 @@ public class ConfigurateHelper implements IConfigurateHelper {
     public TypeSerializerCollection complete() {
         this.withModules = this.moduleBuilderTSC.build();
         return this.withModules;
+    }
+
+    @Override
+    public CommentedConfigurationNode createNode() {
+        return CommentedConfigurationNode.root(this.setOptions(this.options));
     }
 
     private static TypeSerializerCollection setupCore(final INucleusServiceCollection serviceCollection,

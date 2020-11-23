@@ -53,10 +53,10 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         this.dataDirectory = serviceCollection.dataDir();
         this.storageManager = serviceCollection.storageManager();
         serviceCollection.reloadableService().registerDataFileReloadable(this);
-        this.load();
     }
 
-    @Override public void load() {
+    @Override
+    public void load() {
         try {
             this.data = this.configurationLoader()
                     .load()
@@ -67,7 +67,8 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
         }
     }
 
-    @Override public void save() {
+    @Override
+    public void save() {
         try {
             final GsonConfigurationLoader gsonConfigurationLoader = this.configurationLoader();
             final ConfigurationNode node = gsonConfigurationLoader.createNode();
@@ -79,7 +80,8 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
 
     }
 
-    @Override public List<UUID> getForIp(final String ip) {
+    @Override
+    public List<UUID> getForIp(final String ip) {
         this.updateCacheForOnlinePlayers();
         final String ipToCheck = ip.replace("/", "");
         return this.data.getNode().entrySet().stream().filter(x -> x.getValue()
@@ -87,26 +89,30 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    @Override public List<UUID> getJailed() {
+    @Override
+    public List<UUID> getJailed() {
         this.updateCacheForOnlinePlayers();
         return this.data.getNode().entrySet().stream().filter(x -> x.getValue().isJailed())
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    @Override public List<UUID> getJailedIn(final String name) {
+    @Override
+    public List<UUID> getJailedIn(final String name) {
         this.updateCacheForOnlinePlayers();
         return this.data.getNode().entrySet().stream()
                 .filter(x -> x.getValue().getJailName().map(y -> y.equalsIgnoreCase(name)).orElse(false))
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    @Override public List<UUID> getMuted() {
+    @Override
+    public List<UUID> getMuted() {
         this.updateCacheForOnlinePlayers();
         return this.data.getNode().entrySet().stream().filter(x -> x.getValue().isMuted())
                 .map(Map.Entry::getKey).collect(Collectors.toList());
     }
 
-    @Override public void updateCacheForOnlinePlayers() {
+    @Override
+    public void updateCacheForOnlinePlayers() {
         final IUserQueryObject iuq = new UserQueryObject();
         iuq.addAllKeys(Sponge.getServer().getOnlinePlayers().stream().map(Identifiable::getUniqueId).collect(Collectors.toList()));
         this.storageManager.getUserService().getAll(iuq).thenAccept(result ->

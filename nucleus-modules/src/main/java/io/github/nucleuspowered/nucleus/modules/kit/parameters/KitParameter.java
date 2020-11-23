@@ -19,6 +19,7 @@ import org.spongepowered.api.service.permission.Subject;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class KitParameter implements ValueParameter<Kit> {
@@ -28,8 +29,8 @@ public final class KitParameter implements ValueParameter<Kit> {
     private final IMessageProviderService messageProviderService;
     private boolean permissionCheck;
 
-    public KitParameter(final INucleusServiceCollection serviceCollection, final boolean permissionCheck) {
-        this.kitService = serviceCollection.getServiceUnchecked(KitService.class);
+    public KitParameter(final INucleusServiceCollection serviceCollection, final KitService kitService, final boolean permissionCheck) {
+        this.kitService = kitService;
         this.messageProviderService = serviceCollection.messageProvider();
         this.permissionService = serviceCollection.permissionService();
         this.permissionCheck = permissionCheck;

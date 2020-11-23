@@ -395,7 +395,7 @@ public final class NucleusCore {
         final CommentedConfigurationNode defaults = this.serviceCollection.configurateHelper().createNode();
         for (final ModuleContainer moduleContainer : moduleContainers) {
             try {
-                defaults.node(moduleContainer.getId()).set(ModuleState.TRUE);
+                defaults.node(moduleContainer.getId()).set(ModuleState.class, ModuleState.TRUE);
             } catch (final SerializationException e) {
                 // ignored
             }

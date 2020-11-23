@@ -13,6 +13,7 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.plugin.PluginContainer;
 
@@ -71,19 +72,18 @@ public class NucleusErrorHandler {
 
     public void generatePrettyPrint(final Logger logger, final Level loggerLevel) {
         final PrettyPrinter prettyPrinter = new PrettyPrinter(80);
-        prettyPrinter.add(this.getTitle());
+        prettyPrinter.add(this.getTitle()).centre();
         prettyPrinter.hr('-');
         this.addX(prettyPrinter);
         prettyPrinter.hr('-');
         this.createTopLevelMessage(prettyPrinter);
         this.printStackTraceIfAny(prettyPrinter);
-        prettyPrinter.hr('-');
         prettyPrinter.addWrapped("If this error persists, check your configuration files and ensure that you have the latest version of Nucleus which "
                 + "matches the current version of the Sponge API.");
         this.createPostStackTraceMessage(prettyPrinter);
         prettyPrinter.add();
         prettyPrinter.hr('*');
-        prettyPrinter.centre().add("Server Information");
+        prettyPrinter.add("Server Information").centre();
         prettyPrinter.hr('*');
         prettyPrinter.add();
 
@@ -143,22 +143,22 @@ public class NucleusErrorHandler {
     }
 
     protected final void addX(final PrettyPrinter prettyPrinter) {
-        prettyPrinter.centre().add("\\              /");
-        prettyPrinter.centre().add(" \\            / ");
-        prettyPrinter.centre().add("  \\          /  ");
-        prettyPrinter.centre().add("   \\        /   ");
-        prettyPrinter.centre().add("    \\      /    ");
-        prettyPrinter.centre().add("     \\    /     ");
-        prettyPrinter.centre().add("      \\  /      ");
-        prettyPrinter.centre().add("       \\/       ");
-        prettyPrinter.centre().add("       /\\       ");
-        prettyPrinter.centre().add("      /  \\      ");
-        prettyPrinter.centre().add("     /    \\     ");
-        prettyPrinter.centre().add("    /      \\    ");
-        prettyPrinter.centre().add("   /        \\   ");
-        prettyPrinter.centre().add("  /          \\  ");
-        prettyPrinter.centre().add(" /            \\ ");
-        prettyPrinter.centre().add("/              \\");
+        prettyPrinter.add("\\              /").centre();
+        prettyPrinter.add(" \\            / ").centre();
+        prettyPrinter.add("  \\          /  ").centre();
+        prettyPrinter.add("   \\        /   ").centre();
+        prettyPrinter.add("    \\      /    ").centre();
+        prettyPrinter.add("     \\    /     ").centre();
+        prettyPrinter.add("      \\  /      ").centre();
+        prettyPrinter.add("       \\/       ").centre();
+        prettyPrinter.add("       /\\       ").centre();
+        prettyPrinter.add("      /  \\      ").centre();
+        prettyPrinter.add("     /    \\     ").centre();
+        prettyPrinter.add("    /      \\    ").centre();
+        prettyPrinter.add("   /        \\   ").centre();
+        prettyPrinter.add("  /          \\  ").centre();
+        prettyPrinter.add(" /            \\ ").centre();
+        prettyPrinter.add("/              \\").centre();
     }
 
     

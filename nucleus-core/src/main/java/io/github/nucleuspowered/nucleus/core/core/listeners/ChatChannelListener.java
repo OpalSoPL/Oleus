@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.core.core.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
@@ -22,6 +23,7 @@ public class ChatChannelListener implements ListenerBase {
 
     private final IChatMessageFormatterService chatMessageFormatter;
 
+    @Inject
     public ChatChannelListener(final INucleusServiceCollection serviceCollection) {
         this.chatMessageFormatter = serviceCollection.chatMessageFormatter();
     }

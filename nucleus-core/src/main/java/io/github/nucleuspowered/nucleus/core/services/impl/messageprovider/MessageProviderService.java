@@ -66,7 +66,7 @@ public class MessageProviderService implements IMessageProviderService, IReloada
     private final INucleusServiceCollection serviceCollection;
     private final IUserPreferenceService userPreferenceService;
 
-    private Locale defaultLocale = Sponge.getServer().getLocale();
+    private Locale defaultLocale = Locale.getDefault();
     private boolean useMessagesFile;
     private boolean useClientLocalesWhenPossible;
 

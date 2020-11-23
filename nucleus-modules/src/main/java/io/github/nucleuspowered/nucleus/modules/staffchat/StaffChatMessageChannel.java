@@ -17,6 +17,7 @@ import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.LinearComponents;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.PlayerChatRouter;
@@ -30,8 +31,6 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
 
     private static StaffChatMessageChannel INSTANCE = null;
 
-    private boolean formatting = false;
-
     public static StaffChatMessageChannel getInstance() {
         if (StaffChatMessageChannel.INSTANCE != null) {
             throw new IllegalStateException("StaffChatMessageChannel#Instance");
@@ -40,17 +39,18 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
         return StaffChatMessageChannel.INSTANCE;
     }
 
+
     private final IPermissionService permissionService;
     private final IUserPreferenceService userPreferenceService;
-    private NucleusTextTemplateImpl template;
-    private TextColor colour;
+    private NucleusTextTemplateImpl template = NucleusTextTemplateImpl.empty();
+    private TextColor colour = NamedTextColor.BLUE;
+    private boolean formatting = false;
 
     @Inject
     StaffChatMessageChannel(final INucleusServiceCollection serviceCollection) {
         serviceCollection.reloadableService().registerReloadable(this);
         this.permissionService = serviceCollection.permissionService();
         this.userPreferenceService = serviceCollection.userPreferenceService();
-        this.onReload(serviceCollection);
         StaffChatMessageChannel.INSTANCE = this;
     }
 

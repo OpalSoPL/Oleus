@@ -4,7 +4,9 @@
  */
 package io.github.nucleuspowered.nucleus.core.services.interfaces;
 
+import com.google.inject.ImplementedBy;
 import io.github.nucleuspowered.nucleus.core.core.config.CoreConfig;
+import io.github.nucleuspowered.nucleus.core.services.impl.configprovider.ConfigProvider;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.transformation.ConfigurationTransformation;
 
@@ -15,6 +17,7 @@ import java.util.function.Supplier;
 /**
  * Provides config objects.
  */
+@ImplementedBy(ConfigProvider.class)
 public interface IConfigProvider {
 
     CoreConfig getCoreConfig();

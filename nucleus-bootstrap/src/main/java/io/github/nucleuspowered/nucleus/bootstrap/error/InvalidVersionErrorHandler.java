@@ -2,9 +2,10 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.core.startuperror;
+package io.github.nucleuspowered.nucleus.bootstrap.error;
 
 import io.github.nucleuspowered.nucleus.core.IPluginInfo;
+import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.core.util.PrettyPrinter;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.plugin.PluginContainer;

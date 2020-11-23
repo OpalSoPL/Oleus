@@ -10,8 +10,10 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.modules.connection.listeners.ConnectionListener;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public class ConnectionModule implements IModule.Configurable<ConnectionConfig> {
@@ -23,22 +25,22 @@ public class ConnectionModule implements IModule.Configurable<ConnectionConfig> 
     }
 
     @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(ConnectionPermissions.class);
     }
 
     @Override public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
+        return Collections.singleton(ConnectionListener.class);
     }
 
     @Override public Collection<Class<? extends TaskBase>> getAsyncTasks() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override public Class<ConnectionConfig> getConfigClass() {
-        return null;
+        return ConnectionConfig.class;
     }
 }

@@ -68,9 +68,9 @@ public class RTPConfig {
 
     public RTPConfig() {
         this.prohibitedBiomes = new HashSet<>();
-        this.prohibitedBiomes.add(BiomeTypes.OCEAN.get().getKey().asString());
-        this.prohibitedBiomes.add(BiomeTypes.DEEP_OCEAN.get().getKey().asString());
-        this.prohibitedBiomes.add(BiomeTypes.FROZEN_OCEAN.get().getKey().asString());
+        this.prohibitedBiomes.add("minecraft:ocean");
+        this.prohibitedBiomes.add("minecraft:deep_ocean");
+        this.prohibitedBiomes.add("minecraft:frozen_ocean");
         this.perWorldRTPConfigList = new HashMap<>();
         this.perWorldRTPConfigList.put("example", new PerWorldRTPConfig());
     }

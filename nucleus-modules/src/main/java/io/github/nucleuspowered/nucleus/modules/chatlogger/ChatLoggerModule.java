@@ -58,6 +58,6 @@ public class ChatLoggerModule implements IModule.Configurable<ChatLoggingConfig>
 
     @Override
     public Class<ChatLoggingConfig> getConfigClass() {
-        return null;
+        return ChatLoggingConfig.class;
     }
 }

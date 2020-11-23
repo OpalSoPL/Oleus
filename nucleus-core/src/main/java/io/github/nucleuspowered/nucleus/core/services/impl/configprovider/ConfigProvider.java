@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @Singleton
@@ -48,7 +49,6 @@ public class ConfigProvider implements IConfigProvider {
         this.logger = logger;
         this.coreLoader = ConfigProvider.getLoader(configurateHelper, configPath.resolve(ConfigProvider.CORE_CONFIG_PATH));
         this.modulesLoader = ConfigProvider.getLoader(configurateHelper, configPath.resolve(ConfigProvider.MODULES_CONFIG_PATH));
-        this.providers.put(CoreConfig.class, CoreConfig::new);
     }
 
     @Override
@@ -61,8 +61,10 @@ public class ConfigProvider implements IConfigProvider {
             final Class<T> typeOfConfig,
             final Supplier<T> creator,
             final Collection<ConfigurationTransformation> configurationTransformationCollection) {
+        Objects.requireNonNull(typeOfConfig, "Module ID: " + moduleId + " has a null config type!");
         if (this.providers.containsKey(typeOfConfig) || this.moduleConfigs.containsKey(moduleId)) {
-            throw new IllegalStateException("Cannot register type or module more than once!");
+            throw new IllegalStateException("Cannot register type or module more than once (type of config " + typeOfConfig.getSimpleName() +
+                    ", id " + moduleId + ")!");
         }
 
         this.providers.put(typeOfConfig, creator);

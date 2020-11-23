@@ -92,11 +92,11 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         this.logger = serviceCollection.logger();
 
         this.withPermission = Parameter.builder(Kit.class)
-                .parser(new KitParameter(serviceCollection, true))
+                .parser(new KitParameter(serviceCollection, this, true))
                 .setKey(KitService.KIT_KEY)
                 .build();
         this.withoutPermission = Parameter.builder(Kit.class)
-                .parser(new KitParameter(serviceCollection, false))
+                .parser(new KitParameter(serviceCollection, this, false))
                 .setKey(KitService.KIT_KEY)
                 .build();
     }
