@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.fly.listeners;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.jail.event.NucleusJailEvent;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.modules.fly.FlyKeys;
@@ -32,6 +33,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
     private final INucleusServiceCollection serviceCollection;
     private FlyConfig flyConfig;
 
+    @Inject
     public FlyListener(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.flyConfig = serviceCollection.configProvider().getDefaultModuleConfig(FlyConfig.class);

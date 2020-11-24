@@ -10,7 +10,9 @@ import io.github.nucleuspowered.nucleus.core.scaffold.task.SyncTaskBase;
 import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.framework.qual.DefaultQualifier;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 import org.spongepowered.configurate.transformation.ConfigurationTransformation;
 
@@ -18,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
+@DefaultQualifier(NonNull.class)
 public interface IModule {
 
     void init(INucleusServiceCollection serviceCollection);

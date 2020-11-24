@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.jail.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.jail.data.Jail;
 import io.github.nucleuspowered.nucleus.modules.jail.JailPermissions;
 import io.github.nucleuspowered.nucleus.modules.jail.parameter.JailParameter;
@@ -28,6 +29,7 @@ public class JailTeleportCommand implements ICommandExecutor {
 
     private final Parameter.Value<Jail> parameter;
 
+    @Inject
     public JailTeleportCommand(final INucleusServiceCollection serviceCollection) {
         final JailService handler = serviceCollection.getServiceUnchecked(JailService.class);
         this.parameter = Parameter.builder(Jail.class)

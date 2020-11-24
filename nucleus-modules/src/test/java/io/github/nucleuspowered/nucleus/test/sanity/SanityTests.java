@@ -2,18 +2,23 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.core.tests.sanity;
+package io.github.nucleuspowered.nucleus.test.sanity;
 
 import com.google.common.reflect.ClassPath;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
+import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import org.junit.Assert;
 import org.junit.Test;
 import org.spongepowered.api.util.Tuple;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -172,5 +177,34 @@ public class SanityTests {
         }
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testCommandsListenersTasksAreInjectable() throws IOException {
+        final Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
+                .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");
+        final Set<Class<?>> sc = ci.stream().map(ClassPath.ClassInfo::load)
+                .filter(x -> ICommandExecutor.class.isAssignableFrom(x)
+                        || ListenerBase.class.isAssignableFrom(x)
+                        || TaskBase.class.isAssignableFrom(x)
+                        || IModule.class.isAssignableFrom(x))
+                .filter(x -> !x.isInterface() && !Modifier.isAbstract(x.getModifiers()))
+                .filter(x -> {
+                    final Constructor<?>[] constructors = x.getDeclaredConstructors();
+                    int validCtors = 0;
+                    for (final Constructor<?> ctor : constructors) {
+                        if (ctor.getParameterCount() == 0 || ctor.getAnnotation(Inject.class) != null) {
+                            validCtors++;
+                        }
+                    }
+                    return validCtors != 1;
+                })
+                .collect(Collectors.toSet());
+
+        if (!sc.isEmpty()) {
+            final StringBuilder sb = new StringBuilder("Some classes that are injected into are not @Injectable!").append(System.lineSeparator());
+            sc.forEach(x -> sb.append(x).append(System.lineSeparator()));
+            Assert.fail(sb.toString());
+        }
+    }
 
 }

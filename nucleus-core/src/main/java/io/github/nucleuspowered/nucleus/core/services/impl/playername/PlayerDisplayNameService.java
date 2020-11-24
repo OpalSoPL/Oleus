@@ -191,7 +191,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         if (user instanceof Nameable) {
             return this.getName((Nameable) user);
         } else if (user instanceof SystemSubject || user instanceof Server) {
-            return this.getDisplayName(Util.CONSOLE_FAKE_UUID);
+            return Component.text("Server");
         }
         return Component.text("Unknown");
     }

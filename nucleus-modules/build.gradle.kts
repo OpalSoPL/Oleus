@@ -1,5 +1,5 @@
 plugins {
-    java
+    `java-library`
     eclipse
 }
 
@@ -28,9 +28,8 @@ java {
 }
 
 dependencies {
-    implementation(project(":nucleus-api"))
-    implementation(project(":nucleus-core"))
-    implementation("org.jetbrains:annotations:19.0.0")
+    api(project(":nucleus-api"))
+    api(project(":nucleus-core"))
 
     testCompile("org.mockito:mockito-all:1.10.19")
     testCompile("org.powermock:powermock-module-junit4:1.6.4")

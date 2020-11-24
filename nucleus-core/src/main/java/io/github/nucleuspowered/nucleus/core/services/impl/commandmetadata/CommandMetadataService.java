@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -107,7 +108,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             final String id,
             final String name,
             final Collection<? extends Class<? extends ICommandExecutor>> associatedContext) {
-        for (final Class<? extends ICommandExecutor> c : associatedContext) {
+        for (final Class<? extends ICommandExecutor> c : Objects.requireNonNull(associatedContext, "Module " + id + " has a null command call.")) {
             this.registerCommand(id, name, c);
         }
     }
@@ -117,7 +118,9 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             final String id,
             final String name,
             final Class<? extends ICommandExecutor> associatedContext) {
-        Preconditions.checkState(!this.registrationComplete, "Registration has completed.");
+        if (this.registrationComplete) {
+            throw new IllegalStateException("Registration has completed.");
+        }
         final Command command = associatedContext.getAnnotation(Command.class);
         if (command == null) {
             throw new NullPointerException("Command annotation is missing");

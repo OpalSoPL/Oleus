@@ -38,9 +38,11 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigProvider
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.core.startuperror.ConfigErrorHandler;
+import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.core.util.functional.Action;
 import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
 import io.leangen.geantyref.TypeToken;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
@@ -83,6 +85,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -227,7 +230,12 @@ public final class NucleusCore {
 
     @Listener(order = Order.LAST)
     public void establishCommands(final RegisterCommandEvent<Command.Parameterized> event) {
-        this.serviceCollection.commandMetadataService().completeRegistrationPhase(this.serviceCollection, event);
+        try {
+            this.serviceCollection.commandMetadataService().completeRegistrationPhase(this.serviceCollection, event);
+        } catch (final Exception e) {
+            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
+                    .generatePrettyPrint(this.logger, Level.ERROR);
+        }
     }
 
     @Listener
@@ -338,7 +346,9 @@ public final class NucleusCore {
             final ModuleContainer container = tuple.getFirst();
             // listeners
             Sponge.getEventManager().registerListeners(this.pluginContainer, module);
-            for (final Class<? extends ListenerBase> listenerClass : module.getListeners()) {
+
+            for (final Class<? extends ListenerBase> listenerClass :
+                    Objects.requireNonNull(module.getListeners(), "Module " + tuple.getFirst().getId() + " has a null listener call.")) {
                 final ListenerBase listener = this.injector.getInstance(listenerClass);
                 if (listener instanceof ListenerBase.Conditional) {
                     this.serviceCollection.reloadableService().registerReloadable(new ListenerReloadableWrapper((ListenerBase.Conditional) listener));

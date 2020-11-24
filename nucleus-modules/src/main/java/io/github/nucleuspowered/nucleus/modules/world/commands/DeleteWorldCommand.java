@@ -15,7 +15,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.vavr.Tuple3;
 import net.kyori.adventure.audience.Audience;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.exception.CommandException;

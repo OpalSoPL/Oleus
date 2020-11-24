@@ -33,6 +33,7 @@ public final class VanishModule implements IModule.Configurable<VanishConfig> {
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
+        serviceCollection.registerService(VanishService.class, new VanishService(serviceCollection), false);
         serviceCollection.placeholderService()
                 .registerToken(
                         "vanished",

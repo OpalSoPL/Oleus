@@ -6,15 +6,18 @@ package io.github.nucleuspowered.nucleus.modules.commandspy;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
+import io.github.nucleuspowered.nucleus.modules.commandspy.commands.CommandSpyCommand;
 import io.github.nucleuspowered.nucleus.modules.commandspy.config.CommandSpyConfig;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.modules.commandspy.listeners.CommandSpyListener;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 public final class CommandSpyModule implements IModule.Configurable<CommandSpyConfig> {
@@ -27,19 +30,15 @@ public final class CommandSpyModule implements IModule.Configurable<CommandSpyCo
     }
 
     @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
-        return null;
+        return Collections.singletonList(CommandSpyCommand.class);
     }
 
     @Override public Optional<Class<?>> getPermissions() {
-        return Optional.empty();
+        return Optional.of(CommandSpyPermissions.class);
     }
 
     @Override public Collection<Class<? extends ListenerBase>> getListeners() {
-        return null;
-    }
-
-    @Override public Collection<Class<? extends TaskBase>> getAsyncTasks() {
-        return null;
+        return Collections.singletonList(CommandSpyListener.class);
     }
 
     @Override public Class<CommandSpyConfig> getConfigClass() {

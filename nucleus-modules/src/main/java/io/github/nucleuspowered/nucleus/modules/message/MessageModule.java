@@ -16,6 +16,7 @@ import io.github.nucleuspowered.nucleus.modules.message.listener.MessageListener
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.modules.message.services.MessageHandler;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 
@@ -30,7 +31,7 @@ public final class MessageModule implements IModule.Configurable<MessageConfig> 
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
-
+        serviceCollection.registerService(MessageHandler.class, new MessageHandler(serviceCollection), false);
     }
 
     @Override

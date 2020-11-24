@@ -111,7 +111,7 @@ public class NucleusBootstrapper {
             try {
                 this.logger.info("Nucleus {} running on Sponge API {} ({} version {})", pluginInfo.version(),
                         Sponge.getPlatform().getContainer(Platform.Component.API).getMetadata().getVersion(),
-                        Sponge.getPlatform().getContainer(Platform.Component.IMPLEMENTATION).getMetadata().getName(),
+                        Sponge.getPlatform().getContainer(Platform.Component.IMPLEMENTATION).getMetadata().getName().orElse("Unknown Implementation"),
                         Sponge.getPlatform().getContainer(Platform.Component.IMPLEMENTATION).getMetadata().getVersion());
                 this.logger.info("Nucleus is starting...");
                 final NucleusCore core =

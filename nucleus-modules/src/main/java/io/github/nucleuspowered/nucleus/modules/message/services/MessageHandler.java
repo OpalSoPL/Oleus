@@ -65,7 +65,6 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
         this.serviceCollection = serviceCollection;
         this.systemMessageTarget =
                 new SystemSubjectMessageTarget(serviceCollection.playerDisplayNameService().getDisplayName(Util.CONSOLE_FAKE_UUID));
-        this.onReload(serviceCollection);
     }
 
     @Override

@@ -46,6 +46,7 @@ public class EntityInfoCommand implements ICommandExecutor {
         };
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the entities in the world.

@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.back.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportResult;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.api.util.WorldPositionRotation;
@@ -48,6 +49,7 @@ public class BackCommand implements ICommandExecutor, IReloadableService.Reloada
     private final Flag forceFlag = Flag.of("f", "force");
     private final Flag borderFlag;
 
+    @Inject
     public BackCommand(final IPermissionService service) {
         this.borderFlag = Flag.builder().setRequirement(cause -> service.hasPermission(cause, BackPermissions.TPPOS_BORDER)).build();
     }

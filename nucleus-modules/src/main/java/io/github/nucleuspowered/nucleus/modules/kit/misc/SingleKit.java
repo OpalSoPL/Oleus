@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.kit.misc;
 import com.google.common.collect.Lists;
 import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
-import org.jetbrains.annotations.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.exception.CommandException;

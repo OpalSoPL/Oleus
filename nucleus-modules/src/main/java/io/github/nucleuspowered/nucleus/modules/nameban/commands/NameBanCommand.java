@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.nameban.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.nameban.exception.NameBanException;
 import io.github.nucleuspowered.nucleus.modules.nameban.NameBanPermissions;
@@ -27,6 +28,7 @@ public class NameBanCommand implements ICommandExecutor, IReloadableService.Relo
 
     private final Parameter.Value<String> regexParameter;
 
+    @Inject
     public NameBanCommand(final INucleusServiceCollection serviceCollection) {
         this.regexParameter = Parameter.builder(String.class)
                 .setKey("name")

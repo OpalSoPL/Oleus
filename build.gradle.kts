@@ -113,6 +113,7 @@ dependencies {
     implementation(project(":nucleus-api"))
     implementation(project(":nucleus-core"))
     implementation(project(":nucleus-bootstrap"))
+    testImplementation("junit:junit:4.12")
 }
 
 /**
