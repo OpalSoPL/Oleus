@@ -4,15 +4,27 @@
  */
 package io.github.nucleuspowered.nucleus.core.core;
 
+import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IGeneralDataObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IWorldDataObject;
+import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.NucleusKeysProvider;
+import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.PreferenceKeyImpl;
 import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 import java.time.Instant;
+import java.util.Locale;
 
 public final class CoreKeys {
+
+    public static final NucleusUserPreferenceService.PreferenceKey<Locale> LOCALE_PREFERENCE_KEY = new PreferenceKeyImpl.LocaleKey(
+            NucleusKeysProvider.PLAYER_LOCALE_KEY,
+            Locale.UK,
+            CorePermissions.BASE_NUCLEUSLANGUAGE,
+            "userpref.player_locale",
+            (serviceCollection, uuid, value) -> serviceCollection.messageProvider().invalidateLocaleCacheFor(uuid)
+    );
 
     public static final DataKey<Integer, IGeneralDataObject> GENERAL_VERSION = DataKey.of(GeAnTyRefTypeTokens.INTEGER, IGeneralDataObject.class, "data_version");
 

@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.core;
 import com.google.inject.Injector;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
+import io.github.nucleuspowered.nucleus.core.core.CoreKeys;
 import io.github.nucleuspowered.nucleus.core.core.CoreModule;
 import io.github.nucleuspowered.nucleus.core.core.CorePermissions;
 import io.github.nucleuspowered.nucleus.core.core.config.CoreConfig;
@@ -172,18 +173,28 @@ public final class NucleusCore {
 
     @Listener
     public void establishNewRegistries(final RegisterCatalogRegistryEvent event) {
-        event.register(CommandModifierFactory.class, ResourceKey.of("nucleus", "command_modifier_factory"));
-        event.register(TeleportScanner.class, ResourceKey.of("nucleus", "teleport_scanner"));
-        event.register(IStorageRepositoryFactory.class, ResourceKey.of("nucleus", "storage_repository_factory"));
-        event.register(NucleusUserPreferenceService.PreferenceKey.class, ResourceKey.of("nucleus", "user_preference_key"));
+        try {
+            event.register(CommandModifierFactory.class, ResourceKey.of("nucleus", "command_modifier_factory"));
+            event.register(TeleportScanner.class, ResourceKey.of("nucleus", "teleport_scanner"));
+            event.register(IStorageRepositoryFactory.class, ResourceKey.of("nucleus", "storage_repository_factory"));
+            event.register(NucleusUserPreferenceService.PreferenceKey.class, ResourceKey.of("nucleus", "user_preference_key"));
+        } catch (final Exception e) {
+            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
+                    .generatePrettyPrint(this.logger, Level.ERROR);
+        }
     }
 
     @Listener
     public void registerCommandModifierFactories(final RegisterCatalogEvent<CommandModifierFactory> event) {
-        event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COOLDOWN, new CooldownModifier()));
-        event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COST, new CostModifier()));
-        event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_WARMUP, new WarmupModifier()));
-        event.register(new CommandModifierFactory.Simple(CommandModifiers.REQUIRE_ECONOMY, new RequiresEconomyModifier()));
+        try {
+            event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COOLDOWN, new CooldownModifier()));
+            event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COST, new CostModifier()));
+            event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_WARMUP, new WarmupModifier()));
+            event.register(new CommandModifierFactory.Simple(CommandModifiers.REQUIRE_ECONOMY, new RequiresEconomyModifier()));
+        } catch (final Exception e) {
+            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
+                    .generatePrettyPrint(this.logger, Level.ERROR);
+        }
     }
 
     @Listener
@@ -207,25 +218,27 @@ public final class NucleusCore {
 
     @Listener
     public void registerStorageRepositoryFactories(final RegisterCatalogEvent<IStorageRepositoryFactory> event) {
-        event.register(this.serviceCollection.storageManager().getFlatFileRepositoryFactory());
+        try {
+            event.register(this.serviceCollection.storageManager().getFlatFileRepositoryFactory());
+        } catch (final Exception e) {
+            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
+                    .generatePrettyPrint(this.logger, Level.ERROR);
+        }
     }
 
     @Listener
     public void registerCoreUserPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
-        event.register(
-                new PreferenceKeyImpl.LocaleKey(
-                        NucleusKeysProvider.PLAYER_LOCALE_KEY,
-                        Locale.UK,
-                        CorePermissions.BASE_NUCLEUSLANGUAGE,
-                        "userpref.player_locale",
-                        (serviceCollection, uuid, value) -> serviceCollection.messageProvider().invalidateLocaleCacheFor(uuid)
-                )
-        );
+        event.register(CoreKeys.LOCALE_PREFERENCE_KEY);
     }
 
     @Listener
     public void establishFactories(final RegisterFactoryEvent event) {
-        this.serviceCollection.registerFactories(event);
+        try {
+            this.serviceCollection.registerFactories(event);
+        } catch (final Exception e) {
+            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
+                    .generatePrettyPrint(this.logger, Level.ERROR);
+        }
     }
 
     @Listener(order = Order.LAST)
