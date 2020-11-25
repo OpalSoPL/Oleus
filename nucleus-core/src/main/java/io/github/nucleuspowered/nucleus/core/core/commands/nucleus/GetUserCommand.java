@@ -38,8 +38,11 @@ public class GetUserCommand implements ICommandExecutor {
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
                 Parameter.firstOf(
-                        Parameter.builder(UUID.class).parser(new UUIDParameter<>(Optional::ofNullable, serviceCollection.messageProvider())).setKey(this.uuidKey).build(),
-                        Parameter.builder(String.class).parser(new RegexParameter(Pattern.compile("^[.]{1,16}$"), "command.nucleus.getuser.regex",
+                        Parameter.builder(UUID.class)
+                                .parser(new UUIDParameter<>(Optional::ofNullable, serviceCollection.messageProvider())).setKey(this.uuidKey).build(),
+                        Parameter.builder(String.class)
+                                .setKey(this.playerKey)
+                                .parser(new RegexParameter(Pattern.compile("^[.]{1,16}$"), "command.nucleus.getuser.regex",
                                 serviceCollection.messageProvider())).build()
             )
         };

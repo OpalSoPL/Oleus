@@ -16,7 +16,7 @@ import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 public class BaseLoggerListener extends AbstractLoggerListener {
 
     @Inject
-    BaseLoggerListener(final INucleusServiceCollection serviceCollection) {
+    public BaseLoggerListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection);
     }
 

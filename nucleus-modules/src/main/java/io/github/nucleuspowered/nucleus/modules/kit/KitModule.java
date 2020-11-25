@@ -27,6 +27,7 @@ import io.github.nucleuspowered.nucleus.modules.kit.commands.KitSetFirstJoinComm
 import io.github.nucleuspowered.nucleus.modules.kit.commands.KitViewCommand;
 import io.github.nucleuspowered.nucleus.modules.kit.commands.command.KitAddCommandCommand;
 import io.github.nucleuspowered.nucleus.modules.kit.commands.command.KitClearCommandCommand;
+import io.github.nucleuspowered.nucleus.modules.kit.commands.command.KitCommandCommand;
 import io.github.nucleuspowered.nucleus.modules.kit.commands.command.KitRemoveCommandCommand;
 import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
 import io.github.nucleuspowered.nucleus.modules.kit.listeners.KitAutoRedeemListener;
@@ -67,6 +68,7 @@ public class KitModule implements IModule.Configurable<KitConfig> {
                 KitClearCommandCommand.class,
                 KitClearCommandCommand.class,
                 KitRemoveCommandCommand.class,
+                KitCommandCommand.class,
 
                 // Kit
                 KitAutoRedeemCommand.class,

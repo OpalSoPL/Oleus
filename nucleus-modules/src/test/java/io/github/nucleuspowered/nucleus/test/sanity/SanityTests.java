@@ -192,7 +192,7 @@ public class SanityTests {
                     final Constructor<?>[] constructors = x.getDeclaredConstructors();
                     int validCtors = 0;
                     for (final Constructor<?> ctor : constructors) {
-                        if (ctor.getParameterCount() == 0 || ctor.getAnnotation(Inject.class) != null) {
+                        if (Modifier.isPublic(ctor.getModifiers()) && (ctor.getParameterCount() == 0 || ctor.getAnnotation(Inject.class) != null)) {
                             validCtors++;
                         }
                     }

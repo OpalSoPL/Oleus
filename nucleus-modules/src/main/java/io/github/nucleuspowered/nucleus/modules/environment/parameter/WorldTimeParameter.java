@@ -50,11 +50,11 @@ public class WorldTimeParameter implements ValueParameter<MinecraftDayTime> {
     private static final Pattern ticks = Pattern.compile("^(\\d+)$");
 
     private static final MinecraftDayTime DAWN = MinecraftDayTime.minecraftEpoch();
-    private static final MinecraftDayTime DAY = MinecraftDayTime.of(0, 7, 0);
-    private static final MinecraftDayTime NOON = MinecraftDayTime.of(0, 12, 0);
-    private static final MinecraftDayTime DUSK = MinecraftDayTime.of(0, 18, 0);
-    private static final MinecraftDayTime NIGHT = MinecraftDayTime.of(0, 20, 0);
-    private static final MinecraftDayTime MIDNIGHT = MinecraftDayTime.of(1, 0, 0);
+    private static final MinecraftDayTime DAY = MinecraftDayTime.of(1, 7, 0);
+    private static final MinecraftDayTime NOON = MinecraftDayTime.of(1, 12, 0);
+    private static final MinecraftDayTime DUSK = MinecraftDayTime.of(1, 18, 0);
+    private static final MinecraftDayTime NIGHT = MinecraftDayTime.of(1, 20, 0);
+    private static final MinecraftDayTime MIDNIGHT = MinecraftDayTime.of(2, 0, 0);
 
     private final boolean allowAliases;
 

@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.core.core.commands;
 
+import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.core.core.CorePermissions;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
@@ -40,6 +41,7 @@ public class CommandInfoCommand implements ICommandExecutor {
 
     private final Parameter.Value<CommandMapping> commandParameter;
 
+    @Inject
     public CommandInfoCommand(final IMessageProviderService messageProviderService) {
         this.commandParameter = Parameter.builder(CommandMapping.class)
                 .setKey("command")

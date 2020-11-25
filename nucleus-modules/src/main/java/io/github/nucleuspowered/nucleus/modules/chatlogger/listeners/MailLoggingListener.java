@@ -18,7 +18,7 @@ import org.spongepowered.api.event.filter.cause.First;
 public class MailLoggingListener extends AbstractLoggerListener {
 
     @Inject
-    MailLoggingListener(final INucleusServiceCollection serviceCollection) {
+    public MailLoggingListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection);
     }
 

@@ -36,6 +36,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -44,6 +45,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -156,12 +159,10 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         this.registrationComplete = true;
         this.load();
 
-        final Map<Class<? extends ICommandExecutor>, String> metadataStringMap = this.commandMetadataMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        entry -> entry.getValue().getExecutor(),
-                        Map.Entry::getKey
-                ));
+        final Map<Class<? extends ICommandExecutor>, String> metadataStringMap = new HashMap<>();
+        for (final Map.Entry<String, CommandMetadata> commandMetadataEntry : this.commandMetadataMap.entrySet()) {
+            metadataStringMap.put(commandMetadataEntry.getValue().getExecutor(), commandMetadataEntry.getKey());
+        }
 
         final Map<CommandMetadata, CommandControl> commands = new HashMap<>();
         // this.commandMetadataMap.values().forEach(metadata -> execToMeta.put(metadata.getExecutor(), metadata));

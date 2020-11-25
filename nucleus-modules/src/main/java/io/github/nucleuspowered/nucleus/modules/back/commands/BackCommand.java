@@ -51,7 +51,8 @@ public class BackCommand implements ICommandExecutor, IReloadableService.Reloada
 
     @Inject
     public BackCommand(final IPermissionService service) {
-        this.borderFlag = Flag.builder().setRequirement(cause -> service.hasPermission(cause, BackPermissions.TPPOS_BORDER)).build();
+        this.borderFlag =
+                Flag.builder().alias("b").alias("border").setRequirement(cause -> service.hasPermission(cause, BackPermissions.TPPOS_BORDER)).build();
     }
 
     @Override

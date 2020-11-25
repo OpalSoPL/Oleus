@@ -14,7 +14,7 @@ import org.spongepowered.api.event.Order;
 public class MessageLoggingListener extends AbstractLoggerListener {
 
     @Inject
-    MessageLoggingListener(final INucleusServiceCollection serviceCollection) {
+    public MessageLoggingListener(final INucleusServiceCollection serviceCollection) {
         super(serviceCollection);
     }
 
