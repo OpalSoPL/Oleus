@@ -30,6 +30,6 @@ public interface ICommandResult {
 
     Optional<Component> getErrorMessage(ICommandContext source);
 
-    CommandResult getResult();
+    CommandResult getResult(ICommandContext source);
 
 }

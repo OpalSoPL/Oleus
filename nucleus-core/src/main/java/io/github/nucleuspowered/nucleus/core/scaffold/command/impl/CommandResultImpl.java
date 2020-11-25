@@ -66,8 +66,8 @@ public class CommandResultImpl implements ICommandResult {
     }
 
     @Override
-    public CommandResult getResult() {
-        return null;
+    public CommandResult getResult(final ICommandContext source) {
+        return this.success ? CommandResult.success() : this.getErrorMessage(source).map(CommandResult::error).orElseGet(CommandResult::empty);
     }
 
     public static final class Literal extends CommandResultImpl {

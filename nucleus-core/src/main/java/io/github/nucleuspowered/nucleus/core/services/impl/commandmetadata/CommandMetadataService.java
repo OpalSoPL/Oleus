@@ -9,6 +9,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import io.github.nucleuspowered.nucleus.core.IPluginInfo;
 import io.github.nucleuspowered.nucleus.core.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
@@ -22,14 +23,20 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandMetadat
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.core.util.functional.Action;
 import io.leangen.geantyref.TypeToken;
+import io.vavr.Tuple;
+import io.vavr.Tuple3;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,6 +47,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,6 +72,9 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     private final Map<String, CommandMetadata> commandMetadataMap = new HashMap<>();
     private final Map<CommandControl, List<String>> controlToAliases = new HashMap<>();
     private final BiMap<Class<? extends ICommandExecutor>, CommandControl> controlToExecutorClass = HashBiMap.create();
+    private final Logger logger;
+    private final PluginContainer pluginContainer;
+    private final IPluginInfo pluginInfo;
 
     private CommentedConfigurationNode commandsConfConfigNode;
     private boolean registrationComplete = false;
@@ -74,12 +85,18 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     public CommandMetadataService(@ConfigDirectory final Path configDirectory,
             final IReloadableService reloadableService,
             final IMessageProviderService messageProviderService,
-            final IConfigurateHelper helper) {
+            final IConfigurateHelper helper,
+            final Logger logger,
+            final PluginContainer pluginContainer,
+            final IPluginInfo pluginInfo) {
         reloadableService.registerReloadable(this);
         this.configurateHelper = helper;
         this.messageProviderService = messageProviderService;
         this.reloadableService = reloadableService;
         this.commandsFile = configDirectory.resolve("commands.conf");
+        this.logger = logger;
+        this.pluginContainer = pluginContainer;
+        this.pluginInfo = pluginInfo;
     }
 
     private String getKey(final Command command) {
@@ -265,6 +282,8 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
         }
 
         // Now we register all root commands as necessary.
+        final List<Tuple3<String, String[], org.spongepowered.api.command.Command.Parameterized>> builtCommands = new LinkedList<>();
+        boolean tripError = false;
         if (parentControl == null) {
             for (final Map.Entry<CommandControl, List<String>> aliases : this.controlToAliases.entrySet()) {
                 // Ensure that the first entry in the list is the one specified first
@@ -283,15 +302,26 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
                 final String first = orderedAliases.get(0);
                 final Collection<String> others = orderedAliases.size() > 1 ? orderedAliases.subList(1, orderedAliases.size()) :
                         Collections.emptyList();
-                this.registeredAliases.addAll(event.register(
-                        collection.pluginContainer(),
-                        this.createCommand(aliases.getKey()),
-                        first,
-                        others.toArray(new String[0])
-                ).getAllAliases());
+                try {
+                    builtCommands.add(Tuple.of(first, others.toArray(new String[0]), this.createCommand(aliases.getKey())));
+                } catch (final Exception e) {
+                    this.logger.error("Failed to register: {}", first);
+                    if (!tripError) {
+                        new NucleusErrorHandler(this.pluginContainer, e, false, this.logger, this.pluginInfo)
+                                .generatePrettyPrint(this.logger, Level.ERROR);
+                    }
+                    tripError = true;
+                }
             }
 
-            this.registeredCommands.putAll(commands);
+            if (!tripError) {
+                // Finally, register all commands
+                for (final Tuple3<String, String[], org.spongepowered.api.command.Command.Parameterized> command : builtCommands) {
+                    this.registeredAliases.addAll(event.register(collection.pluginContainer(), command._3, command._1, command._2).getAllAliases());
+                }
+
+                this.registeredCommands.putAll(commands);
+            }
         }
     }
 

@@ -38,8 +38,11 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +53,7 @@ public final class CommandControl {
     private static final String CONTEXT_KEY = "nucleus_command";
 
     private final INucleusServiceCollection serviceCollection;
-    private final ImmutableList<String> basicPermission;
+    private final List<String> basicPermission;
     private final CommandMetadata metadata;
     @Nullable private final ICommandExecutor executor;
 
@@ -59,7 +62,7 @@ public final class CommandControl {
     private final String commandKey;
     private final Context context;
     private final List<String> aliases;
-    private final ImmutableMap<CommandModifier, ICommandModifier> modifiers;
+    private final Map<CommandModifier, ICommandModifier> modifiers;
     private final CommandModifiersConfig commandModifiersConfig = new CommandModifiersConfig();
 
     private final String command;
@@ -74,10 +77,10 @@ public final class CommandControl {
         this.metadata = meta;
         this.commandKey = meta.getCommandKey();
         this.context = new Context(CONTEXT_KEY, this.commandKey.replace(".", " "));
-        this.basicPermission = ImmutableList.copyOf(meta.getCommandAnnotation().basePermission());
+        this.basicPermission = Collections.unmodifiableList(Arrays.asList(meta.getCommandAnnotation().basePermission()));
         this.serviceCollection = serviceCollection;
 
-        this.aliases = ImmutableList.copyOf(meta.getAliases());
+        this.aliases = Collections.unmodifiableList(Arrays.asList(meta.getAliases()));
         if (parent != null) {
             this.command = parent.command + " " + meta.getAliases()[0];
         } else {
@@ -85,7 +88,7 @@ public final class CommandControl {
         }
 
         // this must be last.
-        this.modifiers = validateModifiers(this, serviceCollection.logger(), meta.getCommandAnnotation());
+        this.modifiers = CommandControl.validateModifiers(this, serviceCollection.logger(), meta.getCommandAnnotation());
     }
 
     public void attach(final String alias, final CommandControl commandControl) {
@@ -146,7 +149,7 @@ public final class CommandControl {
                 modifiers
         );
 
-        try (final NoExceptionAutoClosable closable = this.serviceCollection.permissionService().setContextTemporarily(context, this.context)) {
+        try (final NoExceptionAutoClosable ignored = this.serviceCollection.permissionService().setContextTemporarily(context, this.context)) {
             // Do we have permission?
             if (!this.testPermission(context)) {
                 throw new CommandPermissionException(contextSource.getMessage("permissions.nopermission"));
@@ -167,7 +170,7 @@ public final class CommandControl {
                 if (result.isPresent()) {
                     // STOP.
                     this.onResult(contextSource, result.get());
-                    return result.get().getResult();
+                    return result.get().getResult(contextSource);
                 }
 
                 // Modifiers might have something to say about it.
@@ -177,12 +180,12 @@ public final class CommandControl {
                         if (result.isPresent()) {
                             // STOP.
                             this.onResult(contextSource, result.get());
-                            return result.get().getResult();
+                            return result.get().getResult(contextSource);
                         }
                     }
                 }
 
-                return this.execute(contextSource).getResult();
+                return this.execute(contextSource).getResult(contextSource);
             } catch (final Exception ex) {
                 // Run any fail actions.
                 this.runFailActions(contextSource);
@@ -290,7 +293,7 @@ public final class CommandControl {
         }
     }
 
-    public ImmutableList<String> getPermission() {
+    public Collection<String> getPermission() {
         return this.basicPermission;
     }
 
@@ -368,12 +371,13 @@ public final class CommandControl {
         return ImmutableList.copyOf(this.aliases);
     }
 
-    private static ImmutableMap<CommandModifier, ICommandModifier> validateModifiers(final CommandControl control, final Logger logger, final Command command) {
+    private static Map<CommandModifier, ICommandModifier> validateModifiers(final CommandControl control, final Logger logger,
+            final Command command) {
         if (command.modifiers().length == 0) {
             return ImmutableMap.of();
         }
 
-        final ImmutableMap.Builder<CommandModifier, ICommandModifier> modifiers = new ImmutableMap.Builder<>();
+        final Map<CommandModifier, ICommandModifier> modifiers = new LinkedHashMap<>();
         for (final CommandModifier modifier : command.modifiers()) {
             try {
                 // Get the registry entry.
@@ -403,7 +407,7 @@ public final class CommandControl {
             }
         }
 
-        return modifiers.build();
+        return Collections.unmodifiableMap(modifiers);
     }
 
     public Component getUsage(final ICommandContext context) {
