@@ -35,6 +35,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.NucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.PreferenceKeyImpl;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandMetadataService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager;
@@ -54,6 +55,7 @@ import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.EventContext;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
 import org.spongepowered.api.event.lifecycle.RefreshGameEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogRegistryEvent;
@@ -232,6 +234,11 @@ public final class NucleusCore {
     }
 
     @Listener
+    public void onGameLoadComplete(final LoadedGameEvent event) {
+        this.serviceCollection.userPreferenceService().postInit();
+    }
+
+    @Listener
     public void establishFactories(final RegisterFactoryEvent event) {
         try {
             this.serviceCollection.registerFactories(event);
@@ -244,7 +251,9 @@ public final class NucleusCore {
     @Listener(order = Order.LAST)
     public void establishCommands(final RegisterCommandEvent<Command.Parameterized> event) {
         try {
-            this.serviceCollection.commandMetadataService().completeRegistrationPhase(this.serviceCollection, event);
+            final ICommandMetadataService metadataService = this.serviceCollection.commandMetadataService();
+            metadataService.reset(); // for clients.
+            metadataService.completeRegistrationPhase(this.serviceCollection, event);
         } catch (final Exception e) {
             new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
                     .generatePrettyPrint(this.logger, Level.ERROR);
@@ -367,6 +376,9 @@ public final class NucleusCore {
                     this.serviceCollection.reloadableService().registerReloadable(new ListenerReloadableWrapper((ListenerBase.Conditional) listener));
                 } else {
                     Sponge.getEventManager().registerListeners(this.pluginContainer, listener);
+                }
+                if (listener instanceof IReloadableService.Reloadable) {
+                    this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) listener);
                 }
             }
 

@@ -4,7 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.core.services.impl.commandmetadata;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.inject.Inject;
@@ -43,7 +42,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -53,9 +51,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 @Singleton
 public class CommandMetadataService implements ICommandMetadataService, IReloadableService.Reloadable {
@@ -68,13 +63,13 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     private final Path commandsFile;
     private final IConfigurateHelper configurateHelper;
     private final IMessageProviderService messageProviderService;
-    private final IReloadableService reloadableService;
     private final Map<String, CommandMetadata> commandMetadataMap = new HashMap<>();
     private final Map<CommandControl, List<String>> controlToAliases = new HashMap<>();
     private final BiMap<Class<? extends ICommandExecutor>, CommandControl> controlToExecutorClass = HashBiMap.create();
     private final Logger logger;
     private final PluginContainer pluginContainer;
     private final IPluginInfo pluginInfo;
+    private final IReloadableService reloadableService;
 
     private CommentedConfigurationNode commandsConfConfigNode;
     private boolean registrationComplete = false;
@@ -90,13 +85,20 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             final PluginContainer pluginContainer,
             final IPluginInfo pluginInfo) {
         reloadableService.registerReloadable(this);
+        this.reloadableService = reloadableService;
         this.configurateHelper = helper;
         this.messageProviderService = messageProviderService;
-        this.reloadableService = reloadableService;
         this.commandsFile = configDirectory.resolve("commands.conf");
         this.logger = logger;
         this.pluginContainer = pluginContainer;
         this.pluginInfo = pluginInfo;
+    }
+
+    @Override
+    public void reset() {
+        this.registeredAliases.clear();
+        this.registeredCommands.clear();
+        this.registrationComplete = false;
     }
 
     private String getKey(final Command command) {
@@ -390,6 +392,9 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
 
     private CommandControl construct(@Nullable final CommandControl parent, final CommandMetadata metadata, final INucleusServiceCollection serviceCollection) {
         final ICommandExecutor executor = serviceCollection.injector().getInstance(metadata.getExecutor());
+        if (executor instanceof IReloadableService.Reloadable) {
+            this.reloadableService.registerReloadable((IReloadableService.Reloadable) executor);
+        }
         return new CommandControl(
                 executor,
                 parent,

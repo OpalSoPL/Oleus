@@ -109,6 +109,11 @@ public final class CommandControl {
         }
     }
 
+    @Nullable
+    public ICommandExecutor getExecutor() {
+        return this.executor;
+    }
+
     public org.spongepowered.api.command.Command.Parameterized createCommand() {
         final org.spongepowered.api.command.Command.Builder b = org.spongepowered.api.command.Command.builder();
         if (this.executor != null) {

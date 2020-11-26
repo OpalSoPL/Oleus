@@ -32,6 +32,8 @@ public interface ICommandMetadataService {
     void completeRegistrationPhase(INucleusServiceCollection serviceCollection,
             RegisterCommandEvent<org.spongepowered.api.command.Command.Parameterized> event);
 
+    void reset();
+
     Optional<CommandControl> getControl(Class<? extends ICommandExecutor> executorClass);
 
     Collection<CommandControl> getCommands();

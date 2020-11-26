@@ -21,6 +21,8 @@ public interface IReloadableService {
 
     void fireDataFileReloadables(INucleusServiceCollection serviceCollection);
 
+    void removeReloadable(Reloadable reloadable);
+
     interface Reloadable {
 
         void onReload(INucleusServiceCollection serviceCollection);

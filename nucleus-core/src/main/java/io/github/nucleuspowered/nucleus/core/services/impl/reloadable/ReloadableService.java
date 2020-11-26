@@ -46,4 +46,9 @@ public class ReloadableService implements IReloadableService {
             dataLocationReloadable.onDataFileLocationChange(serviceCollection);
         }
     }
+
+    @Override
+    public void removeReloadable(final Reloadable reloadable) {
+        this.reloadables.remove(reloadable);
+    }
 }
