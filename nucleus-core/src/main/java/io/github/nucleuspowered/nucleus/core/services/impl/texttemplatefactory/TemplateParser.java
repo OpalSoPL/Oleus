@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -141,7 +142,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
     public Optional<ITextStyleService.TextFormat> createTextTemplateFragmentWithLinks(final String message,
             final List<BiFunction<Object, Map<String, Function<Object, Optional<ComponentLike>>>, Component>> elements,
             final ITextStyleService.TextFormat format) {
-        Preconditions.checkNotNull(message, "message");
+        Objects.requireNonNull(message, "message");
         if (message.isEmpty()) {
             return Optional.of(format);
         }

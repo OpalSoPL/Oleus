@@ -582,6 +582,7 @@ public class TextStyleService implements ITextStyleService {
                 builder.color(this.colour);
             }
             builder.style(this.style);
+            builder.append(component);
             return builder;
         }
     }
