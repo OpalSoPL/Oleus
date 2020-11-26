@@ -14,6 +14,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IPlayerDisplayN
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.util.CommandNameCache;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.SystemSubject;
@@ -75,7 +76,7 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
         // If whitelist, and we have the command, or if not blacklist, and we do not have the command.
         if (this.c.isWhitelist() == !commands.isEmpty()) {
             final String message = this.messageProvider.getMessageString("commandlog.message",
-                    this.displayNameProvider.getName(source, Component.text("unknown")),
+                    PlainComponentSerializer.plain().serialize(this.displayNameProvider.getName(source, Component.text("unknown"))),
                     event.getCommand(),
                     event.getArguments());
             this.logger.info(message);

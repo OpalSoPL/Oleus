@@ -4,25 +4,24 @@
  */
 package io.github.nucleuspowered.nucleus.core.util;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.inject.Singleton;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.manager.CommandMapping;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
-
-import com.google.inject.Singleton;
-import org.spongepowered.api.command.manager.CommandMapping;
+import java.util.stream.Collectors;
 
 @Singleton
 public final class CommandNameCache {
 
     public static final CommandNameCache INSTANCE = new CommandNameCache();
 
-    private final Map<CommandMapping, ImmutableSet<String>> mappingSetMap = new WeakHashMap<>();
+    private final Map<CommandMapping, Set<String>> mappingSetMap = new WeakHashMap<>();
 
     private CommandNameCache() {}
 
@@ -34,6 +33,6 @@ public final class CommandNameCache {
 
     public Set<String> getLowercase(final CommandMapping mapping) {
         return new HashSet<>(this.mappingSetMap
-                .computeIfAbsent(mapping, x -> x.getAllAliases().stream().map(String::toLowerCase).collect(ImmutableSet.toImmutableSet())));
+                .computeIfAbsent(mapping, x -> x.getAllAliases().stream().map(String::toLowerCase).collect(Collectors.toSet())));
     }
 }

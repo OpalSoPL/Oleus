@@ -26,6 +26,6 @@ public final class ArgumentElement implements TextElement {
             return Component.empty();
         }
 
-        return null;
+        return component;
     }
 }
