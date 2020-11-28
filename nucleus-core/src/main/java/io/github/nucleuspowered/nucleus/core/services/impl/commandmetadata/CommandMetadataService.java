@@ -328,7 +328,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     private void mergeAliases() {
-        final CommentedConfigurationNode toMerge = this.configurateHelper.createNode();
+        final CommentedConfigurationNode toMerge = this.configurateHelper.createConfigNode();
         this.commandMetadataMap.values().forEach(metadata -> {
             try {
                 final CommentedConfigurationNode node = toMerge.node(metadata.getCommandKey());
@@ -353,7 +353,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
     }
 
     private void mergeModifierDefaults() {
-        final CommentedConfigurationNode toMerge = this.configurateHelper.createNode();
+        final CommentedConfigurationNode toMerge = this.configurateHelper.createConfigNode();
         this.controlToAliases.keySet().forEach(control -> {
             final CommentedConfigurationNode node = toMerge.node(control.getCommandKey());
             if (!control.isModifierKeyRedirected()) { // if redirected, another command will deal with this.

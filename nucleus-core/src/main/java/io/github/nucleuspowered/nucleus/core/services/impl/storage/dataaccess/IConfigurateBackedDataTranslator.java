@@ -11,6 +11,7 @@ import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.c
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
 import io.github.nucleuspowered.storage.exceptions.DataLoadException;
 import io.github.nucleuspowered.storage.exceptions.DataSaveException;
+import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
@@ -64,6 +65,8 @@ public interface IConfigurateBackedDataTranslator<R extends IConfigurateBackedDa
 
     ConfigurationOptions getOptions();
 
-    ConfigurationNode createNewNode();
+    default ConfigurationNode createNewNode() {
+        return CommentedConfigurationNode.root(this.getOptions());
+    }
 
 }

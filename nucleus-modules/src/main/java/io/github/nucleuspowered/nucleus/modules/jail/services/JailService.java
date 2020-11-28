@@ -241,7 +241,9 @@ public final class JailService implements NucleusJailService, IReloadableService
 
     public void clearCacheFor(final UUID player) {
         final Jailing jailData = this.jailings.get(player);
-        if (jailData instanceof JailingEntry) {
+        if (jailData == JailService.NOT_JAILED) {
+            this.serviceCollection.storageManager().getUserService().removeAndSave(player, JailKeys.JAIL_DATA);
+        } if (jailData instanceof JailingEntry) {
             this.serviceCollection.storageManager().getUserService().setAndSave(player, JailKeys.JAIL_DATA, ((JailingEntry) jailData).asJailData(this.isOnlineOnly));
         }
         this.jailings.invalidate(player);

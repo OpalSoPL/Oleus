@@ -151,7 +151,9 @@ public final class MuteService implements NucleusMuteService, IReloadableService
 
     public void clearCacheFor(final UUID player) {
         final Mute muteData = this.mutes.get(player);
-        if (muteData instanceof MutedEntry) {
+        if (muteData == MuteService.NOT_MUTED) {
+            this.serviceCollection.storageManager().getUserService().removeAndSave(player, MuteKeys.MUTE_DATA);
+        } else if (muteData instanceof MutedEntry) {
             this.serviceCollection.storageManager().getUserService()
                     .setAndSave(player, MuteKeys.MUTE_DATA, ((MutedEntry) muteData).asMuteData(this.isOnlineOnly));
         }
@@ -161,8 +163,8 @@ public final class MuteService implements NucleusMuteService, IReloadableService
     public void onPlayerLogin(final ServerPlayer player) {
         this.mutes.refresh(player.getUniqueId());
         final Mute mute = this.mutes.get(player.getUniqueId());
-        if (mute instanceof MutedEntry) {
-            this.onMute((MutedEntry) mute, player);
+        if (mute != MuteService.NOT_MUTED && mute instanceof MutedEntry) {
+            this.onMute(mute, player);
         }
     }
 

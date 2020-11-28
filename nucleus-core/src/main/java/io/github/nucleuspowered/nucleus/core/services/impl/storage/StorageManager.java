@@ -107,46 +107,34 @@ public final class StorageManager implements IStorageManager {
 
     private final IConfigurateBackedDataTranslator<IUserDataObject> userDataAccess = new IConfigurateBackedDataTranslator<IUserDataObject>() {
         @Override public ConfigurationOptions getOptions() {
-            return StorageManager.this.configurateHelper.getOptions();
-        }
-
-        @Override public ConfigurationNode createNewNode() {
-            return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return StorageManager.this.configurateHelper.getDefaultDataOptions();
         }
 
         @Override public IUserDataObject createNew() {
             final UserDataObject d = new UserDataObject();
-            d.setBackingNode(StorageManager.this.configurateHelper.createNode());
+            d.setBackingNode(StorageManager.this.configurateHelper.createDataNode());
             return d;
         }
     };
     private final IConfigurateBackedDataTranslator<IWorldDataObject> worldDataAccess = new IConfigurateBackedDataTranslator<IWorldDataObject>() {
         @Override public ConfigurationOptions getOptions() {
-            return StorageManager.this.configurateHelper.getOptions();
-        }
-
-        @Override public ConfigurationNode createNewNode() {
-            return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return StorageManager.this.configurateHelper.getDefaultDataOptions();
         }
 
         @Override public IWorldDataObject createNew() {
             final WorldDataObject d = new WorldDataObject();
-            d.setBackingNode(StorageManager.this.configurateHelper.createNode());
+            d.setBackingNode(StorageManager.this.configurateHelper.createDataNode());
             return d;
         }
     };
     private final IConfigurateBackedDataTranslator<IGeneralDataObject> generalDataAccess = new IConfigurateBackedDataTranslator<IGeneralDataObject>() {
         @Override public ConfigurationOptions getOptions() {
-            return StorageManager.this.configurateHelper.getOptions();
-        }
-
-        @Override public ConfigurationNode createNewNode() {
-            return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
+            return StorageManager.this.configurateHelper.getDefaultDataOptions();
         }
 
         @Override public IGeneralDataObject createNew() {
             final GeneralDataObject d = new GeneralDataObject();
-            d.setBackingNode(StorageManager.this.configurateHelper.createNode());
+            d.setBackingNode(StorageManager.this.configurateHelper.createDataNode());
             return d;
         }
     };

@@ -13,21 +13,28 @@ import java.util.concurrent.CompletableFuture;
 public final class ServicesUtil {
 
     public static <R> CompletableFuture<R> run(final CheckedFunction0<R> taskConsumer, final PluginContainer pluginContainer) {
+        return ServicesUtil.run(taskConsumer, pluginContainer, true);
+    }
+
+    public static <R> CompletableFuture<R> run(final CheckedFunction0<R> taskConsumer, final PluginContainer pluginContainer, final boolean printException) {
         final CompletableFuture<R> future = new CompletableFuture<>();
 
         if (Sponge.isServerAvailable() && Sponge.getServer().onMainThread()) {
-            Sponge.getAsyncScheduler().createExecutor(pluginContainer).submit(() -> runInternal(future, taskConsumer));
+            Sponge.getAsyncScheduler().createExecutor(pluginContainer).submit(() -> ServicesUtil.runInternal(future, taskConsumer, printException));
         } else {
-            runInternal(future, taskConsumer);
+            ServicesUtil.runInternal(future, taskConsumer, printException);
         }
 
         return future;
     }
 
-    private static <R> void runInternal(final CompletableFuture<R> future, final CheckedFunction0<R> taskConsumer) {
+    private static <R> void runInternal(final CompletableFuture<R> future, final CheckedFunction0<R> taskConsumer, final boolean printException) {
         try {
             future.complete(taskConsumer.apply());
         } catch (final Throwable e) {
+            if (printException) {
+                e.printStackTrace();
+            }
             future.completeExceptionally(e);
         }
     }

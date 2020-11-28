@@ -84,11 +84,11 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
             baseMessage = baseMessage.replaceText(removal, x -> Component.empty());
         }
 
-        final ChatTemplateConfig ctc;
+        final ChatService.TemplateCache ctc;
         if (this.chatConfig.isUseGroupTemplates()) {
             ctc = this.chatService.getTemplateNow(player);
         } else {
-            ctc = this.chatConfig.getDefaultTemplate();
+            ctc = this.chatService.getDefaultTemplate();
         }
 
         final TextComponent.Builder builder = Component.text();
@@ -109,7 +109,8 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
         return serviceCollection.configProvider().getModuleConfig(ChatConfig.class).isModifychat();
     }
 
-    private TextComponent useMessage(final ServerPlayer player, final Component rawMessage, final ChatTemplateConfig chatTemplateConfig) {
+    private TextComponent useMessage(final ServerPlayer player, final Component rawMessage, final ChatService.TemplateCache templateCache) {
+        final ChatTemplateConfig chatTemplateConfig = templateCache.getConfig();
         String m = LegacyComponentSerializer.legacyAmpersand().serialize(rawMessage);
         if (this.chatConfig.isRemoveBlueUnderline()) {
             m = m.replaceAll("&9&n([A-Za-z0-9-.]+)(&r)?", "$1");

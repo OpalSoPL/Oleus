@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.modules.kit.storage;
 import com.google.gson.JsonObject;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.core.services.impl.storage.StorageManager;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataaccess.IConfigurateBackedDataTranslator;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.services.SingleCachedService;
 import io.github.nucleuspowered.storage.IStorageModule;
@@ -28,16 +27,12 @@ public final class KitStorageModule implements IStorageModule<IKitDataObject, IS
 
     private final IConfigurateBackedDataTranslator<IKitDataObject> kitsDataAccess = new IConfigurateBackedDataTranslator<IKitDataObject>() {
         @Override public ConfigurationOptions getOptions() {
-            return KitStorageModule.this.serviceCollection.configurateHelper().getOptions();
-        }
-
-        @Override public ConfigurationNode createNewNode() {
-            return CommentedConfigurationNode.root(KitStorageModule.this.serviceCollection.configurateHelper().setOptions(ConfigurationOptions.defaults()));
+            return KitStorageModule.this.serviceCollection.configurateHelper().getDefaultDataOptions();
         }
 
         @Override public IKitDataObject createNew() {
             final KitDataObject d = new KitDataObject();
-            d.setBackingNode(KitStorageModule.this.serviceCollection.configurateHelper().createNode());
+            d.setBackingNode(KitStorageModule.this.serviceCollection.configurateHelper().createDataNode());
             return d;
         }
     };

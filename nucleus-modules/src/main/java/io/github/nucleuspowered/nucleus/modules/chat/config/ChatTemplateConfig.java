@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.chat.config;
 
-import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
@@ -29,19 +27,19 @@ public class ChatTemplateConfig {
     @LocalisedComment("config.chat.template.namestyle")
     private String namestyle = "";
 
-    @DefaultValueSetting(key = "prefix", defaultValue = "{{prefix:s}}{{displayname}}{{suffix}}&f: ")
+    @Setting("prefix")
     @LocalisedComment("config.chat.template.prefix")
-    private NucleusTextTemplateImpl prefix;
+    private String prefix = "{{prefix:s}}{{displayname}}{{suffix}}&f: ";
 
     @Setting
     @LocalisedComment("config.chat.template.suffix")
-    private NucleusTextTemplateImpl suffix;
+    private String suffix;
 
-    public NucleusTextTemplateImpl getPrefix() {
+    public String getPrefix() {
         return this.prefix;
     }
 
-    public NucleusTextTemplateImpl getSuffix() {
+    public String getSuffix() {
         return this.suffix;
     }
 

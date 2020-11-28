@@ -14,9 +14,13 @@ import org.spongepowered.configurate.serialize.TypeSerializerCollection;
 @ImplementedBy(ConfigurateHelper.class)
 public interface IConfigurateHelper {
 
+    ConfigurationOptions getDefaultConfigOptions();
+
+    ConfigurationOptions getDefaultDataOptions();
+
     ConfigurationOptions setOptions(ConfigurationOptions options);
 
-    default CommentedConfigurationNode createNode() {
+    default CommentedConfigurationNode createConfigNode() {
         return CommentedConfigurationNode.root(this.setOptions(ConfigurationOptions.defaults()));
     }
 
@@ -27,4 +31,6 @@ public interface IConfigurateHelper {
     void addTypeSerialiser(@Nullable TypeSerializerCollection collection);
 
     TypeSerializerCollection complete();
+
+    CommentedConfigurationNode createDataNode();
 }

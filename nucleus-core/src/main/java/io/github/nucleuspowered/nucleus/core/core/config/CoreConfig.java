@@ -111,7 +111,7 @@ public class CoreConfig {
         return this.kickOnStop.isKickOnStop();
     }
 
-    public NucleusTextTemplateImpl getKickOnStopMessage() {
+    public String getKickOnStopMessage() {
         return this.kickOnStop.getKickOnStopMessage();
     }
 

@@ -5,8 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.chat.config;
 
 import com.google.common.collect.ImmutableMap;
-import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
@@ -35,9 +33,9 @@ public class ChatConfig {
     @LocalisedComment("config.chat.aggressive")
     private boolean tryForceFormatting = false;
 
-    @DefaultValueSetting(key = "me-prefix", defaultValue = "&7* {{displayName}} ")
+    @Setting("me-prefix")
     @LocalisedComment("config.chat.meprefix")
-    private NucleusTextTemplateImpl mePrefix;
+    private String mePrefix = "&7* {{displayName}} ";
 
     @Setting(value = "ignore-other-plugins-when-formatting")
     @LocalisedComment("config.chat.removeother")
@@ -47,7 +45,7 @@ public class ChatConfig {
     @LocalisedComment("config.chat.modifymessage")
     private boolean modifyMessage = true;
 
-    public NucleusTextTemplateImpl getMePrefix() {
+    public String getMePrefix() {
         return this.mePrefix;
     }
 

@@ -9,7 +9,6 @@ import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import io.github.nucleuspowered.nucleus.core.core.CoreKeys;
 import io.github.nucleuspowered.nucleus.core.core.CoreModule;
-import io.github.nucleuspowered.nucleus.core.core.CorePermissions;
 import io.github.nucleuspowered.nucleus.core.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.core.core.services.UniqueUserService;
 import io.github.nucleuspowered.nucleus.core.core.teleport.filters.NoCheckFilter;
@@ -33,8 +32,6 @@ import io.github.nucleuspowered.nucleus.core.scaffold.task.SyncTaskBase;
 import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.NucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.NucleusKeysProvider;
-import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.PreferenceKeyImpl;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandMetadataService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
@@ -87,7 +84,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -427,7 +423,7 @@ public final class NucleusCore {
     }
 
     private Collection<ModuleContainer> filterModules(final Collection<ModuleContainer> moduleContainers) {
-        final CommentedConfigurationNode defaults = this.serviceCollection.configurateHelper().createNode();
+        final CommentedConfigurationNode defaults = this.serviceCollection.configurateHelper().createConfigNode();
         for (final ModuleContainer moduleContainer : moduleContainers) {
             try {
                 defaults.node(moduleContainer.getId()).set(ModuleState.class, ModuleState.TRUE);

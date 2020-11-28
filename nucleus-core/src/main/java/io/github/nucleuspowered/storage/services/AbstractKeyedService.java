@@ -231,6 +231,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
             try {
                 this.saveOnThread(key, x);
             } catch (final Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
         });
@@ -243,6 +244,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
             try {
                 this.saveOnThread(key, x);
             } catch (final Exception e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
             return null;

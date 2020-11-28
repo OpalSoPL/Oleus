@@ -18,6 +18,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.queryobjects.IUserQueryObject;
+import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.util.AdventureUtils;
@@ -216,7 +217,9 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
     @Override public void onReload(final INucleusServiceCollection serviceCollection) {
         final CoreConfig c = this.serviceCollection.configProvider().getModuleConfig(CoreConfig.class);
-        this.getKickOnStopMessage = c.isKickOnStop() ? c.getKickOnStopMessage() : null;
+        this.getKickOnStopMessage = c.isKickOnStop() ?
+                serviceCollection.textTemplateFactory().createFromAmpersandStringIgnoringExceptions(c.getKickOnStopMessage())
+                    .orElseGet(NucleusTextTemplateImpl::empty) : null;
         this.warnOnWildcard = c.isCheckForWildcard();
         this.checkSponge = c.isCheckFirstDatePlayed();
     }

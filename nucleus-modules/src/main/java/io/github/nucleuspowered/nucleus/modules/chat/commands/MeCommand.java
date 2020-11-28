@@ -5,9 +5,11 @@
 package io.github.nucleuspowered.nucleus.modules.chat.commands;
 
 import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
+import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.modules.chat.ChatPermissions;
 import io.github.nucleuspowered.nucleus.modules.chat.config.ChatConfig;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
@@ -46,7 +48,7 @@ import org.spongepowered.api.event.message.PlayerChatEvent;
 public class MeCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
     private final IChatMessageFormatterService chatMessageFormatterService;
-    private ChatConfig config = new ChatConfig();
+    private NucleusTextTemplate mePrefix = NucleusTextTemplateImpl.empty();
 
     @Inject
     public MeCommand(final INucleusServiceCollection serviceCollection) {
@@ -70,7 +72,7 @@ public class MeCommand implements ICommandExecutor, IReloadableService.Reloadabl
                 player,
                 context.requireOne(NucleusParameters.MESSAGE));
 
-        final Component header = this.config.getMePrefix().getForObject(context.getCommandSourceRoot());
+        final Component header = this.mePrefix.getForObject(context.getCommandSourceRoot());
         final ITextStyleService.TextFormat t = textStyleService.getLastColourAndStyle(header, null);
         final Component originalMessage = LegacyComponentSerializer.legacyAmpersand().deserialize(message);
         final Component messageToSend = Component.text().color(t.colour().orElse(null)).style(t.style()).append(originalMessage).build();
@@ -93,7 +95,7 @@ public class MeCommand implements ICommandExecutor, IReloadableService.Reloadabl
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        this.config = serviceCollection.configProvider().getModuleConfig(ChatConfig.class);
+        this.mePrefix = serviceCollection.textTemplateFactory().createFromAmpersandString(serviceCollection.configProvider().getModuleConfig(ChatConfig.class).getMePrefix());
     }
 
     public static final class MeChannel implements IChatMessageFormatterService.Channel {

@@ -5,6 +5,8 @@
 package io.github.nucleuspowered.nucleus.modules.commandspy.listeners;
 
 import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
+import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.modules.commandspy.CommandSpyPermissions;
 import io.github.nucleuspowered.nucleus.modules.commandspy.config.CommandSpyConfig;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
@@ -38,6 +40,7 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
     private CommandSpyConfig config = new CommandSpyConfig();
     private Set<String> toSpy = Collections.emptySet();
     private boolean listIsEmpty = true;
+    private NucleusTextTemplate prefix = NucleusTextTemplateImpl.empty();
 
     @Inject
     public CommandSpyListener(final INucleusServiceCollection serviceCollection) {
@@ -70,7 +73,7 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
                     .collect(Collectors.toList());
 
                 if (!playerList.isEmpty()) {
-                    final Component prefix = this.config.getTemplate().getForObject(player);
+                    final Component prefix = this.prefix.getForObject(player);
                     final ITextStyleService.TextFormat st = this.textStyleService.getLastColourAndStyle(prefix, null);
                     final Component messageToSend = LinearComponents.linear(
                             prefix,
@@ -91,6 +94,8 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
         this.config = serviceCollection.configProvider().getModuleConfig(CommandSpyConfig.class);
         this.listIsEmpty = this.config.getCommands().isEmpty();
         this.toSpy = this.config.getCommands().stream().map(String::toLowerCase).collect(Collectors.toSet());
+        this.prefix =
+                serviceCollection.textTemplateFactory().createFromAmpersandStringIgnoringExceptions(this.config.getTemplate()).orElseGet(NucleusTextTemplateImpl::empty);
     }
 
     @Override

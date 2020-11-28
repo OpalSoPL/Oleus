@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.modules.commandspy.config;
 
-import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
@@ -16,9 +14,9 @@ import java.util.List;
 @ConfigSerializable
 public class CommandSpyConfig {
 
-    @DefaultValueSetting(key = "prefix", defaultValue = "&7[CS: {{name}}]: ")
+    @Setting("prefix")
     @LocalisedComment("config.commandspy.template")
-    private NucleusTextTemplateImpl prefix;
+    private String prefix = "&7[CS: {{name}}]: ";
 
     // use-whitelist
     @Setting(value = "filter-is-whitelist")
@@ -32,7 +30,7 @@ public class CommandSpyConfig {
     @LocalisedComment("config.commandspy.filter")
     private List<String> commands = new ArrayList<>();
 
-    public NucleusTextTemplateImpl getTemplate() {
+    public String getTemplate() {
         return this.prefix;
     }
 

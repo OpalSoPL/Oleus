@@ -25,7 +25,7 @@ public class ChatModule implements IModule.Configurable<ChatConfig> {
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
-        serviceCollection.registerService(ChatService.class, new ChatService(), false);
+        serviceCollection.registerService(ChatService.class, new ChatService(serviceCollection.textTemplateFactory()), false);
     }
 
     @Override

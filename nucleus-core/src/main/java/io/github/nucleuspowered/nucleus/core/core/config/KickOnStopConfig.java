@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.core.core.config;
 
-import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
-import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
@@ -17,15 +15,15 @@ public class KickOnStopConfig {
     @LocalisedComment("config.core.kickonstop.flag")
     private boolean kickOnStop = false;
 
-    @DefaultValueSetting(key = "message", defaultValue = "Server closed")
+    @Setting("message")
     @LocalisedComment("config.core.kickonstop.message")
-    private NucleusTextTemplateImpl kickOnStopMessage;
+    private String kickOnStopMessage = "Server closed";
 
     public boolean isKickOnStop() {
         return this.kickOnStop;
     }
 
-    public NucleusTextTemplateImpl getKickOnStopMessage() {
+    public String getKickOnStopMessage() {
         return this.kickOnStopMessage;
     }
 }

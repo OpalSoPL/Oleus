@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.core.services.impl.configurate;
 
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
-import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.DefaultValueSetting;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.configurate.CommentedConfigurationNodeIntermediary;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -24,25 +23,6 @@ public final class ObjectMapperActions {
                     commented.comment(translated);
                 }
             };
-        };
-    }
-
-    static NodeResolver.Factory defaultValue() {
-        return (name, element) -> {
-            if (element.isAnnotationPresent(DefaultValueSetting.class)) {
-                return node -> {
-                    final ConfigurationNode node1 = node.node(node.key());
-                    if (node1.virtual()) {
-                        try {
-                            node1.set(element.getAnnotation(DefaultValueSetting.class).defaultValue());
-                        } catch (final SerializationException exception) {
-                            // ignored
-                        }
-                    }
-                    return node1;
-                };
-            }
-            return null;
         };
     }
 

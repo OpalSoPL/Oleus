@@ -20,6 +20,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigurateHel
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
 import io.leangen.geantyref.TypeToken;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -41,8 +42,10 @@ public class ConfigurateHelper implements IConfigurateHelper {
     private final TypeSerializerCollection.Builder moduleBuilderTSC;
     private final ConfigurationOptions options;
 
-    @Nullable
-    private TypeSerializerCollection withModules = null;
+    @MonotonicNonNull private ConfigurationOptions defaultConfigOptions;
+    @MonotonicNonNull private ConfigurationOptions defaultDataOptions;
+
+    @MonotonicNonNull private TypeSerializerCollection withModules = null;
 
     @Inject
     public ConfigurateHelper(final INucleusServiceCollection serviceCollection,
@@ -51,13 +54,36 @@ public class ConfigurateHelper implements IConfigurateHelper {
         this.objectMapperFactory = ObjectMapper
                 .factoryBuilder()
                 .addProcessor(LocalisedComment.class, ObjectMapperActions.localisedComments(serviceCollection.messageProvider()))
-                .addNodeResolver(ObjectMapperActions.defaultValue()) // Ideally, we don't want to do this in the long term.
                 .build();
         this.baseTypeSerializerCollection = ConfigurateHelper.setupCore(
                 serviceCollection,
                 this.objectMapperFactory,
                 configurationLoader.defaultOptions());
         this.moduleBuilderTSC = this.baseTypeSerializerCollection.childBuilder();
+    }
+
+    @Override
+    public ConfigurationOptions getDefaultConfigOptions() {
+        if (this.withModules != null) {
+            if (this.defaultConfigOptions == null) {
+                this.defaultConfigOptions = this.options.serializers(this.withModules);
+            }
+            return this.defaultConfigOptions;
+        }
+
+        return this.options.serializers(this.baseTypeSerializerCollection);
+    }
+
+    @Override
+    public ConfigurationOptions getDefaultDataOptions() {
+        if (this.withModules != null) {
+            if (this.defaultDataOptions == null) {
+                this.defaultDataOptions = this.options.implicitInitialization(false).serializers(this.withModules);
+            }
+            return this.defaultDataOptions;
+        }
+
+        return this.options.implicitInitialization(false).serializers(this.baseTypeSerializerCollection);
     }
 
     /**
@@ -93,8 +119,13 @@ public class ConfigurateHelper implements IConfigurateHelper {
     }
 
     @Override
-    public CommentedConfigurationNode createNode() {
-        return CommentedConfigurationNode.root(this.setOptions(this.options));
+    public CommentedConfigurationNode createConfigNode() {
+        return CommentedConfigurationNode.root(this.getDefaultConfigOptions());
+    }
+
+    @Override
+    public CommentedConfigurationNode createDataNode() {
+        return CommentedConfigurationNode.root(this.getDefaultDataOptions());
     }
 
     private static TypeSerializerCollection setupCore(final INucleusServiceCollection serviceCollection,
