@@ -106,6 +106,10 @@ public final class StorageManager implements IStorageManager {
     private IStorageRepository.@Nullable Single<JsonObject> generalRepository;
 
     private final IConfigurateBackedDataTranslator<IUserDataObject> userDataAccess = new IConfigurateBackedDataTranslator<IUserDataObject>() {
+        @Override public ConfigurationOptions getOptions() {
+            return StorageManager.this.configurateHelper.getOptions();
+        }
+
         @Override public ConfigurationNode createNewNode() {
             return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
@@ -117,6 +121,10 @@ public final class StorageManager implements IStorageManager {
         }
     };
     private final IConfigurateBackedDataTranslator<IWorldDataObject> worldDataAccess = new IConfigurateBackedDataTranslator<IWorldDataObject>() {
+        @Override public ConfigurationOptions getOptions() {
+            return StorageManager.this.configurateHelper.getOptions();
+        }
+
         @Override public ConfigurationNode createNewNode() {
             return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }
@@ -128,6 +136,10 @@ public final class StorageManager implements IStorageManager {
         }
     };
     private final IConfigurateBackedDataTranslator<IGeneralDataObject> generalDataAccess = new IConfigurateBackedDataTranslator<IGeneralDataObject>() {
+        @Override public ConfigurationOptions getOptions() {
+            return StorageManager.this.configurateHelper.getOptions();
+        }
+
         @Override public ConfigurationNode createNewNode() {
             return CommentedConfigurationNode.root(StorageManager.this.configurateHelper.setOptions(ConfigurationOptions.defaults()));
         }

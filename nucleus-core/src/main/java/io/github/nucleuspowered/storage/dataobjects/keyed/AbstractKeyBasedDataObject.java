@@ -61,7 +61,7 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
     public void remove(final DataKey<?, ? extends T> dataKey) {
         try {
             this.getNode(dataKey.getDataPath()).set(null);
-        } catch (SerializationException e) {
+        } catch (final SerializationException e) {
             e.printStackTrace();
         }
     }

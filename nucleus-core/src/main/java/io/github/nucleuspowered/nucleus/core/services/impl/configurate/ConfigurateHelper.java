@@ -38,7 +38,7 @@ public class ConfigurateHelper implements IConfigurateHelper {
 
     private final TypeSerializerCollection baseTypeSerializerCollection;
     private final ObjectMapper.Factory objectMapperFactory;
-    private final TypeSerializerCollection.Builder moduleBuilderTSC = TypeSerializerCollection.builder();
+    private final TypeSerializerCollection.Builder moduleBuilderTSC;
     private final ConfigurationOptions options;
 
     @Nullable
@@ -57,6 +57,7 @@ public class ConfigurateHelper implements IConfigurateHelper {
                 serviceCollection,
                 this.objectMapperFactory,
                 configurationLoader.defaultOptions());
+        this.moduleBuilderTSC = this.baseTypeSerializerCollection.childBuilder();
     }
 
     /**

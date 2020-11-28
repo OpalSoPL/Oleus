@@ -13,6 +13,7 @@ import io.github.nucleuspowered.storage.exceptions.DataLoadException;
 import io.github.nucleuspowered.storage.exceptions.DataSaveException;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.gson.GsonConfigurationLoader;
 
 import java.io.BufferedReader;
@@ -34,6 +35,7 @@ public interface IConfigurateBackedDataTranslator<R extends IConfigurateBackedDa
             final ConfigurationNode node = GsonConfigurationLoader.builder()
                     .source(() -> new BufferedReader(new StringReader(json)))
                     .sink(() -> null) // we're not saving
+                    .defaultOptions(this.getOptions())
                     .build()
                     .load();
             obj.setBackingNode(node);
@@ -51,6 +53,7 @@ public interface IConfigurateBackedDataTranslator<R extends IConfigurateBackedDa
             GsonConfigurationLoader.builder()
                     .source(() -> null) // we're not loading
                     .sink(() -> bw) // we're not saving
+                    .defaultOptions(this.getOptions())
                     .build()
                     .save(node);
             bw.flush();
@@ -59,6 +62,8 @@ public interface IConfigurateBackedDataTranslator<R extends IConfigurateBackedDa
             throw new DataSaveException("Could not translate Json", e);
         }
     }
+
+    ConfigurationOptions getOptions();
 
     ConfigurationNode createNewNode();
 
