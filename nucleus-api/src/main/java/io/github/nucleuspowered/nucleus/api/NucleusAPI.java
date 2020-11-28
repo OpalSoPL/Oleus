@@ -12,6 +12,7 @@ import io.github.nucleuspowered.nucleus.api.module.afk.NucleusAFKService;
 import io.github.nucleuspowered.nucleus.api.module.back.NucleusBackService;
 import io.github.nucleuspowered.nucleus.api.module.freezeplayer.NucleusFreezePlayerService;
 import io.github.nucleuspowered.nucleus.api.module.home.NucleusHomeService;
+import io.github.nucleuspowered.nucleus.api.module.ignore.NucleusIgnoreService;
 import io.github.nucleuspowered.nucleus.api.module.invulnerability.NucleusInvulnerabilityService;
 import io.github.nucleuspowered.nucleus.api.module.jail.NucleusJailService;
 import io.github.nucleuspowered.nucleus.api.module.kit.NucleusKitService;
@@ -147,6 +148,19 @@ public final class NucleusAPI {
      */
     public static Optional<NucleusHomeService> getHomeService() {
         return getService(NucleusHomeService.class);
+    }
+
+    /**
+     * Gets the {@link NucleusIgnoreService}, if it exists.
+     *
+     * <p>
+     *     Requires the "ignore" module.
+     * </p>
+     *
+     * @return The {@link NucleusIgnoreService}
+     */
+    public static Optional<NucleusIgnoreService> getIgnoreService() {
+        return getService(NucleusIgnoreService.class);
     }
 
     /**

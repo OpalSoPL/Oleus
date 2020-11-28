@@ -5,11 +5,14 @@
 package io.github.nucleuspowered.nucleus.modules.ignore.services;
 
 import com.google.common.collect.ImmutableList;
+import io.github.nucleuspowered.nucleus.api.module.ignore.NucleusIgnoreService;
+import io.github.nucleuspowered.nucleus.core.scaffold.service.annotations.APIService;
 import io.github.nucleuspowered.nucleus.modules.ignore.IgnoreKeys;
 import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +20,8 @@ import java.util.UUID;
 
 import com.google.inject.Inject;
 
-public class IgnoreService implements ServiceBase {
+@APIService(NucleusIgnoreService.class)
+public class IgnoreService implements NucleusIgnoreService, ServiceBase {
 
     private final INucleusServiceCollection serviceCollection;
 
@@ -57,6 +61,7 @@ public class IgnoreService implements ServiceBase {
         }
     }
 
+    @Override
     public boolean isIgnored(final UUID ignorer, final UUID ignoree) {
         return this.get(ignorer).contains(ignoree);
     }
@@ -76,4 +81,10 @@ public class IgnoreService implements ServiceBase {
 
         return this.ignoredBy.get(player);
     }
+
+    @Override
+    public Collection<UUID> getIgnoredBy(final UUID uuid) {
+        return this.getAllIgnored(uuid);
+    }
+
 }

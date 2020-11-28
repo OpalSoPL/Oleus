@@ -272,6 +272,12 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         if (service.getClass().isAnnotationPresent(APIService.class)) {
             this.apiFactories.put(service.getClass().getAnnotation(APIService.class).value(), service);
         }
+        if (service instanceof IReloadableService.Reloadable) {
+            this.reloadableService.get().registerReloadable((IReloadableService.Reloadable) service);
+        }
+        if (service instanceof IReloadableService.DataLocationReloadable) {
+            this.reloadableService.get().registerDataFileReloadable((IReloadableService.DataLocationReloadable) service);
+        }
     }
 
     @Override @SuppressWarnings("unchecked")

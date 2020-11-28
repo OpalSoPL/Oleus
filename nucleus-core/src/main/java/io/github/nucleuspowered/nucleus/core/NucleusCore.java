@@ -370,9 +370,9 @@ public final class NucleusCore {
                 final ListenerBase listener = this.injector.getInstance(listenerClass);
                 if (listener instanceof ListenerBase.Conditional) {
                     this.serviceCollection.reloadableService().registerReloadable(new ListenerReloadableWrapper((ListenerBase.Conditional) listener));
-                } else {
-                    Sponge.getEventManager().registerListeners(this.pluginContainer, listener);
                 }
+
+                Sponge.getEventManager().registerListeners(this.pluginContainer, listener);
                 if (listener instanceof IReloadableService.Reloadable) {
                     this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) listener);
                 }

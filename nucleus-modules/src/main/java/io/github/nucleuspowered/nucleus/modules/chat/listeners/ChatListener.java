@@ -5,11 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.chat.listeners;
 
 import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.api.NucleusAPI;
+import io.github.nucleuspowered.nucleus.api.module.ignore.NucleusIgnoreService;
 import io.github.nucleuspowered.nucleus.api.placeholder.NucleusPlaceholderService;
-import io.github.nucleuspowered.nucleus.modules.chat.ChatPermissions;
-import io.github.nucleuspowered.nucleus.modules.chat.config.ChatConfig;
-import io.github.nucleuspowered.nucleus.modules.chat.config.ChatTemplateConfig;
-import io.github.nucleuspowered.nucleus.modules.chat.services.ChatService;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IChatMessageFormatterService;
@@ -17,16 +15,27 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionServ
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ITextStyleService;
 import io.github.nucleuspowered.nucleus.core.util.AdventureUtils;
+import io.github.nucleuspowered.nucleus.modules.chat.ChatPermissions;
+import io.github.nucleuspowered.nucleus.modules.chat.config.ChatConfig;
+import io.github.nucleuspowered.nucleus.modules.chat.config.ChatTemplateConfig;
+import io.github.nucleuspowered.nucleus.modules.chat.services.ChatService;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.LinearComponents;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.message.PlayerChatEvent;
 
+import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
  * A listener that modifies all chat messages. Uses the
@@ -81,7 +90,7 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
 
         if (this.chatConfig.isTryRemoveMinecraftPrefix()) {
             final Pattern removal = Pattern.compile("<" + player.getName() + ">");
-            baseMessage = baseMessage.replaceText(removal, x -> Component.empty());
+            baseMessage = baseMessage.replaceText(function -> function.match(removal).replacement(Component.empty()));
         }
 
         final ChatService.TemplateCache ctc;
@@ -97,11 +106,23 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
         if (!AdventureUtils.isEmpty(header)) {
             builder.append(header);
         }
-        builder.append(this.chatConfig.isModifyMessage() ? this.useMessage(player, baseMessage, ctc) : baseMessage);
+        final Component body = this.chatConfig.isModifyMessage() ? this.useMessage(player, baseMessage, ctc) : baseMessage;
         if (!AdventureUtils.isEmpty(footer)) {
             builder.append(footer);
         }
-        event.setMessage(builder.asComponent());
+        event.setMessage(body);
+        final Audience audience;
+        if (NucleusAPI.getIgnoreService().isPresent()) {
+            final UUID uuid = player.getUniqueId();
+            final NucleusIgnoreService ignoreService = NucleusAPI.getIgnoreService().get();
+            audience = Audience.audience(StreamSupport.stream(Sponge.getServer().audiences().spliterator(), false)
+                    .filter(x -> (!(x instanceof ServerPlayer)) || !ignoreService.isIgnored(uuid, ((ServerPlayer) x).getUniqueId()))
+                    .collect(Collectors.toList()));
+        } else {
+            audience = Sponge.getServer();
+        }
+        event.setChatRouter((sendingPlayer, message) ->
+                        audience.sendMessage(sendingPlayer, LinearComponents.linear(header, message, footer), MessageType.CHAT));
     }
 
     @Override

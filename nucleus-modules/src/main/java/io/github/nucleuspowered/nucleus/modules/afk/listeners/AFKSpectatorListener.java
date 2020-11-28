@@ -20,6 +20,8 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
 
+import java.util.UUID;
+
 public class AFKSpectatorListener implements ListenerBase.Conditional {
 
     private final IPermissionService permissionService;
@@ -31,20 +33,24 @@ public class AFKSpectatorListener implements ListenerBase.Conditional {
 
 
     @Listener
-    public void onAfk(final NucleusAFKEvent event, @Getter("getTargetPlayer") final ServerPlayer player) {
-        if (player.gameMode().get().equals(GameModes.SPECTATOR)) {
-            if (event.getAudience().filter(x -> Sponge.getSystemSubject().equals(x)).isPresent()) {
-                event.setAudience(this.permissionService.permissionMessageChannel(AFKPermissions.AFK_NOTIFY));
-                event.setMessage(Component.text("[Spectator] " + event.getMessage(), NamedTextColor.RED));
+    public void onAfk(final NucleusAFKEvent event, @Getter("getTargetPlayer") final UUID player) {
+        Sponge.getServer().getPlayer(player).ifPresent(pl -> {
+            if (pl.gameMode().get().equals(GameModes.SPECTATOR)) {
+                if (event.getAudience().filter(x -> Sponge.getSystemSubject().equals(x)).isPresent()) {
+                    event.setAudience(this.permissionService.permissionMessageChannel(AFKPermissions.AFK_NOTIFY));
+                    event.setMessage(Component.text("[Spectator] " + event.getMessage(), NamedTextColor.RED));
+                }
             }
-        }
+        });
     }
 
     @Listener(order = Order.FIRST)
-    public void onAfk(final NucleusAFKEvent.Kick event, @Getter("getTargetPlayer") final ServerPlayer player) {
-        if (player.gameMode().get().equals(GameModes.SPECTATOR)) {
-            event.setCancelled(true);
-        }
+    public void onAfk(final NucleusAFKEvent.Kick event, @Getter("getTargetPlayer") final UUID player) {
+        Sponge.getServer().getPlayer(player).ifPresent(pl -> {
+            if (pl.gameMode().get().equals(GameModes.SPECTATOR)) {
+                event.setCancelled(true);
+            }
+        });
     }
 
     @Override
