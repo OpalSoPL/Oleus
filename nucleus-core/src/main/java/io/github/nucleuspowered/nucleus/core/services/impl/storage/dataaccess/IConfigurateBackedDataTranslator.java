@@ -52,12 +52,11 @@ public interface IConfigurateBackedDataTranslator<R extends IConfigurateBackedDa
              final BufferedWriter bw = new BufferedWriter(sw)) {
             GsonConfigurationLoader.builder()
                     .source(() -> null) // we're not loading
-                    .sink(() -> bw) // we're not saving
+                    .sink(() -> bw) // we're saving
                     .defaultOptions(this.getOptions())
                     .build()
                     .save(node);
-            bw.flush();
-            return JSON_PARSER.parse(sw.toString()).getAsJsonObject();
+            return IConfigurateBackedDataTranslator.JSON_PARSER.parse(sw.toString()).getAsJsonObject();
         } catch (final IOException e) {
             throw new DataSaveException("Could not translate Json", e);
         }
