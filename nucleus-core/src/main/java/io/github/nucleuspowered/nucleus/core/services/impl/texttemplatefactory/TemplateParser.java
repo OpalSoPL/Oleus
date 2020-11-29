@@ -76,9 +76,9 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         final Matcher mat = pattern.matcher(string);
         final List<String> map = new ArrayList<>();
 
-        final List<String> s = Lists.newArrayList(pattern.split(string));
+        final List<String> s = new ArrayList<>();
+        Collections.addAll(s, pattern.split(string));
         int index = 0;
-
         while (mat.find()) {
             if (mat.group("url") != null && mat.group("urltwo") != null) {
                 String toUpdate = s.get(index);
@@ -122,7 +122,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         for (int i = 0; i < map.size(); i++) {
             texts.add(new PlaceholderElement(textFormat.colour().orElse(null), textFormat.style(), map.get(i)));
             if (s.size() > i + 1) {
-                textFormat = this.createTextTemplateFragmentWithLinks(s.get(0), texts, textFormat).orElse(textFormat);
+                textFormat = this.createTextTemplateFragmentWithLinks(s.get(i + 1), texts, textFormat).orElse(textFormat);
             }
         }
 
