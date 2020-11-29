@@ -33,6 +33,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.exception.CommandPermissionException;
 import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
@@ -117,8 +118,10 @@ public final class CommandControl {
     public org.spongepowered.api.command.Command.Parameterized createCommand() {
         final org.spongepowered.api.command.Command.Builder b = org.spongepowered.api.command.Command.builder();
         if (this.executor != null) {
-            b.setExecutor(this::process)
-                    .parameters(this.executor.parameters(this.serviceCollection));
+            b.setExecutor(this::process);
+            for (final Parameter parameter : this.executor.parameters(this.serviceCollection)) {
+                b.parameter(parameter);
+            }
             for (final Flag flag : this.executor.flags(this.serviceCollection)) {
                 b.flag(flag);
             }

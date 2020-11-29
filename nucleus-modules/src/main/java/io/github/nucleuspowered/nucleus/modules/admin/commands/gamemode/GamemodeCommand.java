@@ -40,7 +40,7 @@ public class GamemodeCommand extends GamemodeBase {
 
     private final Parameter.Value<GameMode> gameModeParameter =
             Parameter.builder(GameMode.class)
-                    .setKey("gamemode")
+                    .setKey("Game Mode")
                     .parser(VariableValueParameters.catalogedElementParameterBuilder(GameMode.class).build())
                     .build();
 
