@@ -67,8 +67,10 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                this.customTargetParameter,
-                NucleusParameters.Composite.PLAYER_OR_CONSOLE,
+                Parameter.firstOf(
+                        this.customTargetParameter,
+                        NucleusParameters.Composite.PLAYER_OR_CONSOLE
+                ),
                 NucleusParameters.MESSAGE
         };
     }
