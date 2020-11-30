@@ -8,6 +8,8 @@ import io.github.nucleuspowered.nucleus.modules.protection.config.ProtectionConf
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
+import org.spongepowered.api.block.transaction.Operation;
+import org.spongepowered.api.block.transaction.Operations;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -23,14 +25,15 @@ public class MobProtectionListener implements IReloadableService.Reloadable, Lis
     private List<EntityType<?>> whitelistedTypes;
 
     @Listener
-    @Exclude({ChangeBlockEvent.Grow.class, ChangeBlockEvent.Decay.class})
-    public void onMobChangeBlock(final ChangeBlockEvent event, @Root final Living living) {
+    public void onMobChangeBlock(final ChangeBlockEvent.All event, @Root final Living living) {
         if (living instanceof ServerPlayer || this.whitelistedTypes.contains(living.getType())) {
             return;
         }
 
-        // If the entity is not in the whitelist, then cancel the event.
-        event.setCancelled(true);
+        event.getTransactions().stream().filter(x -> {
+            final Operation operation = x.getOperation();
+            return operation != Operations.GROWTH && operation != Operations.DECAY;
+        }).forEach(x -> x.setValid(false));
     }
 
     @Override

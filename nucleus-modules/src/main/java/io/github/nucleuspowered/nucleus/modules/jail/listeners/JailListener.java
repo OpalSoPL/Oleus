@@ -136,7 +136,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onBlockChange(final ChangeBlockEvent event, @Root final ServerPlayer player) {
+    public void onBlockChange(final ChangeBlockEvent.Pre event, @Root final ServerPlayer player) {
         if (this.handler.isPlayerJailed(player.getUniqueId())) {
             event.setCancelled(true);
             this.handler.notify(player);

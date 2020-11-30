@@ -23,7 +23,7 @@ public class CropTrampleListener implements IReloadableService.Reloadable, Liste
 
     // Not sure this should be correct. Keep an eye.
     @Listener
-    public void onBlockChange(final ChangeBlockEvent.Place breakEvent, @Root final Entity entity) {
+    public void onBlockChange(final ChangeBlockEvent.All breakEvent, @Root final Entity entity) {
         // If player or entity and the corresponding option is added
         final boolean isPlayer = entity instanceof ServerPlayer;
         if (this.cropplayer && isPlayer || this.cropentity && !isPlayer) {
