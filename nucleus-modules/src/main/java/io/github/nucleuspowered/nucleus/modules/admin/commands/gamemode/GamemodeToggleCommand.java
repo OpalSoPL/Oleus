@@ -18,7 +18,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
 @Command(
         aliases = {"gmt"},
-        parentCommand = GamemodeCommand.class,
         basePermission = {AdminPermissions.BASE_GAMEMODE,
                 AdminPermissions.GAMEMODE_MODES_SPECTATOR,
                 AdminPermissions.GAMEMODE_MODES_CREATIVE},
