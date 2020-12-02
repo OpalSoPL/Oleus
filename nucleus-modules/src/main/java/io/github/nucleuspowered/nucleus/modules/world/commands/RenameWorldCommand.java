@@ -17,6 +17,8 @@ import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.storage.WorldProperties;
 
+import java.util.Locale;
+
 @Command(
         aliases = {"rename"},
         basePermission = WorldPermissions.BASE_WORLD_RENAME,
@@ -40,7 +42,9 @@ public class RenameWorldCommand implements ICommandExecutor {
         final WorldProperties worldProperties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_UNLOADED_ONLY);
         final ResourceKey oldName = worldProperties.getKey();
         final String newName = context.requireOne(this.nameKey);
-        Sponge.getServer().getWorldManager().renameWorld(oldName, newName).handle((result, exception) -> {
+        final ResourceKey newKey = ResourceKey.builder().namespace(context.getServiceCollection().pluginContainer())
+                .value(newName.toLowerCase(Locale.ROOT)).build();
+        Sponge.getServer().getWorldManager().renameWorld(oldName, newKey).handle((result, exception) -> {
             context.getServiceCollection().schedulerService().runOnMainThread(() ->
             {
                 if (exception == null) {

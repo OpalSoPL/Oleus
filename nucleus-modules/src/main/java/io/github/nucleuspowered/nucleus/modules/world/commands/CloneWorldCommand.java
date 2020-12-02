@@ -64,7 +64,7 @@ public class CloneWorldCommand implements ICommandExecutor {
             mr = context::getAudience;
         }
 
-        Sponge.getServer().getWorldManager().copyWorld(oldName, newName.getValue()).handle((result, ex) -> {
+        Sponge.getServer().getWorldManager().copyWorld(oldName, newName).handle((result, ex) -> {
 
             final Audience m = mr.get();
             if (ex == null && result != null) {
