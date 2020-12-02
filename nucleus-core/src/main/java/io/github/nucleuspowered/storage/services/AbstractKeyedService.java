@@ -8,6 +8,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.google.common.collect.ImmutableSet;
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
@@ -23,6 +24,7 @@ import io.vavr.Value;
 import io.vavr.collection.Stream;
 import io.vavr.control.Try;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.HashSet;
@@ -33,6 +35,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -49,6 +52,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
                 }
             });
     private final Cache<K, D> cache = Caffeine.newBuilder()
+            .removalListener(this::onRemoval)
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .build();
     private final Set<K> dirty = new HashSet<>();
@@ -303,4 +307,13 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
         }
     }
 
+    private void onRemoval(@Nullable final K key, @Nullable final D dataObject, @NonNull final RemovalCause removalCause) {
+        // If evicted normally, make sure it's saved.
+        if (removalCause.wasEvicted() && key != null && dataObject != null) {
+            this.save(key, dataObject);
+            this.onEviction(key, dataObject, this.cache::put);
+        }
+    }
+
+    protected abstract void onEviction(final K key, final D dataObject, final BiConsumer<K, D> reAdd);
 }

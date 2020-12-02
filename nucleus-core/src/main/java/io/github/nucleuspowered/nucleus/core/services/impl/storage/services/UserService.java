@@ -10,13 +10,21 @@ import io.github.nucleuspowered.nucleus.core.services.impl.storage.queryobjects.
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IDataVersioning;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.storage.services.AbstractKeyedService;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 public final class UserService extends AbstractKeyedService<UUID, IUserQueryObject, IUserDataObject, JsonObject> {
 
     public UserService(final IStorageManager repository, final PluginContainer pluginContainer, final IDataVersioning dataVersioning) {
         super(repository::getUserDataAccess, repository::getUserRepository, dataVersioning::migrate, dataVersioning::setVersion, pluginContainer);
     }
+
+    @Override
+    protected void onEviction(final UUID key, final IUserDataObject dataObject, final BiConsumer<UUID, IUserDataObject> reAdd) {
+        Sponge.getServer().getPlayer(key).ifPresent(x -> reAdd.accept(key, dataObject));
+    }
+
 }
