@@ -42,9 +42,7 @@ public class RenameWorldCommand implements ICommandExecutor {
         final WorldProperties worldProperties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_UNLOADED_ONLY);
         final ResourceKey oldName = worldProperties.getKey();
         final String newName = context.requireOne(this.nameKey);
-        final ResourceKey newKey = ResourceKey.builder().namespace(context.getServiceCollection().pluginContainer())
-                .value(newName.toLowerCase(Locale.ROOT)).build();
-        Sponge.getServer().getWorldManager().renameWorld(oldName, newKey).handle((result, exception) -> {
+        Sponge.getServer().getWorldManager().renameWorld(oldName, newName).handle((result, exception) -> {
             context.getServiceCollection().schedulerService().runOnMainThread(() ->
             {
                 if (exception == null) {
