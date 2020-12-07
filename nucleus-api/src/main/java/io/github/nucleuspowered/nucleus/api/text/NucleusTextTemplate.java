@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.text;
 
+import io.github.nucleuspowered.nucleus.api.NucleusAPI;
 import io.github.nucleuspowered.nucleus.api.placeholder.NucleusPlaceholderService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -18,6 +19,18 @@ import java.util.function.Function;
  * Represents a template that Nucleus uses to create texts from templates.
  */
 public interface NucleusTextTemplate extends ComponentLike {
+
+    /**
+     * Creates a {@link NucleusTextTemplate}.
+     *
+     * @see NucleusTextTemplateFactory#createFromAmpersandString(String)
+     *
+     * @param ampersandString The ampersand encoded string
+     * @return The {@link NucleusTextTemplate}
+     */
+    static NucleusTextTemplate create(final String ampersandString) {
+        return NucleusAPI.getTextTemplateFactory().createFromAmpersandString(ampersandString);
+    }
 
     /**
      * Whether the text is empty.

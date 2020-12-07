@@ -148,6 +148,7 @@ public interface NucleusPrivateMessagingService {
     /**
      * Gets the {@link UserMessageTarget} for the given {@link UUID}
      *
+     * @param uuid The {@link UUID} of the user to get the message target for
      * @return The {@link UserMessageTarget}
      */
     Optional<UserMessageTarget> getUserMessageTarget(UUID uuid);
@@ -157,6 +158,7 @@ public interface NucleusPrivateMessagingService {
      *
      * <p>This identifier should not be prefixed with #.</p>
      *
+     * @param identifier The identifier
      * @return The {@link CustomMessageTarget}
      */
     Optional<CustomMessageTarget> getCustomMessageTarget(String identifier);

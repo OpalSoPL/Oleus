@@ -74,10 +74,6 @@ public interface NucleusHomeService {
      */
     Optional<Home> getHome(UUID user, String name);
 
-    default Optional<Home> getHome(final User user, final String name) {
-        return this.getHome(user.getUniqueId(), name);
-    }
-
     /**
      * Creates a home. This is subject to Nucleus' standard checks.
      *

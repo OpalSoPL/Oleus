@@ -18,9 +18,16 @@ public interface MessageTarget {
 
     /**
      * Gets an {@link Audience} that represents this target, if any.
+     *
+     * @return The {@link Audience}
      */
     Optional<Audience> getRepresentedAudience();
 
+    /**
+     * The name of this target.
+     *
+     * @return The name.
+     */
     default String getName() {
         return PlainComponentSerializer.plain().serialize(this.getDisplayName());
     }

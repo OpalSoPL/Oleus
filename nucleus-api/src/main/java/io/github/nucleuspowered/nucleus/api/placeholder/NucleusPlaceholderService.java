@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.placeholder;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.placeholder.PlaceholderComponent;
@@ -17,6 +18,17 @@ import java.util.Optional;
  */
 public interface NucleusPlaceholderService {
 
+    /**
+     * Parses the given input token in the context of the given sender.
+     *
+     * <p>This method will determine the placeholder to use from the
+     * Nucleus perspective - so any Nucleus specific tokens can be parsed via
+     * this method.</p>
+     *
+     * @param sender The sender to associate the placeholder output with.
+     * @param input The token input
+     * @return The {@link ComponentLike} if valid, or {@link Component#empty()}
+     */
     ComponentLike parse(@Nullable Object sender, String input);
 
     /**

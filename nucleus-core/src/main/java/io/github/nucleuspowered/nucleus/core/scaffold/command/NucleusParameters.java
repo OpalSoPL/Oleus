@@ -22,10 +22,8 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.storage.WorldProperties;
-import org.spongepowered.math.vector.Vector3d;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,13 +51,10 @@ public final class NucleusParameters {
         public static final String MESSAGE = "message";
         public static final String NAME = "name";
         public static final String PLAYER = "player";
-        public static final String PLAYER_OR_CONSOLE = "player|-";
         public static final String REASON = "reason";
         public static final String SUBJECT = "subject";
         public static final String USER = "user";
-        public static final String USER_UUID = "user uuid";
         public static final String WORLD = "world";
-        public static final String XYZ = "x y z";
     }
 
     private NucleusParameters() {
@@ -97,9 +92,6 @@ public final class NucleusParameters {
     public static final Parameter.Value<GameProfile> GAME_PROFILE =
             Parameter.builder(TypeToken.get(GameProfile.class)).setKey(Keys.GAME_PROFILE).parser(CatalogedValueParameters.GAME_PROFILE).build();
 
-    public static final Parameter.Value<Collection<GameProfile>> MANY_GAME_PROFILES =
-            Parameter.builder(new TypeToken<Collection<GameProfile>>() {}).setKey(Keys.GAME_PROFILE).parser(CatalogedValueParameters.MANY_GAME_PROFILES).build();
-
     public static final Parameter.Value<Component> DISPLAY_NAME_COMPONENT = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.DISPLAY_NAME).build();
 
     public static final Parameter.Value<String> COMMAND = Parameter.remainingJoinedStrings().setKey(Keys.COMMAND).build();
@@ -108,16 +100,12 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<String> DESCRIPTION = Parameter.remainingJoinedStrings().setKey(Keys.DESCRIPTION).build();
 
-    public static final Parameter.Value<String> OPTIONAL_DESCRIPTION = Parameter.remainingJoinedStrings().setKey(Keys.DESCRIPTION).optional().build();
-
     public static final Parameter.Value<Component> OPTIONAL_DESCRIPTION_COMPONENT =
-            Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.DESCRIPTION).optional().build();;
+            Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.DESCRIPTION).optional().build();
 
     public static final Parameter.Value<Component> LORE = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.LORE).build();
 
     public static final Parameter.Value<String> MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).build();
-
-    public static final Parameter.Value<Component> MESSAGE_COMPONENT = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.MESSAGE).build();
 
     public static final Parameter.Value<String> OPTIONAL_MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).optional().build();
 
@@ -162,8 +150,6 @@ public final class NucleusParameters {
     public static final Parameter.Value<Duration> DURATION = Parameter.duration().setKey(Keys.DURATION).build();
 
     public static final Parameter.Value<Duration> OPTIONAL_DURATION = Parameter.duration().setKey(Keys.DURATION).optional().build();
-
-    public static final Parameter.Value<Vector3d> POSITION = Parameter.vector3d().setKey(Keys.XYZ).build();
 
     public static final Parameter.Value<ServerLocation> LOCATION = Parameter.location().setKey(Keys.LOCATION).build();
 

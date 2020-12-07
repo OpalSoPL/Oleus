@@ -24,6 +24,18 @@ import java.util.UUID;
 public interface Kit {
 
     /**
+     * Creates a {@link Kit}.
+     *
+     * @see NucleusKitService#createKit(String)
+     *
+     * @param name The name of the kit to create
+     * @return The {@link Kit}
+     */
+    static Kit create(final String name) {
+        return NucleusAPI.getKitService().orElseThrow(() -> new IllegalStateException("The kit module is not loaded.")).createKit(name);
+    }
+
+    /**
      * Gets the name of the kit.
      *
      * @return The name

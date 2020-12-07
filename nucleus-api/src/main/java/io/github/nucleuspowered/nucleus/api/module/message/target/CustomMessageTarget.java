@@ -6,6 +6,8 @@ package io.github.nucleuspowered.nucleus.api.module.message.target;
 
 /**
  * A message target that can be messaged via private message.
+ *
+ * <p>This interface is designed to be implemented by the target itself.</p>
  */
 public interface CustomMessageTarget extends MessageTarget {
 
