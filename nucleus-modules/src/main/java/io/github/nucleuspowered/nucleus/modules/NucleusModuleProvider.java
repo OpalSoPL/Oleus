@@ -38,7 +38,6 @@ import io.github.nucleuspowered.nucleus.modules.freezeplayer.FreezePlayerModule;
 import io.github.nucleuspowered.nucleus.modules.fun.FunModule;
 import io.github.nucleuspowered.nucleus.modules.home.HomeModule;
 import io.github.nucleuspowered.nucleus.modules.home.config.HomeConfig;
-import io.github.nucleuspowered.nucleus.modules.ignore.IgnoreModule;
 import io.github.nucleuspowered.nucleus.modules.info.InfoModule;
 import io.github.nucleuspowered.nucleus.modules.info.config.InfoConfig;
 import io.github.nucleuspowered.nucleus.modules.inventory.InventoryModule;
@@ -140,7 +139,6 @@ public final class NucleusModuleProvider implements IModuleProvider {
         containers.add(NucleusModuleProvider.createContainer(FreezePlayerModule.ID, "Freeze Player", FreezePlayerModule.class));
         containers.add(NucleusModuleProvider.createContainer(FunModule.ID, "Fun", FunModule.class));
         containers.add(NucleusModuleProvider.createContainer(HomeModule.ID, "Home", HomeModule.class, HomeConfig.class));
-        containers.add(NucleusModuleProvider.createContainer(IgnoreModule.ID, "Ignore", IgnoreModule.class));
         containers.add(NucleusModuleProvider.createContainer(InfoModule.ID, "Info", InfoModule.class, InfoConfig.class));
         containers.add(NucleusModuleProvider.createContainer(InventoryModule.ID, "Inventory", InventoryModule.class));
         containers.add(NucleusModuleProvider.createContainer(InvulnerabilityModule.ID, "Invulnerability", InvulnerabilityModule.class));
