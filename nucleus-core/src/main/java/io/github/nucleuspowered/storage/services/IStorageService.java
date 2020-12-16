@@ -13,6 +13,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -262,6 +263,14 @@ public interface IStorageService<D extends IDataObject> {
          * @return A {@link CompletableFuture} that will contain an exception if there was a failure
          */
         CompletableFuture<Void> delete(@NonNull K key);
+
+        /**
+         * Clears the cache for objects that do not have keys that
+         * match those in the provided set.
+         *
+         * @param keysToKeep The keys
+         */
+        CompletableFuture<Void> clearCacheUnless(Set<K> keysToKeep);
 
         /**
          * Indicates the data is also keyed.

@@ -14,6 +14,23 @@ import java.util.Optional;
 
 public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends AbstractConfigurateBackedDataObject implements IKeyedDataObject<T> {
 
+    private transient boolean isDirty = false;
+
+    @Override
+    public final void markDirty() {
+        this.isDirty = true;
+    }
+
+    @Override
+    public final void markDirty(final boolean markDirty) {
+        this.isDirty = markDirty;
+    }
+
+    @Override
+    public final boolean isDirty() {
+        return this.isDirty;
+    }
+
     @Override
     public boolean has(final DataKey<?, ? extends T> dataKey) {
         return !this.getNode(dataKey.getDataPath()).virtual();
@@ -50,7 +67,12 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
 
     public <V> boolean set(final DataKey<V, ? extends T> dataKey, final V data) {
         try {
+<<<<<<< HEAD
             this.getNode(dataKey.getDataPath()).set(dataKey.getKeyType(), data);
+=======
+            getNode(dataKey.getKey()).setValue(dataKey.getType(), data);
+            this.markDirty();
+>>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
             return true;
         } catch (final ConfigurateException e) {
             e.printStackTrace();
@@ -58,12 +80,18 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
         }
     }
 
+<<<<<<< HEAD
     public void remove(final DataKey<?, ? extends T> dataKey) {
         try {
             this.getNode(dataKey.getDataPath()).set(null);
         } catch (final SerializationException e) {
             e.printStackTrace();
         }
+=======
+    public void remove(DataKey<?, ? extends T> dataKey) {
+        getNode(dataKey.getKey()).setValue(null);
+        this.markDirty();
+>>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
     }
 
     private ConfigurationNode getNode(final String[] key) {
@@ -75,7 +103,17 @@ public class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> extends A
         return r;
     }
 
+<<<<<<< HEAD
     public final class ValueImpl<V, B extends T> implements IKeyedDataObject.Value<V> {
+=======
+    @Override
+    public void setBackingNode(ConfigurationNode node) {
+        this.markDirty(false);
+        super.setBackingNode(node);
+    }
+
+    public class ValueImpl<V, B extends T> implements IKeyedDataObject.Value<V> {
+>>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
 
         @Nullable private V value;
         private final DataKey<V, B> dataKey;

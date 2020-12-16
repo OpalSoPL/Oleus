@@ -9,9 +9,12 @@ import io.github.nucleuspowered.nucleus.core.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.util.Identifiable;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.stream.Collectors;
 
 /**
  * Core tasks. No module, must always run.
@@ -33,17 +36,19 @@ public class CoreTask implements TaskBase, IReloadableService.Reloadable {
 
     @Override
     public void run() {
-        this.serviceCollection.storageManager().getUserService().clearCache();
-
         if (this.printSave) {
             this.serviceCollection.logger().info(this.serviceCollection.messageProvider().getMessageString("core.savetask.starting"));
         }
 
-        this.serviceCollection.storageManager().saveAll();
+        // Only do maintenance on the cache once it's been saved.
+        this.serviceCollection.storageManager().saveAll().thenAccept(x -> {
+            if (this.printSave) {
+                this.serviceCollection.logger().info(this.serviceCollection.messageProvider().getMessageString("core.savetask.complete"));
+            }
+            this.serviceCollection.storageManager().getUserService().clearCacheUnless(
+                    Sponge.getServer().getOnlinePlayers().stream().map(Identifiable::getUniqueId).collect(Collectors.toSet()));
+        });
 
-        if (this.printSave) {
-            this.serviceCollection.logger().info(this.serviceCollection.messageProvider().getMessageString("core.savetask.complete"));
-        }
     }
 
     @Override

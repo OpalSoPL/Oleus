@@ -272,6 +272,11 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
             }
         }
 
+        @Override
+        public void clearCache(final Iterable<ResourceKey> keys) {
+            // no-op here
+        }
+
         private static class FileWalker extends SimpleFileVisitor<Path> {
 
             private final Set<ResourceKey> keys = new HashSet<>();
@@ -336,6 +341,11 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
             } catch (final IOException e) {
                 throw new DataLoadException("Could not walk the file tree", e);
             }
+        }
+
+        @Override
+        public void clearCache(final Iterable<UUID> keys) {
+            // no-op here
         }
 
         private static class UUIDFileWalker extends SimpleFileVisitor<Path> {
