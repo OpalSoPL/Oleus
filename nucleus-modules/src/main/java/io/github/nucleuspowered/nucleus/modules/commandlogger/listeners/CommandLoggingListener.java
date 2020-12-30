@@ -25,11 +25,18 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.command.ExecuteCommandEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.api.util.Nameable;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.naming.Name;
 
 public class CommandLoggingListener implements IReloadableService.Reloadable, ListenerBase {
 
@@ -63,11 +70,11 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
         } else {
             accept = this.c.getLoggerTarget().isLogOther();
         }
-
         if (!accept) {
             // We're not logging this!
             return;
         }
+        final String name = PlainComponentSerializer.plain().serialize(this.displayNameProvider.getName(source, Component.text("unknown")));
 
         final String command = event.getCommand().toLowerCase();
         final Set<String> commands = CommandNameCache.INSTANCE.getFromCommandAndSource(command, event.getCommandCause());
@@ -75,8 +82,34 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
 
         // If whitelist, and we have the command, or if not blacklist, and we do not have the command.
         if (this.c.isWhitelist() == !commands.isEmpty()) {
+            final String cause;
+            if (this.c.isCauseEnhanced()) {
+                final List<String> l = event.getCause()
+                        .all()
+                        .stream()
+                        .filter(x -> (x instanceof PluginContainer || x instanceof Nameable || x instanceof SystemSubject) && x != source)
+                        .map(x -> {
+                            if (x instanceof Nameable) {
+                                return ((Nameable) x).getName();
+                            } else if (x instanceof SystemSubject) {
+                                return "Server";
+                            } else {
+                                return "(plugin) " + ((PluginContainer) x).getMetadata().getName();
+                            }
+                        })
+                        .collect(Collectors.toList());
+                if (l.isEmpty()) {
+                    cause = name;
+                } else {
+                    final List<String> stack = new ArrayList<>(l);
+                    Collections.reverse(stack);
+                    cause = String.format("[ %s -> ] %s", String.join(" -> ", stack), name);
+                }
+            } else {
+                cause = name;
+            }
             final String message = this.messageProvider.getMessageString("commandlog.message",
-                    PlainComponentSerializer.plain().serialize(this.displayNameProvider.getName(source, Component.text("unknown"))),
+                    cause,
                     event.getCommand(),
                     event.getArguments());
             this.logger.info(message);
