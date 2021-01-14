@@ -62,6 +62,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javax.swing.text.html.Option;
+
 @APIService(NucleusKitService.class)
 public class KitService implements NucleusKitService, IReloadableService.Reloadable, ServiceBase {
 
@@ -163,9 +165,10 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     @Override
     public CompletableFuture<Optional<Instant>> getCooldownExpiry(final Kit kit, final UUID user) {
         return this.redeemTime(kit.getName(), user).thenApply(x -> {
-            if (x.isPresent()) {
-                if (x.get().isAfter(Instant.now())) {
-                    return x;
+            if (x.isPresent() && kit.getCooldown().isPresent()) {
+                final Instant adjustedInstant = x.get().plus(kit.getCooldown().get());
+                if (adjustedInstant.isAfter(Instant.now())) {
+                    return Optional.of(adjustedInstant);
                 }
             }
             return Optional.empty();
@@ -336,7 +339,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
             frame.pushCause(Sponge.getSystemSubject());
             for (final String command : commands) {
                 try {
-                    Sponge.getCommandManager().process(command.replace("{{player}}", playerName));
+                    Sponge.getServer().getCommandManager().process(command.replace("{{player}}", playerName));
                 } catch (final CommandException e) {
                     e.printStackTrace();
                     success = false;
