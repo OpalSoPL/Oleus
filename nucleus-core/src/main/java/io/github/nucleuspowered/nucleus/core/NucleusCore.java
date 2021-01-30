@@ -32,7 +32,6 @@ import io.github.nucleuspowered.nucleus.core.scaffold.task.SyncTaskBase;
 import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.NucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.UserPreferenceService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandMetadataService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
@@ -58,12 +57,10 @@ import org.spongepowered.api.event.lifecycle.RefreshGameEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent;
 import org.spongepowered.api.event.lifecycle.RegisterRegistryEvent;
-import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
-import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Tuple;
@@ -183,41 +180,37 @@ public final class NucleusCore {
     @Listener
     public void establishNewRegistries(final RegisterRegistryEvent.GameScoped event) {
         try {
-            event.register(this.serviceCollection.userPreferenceService().getRegistryResourceKey(), false, () -> {
+            event.register(this.serviceCollection.userPreferenceService().getRegistryResourceKey(), true, () -> {
                 final Map<ResourceKey, NucleusUserPreferenceService.PreferenceKey<?>> factoryMap = new HashMap<>();
                 factoryMap.put(CoreKeys.LOCALE_PREFERENCE_KEY.getKey(), CoreKeys.LOCALE_PREFERENCE_KEY);
                 return factoryMap;
             });
-            event.register(this.commandModifierFactoryKey, false);
-            event.register(this.teleportScannerKey, false);
-            event.register(this.storageFactoryKey, false);
+            event.register(this.commandModifierFactoryKey, false, () -> {
+                final Map<ResourceKey, CommandModifierFactory> factoryMap = new HashMap<>();
+
+                factoryMap.put(ResourceKey.resolve(CommandModifiers.HAS_COOLDOWN),
+                        new CommandModifierFactory.Simple(CommandModifiers.HAS_COOLDOWN, new CooldownModifier()));
+                factoryMap.put(ResourceKey.resolve(CommandModifiers.HAS_COST),
+                        new CommandModifierFactory.Simple(CommandModifiers.HAS_COST, new CostModifier()));
+                factoryMap.put(ResourceKey.resolve(CommandModifiers.HAS_WARMUP),
+                        new CommandModifierFactory.Simple(CommandModifiers.HAS_WARMUP, new WarmupModifier()));
+                factoryMap.put(ResourceKey.resolve(CommandModifiers.REQUIRE_ECONOMY),
+                        new CommandModifierFactory.Simple(CommandModifiers.REQUIRE_ECONOMY, new RequiresEconomyModifier()));
+                return factoryMap;
+            });
+            event.register(this.teleportScannerKey, true, () -> {
+                final Map<ResourceKey, TeleportScanner> factoryMap = new HashMap<>();
+                factoryMap.put(NoTeleportScanner.KEY, new NoTeleportScanner());
+                factoryMap.put(VerticalTeleportScanner.Ascending.KEY, new VerticalTeleportScanner.Ascending());
+                factoryMap.put(VerticalTeleportScanner.Descending.KEY, new VerticalTeleportScanner.Descending());
+                return factoryMap;
+            });
+            event.register(this.storageFactoryKey, true,
+                    () -> Collections.singletonMap(IStorageManager.FLAT_FILE_KEY, this.serviceCollection.storageManager().getFlatFileRepositoryFactory()));
         } catch (final Exception e) {
             new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
                     .generatePrettyPrint(this.logger, Level.ERROR);
         }
-    }
-
-    @Listener
-    public void registerCommandModifierFactories(final RegisterRegistryValueEvent.GameScoped event) {
-        try {
-            event.getGame().registries().
-            final RegisterRegistryValueEvent.RegistryStep<CommandModifierFactory> factoryRegistryStep =
-                    event.registry(RegistryType.of())
-            .register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COOLDOWN, new CooldownModifier()));
-            event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COST, new CostModifier()));
-            event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_WARMUP, new WarmupModifier()));
-            event.register(new CommandModifierFactory.Simple(CommandModifiers.REQUIRE_ECONOMY, new RequiresEconomyModifier()));
-        } catch (final Exception e) {
-            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
-                    .generatePrettyPrint(this.logger, Level.ERROR);
-        }
-    }
-
-    @Listener
-    public void registerTeleportScanners(final RegisterCatalogEvent<TeleportScanner> event) {
-        event.register(new NoTeleportScanner());
-        event.register(new VerticalTeleportScanner.Ascending());
-        event.register(new VerticalTeleportScanner.Descending());
     }
 
     @Listener
@@ -230,21 +223,6 @@ public final class NucleusCore {
     public void onRegisterPlaceholders(final RegisterCatalogEvent<PlaceholderParser> event) {
         this.serviceCollection.placeholderService().getParsers().forEach(event::register);
         this.serviceCollection.logger().info("Registered placeholder parsers.");
-    }
-
-    @Listener
-    public void registerStorageRepositoryFactories(final RegisterCatalogEvent<IStorageRepositoryFactory> event) {
-        try {
-            event.register(this.serviceCollection.storageManager().getFlatFileRepositoryFactory());
-        } catch (final Exception e) {
-            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
-                    .generatePrettyPrint(this.logger, Level.ERROR);
-        }
-    }
-
-    @Listener
-    public void registerCoreUserPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
-        event.register(CoreKeys.LOCALE_PREFERENCE_KEY);
     }
 
     @Listener

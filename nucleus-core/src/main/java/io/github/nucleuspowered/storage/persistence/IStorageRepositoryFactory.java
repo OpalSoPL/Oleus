@@ -19,7 +19,7 @@ import java.util.UUID;
  * <p>Any of these methods may return {@code null} to indicate that the storage type is
  * <strong>not supported</strong> for this specific data type.</p>
  */
-public interface IStorageRepositoryFactory extends CatalogType {
+public interface IStorageRepositoryFactory {
 
     /**
      * Gets a storage system for user data

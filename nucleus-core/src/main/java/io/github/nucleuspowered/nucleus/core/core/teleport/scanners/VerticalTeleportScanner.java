@@ -16,15 +16,10 @@ import java.util.Optional;
 
 public abstract class VerticalTeleportScanner implements TeleportScanner {
 
-    private final ResourceKey key;
+    private final boolean isAscending;
 
-    protected VerticalTeleportScanner(final ResourceKey key) {
-        this.key = key;
-    }
-
-    @Override
-    public ResourceKey getKey() {
-        return this.key;
+    protected VerticalTeleportScanner(final boolean isAscending) {
+        this.isAscending = isAscending;
     }
 
     @Override
@@ -37,7 +32,7 @@ public abstract class VerticalTeleportScanner implements TeleportScanner {
             final TeleportHelperFilter filter,
             final TeleportHelperFilter... filters) {
         final int maxy = world.getBlockMax().getY();
-        final int jumps = (height * 2) - 1;
+        final int jumps = ((height * 2) - 1) * (this.isAscending ? 1 : -1);
 
         do {
             final Optional<ServerLocation> result = Sponge.getServer().getTeleportHelper()
@@ -61,16 +56,20 @@ public abstract class VerticalTeleportScanner implements TeleportScanner {
 
     public static class Ascending extends VerticalTeleportScanner {
 
+        public static final ResourceKey KEY = ResourceKey.of("nucleus", "ascending_scan");
+
         public Ascending() {
-            super(ResourceKey.of("nucleus", "ascending_scan"));
+            super(true);
         }
 
     }
 
     public static class Descending extends VerticalTeleportScanner {
 
+        public static final ResourceKey KEY = ResourceKey.of("nucleus", "descending_scan");
+
         public Descending() {
-            super(ResourceKey.of("nucleus", "descending_scan"));
+            super(false);
         }
 
     }

@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public class NoTeleportScanner implements TeleportScanner {
 
-    private final ResourceKey key = ResourceKey.of("nucleus", "no_scan");
+    public static final ResourceKey KEY = ResourceKey.of("nucleus", "no_scan");
 
     @Override
     public Optional<ServerLocation> scanFrom(
@@ -37,11 +37,6 @@ public class NoTeleportScanner implements TeleportScanner {
                 filter,
                 filters
         );
-    }
-
-    @Override
-    public ResourceKey getKey() {
-        return this.key;
     }
 
 }
