@@ -80,8 +80,4 @@ public final class FlatFileStorageRepositoryFactory implements IStorageRepositor
         return new FlatFileStorageRepository.Single(this.logger, () -> this.dataPath.get().resolve(KITS_FILE));
     }
 
-    @Override
-    public ResourceKey getKey() {
-        return this.key;
-    }
 }

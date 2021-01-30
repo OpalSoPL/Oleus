@@ -110,7 +110,7 @@ public class SeenCommand implements ICommandExecutor {
                                     x
                             )).orElse(null));
         if (res != null) {
-            if (Sponge.getCommandManager().getCommandMapping("nucleus:getfromip").isPresent()) {
+            if (Sponge.getServer().getCommandManager().getCommandMapping("nucleus:getfromip").isPresent()) {
                 return res.getFirst()
                         .hoverEvent(HoverEvent.showText(context.getMessage("command.seen.ipclick")))
                         .clickEvent(ClickEvent.runCommand("/nucleus:getfromip " + res.getSecond().replaceAll("^/", "")));
@@ -249,7 +249,7 @@ public class SeenCommand implements ICommandExecutor {
     private Component getLocationString(final String key, final ResourceKey worldKey, final Vector3d position, final ICommandContext context) {
         final Component text = context.getMessage(key, context.getMessage("command.seen.locationtemplate", worldKey.asString(),
                 position.toInt().toString()));
-        if (Sponge.getCommandManager().getCommandMapping("nucleus:tppos")
+        if (Sponge.getServer().getCommandManager().getCommandMapping("nucleus:tppos")
                 .map(x -> x.getRegistrar().canExecute(context.getCause(), x))
                 .orElse(false)) {
 

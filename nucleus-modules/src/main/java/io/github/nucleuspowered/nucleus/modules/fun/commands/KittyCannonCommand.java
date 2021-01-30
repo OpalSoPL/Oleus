@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.fun.commands;
 
 import com.google.inject.Inject;
-import io.github.nucleuspowered.nucleus.modules.fun.FunPermissions;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
@@ -13,13 +12,14 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.modules.fun.FunPermissions;
 import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
-import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
+import org.spongepowered.api.command.parameter.managed.standard.ResourceKeyedValueParameters;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.CatType;
 import org.spongepowered.api.entity.Entity;
@@ -27,6 +27,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
@@ -35,7 +36,6 @@ import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.imaginary.Quaterniond;
 import org.spongepowered.math.vector.Vector3d;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Command(
         aliases = {"kittycannon", "kc"},
@@ -63,7 +64,7 @@ public class KittyCannonCommand implements ICommandExecutor {
     @Inject
     public KittyCannonCommand(final INucleusServiceCollection serviceCollection) {
         this.players = Parameter.builder(new TypeToken<Collection<ServerPlayer>>() {})
-            .parser(CatalogedValueParameters.MANY_PLAYERS)
+            .parser(ResourceKeyedValueParameters.MANY_PLAYERS)
             .setKey("players")
             .optional()
             .setRequirements(cause -> serviceCollection.permissionService().hasPermission(cause, FunPermissions.OTHERS_KITTYCANNON))
@@ -106,7 +107,7 @@ public class KittyCannonCommand implements ICommandExecutor {
         final Quaterniond rot = Quaterniond.fromAxesAnglesDeg(headRotation.getX(), -headRotation.getY(), headRotation.getZ());
         final Vector3d velocity = spawnAt.get(Keys.VELOCITY).orElse(Vector3d.ZERO).add(rot.rotate(Vector3d.UNIT_Z).mul(5 * this.random.nextDouble() + 1));
         final ServerWorld world = spawnAt.getWorld();
-        final List<CatType> catTypes = new ArrayList<>(Sponge.getRegistry().getCatalogRegistry().getAllOf(CatType.class));
+        final List<CatType> catTypes = RegistryTypes.CAT_TYPE.get().stream().collect(Collectors.toList());
         final Entity cat = world.createEntity(
                 EntityTypes.CAT.get(),
                 spawnAt.getLocation().getPosition().add(0, 1, 0).add(spawnAt.getTransform().getRotationAsQuaternion().getDirection()));
@@ -157,7 +158,7 @@ public class KittyCannonCommand implements ICommandExecutor {
 
         @Override
         public void accept(final ScheduledTask task) {
-            final Optional<ServerWorld> oWorld = Sponge.getServer().getWorldManager().getWorld(this.world);
+            final Optional<ServerWorld> oWorld = Sponge.getServer().getWorldManager().world(this.world);
             if (!oWorld.isPresent()) {
                 task.cancel();
                 return;

@@ -58,8 +58,4 @@ public class NamePlaceholder<T> implements PlaceholderParser {
         return Component.empty();
     }
 
-    @Override
-    public ResourceKey getKey() {
-        return this.resourceKey;
-    }
 }

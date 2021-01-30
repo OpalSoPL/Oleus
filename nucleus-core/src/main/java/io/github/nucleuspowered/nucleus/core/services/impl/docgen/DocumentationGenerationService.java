@@ -188,20 +188,20 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
             final List<TokenDoc> tokenDocs = this.serviceCollection
                     .placeholderService()
                     .getNucleusParsers()
-                    .values()
+                    .entrySet()
                     .stream()
-                    .filter(PlaceholderMetadata::isDocument)
+                    .filter(x -> x.getValue().isDocument())
                     .filter(x -> {
-                        if (!messageProviderService.hasKey("nucleus.token." + x.getToken().toLowerCase())) {
-                            this.serviceCollection.logger().warn("Could not find message key for nucleus.token.{}", x.getToken().toLowerCase());
+                        if (!messageProviderService.hasKey("nucleus.token." + x.getValue().getToken().toLowerCase())) {
+                            this.serviceCollection.logger().warn("Could not find message key for nucleus.token.{}", x.getValue().getToken().toLowerCase());
                             return false;
                         }
                         return true;
                     })
                     .map(x -> new TokenDoc()
-                            .setId(x.getParser().getKey().asString())
-                            .setName(x.getToken())
-                            .setDescription(messageProviderService.getMessageString("nucleus.token." + x.getToken().toLowerCase())))
+                            .setId("nucleus:" + x.getKey())
+                            .setName(x.getValue().getToken())
+                            .setDescription(messageProviderService.getMessageString("nucleus.token." + x.getValue().getToken().toLowerCase())))
                     .collect(Collectors.toList());
 
             final YamlConfigurationLoader configurationLoader = YamlConfigurationLoader.builder()

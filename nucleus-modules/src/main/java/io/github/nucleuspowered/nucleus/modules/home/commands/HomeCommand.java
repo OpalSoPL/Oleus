@@ -124,7 +124,7 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
             wl = home.get();
         }
 
-        Sponge.getServer().getWorldManager().getWorld(wl.getWorldProperties().get().getKey())
+        Sponge.getServer().getWorldManager().getWorld(wl.getWorld().get().getKey())
                 .orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
 
         final ServerLocation targetLocation = wl.getLocation().orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));

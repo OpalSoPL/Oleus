@@ -90,7 +90,7 @@ public class PowertoolListener implements ListenerBase {
                     }
 
                     try {
-                        Sponge.getCommandManager().process(s);
+                        Sponge.getServer().getCommandManager().process(s);
                     } catch (final CommandException e) {
                         // ignored
                     }

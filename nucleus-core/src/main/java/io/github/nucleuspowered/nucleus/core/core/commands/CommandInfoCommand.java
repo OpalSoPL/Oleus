@@ -123,7 +123,7 @@ public class CommandInfoCommand implements ICommandExecutor {
 
         @Override
         public List<String> complete(final CommandContext context, final String string) {
-            return new ArrayList<>(Sponge.getCommandManager().suggest(context.getSubject(), context.getCause().getAudience(), string));
+            return new ArrayList<>(Sponge.getServer().getCommandManager().suggest(context.getSubject(), context.getCause().getAudience(), string));
         }
 
         @Override
@@ -132,7 +132,7 @@ public class CommandInfoCommand implements ICommandExecutor {
                 final ArgumentReader.@NonNull Mutable reader,
                 final CommandContext.@NonNull Builder context) throws ArgumentParseException {
             final String next = reader.parseString();
-            final Optional<CommandMapping> commandMapping = Sponge.getCommandManager().getCommandMapping(next);
+            final Optional<CommandMapping> commandMapping = Sponge.getServer().getCommandManager().getCommandMapping(next);
             if (commandMapping.filter(x -> x.getRegistrar().canExecute(context.getCause(), x)).isPresent()) {
                 return commandMapping;
             }

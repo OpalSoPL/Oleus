@@ -130,7 +130,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
         // Permission checks are done by the parser.
         final WarpService service = context.getServiceCollection().getServiceUnchecked(WarpService.class);
         final Warp wd = context.requireOne(service.warpElement(true));
-        final WorldProperties worldProperties = wd.getWorldProperties().orElseThrow(() -> context.createException(
+        final WorldProperties worldProperties = wd.getWorld().orElseThrow(() -> context.createException(
                 "command.warp.worlddoesnotexist"
         ));
 

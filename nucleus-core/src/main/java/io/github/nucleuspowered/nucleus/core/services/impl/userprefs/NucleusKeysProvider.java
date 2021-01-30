@@ -7,10 +7,12 @@ package io.github.nucleuspowered.nucleus.core.services.impl.userprefs;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.registry.DefaultedRegistryType;
 
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class NucleusKeysProvider implements NucleusUserPreferenceService.Keys {
 
@@ -23,9 +25,14 @@ public final class NucleusKeysProvider implements NucleusUserPreferenceService.K
     public final static ResourceKey VANISH_ON_LOGIN_KEY = ResourceKey.resolve("nucleus:vanish-on-login");
     public final static ResourceKey VIEW_STAFF_CHAT_KEY = ResourceKey.resolve("nucleus:view-staff-chat");
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    private final DefaultedRegistryType<NucleusUserPreferenceService.PreferenceKey<?>> registryType;
+
+    public NucleusKeysProvider(final DefaultedRegistryType<NucleusUserPreferenceService.PreferenceKey<?>> registryType) {
+        this.registryType = registryType;
+    }
+
     public Collection<NucleusUserPreferenceService.PreferenceKey<?>> getAll() {
-        return (Collection) Sponge.getRegistry().getCatalogRegistry().getAllOf(NucleusUserPreferenceService.PreferenceKey.class);
+        return this.registryType.get().stream().collect(Collectors.toList());
     }
 
     @Override
@@ -64,9 +71,8 @@ public final class NucleusKeysProvider implements NucleusUserPreferenceService.K
         return this.get(NucleusKeysProvider.PLAYER_LOCALE_KEY);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private <T> Optional<NucleusUserPreferenceService.PreferenceKey<T>> get(final ResourceKey key) {
-        return (Optional) Sponge.getRegistry().getCatalogRegistry().get(NucleusUserPreferenceService.PreferenceKey.class, key);
+        return this.registryType.get().findValue(key);
     }
 
 }

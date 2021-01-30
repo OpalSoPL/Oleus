@@ -38,7 +38,7 @@ public final class JailLocationEntry implements Jail, NamedLocation {
     }
 
     @Override
-    public Optional<WorldProperties> getWorldProperties() {
+    public Optional<WorldProperties> getWorld() {
         return Sponge.getServer().getWorldManager().getProperties(this.worldKey);
     }
 

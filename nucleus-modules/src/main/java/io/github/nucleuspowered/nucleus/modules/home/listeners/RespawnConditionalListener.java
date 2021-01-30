@@ -32,7 +32,7 @@ public class RespawnConditionalListener implements ListenerBase.Conditional {
     @Listener
     public void onRespawn(final RespawnPlayerEvent.SelectWorld event, @Getter("getEntity") final ServerPlayer player) {
         final Optional<Home> oh = this.homeService.getHome(player.getUniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
-        oh.flatMap(x -> x.getWorldProperties().flatMap(WorldProperties::getWorld)).ifPresent(event::setDestinationWorld);
+        oh.flatMap(x -> x.getWorld().flatMap(WorldProperties::getWorld)).ifPresent(event::setDestinationWorld);
     }
 
     @Listener

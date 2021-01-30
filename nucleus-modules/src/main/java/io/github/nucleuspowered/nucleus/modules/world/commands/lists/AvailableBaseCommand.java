@@ -9,13 +9,12 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
 import net.kyori.adventure.text.Component;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AvailableBaseCommand<T extends CatalogType> implements ICommandExecutor {
+public abstract class AvailableBaseCommand<T> implements ICommandExecutor {
 
     private final Class<T> catalogType;
     private final String titleKey;

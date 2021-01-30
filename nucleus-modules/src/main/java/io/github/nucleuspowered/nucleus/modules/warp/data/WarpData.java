@@ -61,7 +61,7 @@ public class WarpData implements Warp {
     }
 
     @Override
-    public Optional<WorldProperties> getWorldProperties() {
+    public Optional<WorldProperties> getWorld() {
         return Sponge.getServer().getWorldManager().getProperties(this.worldKey);
     }
 

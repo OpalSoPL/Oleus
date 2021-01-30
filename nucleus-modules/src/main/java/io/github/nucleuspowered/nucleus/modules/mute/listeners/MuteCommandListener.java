@@ -47,7 +47,7 @@ public class MuteCommandListener implements ListenerBase.Conditional {
         }
 
         final String command = event.getCommand().toLowerCase();
-        final Optional<? extends CommandMapping> oc = Sponge.getCommandManager().getCommandMapping(command);
+        final Optional<? extends CommandMapping> oc = Sponge.getServer().getCommandManager().getCommandMapping(command);
         final Set<String> cmd;
 
         // If the command exists, then get all aliases.

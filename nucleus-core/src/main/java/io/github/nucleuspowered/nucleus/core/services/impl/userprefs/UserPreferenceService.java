@@ -11,8 +11,12 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IUserPreferenceService;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.registry.DefaultedRegistryType;
 import org.spongepowered.api.registry.RegistryKey;
+import org.spongepowered.api.registry.RegistryRoots;
 import org.spongepowered.api.registry.RegistryType;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +28,7 @@ import java.util.UUID;
 public class UserPreferenceService implements IUserPreferenceService {
 
     private final ResourceKey resourceKey;
+    private final DefaultedRegistryType<PreferenceKey<?>> registryType;
     private final NucleusKeysProvider provider;
     private final Map<ResourceKey, NucleusUserPreferenceService.PreferenceKey<?>> registered = new HashMap<>();
     private final INucleusServiceCollection serviceCollection;
@@ -32,7 +37,8 @@ public class UserPreferenceService implements IUserPreferenceService {
     public UserPreferenceService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.resourceKey = ResourceKey.of(serviceCollection.pluginContainer(), "preference_service");
-        this.provider = new NucleusKeysProvider();
+        this.registryType = RegistryType.of(RegistryRoots.SPONGE, this.resourceKey).asDefaultedType(() -> Sponge.getGame().registries());
+        this.provider = new NucleusKeysProvider(this.registryType);
     }
 
     @Override
@@ -117,6 +123,11 @@ public class UserPreferenceService implements IUserPreferenceService {
     @Override
     public ResourceKey getRegistryResourceKey() {
         return this.resourceKey;
+    }
+
+    @Override
+    public DefaultedRegistryType<PreferenceKey<?>> getRegistryResourceType() {
+        return this.registryType;
     }
 
     @Override

@@ -7,6 +7,8 @@ package io.github.nucleuspowered.nucleus.api.util.data;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -25,11 +27,11 @@ public interface NamedLocation {
     ResourceKey getResourceKey();
 
     /**
-     * Gets the {@link WorldProperties} that this location points to, if the world exists.
+     * Gets the {@link ServerWorld} that this location points to, if the world exists.
      *
      * @return The World Properties
      */
-    Optional<WorldProperties> getWorldProperties();
+    Optional<ServerWorld> getWorld();
 
     /**
      * Gets the rotation.

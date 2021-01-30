@@ -26,7 +26,7 @@ public final class CommandNameCache {
     private CommandNameCache() {}
 
     public Set<String> getFromCommandAndSource(final String command, final CommandCause source) {
-        final Optional<? extends CommandMapping> oc = Sponge.getCommandManager().getCommandMapping(command)
+        final Optional<? extends CommandMapping> oc = Sponge.getServer().getCommandManager().getCommandMapping(command)
                 .filter(x -> x.getRegistrar().canExecute(source, x));
         return oc.map(CommandNameCache.INSTANCE::getLowercase).orElseGet(HashSet::new);
     }

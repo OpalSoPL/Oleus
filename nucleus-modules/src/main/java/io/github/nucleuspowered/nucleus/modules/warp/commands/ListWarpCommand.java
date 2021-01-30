@@ -143,7 +143,7 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
 
     private TextComponent createWarp(@Nullable final Warp data, final String name, final boolean econExists, final double defaultCost,
             final ICommandContext context) {
-        if (data == null || !data.getWorldProperties().map(WorldProperties::isEnabled).orElse(false)) {
+        if (data == null || !data.getWorld().map(WorldProperties::isEnabled).orElse(false)) {
             return Component.text().content(name).color(NamedTextColor.RED)
                     .hoverEvent(HoverEvent.showText(
                             context.getMessage("command.warps.unavailable"))).build();

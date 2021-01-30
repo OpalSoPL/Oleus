@@ -103,10 +103,6 @@ public final class NucleusCore {
     private final List<Action> onStartedActions = new LinkedList<>();
     private final IPluginInfo pluginInfo;
 
-    private final ResourceKey commandModifierFactoryKey;
-    private final ResourceKey teleportScannerKey;
-    private final ResourceKey storageFactoryKey;
-
     @Nullable private Path dataDirectory;
 
     private final INucleusServiceCollection serviceCollection;
@@ -131,9 +127,6 @@ public final class NucleusCore {
                 this::getDataDirectory,
                 this.configDirectory
         );
-        this.commandModifierFactoryKey = ResourceKey.of(this.pluginContainer, "command_modifier_factory");
-        this.teleportScannerKey = TeleportScanners.REGISTRY_KEY;
-        this.storageFactoryKey = ResourceKey.of(this.pluginContainer, "storage_repository_factory");
     }
 
     /**
@@ -186,7 +179,7 @@ public final class NucleusCore {
                 factoryMap.put(CoreKeys.LOCALE_PREFERENCE_KEY.getKey(), CoreKeys.LOCALE_PREFERENCE_KEY);
                 return factoryMap;
             });
-            event.register(this.commandModifierFactoryKey, false, () -> {
+            event.register(Registry.Keys.COMMAND_MODIFIER_FACTORY_KEY, false, () -> {
                 final Map<ResourceKey, CommandModifierFactory> factoryMap = new HashMap<>();
 
                 factoryMap.put(ResourceKey.resolve(CommandModifiers.HAS_COOLDOWN),
@@ -199,14 +192,14 @@ public final class NucleusCore {
                         new CommandModifierFactory.Simple(CommandModifiers.REQUIRE_ECONOMY, new RequiresEconomyModifier()));
                 return factoryMap;
             });
-            event.register(this.teleportScannerKey, true, () -> {
+            event.register(TeleportScanners.REGISTRY_KEY, true, () -> {
                 final Map<ResourceKey, TeleportScanner> factoryMap = new HashMap<>();
                 factoryMap.put(NoTeleportScanner.KEY, new NoTeleportScanner());
                 factoryMap.put(VerticalTeleportScanner.Ascending.KEY, new VerticalTeleportScanner.Ascending());
                 factoryMap.put(VerticalTeleportScanner.Descending.KEY, new VerticalTeleportScanner.Descending());
                 return factoryMap;
             });
-            event.register(this.storageFactoryKey, true,
+            event.register(Registry.Keys.STORAGE_REPOSITORY_KEY, true,
                     () -> Collections.singletonMap(IStorageManager.FLAT_FILE_KEY, this.serviceCollection.storageManager().getFlatFileRepositoryFactory()));
         } catch (final Exception e) {
             new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)

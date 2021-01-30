@@ -1,0 +1,30 @@
+package io.github.nucleuspowered.nucleus.core;
+
+import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandModifierFactory;
+import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.registry.RegistryRoots;
+import org.spongepowered.api.registry.RegistryType;
+
+public final class Registry {
+
+    public static final class Keys {
+
+        public static final ResourceKey COMMAND_MODIFIER_FACTORY_KEY = ResourceKey.of("nucleus", "command_modifier_factory");
+
+        public static final ResourceKey STORAGE_REPOSITORY_KEY = ResourceKey.of("nucleus", "storage_repository_factory");
+    }
+
+    public static final class Types {
+
+        public static final RegistryType<CommandModifierFactory> COMMAND_MODIFIER_FACTORY =
+                RegistryType.of(RegistryRoots.SPONGE, Keys.COMMAND_MODIFIER_FACTORY_KEY);
+
+        public static final RegistryType<IStorageRepositoryFactory> STORAGE_REPOSITORY =
+                RegistryType.of(RegistryRoots.SPONGE, Keys.STORAGE_REPOSITORY_KEY);
+
+    }
+
+
+
+}

@@ -21,7 +21,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
+import org.spongepowered.api.command.parameter.managed.standard.ResourceKeyedValueParameters;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Living;
@@ -59,7 +59,7 @@ public class LightningCommand implements ICommandExecutor {
             .optional()
             .setRequirements(cause -> permissionService.hasPermission(cause, FunPermissions.OTHERS_LIGHTNING))
             .setKey("targets")
-            .parser(CatalogedValueParameters.MANY_ENTITIES)
+            .parser(ResourceKeyedValueParameters.MANY_ENTITIES)
             .build();
     }
 

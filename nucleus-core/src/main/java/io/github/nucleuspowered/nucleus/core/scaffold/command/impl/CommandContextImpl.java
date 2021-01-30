@@ -28,6 +28,8 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Nameable;
 import org.spongepowered.api.util.locale.LocaleSource;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.ArrayList;
@@ -354,15 +356,15 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public WorldProperties getWorldPropertiesOrFromSelf(final Parameter.Key<WorldProperties> worldKey) throws CommandException {
+    public ServerWorld getWorldPropertiesOrFromSelf(final Parameter.Key<ServerWorld> worldKey) throws CommandException {
         return this.getWorldPropertiesOrFromSelfOptional(worldKey).orElseThrow(() -> new CommandException(this.getMessage("command.specifyworld")));
     }
 
     @Override
-    public Optional<WorldProperties> getWorldPropertiesOrFromSelfOptional(final Parameter.Key<WorldProperties> worldKey) {
-        final Optional<WorldProperties> optionalWorldProperties = this.context.getOne(worldKey);
+    public Optional<ServerWorld> getWorldPropertiesOrFromSelfOptional(final Parameter.Key<ServerWorld> worldKey) {
+        final Optional<ServerWorld> optionalWorldProperties = this.context.getOne(worldKey);
         if (!optionalWorldProperties.isPresent()) {
-            return this.cause.getLocation().map(x -> x.getWorld().getProperties());
+            return this.cause.getLocation().map(Location::getWorld);
         }
 
         return Optional.empty();

@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
+import io.github.nucleuspowered.nucleus.core.Registry;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
@@ -389,11 +390,11 @@ public final class CommandControl {
         for (final CommandModifier modifier : command.modifiers()) {
             try {
                 // Get the registry entry.
-                final ICommandModifier commandModifier = Sponge.getRegistry()
-                        .getCatalogRegistry()
-                        .get(CommandModifierFactory.class, ResourceKey.resolve(modifier.value()))
-                        .map(x -> x.apply(control))
-                        .orElseThrow(() -> new IllegalArgumentException("Could not get registry entry for \"" + modifier.value() + "\""));
+                final ICommandModifier commandModifier =
+                        Sponge.getGame().registries().registry(Registry.Types.COMMAND_MODIFIER_FACTORY)
+                                .findValue(ResourceKey.resolve(modifier.value()))
+                                .map(x -> x.apply(control))
+                                .orElseThrow(() -> new IllegalArgumentException("Could not get registry entry for \"" + modifier.value() + "\""));
                 commandModifier.validate(modifier);
                 modifiers.put(modifier, commandModifier);
             } catch (final IllegalArgumentException ex) {

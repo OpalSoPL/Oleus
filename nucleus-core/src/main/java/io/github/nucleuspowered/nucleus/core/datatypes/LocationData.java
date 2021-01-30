@@ -4,13 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus.core.datatypes;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.world.server.ServerLocation;
-import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.text.MessageFormat;
 import java.util.Optional;
@@ -19,7 +18,6 @@ public class LocationData implements NamedLocation {
 
     private final String warpName;
     private final ResourceKey resourceKey;
-    @Nullable private final WorldProperties worldProperties;
     private final Vector3d position;
     private final Vector3d rotation;
 
@@ -28,7 +26,6 @@ public class LocationData implements NamedLocation {
         this.position = position;
         this.warpName = name;
         this.resourceKey = world;
-        this.worldProperties = Sponge.getServer().getWorldManager().getProperties(this.resourceKey).orElse(null);
     }
 
     public String getName() {
@@ -40,8 +37,8 @@ public class LocationData implements NamedLocation {
         return this.resourceKey;
     }
 
-    @Override public Optional<WorldProperties> getWorldProperties() {
-        return Optional.ofNullable(this.worldProperties);
+    @Override public Optional<ServerWorld> getWorld() {
+        return Sponge.getServer().getWorldManager().world(this.resourceKey);
     }
 
     public Vector3d getRotation() {
@@ -53,14 +50,10 @@ public class LocationData implements NamedLocation {
     }
 
     @Override public Optional<ServerLocation> getLocation() {
-        return Sponge.getServer().getWorldManager().getWorld(this.resourceKey).map(x -> x.getLocation(this.position));
+        return Sponge.getServer().getWorldManager().world(this.resourceKey).map(x -> x.getLocation(this.position));
     }
 
     public String toLocationString() {
-        if (this.worldProperties == null) {
-            return MessageFormat.format("name: {0}, no location", this.warpName);
-        }
-
         return MessageFormat.format("name: {0}, world: {1}, x: {2}, y: {3}, z: {4}", this.warpName, this.resourceKey.asString(),
             (int) this.position.getX(), (int) this.position.getY(), (int) this.position.getZ());
     }

@@ -5,8 +5,6 @@
 package io.github.nucleuspowered.nucleus.modules.chat.listeners;
 
 import com.google.inject.Inject;
-import io.github.nucleuspowered.nucleus.api.NucleusAPI;
-import io.github.nucleuspowered.nucleus.api.module.ignore.NucleusIgnoreService;
 import io.github.nucleuspowered.nucleus.api.placeholder.NucleusPlaceholderService;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
@@ -32,10 +30,7 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.message.PlayerChatEvent;
 
-import java.util.UUID;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * A listener that modifies all chat messages. Uses the
@@ -111,16 +106,7 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
             builder.append(footer);
         }
         event.setMessage(body);
-        final Audience audience;
-        if (NucleusAPI.getIgnoreService().isPresent()) {
-            final UUID uuid = player.getUniqueId();
-            final NucleusIgnoreService ignoreService = NucleusAPI.getIgnoreService().get();
-            audience = Audience.audience(StreamSupport.stream(Sponge.getServer().audiences().spliterator(), false)
-                    .filter(x -> (!(x instanceof ServerPlayer)) || !ignoreService.isIgnored(uuid, ((ServerPlayer) x).getUniqueId()))
-                    .collect(Collectors.toList()));
-        } else {
-            audience = Sponge.getServer();
-        }
+        final Audience audience = Sponge.getServer();
         event.setChatRouter((sendingPlayer, message) ->
                         audience.sendMessage(sendingPlayer, LinearComponents.linear(header, message, footer), MessageType.CHAT));
     }

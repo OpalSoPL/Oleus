@@ -35,12 +35,12 @@ public class CommandElementSupplier implements ICommandElementSupplier {
 
     @Override
     public Parameter.Value<User> createOnlyOtherUserPermissionElement(final String permission) {
-        return Parameter.userOrSource().optional().setKey(NucleusParameters.ONE_USER.getKey()).setRequiredPermission(permission).build();
+        return Parameter.user().optional().setKey(NucleusParameters.ONE_USER.getKey()).setRequiredPermission(permission).build();
     }
 
     @Override
     public Parameter.Value<ServerPlayer> createOnlyOtherPlayerPermissionElement(final String permission) {
-        return Parameter.playerOrSource().optional().setKey(NucleusParameters.ONE_PLAYER.getKey()).setRequiredPermission(permission).build();
+        return Parameter.player().optional().setKey(NucleusParameters.ONE_PLAYER.getKey()).setRequiredPermission(permission).build();
     }
 
     @Override

@@ -59,10 +59,10 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
         return value.node("name").getString(String.valueOf(value.key()));
     }
 
+    @SuppressWarnings("deprecation")
     public static ResourceKey convertUUID(final UUID value, final SerializationException ex) throws SerializationException {
-        return Sponge.getServer().getWorldManager().getWorlds().stream().filter(x -> x.getUniqueId().equals(value)).findFirst()
-                .orElseThrow(() -> ex)
-                .getKey();
+        return Sponge.getServer().getWorldManager().worldKey(value)
+                .orElseThrow(() -> ex);
     }
 
     public static ResourceKey getWorldResourceKey(final ConfigurationNode value) throws SerializationException {

@@ -78,7 +78,7 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
         }
 
         context.sendMessage("command.sudo.force", pl.getName(), cmd);
-        Sponge.getCommandManager().process(pl, cmd);
+        Sponge.getServer().getCommandManager().process(pl, cmd);
         return context.successResult();
     }
 

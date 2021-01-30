@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.api.core;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.registry.DefaultedRegistryType;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -20,6 +21,8 @@ public interface NucleusUserPreferenceService {
      * @return The key.
      */
     ResourceKey getRegistryResourceKey();
+
+    DefaultedRegistryType<PreferenceKey<?>> getRegistryResourceType();
 
     /**
      * Gets the user preference keys available for this user.

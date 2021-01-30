@@ -18,12 +18,10 @@ public class NamedOptionPlaceholder implements PlaceholderParser {
 
     private final IPermissionService permissionService;
     private final String namedOption;
-    private final ResourceKey resourceKey;
 
     public NamedOptionPlaceholder(final IPermissionService permissionService, final String namedOption) {
         this.permissionService = permissionService;
         this.namedOption = namedOption;
-        this.resourceKey = ResourceKey.resolve("nucleus:option_" + namedOption.toLowerCase());
     }
 
     @Override
@@ -35,8 +33,4 @@ public class NamedOptionPlaceholder implements PlaceholderParser {
                 .orElse(Component.empty());
     }
 
-    @Override
-    public ResourceKey getKey() {
-        return this.resourceKey;
-    }
 }
