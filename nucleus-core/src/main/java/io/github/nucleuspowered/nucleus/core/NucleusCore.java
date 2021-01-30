@@ -39,7 +39,6 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager
 import io.github.nucleuspowered.nucleus.core.startuperror.ConfigErrorHandler;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.core.util.functional.Action;
-import io.github.nucleuspowered.storage.persistence.IStorageRepositoryFactory;
 import io.leangen.geantyref.TypeToken;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -57,14 +56,15 @@ import org.spongepowered.api.event.lifecycle.RefreshGameEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent;
 import org.spongepowered.api.event.lifecycle.RegisterRegistryEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Tuple;
-import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurateException;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
@@ -214,14 +214,15 @@ public final class NucleusCore {
     }
 
     @Listener
-    public void onRegisterTeleportHelperFilters(final RegisterCatalogEvent<TeleportHelperFilter> event) {
-        event.register(new NoCheckFilter());
-        event.register(new WallCheckFilter());
-    }
+    public void onGlobalRegistryValueRegistrationEvent(final RegisterRegistryValueEvent.GameScoped event) {
+        event.registry(RegistryTypes.TELEPORT_HELPER_FILTER)
+                .register(NoCheckFilter.KEY, new NoCheckFilter())
+                .register(WallCheckFilter.KEY, new WallCheckFilter());
 
-    @Listener
-    public void onRegisterPlaceholders(final RegisterCatalogEvent<PlaceholderParser> event) {
-        this.serviceCollection.placeholderService().getParsers().forEach(event::register);
+        final RegisterRegistryValueEvent.RegistryStep<PlaceholderParser> placeholderParserRegistryStep =
+                event.registry(RegistryTypes.PLACEHOLDER_PARSER);
+        this.serviceCollection.placeholderService().getNucleusParsers().forEach((key, value) ->
+                placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, key), value.getParser()));
         this.serviceCollection.logger().info("Registered placeholder parsers.");
     }
 

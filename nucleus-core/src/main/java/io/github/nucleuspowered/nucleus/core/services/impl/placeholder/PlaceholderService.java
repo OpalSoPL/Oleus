@@ -27,9 +27,11 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.placeholder.PlaceholderComponent;
 import org.spongepowered.api.placeholder.PlaceholderContext;
 import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Nameable;
 import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.ArrayList;
@@ -69,7 +71,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     public PlaceholderService(final INucleusServiceCollection serviceCollection) {
         this.optionParser = new OptionPlaceholder(serviceCollection.permissionService());
         this.emptyParser =
-                PlaceholderParser.builder().key(ResourceKey.resolve("nucleus:empty")).parser(p -> Component.empty()).build();
+                PlaceholderParser.builder().parser(p -> Component.empty()).build();
     }
 
     @Override
@@ -107,34 +109,28 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         this.registerToken("suffix", new NamedOptionPlaceholder(permissionService, "suffix"));
 
         this.registerToken("maxplayers", PlaceholderParser.builder()
-                .key(ResourceKey.resolve("nucleus:maxplayers"))
                 .parser(p -> Component.text(Sponge.getServer().getMaxPlayers()))
                 .build());
         this.registerToken("onlineplayers", PlaceholderParser.builder()
-                        .key(ResourceKey.resolve("nucleus:onlineplayers"))
                         .parser(p -> Component.text(Sponge.getServer().getOnlinePlayers().size()))
                         .build());
         this.registerToken("currentworld", PlaceholderParser.builder()
-                .key(ResourceKey.resolve("nucleus:currentworld"))
                 .parser(placeholder -> Component.text(PlaceholderService.getWorld(placeholder).getKey().getFormatted()))
                 .build());
         this.registerToken("time",
                 PlaceholderParser.builder()
-                        .key(ResourceKey.resolve("nucleus:time"))
                         .parser(placeholder ->
                                 Component.text(
                                         Util.getTimeFromDayTime(serviceCollection.messageProvider(),
-                                                PlaceholderService.getWorld(placeholder).getDayTime())))
+                                                PlaceholderService.getWorld(placeholder).dayTime())))
                         .build());
 
         this.registerToken("uniquevisitor",
                 PlaceholderParser.builder()
-                        .key(ResourceKey.resolve("nucleus:uniquevisitor"))
                         .parser(placeholder -> Component.text(serviceCollection.getServiceUnchecked(UniqueUserService.class).getUniqueUserCount()))
                         .build());
         this.registerToken("ipaddress",
                 PlaceholderParser.builder()
-                        .key(ResourceKey.resolve("nucleus:ipaddress"))
                         .parser(placeholder -> placeholder.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
                                 .map(x -> Component.text(((ServerPlayer) x).getConnection().getAddress().getAddress().toString()))
                                 .orElse(Component.text("localhost")))
@@ -211,7 +207,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     @Override
     public Optional<PlaceholderParser> getParser(final String token) {
         if (token.contains(":")) {
-            return Sponge.getRegistry().getCatalogRegistry().get(PlaceholderParser.class, ResourceKey.resolve(token));
+            return RegistryTypes.PLACEHOLDER_PARSER.get().findValue(ResourceKey.resolve(token));
         }
         final PlaceholderMetadata placeholderMetadata = this.parsers.get(SEPARATOR.split(token.toLowerCase(), 2)[0]);
         if (placeholderMetadata == null) {
@@ -243,11 +239,11 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
 
     // --
 
-    private static WorldProperties getWorld(final PlaceholderContext placeholder) {
+    private static ServerWorldProperties getWorld(final PlaceholderContext placeholder) {
         return placeholder.getAssociatedObject()
                 .filter(x -> x instanceof Locatable)
                 .map(x -> ((Locatable) x).getServerLocation().getWorld().getProperties())
-                .orElseGet(Sponge.getServer().getWorldManager().getDefaultProperties()::get);
+                .orElseGet(Sponge.getServer().getWorldManager().defaultWorld()::getProperties);
     }
 
 }

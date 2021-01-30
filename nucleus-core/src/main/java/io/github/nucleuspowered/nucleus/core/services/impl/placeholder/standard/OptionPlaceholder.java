@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class OptionPlaceholder implements PlaceholderParser {
 
-    private final ResourceKey key = ResourceKey.resolve("nucleus:option");
+    private static final ResourceKey KEY = ResourceKey.resolve("nucleus:option");
     private final IPermissionService permissionService;
 
     public OptionPlaceholder(final IPermissionService permissionService) {
@@ -37,8 +37,4 @@ public class OptionPlaceholder implements PlaceholderParser {
         return Component.empty();
     }
 
-    @Override
-    public ResourceKey getKey() {
-        return this.key;
-    }
 }

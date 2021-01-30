@@ -13,7 +13,7 @@ import org.spongepowered.math.vector.Vector3i;
 
 public final class NoCheckFilter implements TeleportHelperFilter {
 
-    private final ResourceKey key = ResourceKey.resolve("nucleus:no_check");
+    public static final ResourceKey KEY = ResourceKey.resolve("nucleus:no_check");
 
     @Override
     public Tristate isValidLocation(final ServerWorld world, final Vector3i position) {
@@ -30,8 +30,4 @@ public final class NoCheckFilter implements TeleportHelperFilter {
         return true;
     }
 
-    @Override
-    public ResourceKey getKey() {
-        return this.key;
-    }
 }

@@ -12,7 +12,7 @@ import org.spongepowered.math.vector.Vector3i;
 
 public final class WallCheckFilter extends FilterBase {
 
-    private final ResourceKey key = ResourceKey.resolve("nucleus:wall_check");
+    public static final ResourceKey KEY = ResourceKey.resolve("nucleus:wall_check");
 
     @Override
     public Tristate isValidLocation(final ServerWorld world, final Vector3i position) {
@@ -32,11 +32,6 @@ public final class WallCheckFilter extends FilterBase {
     @Override
     public boolean isSafeBodyMaterial(final BlockState blockState) {
         return true;
-    }
-
-    @Override
-    public ResourceKey getKey() {
-        return this.key;
     }
 
 }

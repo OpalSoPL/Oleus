@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.queryobjects.IUserQueryObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.queryobjects.IWorldQueryObject;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.ResourceKey;
 
 import java.util.UUID;
