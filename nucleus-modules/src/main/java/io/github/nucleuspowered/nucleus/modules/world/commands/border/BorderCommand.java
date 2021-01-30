@@ -35,12 +35,12 @@ public class BorderCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY
+                NucleusParameters.ONLINE_WORLD_OPTIONAL
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.getKey())
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey())
                 .orElseThrow(() -> context.createException("command.world.player"));
         final List<Component> worldBorderInfo = new ArrayList<>();
 

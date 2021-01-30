@@ -7,8 +7,10 @@ package io.github.nucleuspowered.nucleus.api.module.rtp.kernel;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-
-import java.util.function.Supplier;
+import org.spongepowered.api.registry.DefaultedRegistryReference;
+import org.spongepowered.api.registry.DefaultedRegistryType;
+import org.spongepowered.api.registry.RegistryRoots;
+import org.spongepowered.api.registry.RegistryType;
 
 /**
  * Nucleus supplied {@link RTPKernel}s.
@@ -29,14 +31,16 @@ public final class RTPKernels {
 
     }
 
+    public final static DefaultedRegistryType<RTPKernel> REGISTRY_TYPE =
+            RegistryType.of(RegistryRoots.SPONGE, ResourceKey.of("nucleus", "rtp")).asDefaultedType(() -> Sponge.getGame().registries());
+
     /**
      * The default Nucleus RTP kernel, adjusted to centre around the player,
      * not the world border centre.
      *
      * <p>This has an ID of {@code nucleus:around_player}</p>
      */
-    public final static Supplier<RTPKernel> AROUND_PLAYER =
-            () -> Sponge.getRegistry().getCatalogRegistry().get(RTPKernel.class, Identifiers.AROUND_PLAYER).get();
+    public final static DefaultedRegistryReference<RTPKernel> AROUND_PLAYER = RTPKernels.getReference(RTPKernels.Identifiers.AROUND_PLAYER);
 
     /**
      * The default Nucleus RTP kernel, adjusted to centre around the player,
@@ -44,23 +48,24 @@ public final class RTPKernels {
      *
      * <p>This has an ID of {@code nucleus:around_player_surface}</p>
      */
-    public final static Supplier<RTPKernel> AROUND_PLAYER_SURFACE =
-            () -> Sponge.getRegistry().getCatalogRegistry().get(RTPKernel.class, Identifiers.AROUND_PLAYER_SURFACE).get();
+    public final static DefaultedRegistryReference<RTPKernel> AROUND_PLAYER_SURFACE = RTPKernels.getReference(Identifiers.AROUND_PLAYER_SURFACE);
 
     /**
      * The default Nucleus RTP kernel.
      *
      * <p>This has an ID of {@code nucleus:default}</p>
      */
-    public final static Supplier<RTPKernel> DEFAULT =
-            () -> Sponge.getRegistry().getCatalogRegistry().get(RTPKernel.class, Identifiers.DEFAULT).get();
+    public final static DefaultedRegistryReference<RTPKernel> DEFAULT = RTPKernels.getReference(Identifiers.DEFAULT);
 
     /**
      * The default Nucleus RTP kernel, adjusted to ensure locations are surface only.
      *
      * <p>This has an ID of {@code nucleus:surface_only}</p>
      */
-    public final static Supplier<RTPKernel> SURFACE_ONLY =
-            () -> Sponge.getRegistry().getCatalogRegistry().get(RTPKernel.class, Identifiers.SURFACE_ONLY).get();
+    public final static DefaultedRegistryReference<RTPKernel> SURFACE_ONLY = RTPKernels.getReference(Identifiers.SURFACE_ONLY);
+
+    private static DefaultedRegistryReference<RTPKernel> getReference(final ResourceKey resourceKey) {
+        return RTPKernels.REGISTRY_TYPE.asDefaultedType(() -> Sponge.getGame().registries()).defaultReferenced(Identifiers.AROUND_PLAYER);
+    }
 
 }

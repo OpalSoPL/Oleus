@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.world.commands;
 
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
@@ -13,7 +14,9 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 @Command(
@@ -24,22 +27,23 @@ import org.spongepowered.api.world.storage.WorldProperties;
 )
 public class SetDifficultyWorldCommand implements ICommandExecutor {
 
-    private final Parameter.Value<Difficulty> difficultyValue = Parameter.catalogedElement(Difficulty.class).setKey("difficulty").build();
+    private final Parameter.Value<Difficulty> difficultyValue =
+            Parameter.registryElement(TypeTokens.DIFFICULTY, RegistryTypes.DIFFICULTY).setKey("difficulty").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
                 this.difficultyValue,
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL
+                NucleusParameters.ONLINE_WORLD_OPTIONAL
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Difficulty difficultyInput = context.requireOne(this.difficultyValue);
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.getKey())
+        final ServerWorld worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL)
                         .orElseThrow(() -> context.createException("command.world.player"));
 
-        worldProperties.setDifficulty(difficultyInput);
+        worldProperties.getProperties().setDifficulty(difficultyInput);
         context.sendMessage("command.world.setdifficulty.success",
                 worldProperties.getKey().asString(),
                 difficultyInput.asComponent());

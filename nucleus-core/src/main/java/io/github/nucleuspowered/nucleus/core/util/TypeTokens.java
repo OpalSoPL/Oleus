@@ -4,65 +4,64 @@
  */
 package io.github.nucleuspowered.nucleus.core.util;
 
-import io.github.nucleuspowered.nucleus.core.configurate.datatypes.LocationNode;
-import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.world.server.ServerLocation;
-import org.spongepowered.math.vector.Vector3d;
-import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
-import io.github.nucleuspowered.nucleus.api.module.warp.data.Warp;
-import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.world.storage.WorldProperties;
+import io.github.nucleuspowered.nucleus.core.configurate.datatypes.LocationNode;
+import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.configurate.AbstractConfigurateBackedDataObject;
+import io.leangen.geantyref.TypeToken;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.util.MinecraftDayTime;
+import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Predicate;
 
-@SuppressWarnings("UnstableApiUsage")
 public final class TypeTokens {
 
-    public static final TypeToken<Boolean> BOOLEAN = TypeToken.of(Boolean.class);
+    public static final TypeToken<AbstractConfigurateBackedDataObject> ABSTRACT_DATA_OBJECT_TYPE_TOKEN =
+            TypeToken.get(AbstractConfigurateBackedDataObject.class);
 
-    public static final TypeToken<Instant> INSTANT = TypeToken.of(Instant.class);
+    public static final TypeToken<Boolean> BOOLEAN = TypeToken.get(Boolean.class);
 
-    public static final TypeToken<ServerLocation> LOCATION_WORLD = TypeToken.of(ServerLocation.class);
+    public static final TypeToken<Instant> INSTANT = TypeToken.get(Instant.class);
 
-    public static final TypeToken<LocationNode> LOCATION_NODE = TypeToken.of(LocationNode.class);
+    public static final TypeToken<Integer> INTEGER = TypeToken.get(Integer.class);
 
-    public static final TypeToken<Integer> INTEGER = TypeToken.of(Integer.class);
+    public static final TypeToken<Locale> LOCALE = TypeToken.get(Locale.class);
 
-    public static final TypeToken<Long> LONG = TypeToken.of(Long.class);
+    public static final TypeToken<LocationNode> LOCATION_NODE = TypeToken.get(LocationNode.class);
 
-    public static final TypeToken<String> STRING = TypeToken.of(String.class);
+    public static final TypeToken<MinecraftDayTime> MINECRAFT_DAY_TIME = TypeToken.get(MinecraftDayTime.class);
 
-    public static final TypeToken<Map<String, LocationNode>> LOCATIONS = new TypeToken<Map<String, LocationNode>>() {};
+    public static final TypeToken<NamedLocation> NAMED_LOCATION = TypeToken.get(NamedLocation.class);
 
-    public static final TypeToken<List<UUID>> UUID_LIST = new TypeToken<List<UUID>>() {};
+    public static final TypeToken<Map<String, LocationNode>> LOCATION_NODES_MAP = new TypeToken<Map<String, LocationNode>>() { };
 
-    public static final TypeToken<Vector3d> VECTOR_3D = TypeToken.of(Vector3d.class);
+    public static final TypeToken<ResourceKey> RESOURCE_KEY = TypeToken.get(ResourceKey.class);
 
-    public static final TypeToken<Warp> WARP = TypeToken.of(Warp.class);
+    public static final TypeToken<String> STRING = TypeToken.get(String.class);
 
-    public static final TypeToken<WarpCategory> WARP_CATEGORY = TypeToken.of(WarpCategory.class);
+    public static final TypeToken<UUID> UUID = TypeToken.get(UUID.class);
 
-    public static final TypeToken<UUID> UUID = TypeToken.of(UUID.class);
+    public static final TypeToken<List<java.util.UUID>> UUID_LIST = new TypeToken<List<UUID>>() {};
 
-    public static final TypeToken<NamedLocation> NAMEDLOCATION = TypeToken.of(NamedLocation.class);
+    public static final TypeToken<NamedLocation> NAMEDLOCATION = TypeToken.get(NamedLocation.class);
 
-    public static final TypeToken<MailMessage> MAIL_MESSAGE = TypeToken.of(MailMessage.class);
+    public static final TypeToken<Vector3d> VECTOR_3D = TypeToken.get(Vector3d.class);
 
-    public static final TypeToken<Entity> ENTITY = TypeToken.of(Entity.class);
+    public static final TypeToken<MailMessage> MAIL_MESSAGE = TypeToken.get(MailMessage.class);
 
-    public static final TypeToken<WorldProperties> WORLD_PROPERTIES = TypeToken.of(WorldProperties.class);
+    public static final TypeToken<GameMode> GAME_MODE = TypeToken.get(GameMode.class);
 
-    public static final TypeToken<Predicate<Entity>> PREDICATE_ENTITY = new TypeToken<Predicate<Entity>>() {};
+    public static final TypeToken<Difficulty> DIFFICULTY = TypeToken.get(Difficulty.class);
 
-    public static final TypeToken<Locale> LOCALE = TypeToken.of(Locale.class);
+    private TypeTokens() {
+        // no-op
+    }
 
-    public static final TypeToken<ResourceKey> RESOURCE_KEY = TypeToken.of(ResourceKey.class);
 }

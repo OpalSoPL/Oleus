@@ -16,7 +16,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.CommandModifier;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.util.MinecraftDayTime;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -40,7 +40,7 @@ public class AddTimeCommand implements ICommandExecutor {
 
     @Inject
     public AddTimeCommand(final INucleusServiceCollection serviceCollection) {
-        this.timeParameter = Parameter.builder(GeAnTyRefTypeTokens.MINECRAFT_DAY_TIME).setKey("time")
+        this.timeParameter = Parameter.builder(TypeTokens.MINECRAFT_DAY_TIME).setKey("time")
                 .parser(new WorldTimeParameter(false, serviceCollection.messageProvider()))
                 .build();
     }
@@ -48,14 +48,14 @@ public class AddTimeCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY,
+                NucleusParameters.ONLINE_WORLD_OPTIONAL,
                 this.timeParameter
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) {
-        final Optional<WorldProperties> pr = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.getKey());
+        final Optional<WorldProperties> pr = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey());
         if (!pr.isPresent()) {
             return context.errorResult("command.world.player");
         }

@@ -8,8 +8,6 @@ import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.world.commands.CloneWorldCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.CreateWorldCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.DeleteWorldCommand;
-import io.github.nucleuspowered.nucleus.modules.world.commands.DisableWorldCommand;
-import io.github.nucleuspowered.nucleus.modules.world.commands.EnableWorldCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.GameruleCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.InfoWorldCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.ListWorldCommand;
@@ -66,8 +64,6 @@ public class WorldModule implements IModule.Configurable<WorldConfig> {
                 CloneWorldCommand.class,
                 CreateWorldCommand.class,
                 DeleteWorldCommand.class,
-                DisableWorldCommand.class,
-                EnableWorldCommand.class,
                 GameruleCommand.class,
                 InfoWorldCommand.class,
                 ListWorldCommand.class,

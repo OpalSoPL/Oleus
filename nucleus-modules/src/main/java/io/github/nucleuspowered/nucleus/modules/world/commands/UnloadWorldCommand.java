@@ -17,7 +17,6 @@ import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.server.ServerWorld;
-import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,73 +33,36 @@ public class UnloadWorldCommand implements ICommandExecutor {
     @Override
     public Flag[] flags(final INucleusServiceCollection serviceCollection) {
         return new Flag[] {
-                Flag.builder()
-                        .setRequirement(commandCause -> serviceCollection.permissionService().hasPermission(commandCause, WorldPermissions.BASE_WORLD_DISABLE))
-                        .alias("d")
-                        .alias("disable")
-                        .build(),
-                Flag.of(NucleusParameters.WORLD_PROPERTIES_LOADED_ONLY, "t", "transfer")
+                Flag.of(NucleusParameters.ONLINE_WORLD, "t", "transfer")
         };
     }
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY
+            NucleusParameters.ONLINE_WORLD
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY);
-        final Optional<WorldProperties> transferWorld = context.getOne(NucleusParameters.WORLD_PROPERTIES_LOADED_ONLY);
-        final boolean disable = context.hasFlag("d");
-
-        final Optional<ServerWorld> worldOptional = worldProperties.getWorld();
-        if (!worldOptional.isPresent()) {
-            // Not loaded.
-            if (disable) {
-                UnloadWorldCommand.disable(worldProperties, context, false);
-            }
-
-            return context.errorResult("command.world.unload.alreadyunloaded", worldProperties.getKey().asString());
-        }
-
-        final ServerWorld world = worldOptional.get();
+        final ServerWorld world = context.requireOne(NucleusParameters.ONLINE_WORLD);
+        final Optional<ServerWorld> transferWorld = context.getOne(NucleusParameters.ONLINE_WORLD);
         final List<Player> playerCollection = Sponge.getServer().getOnlinePlayers().stream().filter(x -> x.getWorld().equals(world)).collect(Collectors.toList());
 
-        if ((transferWorld.isPresent() && transferWorld.get().isEnabled())) {
-            playerCollection.forEach(x -> x.transferToWorld(transferWorld.get().getWorld().get(), transferWorld.get().getSpawnPosition().toDouble()));
-        }
+        transferWorld.ifPresent(serverWorld -> playerCollection.forEach(x -> x.transferToWorld(serverWorld)));
 
-        return UnloadWorldCommand.unloadWorld(context, world, disable);
+        return UnloadWorldCommand.unloadWorld(context, world);
     }
 
-    private static ICommandResult disable(final WorldProperties worldProperties,
-            final ICommandContext context,
-            final boolean messageOnError) {
-        if (worldProperties.isEnabled()) {
-            return DisableWorldCommand.disableWorld(context, worldProperties);
-        } else if (messageOnError) {
-            return context.errorResult("command.world.disable.alreadydisabled", worldProperties.getKey().asString());
-        }
-
-        return context.successResult();
-    }
-
-    private static ICommandResult unloadWorld(final ICommandContext context, final ServerWorld world, final boolean disable) {
-        final WorldProperties worldProperties = world.getProperties();
-        context.sendMessage("command.world.unload.start", worldProperties.getKey().asString());
+    private static ICommandResult unloadWorld(final ICommandContext context, final ServerWorld world) {
+        context.sendMessage("command.world.unload.start", world.getKey().asString());
         Sponge.getServer().getWorldManager().unloadWorld(world).handle((result, exception) -> {
             context.getServiceCollection().schedulerService().runOnMainThread(() -> {
                 if (exception == null && result) {
-                    context.sendMessage("command.world.unload.success", worldProperties.getKey().asString());
-                    if (disable) {
-                        UnloadWorldCommand.disable(worldProperties, context, true).getErrorMessage(context)
-                            .ifPresent(context::sendMessageText);
-                    }
+                    context.sendMessage("command.world.unload.success", world.getKey().asString());
                 } else {
-                    context.sendMessage("command.world.unload.failed", worldProperties.getKey().asString());
+                    context.sendMessage("command.world.unload.failed", world.getKey().asString());
                 }
             });
             return null;

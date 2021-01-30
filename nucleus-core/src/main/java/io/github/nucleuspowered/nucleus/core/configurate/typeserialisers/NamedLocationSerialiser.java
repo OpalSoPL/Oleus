@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.core.configurate.typeserialisers;
 
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import io.github.nucleuspowered.nucleus.core.datatypes.LocationData;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -67,9 +67,9 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
 
     public static ResourceKey getWorldResourceKey(final ConfigurationNode value) throws SerializationException {
         try {
-            return value.node("world").get(GeAnTyRefTypeTokens.RESOURCE_KEY);
+            return value.node("world").get(TypeTokens.RESOURCE_KEY);
         } catch (final SerializationException e) {
-            final UUID uuid = value.node("world").get(GeAnTyRefTypeTokens.UUID);
+            final UUID uuid = value.node("world").get(TypeTokens.UUID);
             return NamedLocationSerialiser.convertUUID(uuid, e);
         }
     }
@@ -91,7 +91,7 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
     }
 
     public static void serializeLocation(final NamedLocation obj, final ConfigurationNode value) throws SerializationException {
-        value.node("world").set(GeAnTyRefTypeTokens.RESOURCE_KEY, obj.getResourceKey());
+        value.node("world").set(TypeTokens.RESOURCE_KEY, obj.getResourceKey());
 
         value.node("x").set(obj.getPosition().getX());
         value.node("y").set(obj.getPosition().getY());

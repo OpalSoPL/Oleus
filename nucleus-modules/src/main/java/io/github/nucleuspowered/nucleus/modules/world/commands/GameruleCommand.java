@@ -18,7 +18,8 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.gamerule.GameRule;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 
 import java.text.MessageFormat;
 import java.util.Comparator;
@@ -36,13 +37,14 @@ public class GameruleCommand implements ICommandExecutor {
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY
+                NucleusParameters.ONLINE_WORLD_OPTIONAL
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.getKey())
+        final ServerWorld serverWorld = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD.getKey())
                 .orElseThrow(() -> context.createException("command.world.player"));
+        final ServerWorldProperties worldProperties = serverWorld.getProperties();
         final Map<GameRule<?>, ?> gameRules = worldProperties.getGameRules();
 
         final String message = context.getMessageString("command.world.gamerule.key");

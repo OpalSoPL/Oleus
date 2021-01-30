@@ -65,7 +65,7 @@ public class WeatherCommand implements ICommandExecutor, IReloadableService.Relo
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY,
+                NucleusParameters.ONLINE_WORLD_OPTIONAL,
                 this.weatherParameter,
                 NucleusParameters.OPTIONAL_DURATION
         };
@@ -74,7 +74,7 @@ public class WeatherCommand implements ICommandExecutor, IReloadableService.Relo
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         // We can predict the weather on multiple worlds now!
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.getKey());
+        final WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey());
         final ServerWorld w = wp.getWorld()
             .orElseThrow(() -> context.createException("args.worldproperties.notloaded", wp.getKey().asString()));
 

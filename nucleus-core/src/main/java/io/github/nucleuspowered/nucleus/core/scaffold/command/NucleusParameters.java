@@ -5,23 +5,24 @@
 package io.github.nucleuspowered.nucleus.core.scaffold.command;
 
 import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.AudienceValueParameter;
-import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.WorldPropertiesValueParameter;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.OfflineWorldParameter;
 import io.leangen.geantyref.TypeToken;
 import io.vavr.control.Either;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.parameter.CommonParameters;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
+import org.spongepowered.api.command.parameter.managed.standard.ResourceKeyedValueParameters;
 import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.world.server.ServerLocation;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -66,12 +67,12 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<List<Entity>> MANY_ENTITY = Parameter.builder(new TypeToken<List<Entity>>() {})
             .setKey(Keys.SUBJECT)
-            .parser(CatalogedValueParameters.MANY_ENTITIES)
+            .parser(ResourceKeyedValueParameters.MANY_ENTITIES)
             .build();
 
     public static final Parameter.Value<List<ServerPlayer>> MANY_PLAYER = Parameter.builder(new TypeToken<List<ServerPlayer>>() {})
             .setKey(Keys.PLAYER)
-            .parser(CatalogedValueParameters.MANY_PLAYERS)
+            .parser(ResourceKeyedValueParameters.MANY_PLAYERS)
             .build();
 
     public static final Parameter.Value<ServerPlayer> ONE_PLAYER = CommonParameters.PLAYER;
@@ -90,7 +91,7 @@ public final class NucleusParameters {
     public static final Parameter.Value<User> ONE_USER = Parameter.user().setKey(Keys.USER).build();
 
     public static final Parameter.Value<GameProfile> GAME_PROFILE =
-            Parameter.builder(TypeToken.get(GameProfile.class)).setKey(Keys.GAME_PROFILE).parser(CatalogedValueParameters.GAME_PROFILE).build();
+            Parameter.builder(TypeToken.get(GameProfile.class)).setKey(Keys.GAME_PROFILE).parser(ResourceKeyedValueParameters.GAME_PROFILE).build();
 
     public static final Parameter.Value<Component> DISPLAY_NAME_COMPONENT = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.DISPLAY_NAME).build();
 
@@ -113,39 +114,16 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<String> OPTIONAL_REASON = Parameter.remainingJoinedStrings().setKey(Keys.REASON).optional().build();
 
-    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_ENABLED_ONLY =
-            Parameter.builder(WorldProperties.class)
-                    .setKey(Keys.ENABLED_WORLD)
-                    .parser(new WorldPropertiesValueParameter(
-                            WorldProperties::isEnabled,
-                            key -> Component.text(key.getFormatted() + " is not a disabled world properties.")))
-                    .build();
+    public static final Parameter.Value<ServerWorld> ONLINE_WORLD = CommonParameters.WORLD;
 
-    public static final Parameter.Value<WorldProperties> OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY =
-            CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY_OPTIONAL;
+    public static final Parameter.Value<ServerWorld> ONLINE_WORLD_OPTIONAL = Parameter.world().optional().setKey(Keys.WORLD).build();
 
-    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_DISABLED_ONLY =
-            Parameter.builder(WorldProperties.class)
+    public static final Parameter.Value<ResourceKey> OFFLINE_WORLD =
+            Parameter.builder(ResourceKey.class)
                     .setKey(Keys.WORLD)
-                    .parser(new WorldPropertiesValueParameter(
-                            x -> !x.isEnabled(),
-                            key -> Component.text(key.getFormatted() + " is not a disabled world properties.")))
+                    .parser(new OfflineWorldParameter(
+                            key -> Component.text(key.getFormatted() + " is not an unloaded world.")))
                     .build();
-
-    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_ALL = CommonParameters.ALL_WORLD_PROPERTIES;
-
-    public static final Parameter.Value<WorldProperties> OPTIONAL_WORLD_PROPERTIES_ALL =
-            Parameter.worldProperties(false).optional().setKey(Keys.WORLD).build();
-
-    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_UNLOADED_ONLY =
-            Parameter.builder(WorldProperties.class)
-                    .setKey(Keys.WORLD)
-                    .parser(new WorldPropertiesValueParameter(
-                            x -> !x.getWorld().isPresent(),
-                            key -> Component.text(key.getFormatted() + " is not an unloaded world properties.")))
-                    .build();
-
-    public static final Parameter.Value<WorldProperties> WORLD_PROPERTIES_LOADED_ONLY = CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY;
 
     public static final Parameter.Value<Duration> DURATION = Parameter.duration().setKey(Keys.DURATION).build();
 

@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.PreferenceKeyImpl;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class VanishKeys {
@@ -22,7 +22,7 @@ public final class VanishKeys {
 
     public static final DataKey<Boolean, IUserDataObject> VANISH_STATUS = DataKey.of(
             false,
-            GeAnTyRefTypeTokens.BOOLEAN,
+            TypeTokens.BOOLEAN,
             IUserDataObject.class,
             "vanish");
 }

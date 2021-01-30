@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.NucleusKeysProvider;
 import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.PreferenceKeyImpl;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class PowertoolKeys {
@@ -21,8 +21,8 @@ public final class PowertoolKeys {
             );
 
     public final static DataKey.MapListKey<String, String, IUserDataObject> POWERTOOLS = DataKey.ofMapList(
-                    GeAnTyRefTypeTokens.STRING,
-                    GeAnTyRefTypeTokens.STRING,
+                    TypeTokens.STRING,
+                    TypeTokens.STRING,
                     IUserDataObject.class,
                     "powertools"
             );

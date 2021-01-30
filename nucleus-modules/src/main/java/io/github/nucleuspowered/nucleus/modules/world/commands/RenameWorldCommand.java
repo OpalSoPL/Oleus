@@ -17,8 +17,6 @@ import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import java.util.Locale;
-
 @Command(
         aliases = {"rename"},
         basePermission = WorldPermissions.BASE_WORLD_RENAME,
@@ -32,23 +30,22 @@ public class RenameWorldCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.WORLD_PROPERTIES_UNLOADED_ONLY,
+                NucleusParameters.OFFLINE_WORLD,
                 this.nameKey
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_UNLOADED_ONLY);
-        final ResourceKey oldName = worldProperties.getKey();
-        final String newName = context.requireOne(this.nameKey);
-        Sponge.getServer().getWorldManager().renameWorld(oldName, newName).handle((result, exception) -> {
+        final ResourceKey oldName = context.requireOne(NucleusParameters.OFFLINE_WORLD);
+        final ResourceKey newName = ResourceKey.of("nucleus", context.requireOne(this.nameKey));
+        Sponge.getServer().getWorldManager().moveWorld(oldName, newName).handle((result, exception) -> {
             context.getServiceCollection().schedulerService().runOnMainThread(() ->
             {
-                if (exception == null) {
-                    context.sendMessage("command.world.rename.success", oldName.asString(), result.getKey().asString());
+                if (exception == null && result) {
+                    context.sendMessage("command.world.rename.success", oldName.asString(), newName.asString());
                 } else {
-                    context.sendMessage("command.world.rename.failed", oldName.asString(), newName);
+                    context.sendMessage("command.world.rename.failed", oldName.asString(), newName.asString());
                 }
             });
             return null;

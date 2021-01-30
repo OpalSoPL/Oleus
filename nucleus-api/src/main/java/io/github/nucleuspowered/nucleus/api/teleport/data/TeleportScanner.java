@@ -8,7 +8,6 @@ import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.teleport.TeleportHelper;
 import org.spongepowered.math.vector.Vector3i;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
@@ -17,7 +16,7 @@ import java.util.Optional;
 /**
  * Scans {@link Location}s for safe teleport locations.
  */
-public interface TeleportScanner extends CatalogType {
+public interface TeleportScanner {
 
     default Optional<ServerLocation> scanFrom(
             final ServerWorld world,

@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.rtp.options;
 
 import com.google.common.base.Preconditions;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
-import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.Biome;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +17,7 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
     int min = 0;
     int minheight = 1;
     int maxheight = 255;
-    final Set<BiomeType> prohibitedBiomes = new HashSet<>();
+    final Set<Biome> prohibitedBiomes = new HashSet<>();
 
     @Override public NucleusRTPService.RTPOptions.Builder setMaxRadius(final int max) {
         if (max <= 0) {
@@ -51,7 +51,7 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder prohibitedBiome(final BiomeType biomeType) {
+    @Override public NucleusRTPService.RTPOptions.Builder prohibitedBiome(final Biome biomeType) {
         this.prohibitedBiomes.add(Preconditions.checkNotNull(biomeType));
         return this;
     }

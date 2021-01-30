@@ -18,6 +18,8 @@ import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Map;
@@ -38,8 +40,8 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
     }
 
     @Override
-    public RTPOptions options(@Nullable final WorldProperties world) {
-        @Nullable final String name = world == null ? null : world.getKey().asString();
+    public RTPOptions options(@Nullable final ServerWorldProperties world) {
+        @Nullable final String name = world == null ? null : world.key().asString();
         return new io.github.nucleuspowered.nucleus.modules.rtp.options.RTPOptions(this.config, name);
     }
 
@@ -52,11 +54,11 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
     public RTPKernel getDefaultKernel() {
         if (this.lazyLoadedKernel == null) {
             // does the kernel exist?
-            String kernelId = this.config.getDefaultRTPKernel();
-            kernelId = kernelId.contains(":") ? kernelId : "nucleus:" + kernelId;
-            final Optional<RTPKernel> rtpKernel = Sponge.getRegistry().getCatalogRegistry().get(RTPKernel.class, ResourceKey.resolve(kernelId));
+            final String kernelId = this.config.getDefaultRTPKernel();
+            final String idToUse = kernelId.contains(":") ? kernelId : "nucleus:" + kernelId;
+            final Optional<RTPKernel> rtpKernel = RTPKernels.REGISTRY_TYPE.find().flatMap(x -> x.findValue(ResourceKey.resolve(idToUse)));
             if (!rtpKernel.isPresent()) {
-                this.logger.warn("Kernel with ID {} could not be found. Falling back to the default.", RTPKernels.DEFAULT.get().getKey().asString());
+                this.logger.warn("Kernel with ID {} could not be found. Falling back to the default.", RTPKernels.Identifiers.DEFAULT.asString());
                 this.lazyLoadedKernel = RTPKernels.DEFAULT.get();
             } else {
                 this.lazyLoadedKernel = rtpKernel.get();
@@ -66,7 +68,11 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
         return this.lazyLoadedKernel;
     }
 
-    @Override public RTPKernel getKernel(final WorldProperties world) {
+    @Override public RTPKernel getKernel(final ServerWorldProperties world) {
+        return this.getKernel(world.key().asString());
+    }
+
+    @Override public RTPKernel getKernel(final ServerWorld world) {
         return this.getKernel(world.getKey().asString());
     }
 
@@ -75,9 +81,9 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
             final RTPKernel kernel = this.perWorldLazyLoadedKernel.get(x);
             if (kernel == null) {
                 // does the kernel exist?
-                String kernelId = x.getDefaultRTPKernel();
-                kernelId = kernelId.contains(":") ? kernelId : "nucleus:" + kernelId;
-                final Optional<RTPKernel> rtpKernel = Sponge.getRegistry().getCatalogRegistry().get(RTPKernel.class, ResourceKey.resolve(kernelId));
+                final String kernelId = this.config.getDefaultRTPKernel();
+                final String idToUse = kernelId.contains(":") ? kernelId : "nucleus:" + kernelId;
+                final Optional<RTPKernel> rtpKernel = RTPKernels.REGISTRY_TYPE.find().flatMap(y -> y.findValue(ResourceKey.resolve(idToUse)));
                 if (!rtpKernel.isPresent()) {
                     this.logger.warn("Kernel with ID {} for world {} could not be found. Falling back to the default.",
                             kernelId, world);

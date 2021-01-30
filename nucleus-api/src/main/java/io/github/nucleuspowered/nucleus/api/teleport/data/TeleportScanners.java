@@ -6,17 +6,26 @@ package io.github.nucleuspowered.nucleus.api.teleport.data;
 
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.registry.DefaultedRegistryType;
+import org.spongepowered.api.registry.RegistryRoots;
+import org.spongepowered.api.registry.RegistryType;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.function.Supplier;
 
 public final class TeleportScanners {
 
+    public static final ResourceKey REGISTRY_KEY = ResourceKey.of("nucleus", "teleport_scanner");
+
+    public static final DefaultedRegistryType<TeleportScanner> REGISTRY =
+            RegistryType.of(RegistryRoots.SPONGE, TeleportScanners.REGISTRY_KEY).asDefaultedType(() -> Sponge.getGame().registries());
+
     public static final Supplier<TeleportScanner> ASCENDING_SCAN =
-            () -> Sponge.getRegistry().getCatalogRegistry().get(TeleportScanner.class, ResourceKey.of("nucleus", "ascending_scan")).get();
+            TeleportScanners.REGISTRY.defaultReferenced(ResourceKey.of("nucleus", "ascending_scan"));
 
     public static final Supplier<TeleportScanner> DESCENDING_SCAN =
-            () -> Sponge.getRegistry().getCatalogRegistry().get(TeleportScanner.class, ResourceKey.of("nucleus", "descending_scan")).get();
+            TeleportScanners.REGISTRY.defaultReferenced(ResourceKey.of("nucleus", "descending_scan"));
 
     public static final Supplier<TeleportScanner> NO_SCAN =
-            () -> Sponge.getRegistry().getCatalogRegistry().get(TeleportScanner.class, ResourceKey.of("nucleus", "no_scan")).get();
+            TeleportScanners.REGISTRY.defaultReferenced(ResourceKey.of("nucleus", "no_scan"));
 }

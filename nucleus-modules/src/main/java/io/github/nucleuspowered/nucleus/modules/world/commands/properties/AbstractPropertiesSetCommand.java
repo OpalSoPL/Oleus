@@ -11,6 +11,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 abstract class AbstractPropertiesSetCommand implements ICommandExecutor {
@@ -23,18 +24,18 @@ abstract class AbstractPropertiesSetCommand implements ICommandExecutor {
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL,
+                NucleusParameters.ONLINE_WORLD_OPTIONAL,
                 NucleusParameters.ONE_TRUE_FALSE
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.getKey())
+        final ServerWorld worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL)
                 .orElseThrow(() -> context.createException("command.world.player"));
         final boolean set = context.requireOne(NucleusParameters.ONE_TRUE_FALSE);
-        this.setter(worldProperties, set);
+        this.setter(worldProperties.getProperties(), set);
         context.sendMessage("command.world.setproperty.success", this.name, worldProperties.getKey().asString(), String.valueOf(set));
-        this.extraLogic(context, worldProperties, set);
+        this.extraLogic(context, worldProperties.getProperties(), set);
         return context.successResult();
     }
 

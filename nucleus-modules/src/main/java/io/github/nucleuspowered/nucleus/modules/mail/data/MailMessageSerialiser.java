@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.mail.data;
 
 import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
@@ -25,7 +25,7 @@ public class MailMessageSerialiser implements TypeSerializer<MailMessage> {
 
         try {
             return new MailData(
-                    node.node("uuid").get(GeAnTyRefTypeTokens.UUID),
+                    node.node("uuid").get(TypeTokens.UUID),
                     Instant.ofEpochMilli(node.node("date").getLong()),
                     node.node("message").getString()
             );

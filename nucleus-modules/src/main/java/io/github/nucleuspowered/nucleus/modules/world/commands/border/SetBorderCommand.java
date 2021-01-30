@@ -16,6 +16,7 @@ import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.time.Duration;
@@ -36,7 +37,7 @@ public class SetBorderCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                Parameter.seqBuilder(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL)
+                Parameter.seqBuilder(NucleusParameters.ONLINE_WORLD_OPTIONAL)
                     .then(this.xParam)
                     .then(this.zParam)
                     .optional()
@@ -48,7 +49,7 @@ public class SetBorderCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ALL.getKey())
+        final ServerWorld wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL)
                 .orElseThrow(() -> context.createException("command.world.player"));
         final int x;
         final int z;
@@ -69,7 +70,7 @@ public class SetBorderCommand implements ICommandExecutor {
             z = context.requireOne(this.zParam);
         }
 
-        final WorldBorder border = wp.getWorldBorder();
+        final WorldBorder border = wp.getProperties().worldBorder();
         // Now, if we have an x and a z key, get the centre from that.
         border.setCenter(x, z);
 

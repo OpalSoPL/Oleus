@@ -15,6 +15,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
@@ -28,19 +29,19 @@ public class LockWeatherCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY,
+                NucleusParameters.ONLINE_WORLD_OPTIONAL,
                 NucleusParameters.OPTIONAL_ONE_TRUE_FALSE
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Optional<WorldProperties> world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.getKey());
+        final Optional<ServerWorld> world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey());
         if (!world.isPresent()) {
             return context.errorResult("command.specifyworld");
         }
 
-        final WorldProperties wp = world.get();
+        final ServerWorld wp = world.get();
         try (final IKeyedDataObject.Value<Boolean> vb = context.getServiceCollection().storageManager()
                 .getOrCreateWorldOnThread(wp.getKey())
                 .getAndSet(EnvironmentKeys.LOCKED_WEATHER)) {

@@ -15,6 +15,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.ArrayList;
@@ -30,16 +31,16 @@ public class InfoWorldCommand implements ICommandExecutor {
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.WORLD_PROPERTIES_ALL
+                NucleusParameters.ONLINE_WORLD
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.WORLD_PROPERTIES_ALL.getKey())
+        final ServerWorld wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD)
                 .orElseThrow(() -> context.createException("command.world.player"));
         final List<Component> listContent = new ArrayList<>();
         final boolean canSeeSeeds = context.testPermission(WorldPermissions.WORLD_SEED);
-        ListWorldCommand.getWorldInfo(context, listContent, wp, canSeeSeeds);
+        ListWorldCommand.getWorldInfo(context, listContent, wp.getProperties(), canSeeSeeds);
         Util.getPaginationBuilder(context.getAudience())
                 .contents(listContent)
                 .title(context.getMessage("command.world.info.title", wp.getKey().asString()))

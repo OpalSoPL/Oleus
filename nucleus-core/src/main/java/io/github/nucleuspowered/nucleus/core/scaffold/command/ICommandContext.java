@@ -16,6 +16,7 @@ import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.time.Duration;
@@ -180,9 +181,17 @@ public interface ICommandContext {
 
     boolean isConsoleAndBypass();
 
-    WorldProperties getWorldPropertiesOrFromSelf(Parameter.Key<WorldProperties> worldKey) throws CommandException;
+    default ServerWorld getWorldPropertiesOrFromSelf(final Parameter.Value<ServerWorld> worldKey) throws CommandException {
+        return this.getWorldPropertiesOrFromSelf(worldKey.getKey());
+    }
 
-    Optional<WorldProperties> getWorldPropertiesOrFromSelfOptional(Parameter.Key<WorldProperties> worldKey);
+    ServerWorld getWorldPropertiesOrFromSelf(Parameter.Key<ServerWorld> worldKey) throws CommandException;
+
+    default Optional<ServerWorld> getWorldPropertiesOrFromSelfOptional(final Parameter.Value<ServerWorld> worldKey) {
+        return this.getWorldPropertiesOrFromSelfOptional(worldKey.getKey());
+    }
+
+    Optional<ServerWorld> getWorldPropertiesOrFromSelfOptional(Parameter.Key<ServerWorld> worldKey);
 
     String getName();
 

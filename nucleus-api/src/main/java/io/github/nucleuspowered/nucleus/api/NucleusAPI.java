@@ -29,9 +29,10 @@ import io.github.nucleuspowered.nucleus.api.placeholder.NucleusPlaceholderServic
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplateFactory;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.registry.UnknownTypeException;
 
 import java.util.Optional;
+
+import javax.lang.model.type.UnknownTypeException;
 
 /**
  * Contains static methods as an alternative way from using the Sponge Service manager.
@@ -323,7 +324,7 @@ public final class NucleusAPI {
     // A single point of failure means a single point to fix!
     private static <T> Optional<T> getService(final Class<T> clazz) {
         try {
-            return Optional.of(Sponge.getRegistry().getFactoryRegistry().provideFactory(clazz));
+            return Optional.of(Sponge.getGame().getFactoryProvider().provide(clazz));
         } catch (final UnknownTypeException exception) {
             return Optional.empty();
         }

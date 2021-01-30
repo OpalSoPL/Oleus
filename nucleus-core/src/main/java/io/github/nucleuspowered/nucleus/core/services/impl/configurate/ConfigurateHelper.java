@@ -7,7 +7,6 @@ package io.github.nucleuspowered.nucleus.core.services.impl.configurate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
-import io.github.nucleuspowered.nucleus.core.NucleusCore;
 import io.github.nucleuspowered.nucleus.core.configurate.typeserialisers.InstantTypeSerialiser;
 import io.github.nucleuspowered.nucleus.core.configurate.typeserialisers.LocaleSerialiser;
 import io.github.nucleuspowered.nucleus.core.configurate.typeserialisers.NamedLocationSerialiser;
@@ -18,14 +17,13 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.DataObjectTranslator;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.leangen.geantyref.TypeToken;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
-import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.objectmapping.ObjectMapper;
 import org.spongepowered.configurate.serialize.TypeSerializerCollection;
@@ -141,9 +139,9 @@ public class ConfigurateHelper implements IConfigurateHelper {
                 new NucleusTextTemplateTypeSerialiser(serviceCollection.textTemplateFactory()));
         typeSerializerCollection.register(TypeToken.get(Instant.class), new InstantTypeSerialiser());
 
-        typeSerializerCollection.register(GeAnTyRefTypeTokens.ABSTRACT_DATA_OBJECT_TYPE_TOKEN, DataObjectTranslator.INSTANCE);
-        typeSerializerCollection.register(GeAnTyRefTypeTokens.NAMED_LOCATION, new NamedLocationSerialiser());
-        typeSerializerCollection.register(GeAnTyRefTypeTokens.LOCALE, new LocaleSerialiser());
+        typeSerializerCollection.register(TypeTokens.ABSTRACT_DATA_OBJECT_TYPE_TOKEN, DataObjectTranslator.INSTANCE);
+        typeSerializerCollection.register(TypeTokens.NAMED_LOCATION, new NamedLocationSerialiser());
+        typeSerializerCollection.register(TypeTokens.LOCALE, new LocaleSerialiser());
 
         return typeSerializerCollection.build();
     }

@@ -8,9 +8,9 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.conf
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.biome.Biome;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 import org.spongepowered.math.GenericMath;
@@ -75,7 +75,7 @@ public class RTPConfig {
         this.perWorldRTPConfigList.put("example", new PerWorldRTPConfig());
     }
 
-    private transient Set<BiomeType> lazyLoadProhbitedBiomes;
+    private transient Set<Biome> lazyLoadProhbitedBiomes;
 
     public int getNoOfAttempts() {
         return this.noOfAttempts;
@@ -110,19 +110,19 @@ public class RTPConfig {
         return this.perWorldPermissions;
     }
 
-    public Optional<WorldProperties> getDefaultWorld() {
+    public Optional<ServerWorld> getDefaultWorld() {
         if (this.defaultWorld == null || this.defaultWorld.equalsIgnoreCase("")) {
             return Optional.empty();
         }
 
-        return Sponge.getServer().getWorldManager().getProperties(ResourceKey.resolve(this.defaultWorld)).filter(WorldProperties::isEnabled);
+        return Sponge.getServer().getWorldManager().world(ResourceKey.resolve(this.defaultWorld));
     }
 
-    public Set<BiomeType> getProhibitedBiomes() {
+    public Set<Biome> getProhibitedBiomes() {
         if (this.lazyLoadProhbitedBiomes == null) {
             this.lazyLoadProhbitedBiomes = this.prohibitedBiomes.stream()
                     .map(ResourceKey::resolve)
-                    .map(x -> Sponge.getRegistry().getCatalogRegistry().get(BiomeType.class, x).orElse(null))
+                    .map(x -> Sponge.getServer().registries().findRegistry(RegistryTypes.BIOME).flatMap(r -> r.findValue(x)).orElse(null))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
         }

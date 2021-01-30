@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IGeneralDataObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 import io.leangen.geantyref.TypeToken;
 
@@ -20,5 +20,5 @@ public final class JailKeys {
             DataKey.of(JailKeys.JAIL_DATA_KEY, IUserDataObject.class, "jailData");
 
     public static final DataKey.MapKey<String, NamedLocation, IGeneralDataObject> JAILS =
-            DataKey.ofMap(GeAnTyRefTypeTokens.STRING, GeAnTyRefTypeTokens.NAMEDLOCATION, IGeneralDataObject.class, "jails");
+            DataKey.ofMap(TypeTokens.STRING, TypeTokens.NAMEDLOCATION, IGeneralDataObject.class, "jails");
 }

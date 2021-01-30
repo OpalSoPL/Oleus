@@ -23,32 +23,31 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class WorldPropertiesValueParameter implements ValueParameter<WorldProperties> {
+public class OfflineWorldParameter implements ValueParameter<ResourceKey> {
 
-    private final Predicate<WorldProperties> filter;
     private final Function<ResourceKey, Component> errorMessageGenerator;
 
-    public WorldPropertiesValueParameter(final Predicate<WorldProperties> filter, final Function<ResourceKey, Component> errorMessageGenerator) {
-        this.filter = filter;
+    public OfflineWorldParameter(final Function<ResourceKey, Component> errorMessageGenerator) {
         this.errorMessageGenerator = errorMessageGenerator;
     }
 
     @Override
     public List<String> complete(final CommandContext context, final String input) {
-        return Sponge.getServer().getWorldManager().getAllProperties().stream()
-                .filter(x -> x.getKey().getFormatted().startsWith(input))
-                .filter(this.filter)
-                .map(y -> y.getKey().toString())
+        return Sponge.getServer().getWorldManager().offlineWorldKeys().stream()
+                .filter(x -> x.getFormatted().startsWith(input))
+                .map(Object::toString)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<? extends WorldProperties> getValue(final Parameter.Key<? super WorldProperties> parameterKey,
+    public Optional<? extends ResourceKey> getValue(final Parameter.Key<? super ResourceKey> parameterKey,
             final ArgumentReader.Mutable reader, final CommandContext.Builder context) throws ArgumentParseException {
         final ResourceKey key = reader.parseResourceKey();
-        final Optional<WorldProperties> ow =
-                Sponge.getServer().getWorldManager().getProperties(key)
-                        .filter(this.filter);
+        final Optional<ResourceKey> ow =
+                Sponge.getServer().getWorldManager().offlineWorldKeys()
+                        .stream()
+                        .filter(x -> x.equals(key))
+                        .findFirst();
         if (ow.isPresent()) {
             return ow;
         }

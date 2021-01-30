@@ -24,6 +24,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -44,7 +46,7 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
                 NucleusParameters.ONE_USER,
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY
+                NucleusParameters.ONLINE_WORLD_OPTIONAL
         };
     }
 
@@ -56,8 +58,9 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User target = context.requireOne(NucleusParameters.ONE_USER);
-        final WorldProperties world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.getKey())
-            .orElseGet(() -> this.gsc.isOnSpawnCommand() ? this.gsc.getWorld().get() : Sponge.getServer().getWorldManager().getDefaultProperties().get());
+        final ServerWorld world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey())
+            .orElseGet(() -> this.gsc.isOnSpawnCommand() ? this.gsc.getWorld().get() :
+                    Sponge.getServer().getWorldManager().defaultWorld());
 
         final Tuple<ServerLocation, Vector3d> worldTransform = SpawnHelper.getSpawn(world, target.getPlayer().orElse(null), context);
 

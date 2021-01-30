@@ -13,7 +13,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command
 import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.RegexParameter;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.UUIDParameter;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.profile.GameProfile;
@@ -32,8 +32,8 @@ import java.util.regex.Pattern;
 )
 public class GetUserCommand implements ICommandExecutor {
 
-    private final Parameter.Key<UUID> uuidKey = Parameter.key("UUID", GeAnTyRefTypeTokens.UUID);
-    private final Parameter.Key<String> playerKey = Parameter.key("name", GeAnTyRefTypeTokens.STRING);
+    private final Parameter.Key<UUID> uuidKey = Parameter.key("UUID", TypeTokens.UUID);
+    private final Parameter.Key<String> playerKey = Parameter.key("name", TypeTokens.STRING);
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {

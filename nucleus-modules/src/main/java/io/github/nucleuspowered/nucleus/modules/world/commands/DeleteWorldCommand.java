@@ -21,6 +21,8 @@ import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.time.Instant;
@@ -38,44 +40,39 @@ import java.util.function.Supplier;
 )
 public class DeleteWorldCommand implements ICommandExecutor {
 
-    @Nullable private Tuple3<Instant, UUID, WorldProperties> confirm = null;
+    @Nullable private Tuple3<Instant, UUID, ServerWorldProperties> confirm = null;
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.WORLD_PROPERTIES_ALL,
+                NucleusParameters.ONLINE_WORLD,
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties properties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_ALL.getKey());
+        final ServerWorld properties = context.requireOne(NucleusParameters.ONLINE_WORLD);
         if (this.confirm != null && this.confirm._1().isAfter(Instant.now()) &&
                 this.confirm._2().equals(context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID)) &&
                 this.confirm._3().getUniqueId().equals(properties.getUniqueId())) {
             try {
-                return this.completeDeletion(context, properties);
+                return this.completeDeletion(context, properties.getProperties());
             } finally {
                 this.confirm = null;
             }
         }
 
-        this.confirm = null;
-        if (properties.getWorld().isPresent()) {
-            return context.errorResult("command.world.delete.loaded", properties.getKey().asString());
-        }
-
         // Scary warning.
-        this.confirm = new Tuple3<>(Instant.now().plus(30, ChronoUnit.SECONDS), context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID), properties);
+        this.confirm = new Tuple3<>(Instant.now().plus(30, ChronoUnit.SECONDS), context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID), properties.getProperties());
         context.sendMessage("command.world.delete.warning1", properties.getKey().asString());
         context.sendMessage("command.world.delete.warning3", properties.getKey().asString());
         return context.successResult();
     }
 
-    private ICommandResult completeDeletion(final ICommandContext context, final WorldProperties properties) throws CommandException {
+    private ICommandResult completeDeletion(final ICommandContext context, final ServerWorldProperties properties) throws CommandException {
         Preconditions.checkNotNull(this.confirm);
         final String worldName = this.confirm._3().getKey().asString();
-        if (Sponge.getServer().getWorldManager().getWorld(properties.getKey()).isPresent()) {
+        if (Sponge.getServer().getWorldManager().world(properties.getKey()).isPresent()) {
             return context.errorResult("command.world.delete.loaded", this.confirm._3().getKey().asString());
         }
 

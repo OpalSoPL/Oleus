@@ -24,17 +24,12 @@ public final class SpawnHelper {
 
     private SpawnHelper() {}
 
-    public static Tuple<ServerLocation, Vector3d> getSpawn(@NonNull final WorldProperties wp, @Nullable final ServerPlayer player,
+    public static Tuple<ServerLocation, Vector3d> getSpawn(@NonNull final ServerWorld wp, @Nullable final ServerPlayer player,
             final ICommandContext context) throws CommandException {
-        final Optional<ServerWorld> ow = wp.getWorld();
-
-        if (!ow.isPresent()) {
-            throw context.createException("command.spawn.noworld");
-        }
 
         final ResourceKey worldKey = Objects.requireNonNull(wp, "WorldProperties").getKey();
         return new Tuple<>(
-                ServerLocation.of(worldKey, wp.getSpawnPosition().toDouble().add(0.5, 0, 0.5)),
+                ServerLocation.of(worldKey, wp.getProperties().spawnPosition().toDouble().add(0.5, 0, 0.5)),
                 context.getServiceCollection()
                         .storageManager()
                         .getWorldService()

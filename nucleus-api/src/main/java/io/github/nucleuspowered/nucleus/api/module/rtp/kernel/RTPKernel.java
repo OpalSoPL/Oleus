@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.api.module.rtp.kernel;
 
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.util.annotation.CatalogedBy;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -24,7 +23,7 @@ import java.util.Optional;
  * location is supplied.</p>
  */
 @CatalogedBy(RTPKernels.class)
-public interface RTPKernel extends CatalogType {
+public interface RTPKernel {
 
     /**
      * Gets a new location.

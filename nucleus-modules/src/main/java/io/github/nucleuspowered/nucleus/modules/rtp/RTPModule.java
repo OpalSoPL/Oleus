@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.rtp;
 
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
+import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernels;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.rtp.commands.RandomTeleportCommand;
 import io.github.nucleuspowered.nucleus.modules.rtp.config.RTPConfig;
@@ -18,11 +19,12 @@ import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogRegistryEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryEvent;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public class RTPModule implements IModule.Configurable<RTPConfig> {
@@ -56,16 +58,15 @@ public class RTPModule implements IModule.Configurable<RTPConfig> {
     }
 
     @Listener
-    public void onCatalogTypeRegistration(final RegisterCatalogRegistryEvent event) {
-        event.register(RTPKernel.class, RTPModule.CATALOG_KEY);
-    }
-
-    @Listener
-    public void onRTPKernelRegistration(final RegisterCatalogEvent<RTPKernel> event) {
-        event.register(new DefaultKernel());
-        event.register(new SurfaceKernel());
-        event.register(new AroundPlayerKernel());
-        event.register(new AroundPlayerAndSurfaceKernel());
+    public void onCatalogTypeRegistration(final RegisterRegistryEvent.GameScoped event) {
+        event.register(RTPModule.CATALOG_KEY, true, () -> {
+            final Map<ResourceKey, RTPKernel> map = new HashMap<>();
+            map.put(RTPKernels.Identifiers.DEFAULT, new DefaultKernel());
+            map.put(RTPKernels.Identifiers.SURFACE_ONLY, new SurfaceKernel());
+            map.put(RTPKernels.Identifiers.AROUND_PLAYER, new AroundPlayerKernel());
+            map.put(RTPKernels.Identifiers.AROUND_PLAYER_SURFACE, new AroundPlayerAndSurfaceKernel());
+            return map;
+        });
     }
 
 }

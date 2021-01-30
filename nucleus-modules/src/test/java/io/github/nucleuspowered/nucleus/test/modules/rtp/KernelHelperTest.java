@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.test.modules.rtp;
 
 import io.github.nucleuspowered.nucleus.modules.rtp.kernels.KernelHelper;
+import org.spongepowered.api.world.biome.Biome;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
@@ -12,7 +13,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.spongepowered.api.world.biome.BiomeType;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -93,7 +93,7 @@ public class KernelHelperTest {
         }
 
         @Override
-        public Set<BiomeType> prohibitedBiomes() {
+        public Set<Biome> prohibitedBiomes() {
             return null;
         }
     }

@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.spawn.config;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.configuratehelper.LocalisedComment;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
@@ -44,10 +45,10 @@ public class GlobalSpawnConfig {
         return this.onLogin;
     }
 
-    public Optional<WorldProperties> getWorld() {
-        Optional<WorldProperties> ow = Sponge.getServer().getWorldManager().getProperties(ResourceKey.resolve(this.spawnWorld));
+    public Optional<ServerWorld> getWorld() {
+        Optional<ServerWorld> ow = Sponge.getServer().getWorldManager().world(ResourceKey.resolve(this.spawnWorld));
         if (!ow.isPresent()) {
-            ow = Sponge.getServer().getWorldManager().getDefaultProperties();
+            ow = Optional.of(Sponge.getServer().getWorldManager().defaultWorld());
         }
 
         return ow;

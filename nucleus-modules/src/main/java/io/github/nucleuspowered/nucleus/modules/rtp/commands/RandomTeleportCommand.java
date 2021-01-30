@@ -36,7 +36,6 @@ import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
-import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.time.Duration;
@@ -78,7 +77,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
                 serviceCollection.commandElementSupplier().createOnlyOtherPlayerPermissionElement(RTPPermissions.OTHERS_RTP),
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY
+                NucleusParameters.ONLINE_WORLD_OPTIONAL
         };
     }
 
@@ -92,11 +91,11 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
         }
 
         // Get the current world.
-        final WorldProperties wp;
+        final ServerWorld wp;
         if (this.rc.getDefaultWorld().isPresent()) {
-            wp = context.getOne(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY).orElseGet(() -> this.rc.getDefaultWorld().get());
+            wp = context.getOne(NucleusParameters.ONLINE_WORLD_OPTIONAL).orElseGet(() -> this.rc.getDefaultWorld().get());
         } else {
-            wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY.getKey()).get();
+            wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey()).get();
         }
 
         if (this.rc.isPerWorldPermissions()) {
@@ -106,15 +105,12 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
             }
         }
 
-        final ServerWorld currentWorld = Sponge.getServer().getWorldManager().getWorld(wp.getKey())
-                .orElseThrow(() -> context.createException("command.rtp.worldnoload", wp.getKey().asString()));
-
         context.sendMessage("command.rtp.searching");
 
-        final RTPOptions options = new RTPOptions(this.rc, currentWorld.getKey().asString());
+        final RTPOptions options = new RTPOptions(this.rc, wp.getKey().asString());
         final RTPTask rtask = new RTPTask(
                 context.getServiceCollection().pluginContainer(),
-                currentWorld,
+                wp,
                 context,
                 player.getUniqueId(),
                 this.rc.getNoOfAttempts(),

@@ -7,8 +7,9 @@ package io.github.nucleuspowered.nucleus.api.module.rtp;
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.world.server.ServerLocation;
-import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.Biome;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
@@ -33,10 +34,10 @@ public interface NucleusRTPService {
      * Gets the {@link RTPOptions} that contains the current
      * rtp configuration for the specified world.
      *
-     * @param world The {@link WorldProperties}, or {@code null} for defaults.
+     * @param world The {@link ServerWorldProperties}, or {@code null} for defaults.
      * @return The {@link RTPOptions}
      */
-    RTPOptions options(@Nullable WorldProperties world);
+    RTPOptions options(@Nullable ServerWorldProperties world);
 
     /**
      * Gets the {@link RTPOptions} that contains the current
@@ -89,7 +90,9 @@ public interface NucleusRTPService {
      * @param world The world to get the kernel for
      * @return The kernel
      */
-    RTPKernel getKernel(WorldProperties world);
+    RTPKernel getKernel(ServerWorldProperties world);
+
+    RTPKernel getKernel(ServerWorld world);
 
     /**
      * Gets the default {@link RTPKernel} used when executing
@@ -138,7 +141,7 @@ public interface NucleusRTPService {
          *
          * @return The set of biomes
          */
-        Set<BiomeType> prohibitedBiomes();
+        Set<Biome> prohibitedBiomes();
 
         interface Builder {
 
@@ -177,12 +180,12 @@ public interface NucleusRTPService {
             Builder setMaxHeight(int min) throws IllegalArgumentException;
 
             /**
-             * Adds a {@link BiomeType} to the prohibited biomes set.
+             * Adds a {@link Biome} to the prohibited biomes set.
              *
-             * @param biomeType The {@link BiomeType} to add.
+             * @param biomeType The {@link Biome} to add.
              * @return This builder, for chaining.
              */
-            Builder prohibitedBiome(BiomeType biomeType);
+            Builder prohibitedBiome(Biome biomeType);
 
             /**
              * Sets this builder state from the specified {@link RTPOptions}

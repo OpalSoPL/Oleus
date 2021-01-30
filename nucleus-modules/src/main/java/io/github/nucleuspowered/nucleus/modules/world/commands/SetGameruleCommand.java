@@ -14,10 +14,10 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
-import org.spongepowered.api.command.parameter.managed.ValueParameter;
 import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.gamerule.GameRule;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.lang.reflect.Type;
 
@@ -31,7 +31,7 @@ public class SetGameruleCommand implements ICommandExecutor {
 
     @SuppressWarnings("unchecked")
     private final Parameter.Value<GameRule<?>> gameMode = Parameter.builder(new TypeToken<GameRule<?>>() {})
-            .parser((ValueParameter<GameRule<?>>) (Object) VariableValueParameters.catalogedElementParameterBuilder(GameRule.class).build())
+            .parser(VariableValueParameters.registryEntryBuilder(RegistryTypes.GAME_RULE).build())
             .setKey("gameRule")
             .build();
 
@@ -40,7 +40,7 @@ public class SetGameruleCommand implements ICommandExecutor {
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.OPTIONAL_WORLD_PROPERTIES_ENABLED_ONLY,
+                NucleusParameters.ONLINE_WORLD_OPTIONAL,
                 this.gameMode,
                 Parameter.firstOf(
                         NucleusParameters.ONE_TRUE_FALSE,
@@ -52,27 +52,27 @@ public class SetGameruleCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.WORLD_PROPERTIES_ENABLED_ONLY.getKey())
+        final ServerWorld serverWorld = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD.getKey())
                 .orElseThrow(() -> context.createException("command.world.player"));
         final GameRule<?> gameRule = context.requireOne(this.gameMode);
         final Type type = gameRule.getValueType();
         if (type == Boolean.class || type == boolean.class) {
             final boolean val = context.getOne(NucleusParameters.ONE_TRUE_FALSE)
                     .orElseThrow(() -> context.createException("command.world.gamerule.set.boolean"));
-            worldProperties.setGameRule((GameRule<Boolean>) gameRule, val);
-            context.sendMessage("command.world.gamerule.set.success", gameRule, val, worldProperties.getKey().asString());
+            serverWorld.getProperties().setGameRule((GameRule<Boolean>) gameRule, val);
+            context.sendMessage("command.world.gamerule.set.success", gameRule, val, serverWorld.getKey().asString());
         } else if (type == Integer.class || type == int.class) {
             final int val = context.getOne(this.intVal)
                     .orElseThrow(() -> context.createException("command.world.gamerule.set.integer"));
-            worldProperties.setGameRule((GameRule<Integer>) gameRule, val);
-            context.sendMessage("command.world.gamerule.set.success", gameRule, val, worldProperties.getKey().asString());
+            serverWorld.getProperties().setGameRule((GameRule<Integer>) gameRule, val);
+            context.sendMessage("command.world.gamerule.set.success", gameRule, val, serverWorld.getKey().asString());
         } else if (type == String.class) {
             final String val = context.getOne(this.stringVal)
                     .orElseGet(() -> context.getOne(this.intVal)
                             .map(String::valueOf)
                             .orElseGet(() -> String.valueOf(context.requireOne(NucleusParameters.ONE_TRUE_FALSE))));
-            worldProperties.setGameRule((GameRule<String>) gameRule, val);
-            context.sendMessage("command.world.gamerule.set.success", gameRule, val, worldProperties.getKey().asString());
+            serverWorld.getProperties().setGameRule((GameRule<String>) gameRule, val);
+            context.sendMessage("command.world.gamerule.set.success", gameRule, val, serverWorld.getKey().asString());
         } else {
             return context.errorResult("command.world.gamerule.set.notype");
         }

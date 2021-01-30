@@ -18,6 +18,7 @@ import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.UUID;
@@ -37,16 +38,16 @@ public class CloneWorldCommand implements ICommandExecutor {
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-                NucleusParameters.WORLD_PROPERTIES_ALL,
+                NucleusParameters.ONLINE_WORLD,
                 this.newNameParameter
         };
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties worldToCopy = context.requireOne(NucleusParameters.WORLD_PROPERTIES_ALL);
+        final ServerWorld worldToCopy = context.requireOne(NucleusParameters.ONLINE_WORLD);
         final ResourceKey oldName = worldToCopy.getKey();
         final ResourceKey newName = ResourceKey.of(context.getServiceCollection().pluginContainer(), context.requireOne(this.newNameParameter));
-        if (Sponge.getServer().getWorldManager().getWorld(newName).isPresent()) {
+        if (Sponge.getServer().getWorldManager().world(newName).isPresent()) {
             return context.errorResult("command.world.clone.alreadyexists", newName.asString());
         }
 

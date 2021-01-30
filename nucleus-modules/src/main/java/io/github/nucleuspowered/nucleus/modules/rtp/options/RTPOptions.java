@@ -4,13 +4,13 @@
  */
 package io.github.nucleuspowered.nucleus.modules.rtp.options;
 
-import com.google.common.collect.ImmutableSet;
 import io.github.nucleuspowered.nucleus.api.module.rtp.NucleusRTPService;
 import io.github.nucleuspowered.nucleus.modules.rtp.config.RTPConfig;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.Biome;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class RTPOptions implements NucleusRTPService.RTPOptions {
@@ -19,7 +19,7 @@ public class RTPOptions implements NucleusRTPService.RTPOptions {
     private final int max;
     private final int minHeight;
     private final int maxHeight;
-    private final Set<BiomeType> prohibitedBiomes;
+    private final Set<Biome> prohibitedBiomes;
 
     public RTPOptions(final RTPConfig config, @Nullable final String worldName) {
         this.min = config.getMinRadius(worldName);
@@ -34,7 +34,7 @@ public class RTPOptions implements NucleusRTPService.RTPOptions {
         this.max = builder.max;
         this.minHeight = builder.minheight;
         this.maxHeight = builder.maxheight;
-        this.prohibitedBiomes = ImmutableSet.copyOf(builder.prohibitedBiomes);
+        this.prohibitedBiomes = Collections.unmodifiableSet(new HashSet<>(builder.prohibitedBiomes));
     }
 
     @Override
@@ -55,7 +55,7 @@ public class RTPOptions implements NucleusRTPService.RTPOptions {
         return this.maxHeight;
     }
 
-    @Override public Set<BiomeType> prohibitedBiomes() {
+    @Override public Set<Biome> prohibitedBiomes() {
         return this.prohibitedBiomes;
     }
 }

@@ -11,7 +11,7 @@ import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.ValueParameter;
-import org.spongepowered.api.command.parameter.managed.standard.CatalogedValueParameters;
+import org.spongepowered.api.command.parameter.managed.standard.ResourceKeyedValueParameters;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +24,7 @@ public final class AudienceValueParameter implements ValueParameter<List<Audienc
         if (currentInput.equals("-")) {
             return Collections.singletonList("-");
         }
-        return CatalogedValueParameters.MANY_PLAYERS.get().complete(context, currentInput);
+        return ResourceKeyedValueParameters.MANY_PLAYERS.get().complete(context, currentInput);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -38,6 +38,6 @@ public final class AudienceValueParameter implements ValueParameter<List<Audienc
             reader.parseString();
             return Optional.of(Collections.singletonList(Sponge.getSystemSubject()));
         }
-        return CatalogedValueParameters.MANY_PLAYERS.get().getValue((Parameter.Key) parameterKey, reader, context);
+        return ResourceKeyedValueParameters.MANY_PLAYERS.get().getValue((Parameter.Key) parameterKey, reader, context);
     }
 }

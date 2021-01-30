@@ -6,12 +6,12 @@ package io.github.nucleuspowered.nucleus.modules.mail;
 
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
-import io.github.nucleuspowered.nucleus.core.util.GeAnTyRefTypeTokens;
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 
 public final class MailKeys {
 
     public static final DataKey.ListKey<MailMessage, IUserDataObject> MAIL_DATA =
-            DataKey.ofList(GeAnTyRefTypeTokens.MAIL_MESSAGE, IUserDataObject.class, "mailData");
+            DataKey.ofList(TypeTokens.MAIL_MESSAGE, IUserDataObject.class, "mailData");
 
 }

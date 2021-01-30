@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.core;
 import com.google.inject.Injector;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
+import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.core.core.CoreKeys;
 import io.github.nucleuspowered.nucleus.core.core.CoreModule;
 import io.github.nucleuspowered.nucleus.core.core.config.CoreConfig;
@@ -131,7 +132,7 @@ public final class NucleusCore {
                 this.configDirectory
         );
         this.commandModifierFactoryKey = ResourceKey.of(this.pluginContainer, "command_modifier_factory");
-        this.teleportScannerKey = ResourceKey.of(this.pluginContainer, "teleport_scanner");
+        this.teleportScannerKey = TeleportScanners.REGISTRY_KEY;
         this.storageFactoryKey = ResourceKey.of(this.pluginContainer, "storage_repository_factory");
     }
 

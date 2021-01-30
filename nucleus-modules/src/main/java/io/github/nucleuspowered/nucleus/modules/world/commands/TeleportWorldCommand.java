@@ -17,6 +17,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -41,7 +42,7 @@ public class TeleportWorldCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            NucleusParameters.WORLD_PROPERTIES_LOADED_ONLY,
+            NucleusParameters.ONLINE_WORLD,
             serviceCollection.commandElementSupplier()
                 .createOnlyOtherPlayerPermissionElement(WorldPermissions.WORLD_TELEPORT_OTHER)
         };
@@ -49,9 +50,9 @@ public class TeleportWorldCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer player = context.getIfPlayer("command.world.player");
-        final WorldProperties worldProperties = context.requireOne(NucleusParameters.WORLD_PROPERTIES_LOADED_ONLY);
-        final Vector3d pos = worldProperties.getSpawnPosition().toDouble();
-        if (!worldProperties.getWorld().map(x -> player.transferToWorld(x, pos)).filter(x -> x).isPresent()) {
+        final ServerWorld worldProperties = context.requireOne(NucleusParameters.ONLINE_WORLD);
+        final Vector3d pos = worldProperties.getProperties().spawnPosition().toDouble();
+        if (!player.transferToWorld(worldProperties, pos)) {
             return context.errorResult("command.world.teleport.failed", worldProperties.getKey().asString());
         }
 
