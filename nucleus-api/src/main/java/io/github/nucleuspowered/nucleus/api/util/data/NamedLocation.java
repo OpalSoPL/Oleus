@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.api.util.data;
 
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 

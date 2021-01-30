@@ -22,7 +22,7 @@ import org.spongepowered.api.command.parameter.CommonParameters;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.world.BlockChangeFlags;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 @Command(aliases = {"blockzap", "zapblock"},
         basePermission = AdminPermissions.BASE_BLOCKZAP,

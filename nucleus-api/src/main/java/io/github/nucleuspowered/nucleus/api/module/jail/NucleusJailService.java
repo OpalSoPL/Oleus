@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.time.Duration;

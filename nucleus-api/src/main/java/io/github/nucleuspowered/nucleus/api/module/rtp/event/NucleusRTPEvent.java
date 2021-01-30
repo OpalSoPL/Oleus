@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.api.module.rtp.event;
 
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 /**
  * Events for RTP

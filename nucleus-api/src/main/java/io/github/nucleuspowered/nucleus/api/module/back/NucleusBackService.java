@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.api.module.back;
 
 import io.github.nucleuspowered.nucleus.api.util.WorldPositionRotation;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;

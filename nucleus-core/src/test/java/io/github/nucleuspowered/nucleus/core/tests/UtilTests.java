@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.core.tests;
 
 import io.github.nucleuspowered.nucleus.core.Util;
 import org.junit.Ignore;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 import org.junit.Assert;

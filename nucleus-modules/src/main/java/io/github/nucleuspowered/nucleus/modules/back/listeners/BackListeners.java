@@ -24,7 +24,7 @@ import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.type.Exclude;
 
 import com.google.inject.Inject;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 public class BackListeners implements IReloadableService.Reloadable, ListenerBase {
 

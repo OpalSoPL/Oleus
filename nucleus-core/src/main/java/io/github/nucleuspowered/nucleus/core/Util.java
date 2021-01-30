@@ -22,7 +22,7 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.util.MinecraftDayTime;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -127,12 +127,12 @@ public final class Util {
     public static boolean isLocationInWorldBorder(final Vector3d location, final ServerWorld world) {
 
         // Diameter, not radius - we'll want the radius later. We use long, we want the floor!
-        final long radius = (long)Math.floor(world.getProperties().getWorldBorder().getDiameter() / 2.0);
+        final long radius = (long)Math.floor(world.getProperties().worldBorder().getDiameter() / 2.0);
 
         // We get the current position and subtract the border centre. This gives us an effective distance from the
         // centre in all three dimensions. We just care about the magnitude in the x and z directions, so we get the
         // positive amount.
-        final Vector3d displacement = location.sub(world.getProperties().getWorldBorder().getCenter()).abs();
+        final Vector3d displacement = location.sub(world.getProperties().worldBorder().getCenter()).abs();
 
         // Check that we're not too far out.
         return !(displacement.getX() > radius || displacement.getZ() > radius);

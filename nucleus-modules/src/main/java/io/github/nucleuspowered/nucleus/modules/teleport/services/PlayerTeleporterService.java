@@ -233,7 +233,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                             if (this.useCommandsOnClickAcceptDeny) {
                                 try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
                                     frame.pushCause(root);
-                                    Sponge.getCommandManager().process("nucleus:tpaccept");
+                                    Sponge.getServer().getCommandManager().process("nucleus:tpaccept");
                                 } catch (final CommandException ex) {
                                     src.sendMessage(Identity.nil(), ex.componentMessage());
                                 }
@@ -257,7 +257,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                         if (this.useCommandsOnClickAcceptDeny) {
                             try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
                                 frame.pushCause(root);
-                                Sponge.getCommandManager().process("nucleus:tpdeny");
+                                Sponge.getServer().getCommandManager().process("nucleus:tpdeny");
                             } catch (final CommandException ex) {
                                 src.sendMessage(Identity.nil(), ex.componentMessage());
                             }

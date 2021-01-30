@@ -9,7 +9,7 @@ import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.UUID;

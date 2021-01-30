@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.api.teleport;
 
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
 import java.util.Optional;

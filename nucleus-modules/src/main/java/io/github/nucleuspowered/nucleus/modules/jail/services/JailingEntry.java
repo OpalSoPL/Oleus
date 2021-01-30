@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.api.module.jail.data.Jailing;
 import io.github.nucleuspowered.nucleus.modules.jail.data.JailData;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.time.Duration;
 import java.time.Instant;

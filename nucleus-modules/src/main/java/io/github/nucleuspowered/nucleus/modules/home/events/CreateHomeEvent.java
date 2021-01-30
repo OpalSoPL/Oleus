@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.home.events;
 
 import io.github.nucleuspowered.nucleus.api.module.home.event.NucleusHomeEvent;
 import org.spongepowered.api.event.Cause;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.UUID;
 

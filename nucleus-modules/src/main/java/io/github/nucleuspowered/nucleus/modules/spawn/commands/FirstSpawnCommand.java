@@ -19,7 +19,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandMo
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;

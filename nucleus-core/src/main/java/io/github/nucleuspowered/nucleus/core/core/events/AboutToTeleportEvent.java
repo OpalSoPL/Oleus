@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.api.teleport.event.NucleusTeleportEvent;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.Optional;

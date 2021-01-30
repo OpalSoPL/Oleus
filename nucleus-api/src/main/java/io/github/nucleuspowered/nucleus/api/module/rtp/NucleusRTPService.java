@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.api.module.rtp;
 
 import io.github.nucleuspowered.nucleus.api.module.rtp.kernel.RTPKernel;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;

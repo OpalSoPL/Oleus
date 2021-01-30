@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.warp.event;
 
 import io.github.nucleuspowered.nucleus.api.module.warp.event.NucleusWarpEvent;
 import org.spongepowered.api.event.Cause;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 public class CreateWarpEvent extends AbstractWarpEvent implements NucleusWarpEvent.Create {
 

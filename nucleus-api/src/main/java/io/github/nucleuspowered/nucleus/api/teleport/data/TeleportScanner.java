@@ -4,7 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.api.teleport.data;
 
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.teleport.TeleportHelper;
 import org.spongepowered.math.vector.Vector3i;

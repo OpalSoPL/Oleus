@@ -9,11 +9,6 @@ import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.benmanes.caffeine.cache.RemovalCause;
-<<<<<<< HEAD
-import com.google.common.collect.ImmutableSet;
-=======
-import com.google.common.collect.ImmutableMap;
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
 import io.github.nucleuspowered.storage.dataaccess.IDataTranslator;
 import io.github.nucleuspowered.storage.dataobjects.keyed.DataKey;
 import io.github.nucleuspowered.storage.dataobjects.keyed.IKeyedDataObject;
@@ -55,19 +50,10 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
                     return new ReentrantReadWriteLock();
                 }
             });
-<<<<<<< HEAD
     private final Cache<K, D> cache = Caffeine.newBuilder()
             .removalListener(this::onRemoval)
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .build();
-    private final Set<K> dirty = new HashSet<>();
-=======
-    private final Cache<UUID, D> cache = Caffeine
-            .newBuilder()
-            .removalListener(this::onRemoval)
-            .expireAfterAccess(5, TimeUnit.MINUTES)
-            .build();
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
 
     private final Supplier<IDataTranslator<D, O>> dataTranslator;
     private final Supplier<IStorageRepository.Keyed<K, Q, O>> storageRepositorySupplier;
@@ -143,16 +129,8 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-<<<<<<< HEAD
-    public CompletableFuture<Optional<D>> get(@NonNull final K key) {
-        final ReentrantReadWriteLock.ReadLock lock = this.dataLocks.get(key).readLock();
-        try {
-            lock.lock();
-            final D result = this.cache.getIfPresent(key);
-            this.dirty.add(key);
-=======
-    public CompletableFuture<Void> clearCacheUnless(final Set<UUID> keysToKeep) {
-        final Set<UUID> keysToRemove = this.cache.asMap().keySet().stream().filter(x -> !keysToKeep.contains(x)).collect(Collectors.toSet());
+    public CompletableFuture<Void> clearCacheUnless(final Set<K> keysToKeep) {
+        final Set<K> keysToRemove = this.cache.asMap().keySet().stream().filter(x -> !keysToKeep.contains(x)).collect(Collectors.toSet());
         this.cache.invalidateAll(keysToRemove);
         return ServicesUtil.run(() -> {
             this.storageRepositorySupplier.get().clearCache(keysToRemove);
@@ -161,12 +139,11 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-    public CompletableFuture<Optional<D>> get(@NonNull final UUID key) {
-        ReentrantReadWriteLock.ReadLock lock = this.dataLocks.get(key).readLock();
+    public CompletableFuture<Optional<D>> get(@NonNull final K key) {
+        final ReentrantReadWriteLock.ReadLock lock = this.dataLocks.get(key).readLock();
         try {
             lock.lock();
-            D result = this.cache.getIfPresent(key);
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
+            final D result = this.cache.getIfPresent(key);
             if (result != null) {
                 return CompletableFuture.completedFuture(Optional.of(result));
             }
@@ -178,31 +155,21 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     }
 
     @Override
-<<<<<<< HEAD
-    public Optional<D> getOnThread(@NonNull final K key) {
-=======
-    public CompletableFuture<D> getOrNew(@Nonnull final UUID key) {
+    public CompletableFuture<D> getOrNew(@NonNull final K key) {
         return get(key).thenApply(d -> d.orElseGet(() -> {
-            D result = createNew();
+            final D result = createNew();
             save(key, result);
             return result;
         }));
     }
 
     @Override
-    @SuppressWarnings("ConstantConditions")
-    public Optional<D> getOnThread(@NonNull UUID key) {
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
+    public Optional<D> getOnThread(@NonNull final K key) {
         // Read lock for the cache
         final ReentrantReadWriteLock.ReadLock lock = this.dataLocks.get(key).readLock();
         try {
             lock.lock();
-<<<<<<< HEAD
             final D result = this.cache.getIfPresent(key);
-            this.dirty.add(key);
-=======
-            D result = this.cache.getIfPresent(key);
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
             if (result != null) {
                 return Optional.of(result);
             }
@@ -217,12 +184,7 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
         }
     }
 
-<<<<<<< HEAD
     private Optional<D> getFromRepo(@NonNull final K key) throws Exception {
-=======
-    @SuppressWarnings("ConstantConditions")
-    private Optional<D> getFromRepo(@NonNull UUID key) throws Exception {
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
         // Write lock because of the cache
         final ReentrantReadWriteLock.WriteLock lock = this.dataLocks.get(key).writeLock();
         try {
@@ -258,19 +220,8 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     @Override
     public CompletableFuture<Map<K, D>> getAll(@NonNull final Q query) {
         return ServicesUtil.run(() -> {
-<<<<<<< HEAD
-            final Map<K, D> res = this.getAllFromQuery(query);
-            /* Map<K, D> res = r.entrySet().stream()
-                    .filter(x -> x.getValue() != null)
-                    .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, v -> dataAccess.fromDataAccessObject(v.getValue()))); */
-            res.forEach((k, v) -> {
-                this.cache.put(k, v);
-                this.dirty.add(k);
-            });
-=======
-            Map<UUID, D> res = this.getAll.apply(query);
+            final Map<K, D> res = this.getAllFromQuery(query);//.apply(query);
             res.forEach(this.cache::put);
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
             return res;
         }, this.pluginContainer);
     }
@@ -320,22 +271,20 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
         }, this.pluginContainer);
     }
 
-<<<<<<< HEAD
-=======
-    private void saveOnThread(@NonNull final UUID key, @NonNull final D value) throws Exception {
-        ReentrantReadWriteLock reentrantReadWriteLock = this.dataLocks.get(key);
-        ReentrantReadWriteLock.WriteLock lock = reentrantReadWriteLock.writeLock();
+    @SuppressWarnings("ConstantConditions")
+    private void saveOnThread(@NonNull final K key, @NonNull final D value) throws Exception {
+        final ReentrantReadWriteLock reentrantReadWriteLock = this.dataLocks.get(key);
+        final ReentrantReadWriteLock.WriteLock lock = reentrantReadWriteLock.writeLock();
         try {
             lock.lock();
             this.cache.put(key, value);
-            this.save.apply(key, value);
+            this.saveObject(key, value);
             value.markDirty(false);
         } finally {
             lock.unlock();
         }
     }
 
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
     @Override
     public CompletableFuture<Void> delete(@NonNull final K key) {
         return ServicesUtil.run(() -> {
@@ -359,47 +308,19 @@ public abstract class AbstractKeyedService<K, Q extends IQueryObject<K, Q>, D ex
     @Override
     public CompletableFuture<Void> ensureSaved() {
         return ServicesUtil.run(() -> {
-<<<<<<< HEAD
-            for (final K K : ImmutableSet.copyOf(this.dirty)) {
-                final D d = this.cache.getIfPresent(K);
-                if (d != null) {
-                    this.save(K, d);
-                } else {
-                    this.dirty.remove(K);
-=======
-            for (final Map.Entry<UUID, D> objectToSave : new HashMap<>(this.cache.asMap()).entrySet()) {
+            for (final Map.Entry<K, D> objectToSave : new HashMap<>(this.cache.asMap()).entrySet()) {
                 if (objectToSave.getValue() != null && objectToSave.getValue().isDirty()) {
                     this.save(objectToSave.getKey(), objectToSave.getValue());
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
                 }
             }
             return null;
         }, this.pluginContainer);
     }
 
-    private void saveOnThread(@NonNull final K key, @NonNull final D value) throws Exception {
-        final ReentrantReadWriteLock reentrantReadWriteLock = this.dataLocks.get(key);
-        final ReentrantReadWriteLock.WriteLock lock = reentrantReadWriteLock.writeLock();
-        try {
-            lock.lock();
-            this.cache.put(key, value);
-            this.saveObject(key, value);
-            this.dirty.remove(key);
-        } finally {
-            lock.unlock();
-        }
-    }
-
     private void onRemoval(@Nullable final K key, @Nullable final D dataObject, @NonNull final RemovalCause removalCause) {
         // If evicted normally, make sure it's saved.
-<<<<<<< HEAD
-        if (removalCause.wasEvicted() && key != null && dataObject != null) {
+        if (removalCause.wasEvicted() && key != null && dataObject != null && dataObject.isDirty()) {
             this.save(key, dataObject);
-            this.onEviction(key, dataObject, this.cache::put);
-=======
-        if (removalCause.wasEvicted() && uuid != null && dataObject != null && dataObject.isDirty()) {
-            this.save(uuid, dataObject);
->>>>>>> 7cb6a5b8 (Do not clear the user data cache before saving it.)
         }
     }
 

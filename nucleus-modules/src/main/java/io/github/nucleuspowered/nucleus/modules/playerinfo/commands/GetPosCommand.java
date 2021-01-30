@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.playerinfo.commands;
 
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.modules.playerinfo.PlayerInfoPermissions;

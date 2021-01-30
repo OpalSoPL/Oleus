@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.core.util;
 
 import io.github.nucleuspowered.nucleus.core.configurate.datatypes.LocationNode;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;

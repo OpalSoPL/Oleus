@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.api.module.rtp.event.NucleusRTPEvent;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 public class RTPSelectedLocationEvent extends AbstractEvent implements NucleusRTPEvent.SelectedLocation {
 

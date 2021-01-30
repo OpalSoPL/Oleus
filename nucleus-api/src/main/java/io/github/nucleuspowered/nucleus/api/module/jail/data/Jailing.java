@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.api.module.jail.data;
 
 import io.github.nucleuspowered.nucleus.api.util.data.TimedEntry;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import java.time.Instant;
 import java.util.Optional;

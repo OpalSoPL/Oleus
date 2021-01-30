@@ -8,7 +8,7 @@ import io.github.nucleuspowered.nucleus.api.module.jail.data.Jail;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 

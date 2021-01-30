@@ -6,7 +6,7 @@ package io.github.nucleuspowered.nucleus.core.datatypes;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import org.spongepowered.api.Sponge;
