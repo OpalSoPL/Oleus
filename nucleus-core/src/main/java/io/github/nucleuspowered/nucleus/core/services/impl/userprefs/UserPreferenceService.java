@@ -11,6 +11,8 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IUserPreferenceService;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.registry.RegistryKey;
+import org.spongepowered.api.registry.RegistryType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +23,7 @@ import java.util.UUID;
 @Singleton
 public class UserPreferenceService implements IUserPreferenceService {
 
+    private final ResourceKey resourceKey;
     private final NucleusKeysProvider provider;
     private final Map<ResourceKey, NucleusUserPreferenceService.PreferenceKey<?>> registered = new HashMap<>();
     private final INucleusServiceCollection serviceCollection;
@@ -28,6 +31,7 @@ public class UserPreferenceService implements IUserPreferenceService {
     @Inject
     public UserPreferenceService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
+        this.resourceKey = ResourceKey.of(serviceCollection.pluginContainer(), "preference_service");
         this.provider = new NucleusKeysProvider();
     }
 
@@ -36,7 +40,8 @@ public class UserPreferenceService implements IUserPreferenceService {
         this.provider.getAll().forEach(x -> this.register((PreferenceKeyImpl<?>) x));
     }
 
-    @Override public void register(final PreferenceKeyImpl<?> key) {
+    @Override
+    public void register(final PreferenceKeyImpl<?> key) {
         if (this.registered.containsKey(key.getKey())) {
             throw new IllegalArgumentException("ID already registered");
         }
@@ -107,6 +112,11 @@ public class UserPreferenceService implements IUserPreferenceService {
     @Override
     public <T> T getUnwrapped(final UUID uuid, final NucleusUserPreferenceService.PreferenceKey<T> key) {
         return this.get(uuid, key).orElse(null);
+    }
+
+    @Override
+    public ResourceKey getRegistryResourceKey() {
+        return this.resourceKey;
     }
 
     @Override

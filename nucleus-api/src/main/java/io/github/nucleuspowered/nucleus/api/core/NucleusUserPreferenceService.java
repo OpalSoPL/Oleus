@@ -5,7 +5,7 @@
 package io.github.nucleuspowered.nucleus.api.core;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.User;
 
 import java.util.Locale;
@@ -13,6 +13,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface NucleusUserPreferenceService {
+
+    /**
+     * Gets the key for the global scoped registry.
+     *
+     * @return The key.
+     */
+    ResourceKey getRegistryResourceKey();
 
     /**
      * Gets the user preference keys available for this user.
@@ -142,7 +149,15 @@ public interface NucleusUserPreferenceService {
      *
      * @param <T> The type of key.
      */
-    interface PreferenceKey<T> extends CatalogType {
+    interface PreferenceKey<T> {
+
+        /**
+         * Get the {@link ResourceKey} that will be used for this key
+         * in the Nucleus registry.
+         *
+         * @return The key.
+         */
+        ResourceKey getKey();
 
         /**
          * The default value for a preference, if any.

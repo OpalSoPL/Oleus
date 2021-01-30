@@ -17,6 +17,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -50,7 +51,8 @@ public class PowertoolModule implements IModule {
     }
 
     @Listener
-    public void onPreferenceKeyRegistration(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+    // RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event
+    public void onPreferenceKeyRegistration(final RegisterRegistryValueEvent.GameScoped event) {
         event.register(PowertoolKeys.POWERTOOL_ENABLED);
     }
 }

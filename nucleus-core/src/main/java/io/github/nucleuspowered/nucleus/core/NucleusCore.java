@@ -32,6 +32,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.task.SyncTaskBase;
 import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.NucleusServiceCollection;
+import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.UserPreferenceService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandMetadataService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigProvider;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
@@ -54,14 +55,15 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.lifecycle.LoadedGameEvent;
 import org.spongepowered.api.event.lifecycle.RefreshGameEvent;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogRegistryEvent;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.registry.RegistryType;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Tuple;
@@ -82,8 +84,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -100,6 +104,10 @@ public final class NucleusCore {
     private final boolean runDocGen = System.getProperty(DOCGEN_PROPERTY) != null;
     private final List<Action> onStartedActions = new LinkedList<>();
     private final IPluginInfo pluginInfo;
+
+    private final ResourceKey commandModifierFactoryKey;
+    private final ResourceKey teleportScannerKey;
+    private final ResourceKey storageFactoryKey;
 
     @Nullable private Path dataDirectory;
 
@@ -125,6 +133,9 @@ public final class NucleusCore {
                 this::getDataDirectory,
                 this.configDirectory
         );
+        this.commandModifierFactoryKey = ResourceKey.of(this.pluginContainer, "command_modifier_factory");
+        this.teleportScannerKey = ResourceKey.of(this.pluginContainer, "teleport_scanner");
+        this.storageFactoryKey = ResourceKey.of(this.pluginContainer, "storage_repository_factory");
     }
 
     /**
@@ -170,12 +181,16 @@ public final class NucleusCore {
     }
 
     @Listener
-    public void establishNewRegistries(final RegisterCatalogRegistryEvent event) {
+    public void establishNewRegistries(final RegisterRegistryEvent.GameScoped event) {
         try {
-            event.register(CommandModifierFactory.class, ResourceKey.of("nucleus", "command_modifier_factory"));
-            event.register(TeleportScanner.class, ResourceKey.of("nucleus", "teleport_scanner"));
-            event.register(IStorageRepositoryFactory.class, ResourceKey.of("nucleus", "storage_repository_factory"));
-            event.register(NucleusUserPreferenceService.PreferenceKey.class, ResourceKey.of("nucleus", "user_preference_key"));
+            event.register(this.serviceCollection.userPreferenceService().getRegistryResourceKey(), false, () -> {
+                final Map<ResourceKey, NucleusUserPreferenceService.PreferenceKey<?>> factoryMap = new HashMap<>();
+                factoryMap.put(CoreKeys.LOCALE_PREFERENCE_KEY.getKey(), CoreKeys.LOCALE_PREFERENCE_KEY);
+                return factoryMap;
+            });
+            event.register(this.commandModifierFactoryKey, false);
+            event.register(this.teleportScannerKey, false);
+            event.register(this.storageFactoryKey, false);
         } catch (final Exception e) {
             new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
                     .generatePrettyPrint(this.logger, Level.ERROR);
@@ -183,9 +198,12 @@ public final class NucleusCore {
     }
 
     @Listener
-    public void registerCommandModifierFactories(final RegisterCatalogEvent<CommandModifierFactory> event) {
+    public void registerCommandModifierFactories(final RegisterRegistryValueEvent.GameScoped event) {
         try {
-            event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COOLDOWN, new CooldownModifier()));
+            event.getGame().registries().
+            final RegisterRegistryValueEvent.RegistryStep<CommandModifierFactory> factoryRegistryStep =
+                    event.registry(RegistryType.of())
+            .register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COOLDOWN, new CooldownModifier()));
             event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_COST, new CostModifier()));
             event.register(new CommandModifierFactory.Simple(CommandModifiers.HAS_WARMUP, new WarmupModifier()));
             event.register(new CommandModifierFactory.Simple(CommandModifiers.REQUIRE_ECONOMY, new RequiresEconomyModifier()));

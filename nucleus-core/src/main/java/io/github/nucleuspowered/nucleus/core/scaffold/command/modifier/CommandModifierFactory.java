@@ -5,12 +5,11 @@
 package io.github.nucleuspowered.nucleus.core.scaffold.command.modifier;
 
 import io.github.nucleuspowered.nucleus.core.scaffold.command.control.CommandControl;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.ResourceKey;
 
 import java.util.function.Function;
 
-public abstract class CommandModifierFactory implements CatalogType, Function<CommandControl, ICommandModifier> {
+public abstract class CommandModifierFactory implements Function<CommandControl, ICommandModifier> {
 
     public static class Simple extends CommandModifierFactory {
 
@@ -26,7 +25,7 @@ public abstract class CommandModifierFactory implements CatalogType, Function<Co
             this.modifierFunction = modifierFunction;
         }
 
-        @Override public ResourceKey getKey() {
+        public ResourceKey getKey() {
             return this.key;
         }
 
