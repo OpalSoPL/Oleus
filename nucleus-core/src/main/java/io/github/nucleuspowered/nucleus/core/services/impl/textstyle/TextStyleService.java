@@ -365,16 +365,14 @@ public class TextStyleService implements ITextStyleService {
 
         final Style.Builder ts = Style.style();
         for (final String split : s.split("\\s*,\\s*")) {
+            final TextDecoration decoration;
             if (split.length() == 1) {
-                final TextDecoration decoration = this.idToStyle.get(split.charAt(0));
-                if (decoration != null) {
-                    ts.apply(decoration);
-                }
+                decoration = this.idToStyle.get(split.charAt(0));
             } else {
-                final TextDecoration decoration = this.styleToPerms.inverse().get(split.toLowerCase());
-                if (decoration != null) {
-                    ts.apply(decoration);
-                }
+                decoration = this.styleToPerms.inverse().get(split.toLowerCase());
+            }
+            if (decoration != null) {
+                ts.apply(decoration);
             }
         }
 

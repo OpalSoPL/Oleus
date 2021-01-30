@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.core.services.impl.teleport;
 
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.api.EventContexts;
 import io.github.nucleuspowered.nucleus.api.teleport.data.NucleusTeleportHelperFilters;
@@ -36,6 +37,11 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
 
     private static final BorderDisableSession DUMMY = new BorderDisableSession() {};
     private SafeTeleportConfig config = new SafeTeleportConfig();
+
+    @Inject
+    public SafeLocationService(final IReloadableService reloadable) {
+        reloadable.registerReloadable(this);
+    }
 
     @Override
     public TeleportResult teleportPlayerSmart(final ServerPlayer player,

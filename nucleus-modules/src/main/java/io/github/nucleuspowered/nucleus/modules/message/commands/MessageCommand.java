@@ -82,7 +82,7 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
             messageTarget = context.requireOne(this.customTargetParameter);
         } else {
             final Either<SystemSubject, ServerPlayer> target = NucleusParameters.Composite.parsePlayerOrConsole(context);
-            if (context.is(target.fold(Function.identity(), Function.identity()))) {
+            if (context.is(target.fold(Function.identity(), Function.identity())) && !this.canMessageSelf) {
                 return context.errorResult("command.message.self");
             }
 
