@@ -49,7 +49,7 @@ public class KickCommand implements ICommandExecutor, IReloadableService.Reloada
         final Component r = context.getOne(NucleusParameters.OPTIONAL_REASON_COMPONENT)
                 .orElseGet(() -> context.getMessage("command.kick.defaultreason"));
 
-        if (context.isConsoleAndBypass() || context.testPermissionFor(pl, KickPermissions.KICK_EXEMPT_TARGET)) {
+        if (context.isConsoleAndBypass() && context.testPermissionFor(pl, KickPermissions.KICK_EXEMPT_TARGET)) {
             return context.errorResult("command.kick.exempt", pl.getName());
         }
 

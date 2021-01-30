@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.api.module.nickname.event;
 import io.github.nucleuspowered.nucleus.api.util.MightOccurAsync;
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.Event;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -18,7 +19,7 @@ import java.util.UUID;
  * base event.</p>
  */
 @MightOccurAsync
-public interface NucleusChangeNicknameEvent {
+public interface NucleusChangeNicknameEvent extends Event {
 
     /**
      * The user whose nickname was changed.
