@@ -57,10 +57,10 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
             Sponge.getServer().getOnlinePlayers().stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst()
                     .ifPresent(x -> x.kick(LegacyComponentSerializer.legacyAmpersand().deserialize(reason)));
             Sponge.getServer().getScheduler().submit(Task.builder().execute(this::save).plugin(this.pluginContainer).build());
+        } else {
+            throw new NameBanException(
+                    Component.text("That is not a valid username."), NameBanException.Reason.DISALLOWED_NAME);
         }
-
-        throw new NameBanException(
-                Component.text("That is not a valid username."), NameBanException.Reason.DISALLOWED_NAME);
     }
 
     @Override public Optional<String> getReasonForBan(final String name) {
