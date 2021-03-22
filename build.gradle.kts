@@ -27,7 +27,7 @@ plugins {
     id("com.github.hierynomus.license") version "0.15.0" apply false
     id("ninja.miserable.blossom") version "1.0.1"
     id("com.github.johnrengelman.shadow") version "5.2.0"
-    id("org.spongepowered.gradle.plugin") version "0.11.0-SNAPSHOT"
+    // id("org.spongepowered.gradle.plugin") version "0.11.0-SNAPSHOT"
     kotlin("jvm") version "1.3.61"
 }
 apply {
@@ -106,7 +106,7 @@ java {
 
 repositories {
     jcenter()
-    maven("https://repo-new.spongepowered.org/maven")
+    maven("https://repo.spongepowered.org/maven")
 }
 
 dependencies {
