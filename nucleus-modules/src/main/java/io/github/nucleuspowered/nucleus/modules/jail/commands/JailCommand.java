@@ -74,7 +74,7 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the subject.
         final User pl = NucleusParameters.Composite.parseUserOrGameProfile(context).fold(Function.identity(),
-                x -> Sponge.getServer().getUserManager().getOrCreate(x));
+                x -> Sponge.server().getUserManager().getOrCreate(x));
         if (!pl.isOnline() && !context.testPermission(JailPermissions.JAIL_OFFLINE)) {
             return context.errorResult("command.jail.offline.noperms");
         }

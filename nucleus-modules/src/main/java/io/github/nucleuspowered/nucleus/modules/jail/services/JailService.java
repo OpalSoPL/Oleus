@@ -144,12 +144,12 @@ public final class JailService implements NucleusJailService, IReloadableService
 
         final ServerLocation location = jail.getLocation().orElseThrow(() -> new IllegalArgumentException("Jail does not have a valid location."));
         if (location.isValid()) {
-            this.serviceCollection.schedulerService().runOnMainThread(() -> Sponge.getServer().getWorldManager().loadWorld(location.getWorldKey())).join();
+            this.serviceCollection.schedulerService().runOnMainThread(() -> Sponge.server().getWorldManager().loadWorld(location.getWorldKey())).join();
         } else {
             throw new IllegalArgumentException("Jail does not have a valid location.");
         }
 
-        final Cause cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
+        final Cause cause = Sponge.server().getCauseStackManager().getCurrentCause();
 
         // Create the jailing
         final JailingEntry jailingEntry = JailingEntry.fromJailingRequest(
@@ -163,11 +163,11 @@ public final class JailService implements NucleusJailService, IReloadableService
         this.jailings.put(victim, jailingEntry);
         this.serviceCollection.storageManager().getUserService().setAndSave(victim, JailKeys.JAIL_DATA, jailingEntry.asJailData(this.isOnlineOnly));
         // Time to jail
-        final Optional<ServerPlayer> serverPlayer = Sponge.getServer().getPlayer(victim);
+        final Optional<ServerPlayer> serverPlayer = Sponge.server().getPlayer(victim);
         if (serverPlayer.isPresent()) {
             final ServerPlayer player = serverPlayer.get();
             this.serviceCollection.schedulerService().runOnMainThread(() -> {
-                try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+                try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                     frame.addContext(EventContexts.IS_JAILING_ACTION, true);
                     player.setLocation(location);
                     player.setRotation(jail.getRotation());
@@ -197,7 +197,7 @@ public final class JailService implements NucleusJailService, IReloadableService
         }
 
         final Jailing jailing = o.get();
-        final Either<ServerPlayer, User> either = Sponge.getServer().getPlayer(user)
+        final Either<ServerPlayer, User> either = Sponge.server().getPlayer(user)
                 .<Either<ServerPlayer, User>>map(Either::left)
                 .orElseGet(() -> this.getUserEither(user));
 
@@ -205,12 +205,12 @@ public final class JailService implements NucleusJailService, IReloadableService
             final WorldProperties worldProperties = player.getWorld().getProperties();
             return ServerLocation.of(worldProperties.getKey(), worldProperties.getSpawnPosition());
         }, u -> {
-            final WorldProperties def = Sponge.getServer().getWorldManager().getDefaultProperties().get();
+            final WorldProperties def = Sponge.server().getWorldManager().getDefaultProperties().get();
             if (u == null) {
                 return ServerLocation.of(def.getKey(), def.getSpawnPosition());
             }
             final WorldProperties target =
-                    Sponge.getServer().getWorldManager().getWorld(u.getWorldKey()).map(ServerWorld::getProperties).orElse(def);
+                    Sponge.server().getWorldManager().getWorld(u.getWorldKey()).map(ServerWorld::getProperties).orElse(def);
             return ServerLocation.of(target.getKey(), target.getSpawnPosition());
         }));
 
@@ -222,7 +222,7 @@ public final class JailService implements NucleusJailService, IReloadableService
                     TeleportScanners.NO_SCAN.get(),
                     TeleportHelperFilters.DEFAULT.get()
             ).orElseGet(() -> {
-                final WorldProperties def = Sponge.getServer().getWorldManager().getDefaultProperties().get();
+                final WorldProperties def = Sponge.server().getWorldManager().getDefaultProperties().get();
                 return ServerLocation.of(def.getKey(), def.getSpawnPosition());
             });
 
@@ -235,7 +235,7 @@ public final class JailService implements NucleusJailService, IReloadableService
         });
 
         // Return player to the specified location
-        Sponge.getEventManager().post(new JailEvent.Unjailed(user, Sponge.getServer().getCauseStackManager().getCurrentCause()));
+        Sponge.getEventManager().post(new JailEvent.Unjailed(user, Sponge.server().getCauseStackManager().getCurrentCause()));
         return true;
     }
 
@@ -279,7 +279,7 @@ public final class JailService implements NucleusJailService, IReloadableService
     public void onJail(final JailingEntry entry, final ServerPlayer serverPlayer) {
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         final IPlayerDisplayNameService playerDisplayNameService = this.serviceCollection.playerDisplayNameService();
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.addContext(EventContexts.IS_JAILING_ACTION, true);
             // It exists.
             final Optional<Duration> timeLeft = entry.getRemainingTime();
@@ -319,7 +319,7 @@ public final class JailService implements NucleusJailService, IReloadableService
     }
 
     private Either<ServerPlayer, User> getUserEither(final UUID uuid) {
-        return Sponge.getServer().getUserManager().get(uuid).<Either<ServerPlayer, User>>map(Either::right).orElse(null);
+        return Sponge.server().getUserManager().get(uuid).<Either<ServerPlayer, User>>map(Either::right).orElse(null);
     }
 
     private ServerLocation eitherToLocation(final Either<ServerPlayer, User> either) {
@@ -331,7 +331,7 @@ public final class JailService implements NucleusJailService, IReloadableService
     }
 
     public void checkExpiry() {
-        for (final ServerPlayer uuid : Sponge.getServer().getOnlinePlayers()) {
+        for (final ServerPlayer uuid : Sponge.server().getOnlinePlayers()) {
             final Jailing jailing = this.jailings.get(uuid.getUniqueId());
             if (jailing != null && jailing != JailService.NOT_JAILED && jailing.expired()) {
                 this.serviceCollection.schedulerService().runOnMainThread(() -> this.unjailPlayer(uuid.getUniqueId()));

@@ -88,7 +88,7 @@ public final class InfoCommand implements ICommandExecutor {
 
         final Map<String, String> commands = new HashMap<>();
         final Map<String, String> plcmds = new HashMap<>();
-        final CommandManager manager = Sponge.getServer().getCommandManager();
+        final CommandManager manager = Sponge.server().getCommandManager();
         manager.getKnownAliases().stream()
                 .map(x -> manager.getCommandMapping(x).orElse(null))
                 .filter(Objects::nonNull)

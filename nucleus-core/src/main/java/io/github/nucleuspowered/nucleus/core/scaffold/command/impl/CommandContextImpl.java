@@ -308,7 +308,7 @@ public final class CommandContextImpl implements ICommandContext {
         if (audience instanceof LocaleSource) {
             locale = ((LocaleSource) audience).getLocale();
         } else {
-            locale = Sponge.getServer().getLocale();
+            locale = Sponge.server().getLocale();
         }
         return this.serviceCollection.messageProvider().getMessageString(locale, key, replacements);
     }
@@ -439,7 +439,7 @@ public final class CommandContextImpl implements ICommandContext {
         if (audience instanceof LocaleSource) {
             locale = ((LocaleSource) audience).getLocale();
         } else {
-            locale = Sponge.getServer().getLocale();
+            locale = Sponge.server().getLocale();
         }
         return locale;
     }

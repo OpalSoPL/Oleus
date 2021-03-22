@@ -31,8 +31,8 @@ public interface NucleusPlayerMetadataService {
      * @param user The {@link User}.
      * @return The {@link Result} if the user exists.
      */
-    default Optional<Result> getUserData(User user) {
-        return getUserData(user.getUniqueId());
+    default Optional<Result> getUserData(final User user) {
+        return this.getUserData(user.uniqueId());
     }
 
     /**

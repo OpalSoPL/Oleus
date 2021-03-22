@@ -24,7 +24,7 @@ public final class UserService extends AbstractKeyedService<UUID, IUserQueryObje
 
     @Override
     protected void onEviction(final UUID key, final IUserDataObject dataObject, final BiConsumer<UUID, IUserDataObject> reAdd) {
-        Sponge.getServer().getPlayer(key).ifPresent(x -> reAdd.accept(key, dataObject));
+        Sponge.server().getPlayer(key).ifPresent(x -> reAdd.accept(key, dataObject));
     }
 
 }

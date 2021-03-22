@@ -57,7 +57,7 @@ public class WorldListener implements ListenerBase.Conditional {
             }
 
             this.messageSent.add(player.getUniqueId());
-            Sponge.getServer().getScheduler().submit(
+            Sponge.server().getScheduler().submit(
                     Task.builder()
                             .delay(Ticks.of(1))
                             .execute(this.relocate(player))
@@ -73,7 +73,7 @@ public class WorldListener implements ListenerBase.Conditional {
 
     private Consumer<ScheduledTask> relocate(final ServerPlayer player) {
         return task -> {
-            final Optional<ServerLocation> location = Sponge.getServer()
+            final Optional<ServerLocation> location = Sponge.server()
                     .getTeleportHelper()
                     .getSafeLocationWithBlacklist(player.getServerLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL.get());
             if (location.isPresent()) {

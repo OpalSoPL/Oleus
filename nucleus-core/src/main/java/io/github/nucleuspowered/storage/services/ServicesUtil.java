@@ -19,7 +19,7 @@ public final class ServicesUtil {
     public static <R> CompletableFuture<R> run(final CheckedFunction0<R> taskConsumer, final PluginContainer pluginContainer, final boolean printException) {
         final CompletableFuture<R> future = new CompletableFuture<>();
 
-        if (Sponge.isServerAvailable() && Sponge.getServer().onMainThread()) {
+        if (Sponge.isServerAvailable() && Sponge.server().onMainThread()) {
             Sponge.getAsyncScheduler().createExecutor(pluginContainer).submit(() -> ServicesUtil.runInternal(future, taskConsumer, printException));
         } else {
             ServicesUtil.runInternal(future, taskConsumer, printException);

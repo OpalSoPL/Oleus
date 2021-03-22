@@ -119,7 +119,7 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
             player.offer(Keys.VANISH_PREVENTS_TARGETING, true);
 
             if (this.isAlter) {
-                Sponge.getServer().getOnlinePlayers().stream().filter(x -> !player.equals(x) || !this.permissionService
+                Sponge.server().getOnlinePlayers().stream().filter(x -> !player.equals(x) || !this.permissionService
                         .hasPermission(x, VanishPermissions.VANISH_SEE))
                         .forEach(x -> x.getTabList().removeEntry(player.getUniqueId()));
             }
@@ -136,7 +136,7 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
 
         if (this.isAlter && user.isOnline()) {
             final ServerPlayer player = user.getPlayer().get();
-            Sponge.getServer().getOnlinePlayers().forEach(x -> {
+            Sponge.server().getOnlinePlayers().forEach(x -> {
                 if (!x.getTabList().getEntry(player.getUniqueId()).isPresent()) {
                     x.getTabList().addEntry(TabListEntry.builder()
                             .displayName(Component.text(player.getName()))

@@ -84,7 +84,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer player = context.getPlayerFromArgs();
         synchronized (this.cachedTasks) {
-            this.cachedTasks.keySet().removeIf(task -> !Sponge.getServer().getScheduler().getTaskById(task.getUniqueId()).isPresent());
+            this.cachedTasks.keySet().removeIf(task -> !Sponge.server().getScheduler().getTaskById(task.getUniqueId()).isPresent());
             if (this.cachedTasks.containsValue(player.getUniqueId())) {
                 return context.errorResult("command.rtp.inprogress", player.getName());
             }
@@ -118,7 +118,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
                 context.getServiceCollection().getServiceUnchecked(RTPService.class).getKernel(wp),
                 context.is(player) ? context.getCost() : 0);
         final Task task = Task.builder().execute(rtask).plugin(context.getServiceCollection().pluginContainer()).build();
-        this.cachedTasks.put(Sponge.getServer().getScheduler().submit(task), player.getUniqueId());
+        this.cachedTasks.put(Sponge.server().getScheduler().submit(task), player.getUniqueId());
 
         return context.successResult();
     }
@@ -160,7 +160,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
             super(source.getServiceCollection(), target1, cost);
             this.logger = source.getServiceCollection().logger();
             this.pluginContainer = pluginContainer;
-            this.cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
+            this.cause = Sponge.server().getCauseStackManager().getCurrentCause();
             this.targetWorld = target;
             this.source = source;
             this.target = target1;
@@ -173,7 +173,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
 
         @Override public void accept(final ScheduledTask task) {
             this.count--;
-            final ServerPlayer serverPlayer = Sponge.getServer().getPlayer(this.target).orElse(null);
+            final ServerPlayer serverPlayer = Sponge.server().getPlayer(this.target).orElse(null);
             if (serverPlayer == null) {
                 this.onCancel();
                 return;
@@ -260,7 +260,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
                     // safe place.
                     final Task t = Task.builder().delay(Ticks.of(2)).execute(this).plugin(this.pluginContainer).build();
                     RandomTeleportCommand.this.cachedTasks.put(
-                            Sponge.getServer().getScheduler().submit(t),
+                            Sponge.server().getScheduler().submit(t),
                             serverPlayer.getUniqueId()
                     );
                 }

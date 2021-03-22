@@ -62,7 +62,7 @@ public interface NucleusHomeService {
      * @return The homes.
      */
     default List<Home> getHomes(final User user) {
-        return this.getHomes(user.getUniqueId());
+        return this.getHomes(user.uniqueId());
     }
 
     /**
@@ -122,6 +122,7 @@ public interface NucleusHomeService {
      * @param location The location of the home.
      * @param rotation The rotation of the player when they return to this home.
      * @throws HomeException if the home could not be created, due to home limits, or a plugin cancelled the event.
+     * @throws NoSuchPlayerException if no such player was found
      */
     default void modifyOrCreateHome(final UUID user, final String name, final ServerLocation location, final Vector3d rotation) throws HomeException, NoSuchPlayerException {
         if (this.getHome(user, name).isPresent()) {

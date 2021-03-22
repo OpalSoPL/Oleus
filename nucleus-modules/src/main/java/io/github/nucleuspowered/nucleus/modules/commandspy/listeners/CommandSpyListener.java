@@ -64,7 +64,7 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
             // If the command is in the list, report it.
             if (isInList == this.config.isUseWhitelist()) {
                 final UUID currentUUID = player.getUniqueId();
-                final List<Player> playerList = Sponge.getServer().getOnlinePlayers()
+                final List<Player> playerList = Sponge.server().getOnlinePlayers()
                     .stream()
                     .filter(x -> !x.getUniqueId().equals(currentUUID))
                     .filter(x -> this.permissionService.hasPermission(x, CommandSpyPermissions.BASE_COMMANDSPY))

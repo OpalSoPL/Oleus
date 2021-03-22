@@ -51,7 +51,7 @@ public class NucleusBootstrapper {
     private boolean versionCheck(final IPluginInfo pluginInfo) throws IllegalStateException {
         if (System.getProperty(NO_VERSION_CHECK) != null) {
             final Pattern matching = Pattern.compile("^(?<major>\\d+)\\.(?<minor>\\d+)");
-            final String v = Sponge.getPlatform().getContainer(Platform.Component.API).getMetadata().getVersion();
+            final String v = Sponge.platform().container(Platform.Component.API).getMetadata().getVersion();
 
             final Matcher version = matching.matcher(NucleusPluginInfo.SPONGE_API_VERSION);
             if (!version.find()) {
@@ -110,15 +110,15 @@ public class NucleusBootstrapper {
         if (this.versionCheck(pluginInfo)) {
             try {
                 this.logger.info("Nucleus {} running on Sponge API {} ({} version {})", pluginInfo.version(),
-                        Sponge.getPlatform().getContainer(Platform.Component.API).getMetadata().getVersion(),
-                        Sponge.getPlatform().getContainer(Platform.Component.IMPLEMENTATION).getMetadata().getName().orElse("Unknown Implementation"),
-                        Sponge.getPlatform().getContainer(Platform.Component.IMPLEMENTATION).getMetadata().getVersion());
+                        Sponge.platform().container(Platform.Component.API).getMetadata().getVersion(),
+                        Sponge.platform().container(Platform.Component.IMPLEMENTATION).getMetadata().getName().orElse("Unknown Implementation"),
+                        Sponge.platform().container(Platform.Component.IMPLEMENTATION).getMetadata().getVersion());
                 this.logger.info("Nucleus is starting...");
                 final NucleusCore core =
                         new NucleusCore(this.pluginContainer, this.configDirectory, this.logger, this.injector, new NucleusModuleProvider(),
                                 pluginInfo);
                 core.init();
-                Sponge.getEventManager().registerListeners(this.pluginContainer, core);
+                Sponge.eventManager().registerListeners(this.pluginContainer, core);
                 this.logger.info("Nucleus has completed initialisation successfully. Awaiting Sponge lifecycle events.");
             } catch (final Exception e) {
                 this.logger.fatal("Nucleus did not complete initialisation. Nucleus will not boot.");

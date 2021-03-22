@@ -169,7 +169,7 @@ public class ResetUserCommand implements ICommandExecutor {
         @Override
         public void accept(final Audience source) {
             final IMessageProviderService messageProvider = this.serviceCollection.messageProvider();
-            final User user = Sponge.getServer().getUserManager().get(this.user).get();
+            final User user = Sponge.server().getUserManager().get(this.user).get();
             if (user.isOnline()) {
                 final ServerPlayer player = user.getPlayer().get();
                 final Component kickReason = messageProvider.getMessageFor(player, "command.kick.defaultreason");
@@ -183,7 +183,7 @@ public class ResetUserCommand implements ICommandExecutor {
             source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.starting", user.getName()));
 
             // Ban temporarily.
-            final BanService bss = Sponge.getServer().getServiceProvider().banService();
+            final BanService bss = Sponge.server().getServiceProvider().banService();
             final boolean isBanned = bss.getBanFor(user.getProfile()).isPresent();
             bss.addBan(Ban.builder().type(BanTypes.PROFILE).expirationDate(Instant.now().plus(30, ChronoUnit.SECONDS)).profile(user.getProfile())
                     .build());
@@ -199,7 +199,7 @@ public class ResetUserCommand implements ICommandExecutor {
                     userStorageService.clearCache();
                     userStorageService.delete(user.getUniqueId());
                     if (this.all) {
-                        if (Sponge.getServer().getUserManager().delete(user)) {
+                        if (Sponge.server().getUserManager().delete(user)) {
                             source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.completeall", user.getName()));
                         } else {
                             source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.completenonm", user.getName()));

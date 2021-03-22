@@ -60,7 +60,7 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
         } */
         return () -> {
             this.sourceChannelMap.remove(audience);
-           // Sponge.getServer().getConsole().setMessageChannel(originalChannel);
+           // Sponge.server().getConsole().setMessageChannel(originalChannel);
         };
     }
 
@@ -68,7 +68,7 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
     public NoExceptionAutoClosable setPlayerNucleusChannelTemporarily(final UUID uuid, final Channel channel) {
         Preconditions.checkNotNull(channel);
         final Channel original = this.chatChannels.get(uuid);
-//        final Optional<Player> player = Sponge.getServer().getPlayer(uuid);
+//        final Optional<Player> player = Sponge.server().getPlayer(uuid);
 //        final MessageChannel originalChannel = player.map(MessageReceiver::getMessageChannel).orElse(null);
         this.chatChannels.put(uuid, channel);
 //        if (channel instanceof Channel.External<?>) {

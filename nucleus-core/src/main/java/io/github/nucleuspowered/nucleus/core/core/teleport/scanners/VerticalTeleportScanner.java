@@ -35,7 +35,7 @@ public abstract class VerticalTeleportScanner implements TeleportScanner {
         final int jumps = ((height * 2) - 1) * (this.isAscending ? 1 : -1);
 
         do {
-            final Optional<ServerLocation> result = Sponge.getServer().getTeleportHelper()
+            final Optional<ServerLocation> result = Sponge.server().getTeleportHelper()
                     .getSafeLocation(
                             ServerLocation.of(world, position),
                             height,

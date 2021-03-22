@@ -35,7 +35,7 @@ public class GlobalMuteCommand implements ICommandExecutor {
         final String onOff = context.getMessageString(turnOn ? "standard.enabled" : "standard.disabled");
         context.sendMessage("command.globalmute.status", onOff);
         final String key = "command.globalmute.broadcast." + (turnOn ? "enabled" : "disabled");
-        for (final ServerPlayer player : Sponge.getServer().getOnlinePlayers()) {
+        for (final ServerPlayer player : Sponge.server().getOnlinePlayers()) {
             context.sendMessageTo(player, key);
         }
         context.sendMessageTo(Sponge.getSystemSubject(), key);

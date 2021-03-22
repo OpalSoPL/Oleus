@@ -32,9 +32,9 @@ public class StopCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) {
         final Optional<? extends String> opt = context.getOne(NucleusParameters.OPTIONAL_MESSAGE);
         if (opt.isPresent()) {
-            Sponge.getServer().shutdown(LegacyComponentSerializer.legacyAmpersand().deserialize(opt.get()));
+            Sponge.server().shutdown(LegacyComponentSerializer.legacyAmpersand().deserialize(opt.get()));
         } else {
-            Sponge.getServer().shutdown();
+            Sponge.server().shutdown();
         }
 
         return context.successResult();

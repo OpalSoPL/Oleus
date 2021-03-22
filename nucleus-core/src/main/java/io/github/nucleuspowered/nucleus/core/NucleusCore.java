@@ -156,7 +156,7 @@ public final class NucleusCore {
 
     public Path getDataDirectory() {
         if (this.dataDirectory == null) {
-            this.dataDirectory = Sponge.getServer().getGame().getGameDirectory().resolve("nucleus");
+            this.dataDirectory = Sponge.server().getGame().getGameDirectory().resolve("nucleus");
             try {
                 Files.createDirectories(this.dataDirectory);
             } catch (final IOException e) {
@@ -273,8 +273,8 @@ public final class NucleusCore {
                 if (docgenPath.isEmpty()) {
                     finalPath = this.getDataDirectory();
                 } else {
-                    final Path path = Sponge.getGame().getGameDirectory().resolve(docgenPath);
-                    boolean isOk = path.toAbsolutePath().startsWith(Sponge.getGame().getGameDirectory().toAbsolutePath());
+                    final Path path = Sponge.game().getGameDirectory().resolve(docgenPath);
+                    boolean isOk = path.toAbsolutePath().startsWith(Sponge.game().getGameDirectory().toAbsolutePath());
                     isOk &= Files.notExists(path) || Files.isDirectory(path);
                     if (isOk) {
                         Files.createDirectories(path);
@@ -291,7 +291,7 @@ public final class NucleusCore {
                 ex.printStackTrace();
             }
 
-            Sponge.getServer().shutdown();
+            Sponge.server().shutdown();
             return;
         }
         this.onStartedActions.forEach(Action::action);
@@ -392,7 +392,7 @@ public final class NucleusCore {
                 if (taskBase instanceof IReloadableService.Reloadable) {
                     this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) taskBase);
                 }
-                this.onStartedActions.add(() -> Sponge.getServer().getScheduler()
+                this.onStartedActions.add(() -> Sponge.server().getScheduler()
                         .submit(
                                 Task.builder().plugin(this.pluginContainer)
                                         .delay(taskBase.interval().getSeconds(), TimeUnit.SECONDS)

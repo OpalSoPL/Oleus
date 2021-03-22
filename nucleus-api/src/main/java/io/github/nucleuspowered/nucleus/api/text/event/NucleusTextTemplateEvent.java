@@ -110,7 +110,7 @@ public interface NucleusTextTemplateEvent extends Event, Cancellable {
          * Resets the the broadcast to the original recipients - all players
          */
         default void sendToAll() {
-            this.setAudience(Sponge.getServer());
+            this.setAudience(Sponge.server());
         }
     }
 }

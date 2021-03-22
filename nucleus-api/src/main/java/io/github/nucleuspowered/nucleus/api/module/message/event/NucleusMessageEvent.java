@@ -36,7 +36,7 @@ public interface NucleusMessageEvent extends Event, Cancellable {
      */
     default Optional<ServerPlayer> getSenderAsPlayer() {
         if (this.getSender() instanceof UserMessageTarget) {
-            return Sponge.getServer().getPlayer(((UserMessageTarget) this.getSender()).getUserUUID());
+            return Sponge.server().player(((UserMessageTarget) this.getSender()).getUserUUID());
         }
         return Optional.empty();
     }
@@ -56,7 +56,7 @@ public interface NucleusMessageEvent extends Event, Cancellable {
      */
     default Optional<ServerPlayer> getReceiverAsPlayer() {
         if (this.getReceiver() instanceof UserMessageTarget) {
-            return Sponge.getServer().getPlayer(((UserMessageTarget) this.getReceiver()).getUserUUID());
+            return Sponge.server().player(((UserMessageTarget) this.getReceiver()).getUserUUID());
         }
         return Optional.empty();
     }

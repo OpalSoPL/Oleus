@@ -110,7 +110,7 @@ public class SeenCommand implements ICommandExecutor {
                                     x
                             )).orElse(null));
         if (res != null) {
-            if (Sponge.getServer().getCommandManager().getCommandMapping("nucleus:getfromip").isPresent()) {
+            if (Sponge.server().getCommandManager().getCommandMapping("nucleus:getfromip").isPresent()) {
                 return res.getFirst()
                         .hoverEvent(HoverEvent.showText(context.getMessage("command.seen.ipclick")))
                         .clickEvent(ClickEvent.runCommand("/nucleus:getfromip " + res.getSecond().replaceAll("^/", "")));
@@ -148,7 +148,7 @@ public class SeenCommand implements ICommandExecutor {
             return this.getLocationString("command.seen.currentlocation", user.getPlayer().get().getServerLocation(), context);
         }
 
-        final Optional<WorldProperties> wp = Sponge.getServer().getWorldManager().getProperties(user.getWorldKey());
+        final Optional<WorldProperties> wp = Sponge.server().getWorldManager().getProperties(user.getWorldKey());
         return wp.map(worldProperties ->
                 this.getLocationString("command.seen.lastlocation", worldProperties.getKey(), user.getPosition(), context))
                 .orElseGet(() -> context.getMessage("standard.unknown"));
@@ -193,7 +193,7 @@ public class SeenCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Either<User, GameProfile> target = NucleusParameters.Composite.parseUserOrGameProfile(context);
-        final User user = target.fold(Function.identity(), x -> Sponge.getServer().getUserManager().getOrCreate(x));
+        final User user = target.fold(Function.identity(), x -> Sponge.server().getUserManager().getOrCreate(x));
         final IUserDataObject userDataObject = context.getServiceCollection()
                 .storageManager()
                 .getUserService()
@@ -249,7 +249,7 @@ public class SeenCommand implements ICommandExecutor {
     private Component getLocationString(final String key, final ResourceKey worldKey, final Vector3d position, final ICommandContext context) {
         final Component text = context.getMessage(key, context.getMessage("command.seen.locationtemplate", worldKey.asString(),
                 position.toInt().toString()));
-        if (Sponge.getServer().getCommandManager().getCommandMapping("nucleus:tppos")
+        if (Sponge.server().getCommandManager().getCommandMapping("nucleus:tppos")
                 .map(x -> x.getRegistrar().canExecute(context.getCause(), x))
                 .orElse(false)) {
 
@@ -257,7 +257,7 @@ public class SeenCommand implements ICommandExecutor {
                     .hoverEvent(HoverEvent.showText(context.getMessage("command.seen.teleportposition")
             ));
 
-            Sponge.getServer().getWorldManager().getWorld(worldKey).ifPresent(
+            Sponge.server().getWorldManager().getWorld(worldKey).ifPresent(
                     x -> building.clickEvent(SpongeComponents.executeCallback(cs -> {
                         if (cs.root() instanceof ServerPlayer) {
                             ((ServerPlayer) cs.root()).setLocation(ServerLocation.of(x, position));

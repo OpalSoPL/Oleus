@@ -28,7 +28,7 @@ public class NoTeleportScanner implements TeleportScanner {
             final int floor,
             final TeleportHelperFilter filter,
             final TeleportHelperFilter... filters) {
-        final TeleportHelper teleportHelper = Sponge.getServer().getTeleportHelper();
+        final TeleportHelper teleportHelper = Sponge.server().getTeleportHelper();
         return teleportHelper.getSafeLocation(
                 ServerLocation.of(world, position),
                 height,

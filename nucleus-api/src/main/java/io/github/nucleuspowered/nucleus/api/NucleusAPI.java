@@ -323,7 +323,7 @@ public final class NucleusAPI {
     // A single point of failure means a single point to fix!
     private static <T> Optional<T> getService(final Class<T> clazz) {
         try {
-            return Optional.of(Sponge.getGame().getFactoryProvider().provide(clazz));
+            return Optional.of(Sponge.game().factoryProvider().provide(clazz));
         } catch (final TypeNotFoundException exception) {
             return Optional.empty();
         }

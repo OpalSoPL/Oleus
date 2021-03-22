@@ -60,7 +60,7 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
         final User target = context.requireOne(NucleusParameters.ONE_USER);
         final ServerWorld world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey())
             .orElseGet(() -> this.gsc.isOnSpawnCommand() ? this.gsc.getWorld().get() :
-                    Sponge.getServer().getWorldManager().defaultWorld());
+                    Sponge.server().getWorldManager().defaultWorld());
 
         final Tuple<ServerLocation, Vector3d> worldTransform = SpawnHelper.getSpawn(world, target.getPlayer().orElse(null), context);
 

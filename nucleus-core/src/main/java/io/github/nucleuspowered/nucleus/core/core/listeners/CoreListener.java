@@ -106,7 +106,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
         final IUserDataObject udo = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(user.getUniqueId());
 
         if (event.getFromLocation().equals(event.getToLocation())) {
-            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                 frame.pushCause(profile);
                 // Check this
                 final NucleusOnLoginEvent onLoginEvent = new NucleusOnLoginEvent(frame.getCurrentCause(), user, udo, event.getFromLocation());
@@ -226,12 +226,12 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onServerAboutToStop(final StoppingEngineEvent<Server> event) {
-        for (final ServerPlayer player : Sponge.getServer().getOnlinePlayers()) {
+        for (final ServerPlayer player : Sponge.server().getOnlinePlayers()) {
             this.serviceCollection.storageManager().getUserOnThread(player.getUniqueId()).ifPresent(x -> this.onPlayerQuit(player, x));
         }
 
         if (this.getKickOnStopMessage != null) {
-            for (final ServerPlayer p : Sponge.getServer().getOnlinePlayers()) {
+            for (final ServerPlayer p : Sponge.server().getOnlinePlayers()) {
                 final Component msg = this.getKickOnStopMessage.getForObject(p);
                 if (AdventureUtils.isEmpty(msg)) {
                     p.kick();

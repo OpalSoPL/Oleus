@@ -137,7 +137,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     }
 
     private ServerPlayer getPlayer(final UUID uuid) {
-        return Sponge.getServer().getPlayer(uuid)
+        return Sponge.server().getPlayer(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("Player with supplied UUID is not online"));
     }
 
@@ -203,7 +203,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         final Instant timeOfLastUse = redeemed.get(kit.getName().toLowerCase());
         final Instant now = Instant.now();
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(player);
 
             // If the kit was used before...
@@ -335,11 +335,11 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     private boolean redeemKitCommands(final Collection<String> commands, final ServerPlayer player) {
         final String playerName = player.getName();
         boolean success = true;
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(Sponge.getSystemSubject());
             for (final String command : commands) {
                 try {
-                    Sponge.getServer().getCommandManager().process(command.replace("{{player}}", playerName));
+                    Sponge.server().getCommandManager().process(command.replace("{{player}}", playerName));
                 } catch (final CommandException e) {
                     e.printStackTrace();
                     success = false;

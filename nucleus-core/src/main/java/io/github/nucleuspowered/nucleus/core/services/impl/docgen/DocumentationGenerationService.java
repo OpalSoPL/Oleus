@@ -68,7 +68,7 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
 
     @Override
     public void generate(final Path directory) throws IOException {
-        try (final CauseStackManager.StackFrame stackFrame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame stackFrame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             stackFrame.pushCause(Sponge.getSystemSubject());
             final CommandCause cause = CommandCause.create();
 

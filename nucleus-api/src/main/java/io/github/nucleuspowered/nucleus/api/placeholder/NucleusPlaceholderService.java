@@ -42,7 +42,7 @@ public interface NucleusPlaceholderService {
 
     /**
      * Gets the Nucleus placeholder parser for displaying
-     * {@link Subject#getOption(String)}
+     * {@link Subject#option(String)}
      *
      * @return The parser.
      */

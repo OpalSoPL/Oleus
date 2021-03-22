@@ -22,7 +22,7 @@ public abstract class JailingEntry implements Jailing {
         if (jailData.getTimeFromNextLogin() == null) {
             return new JailingEntry.Untimed(jailData);
         }
-        return Sponge.getServer().getPlayer(user).<JailingEntry>map(x -> new JailingEntry.Ticking(jailData))
+        return Sponge.server().getPlayer(user).<JailingEntry>map(x -> new JailingEntry.Ticking(jailData))
                 .orElseGet(() -> isOnlineOnly ? new JailingEntry.Stopped(jailData) : new JailingEntry.Ticking(jailData));
     }
 
@@ -33,7 +33,7 @@ public abstract class JailingEntry implements Jailing {
             return new JailingEntry.Untimed(reason, jailName, jailer, previousLocation, creationInstant);
         }
 
-        if (Sponge.getServer().getPlayer(user).isPresent()) {
+        if (Sponge.server().getPlayer(user).isPresent()) {
             return new JailingEntry.Ticking(reason, jailName, jailer, previousLocation, creationInstant, Instant.now().plus(timeRemaining));
         }
         return new JailingEntry.Stopped(reason, jailName, jailer, previousLocation, creationInstant, timeRemaining);

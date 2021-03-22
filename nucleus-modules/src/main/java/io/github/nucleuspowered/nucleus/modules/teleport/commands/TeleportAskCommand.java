@@ -96,7 +96,7 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
             return context.errorResult("command.teleport.self");
         }
 
-        final RequestEvent.CauseToPlayer event = new RequestEvent.CauseToPlayer(Sponge.getServer().getCauseStackManager().getCurrentCause(), target.getUniqueId());
+        final RequestEvent.CauseToPlayer event = new RequestEvent.CauseToPlayer(Sponge.server().getCauseStackManager().getCurrentCause(), target.getUniqueId());
         if (Sponge.getEventManager().post(event)) {
             if (event.getCancelMessage().isPresent()) {
                 return context.errorResultLiteral(event.getCancelMessage().get());

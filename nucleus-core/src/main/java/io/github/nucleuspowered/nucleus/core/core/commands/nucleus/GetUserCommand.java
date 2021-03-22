@@ -51,7 +51,7 @@ public class GetUserCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) {
         final CompletableFuture<GameProfile> profile;
         final String toGet;
-        final GameProfileManager manager = Sponge.getServer().getGameProfileManager();
+        final GameProfileManager manager = Sponge.server().getGameProfileManager();
         if (context.hasAny(this.uuidKey)) {
             final UUID u = context.requireOne(this.uuidKey);
             toGet = u.toString();
@@ -74,7 +74,7 @@ public class GetUserCommand implements ICommandExecutor {
             }
 
             // We have a game profile, it's been added to the cache. Create the user too, just in case.
-            Sponge.getServer().getUserManager().getOrCreate(gp);
+            Sponge.server().getUserManager().getOrCreate(gp);
             context.sendMessage("command.nucleus.getuser.success", gp.getUniqueId().toString(), gp.getName().orElse("unknown"));
 
             return 0;

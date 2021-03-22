@@ -94,9 +94,9 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
         }
 
         if (this.isUseMinecraftCommand) {
-            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                 frame.addContext(EventContextKeys.SUBJECT, Sponge.getSystemSubject());
-                final CommandResult result = Sponge.getServer().getCommandManager().process(
+                final CommandResult result = Sponge.server().getCommandManager().process(
                         String.format("minecraft:give %s skull %d 3 {SkullOwner:%s}", player.getName(), amount, user.getName()));
                 if (result.isSuccess()) {
                     context.sendMessage("command.skull.success.plural", String.valueOf(amount), user.getName());

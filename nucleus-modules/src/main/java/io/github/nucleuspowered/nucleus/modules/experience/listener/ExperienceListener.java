@@ -82,7 +82,7 @@ public class ExperienceListener implements ListenerBase {
             final int exp = this.deadExpPlayers.get(player.getUniqueId());
             final Task task =
                     Task.builder().delay(Ticks.of(1)).execute(() -> player.offer(Keys.EXPERIENCE, exp)).plugin(this.pluginContainer).build();
-            Sponge.getServer().getScheduler().submit(task);
+            Sponge.server().getScheduler().submit(task);
             this.deadExpPlayers.remove(player.getUniqueId());
         }
     }

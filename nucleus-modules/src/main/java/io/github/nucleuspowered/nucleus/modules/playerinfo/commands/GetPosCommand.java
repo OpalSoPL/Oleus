@@ -47,7 +47,7 @@ public class GetPosCommand implements ICommandExecutor {
         if (user.isOnline()) {
             location = user.getPlayer().get().getServerLocation();
         } else {
-            final ServerWorld w = Sponge.getServer().getWorldManager().getWorld(user.getWorldKey())
+            final ServerWorld w = Sponge.server().getWorldManager().getWorld(user.getWorldKey())
                             .orElseThrow(() -> context.createException("command.getpos.location.nolocation", user.getName()));
             location = ServerLocation.of(w, user.getPosition());
         }

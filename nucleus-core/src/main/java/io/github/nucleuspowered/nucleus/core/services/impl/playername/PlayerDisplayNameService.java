@@ -84,7 +84,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
     @Override
     public Optional<User> getUser(final String displayName) {
-        final Optional<User> withRealName = Sponge.getServer().getUserManager().get(displayName);
+        final Optional<User> withRealName = Sponge.server().getUserManager().get(displayName);
         if (withRealName.isPresent()) {
             return withRealName;
         }
@@ -102,7 +102,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     @Override
     public Map<UUID, List<String>> startsWith(final String displayName) {
         final Map<UUID, List<String>> uuids = new HashMap<>();
-        Sponge.getServer().getOnlinePlayers().stream()
+        Sponge.server().getOnlinePlayers().stream()
             .filter(x -> x.getName().toLowerCase().startsWith(displayName.toLowerCase()))
             .forEach(x -> uuids.put(x.getUniqueId(), Lists.newArrayList(x.getName())));
 
@@ -126,7 +126,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         if (playerUUID == Util.CONSOLE_FAKE_UUID) {
             return this.getName(Sponge.getSystemSubject());
         }
-       final User user = Sponge.getServer()
+       final User user = Sponge.server()
                 .getUserManager()
                 .get(playerUUID)
                 .orElseThrow(() -> new IllegalArgumentException("UUID does not map to a player"));
@@ -216,7 +216,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         if (uuid == Util.CONSOLE_FAKE_UUID) {
             return Component.text("Server");
         }
-        return Component.text(Sponge.getServer().getUserManager().get(uuid).map(User::getName).orElse("unknown"));
+        return Component.text(Sponge.server().getUserManager().get(uuid).map(User::getName).orElse("unknown"));
     }
 
     @Override

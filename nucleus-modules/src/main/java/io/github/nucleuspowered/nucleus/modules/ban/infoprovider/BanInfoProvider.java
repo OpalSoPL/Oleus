@@ -34,7 +34,7 @@ public class BanInfoProvider implements NucleusProvider {
             final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, BanPermissions.BASE_CHECKBAN)) {
             // If we have a ban service, then check for a ban.
-            final BanService obs = Sponge.getServer().getServiceProvider().banService();
+            final BanService obs = Sponge.server().getServiceProvider().banService();
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             final Optional<Ban.Profile> bs = obs.getBanFor(user.getProfile());
             final Audience audience = source.getAudience();

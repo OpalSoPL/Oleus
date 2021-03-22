@@ -180,7 +180,7 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
                 return context.successResult();
             }
         } else {
-            final ServerWorld w = Sponge.getServer().getWorldManager().getWorld(to.getWorldKey()).orElseThrow(r);
+            final ServerWorld w = Sponge.server().getWorldManager().getWorld(to.getWorldKey()).orElseThrow(r);
             final ServerLocation l = ServerLocation.of(w, to.getPosition());
 
             final boolean result = context.getServiceCollection()

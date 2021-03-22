@@ -104,7 +104,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
     @Override
     public int getSocialSpyLevel(final UUID uuid) {
         if (this.useLevels) {
-            final User user = Sponge.getServer().getUserManager().get(uuid).orElseThrow(() -> new IllegalArgumentException("Cannot get user with "
+            final User user = Sponge.server().getUserManager().get(uuid).orElseThrow(() -> new IllegalArgumentException("Cannot get user with "
                     + "UUID " + uuid.toString()));
             return this.serviceCollection.permissionService().getPositiveIntOptionFromSubject(user, MessagePermissions.SOCIALSPY_LEVEL_KEY).orElse(0);
         }
@@ -177,7 +177,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
                 .collect(Collectors.toSet());
 
         // Get those who aren't the subjects and have social spy on.
-        final Set<ServerPlayer> sources = Sponge.getServer().getOnlinePlayers()
+        final Set<ServerPlayer> sources = Sponge.server().getOnlinePlayers()
                 .stream()
                 .filter(x -> !uuidsToSpyOn.contains(x.getUniqueId()))
                 .filter(x -> this.isSocialSpy(x.getUniqueId()))
@@ -202,9 +202,9 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
         boolean isBlocked = false;
         this.checkValid(sender);
         this.checkValid(receiver);
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             @Nullable final ServerPlayer senderAsPlayer = sender instanceof UserMessageTarget ?
-                    Sponge.getServer().getPlayer(((UserMessageTarget) sender).getUserUUID()).orElseThrow(() -> new IllegalArgumentException("Sender"
+                    Sponge.server().getPlayer(((UserMessageTarget) sender).getUserUUID()).orElseThrow(() -> new IllegalArgumentException("Sender"
                             + " is not online")) : null;
             if (sender instanceof AbstractMessageTarget) {
                 ((AbstractMessageTarget) sender).pushCauseToFrame(frame);
@@ -275,7 +275,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
                 if (!lm.isEmpty()) {
                     final Component socialSpyToSend = this.constructMessage(sender, tm, prefix, tokens);
                     for (final UUID uuid : lm) {
-                        Sponge.getServer().getPlayer(uuid).ifPresent(x -> x.sendMessage(socialSpyToSend));
+                        Sponge.server().getPlayer(uuid).ifPresent(x -> x.sendMessage(socialSpyToSend));
                     }
                 }
             }

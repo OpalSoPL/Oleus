@@ -29,15 +29,15 @@ public final class UUIDParameter<T> implements ValueParameter<T> {
     private final IMessageProviderService messageProvider;
 
     public static UUIDParameter<GameProfile> gameProfile(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.getServer().getGameProfileManager().getCache().getById(x), messageProvider);
+        return new UUIDParameter<>(x -> Sponge.server().getGameProfileManager().getCache().getById(x), messageProvider);
     }
 
     public static UUIDParameter<User> user(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.getServer().getUserManager().get(x), messageProvider);
+        return new UUIDParameter<>(x -> Sponge.server().getUserManager().get(x), messageProvider);
     }
 
     public static UUIDParameter<ServerPlayer> player(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.getServer().getPlayer(x), messageProvider);
+        return new UUIDParameter<>(x -> Sponge.server().getPlayer(x), messageProvider);
     }
 
     public UUIDParameter(@Nullable final Function<UUID, Optional<T>> validator, final IMessageProviderService messageProviderService) {

@@ -53,7 +53,7 @@ public class NucleusErrorHandler {
     public void errorOnStartup(final StartedEngineEvent<Server> event) {
         try {
             if (Sponge.getPlatform().getType().isServer()) {
-                Sponge.getServer().setHasWhitelist(true);
+                Sponge.server().setHasWhitelist(true);
             }
         } catch (final Throwable e) {
             //ignored
@@ -62,7 +62,7 @@ public class NucleusErrorHandler {
         this.generatePrettyPrint(this.logger, Level.FATAL);
 
         if (this.shouldShutdown) {
-            Sponge.getServer().shutdown();
+            Sponge.server().shutdown();
         }
     }
 

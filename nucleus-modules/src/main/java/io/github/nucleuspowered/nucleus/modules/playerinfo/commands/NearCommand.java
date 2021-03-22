@@ -82,7 +82,7 @@ public class NearCommand implements ICommandExecutor, IReloadableService.Reloada
             location = user.getPlayer().get().getServerLocation();
             position = location.getPosition();
         } else {
-            final ServerWorld world = Sponge.getServer().getWorldManager().getWorld(user.getWorldKey())
+            final ServerWorld world = Sponge.server().getWorldManager().getWorld(user.getWorldKey())
                     .orElseThrow((() -> context.createException("command.near.location.nolocation", user.getName())));
             position = user.getPosition();
             location = ServerLocation.of(world, position);

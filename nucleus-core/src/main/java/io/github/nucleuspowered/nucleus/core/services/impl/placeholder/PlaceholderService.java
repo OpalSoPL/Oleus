@@ -109,10 +109,10 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         this.registerToken("suffix", new NamedOptionPlaceholder(permissionService, "suffix"));
 
         this.registerToken("maxplayers", PlaceholderParser.builder()
-                .parser(p -> Component.text(Sponge.getServer().getMaxPlayers()))
+                .parser(p -> Component.text(Sponge.server().getMaxPlayers()))
                 .build());
         this.registerToken("onlineplayers", PlaceholderParser.builder()
-                        .parser(p -> Component.text(Sponge.getServer().getOnlinePlayers().size()))
+                        .parser(p -> Component.text(Sponge.server().getOnlinePlayers().size()))
                         .build());
         this.registerToken("currentworld", PlaceholderParser.builder()
                 .parser(placeholder -> Component.text(PlaceholderService.getWorld(placeholder).getKey().getFormatted()))
@@ -243,7 +243,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         return placeholder.getAssociatedObject()
                 .filter(x -> x instanceof Locatable)
                 .map(x -> ((Locatable) x).getServerLocation().getWorld().getProperties())
-                .orElseGet(Sponge.getServer().getWorldManager().defaultWorld()::getProperties);
+                .orElseGet(Sponge.server().getWorldManager().defaultWorld()::getProperties);
     }
 
 }

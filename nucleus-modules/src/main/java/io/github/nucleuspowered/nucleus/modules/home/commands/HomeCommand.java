@@ -124,7 +124,7 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
             wl = home.get();
         }
 
-        Sponge.getServer().getWorldManager().getWorld(wl.getWorld().get().getKey())
+        Sponge.server().getWorldManager().getWorld(wl.getWorld().get().getKey())
                 .orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
 
         final ServerLocation targetLocation = wl.getLocation().orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
@@ -137,7 +137,7 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
             }
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             final UseHomeEvent event = new UseHomeEvent(frame.getCurrentCause(), target, wl);
 
             if (Sponge.getEventManager().post(event)) {

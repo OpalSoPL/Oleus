@@ -112,7 +112,7 @@ public class LightningCommand implements ICommandExecutor {
         final ServerWorld world = location.getWorld();
         final Entity bolt = world.createEntity(EntityTypes.LIGHTNING_BOLT.get(), location.getPosition());
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             world.spawnEntity(bolt);
             if (target != null) {
                 context.sendMessage("command.lightning.success.other",

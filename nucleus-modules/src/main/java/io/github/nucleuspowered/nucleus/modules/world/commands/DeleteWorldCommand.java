@@ -72,7 +72,7 @@ public class DeleteWorldCommand implements ICommandExecutor {
     private ICommandResult completeDeletion(final ICommandContext context, final ServerWorldProperties properties) throws CommandException {
         Preconditions.checkNotNull(this.confirm);
         final String worldName = this.confirm._3().getKey().asString();
-        if (Sponge.getServer().getWorldManager().world(properties.getKey()).isPresent()) {
+        if (Sponge.server().getWorldManager().world(properties.getKey()).isPresent()) {
             return context.errorResult("command.world.delete.loaded", this.confirm._3().getKey().asString());
         }
 
@@ -83,11 +83,11 @@ public class DeleteWorldCommand implements ICommandExecutor {
         }
 
         // Now request deletion
-        final CompletableFuture<Boolean> completableFuture = Sponge.getServer().getWorldManager().deleteWorld(properties.getKey());
+        final CompletableFuture<Boolean> completableFuture = Sponge.server().getWorldManager().deleteWorld(properties.getKey());
         final Supplier<Optional<? extends Audience>> source;
         if (context.getAudience() instanceof ServerPlayer) {
             final UUID uuid = ((ServerPlayer) context.getAudience()).getUniqueId();
-            source = () -> Sponge.getServer().getPlayer(uuid);
+            source = () -> Sponge.server().getPlayer(uuid);
         } else {
             source = Optional::empty;
         }

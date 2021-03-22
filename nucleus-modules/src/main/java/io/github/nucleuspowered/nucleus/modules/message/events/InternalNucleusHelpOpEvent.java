@@ -16,7 +16,7 @@ public class InternalNucleusHelpOpEvent extends AbstractEvent implements Nucleus
     private boolean isCancelled = false;
 
     public InternalNucleusHelpOpEvent(final String message) {
-        this.cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
+        this.cause = Sponge.server().getCauseStackManager().getCurrentCause();
         this.message = message;
     }
 

@@ -63,7 +63,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
         final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
 
         final Optional<Duration> time = context.getOne(NucleusParameters.DURATION);
-        final User user = either.fold(Function.identity(), Sponge.getServer().getUserManager()::getOrCreate);
+        final User user = either.fold(Function.identity(), Sponge.server().getUserManager()::getOrCreate);
         final Optional<Mute> omd = handler.getPlayerMuteInfo(user.getUniqueId());
         final Optional<String> reas = context.getOne(NucleusParameters.OPTIONAL_REASON);
 
@@ -87,7 +87,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.errorResult("command.mute.length.toolong", context.getTimeString(this.maxMute));
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             context.getAsPlayer().ifPresent(frame::pushCause);
             if (handler.mutePlayer(user.getUniqueId(), rs, time.orElse(null))) {
                 // Success.

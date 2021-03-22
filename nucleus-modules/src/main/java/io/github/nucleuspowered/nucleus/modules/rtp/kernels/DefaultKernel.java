@@ -51,7 +51,7 @@ public class DefaultKernel implements RTPKernel {
             return Optional.empty();
         }
 
-        final Optional<ServerLocation> targetLocation = Sponge.getServer().getTeleportHelper().getSafeLocation(worldLocation,
+        final Optional<ServerLocation> targetLocation = Sponge.server().getTeleportHelper().getSafeLocation(worldLocation,
                 TeleportHelper.DEFAULT_HEIGHT,
                 TeleportHelper.DEFAULT_WIDTH,
                 TeleportHelper.DEFAULT_FLOOR_CHECK_DISTANCE,

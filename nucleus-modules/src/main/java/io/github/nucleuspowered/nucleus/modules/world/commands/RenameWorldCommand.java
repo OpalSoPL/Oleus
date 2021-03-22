@@ -39,7 +39,7 @@ public class RenameWorldCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ResourceKey oldName = context.requireOne(NucleusParameters.OFFLINE_WORLD);
         final ResourceKey newName = ResourceKey.of("nucleus", context.requireOne(this.nameKey));
-        Sponge.getServer().getWorldManager().moveWorld(oldName, newName).handle((result, exception) -> {
+        Sponge.server().getWorldManager().moveWorld(oldName, newName).handle((result, exception) -> {
             context.getServiceCollection().schedulerService().runOnMainThread(() ->
             {
                 if (exception == null && result) {

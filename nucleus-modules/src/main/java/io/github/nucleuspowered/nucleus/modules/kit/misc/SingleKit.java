@@ -156,18 +156,18 @@ public class SingleKit implements Kit {
 
     @Override
     public Kit updateKitInventory(final UUID player) {
-        return this.updateKitInventory(Util.getStandardInventory(Sponge.getServer().getPlayer(player).get()));
+        return this.updateKitInventory(Util.getStandardInventory(Sponge.server().getPlayer(player).get()));
     }
 
     @Override
     public void redeemKitCommands(final UUID player) {
         final SystemSubject source = Sponge.getSystemSubject();
-        final ServerPlayer pl = Sponge.getServer().getPlayer(player).get();
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        final ServerPlayer pl = Sponge.server().getPlayer(player).get();
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(pl);
             for (final String x : this.getCommands()) {
                 try {
-                    Sponge.getServer().getCommandManager().process(source, x.replace("{{player}}", pl.getName()));
+                    Sponge.server().getCommandManager().process(source, x.replace("{{player}}", pl.getName()));
                 } catch (final CommandException e) {
                     e.printStackTrace();
                 }

@@ -51,7 +51,7 @@ public final class MailReadBase {
         }
 
         final String name =
-                Sponge.getServer().getUserManager().get(target).map(User::getName).orElseGet(() -> context.getMessageString("standard.unknown"));
+                Sponge.server().getUserManager().get(target).map(User::getName).orElseGet(() -> context.getMessageString("standard.unknown"));
         final boolean isSelf = context.is(target);
         if (lmd.isEmpty()) {
             if (isSelf) {

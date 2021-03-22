@@ -63,17 +63,17 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final boolean showVanished = context.testPermission(PlayerInfoPermissions.LIST_SEEVANISHED);
 
-        final Collection<ServerPlayer> players = Sponge.getServer().getOnlinePlayers();
+        final Collection<ServerPlayer> players = Sponge.server().getOnlinePlayers();
         final long playerCount = players.size();
         final long hiddenCount = players.stream().filter(x -> x.get(Keys.VANISH).orElse(false)).count();
 
         final Component header;
         if (showVanished && hiddenCount > 0) {
             header = context.getMessage("command.list.playercount.hidden", String.valueOf(playerCount),
-                    String.valueOf(Sponge.getServer().getMaxPlayers()), String.valueOf(hiddenCount));
+                    String.valueOf(Sponge.server().getMaxPlayers()), String.valueOf(hiddenCount));
         } else {
             header = context.getMessage("command.list.playercount.base", String.valueOf(playerCount - hiddenCount),
-                    String.valueOf(Sponge.getServer().getMaxPlayers()));
+                    String.valueOf(Sponge.server().getMaxPlayers()));
         }
 
         final PaginationList.Builder builder = Util.getPaginationBuilder(context.getAudience()).title(header);
@@ -132,7 +132,7 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
         final IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
         final IPermissionService permissionService = context.getServiceCollection().permissionService();
         final Map<String, List<ServerPlayer>> map = new HashMap<>();
-        for (final ServerPlayer player : Sponge.getServer().getOnlinePlayers()) {
+        for (final ServerPlayer player : Sponge.server().getOnlinePlayers()) {
             if (showVanished || context.getAsPlayer().map(x -> playerOnlineService.isOnline(x, player.getUser())).orElse(true)) {
                 String perm = permissionService.getOptionFromSubject(player, LIST_OPTION).orElse(def);
                 if (perm.trim().isEmpty()) {

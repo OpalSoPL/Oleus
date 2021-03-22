@@ -90,7 +90,7 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
     @Override
     public ForwardingAudience receivers() {
         final List<Audience> audienceList = new ArrayList<>();
-        Sponge.getServer().getOnlinePlayers().stream()
+        Sponge.server().getOnlinePlayers().stream()
                 .filter(this::test)
                 .forEach(audienceList::add);
         audienceList.add(Sponge.getSystemSubject());

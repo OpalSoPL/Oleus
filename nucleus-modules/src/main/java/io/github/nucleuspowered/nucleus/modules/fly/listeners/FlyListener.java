@@ -53,17 +53,17 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
 
         this.serviceCollection.storageManager().getUser(pl.getUniqueId()).thenAccept(x -> x.ifPresent(y -> {
             if (y.get(FlyKeys.FLY_TOGGLE).orElse(false)) {
-                if (Sponge.getServer().onMainThread()) {
+                if (Sponge.server().onMainThread()) {
                     this.exec(pl);
                 } else {
-                    Sponge.getServer().getScheduler().submit(
+                    Sponge.server().getScheduler().submit(
                             Task.builder().execute(() -> this.exec(pl)).plugin(this.serviceCollection.pluginContainer()).build());
                 }
             } else {
-                if (Sponge.getServer().onMainThread()) {
+                if (Sponge.server().onMainThread()) {
                     this.safeTeleport(pl);
                 } else {
-                    Sponge.getServer().getScheduler().submit(
+                    Sponge.server().getScheduler().submit(
                             Task.builder().execute(() -> this.safeTeleport(pl)).plugin(this.serviceCollection.pluginContainer()).build());
                 }
             }
@@ -110,7 +110,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
         // If we're moving world...
         if (!twfrom.getKey().equals(twto.getKey())) {
             // Next tick, they can fly... if they have permission to do so.
-            Sponge.getServer().getScheduler().submit(Task.builder().execute(() -> {
+            Sponge.server().getScheduler().submit(Task.builder().execute(() -> {
                 if (this.serviceCollection.permissionService().hasPermission(pl, FlyPermissions.BASE_FLY)) {
                     pl.offer(Keys.CAN_FLY, true);
                     if (isFlying) {

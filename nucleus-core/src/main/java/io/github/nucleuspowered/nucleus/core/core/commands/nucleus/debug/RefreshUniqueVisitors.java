@@ -36,7 +36,7 @@ public class RefreshUniqueVisitors implements ICommandExecutor {
         final Supplier<Audience> scs;
         if (optionalUUID.isPresent()) {
             final UUID uuid = optionalUUID.get();
-            scs = () -> Sponge.getServer().getPlayer(uuid).map(x -> (Audience) x).orElseGet(Sponge::getSystemSubject);
+            scs = () -> Sponge.server().getPlayer(uuid).map(x -> (Audience) x).orElseGet(Sponge::getSystemSubject);
         } else {
             scs = Sponge::getSystemSubject;
         }

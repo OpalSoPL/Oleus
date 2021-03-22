@@ -123,7 +123,7 @@ public class WorldTimeParameter implements ValueParameter<MinecraftDayTime> {
 
         // 0 -> 23999
         if (ticks.matcher(arg).matches()) {
-            return MinecraftDayTime.of(Sponge.getServer(), Ticks.of(Long.parseLong(arg)));
+            return MinecraftDayTime.of(Sponge.server(), Ticks.of(Long.parseLong(arg)));
         }
 
         throw reader.createException(this.messageProvider.getMessageFor(audience, "args.worldtime.error", arg));

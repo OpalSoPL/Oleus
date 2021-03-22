@@ -71,7 +71,7 @@ public final class MuteService implements NucleusMuteService, IReloadableService
     }
 
     public void checkExpiry() {
-        for (final ServerPlayer uuid : Sponge.getServer().getOnlinePlayers()) {
+        for (final ServerPlayer uuid : Sponge.server().getOnlinePlayers()) {
             final Mute mute = this.mutes.get(uuid.getUniqueId());
             if (mute != null && mute != MuteService.NOT_MUTED && mute.expired()) {
                 this.serviceCollection.schedulerService().runOnMainThread(() -> this.unmutePlayer(uuid.getUniqueId()));
@@ -105,7 +105,7 @@ public final class MuteService implements NucleusMuteService, IReloadableService
             return false; // already muted
         }
 
-        final Object root = Sponge.getServer().getCauseStackManager().getCurrentCause().root();
+        final Object root = Sponge.server().getCauseStackManager().getCurrentCause().root();
         @Nullable final UUID uuid;
         if (root instanceof ServerPlayer) {
             uuid = ((ServerPlayer) root).getUniqueId();
@@ -115,13 +115,13 @@ public final class MuteService implements NucleusMuteService, IReloadableService
         final MutedEntry entry = MutedEntry.fromMutingRequest(user, reason, uuid, Instant.now(), duration);
         this.serviceCollection.storageManager().getUserService().setAndSave(user, MuteKeys.MUTE_DATA, entry.asMuteData(this.isOnlineOnly));
         Sponge.getEventManager().post(new MuteEvent.Muted(
-                Sponge.getServer().getCauseStackManager().getCurrentCause(),
+                Sponge.server().getCauseStackManager().getCurrentCause(),
                 user,
                 duration,
                 Component.text(reason)
         ));
 
-        Sponge.getServer().getPlayer(user).ifPresent(x -> {
+        Sponge.server().getPlayer(user).ifPresent(x -> {
             this.mutes.invalidate(user);
             this.mutes.put(user, entry);
             this.onMute(entry, x);
@@ -136,11 +136,11 @@ public final class MuteService implements NucleusMuteService, IReloadableService
             this.serviceCollection.storageManager().getUserService().removeAndSave(uuid, MuteKeys.MUTE_DATA);
             this.mutes.invalidate(uuid);
             Sponge.getEventManager().post(new MuteEvent.Unmuted(
-                    Sponge.getServer().getCauseStackManager().getCurrentCause(),
+                    Sponge.server().getCauseStackManager().getCurrentCause(),
                     uuid,
                     mute.get().expired()));
 
-            Sponge.getServer().getPlayer(uuid).ifPresent(x -> {
+            Sponge.server().getPlayer(uuid).ifPresent(x -> {
                 this.mutes.put(uuid, MuteService.NOT_MUTED);
                 this.serviceCollection.messageProvider().sendMessageTo(x, "mute.elapsed");
             });

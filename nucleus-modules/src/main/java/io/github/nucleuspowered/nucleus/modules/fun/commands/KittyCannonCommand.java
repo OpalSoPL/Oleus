@@ -113,7 +113,7 @@ public class KittyCannonCommand implements ICommandExecutor {
                 spawnAt.getLocation().getPosition().add(0, 1, 0).add(spawnAt.getTransform().getRotationAsQuaternion().getDirection()));
         cat.offer(Keys.CAT_TYPE, catTypes.get(this.random.nextInt(catTypes.size())));
 
-        Sponge.getServer().getScheduler().submit(
+        Sponge.server().getScheduler().submit(
                 Task.builder().interval(Ticks.of(5))
                         .delay(Ticks.of(5))
                         .execute(new CatTimer(world.getKey(),
@@ -126,7 +126,7 @@ public class KittyCannonCommand implements ICommandExecutor {
                         .plugin(context.getServiceCollection().pluginContainer())
                         .build());
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
             world.spawnEntity(cat);
         }
@@ -158,7 +158,7 @@ public class KittyCannonCommand implements ICommandExecutor {
 
         @Override
         public void accept(final ScheduledTask task) {
-            final Optional<ServerWorld> oWorld = Sponge.getServer().getWorldManager().world(this.world);
+            final Optional<ServerWorld> oWorld = Sponge.server().getWorldManager().world(this.world);
             if (!oWorld.isPresent()) {
                 task.cancel();
                 return;
@@ -183,7 +183,7 @@ public class KittyCannonCommand implements ICommandExecutor {
                     .shouldDamageEntities(this.damageEntities).shouldPlaySmoke(true).shouldBreakBlocks(this.breakBlocks)
                     .radius(2).build();
                 e.remove();
-                try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+                try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                     frame.pushCause(this.player);
                     oWorld.get().triggerExplosion(explosion);
                 }

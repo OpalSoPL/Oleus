@@ -93,7 +93,7 @@ public class RocketCommand implements ICommandExecutor {
                     .build();
 
             target.getServerLocation().getWorld().triggerExplosion(ex);
-            Sponge.getServer().getScheduler().submit(
+            Sponge.server().getScheduler().submit(
                     Task.builder()
                             .plugin(context.getServiceCollection().pluginContainer())
                             .execute(() -> ex.getWorld().playSound(

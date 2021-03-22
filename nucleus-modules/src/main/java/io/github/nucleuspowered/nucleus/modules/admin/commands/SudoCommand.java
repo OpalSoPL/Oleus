@@ -64,7 +64,7 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
             }
 
             final Component rawMessage = Component.text(cmd.split(":", 2)[1]);
-            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                 frame.pushCause(context.getCommandSourceRoot());
                 frame.pushCause(pl); // on top
                 frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.getProfile());
@@ -78,7 +78,7 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
         }
 
         context.sendMessage("command.sudo.force", pl.getName(), cmd);
-        Sponge.getServer().getCommandManager().process(pl, cmd);
+        Sponge.server().getCommandManager().process(pl, cmd);
         return context.successResult();
     }
 

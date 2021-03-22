@@ -115,14 +115,14 @@ public class RTPConfig {
             return Optional.empty();
         }
 
-        return Sponge.getServer().getWorldManager().world(ResourceKey.resolve(this.defaultWorld));
+        return Sponge.server().getWorldManager().world(ResourceKey.resolve(this.defaultWorld));
     }
 
     public Set<Biome> getProhibitedBiomes() {
         if (this.lazyLoadProhbitedBiomes == null) {
             this.lazyLoadProhbitedBiomes = this.prohibitedBiomes.stream()
                     .map(ResourceKey::resolve)
-                    .map(x -> Sponge.getServer().registries().findRegistry(RegistryTypes.BIOME).flatMap(r -> r.findValue(x)).orElse(null))
+                    .map(x -> Sponge.server().registries().findRegistry(RegistryTypes.BIOME).flatMap(r -> r.findValue(x)).orElse(null))
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
         }

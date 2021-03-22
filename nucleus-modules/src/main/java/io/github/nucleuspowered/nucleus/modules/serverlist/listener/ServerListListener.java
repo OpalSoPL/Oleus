@@ -54,7 +54,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
             if (ott.isPresent()) {
                 response.setDescription(ott.get());
             } else {
-                if (Sponge.getServer().hasWhitelist() && !this.whitelist.isEmpty()) {
+                if (Sponge.server().hasWhitelist() && !this.whitelist.isEmpty()) {
                     list = this.whitelist;
                 } else if (!this.messages.isEmpty()) {
                     list = this.messages;
@@ -70,7 +70,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
         if (this.hidePlayerCount) {
             response.setHidePlayers(true);
         } else if (this.hideVanishPlayers) {
-            final Collection<GameProfile> players = Sponge.getServer().getOnlinePlayers().stream()
+            final Collection<GameProfile> players = Sponge.server().getOnlinePlayers().stream()
                     .filter(x -> !x.get(Keys.VANISH).orElse(false))
                     .map(ServerPlayer::getProfile)
                     .collect(Collectors.toList());

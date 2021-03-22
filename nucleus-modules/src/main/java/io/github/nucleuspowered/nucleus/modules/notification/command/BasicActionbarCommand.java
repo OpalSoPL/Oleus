@@ -49,7 +49,7 @@ public class BasicActionbarCommand implements ICommandExecutor {
         final Collection<ServerPlayer> targets =
                 context.getOne(NucleusParameters.MANY_PLAYER)
                         .map(Collections::unmodifiableCollection)
-                        .orElseGet(Sponge.getServer()::getOnlinePlayers);
+                        .orElseGet(Sponge.server()::getOnlinePlayers);
 
         if (targets.isEmpty()) {
             return context.errorResult("command.title.noonline");

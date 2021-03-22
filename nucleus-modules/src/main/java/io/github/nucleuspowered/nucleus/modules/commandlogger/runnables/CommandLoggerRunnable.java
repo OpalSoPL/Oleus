@@ -35,7 +35,7 @@ public class CommandLoggerRunnable implements TaskBase, IReloadableService.Reloa
     @Override
     public void run() {
         try {
-            Sponge.getServer();
+            Sponge.server();
             if (this.config.isLogToFile()) {
                 this.handler.onTick();
             }

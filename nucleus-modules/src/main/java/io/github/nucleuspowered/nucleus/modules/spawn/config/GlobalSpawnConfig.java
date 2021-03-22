@@ -46,9 +46,9 @@ public class GlobalSpawnConfig {
     }
 
     public Optional<ServerWorld> getWorld() {
-        Optional<ServerWorld> ow = Sponge.getServer().getWorldManager().world(ResourceKey.resolve(this.spawnWorld));
+        Optional<ServerWorld> ow = Sponge.server().getWorldManager().world(ResourceKey.resolve(this.spawnWorld));
         if (!ow.isPresent()) {
-            ow = Optional.of(Sponge.getServer().getWorldManager().defaultWorld());
+            ow = Optional.of(Sponge.server().getWorldManager().defaultWorld());
         }
 
         return ow;

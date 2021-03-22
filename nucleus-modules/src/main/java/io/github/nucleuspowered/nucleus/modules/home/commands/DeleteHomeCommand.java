@@ -66,7 +66,7 @@ public class DeleteHomeCommand implements ICommandExecutor {
         final Home wl = context.requireOne(this.parameter);
         final Optional<User> target = context.getOne(this.userParameter);
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
             context.getServiceCollection().getServiceUnchecked(HomeService.class).removeHome(wl.getOwnersUniqueId(), wl.getName());
             if (target.isPresent()) {

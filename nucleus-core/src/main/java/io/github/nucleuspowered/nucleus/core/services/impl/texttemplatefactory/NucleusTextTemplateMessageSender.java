@@ -30,7 +30,7 @@ public class NucleusTextTemplateMessageSender {
     }
 
     public boolean send() {
-        return this.send(Sponge.getServer(), true);
+        return this.send(Sponge.server(), true);
     }
 
     public boolean send(final Audience audience) {
@@ -39,9 +39,9 @@ public class NucleusTextTemplateMessageSender {
 
     public boolean send(final Audience originalMembers, final boolean isBroadcast) {
         final NucleusTextTemplateEvent event;
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(this.sender);
-            final Cause cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
+            final Cause cause = Sponge.server().getCauseStackManager().getCurrentCause();
             if (isBroadcast) {
                 event = new NucleusTextTemplateEventImpl.Broadcast(
                         this.textTemplate,

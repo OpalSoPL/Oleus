@@ -45,13 +45,13 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
     @IsCancelled(Tristate.TRUE)
     public void onPlayerJoinAndCancelled(final ServerSideConnectionEvent.Login event, @Getter("getUser") final User user) {
         // Don't affect the banned.
-        final BanService banService = Sponge.getServer().getServiceProvider().banService();
+        final BanService banService = Sponge.server().getServiceProvider().banService();
         if (banService.isBanned(user.getProfile()) || banService.isBanned(event.getConnection().getAddress().getAddress())) {
             return;
         }
 
-        if (Sponge.getServer().hasWhitelist()
-            && !Sponge.getServer().getServiceProvider().whitelistService().isWhitelisted(user.getProfile())) {
+        if (Sponge.server().hasWhitelist()
+            && !Sponge.server().getServiceProvider().whitelistService().isWhitelisted(user.getProfile())) {
             if (this.whitelistMessage != null) {
                 event.setMessage(this.whitelistMessage);
                 event.setCancelled(true);
@@ -61,7 +61,7 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
             return;
         }
 
-        final int slotsLeft = Sponge.getServer().getMaxPlayers() - Sponge.getServer().getOnlinePlayers().size();
+        final int slotsLeft = Sponge.server().getMaxPlayers() - Sponge.server().getOnlinePlayers().size();
         if (slotsLeft <= 0) {
             if (this.permissionService.hasPermission(user, ConnectionPermissions.CONNECTION_JOINFULLSERVER)) {
 

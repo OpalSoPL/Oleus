@@ -231,9 +231,9 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                                 return;
                             }
                             if (this.useCommandsOnClickAcceptDeny) {
-                                try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+                                try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                                     frame.pushCause(root);
-                                    Sponge.getServer().getCommandManager().process("nucleus:tpaccept");
+                                    Sponge.server().getCommandManager().process("nucleus:tpaccept");
                                 } catch (final CommandException ex) {
                                     src.sendMessage(Identity.nil(), ex.componentMessage());
                                 }
@@ -255,9 +255,9 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                             return;
                         }
                         if (this.useCommandsOnClickAcceptDeny) {
-                            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+                            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                                 frame.pushCause(root);
-                                Sponge.getServer().getCommandManager().process("nucleus:tpdeny");
+                                Sponge.server().getCommandManager().process("nucleus:tpdeny");
                             } catch (final CommandException ex) {
                                 src.sendMessage(Identity.nil(), ex.componentMessage());
                             }
@@ -340,7 +340,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
         if (requester == null) {
             serviceCollection.messageProvider().sendMessageTo(Sponge.getSystemSubject(), "command.tpdeny.denyrequester", name);
         } else {
-            final Optional<ServerPlayer> op = Sponge.getServer().getPlayer(requester);
+            final Optional<ServerPlayer> op = Sponge.server().getPlayer(requester);
             op.ifPresent(x -> serviceCollection.messageProvider().sendMessageTo(x, "command.tpdeny.denyrequester", name));
 
             if (serviceCollection.economyServiceProvider().serviceExists() && cost > 0) {
@@ -350,7 +350,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                                 "teleport.prep.cancel",
                                 serviceCollection.economyServiceProvider().getCurrencySymbol(cost)));
 
-                final User user = op.map(x -> (User) x).orElseGet(() -> Sponge.getServer().getUserManager().get(requester).orElse(null));
+                final User user = op.map(x -> (User) x).orElseGet(() -> Sponge.server().getUserManager().get(requester).orElse(null));
                 if (user != null) {
                     serviceCollection.economyServiceProvider().depositInPlayer(user.getUniqueId(), cost);
                 }

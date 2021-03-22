@@ -64,7 +64,7 @@ public class ClearInventoryCommand implements ICommandExecutor {
     }
 
     private ICommandResult clear(final ICommandContext context, final Carrier target, final UUID uuid, final String name, final boolean all) {
-        if (Sponge.getEventManager().post(new ClearInventoryEvent.Pre(Sponge.getServer().getCauseStackManager().getCurrentCause(), uuid, all))) {
+        if (Sponge.getEventManager().post(new ClearInventoryEvent.Pre(Sponge.server().getCauseStackManager().getCurrentCause(), uuid, all))) {
             return context.errorResult("command.clearinventory.cancelled", name);
         }
         if (all) {
@@ -72,7 +72,7 @@ public class ClearInventoryCommand implements ICommandExecutor {
         } else {
             Util.getStandardInventory(target).clear();
         }
-        Sponge.getEventManager().post(new ClearInventoryEvent.Post(Sponge.getServer().getCauseStackManager().getCurrentCause(), uuid, all));
+        Sponge.getEventManager().post(new ClearInventoryEvent.Post(Sponge.server().getCauseStackManager().getCurrentCause(), uuid, all));
         context.sendMessage("command.clearinventory.success", name);
         return context.successResult();
     }

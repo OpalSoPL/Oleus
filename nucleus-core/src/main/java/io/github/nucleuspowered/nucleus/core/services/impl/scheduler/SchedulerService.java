@@ -24,7 +24,7 @@ public final class SchedulerService implements ISchedulerService {
 
     @Override
     public CompletableFuture<Void> runOnMainThread(final Runnable runnable) {
-        if (Sponge.getServer().onMainThread()) {
+        if (Sponge.server().onMainThread()) {
             try {
                 runnable.run();
                 return CompletableFuture.completedFuture(null);
@@ -35,7 +35,7 @@ public final class SchedulerService implements ISchedulerService {
             }
         } else {
             final CompletableFuture<Void> future = new CompletableFuture<>();
-            Sponge.getServer().getScheduler().createExecutor(this.pluginContainer).submit(() -> {
+            Sponge.server().getScheduler().createExecutor(this.pluginContainer).submit(() -> {
                 try {
                     runnable.run();
                     return CompletableFuture.completedFuture(null);

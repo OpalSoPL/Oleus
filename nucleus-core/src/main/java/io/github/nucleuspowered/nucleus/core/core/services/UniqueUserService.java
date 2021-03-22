@@ -62,7 +62,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
             this.userCountIsDirty = true;
             ERROR_REPORTED = false;
 
-            if (Sponge.getServer().onMainThread()) {
+            if (Sponge.server().onMainThread()) {
                 Sponge.getAsyncScheduler().createExecutor(this.serviceCollection.pluginContainer())
                         .submit(() -> this.doTask(resultConsumer));
             } else {
@@ -72,7 +72,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
     }
 
     private void doTask(@Nullable final Consumer<Long> resultConsumer) {
-        final UserManager uss = Sponge.getServer().getUserManager();
+        final UserManager uss = Sponge.server().getUserManager();
         final IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> service =
                 this.serviceCollection.storageManager().getUserService();
 

@@ -106,7 +106,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
             this.activity.clear();
         }
 
-        final List<UUID> uuidList = Sponge.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toList());
+        final List<UUID> uuidList = Sponge.server().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toList());
 
         // Remove all offline players.
         final Set<Map.Entry<UUID, AFKData>> entries = this.data.entrySet();
@@ -129,24 +129,24 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
 
                 final NucleusTextTemplate messageToServer = this.onKick == null ? NucleusTextTemplateImpl.empty() : this.onKick;
 
-                Sponge.getServer().getPlayer(e.getKey()).ifPresent(player -> {
+                Sponge.server().getPlayer(e.getKey()).ifPresent(player -> {
                     final Audience mc;
                     if (this.config.isBroadcastOnKick()) {
-                        mc = Sponge.getServer();
+                        mc = Sponge.server();
                     } else {
                         mc = new PermissionMessageChannel(this.serviceCollection.permissionService(), AFKPermissions.AFK_NOTIFY);
                     }
 
                     // TODO: CSM for thread
                     final AFKEvents.Kick events = new AFKEvents.Kick(player.getUniqueId(), messageToServer.getForObject(player), mc,
-                            Sponge.getServer().getCauseStackManager().getCurrentCause());
+                            Sponge.server().getCauseStackManager().getCurrentCause());
                     if (Sponge.getEventManager().post(events)) {
                         // Cancelled.
                         return;
                     }
 
                     final Component toSend = t instanceof NucleusTextTemplateImpl ? ((NucleusTextTemplateImpl) t).getForObject(player) : t.asComponent();
-                    Sponge.getServer().getScheduler().createExecutor(this.serviceCollection.pluginContainer()).execute(() -> player.kick(toSend));
+                    Sponge.server().getScheduler().createExecutor(this.serviceCollection.pluginContainer()).execute(() -> player.kick(toSend));
                     final Component eventMessage = events.getMessage();
                     if (!AdventureUtils.isEmpty(eventMessage)) {
                         events.getAudience().ifPresent(x -> x.sendMessage(eventMessage, MessageType.SYSTEM));
@@ -158,7 +158,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
         // Check AFK status.
         entries.stream().filter(x -> !x.getValue().isKnownAfk && x.getValue().timeToAfk > 0).forEach(e -> {
             if (now - e.getValue().lastActivityTime  > e.getValue().timeToAfk) {
-                Sponge.getServer().getPlayer(e.getKey()).ifPresent(this::setAfkInternal);
+                Sponge.server().getPlayer(e.getKey()).ifPresent(this::setAfkInternal);
             }
         });
     }
@@ -190,9 +190,9 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
                 this.activity.remove(uuid);
             }
 
-            final Tuples.NullableTuple<Component, Audience> ttmc = this.getAFKMessage(Sponge.getServer().getPlayer(uuid).get(), true);
+            final Tuples.NullableTuple<Component, Audience> ttmc = this.getAFKMessage(Sponge.server().getPlayer(uuid).get(), true);
             final AFKEvents.To event = new AFKEvents.To(uuid, ttmc.getFirstUnwrapped(), ttmc.getSecondUnwrapped(),
-                    Sponge.getServer().getCauseStackManager()
+                    Sponge.server().getCauseStackManager()
                     .getCurrentCause());
             Sponge.getEventManager().post(event);
             this.actionEvent(event, "command.afk.to.nobc", "command.afk.to.console");
@@ -222,7 +222,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
     }
 
     private AFKData updateActivity(final UUID uuid, final AFKData data) {
-        return this.updateActivity(uuid, data, Sponge.getServer().getCauseStackManager().getCurrentCause());
+        return this.updateActivity(uuid, data, Sponge.server().getCauseStackManager().getCurrentCause());
     }
 
     private AFKData updateActivity(final UUID uuid, final AFKData data, final Cause cause) {
@@ -230,7 +230,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
         if (data.isKnownAfk) {
             data.isKnownAfk = false;
             data.willKick = false;
-            Sponge.getServer().getPlayer(uuid).ifPresent(x -> {
+            Sponge.server().getPlayer(uuid).ifPresent(x -> {
                 final Tuples.NullableTuple<Component, Audience> ttmc = this.getAFKMessage(x, false);
                 final AFKEvents.From event = new AFKEvents.From(x.getUniqueId(), ttmc.getFirstUnwrapped(), ttmc.getSecondUnwrapped(), cause);
                 Sponge.getEventManager().post(event);
@@ -250,7 +250,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
             event.getAudience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, key));
             if (consoleKey != null) {
                 this.serviceCollection.messageProvider()
-                        .sendMessageTo(Sponge.getSystemSubject(), consoleKey, Sponge.getServer()
+                        .sendMessageTo(Sponge.getSystemSubject(), consoleKey, Sponge.server()
                                 .getPlayer(event.getTargetPlayer()).map(Nameable::getName).orElse("unknown"));
             }
         }
@@ -259,7 +259,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
     private Tuples.NullableTuple<Component, Audience> getAFKMessage(final Player player, final boolean isAfk) {
         if (this.config.isBroadcastAfkOnVanish() || !player.get(Keys.VANISH).orElse(false)) {
             final NucleusTextTemplate template = isAfk ? this.afkMessage : this.returnAfkMessage;
-            return Tuples.ofNullable(template.getForObject(player), Audience.audience(Sponge.getServer()));
+            return Tuples.ofNullable(template.getForObject(player), Audience.audience(Sponge.server()));
         } else {
             return Tuples.ofNullable(null, Audience.empty());
         }
@@ -312,11 +312,11 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
     @Override
     public AFKNotificationResult notifyIsAfk(final Audience audience, final UUID potentialAfkUser) {
         if (this.isAFK(potentialAfkUser)) {
-            final ServerPlayer player = Sponge.getServer().getPlayer(potentialAfkUser).orElse(null);
+            final ServerPlayer player = Sponge.server().getPlayer(potentialAfkUser).orElse(null);
             if (player != null) {
                 final Component messageToSend = this.afkNotifyCommandMessage.getForObject(player);
                 final AFKEvents.Notify event = new AFKEvents.Notify(player.getUniqueId(), messageToSend, audience,
-                        Sponge.getServer().getCauseStackManager().getCurrentCause());
+                        Sponge.server().getCauseStackManager().getCurrentCause());
                 Sponge.getEventManager().post(event);
                 if (event.getMessage() != null && !AdventureUtils.isEmpty(event.getMessage())) {
                     audience.sendMessage(this.afkNotifyCommandMessage);
@@ -343,7 +343,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
                 this.disabledTracking.remove(player, t.getUniqueId());
             }
         }).delay(time).plugin(this.serviceCollection.pluginContainer()).build();
-        final ScheduledTask task = Sponge.getServer().getScheduler().submit(n);
+        final ScheduledTask task = Sponge.server().getScheduler().submit(n);
 
         synchronized (this.lock2) {
             this.disabledTracking.put(player, task.getUniqueId());
@@ -377,7 +377,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
     private Stream<ServerPlayer> getAfkStream(final Predicate<ServerPlayer> filter) {
         return this.data.entrySet().stream()
                 .filter(x -> x.getValue().isKnownAfk)
-                .map(x -> Sponge.getServer().getPlayer(x.getKey()).orElse(null))
+                .map(x -> Sponge.server().getPlayer(x.getKey()).orElse(null))
                 .filter(Objects::nonNull)
                 .filter(filter);
     }
@@ -422,7 +422,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
                 if (!this.cacheValid) {
                     // Get the subject.
                     final IPermissionService service = AFKHandler.this.serviceCollection.permissionService();
-                    Sponge.getServer().getPlayer(this.uuid).ifPresent(x -> {
+                    Sponge.server().getPlayer(this.uuid).ifPresent(x -> {
                         if (service.hasPermission(x, AFKPermissions.AFK_EXEMPT_TOGGLE)) {
                             this.timeToAfk = -1;
                         } else {

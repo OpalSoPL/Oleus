@@ -98,13 +98,13 @@ public class WeatherCommand implements ICommandExecutor, IReloadableService.Relo
 
         if (oi.isPresent()) {
             // YES! I should get a job at the weather service and show them how it's done!
-            Sponge.getServer().getScheduler().submit(Task.builder()
-                    .execute(() -> w.setWeather(we, Ticks.ofWallClockSeconds(Sponge.getServer(), oi.get().intValue())))
+            Sponge.server().getScheduler().submit(Task.builder()
+                    .execute(() -> w.setWeather(we, Ticks.ofWallClockSeconds(Sponge.server(), oi.get().intValue())))
                     .plugin(context.getServiceCollection().pluginContainer()).build());
             context.sendMessage("command.weather.time", we.getKey().asString(), w.getKey().asString(), context.getTimeString(oi.get()));
         } else {
             // No, probably because I've already gotten a job at the weather service...
-            Sponge.getServer().getScheduler().submit(
+            Sponge.server().getScheduler().submit(
                     Task.builder().execute(() -> w.setWeather(we)).plugin(context.getServiceCollection().pluginContainer()).build()
             );
             context.sendMessage("command.weather.set", we.getKey().asString(), w.getKey().asString());

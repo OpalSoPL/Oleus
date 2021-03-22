@@ -34,8 +34,8 @@ public class TeleportAllHereCommand implements ICommandExecutor {
         final ServerPlayer serverPlayer = context.requirePlayer();
         final ServerLocation toLocation = serverPlayer.getServerLocation();
         final Vector3d toRotation = serverPlayer.getRotation();
-        context.sendMessageTo(Sponge.getServer(), "command.tpall.broadcast", context.getName());
-        Sponge.getServer().getOnlinePlayers().forEach(x -> {
+        context.sendMessageTo(Sponge.server(), "command.tpall.broadcast", context.getName());
+        Sponge.server().getOnlinePlayers().forEach(x -> {
             if (!context.is(x)) {
                 context.getServiceCollection()
                         .teleportService()

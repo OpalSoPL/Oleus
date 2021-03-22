@@ -19,7 +19,7 @@ public class ConnectionMessagesForceListener implements ListenerBase.Conditional
     @Listener(order = Order.LAST)
     @Include({ServerSideConnectionEvent.Disconnect.class, ServerSideConnectionEvent.Join.class})
     public void onPlayerLogin(final MessageChannelEvent joinEvent) {
-        joinEvent.setAudience(Sponge.getServer());
+        joinEvent.setAudience(Sponge.server());
     }
 
     @Override

@@ -37,7 +37,7 @@ public interface IChatMessageFormatterService {
         }
 
         default Audience receivers() {
-            return Sponge.getServer();
+            return Sponge.server();
         }
 
         default boolean ignoreIgnoreList() {

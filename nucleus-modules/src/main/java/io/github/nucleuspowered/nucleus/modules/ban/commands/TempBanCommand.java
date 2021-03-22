@@ -79,7 +79,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
                     context.getTimeString(this.banConfig.getMaximumTempBanLength()));
         }
 
-        final BanService service = Sponge.getServer().getServiceProvider().banService();
+        final BanService service = Sponge.server().getServiceProvider().banService();
 
         if (service.isBanned(u.getProfile())) {
             return context.errorResult("command.ban.alreadyset", u.getName());
@@ -113,7 +113,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
                         src));
         send.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
-        Sponge.getServer().getPlayer(u.getUniqueId()).ifPresent(x -> x.kick(r));
+        Sponge.server().getPlayer(u.getUniqueId()).ifPresent(x -> x.kick(r));
         return context.successResult();
     }
 }

@@ -92,7 +92,7 @@ public class TeleportAskHereCommand implements ICommandExecutor {
             return context.errorResult("command.teleport.self");
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(src);
             // Before we do all this, check the event.
             final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(frame.getCurrentCause(), target.getUniqueId());

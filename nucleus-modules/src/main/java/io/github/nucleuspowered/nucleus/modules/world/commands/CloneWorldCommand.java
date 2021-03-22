@@ -47,7 +47,7 @@ public class CloneWorldCommand implements ICommandExecutor {
         final ServerWorld worldToCopy = context.requireOne(NucleusParameters.ONLINE_WORLD);
         final ResourceKey oldName = worldToCopy.getKey();
         final ResourceKey newName = ResourceKey.of(context.getServiceCollection().pluginContainer(), context.requireOne(this.newNameParameter));
-        if (Sponge.getServer().getWorldManager().world(newName).isPresent()) {
+        if (Sponge.server().getWorldManager().world(newName).isPresent()) {
             return context.errorResult("command.world.clone.alreadyexists", newName.asString());
         }
 
@@ -60,12 +60,12 @@ public class CloneWorldCommand implements ICommandExecutor {
         final Supplier<Audience> mr;
         if (context.getAudience() instanceof ServerPlayer) {
             final UUID uuid = ((ServerPlayer) context.getAudience()).getUniqueId();
-            mr = () -> Sponge.getServer().getPlayer(uuid).map(x -> (Audience) x).orElseGet(Audience::empty);
+            mr = () -> Sponge.server().getPlayer(uuid).map(x -> (Audience) x).orElseGet(Audience::empty);
         } else {
             mr = context::getAudience;
         }
 
-        Sponge.getServer().getWorldManager().copyWorld(oldName, newName).handle((result, ex) -> {
+        Sponge.server().getWorldManager().copyWorld(oldName, newName).handle((result, ex) -> {
 
             final Audience m = mr.get();
             if (ex == null && result != null) {

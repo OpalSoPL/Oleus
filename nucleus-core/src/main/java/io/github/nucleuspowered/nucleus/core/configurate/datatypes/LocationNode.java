@@ -72,7 +72,7 @@ public class LocationNode {
      * Gets a {@link Location} from the node.
      */
     public Optional<ServerLocation> getLocationIfExists() {
-        return Sponge.getServer().getWorldManager().world(this.world).map(r -> ServerLocation.of(r, this.getPosition()));
+        return Sponge.server().getWorldManager().world(this.world).map(r -> ServerLocation.of(r, this.getPosition()));
     }
 
     /**

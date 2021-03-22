@@ -87,14 +87,14 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
 
         // Get the profile async.
         Sponge.getAsyncScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
-            final GameProfileManager gpm = Sponge.getServer().getGameProfileManager();
+            final GameProfileManager gpm = Sponge.server().getGameProfileManager();
             try {
                 final GameProfile gp = gpm.getProfile(userToFind).get();
 
                 // Ban the user sync.
-                Sponge.getServer().getScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
+                Sponge.server().getScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
                     // Create the user.
-                    final UserManager uss = Sponge.getServer().getUserManager();
+                    final UserManager uss = Sponge.server().getUserManager();
                     final User user = uss.getOrCreate(gp);
                     context.sendMessage("gameprofile.new", user.getName());
 
@@ -114,7 +114,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
     }
 
     private ICommandResult executeBan(final ICommandContext context, final User user, final String r) {
-        final BanService service = Sponge.getServer().getServiceProvider().banService();
+        final BanService service = Sponge.server().getServiceProvider().banService();
 
         if (!user.isOnline() && !context.testPermission(BanPermissions.BAN_OFFLINE)) {
             return context.errorResult("command.ban.offline.noperms");
@@ -151,7 +151,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         final Component reason = LegacyComponentSerializer.legacyAmpersand().deserialize(r);
         audience.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
-        Sponge.getServer().getPlayer(user.getUniqueId()).ifPresent(pl -> pl.kick(reason));
+        Sponge.server().getPlayer(user.getUniqueId()).ifPresent(pl -> pl.kick(reason));
         return context.successResult();
     }
 

@@ -83,7 +83,7 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
                 filters
         );
 
-        final Cause cause = Sponge.getGame().getServer().getCauseStackManager().getCurrentCause();
+        final Cause cause = Sponge.game().getServer().getCauseStackManager().getCurrentCause();
         if (optionalWorldTransform.isPresent()) {
             ServerLocation targetLocation = optionalWorldTransform.get();
             final AboutToTeleportEvent event = new AboutToTeleportEvent(
@@ -103,7 +103,7 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
                 return TeleportResult.FAIL_CANCELLED;
             }
 
-            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.BYPASS_JAILING_RESTRICTION, true);
                 /*final Optional<Entity> oe = player.getVehicle();
                 if (oe.isPresent()) {

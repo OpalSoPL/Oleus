@@ -52,7 +52,7 @@ public class StaffChatCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Optional<String> toSend = context.getOne(NucleusParameters.OPTIONAL_MESSAGE);
         if (toSend.isPresent()) {
-            try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.SHOULD_FORMAT_CHANNEL, StaffChatMessageChannel.getInstance().formatMessages());
                 if (context.is(ServerPlayer.class)) {
                     final ServerPlayer pl = context.requirePlayer();
@@ -64,7 +64,7 @@ public class StaffChatCommand implements ICommandExecutor {
                         pl.simulateChat(
                                 context.getServiceCollection()
                                         .textStyleService()
-                                        .addUrls(toSend.get()), Sponge.getServer().getCauseStackManager().getCurrentCause());
+                                        .addUrls(toSend.get()), Sponge.server().getCauseStackManager().getCurrentCause());
                     }
 
                     // If you send a message, you're viewing it again.

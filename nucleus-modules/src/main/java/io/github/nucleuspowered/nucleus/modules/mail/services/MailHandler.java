@@ -111,7 +111,7 @@ public class MailHandler implements NucleusMailService, ServiceBase {
                         Sponge.getSystemSubject(),
                         "message.cancel");
             } else {
-                Sponge.getServer().getPlayer(playerFrom)
+                Sponge.server().getPlayer(playerFrom)
                         .ifPresent(x -> messageProvider.sendMessageTo(x, "message.cancel"));
             }
             return;
@@ -124,7 +124,7 @@ public class MailHandler implements NucleusMailService, ServiceBase {
         this.serviceCollection.storageManager().getUserService().save(playerTo, dataObject);
 
         final Component from = this.serviceCollection.playerDisplayNameService().getDisplayName(md.getUuid());
-        Sponge.getServer().getPlayer(playerTo).ifPresent(x ->
+        Sponge.server().getPlayer(playerTo).ifPresent(x ->
                 x.sendMessage(LinearComponents.linear(messageProvider.getMessageFor(x, "mail.youvegotmail"), Component.space(), from)));
     }
 

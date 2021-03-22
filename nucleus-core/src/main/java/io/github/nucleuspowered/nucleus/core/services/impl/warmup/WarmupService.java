@@ -73,7 +73,7 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
                 this.tasks.remove(playerTarget);
                 this.uuidToWarmup.remove(task.getUniqueId());
 
-                if (Sponge.getServer().getPlayer(playerTarget).isPresent()) {
+                if (Sponge.server().getPlayer(playerTarget).isPresent()) {
                     // Only run if the player is still on the server.
                     runnable.run();
                 }
@@ -85,7 +85,7 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
                     .execute(taskToSubmit)
                     .plugin(this.pluginContainer)
                     .build();
-            final ScheduledTask scheduledTask = Sponge.getServer().getScheduler().submit(t);
+            final ScheduledTask scheduledTask = Sponge.server().getScheduler().submit(t);
             this.tasks.put(playerTarget, scheduledTask.getUniqueId());
             this.uuidToWarmup.put(scheduledTask.getUniqueId(), runnable);
         }
@@ -100,7 +100,7 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
     private boolean cancelInternal(final Player player) {
         final UUID taskUUID = this.tasks.get(player.getUniqueId());
         if (taskUUID != null) {
-            Sponge.getServer().getScheduler().getTaskById(taskUUID).ifPresent(ScheduledTask::cancel);
+            Sponge.server().getScheduler().getTaskById(taskUUID).ifPresent(ScheduledTask::cancel);
             final WarmupTask task = this.uuidToWarmup.get(taskUUID);
             if (task != null) {
                 // if we get here, it was never cancelled.
@@ -117,7 +117,7 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
         synchronized (this.lockingObject) {
             final UUID taskUUID = this.tasks.get(player.getUniqueId());
             if (taskUUID != null) {
-                if (Sponge.getServer().getScheduler().getTaskById(taskUUID).isPresent()) {
+                if (Sponge.server().getScheduler().getTaskById(taskUUID).isPresent()) {
                     // remove entries
                     return true;
                 } else {

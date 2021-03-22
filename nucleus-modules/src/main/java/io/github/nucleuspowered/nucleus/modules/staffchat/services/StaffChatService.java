@@ -56,7 +56,7 @@ public class StaffChatService implements NucleusStaffChatService, ServiceBase {
 
     @Override
     public boolean isCurrentlyChattingInStaffChat(final UUID uuid) {
-        return Sponge.getServer().getPlayer(uuid).map(this::isToggledChat).orElse(false);
+        return Sponge.server().getPlayer(uuid).map(this::isToggledChat).orElse(false);
     }
 
     @Override

@@ -106,7 +106,7 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
             builder.append(footer);
         }
         event.setMessage(body);
-        final Audience audience = Sponge.getServer();
+        final Audience audience = Sponge.server();
         event.setChatRouter((sendingPlayer, message) ->
                         audience.sendMessage(sendingPlayer, LinearComponents.linear(header, message, footer), MessageType.CHAT));
     }

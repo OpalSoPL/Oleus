@@ -78,7 +78,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
     @Listener
     public void onPlayerFirstJoin(final NucleusFirstJoinEvent event, @Getter("getPlayer") final ServerPlayer pl) {
         if (this.cmc.isShowFirstTimeMessage() && !this.cmc.getFirstTimeMessage().isEmpty()) {
-            event.getAudience().orElse(Sponge.getServer())
+            event.getAudience().orElse(Sponge.server())
                     .sendMessage(this.firstTimeMessage.getForObject(pl));
         }
     }

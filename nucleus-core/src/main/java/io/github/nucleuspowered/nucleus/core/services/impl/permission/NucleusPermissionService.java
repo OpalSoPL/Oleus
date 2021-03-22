@@ -75,7 +75,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     @Override
     public void assignUserRoleToDefault() {
-        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.getServer().getServiceProvider().permissionService().getDefaults());
+        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.server().getServiceProvider().permissionService().getDefaults());
     }
 
     @Override
@@ -94,12 +94,12 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     @Override
     public void registerContextCalculator(final ContextCalculator<Subject> calculator) {
-        Sponge.getServer().getServiceProvider().permissionService().registerContextCalculator(calculator);
+        Sponge.server().getServiceProvider().permissionService().registerContextCalculator(calculator);
     }
 
     @Override
     public boolean hasPermission(final UUID playerUUID, final String permission) {
-        return this.hasPermission(Sponge.getServer().getUserManager().get(playerUUID)
+        return this.hasPermission(Sponge.server().getUserManager().get(playerUUID)
                 .orElseThrow(() -> new IllegalArgumentException("The UUID " + playerUUID + " is not a valid player UUID")), permission);
     }
 
@@ -135,7 +135,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override public void registerDescriptions() {
         Preconditions.checkState(!this.init);
         this.init = true;
-        final PermissionService ps = Sponge.getServer().getServiceProvider().permissionService();
+        final PermissionService ps = Sponge.server().getServiceProvider().permissionService();
         for (final Map.Entry<String, IPermissionService.Metadata> entry : this.metadataMap.entrySet()) {
             final SuggestedLevel level = entry.getValue().getSuggestedLevel();
             if (level.getRole() != null) {

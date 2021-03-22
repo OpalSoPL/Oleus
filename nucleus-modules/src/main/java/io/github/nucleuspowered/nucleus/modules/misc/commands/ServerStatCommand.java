@@ -50,12 +50,12 @@ public class ServerStatCommand implements ICommandExecutor {
 
         final List<Component> messages = new ArrayList<>();
 
-        messages.add(context.getMessage("command.serverstat.tps", this.getTPS(Sponge.getServer().getTicksPerSecond())));
+        messages.add(context.getMessage("command.serverstat.tps", this.getTPS(Sponge.server().getTicksPerSecond())));
 
         final Optional<Instant> oi = context.getServiceCollection().platformService().gameStartedTime();
         oi.ifPresent(instant -> {
             final Duration duration = Duration.between(instant, Instant.now());
-            final double averageTPS = Math.min(20, ((double) Sponge.getServer().getRunningTimeTicks() / ((double) (duration.toMillis() + 50) / 1000.0d)));
+            final double averageTPS = Math.min(20, ((double) Sponge.server().getRunningTimeTicks() / ((double) (duration.toMillis() + 50) / 1000.0d)));
             messages.add(context.getMessage("command.serverstat.averagetps", this.getTPS(averageTPS)));
             messages.add(this.createText(context, "command.serverstat.uptime.main", "command.serverstat.uptime.hover",
                     context.getTimeString(duration.getSeconds())));
@@ -78,7 +78,7 @@ public class ServerStatCommand implements ICommandExecutor {
         messages.add(this.createText(context, "command.serverstat.freemem.main", "command.serverstat.freemem.hover", String.valueOf(free)));
 
         if (!context.hasFlag("c")) {
-            for (final ServerWorld world : Sponge.getServer().getWorldManager().getWorlds()) {
+            for (final ServerWorld world : Sponge.server().getWorldManager().getWorlds()) {
                 final int numOfEntities = world.getEntities().size();
                 final int loadedChunks = Iterables.size(world.getLoadedChunks());
                 messages.add(Component.empty());

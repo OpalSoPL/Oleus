@@ -57,7 +57,7 @@ public class HelpOpCommand implements ICommandExecutor, IReloadableService.Reloa
         final String message = context.requireOne(NucleusParameters.MESSAGE);
         final ServerPlayer player = context.requirePlayer();
 
-        try (final CauseStackManager.StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(player);
             // Message is about to be sent. Send the event out. If canceled, then
             // that's that.
