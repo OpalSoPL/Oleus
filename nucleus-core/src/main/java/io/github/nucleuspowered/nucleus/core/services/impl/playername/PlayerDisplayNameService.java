@@ -84,7 +84,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
     @Override
     public Optional<User> getUser(final String displayName) {
-        final Optional<User> withRealName = Sponge.server().getUserManager().get(displayName);
+        final Optional<User> withRealName = Sponge.server().userManager().find(displayName);
         if (withRealName.isPresent()) {
             return withRealName;
         }
@@ -102,9 +102,13 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     @Override
     public Map<UUID, List<String>> startsWith(final String displayName) {
         final Map<UUID, List<String>> uuids = new HashMap<>();
-        Sponge.server().getOnlinePlayers().stream()
-            .filter(x -> x.getName().toLowerCase().startsWith(displayName.toLowerCase()))
-            .forEach(x -> uuids.put(x.getUniqueId(), Lists.newArrayList(x.getName())));
+        Sponge.server().onlinePlayers().stream()
+            .filter(x -> x.name().toLowerCase().startsWith(displayName.toLowerCase()))
+            .forEach(x -> {
+                final List<String> names = new ArrayList<>();
+                names.add(x.name());
+                uuids.put(x.uniqueId(), names);
+            });
 
         for (final DisplayNameQuery query : this.queries) {
             query.startsWith(displayName).forEach(
@@ -124,11 +128,11 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     public Component getDisplayName(final UUID playerUUID) {
         final TextComponent.Builder builder;
         if (playerUUID == Util.CONSOLE_FAKE_UUID) {
-            return this.getName(Sponge.getSystemSubject());
+            return this.getName(Sponge.systemSubject());
         }
        final User user = Sponge.server()
-                .getUserManager()
-                .get(playerUUID)
+                .userManager()
+                .find(playerUUID)
                 .orElseThrow(() -> new IllegalArgumentException("UUID does not map to a player"));
         Component userName = null;
         for (final DisplayNameResolver resolver : this.resolvers) {
@@ -140,13 +144,13 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         }
 
         if (userName == null) {
-            builder = Component.text().content(user.getName());
+            builder = Component.text().content(user.name());
         } else {
             builder = Component.text().append(userName);
         }
 
         // Set name colours
-        this.addCommandToNameInternal(builder, user.getName());
+        this.addCommandToNameInternal(builder, user.name());
         this.applyStyle(user, builder);
         return builder.build();
     }
@@ -176,11 +180,11 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         if (source instanceof SystemSubject || source instanceof Server) {
             return this.getDisplayName(Util.CONSOLE_FAKE_UUID);
         } if (source instanceof User) {
-            return this.getDisplayName(((User) source).getUniqueId());
+            return this.getDisplayName(((User) source).uniqueId());
         } else if (source instanceof ServerPlayer) {
-            return this.getDisplayName(((ServerPlayer) source).getUniqueId());
+            return this.getDisplayName(((ServerPlayer) source).uniqueId());
         } else if (source instanceof Nameable) {
-            return Component.text(((Nameable) source).getName());
+            return Component.text(((Nameable) source).name());
         }
 
         return Component.text("Unknown");
@@ -198,7 +202,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
     @Override
     public Component getName(final Nameable user) {
-        final String name = user.getName();
+        final String name = user.name();
         final TextComponent.Builder builder = Component.text().content(name);
         if (user instanceof Subject) {
             this.applyStyle((Subject) user, builder);
@@ -216,14 +220,14 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
         if (uuid == Util.CONSOLE_FAKE_UUID) {
             return Component.text("Server");
         }
-        return Component.text(Sponge.server().getUserManager().get(uuid).map(User::getName).orElse("unknown"));
+        return Component.text(Sponge.server().userManager().find(uuid).map(User::name).orElse("unknown"));
     }
 
     @Override
     public Component addCommandToName(final Nameable p) {
-        final TextComponent.Builder text = Component.text().content(p.getName());
+        final TextComponent.Builder text = Component.text().content(p.name());
         if (p instanceof User || p instanceof ServerPlayer) {
-            this.addCommandToNameInternal(text, p.getName());
+            this.addCommandToNameInternal(text, p.name());
         }
 
         return text.build();
@@ -239,7 +243,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
     public Component addCommandToDisplayName(final Nameable p) {
         final TextComponent.Builder name = Component.text().append(this.getName(p));
         if (p instanceof User || p instanceof ServerPlayer) {
-            this.addCommandToNameInternal(name, p.getName());
+            this.addCommandToNameInternal(name, p.name());
         }
 
         return name.build();

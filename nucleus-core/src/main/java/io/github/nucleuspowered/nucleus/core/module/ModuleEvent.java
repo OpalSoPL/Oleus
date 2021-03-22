@@ -47,7 +47,7 @@ public class ModuleEvent extends AbstractEvent implements NucleusModuleSelection
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 

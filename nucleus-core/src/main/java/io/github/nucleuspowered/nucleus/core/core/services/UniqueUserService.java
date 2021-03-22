@@ -63,7 +63,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
             ERROR_REPORTED = false;
 
             if (Sponge.server().onMainThread()) {
-                Sponge.getAsyncScheduler().createExecutor(this.serviceCollection.pluginContainer())
+                Sponge.asyncScheduler().createExecutor(this.serviceCollection.pluginContainer())
                         .submit(() -> this.doTask(resultConsumer));
             } else {
                 this.doTask(resultConsumer);
@@ -72,16 +72,17 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
     }
 
     private void doTask(@Nullable final Consumer<Long> resultConsumer) {
-        final UserManager uss = Sponge.server().getUserManager();
+        final UserManager uss = Sponge.server().userManager();
         final IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> service =
                 this.serviceCollection.storageManager().getUserService();
 
         // This could be slow...
         if (this.isMoreAccurate) {
-            this.userCount = uss.getAll().stream().filter(GameProfile::hasName)
-                    .map(uss::get).filter(Optional::isPresent)
+            this.userCount = uss.streamAll().filter(GameProfile::hasName)
+                    .map(uss::find)
+                    .filter(Optional::isPresent)
                     .filter(x -> {
-                        final boolean ret = x.get().getPlayer().isPresent() || service.exists(x.get().getUniqueId()).join(); // already async
+                        final boolean ret = x.get().player().isPresent() || service.exists(x.get().uniqueId()).join(); // already async
                         if (!ret) {
                             try {
                                 return x.get().get(Keys.FIRST_DATE_JOINED).isPresent();
@@ -102,7 +103,7 @@ public class UniqueUserService implements ServiceBase, IReloadableService.Reload
                         return ret;
                     }).count();
         } else {
-            this.userCount = uss.getAll().stream().filter(GameProfile::hasName).filter(x -> service.exists(x.getUniqueId()).join()).count();
+            this.userCount = uss.streamAll().filter(GameProfile::hasName).filter(x -> service.exists(x.uniqueId()).join()).count();
         }
 
         this.userCountIsDirty = false;

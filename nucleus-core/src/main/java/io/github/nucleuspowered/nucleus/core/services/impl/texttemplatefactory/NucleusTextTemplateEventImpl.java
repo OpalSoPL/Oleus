@@ -85,7 +85,7 @@ class NucleusTextTemplateEventImpl extends AbstractEvent implements NucleusTextT
 
     @Override
     @NonNull
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 

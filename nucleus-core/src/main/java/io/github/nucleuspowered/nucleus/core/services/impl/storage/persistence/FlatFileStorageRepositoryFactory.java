@@ -46,12 +46,12 @@ public final class FlatFileStorageRepositoryFactory implements IStorageRepositor
             if (query.keys().size() == 1) {
                 final Collection<ResourceKey> keys = query.keys();
                 final ResourceKey key = keys.iterator().next();
-                return this.dataPath.get().resolve(WORLD_DATA_DIRECTORY).resolve(key.getNamespace()).resolve(key.value()  + ".json");
+                return this.dataPath.get().resolve(WORLD_DATA_DIRECTORY).resolve(key.namespace()).resolve(key.value()  + ".json");
             }
 
             throw new DataQueryException("There must only a key", query);
         },
-        key -> this.dataPath.get().resolve(WORLD_DATA_DIRECTORY).resolve(key.getNamespace()).resolve(key.value() + ".json"),
+        key -> this.dataPath.get().resolve(WORLD_DATA_DIRECTORY).resolve(key.namespace()).resolve(key.value() + ".json"),
         () -> this.dataPath.get().resolve(WORLD_DATA_DIRECTORY));
     }
 

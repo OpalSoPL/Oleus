@@ -55,7 +55,7 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
                         AdminPermissions.BASE_SUDO,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", pl.getName());
+            return context.errorResult("command.modifiers.level.insufficient", pl.name());
         }
 
         if (cmd.startsWith("c:")) {
@@ -64,7 +64,7 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
             }
 
             final Component rawMessage = Component.text(cmd.split(":", 2)[1]);
-            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                 frame.pushCause(context.getCommandSourceRoot());
                 frame.pushCause(pl); // on top
                 frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.getProfile());
@@ -77,7 +77,7 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.successResult();
         }
 
-        context.sendMessage("command.sudo.force", pl.getName(), cmd);
+        context.sendMessage("command.sudo.force", pl.name(), cmd);
         Sponge.server().getCommandManager().process(pl, cmd);
         return context.successResult();
     }

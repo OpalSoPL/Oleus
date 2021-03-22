@@ -119,15 +119,15 @@ public final class CommandControl {
     public org.spongepowered.api.command.Command.Parameterized createCommand() {
         final org.spongepowered.api.command.Command.Builder b = org.spongepowered.api.command.Command.builder();
         if (this.executor != null) {
-            b.setExecutor(this::process);
+            b.executor(this::process);
             for (final Parameter parameter : this.executor.parameters(this.serviceCollection)) {
-                b.parameter(parameter);
+                b.addParameter(parameter);
             }
             for (final Flag flag : this.executor.flags(this.serviceCollection)) {
-                b.flag(flag);
+                b.addFlag(flag);
             }
         }
-        b.setExecutionRequirements(re -> {
+        b.executionRequirements(re -> {
             for (final String perm : this.getPermission()) {
                 if (!this.serviceCollection.permissionService().hasPermission(re, perm)) {
                     return false;
@@ -135,9 +135,9 @@ public final class CommandControl {
             }
             return true;
         });
-        b.setShortDescription(this::getShortDescription).setExtendedDescription(this::getExtendedDescription);
+        b.shortDescription(this::getShortDescription).extendedDescription(this::getExtendedDescription);
         for (final Map.Entry<CommandControl, List<String>> control : this.subcommands.entrySet()) {
-            b.child(control.getKey().createCommand(), control.getValue());
+            b.addChild(control.getKey().createCommand(), control.getValue());
         }
         return b.build();
     }
@@ -150,11 +150,11 @@ public final class CommandControl {
          // Create the ICommandContext
         final Map<CommandModifier, ICommandModifier> modifiers = this.selectAppropriateModifiers(context);
         final ICommandContext contextSource = new CommandContextImpl(
-                context.getCause(),
+                context.cause(),
                 context,
                 this.serviceCollection,
                 this,
-                context.getCause().getSubject().equals(Sponge.getSystemSubject()),
+                context.cause().subject().equals(Sponge.systemSubject()),
                 modifiers
         );
 
@@ -270,7 +270,7 @@ public final class CommandControl {
         return this.modifiers
                 .entrySet()
                 .stream()
-                .filter(x -> x.getKey().target().isInstance(source.getCause().root()))
+                .filter(x -> x.getKey().target().isInstance(source.cause().root()))
                 .filter(x -> {
                     try {
                         return x.getValue().canExecuteModifier(this.serviceCollection, source);
@@ -287,7 +287,7 @@ public final class CommandControl {
     public Optional<Component> getShortDescription(@NonNull final CommandCause source) {
         return Optional.of(this.serviceCollection
                 .messageProvider()
-                .getMessageFor(source.getAudience(), this.metadata.getCommandAnnotation().commandDescriptionKey() + ".desc"));
+                .getMessageFor(source.audience(), this.metadata.getCommandAnnotation().commandDescriptionKey() + ".desc"));
     }
 
     public Optional<Component> getExtendedDescription(@NonNull final CommandCause source) {
@@ -295,7 +295,7 @@ public final class CommandControl {
             return Optional.ofNullable(
                     this.serviceCollection
                             .messageProvider()
-                            .getMessageFor(source.getAudience(), this.metadata.getCommandAnnotation().commandDescriptionKey() + ".extended")
+                            .getMessageFor(source.audience(), this.metadata.getCommandAnnotation().commandDescriptionKey() + ".extended")
             );
         } catch (final Exception e) {
             return Optional.empty();

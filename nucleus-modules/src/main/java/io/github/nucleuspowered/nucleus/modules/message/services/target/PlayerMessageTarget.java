@@ -44,12 +44,12 @@ public final class PlayerMessageTarget extends AbstractMessageTarget implements 
 
     @Override
     public Optional<Audience> getRepresentedAudience() {
-        return Sponge.server().getPlayer(this.uuid).map(Function.identity());
+        return Sponge.server().player(this.uuid).map(Function.identity());
     }
 
     @Override
     public String getName() {
-        return Sponge.server().getPlayer(this.uuid).map(Nameable::getName).orElse("");
+        return Sponge.server().player(this.uuid).map(Nameable::getName).orElse("");
     }
 
     @Override
@@ -60,19 +60,19 @@ public final class PlayerMessageTarget extends AbstractMessageTarget implements 
     @Override
     public void receiveMessageFrom(@Nullable final MessageTarget target, final Component message) {
         this.setReplyTarget(target);
-        Sponge.server().getPlayer(this.uuid).orElseThrow(() -> new IllegalArgumentException("The player with UUID " + this.uuid.toString() +
+        Sponge.server().player(this.uuid).orElseThrow(() -> new IllegalArgumentException("The player with UUID " + this.uuid.toString() +
                 " is not online!")).sendMessage(this.getIdentity(target), message);
     }
 
     @Override
     public boolean isAvailableForMessages() {
-        return Sponge.server().getPlayer(this.uuid).isPresent() &&
+        return Sponge.server().player(this.uuid).isPresent() &&
                 this.userPreferenceService.keys().messageReceivingEnabled().flatMap(x -> this.userPreferenceService.get(this.uuid, x)).orElse(true);
     }
 
     @Override
     public boolean canBypassMessageToggle() {
-        return Sponge.server().getPlayer(this.uuid).map(x -> this.permissionService.hasPermission(x, MessagePermissions.MSGTOGGLE_BYPASS)).orElse(false);
+        return Sponge.server().player(this.uuid).map(x -> this.permissionService.hasPermission(x, MessagePermissions.MSGTOGGLE_BYPASS)).orElse(false);
     }
 
     @Override
@@ -93,6 +93,6 @@ public final class PlayerMessageTarget extends AbstractMessageTarget implements 
 
     @Override
     public void pushCauseToFrame(final CauseStackManager.StackFrame frame) {
-        frame.pushCause(Sponge.server().getPlayer(this.uuid).orElseThrow(IllegalStateException::new));
+        frame.pushCause(Sponge.server().player(this.uuid).orElseThrow(IllegalStateException::new));
     }
 }

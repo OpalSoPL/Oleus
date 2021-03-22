@@ -101,7 +101,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
         }
 
         // Throw them to the default world spawn if the config suggests so.
-        final User user = Sponge.server().getUserManager().getOrCreate(loginEvent.getProfile());
+        final User user = Sponge.server().userManager().findOrCreate(loginEvent.getProfile());
         if (this.spawnConfig.isSpawnOnLogin() && !this.serviceCollection.permissionService().hasPermission(user, SpawnPermissions.SPAWN_EXEMPT_LOGIN)) {
 
             ServerWorld world = loginEvent.getFromLocation().getWorld();

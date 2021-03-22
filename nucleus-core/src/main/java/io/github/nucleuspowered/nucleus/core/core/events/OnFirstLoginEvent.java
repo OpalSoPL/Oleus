@@ -40,15 +40,15 @@ public class OnFirstLoginEvent extends AbstractEvent implements NucleusFirstJoin
         return this.player;
     }
 
-    @Override public Cause getCause() {
+    @Override public Cause cause() {
         return this.cause;
     }
 
-    @Override public Component getOriginalMessage() {
+    @Override public Component originalMessage() {
         return this.originalMessage;
     }
 
-    @Override public Component getMessage() {
+    @Override public Component message() {
         return this.message;
     }
 
@@ -56,11 +56,11 @@ public class OnFirstLoginEvent extends AbstractEvent implements NucleusFirstJoin
         this.message = message;
     }
 
-    @Override public Audience getOriginalAudience() {
+    @Override public Audience originalAudience() {
         return this.originalChannel;
     }
 
-    @Override public Optional<Audience> getAudience() {
+    @Override public Optional<Audience> audience() {
         return Optional.ofNullable(this.currentChannel);
     }
 

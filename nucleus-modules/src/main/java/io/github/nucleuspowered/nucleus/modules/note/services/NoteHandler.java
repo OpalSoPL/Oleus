@@ -61,9 +61,9 @@ public class NoteHandler implements NucleusNoteService, ServiceBase {
                 note.getNote(),
                 note.getDate(),
                 user,
-                Sponge.server().getCauseStackManager().getCurrentCause()
+                Sponge.server().causeStackManager().getCurrentCause()
         );
-        Sponge.getEventManager().post(event);
+        Sponge.eventManager().post(event);
 
         return this.serviceCollection.storageManager().getUserService().getOrNew(user).thenApply(x -> {
             try (final IKeyedDataObject.Value<List<NoteData>> v = x.getAndSet(NoteKeys.NOTE_DATA)) {

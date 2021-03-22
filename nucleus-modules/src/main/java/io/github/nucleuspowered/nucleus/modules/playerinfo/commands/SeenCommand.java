@@ -148,7 +148,7 @@ public class SeenCommand implements ICommandExecutor {
             return this.getLocationString("command.seen.currentlocation", user.getPlayer().get().getServerLocation(), context);
         }
 
-        final Optional<WorldProperties> wp = Sponge.server().getWorldManager().getProperties(user.getWorldKey());
+        final Optional<WorldProperties> wp = Sponge.server().worldManager().getProperties(user.getWorldKey());
         return wp.map(worldProperties ->
                 this.getLocationString("command.seen.lastlocation", worldProperties.getKey(), user.getPosition(), context))
                 .orElseGet(() -> context.getMessage("standard.unknown"));
@@ -193,7 +193,7 @@ public class SeenCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Either<User, GameProfile> target = NucleusParameters.Composite.parseUserOrGameProfile(context);
-        final User user = target.fold(Function.identity(), x -> Sponge.server().getUserManager().getOrCreate(x));
+        final User user = target.fold(Function.identity(), x -> Sponge.server().userManager().findOrCreate(x));
         final IUserDataObject userDataObject = context.getServiceCollection()
                 .storageManager()
                 .getUserService()
@@ -204,11 +204,11 @@ public class SeenCommand implements ICommandExecutor {
         // Everyone gets the last online time.
         final IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
         if (context.getAsPlayer().map(x -> playerOnlineService.isOnline(x, user)).orElse(true)) {
-            messages.add(context.getMessage("command.seen.iscurrently.online", user.getName()));
+            messages.add(context.getMessage("command.seen.iscurrently.online", user.name()));
             userDataObject.get(CoreKeys.LAST_LOGIN).ifPresent(x -> messages.add(
                     context.getMessage("command.seen.loggedon", context.getTimeString(Duration.between(x, Instant.now())))));
         } else {
-            messages.add(context.getMessage("command.seen.iscurrently.offline", user.getName()));
+            messages.add(context.getMessage("command.seen.iscurrently.offline", user.name()));
             playerOnlineService.lastSeen(context.getAsPlayer().orElse(null), user).ifPresent(x -> messages.add(
                     context.getMessage("command.seen.loggedoff", context.getTimeString(Duration.between(Instant.now(), x)))));
         }
@@ -238,7 +238,7 @@ public class SeenCommand implements ICommandExecutor {
         Util.getPaginationBuilder(context.getAudience())
                 .contents(messages)
                 .padding(Component.text("-", NamedTextColor.GREEN))
-                .title(context.getMessage("command.seen.title", user.getName())).sendTo(context.getAudience());
+                .title(context.getMessage("command.seen.title", user.name())).sendTo(context.getAudience());
         return context.successResult();
     }
 
@@ -257,7 +257,7 @@ public class SeenCommand implements ICommandExecutor {
                     .hoverEvent(HoverEvent.showText(context.getMessage("command.seen.teleportposition")
             ));
 
-            Sponge.server().getWorldManager().getWorld(worldKey).ifPresent(
+            Sponge.server().worldManager().getWorld(worldKey).ifPresent(
                     x -> building.clickEvent(SpongeComponents.executeCallback(cs -> {
                         if (cs.root() instanceof ServerPlayer) {
                             ((ServerPlayer) cs.root()).setLocation(ServerLocation.of(x, position));

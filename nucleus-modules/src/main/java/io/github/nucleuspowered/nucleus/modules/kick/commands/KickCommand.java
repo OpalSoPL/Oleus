@@ -50,7 +50,7 @@ public class KickCommand implements ICommandExecutor, IReloadableService.Reloada
                 .orElseGet(() -> context.getMessage("command.kick.defaultreason"));
 
         if (context.isConsoleAndBypass() && context.testPermissionFor(pl, KickPermissions.KICK_EXEMPT_TARGET)) {
-            return context.errorResult("command.kick.exempt", pl.getName());
+            return context.errorResult("command.kick.exempt", pl.name());
         }
 
         if (this.levelConfig.isUseLevels() &&
@@ -59,13 +59,13 @@ public class KickCommand implements ICommandExecutor, IReloadableService.Reloada
                         KickPermissions.BASE_KICK,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", pl.getName());
+            return context.errorResult("command.modifiers.level.insufficient", pl.name());
         }
 
         if (pl.kick(r)) {
 
             final Audience audience = context.getServiceCollection().permissionService().permissionMessageChannel(KickPermissions.KICK_NOTIFY);
-            context.sendMessageTo(audience, "command.kick.message", pl.getName(), context.getName());
+            context.sendMessageTo(audience, "command.kick.message", pl.name(), context.getName());
             context.sendMessageTo(audience, "command.reason", r);
             return context.successResult();
         }

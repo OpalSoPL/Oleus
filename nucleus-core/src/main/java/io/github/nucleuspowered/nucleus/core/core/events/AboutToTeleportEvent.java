@@ -61,7 +61,7 @@ public class AboutToTeleportEvent extends AbstractEvent implements NucleusTelepo
         this.isCancelled = cancel;
     }
 
-    @Override public Cause getCause() {
+    @Override public Cause cause() {
         return this.cause;
     }
 }

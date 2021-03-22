@@ -43,11 +43,11 @@ public final class TeleportRequest extends TeleportTask {
     }
 
     public Optional<ServerPlayer> getToBeTeleported() {
-        return Sponge.server().getPlayer(this.toTeleport);
+        return Sponge.server().player(this.toTeleport);
     }
 
     public Optional<ServerPlayer> getTarget() {
-        return Sponge.server().getPlayer(this.target);
+        return Sponge.server().player(this.target);
     }
 
     public void forceExpire(final boolean callback) {

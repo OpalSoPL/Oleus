@@ -51,7 +51,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
             return;
         }
 
-        this.serviceCollection.storageManager().getUser(pl.getUniqueId()).thenAccept(x -> x.ifPresent(y -> {
+        this.serviceCollection.storageManager().getUser(pl.uniqueId()).thenAccept(x -> x.ifPresent(y -> {
             if (y.get(FlyKeys.FLY_TOGGLE).orElse(false)) {
                 if (Sponge.server().onMainThread()) {
                     this.exec(pl);
@@ -89,7 +89,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
             return;
         }
 
-        this.serviceCollection.storageManager().getOrCreateUser(pl.getUniqueId())
+        this.serviceCollection.storageManager().getOrCreateUser(pl.uniqueId())
                 .thenAccept(x -> x.set(FlyKeys.FLY_TOGGLE, pl.get(Keys.CAN_FLY).orElse(false)));
 
     }
@@ -117,7 +117,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
                         pl.offer(Keys.IS_FLYING, true);
                     }
                 } else {
-                    this.serviceCollection.storageManager().getOrCreateUser(pl.getUniqueId()).thenAccept(x -> x.set(FlyKeys.FLY_TOGGLE, false));
+                    this.serviceCollection.storageManager().getOrCreateUser(pl.uniqueId()).thenAccept(x -> x.set(FlyKeys.FLY_TOGGLE, false));
                     pl.offer(Keys.CAN_FLY, false);
                     pl.offer(Keys.IS_FLYING, false);
                 }

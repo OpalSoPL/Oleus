@@ -61,7 +61,7 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
             final TeleportScanner scanner) {
         return this.teleportPlayer(player,
                 location,
-                player.getRotation(),
+                player.rotation(),
                 centreBlock,
                 scanner,
                 this.getAppropriateFilter(player, safe));
@@ -83,17 +83,17 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
                 filters
         );
 
-        final Cause cause = Sponge.game().getServer().getCauseStackManager().getCurrentCause();
+        final Cause cause = Sponge.server().causeStackManager().currentCause();
         if (optionalWorldTransform.isPresent()) {
             ServerLocation targetLocation = optionalWorldTransform.get();
             final AboutToTeleportEvent event = new AboutToTeleportEvent(
                     cause,
                     targetLocation,
                     rotation,
-                    player.getUniqueId()
+                    player.uniqueId()
             );
 
-            if (Sponge.getEventManager().post(event)) {
+            if (Sponge.eventManager().post(event)) {
                 event.getCancelMessage().ifPresent(x -> {
                     final Object o = cause.root();
                     if (o instanceof Audience) {
@@ -103,7 +103,7 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
                 return TeleportResult.FAIL_CANCELLED;
             }
 
-            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.BYPASS_JAILING_RESTRICTION, true);
                 /*final Optional<Entity> oe = player.getVehicle();
                 if (oe.isPresent()) {
@@ -113,8 +113,8 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
                 // Do it, tell the routine if it worked.
                 if (centreBlock) {
                     targetLocation = ServerLocation.of(
-                            targetLocation.getWorld(),
-                            targetLocation.getBlockPosition().toDouble().add(0.5, 0.5, 0.5));
+                            targetLocation.world(),
+                            targetLocation.blockPosition().toDouble().add(0.5, 0.5, 0.5));
                 }
 
                 if (player.setLocationAndRotation(targetLocation, rotation)) {
@@ -136,8 +136,8 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
             final TeleportHelperFilter filter,
             final TeleportHelperFilter... filters) {
         return scanner.scanFrom(
-                location.getWorld(),
-                location.getBlockPosition(),
+                location.world(),
+                location.blockPosition(),
                 this.config.getHeight(),
                 this.config.getWidth(),
                 TeleportHelper.DEFAULT_FLOOR_CHECK_DISTANCE,
@@ -148,7 +148,7 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
 
     @Override
     public TeleportHelperFilter getAppropriateFilter(final ServerPlayer src, final boolean safeTeleport) {
-        if (safeTeleport && !src.get(Keys.GAME_MODE).filter(x -> x == GameModes.SPECTATOR).isPresent()) {
+        if (safeTeleport && !src.get(Keys.GAME_MODE).filter(x -> x == GameModes.SPECTATOR.get()).isPresent()) {
             if (src.get(Keys.IS_FLYING).orElse(false)) {
                 return TeleportHelperFilters.FLYING.get();
             } else {
@@ -166,7 +166,7 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
 
     @Override public BorderDisableSession temporarilyDisableBorder(final boolean reset, final ServerWorld world) {
         if (reset) {
-            final WorldBorder border = world.getBorder();
+            final WorldBorder border = world.border();
             return new WorldBorderReset(border);
         }
 
@@ -182,9 +182,9 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
 
         WorldBorderReset(final WorldBorder border) {
             this.border = border;
-            this.x = border.getCenter().getX();
-            this.z = border.getCenter().getZ();
-            this.diameter = border.getDiameter();
+            this.x = border.center().getX();
+            this.z = border.center().getZ();
+            this.diameter = border.diameter();
         }
 
         @Override

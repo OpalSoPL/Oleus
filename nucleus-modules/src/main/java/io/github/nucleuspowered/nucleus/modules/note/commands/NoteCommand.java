@@ -59,10 +59,10 @@ public class NoteCommand implements ICommandExecutor {
                 final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
                 context.getServiceCollection().schedulerService().runOnMainThread(() -> {
                         messageProviderService.sendMessageTo(messageChannel, "command.note.success", context.getName(), noteData.getNote(),
-                                user.getName());
+                                user.name());
                 });
             } else {
-                context.sendMessage("command.warn.fail", user.getName());
+                context.sendMessage("command.warn.fail", user.name());
             }
         });
 

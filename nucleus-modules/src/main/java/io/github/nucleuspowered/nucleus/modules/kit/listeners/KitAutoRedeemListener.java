@@ -39,7 +39,7 @@ public class KitAutoRedeemListener implements ListenerBase.Conditional, IReloada
     @Listener
     public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Root final ServerPlayer player) {
         final List<Kit> autoRedeemable = this.kitService.getAutoRedeemable();
-        final String name = "[Kit Auto Redeem - " + player.getName() + "]: ";
+        final String name = "[Kit Auto Redeem - " + player.name() + "]: ";
         for (final Kit kit : autoRedeemable) {
             final String permission = KitPermissions.getKitPermission(kit.getName().toLowerCase());
             final String kitName = kit.getName();

@@ -91,7 +91,7 @@ public class TeleportPositionCommand implements ICommandExecutor {
 
         if (!pl.isOnline()) {
             pl.setLocation(loc.getWorldKey(), loc.getPosition());
-            context.sendMessage("command.tppos.success.other", pl.getName());
+            context.sendMessage("command.tppos.success.other", pl.name());
             return context.successResult();
         }
 
@@ -109,7 +109,7 @@ public class TeleportPositionCommand implements ICommandExecutor {
             if (result.isSuccessful()) {
                 context.sendMessageTo(player, "command.tppos.success.self");
                 if (!context.is(pl)) {
-                    context.sendMessage("command.tppos.success.other", pl.getName());
+                    context.sendMessage("command.tppos.success.other", pl.name());
                 }
 
                 return context.successResult();

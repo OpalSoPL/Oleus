@@ -48,13 +48,13 @@ abstract class GamemodeBase implements ICommandExecutor {
         final DataTransactionResult dtr = user.offer(Keys.GAME_MODE, gm);
         if (dtr.isSuccessful()) {
             if (!context.is(user)) {
-                context.sendMessage("command.gamemode.set.other", user.getName(), gm.getKey().getValue());
+                context.sendMessage("command.gamemode.set.other", user.name(), gm.getKey().getValue());
             }
 
             context.sendMessageTo(user, "command.gamemode.set.base", gm.getKey().getValue());
             return context.successResult();
         }
 
-        return context.errorResult("command.gamemode.error", user.getName());
+        return context.errorResult("command.gamemode.error", user.name());
     }
 }

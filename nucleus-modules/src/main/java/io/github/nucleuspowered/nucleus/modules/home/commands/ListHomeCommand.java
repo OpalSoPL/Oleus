@@ -72,7 +72,7 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
         final Audience audience = context.getAudience();
         final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         if (other) {
-            header = messageProviderService.getMessageFor(audience, "home.title.name", user.getName());
+            header = messageProviderService.getMessageFor(audience, "home.title.name", user.name());
         } else {
             header = messageProviderService.getMessageFor(audience, "home.title.normal");
         }
@@ -116,7 +116,7 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
                                 Component.text().content(x.getName())
                                     .color(NamedTextColor.GREEN).style(Style.style(TextDecoration.UNDERLINED))
                                     .hoverEvent(HoverEvent.showText(messageProviderService.getMessageFor(audience, "home.warphover", x.getName())))
-                                    .clickEvent(ClickEvent.runCommand(other ? "/nucleus:home " + user.getName() + " " + x.getName()
+                                    .clickEvent(ClickEvent.runCommand(other ? "/nucleus:home " + user.name() + " " + x.getName()
                                                                           : "/nucleus:home " + x.getName()))
                                     .build())
                            .append(textMessage)

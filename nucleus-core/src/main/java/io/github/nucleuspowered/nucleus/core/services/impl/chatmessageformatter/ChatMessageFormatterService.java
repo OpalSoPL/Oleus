@@ -27,7 +27,7 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
     @Override
     public Optional<Channel> getNucleusChannel(final Audience source) {
         if (source instanceof ServerPlayer) {
-            return this.getNucleusChannel(((ServerPlayer) source).getUniqueId());
+            return this.getNucleusChannel(((ServerPlayer) source).uniqueId());
         }
         return Optional.ofNullable(this.sourceChannelMap.get(source));
     }
@@ -49,7 +49,7 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
     @Override
     public NoExceptionAutoClosable setAudienceNucleusChannelTemporarily(final Audience audience, final Channel channel) {
         if (audience instanceof ServerPlayer) {
-            return this.setPlayerNucleusChannelTemporarily(((ServerPlayer) audience).getUniqueId(), channel);
+            return this.setPlayerNucleusChannelTemporarily(((ServerPlayer) audience).uniqueId(), channel);
         }
         Preconditions.checkNotNull(channel);
         this.sourceChannelMap.put(audience, channel);
@@ -68,7 +68,7 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
     public NoExceptionAutoClosable setPlayerNucleusChannelTemporarily(final UUID uuid, final Channel channel) {
         Preconditions.checkNotNull(channel);
         final Channel original = this.chatChannels.get(uuid);
-//        final Optional<Player> player = Sponge.server().getPlayer(uuid);
+//        final Optional<Player> player = Sponge.server().player(uuid);
 //        final MessageChannel originalChannel = player.map(MessageReceiver::getMessageChannel).orElse(null);
         this.chatChannels.put(uuid, channel);
 //        if (channel instanceof Channel.External<?>) {

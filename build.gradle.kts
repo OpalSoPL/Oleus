@@ -105,7 +105,7 @@ java {
 }
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven("https://repo.spongepowered.org/maven")
 }
 

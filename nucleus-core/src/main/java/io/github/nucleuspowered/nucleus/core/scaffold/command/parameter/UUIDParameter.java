@@ -29,15 +29,15 @@ public final class UUIDParameter<T> implements ValueParameter<T> {
     private final IMessageProviderService messageProvider;
 
     public static UUIDParameter<GameProfile> gameProfile(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.server().getGameProfileManager().getCache().getById(x), messageProvider);
+        return new UUIDParameter<>(x -> Sponge.server().gameProfileManager().cache().byId(x), messageProvider);
     }
 
     public static UUIDParameter<User> user(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.server().getUserManager().get(x), messageProvider);
+        return new UUIDParameter<>(x -> Sponge.server().userManager().find(x), messageProvider);
     }
 
     public static UUIDParameter<ServerPlayer> player(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.server().getPlayer(x), messageProvider);
+        return new UUIDParameter<>(x -> Sponge.server().player(x), messageProvider);
     }
 
     public UUIDParameter(@Nullable final Function<UUID, Optional<T>> validator, final IMessageProviderService messageProviderService) {
@@ -51,7 +51,7 @@ public final class UUIDParameter<T> implements ValueParameter<T> {
     }
 
     @Override
-    public Optional<? extends T> getValue(final Parameter.Key<? super T> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
+    public Optional<? extends T> parseValue(final Parameter.Key<? super T> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
             throws ArgumentParseException {
         String a = reader.parseString();
         try {
@@ -61,10 +61,10 @@ public final class UUIDParameter<T> implements ValueParameter<T> {
 
             final UUID uuid = UUID.fromString(a);
             final T result = this.validator.apply(uuid).orElseThrow(() ->
-                    reader.createException(this.messageProvider.getMessageFor(context.getCause().getAudience(), "args.uuid.notvalid.nomatch")));
+                    reader.createException(this.messageProvider.getMessageFor(context.cause().audience(), "args.uuid.notvalid.nomatch")));
             return Optional.of(result);
         } catch (final IllegalArgumentException e) {
-            throw reader.createException(this.messageProvider.getMessageFor(context.getCause().getAudience(), "args.uuid.notvalid.malformed"));
+            throw reader.createException(this.messageProvider.getMessageFor(context.cause().audience(), "args.uuid.notvalid.malformed"));
         }
     }
 }

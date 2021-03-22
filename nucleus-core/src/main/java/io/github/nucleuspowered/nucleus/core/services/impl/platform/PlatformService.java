@@ -19,7 +19,7 @@ public class PlatformService implements IPlatformService {
     @Nullable private Instant gameStartedTime;
 
     @Override public boolean isServer() {
-        return Sponge.getPlatform().getType().isServer();
+        return Sponge.platform().type().isServer();
     }
 
     @Override public Optional<Instant> gameStartedTime() {

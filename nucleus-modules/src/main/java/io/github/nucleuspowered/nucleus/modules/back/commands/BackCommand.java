@@ -80,7 +80,7 @@ public class BackCommand implements ICommandExecutor, IReloadableService.Reloada
             }
         }
 
-        final ServerWorld world = Sponge.server().getWorldManager().getWorld(loc.getResourceKey()).get();
+        final ServerWorld world = Sponge.server().worldManager().getWorld(loc.getResourceKey()).get();
         final INucleusLocationService service = context.getServiceCollection().teleportService();
         try (final INucleusLocationService.BorderDisableSession ac = service.temporarilyDisableBorder(border, world)) {
             final TeleportResult result = service.teleportPlayerSmart(

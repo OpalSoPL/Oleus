@@ -40,7 +40,7 @@ public class SendMailCommand implements ICommandExecutor {
 
         // Only send mails to players that can read them.
         if (!context.testPermissionFor(pl, MailPermissions.BASE_MAIL)) {
-            return context.errorResult("command.mail.send.error", pl.getName());
+            return context.errorResult("command.mail.send.error", pl.name());
         }
 
         // Send the message.
@@ -48,11 +48,11 @@ public class SendMailCommand implements ICommandExecutor {
                 .orElseThrow(() -> context.createException("args.message.none"));
         final MailHandler handler = context.getServiceCollection().getServiceUnchecked(MailHandler.class);
         if (context.is(Player.class)) {
-            handler.sendMail(context.getIfPlayer().getUniqueId(), pl.getUniqueId(), m);
+            handler.sendMail(context.getIfPlayer().getUniqueId(), pl.uniqueId(), m);
         } else {
-            handler.sendMailFromConsole(pl.getUniqueId(), m);
+            handler.sendMailFromConsole(pl.uniqueId(), m);
         }
 
-        return context.errorResult("command.mail.send.successful", pl.getName());
+        return context.errorResult("command.mail.send.successful", pl.name());
     }
 }

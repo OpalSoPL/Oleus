@@ -31,7 +31,7 @@ public class NoteInfoProvider implements NucleusProvider {
             final Component r = serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.notes", active);
             if (active > 0) {
                 return Optional.of(
-                        r.clickEvent(ClickEvent.runCommand("/nucleus:checknotes " + user.getName()))
+                        r.clickEvent(ClickEvent.runCommand("/nucleus:checknotes " + user.name()))
                                 .hoverEvent(HoverEvent.showText(
                                         serviceCollection.messageProvider().getMessageFor(source.getAudience(), "standard.clicktoseemore"))));
             }

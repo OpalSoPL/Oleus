@@ -60,7 +60,7 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
         final User target = context.requireOne(NucleusParameters.ONE_USER);
         final ServerWorld world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey())
             .orElseGet(() -> this.gsc.isOnSpawnCommand() ? this.gsc.getWorld().get() :
-                    Sponge.server().getWorldManager().defaultWorld());
+                    Sponge.server().worldManager().defaultWorld());
 
         final Tuple<ServerLocation, Vector3d> worldTransform = SpawnHelper.getSpawn(world, target.getPlayer().orElse(null), context);
 
@@ -95,7 +95,7 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
 
         user.setLocation(worldTransform.getWorldKey(), worldTransform.getPosition());
         user.setRotation(rotation);
-        context.sendMessage("command.spawnother.offline.sendonlogin", user.getName(), worldTransform.getWorldKey().asString());
+        context.sendMessage("command.spawnother.offline.sendonlogin", user.name(), worldTransform.getWorldKey().asString());
         return context.successResult();
     }
 }

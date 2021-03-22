@@ -45,7 +45,7 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
     }
 
     @Listener
-    public void onPlayerLogin(final ServerSideConnectionEvent.Join joinEvent, @Getter("getPlayer") final ServerPlayer pl) {
+    public void onPlayerLogin(final ServerSideConnectionEvent.Join joinEvent, @Getter("player") final ServerPlayer pl) {
         if (joinEvent.isMessageCancelled() || (this.cmc.isDisableWithPermission() &&
                 this.permissionService.hasPermission(pl, ConnectionMessagesPermissions.CONNECTIONMESSSAGES_DISABLE))) {
             joinEvent.setMessageCancelled(true);
@@ -53,12 +53,12 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
         }
 
         try {
-            final Optional<String> lastKnown = this.storageManager.getUserOnThread(pl.getUniqueId()).flatMap(x -> x.get(CoreKeys.LAST_KNOWN_NAME));
+            final Optional<String> lastKnown = this.storageManager.getUserOnThread(pl.uniqueId()).flatMap(x -> x.get(CoreKeys.LAST_KNOWN_NAME));
             if (this.cmc.isDisplayPriorName() &&
                 !this.cmc.getPriorNameMessage().isEmpty() &&
-                !lastKnown.orElseGet(pl::getName).equalsIgnoreCase(pl.getName())) {
+                !lastKnown.orElseGet(pl::name).equalsIgnoreCase(pl.name())) {
                     // Name change!
-                    joinEvent.getAudience().orElse(joinEvent.getOriginalAudience())
+                    joinEvent.audience().orElse(joinEvent.originalAudience())
                             .sendMessage(this.priorNameMessage.getForObjectWithTokens(pl,
                                             ImmutableMap.of("previousname", cs -> Optional.of(Component.text(lastKnown.get())))));
             }
@@ -78,14 +78,14 @@ public class ConnectionMessagesListener implements IReloadableService.Reloadable
     @Listener
     public void onPlayerFirstJoin(final NucleusFirstJoinEvent event, @Getter("getPlayer") final ServerPlayer pl) {
         if (this.cmc.isShowFirstTimeMessage() && !this.cmc.getFirstTimeMessage().isEmpty()) {
-            event.getAudience().orElse(Sponge.server())
+            event.audience().orElse(Sponge.server())
                     .sendMessage(this.firstTimeMessage.getForObject(pl));
         }
     }
 
     @Listener
-    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect leaveEvent, @Getter("getPlayer") final ServerPlayer pl) {
-        if (leaveEvent.getMessage() != Component.empty() || (this.cmc.isDisableWithPermission() &&
+    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect leaveEvent, @Getter("player") final ServerPlayer pl) {
+        if (leaveEvent.message() != Component.empty() || (this.cmc.isDisableWithPermission() &&
                 this.permissionService.hasPermission(pl, ConnectionMessagesPermissions.CONNECTIONMESSSAGES_DISABLE))) {
             leaveEvent.setMessage(Component.empty());
             return;

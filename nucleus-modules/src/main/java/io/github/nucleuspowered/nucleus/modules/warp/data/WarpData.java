@@ -62,7 +62,7 @@ public class WarpData implements Warp {
 
     @Override
     public Optional<WorldProperties> getWorld() {
-        return Sponge.server().getWorldManager().getProperties(this.worldKey);
+        return Sponge.server().worldManager().getProperties(this.worldKey);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class WarpData implements Warp {
 
     @Override
     public Optional<ServerLocation> getLocation() {
-        return Sponge.server().getWorldManager().getWorld(this.worldKey).map(x -> ServerLocation.of(x, this.position));
+        return Sponge.server().worldManager().getWorld(this.worldKey).map(x -> ServerLocation.of(x, this.position));
     }
 
     @Override

@@ -41,7 +41,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -71,8 +73,8 @@ public class ResetUserCommand implements ICommandExecutor {
                 Parameter.firstOf(
                         NucleusParameters.ONE_USER,
                         Parameter.builder(User.class)
-                                .setKey(NucleusParameters.ONE_USER.getKey())
-                                .parser(UUIDParameter.user(serviceCollection.messageProvider()))
+                                .key(NucleusParameters.ONE_USER.key())
+                                .addParser(UUIDParameter.user(serviceCollection.messageProvider()))
                                 .build()
                 )
         };
@@ -82,13 +84,13 @@ public class ResetUserCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.requireOne(NucleusParameters.ONE_USER);
         final boolean deleteall = context.hasFlag("a");
-        final UUID responsible = context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID);
+        final UUID responsible = context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID);
 
-        final Audience targetAudience = context.getAudience();
+        final Audience targetAudience = context.audience();
         if (this.callbacks.containsKey(responsible)) {
             final Delete delete = this.callbacks.get(responsible);
             this.callbacks.remove(responsible);
-            if (Instant.now().isBefore(delete.until) && delete.all == deleteall && delete.user.equals(user.getUniqueId())) {
+            if (Instant.now().isBefore(delete.until) && delete.all == deleteall && delete.user.equals(user.uniqueId())) {
                 // execute that callback
                 delete.accept(targetAudience);
                 return context.successResult();
@@ -102,7 +104,7 @@ public class ResetUserCommand implements ICommandExecutor {
         final IMessageProviderService messageProvider = context.getServiceCollection().messageProvider();
 
         messages.add(messageProvider.getMessageFor(targetAudience, "command.nucleus.reset.warning"));
-        messages.add(messageProvider.getMessageFor(targetAudience, "command.nucleus.reset.warning2", user.getName()));
+        messages.add(messageProvider.getMessageFor(targetAudience, "command.nucleus.reset.warning2", user.name()));
         messages.add(messageProvider.getMessageFor(targetAudience, "command.nucleus.reset.warning3"));
         messages.add(messageProvider.getMessageFor(targetAudience, "command.nucleus.reset.warning4"));
         messages.add(messageProvider.getMessageFor(targetAudience, "command.nucleus.reset.warning5"));
@@ -115,7 +117,7 @@ public class ResetUserCommand implements ICommandExecutor {
 
         this.callbacks.put(responsible,
                 new Delete(Instant.now().plus(30, ChronoUnit.SECONDS),
-                    user.getUniqueId(),
+                    user.uniqueId(),
                     deleteall,
                     context.getServiceCollection()));
         messages.add(Component.text().append(messageProvider.getMessageFor(targetAudience, "command.nucleus.reset.reset"))
@@ -125,7 +127,7 @@ public class ResetUserCommand implements ICommandExecutor {
                     if (this.callbacks.containsKey(responsible)) {
                         final Delete delete = this.callbacks.get(responsible);
                         this.callbacks.remove(responsible);
-                        if (Instant.now().isBefore(delete.until) && delete.all == deleteall && delete.user.equals(user.getUniqueId())) {
+                        if (Instant.now().isBefore(delete.until) && delete.all == deleteall && delete.user.equals(user.uniqueId())) {
                             // execute that callback
                             delete.accept(targetAudience);
                         }
@@ -169,27 +171,32 @@ public class ResetUserCommand implements ICommandExecutor {
         @Override
         public void accept(final Audience source) {
             final IMessageProviderService messageProvider = this.serviceCollection.messageProvider();
-            final User user = Sponge.server().getUserManager().get(this.user).get();
+            final User user = Sponge.server().userManager().find(this.user).get();
             if (user.isOnline()) {
-                final ServerPlayer player = user.getPlayer().get();
+                final ServerPlayer player = user.player().get();
                 final Component kickReason = messageProvider.getMessageFor(player, "command.kick.defaultreason");
                 player.kick(kickReason);
 
                 // Let Sponge do what it needs to close the user off.
-                Task.builder().execute(() -> this.accept(source)).delay(Ticks.of(1)).plugin(this.serviceCollection.pluginContainer()).build();
+                final Task task =
+                        Task.builder().execute(() -> this.accept(source)).delay(Ticks.of(1)).plugin(this.serviceCollection.pluginContainer()).build();
+                Sponge.server().scheduler().submit(task);
                 return;
             }
 
-            source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.starting", user.getName()));
+            source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.starting", user.name()));
 
             // Ban temporarily.
-            final BanService bss = Sponge.server().getServiceProvider().banService();
-            final boolean isBanned = bss.getBanFor(user.getProfile()).isPresent();
-            bss.addBan(Ban.builder().type(BanTypes.PROFILE).expirationDate(Instant.now().plus(30, ChronoUnit.SECONDS)).profile(user.getProfile())
-                    .build());
+            final BanService bss = Sponge.server().serviceProvider().banService();
+            final CompletableFuture<Optional<? extends Ban>> future =
+                    bss.addBan(Ban.builder().type(BanTypes.PROFILE)
+                            .expirationDate(Instant.now().plus(30, ChronoUnit.SECONDS)).profile(user.profile())
+                            .build());
 
             // Unload the player in a second, just to let events fire.
-            Sponge.getAsyncScheduler().createExecutor(this.serviceCollection.pluginContainer()).schedule(() -> {
+            Sponge.asyncScheduler().createExecutor(this.serviceCollection.pluginContainer()).schedule(() -> {
+                // TODO: Do this properly
+                final Optional<? extends Ban> ban = future.join();
                 final IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> userStorageService =
                         this.serviceCollection.storageManager().getUserService();
 
@@ -197,24 +204,22 @@ public class ResetUserCommand implements ICommandExecutor {
                 try {
                     // Remove them from the cache immediately.
                     userStorageService.clearCache();
-                    userStorageService.delete(user.getUniqueId());
+                    userStorageService.delete(user.uniqueId());
                     if (this.all) {
-                        if (Sponge.server().getUserManager().delete(user)) {
-                            source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.completeall", user.getName()));
+                        if (Sponge.server().userManager().delete(user)) {
+                            source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.completeall", user.name()));
                         } else {
-                            source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.completenonm", user.getName()));
+                            source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.completenonm", user.name()));
                         }
                     } else {
-                        source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.complete", user.getName()));
+                        source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.complete", user.name()));
                     }
 
-                    source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.restartadvised", user.getName()));
+                    source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.restartadvised", user.name()));
                 } catch (final Exception e) {
-                    source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.failed", user.getName()));
+                    source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.failed", user.name()));
                 } finally {
-                    if (!isBanned) {
-                        bss.getBanFor(user.getProfile()).ifPresent(bss::removeBan);
-                    }
+                    ban.ifPresent(bss::removeBan);
                 }
             } , 1, TimeUnit.SECONDS);
         }

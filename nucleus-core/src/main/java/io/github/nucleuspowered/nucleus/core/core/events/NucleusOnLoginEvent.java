@@ -37,7 +37,7 @@ public class NucleusOnLoginEvent extends AbstractEvent {
         this.from = from;
     }
 
-    @Override public Cause getCause() {
+    @Override public Cause cause() {
         return this.cause;
     }
 

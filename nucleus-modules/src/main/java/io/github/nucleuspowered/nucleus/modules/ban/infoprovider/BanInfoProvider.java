@@ -34,7 +34,7 @@ public class BanInfoProvider implements NucleusProvider {
             final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, BanPermissions.BASE_CHECKBAN)) {
             // If we have a ban service, then check for a ban.
-            final BanService obs = Sponge.server().getServiceProvider().banService();
+            final BanService obs = Sponge.server().serviceProvider().banService();
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             final Optional<Ban.Profile> bs = obs.getBanFor(user.getProfile());
             final Audience audience = source.getAudience();
@@ -52,7 +52,7 @@ public class BanInfoProvider implements NucleusProvider {
 
                 return Optional.of(
                         LinearComponents.linear(
-                            m.clickEvent(ClickEvent.runCommand("/checkban " + user.getName()))
+                            m.clickEvent(ClickEvent.runCommand("/checkban " + user.name()))
                                 .hoverEvent(HoverEvent.showText(
                                         messageProviderService.getMessageFor(audience, "standard.clicktoseemore"))),
                             Component.newline(),

@@ -26,13 +26,13 @@ public final class CommandNameCache {
     private CommandNameCache() {}
 
     public Set<String> getFromCommandAndSource(final String command, final CommandCause source) {
-        final Optional<? extends CommandMapping> oc = Sponge.server().getCommandManager().getCommandMapping(command)
-                .filter(x -> x.getRegistrar().canExecute(source, x));
+        final Optional<? extends CommandMapping> oc = Sponge.server().commandManager().commandMapping(command)
+                .filter(x -> x.registrar().canExecute(source, x));
         return oc.map(CommandNameCache.INSTANCE::getLowercase).orElseGet(HashSet::new);
     }
 
     public Set<String> getLowercase(final CommandMapping mapping) {
         return new HashSet<>(this.mappingSetMap
-                .computeIfAbsent(mapping, x -> x.getAllAliases().stream().map(String::toLowerCase).collect(Collectors.toSet())));
+                .computeIfAbsent(mapping, x -> x.allAliases().stream().map(String::toLowerCase).collect(Collectors.toSet())));
     }
 }

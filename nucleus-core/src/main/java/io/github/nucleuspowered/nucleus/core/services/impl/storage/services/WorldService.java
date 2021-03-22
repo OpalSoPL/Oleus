@@ -24,7 +24,7 @@ public class WorldService extends AbstractKeyedService<ResourceKey, IWorldQueryO
 
     @Override
     protected void onEviction(final ResourceKey key, final IWorldDataObject dataObject, final BiConsumer<ResourceKey, IWorldDataObject> reAdd) {
-        Sponge.server().getWorldManager().world(key).ifPresent(x -> reAdd.accept(key, dataObject));
+        Sponge.server().worldManager().world(key).ifPresent(x -> reAdd.accept(key, dataObject));
     }
 
 }

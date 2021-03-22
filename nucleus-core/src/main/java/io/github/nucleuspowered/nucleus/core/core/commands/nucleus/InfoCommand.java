@@ -64,10 +64,10 @@ public final class InfoCommand implements ICommandExecutor {
         information.add("Environment");
         information.add(separator);
 
-        final Platform platform = Sponge.getPlatform();
-        final PluginContainer game = platform.getContainer(Platform.Component.GAME);
-        final PluginContainer implementation = platform.getContainer(Platform.Component.IMPLEMENTATION);
-        final PluginContainer api = platform.getContainer(Platform.Component.API);
+        final Platform platform = Sponge.platform();
+        final PluginContainer game = platform.container(Platform.Component.GAME);
+        final PluginContainer implementation = platform.container(Platform.Component.IMPLEMENTATION);
+        final PluginContainer api = platform.container(Platform.Component.API);
 
         information.add(String.format("Minecraft Version: %s %s", game.getMetadata().getName().orElse("unknown"), game.getMetadata().getVersion()));
         information.add(String.format("Sponge Version: %s %s", implementation.getMetadata().getName().orElse("unknown"),
@@ -79,7 +79,7 @@ public final class InfoCommand implements ICommandExecutor {
         information.add("Plugins");
         information.add(separator);
 
-        Sponge.getPluginManager().getPlugins().forEach(x -> information.add(x.getMetadata().getName().orElse("unknown") + " (" + x.getMetadata().getId() + ") "
+        Sponge.pluginManager().plugins().forEach(x -> information.add(x.getMetadata().getName().orElse("unknown") + " (" + x.getMetadata().getId() + ") "
                 + "version " + x.getMetadata().getVersion()));
 
         information.add(separator);
@@ -88,14 +88,14 @@ public final class InfoCommand implements ICommandExecutor {
 
         final Map<String, String> commands = new HashMap<>();
         final Map<String, String> plcmds = new HashMap<>();
-        final CommandManager manager = Sponge.server().getCommandManager();
-        manager.getKnownAliases().stream()
-                .map(x -> manager.getCommandMapping(x).orElse(null))
+        final CommandManager manager = Sponge.server().commandManager();
+        manager.knownAliases().stream()
+                .map(x -> manager.commandMapping(x).orElse(null))
                 .filter(Objects::nonNull)
                 .distinct()
                 .forEach(x -> {
-                    final Set<String> a = x.getAllAliases();
-                    final PluginContainer container = x.getPlugin();
+                    final Set<String> a = x.allAliases();
+                    final PluginContainer container = x.plugin();
                     final String id = container.getMetadata().getId();
                     final String info = " - " + container.getMetadata().getName() + " (" + id + ") version " + container.getMetadata().getVersion();
                     a.forEach(y -> {

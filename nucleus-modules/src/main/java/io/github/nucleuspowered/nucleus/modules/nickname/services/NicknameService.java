@@ -102,7 +102,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
     public Optional<ServerPlayer> getFromCache(final String text) {
         final UUID u = this.cache.inverse().get(text);
         if (u != null) {
-            final Optional<ServerPlayer> ret = Sponge.server().getPlayer(u);
+            final Optional<ServerPlayer> ret = Sponge.server().player(u);
             if (!ret.isPresent()) {
                 this.cache.remove(u);
             }
@@ -129,14 +129,14 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         }
 
         final ImmutableMap.Builder<Player, Component> mapToReturn = ImmutableMap.builder();
-        Sponge.server().getOnlinePlayers().stream()
+        Sponge.server().onlinePlayers().stream()
                 .filter(x -> !this.cache.containsKey(x.getUniqueId()))
                 .filter(x -> x.getName().toLowerCase().startsWith(prefix))
                 .forEach(player -> mapToReturn.put(player, player.get(Keys.CUSTOM_NAME).orElseGet(
-                        () -> Component.text(player.getName() + "*"))));
+                        () -> Component.text(player.name() + "*"))));
 
         for (final UUID uuid : uuidCollection) {
-            final Optional<ServerPlayer> op = Sponge.server().getPlayer(uuid);
+            final Optional<ServerPlayer> op = Sponge.server().player(uuid);
             op.ifPresent(player -> mapToReturn.put(player, this.textCache.get(uuid)));
         }
 
@@ -205,10 +205,10 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
     public void removeNick(final UUID uuid) throws NicknameException {
         final Component currentNickname = this.getNickname(uuid).orElse(null);
         final Component name = this.playerDisplayNameService.getName(uuid);
-        final Cause cause = Sponge.server().getCauseStackManager().getCurrentCause();
+        final Cause cause = Sponge.server().causeStackManager().getCurrentCause();
 
         final ChangeNicknameEventPre cne = new ChangeNicknameEventPre(cause, currentNickname, null, uuid);
-        if (Sponge.getEventManager().post(cne)) {
+        if (Sponge.eventManager().post(cne)) {
 
             throw new NicknameException(
                     this.messageProviderService.getMessage("command.nick.eventcancel", name),
@@ -218,9 +218,9 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
 
         this.storageManager.getUserService().removeAndSave(uuid, NicknameKeys.USER_NICKNAME_JSON);
         this.removeFromCache(uuid);
-        Sponge.getEventManager().post(new ChangeNicknameEventPost(cause, currentNickname, null, uuid));
+        Sponge.eventManager().post(new ChangeNicknameEventPost(cause, currentNickname, null, uuid));
 
-        final Optional<User> user = Sponge.server().getUserManager().get(uuid);
+        final Optional<User> user = Sponge.server().userManager().find(uuid);
         if (user.isPresent()) {
             final Optional<ServerPlayer> player = user.get().getPlayer();
             if (player.isPresent()) {
@@ -243,7 +243,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
 
         // Does the user exist?
         try {
-            final Optional<User> match = Sponge.server().getUserManager().get(plain);
+            final Optional<User> match = Sponge.server().userManager().find(plain);
 
             // The only person who can use such a name is oneself.
             if (match.isPresent() && !match.get().getUniqueId().equals(pl)) {
@@ -256,7 +256,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
             // We allow some other nicknames too.
         }
 
-        final Cause cause = Sponge.server().getCauseStackManager().getCurrentCause();
+        final Cause cause = Sponge.server().causeStackManager().getCurrentCause();
         if (!bypass) {
             // Giving subject must have the colour permissions and whatnot. Also,
             // colour and color are the two spellings we support. (RULE BRITANNIA!)
@@ -295,7 +295,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         // Send an event
         final Component currentNickname = this.getNickname(pl).orElse(null);
         final ChangeNicknameEventPre cne = new ChangeNicknameEventPre(cause, currentNickname, nickname, pl);
-        if (Sponge.getEventManager().post(cne)) {
+        if (Sponge.eventManager().post(cne)) {
             throw new NicknameException(
                     this.messageProviderService.getMessage("command.nick.eventcancel", name),
                     NicknameException.Type.EVENT_CANCELLED
@@ -305,9 +305,9 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         this.storageManager.getUserService().setAndSave(pl, NicknameKeys.USER_NICKNAME_JSON, GsonComponentSerializer.gson().serialize(nickname));
         this.updateCache(pl, nickname);
 
-        Sponge.getEventManager().post(new ChangeNicknameEventPost(Sponge.server().getCauseStackManager().getCurrentCause(),
+        Sponge.eventManager().post(new ChangeNicknameEventPost(Sponge.server().causeStackManager().getCurrentCause(),
                 currentNickname, nickname, pl));
-        final Optional<User> user = Sponge.server().getUserManager().get(pl);
+        final Optional<User> user = Sponge.server().userManager().find(pl);
         if (user.isPresent()) {
             final Optional<ServerPlayer> player = user.get().getPlayer();
             if (player.isPresent()) {

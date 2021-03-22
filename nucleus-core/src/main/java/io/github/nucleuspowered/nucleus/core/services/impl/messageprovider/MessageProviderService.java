@@ -145,10 +145,10 @@ public class MessageProviderService implements IMessageProviderService, IReloada
         final Locale toUse;
         if (this.useClientLocalesWhenPossible && commandSource instanceof LocaleSource) {
             if (commandSource instanceof ServerPlayer) {
-                return this.userPreferenceService.getPreferenceFor(((ServerPlayer) commandSource).getUniqueId(),
-                        this.userPreferenceService.keys().playerLocale().get()).orElseGet(((ServerPlayer) commandSource)::getLocale);
+                return this.userPreferenceService.getPreferenceFor(((ServerPlayer) commandSource).uniqueId(),
+                        this.userPreferenceService.keys().playerLocale().get()).orElseGet(((ServerPlayer) commandSource)::locale);
             }
-            toUse = ((LocaleSource) commandSource).getLocale();
+            toUse = ((LocaleSource) commandSource).locale();
         } else {
             toUse = this.defaultLocale;
         }
@@ -293,7 +293,7 @@ public class MessageProviderService implements IMessageProviderService, IReloada
 
     private PropertiesMessageRepository getPropertiesMessagesRepository(final Locale locale) {
         return this.messagesMap.computeIfAbsent(locale, key -> {
-            if (Sponge.getAssetManager().getAsset(
+            if (Sponge.assetManager().asset(
                     this.serviceCollection.pluginContainer(),
                     MessageFormat.format(MESSAGES_BUNDLE_RESOURCE_LOC, locale.toString())).isPresent()) {
                 // it exists

@@ -124,7 +124,7 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
             wl = home.get();
         }
 
-        Sponge.server().getWorldManager().getWorld(wl.getWorld().get().getKey())
+        Sponge.server().worldManager().getWorld(wl.getWorld().get().getKey())
                 .orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
 
         final ServerLocation targetLocation = wl.getLocation().orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
@@ -137,10 +137,10 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
             }
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             final UseHomeEvent event = new UseHomeEvent(frame.getCurrentCause(), target, wl);
 
-            if (Sponge.getEventManager().post(event)) {
+            if (Sponge.eventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
             }
@@ -161,10 +161,10 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
         if (isOther) {
             // Warp to it safely.
             if (result.isSuccessful()) {
-                context.sendMessage("command.homeother.success", user.getName(), wl.getName());
+                context.sendMessage("command.homeother.success", user.name(), wl.getName());
                 return context.successResult();
             } else {
-                return context.errorResult("command.homeother.fail", user.getName(), wl.getName());
+                return context.errorResult("command.homeother.fail", user.name(), wl.getName());
             }
         }
 

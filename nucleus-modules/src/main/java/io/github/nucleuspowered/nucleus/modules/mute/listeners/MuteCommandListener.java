@@ -61,8 +61,8 @@ public class MuteCommandListener implements ListenerBase.Conditional {
                 this.handler.unmutePlayer(player.getUniqueId());
             } else {
                 this.handler.onMute(muteData, player);
-                Sponge.getSystemSubject().sendMessage(LinearComponents.linear(
-                        Component.text(player.getName() + "("),
+                Sponge.systemSubject().sendMessage(LinearComponents.linear(
+                        Component.text(player.name() + "("),
                         this.serviceCollection.messageProvider().getMessage("standard.muted"),
                         Component.text("): "),
                         Component.text("/" + event.getCommand() + " " + event.getArguments())

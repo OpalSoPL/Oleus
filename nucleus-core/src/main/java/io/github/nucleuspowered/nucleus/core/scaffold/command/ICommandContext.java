@@ -33,13 +33,13 @@ public interface ICommandContext {
 
     ServerPlayer requirePlayer() throws CommandException;
 
-    CommandCause getCause();
+    CommandCause cause();
 
     String getCommandKey();
 
     Object getCommandSourceRoot();
 
-    Optional<UUID> getUniqueId();
+    Optional<UUID> uniqueId();
 
     /**
      * Gets the current cooldown for the command
@@ -66,7 +66,7 @@ public interface ICommandContext {
     ServerPlayer getPlayerFromArgs(Parameter.Key<? extends ServerPlayer> serverPlayer, String errorKey) throws CommandException;
 
     default ServerPlayer getPlayerFromArgs() throws CommandException {
-        return this.getPlayerFromArgs(NucleusParameters.ONE_PLAYER.getKey(), "command.playeronly");
+        return this.getPlayerFromArgs(NucleusParameters.ONE_PLAYER.key(), "command.playeronly");
     }
 
     ServerPlayer getCommandSourceAsPlayerUnchecked();
@@ -92,7 +92,7 @@ public interface ICommandContext {
     boolean hasAny(Parameter.Key<?> name);
 
     default boolean hasAny(final Parameter.Value<?> name) {
-        return this.hasAny(name.getKey());
+        return this.hasAny(name.key());
     }
 
     <T> Optional<T> getOne(Parameter.Key<T> name);
@@ -182,13 +182,13 @@ public interface ICommandContext {
     boolean isConsoleAndBypass();
 
     default ServerWorld getWorldPropertiesOrFromSelf(final Parameter.Value<ServerWorld> worldKey) throws CommandException {
-        return this.getWorldPropertiesOrFromSelf(worldKey.getKey());
+        return this.getWorldPropertiesOrFromSelf(worldKey.key());
     }
 
     ServerWorld getWorldPropertiesOrFromSelf(Parameter.Key<ServerWorld> worldKey) throws CommandException;
 
     default Optional<ServerWorld> getWorldPropertiesOrFromSelfOptional(final Parameter.Value<ServerWorld> worldKey) {
-        return this.getWorldPropertiesOrFromSelfOptional(worldKey.getKey());
+        return this.getWorldPropertiesOrFromSelfOptional(worldKey.key());
     }
 
     Optional<ServerWorld> getWorldPropertiesOrFromSelfOptional(Parameter.Key<ServerWorld> worldKey);
@@ -204,13 +204,13 @@ public interface ICommandContext {
     }
 
     default OptionalInt getLevel(final String key) {
-        return this.getLevelFor(this.getCause(), key);
+        return this.getLevelFor(this.cause(), key);
     }
 
     OptionalInt getLevelFor(Subject subject, String key);
 
     default int getLevel(final String key, final String permissionIfNoLevel) {
-        return this.getLevelFor(this.getCause(), key, permissionIfNoLevel);
+        return this.getLevelFor(this.cause(), key, permissionIfNoLevel);
     }
 
     default int getLevelFor(final Subject subject, final String key, final String permissionIfNoLevel) {
@@ -235,7 +235,7 @@ public interface ICommandContext {
 
     void addFailAction(Consumer<ICommandContext> action);
 
-    Audience getAudience();
+    Audience audience();
 
     Locale getLocale();
 }

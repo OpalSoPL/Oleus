@@ -25,12 +25,12 @@ public class OptionPlaceholder implements PlaceholderParser {
 
     @Override
     public Component parse(final PlaceholderContext placeholderContext) {
-        final Optional<Subject> subjectOptional = placeholderContext.getAssociatedObject()
+        final Optional<Subject> subjectOptional = placeholderContext.associatedObject()
                 .filter(x -> x instanceof Subject)
                 .map(x -> (Subject) x);
-        if (subjectOptional.isPresent() && placeholderContext.getArgumentString().isPresent()) {
+        if (subjectOptional.isPresent() && placeholderContext.argumentString().isPresent()) {
             return this.permissionService
-                    .getOptionFromSubject(subjectOptional.get(), placeholderContext.getArgumentString().get())
+                    .getOptionFromSubject(subjectOptional.get(), placeholderContext.argumentString().get())
                     .map(LegacyComponentSerializer.legacyAmpersand()::deserialize)
                     .orElse(Component.empty());
         }

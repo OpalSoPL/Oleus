@@ -14,7 +14,7 @@ abstract class FilterBase implements TeleportHelperFilter {
 
     @SuppressWarnings("all")
     boolean isPassable(World world, Vector3i position, boolean checkSafe) {
-        BlockState block = world.getBlock(position);
+        BlockState block = world.block(position);
         if (checkSafe && isSafeBodyMaterial(block)) {
             return false;
         }

@@ -23,7 +23,7 @@ public class UserDataLoadedEvent extends AbstractEvent {
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 

@@ -48,7 +48,7 @@ public interface IChatMessageFormatterService {
 
         default void formatMessageEvent(final Audience audience, final PlayerChatEvent event) {
             event.setChatRouter(PlayerChatRouter.toAudience(this.receivers()));
-            event.setMessage(this.formatMessage(audience, event.getMessage()));
+            event.setMessage(this.formatMessage(audience, event.message()));
         }
 
     }

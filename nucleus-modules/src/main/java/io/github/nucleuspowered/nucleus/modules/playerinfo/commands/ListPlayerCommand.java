@@ -63,7 +63,7 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final boolean showVanished = context.testPermission(PlayerInfoPermissions.LIST_SEEVANISHED);
 
-        final Collection<ServerPlayer> players = Sponge.server().getOnlinePlayers();
+        final Collection<ServerPlayer> players = Sponge.server().onlinePlayers();
         final long playerCount = players.size();
         final long hiddenCount = players.stream().filter(x -> x.get(Keys.VANISH).orElse(false)).count();
 
@@ -132,7 +132,7 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
         final IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
         final IPermissionService permissionService = context.getServiceCollection().permissionService();
         final Map<String, List<ServerPlayer>> map = new HashMap<>();
-        for (final ServerPlayer player : Sponge.server().getOnlinePlayers()) {
+        for (final ServerPlayer player : Sponge.server().onlinePlayers()) {
             if (showVanished || context.getAsPlayer().map(x -> playerOnlineService.isOnline(x, player.getUser())).orElse(true)) {
                 String perm = permissionService.getOptionFromSubject(player, LIST_OPTION).orElse(def);
                 if (perm.trim().isEmpty()) {

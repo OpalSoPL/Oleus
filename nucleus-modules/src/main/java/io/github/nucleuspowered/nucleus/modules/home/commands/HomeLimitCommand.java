@@ -44,9 +44,9 @@ public class HomeLimitCommand implements ICommandExecutor {
             }
         } else {
             if (max == Integer.MAX_VALUE) {
-                context.sendMessage("command.home.limit.otheru", user.getName(), current);
+                context.sendMessage("command.home.limit.otheru", user.name(), current);
             } else {
-                context.sendMessage("command.home.limit.other", user.getName(), current, max);
+                context.sendMessage("command.home.limit.other", user.name(), current, max);
             }
         }
 

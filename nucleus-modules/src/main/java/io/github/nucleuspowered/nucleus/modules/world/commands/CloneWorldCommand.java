@@ -47,36 +47,36 @@ public class CloneWorldCommand implements ICommandExecutor {
         final ServerWorld worldToCopy = context.requireOne(NucleusParameters.ONLINE_WORLD);
         final ResourceKey oldName = worldToCopy.getKey();
         final ResourceKey newName = ResourceKey.of(context.getServiceCollection().pluginContainer(), context.requireOne(this.newNameParameter));
-        if (Sponge.server().getWorldManager().world(newName).isPresent()) {
+        if (Sponge.server().worldManager().world(newName).isPresent()) {
             return context.errorResult("command.world.clone.alreadyexists", newName.asString());
         }
 
         context.sendMessage("command.world.clone.starting", oldName.asString(), newName.asString());
         if (!context.is(SystemSubject.class)) {
-            context.sendMessageTo(Sponge.getSystemSubject(), "command.world.clone.starting", oldName, newName);
+            context.sendMessageTo(Sponge.systemSubject(), "command.world.clone.starting", oldName, newName);
         }
 
         // Well, you never know, the player might die or disconnect - we have to be vigilant.
         final Supplier<Audience> mr;
         if (context.getAudience() instanceof ServerPlayer) {
             final UUID uuid = ((ServerPlayer) context.getAudience()).getUniqueId();
-            mr = () -> Sponge.server().getPlayer(uuid).map(x -> (Audience) x).orElseGet(Audience::empty);
+            mr = () -> Sponge.server().player(uuid).map(x -> (Audience) x).orElseGet(Audience::empty);
         } else {
             mr = context::getAudience;
         }
 
-        Sponge.server().getWorldManager().copyWorld(oldName, newName).handle((result, ex) -> {
+        Sponge.server().worldManager().copyWorld(oldName, newName).handle((result, ex) -> {
 
             final Audience m = mr.get();
             if (ex == null && result != null) {
                 context.sendMessage("command.world.clone.success", oldName, newName);
                 if (!(m instanceof SystemSubject)) {
-                    context.sendMessageTo(Sponge.getSystemSubject(), "command.world.clone.success", oldName, newName);
+                    context.sendMessageTo(Sponge.systemSubject(), "command.world.clone.success", oldName, newName);
                 }
             } else {
                 context.sendMessage("command.world.clone.failed", oldName, newName);
                 if (!(m instanceof SystemSubject)) {
-                    context.sendMessageTo(Sponge.getSystemSubject(), "command.world.clone.failed", oldName, newName);
+                    context.sendMessageTo(Sponge.systemSubject(), "command.world.clone.failed", oldName, newName);
                 }
             }
 

@@ -63,12 +63,12 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
         final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
 
         final Optional<Duration> time = context.getOne(NucleusParameters.DURATION);
-        final User user = either.fold(Function.identity(), Sponge.server().getUserManager()::getOrCreate);
+        final User user = either.fold(Function.identity(), Sponge.server().userManager()::getOrCreate);
         final Optional<Mute> omd = handler.getPlayerMuteInfo(user.getUniqueId());
         final Optional<String> reas = context.getOne(NucleusParameters.OPTIONAL_REASON);
 
         if (!context.isConsoleAndBypass() && context.testPermissionFor(user, MutePermissions.MUTE_EXEMPT_TARGET)) {
-            return context.errorResult("command.mute.exempt", user.getName());
+            return context.errorResult("command.mute.exempt", user.name());
         }
 
         if (this.levelConfig.isUseLevels() &&
@@ -77,7 +77,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
                         MutePermissions.BASE_MUTE,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", user.getName());
+            return context.errorResult("command.modifiers.level.insufficient", user.name());
         }
 
         // Do we have a reason?
@@ -87,7 +87,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.errorResult("command.mute.length.toolong", context.getTimeString(this.maxMute));
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             context.getAsPlayer().ifPresent(frame::pushCause);
             if (handler.mutePlayer(user.getUniqueId(), rs, time.orElse(null))) {
                 // Success.
@@ -106,13 +106,13 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
             }
         }
 
-        return context.errorResult("command.mute.fail", user.getName());
+        return context.errorResult("command.mute.fail", user.name());
     }
 
     private void timedMute(
             final ICommandContext context, final User user, final Mute data, final Audience mc) {
         final String ts = context.getTimeString(data.getRemainingTime().get());
-        mc.sendMessage(context.getMessage("command.mute.success.time", user.getName(), context.getName(), ts));
+        mc.sendMessage(context.getMessage("command.mute.success.time", user.name(), context.getName(), ts));
         mc.sendMessage(context.getMessage("standard.reasoncoloured", data.getReason()));
 
         if (user.isOnline()) {
@@ -122,7 +122,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
     }
 
     private void permMute(final ICommandContext context, final User user, final Mute data, final Audience mc) {
-        mc.sendMessage(context.getMessage("command.mute.success.norm", user.getName(), context.getName()));
+        mc.sendMessage(context.getMessage("command.mute.success.norm", user.name(), context.getName()));
         mc.sendMessage(context.getMessage("standard.reasoncoloured", data.getReason()));
 
         if (user.isOnline()) {

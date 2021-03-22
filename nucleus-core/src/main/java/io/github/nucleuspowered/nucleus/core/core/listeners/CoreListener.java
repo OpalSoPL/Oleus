@@ -73,7 +73,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener(order = Order.POST)
     public void onPlayerAuth(final ServerSideConnectionEvent.Auth event) {
-        final UUID userId = event.getProfile().getUniqueId();
+        final UUID userId = event.profile().uniqueId();
         if (userId == null) { // it could be, I guess?
             return;
         }
@@ -85,11 +85,11 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
         // Fire the event, which will be async too, perhaps unsurprisingly.
         // The main use for this will be migrations.
         final UserDataLoadedEvent eventToFire = new UserDataLoadedEvent(
-                event.getCause().with(this.serviceCollection.pluginContainer()),
+                event.cause().with(this.serviceCollection.pluginContainer()),
                 dataObject,
-                event.getProfile()
+                event.profile()
         );
-        Sponge.getEventManager().post(eventToFire);
+        Sponge.eventManager().post(eventToFire);
         if (eventToFire.shouldSave()) {
             this.serviceCollection.storageManager().getUserService().save(userId, dataObject);
         }
@@ -100,41 +100,41 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
      * We do this last to avoid interfering with other modules.
      */
     @Listener(order = Order.LATE)
-    public void onPlayerLoginLast(final ServerSideConnectionEvent.Login event, @Getter("getProfile") final GameProfile profile,
-        @Getter("getUser") final User user) {
+    public void onPlayerLoginLast(final ServerSideConnectionEvent.Login event, @Getter("profile") final GameProfile profile,
+        @Getter("user") final User user) {
 
-        final IUserDataObject udo = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(user.getUniqueId());
+        final IUserDataObject udo = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(user.uniqueId());
 
-        if (event.getFromLocation().equals(event.getToLocation())) {
-            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        if (event.fromLocation().equals(event.toLocation())) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                 frame.pushCause(profile);
                 // Check this
-                final NucleusOnLoginEvent onLoginEvent = new NucleusOnLoginEvent(frame.getCurrentCause(), user, udo, event.getFromLocation());
+                final NucleusOnLoginEvent onLoginEvent = new NucleusOnLoginEvent(frame.currentCause(), user, udo, event.fromLocation());
 
-                Sponge.getEventManager().post(onLoginEvent);
+                Sponge.eventManager().post(onLoginEvent);
                 if (onLoginEvent.getTo().isPresent()) {
                     event.setToLocation(onLoginEvent.getTo().get());
                 }
             }
         }
 
-        this.serviceCollection.userCacheService().updateCacheForPlayer(user.getUniqueId(), udo);
+        this.serviceCollection.userCacheService().updateCacheForPlayer(user.uniqueId(), udo);
     }
 
     /* (non-Javadoc)
      * We do this first to try to get the first play status as quick as possible.
      */
     @Listener(order = Order.FIRST)
-    public void onPlayerJoinFirst(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onPlayerJoinFirst(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer player) {
         try {
-            final IUserDataObject qsu = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(player.getUniqueId());
+            final IUserDataObject qsu = this.serviceCollection.storageManager().getUserService().getOrNewOnThread(player.uniqueId());
             qsu.set(CoreKeys.LAST_LOGIN, Instant.now());
             if (this.serviceCollection.platformService().isServer()) {
-                qsu.set(CoreKeys.IP_ADDRESS, player.getConnection().getAddress().getAddress().toString());
+                qsu.set(CoreKeys.IP_ADDRESS, player.connection().address().getAddress().toString());
             }
 
             // We'll do this bit shortly - after the login events have resolved.
-            final String name = player.getName();
+            final String name = player.name();
             Task.builder().execute(() -> qsu.set(CoreKeys.LAST_KNOWN_NAME, name)).delay(Duration.ofSeconds(1)).plugin(this.serviceCollection.pluginContainer()).build();
         } catch (final Exception e) {
             e.printStackTrace();
@@ -142,9 +142,9 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener
-    public void onPlayerJoinLast(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onPlayerJoinLast(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer player) {
         // created before
-        final UUID uuid = player.getUniqueId();
+        final UUID uuid = player.uniqueId();
         final IStorageService.Keyed.KeyedData<UUID, IUserQueryObject, IUserDataObject> userService =
                 this.serviceCollection.storageManager().getUserService();
         if (!userService
@@ -152,19 +152,19 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
                 .flatMap(x -> x.get(CoreKeys.FIRST_JOIN_PROCESSED))
                 .orElse(false)) {
 
-            if (!this.checkSponge || !Util.hasPlayedBeforeSponge(player.getUser())) {
+            if (!this.checkSponge || !Util.hasPlayedBeforeSponge(player.user())) {
                 this.serviceCollection.getServiceUnchecked(UniqueUserService.class).resetUniqueUserCount();
 
                 final NucleusFirstJoinEvent firstJoinEvent = new OnFirstLoginEvent(
-                        event.getCause(), player, event.getOriginalAudience(), event.getAudience().orElse(null), event.getOriginalMessage(),
+                        event.cause(), player, event.originalAudience(), event.audience().orElse(null), event.originalMessage(),
                         event.isMessageCancelled());
 
-                Sponge.getEventManager().post(firstJoinEvent);
-                event.setAudience(firstJoinEvent.getAudience().get());
+                Sponge.eventManager().post(firstJoinEvent);
+                event.setAudience(firstJoinEvent.audience().get());
                 event.setMessageCancelled(firstJoinEvent.isMessageCancelled());
             }
 
-            userService.getOrNew(player.getUniqueId())
+            userService.getOrNew(player.uniqueId())
                     .thenAccept(x -> {
                         x.set(CoreKeys.FIRST_JOIN_PROCESSED, true);
                     });
@@ -173,7 +173,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
         // Warn about wildcard.
         if (player.hasPermission("nucleus")) {
             final IMessageProviderService provider = this.serviceCollection.messageProvider();
-            this.serviceCollection.logger().warn("The player " + player.getName() + " has got either the nucleus wildcard or the * wildcard "
+            this.serviceCollection.logger().warn("The player " + player.name() + " has got either the nucleus wildcard or the * wildcard "
                     + "permission. This may cause unintended side effects.");
 
             if (this.warnOnWildcard) {
@@ -188,7 +188,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
                     );
                 }
                 text.add(provider.getMessageFor(player, "core.permission.wildcard5"));
-                Sponge.getServiceProvider().paginationService()
+                Sponge.serviceProvider().paginationService()
                         .builder()
                         .title(provider.getMessageFor(player, "core.permission.wildcard"))
                         .contents(text)
@@ -199,17 +199,17 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer player) {
-        this.serviceCollection.storageManager().getUser(player.getUniqueId()).thenAccept(x -> x.ifPresent(y -> this.onPlayerQuit(player, y)));
+    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("player") final ServerPlayer player) {
+        this.serviceCollection.storageManager().getUser(player.uniqueId()).thenAccept(x -> x.ifPresent(y -> this.onPlayerQuit(player, y)));
     }
 
     private void onPlayerQuit(final ServerPlayer player, final IUserDataObject udo) {
-        final InetAddress address = player.getConnection().getAddress().getAddress();
+        final InetAddress address = player.connection().address().getAddress();
 
         try {
             udo.set(CoreKeys.IP_ADDRESS, address.toString());
-            this.serviceCollection.userCacheService().updateCacheForPlayer(player.getUniqueId(), udo);
-            this.serviceCollection.storageManager().saveUser(player.getUniqueId(), udo);
+            this.serviceCollection.userCacheService().updateCacheForPlayer(player.uniqueId(), udo);
+            this.serviceCollection.storageManager().saveUser(player.uniqueId(), udo);
         } catch (final Exception e) {
             e.printStackTrace();
         }
@@ -226,12 +226,12 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onServerAboutToStop(final StoppingEngineEvent<Server> event) {
-        for (final ServerPlayer player : Sponge.server().getOnlinePlayers()) {
-            this.serviceCollection.storageManager().getUserOnThread(player.getUniqueId()).ifPresent(x -> this.onPlayerQuit(player, x));
+        for (final ServerPlayer player : Sponge.server().onlinePlayers()) {
+            this.serviceCollection.storageManager().getUserOnThread(player.uniqueId()).ifPresent(x -> this.onPlayerQuit(player, x));
         }
 
         if (this.getKickOnStopMessage != null) {
-            for (final ServerPlayer p : Sponge.server().getOnlinePlayers()) {
+            for (final ServerPlayer p : Sponge.server().onlinePlayers()) {
                 final Component msg = this.getKickOnStopMessage.getForObject(p);
                 if (AdventureUtils.isEmpty(msg)) {
                     p.kick();
@@ -245,7 +245,7 @@ public class CoreListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onGameReload(final RefreshGameEvent event) {
-        final Audience requester = event.getCause().first(Audience.class).orElse(Sponge.getSystemSubject());
+        final Audience requester = event.cause().first(Audience.class).orElse(Sponge.systemSubject());
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         try {
             this.serviceCollection.reloadableService().fireReloadables(this.serviceCollection);

@@ -56,7 +56,7 @@ public class FeedCommand implements ICommandExecutor {
         if (pl.offer(Keys.FOOD_LEVEL, pl.get(Keys.MAX_FOOD_LEVEL).orElse(20)).isSuccessful()) {
             context.sendMessageTo(pl, "command.feed.success.self");
             if (!context.is(pl)) {
-                context.sendMessage("command.feed.success.other", pl.getName());
+                context.sendMessage("command.feed.success.other", pl.name());
             }
 
             return context.successResult();

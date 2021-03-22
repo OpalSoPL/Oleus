@@ -39,8 +39,8 @@ public class DeleteWarpCommand implements ICommandExecutor {
         final WarpService qs = context.getServiceCollection().getServiceUnchecked(WarpService.class);
         final Warp warp = context.requireOne(qs.warpElement(false));
 
-        final DeleteWarpEvent event = new DeleteWarpEvent(Sponge.server().getCauseStackManager().getCurrentCause(), warp);
-        if (Sponge.getEventManager().post(event)) {
+        final DeleteWarpEvent event = new DeleteWarpEvent(Sponge.server().causeStackManager().getCurrentCause(), warp);
+        if (Sponge.eventManager().post(event)) {
             return event.getCancelMessage().map(context::errorResultLiteral)
                     .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
         }

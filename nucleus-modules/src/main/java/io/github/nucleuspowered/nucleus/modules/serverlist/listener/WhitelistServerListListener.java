@@ -45,7 +45,7 @@ public class WhitelistServerListListener implements IReloadableService.Reloadabl
         final Optional<Component> ott = this.service.getMessage();
         if (!ott.isPresent() &&  !this.whitelist.isEmpty()) {
             final NucleusTextTemplate template = this.whitelist.get(this.random.nextInt(this.whitelist.size()));
-            response.setDescription(template.getForObject(Sponge.getSystemSubject()));
+            response.setDescription(template.getForObject(Sponge.systemSubject()));
         }
     }
 

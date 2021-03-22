@@ -33,18 +33,18 @@ public class OfflineWorldParameter implements ValueParameter<ResourceKey> {
 
     @Override
     public List<String> complete(final CommandContext context, final String input) {
-        return Sponge.server().getWorldManager().offlineWorldKeys().stream()
-                .filter(x -> x.getFormatted().startsWith(input))
+        return Sponge.server().worldManager().offlineWorldKeys().stream()
+                .filter(x -> x.formatted().startsWith(input))
                 .map(Object::toString)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<? extends ResourceKey> getValue(final Parameter.Key<? super ResourceKey> parameterKey,
+    public Optional<? extends ResourceKey> parseValue(final Parameter.Key<? super ResourceKey> parameterKey,
             final ArgumentReader.Mutable reader, final CommandContext.Builder context) throws ArgumentParseException {
         final ResourceKey key = reader.parseResourceKey();
         final Optional<ResourceKey> ow =
-                Sponge.server().getWorldManager().offlineWorldKeys()
+                Sponge.server().worldManager().offlineWorldKeys()
                         .stream()
                         .filter(x -> x.equals(key))
                         .findFirst();
@@ -55,7 +55,7 @@ public class OfflineWorldParameter implements ValueParameter<ResourceKey> {
     }
 
     @Override
-    public List<ClientCompletionType> getClientCompletionType() {
+    public List<ClientCompletionType> clientCompletionType() {
         return Collections.singletonList(ClientCompletionTypes.RESOURCE_KEY.get());
     }
 

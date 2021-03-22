@@ -72,7 +72,7 @@ public class BasicActionbarCommand implements ICommandExecutor {
             final ServerPlayer pl = targets.iterator().next();
             final Component t = textTemplate.getForObjectWithSenderToken(pl, sender);
             pl.sendActionBar(t);
-            context.sendMessage("command.title.player.success.single", "Action Bar", t, pl.getName());
+            context.sendMessage("command.title.player.success.single", "Action Bar", t, pl.name());
         }
         return context.successResult();
     }

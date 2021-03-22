@@ -45,22 +45,22 @@ public class UnjailCommand implements ICommandExecutor, IReloadableService.Reloa
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = NucleusParameters.Composite.parseUserOrGameProfile(context)
-                .fold(Function.identity(), Sponge.server().getUserManager()::getOrCreate);
+                .fold(Function.identity(), Sponge.server().userManager()::getOrCreate);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
                         JailPermissions.JAIL_LEVEL_KEY,
                         JailPermissions.BASE_JAIL,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", user.getName());
+            return context.errorResult("command.modifiers.level.insufficient", user.name());
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             if (context.getServiceCollection().getServiceUnchecked(JailService.class).unjailPlayer(user.getUniqueId())) {
-                context.sendMessage("command.jail.unjail.success", user.getName());
+                context.sendMessage("command.jail.unjail.success", user.name());
                 return context.successResult();
             } else {
-                return context.errorResult("command.jail.unjail.fail", user.getName());
+                return context.errorResult("command.jail.unjail.fail", user.name());
             }
         }
     }

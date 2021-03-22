@@ -60,7 +60,7 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
             final Map<String, BlockSpawnsConfig> conf = serviceCollection.configProvider().getModuleConfig(MobConfig.class).getBlockSpawnsConfig();
-            if (conf.entrySet().stream().anyMatch(x -> Sponge.server().getWorldManager().getProperties(ResourceKey.resolve(x.getKey().toLowerCase())).isPresent())) {
+            if (conf.entrySet().stream().anyMatch(x -> Sponge.server().worldManager().getProperties(ResourceKey.resolve(x.getKey().toLowerCase())).isPresent())) {
                 for (final BlockSpawnsConfig s : conf.values()) {
                     final List<String> idsToBlock = s.getIdsToBlock();
                     if (s.isBlockVanillaMobs() || Sponge.getRegistry().getCatalogRegistry().getAllOf(EntityType.class).stream().anyMatch(x -> idsToBlock.contains(x.getKey().asString()))) {

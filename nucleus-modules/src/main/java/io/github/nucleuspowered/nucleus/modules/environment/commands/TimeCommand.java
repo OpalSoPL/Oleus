@@ -41,7 +41,7 @@ public class TimeCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) {
         final WorldProperties pr = context.getWorldPropertiesOrFromSelfOptional(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY_OPTIONAL.getKey())
-                .orElseGet(() -> Sponge.server().getWorldManager().getDefaultProperties().get()
+                .orElseGet(() -> Sponge.server().worldManager().getDefaultProperties().get()
         );
 
         context.sendMessage("command.time", pr.getKey().asString(), context.getTimeString(pr.getDayTime().asInGameDuration()));

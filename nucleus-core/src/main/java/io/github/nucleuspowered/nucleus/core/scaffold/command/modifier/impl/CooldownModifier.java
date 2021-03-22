@@ -47,7 +47,7 @@ public class CooldownModifier implements ICommandModifier {
     }
 
     @Override public boolean canExecuteModifier(final INucleusServiceCollection serviceCollection, final CommandContext source) {
-        return source.getCause().root() instanceof ServerPlayer;
+        return source.cause().root() instanceof ServerPlayer;
     }
 
     @Override public Optional<Component> testRequirement(final ICommandContext source,

@@ -156,7 +156,7 @@ public final class NucleusCore {
 
     public Path getDataDirectory() {
         if (this.dataDirectory == null) {
-            this.dataDirectory = Sponge.server().getGame().getGameDirectory().resolve("nucleus");
+            this.dataDirectory = Sponge.game().gameDirectory().resolve("nucleus");
             try {
                 Files.createDirectories(this.dataDirectory);
             } catch (final IOException e) {
@@ -273,8 +273,8 @@ public final class NucleusCore {
                 if (docgenPath.isEmpty()) {
                     finalPath = this.getDataDirectory();
                 } else {
-                    final Path path = Sponge.game().getGameDirectory().resolve(docgenPath);
-                    boolean isOk = path.toAbsolutePath().startsWith(Sponge.game().getGameDirectory().toAbsolutePath());
+                    final Path path = Sponge.game().gameDirectory().resolve(docgenPath);
+                    boolean isOk = path.toAbsolutePath().startsWith(Sponge.game().gameDirectory().toAbsolutePath());
                     isOk &= Files.notExists(path) || Files.isDirectory(path);
                     if (isOk) {
                         Files.createDirectories(path);
@@ -296,7 +296,7 @@ public final class NucleusCore {
         }
         this.onStartedActions.forEach(Action::action);
         this.serviceCollection.getServiceUnchecked(UniqueUserService.class).resetUniqueUserCount();
-        event.getGame().getAsyncScheduler().createExecutor(this.pluginContainer)
+        Sponge.asyncScheduler().createExecutor(this.pluginContainer)
                 .submit(() -> this.serviceCollection.userCacheService().startFilewalkIfNeeded());
         this.serviceCollection.platformService().setGameStartedTime();
     }
@@ -306,7 +306,7 @@ public final class NucleusCore {
         // Teardown data here
         final IStorageManager manager = this.serviceCollection.storageManager();
         manager.saveAndInvalidateAllCaches().whenComplete((v, t) -> manager.detachAll());
-        Sponge.getAsyncScheduler().getTasksByPlugin(this.pluginContainer).forEach(ScheduledTask::cancel);
+        Sponge.asyncScheduler().tasksByPlugin(this.pluginContainer).forEach(ScheduledTask::cancel);
     }
 
     @Listener
@@ -351,19 +351,19 @@ public final class NucleusCore {
 
     private void completeModuleInit(final Collection<Tuple<ModuleContainer, IModule>> modules) {
         for (final Tuple<ModuleContainer, IModule> tuple : modules) {
-            final IModule module = tuple.getSecond();
-            final ModuleContainer container = tuple.getFirst();
+            final IModule module = tuple.second();
+            final ModuleContainer container = tuple.first();
             // listeners
-            Sponge.getEventManager().registerListeners(this.pluginContainer, module);
+            Sponge.eventManager().registerListeners(this.pluginContainer, module);
 
             for (final Class<? extends ListenerBase> listenerClass :
-                    Objects.requireNonNull(module.getListeners(), "Module " + tuple.getFirst().getId() + " has a null listener call.")) {
+                    Objects.requireNonNull(module.getListeners(), "Module " + tuple.first().getId() + " has a null listener call.")) {
                 final ListenerBase listener = this.injector.getInstance(listenerClass);
                 if (listener instanceof ListenerBase.Conditional) {
                     this.serviceCollection.reloadableService().registerReloadable(new ListenerReloadableWrapper((ListenerBase.Conditional) listener));
                 }
 
-                Sponge.getEventManager().registerListeners(this.pluginContainer, listener);
+                Sponge.eventManager().registerListeners(this.pluginContainer, listener);
                 if (listener instanceof IReloadableService.Reloadable) {
                     this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) listener);
                 }
@@ -378,7 +378,7 @@ public final class NucleusCore {
                 if (taskBase instanceof IReloadableService.Reloadable) {
                     this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) taskBase);
                 }
-                this.onStartedActions.add(() -> Sponge.getAsyncScheduler()
+                this.onStartedActions.add(() -> Sponge.asyncScheduler()
                         .createExecutor(this.pluginContainer)
                         .scheduleAtFixedRate(
                                 taskBase,
@@ -392,7 +392,7 @@ public final class NucleusCore {
                 if (taskBase instanceof IReloadableService.Reloadable) {
                     this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) taskBase);
                 }
-                this.onStartedActions.add(() -> Sponge.server().getScheduler()
+                this.onStartedActions.add(() -> Sponge.server().scheduler()
                         .submit(
                                 Task.builder().plugin(this.pluginContainer)
                                         .delay(taskBase.interval().getSeconds(), TimeUnit.SECONDS)
@@ -410,7 +410,7 @@ public final class NucleusCore {
         }
 
         // Once everything is said and done, run post-init on the loaded modules
-        modules.forEach(tuple -> tuple.getSecond().postLoad(this.serviceCollection));
+        modules.forEach(tuple -> tuple.second().postLoad(this.serviceCollection));
     }
 
     private Collection<ModuleContainer> filterModules(final Collection<ModuleContainer> moduleContainers) {
@@ -452,7 +452,7 @@ public final class NucleusCore {
                                 return true;
                             }
                         }).collect(Collectors.toSet()));
-        Sponge.getEventManager().post(event);
+        Sponge.eventManager().post(event);
         final ArrayList<ModuleContainer> containersToReturn = new ArrayList<>();
         containersToReturn.add(new ModuleContainer("core", "Core", true, CoreModule.class));
         for (final ModuleContainer moduleContainer : moduleContainers) {

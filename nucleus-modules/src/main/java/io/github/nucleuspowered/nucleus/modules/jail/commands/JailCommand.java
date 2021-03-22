@@ -74,7 +74,7 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the subject.
         final User pl = NucleusParameters.Composite.parseUserOrGameProfile(context).fold(Function.identity(),
-                x -> Sponge.server().getUserManager().getOrCreate(x));
+                x -> Sponge.server().userManager().findOrCreate(x));
         if (!pl.isOnline() && !context.testPermission(JailPermissions.JAIL_OFFLINE)) {
             return context.errorResult("command.jail.offline.noperms");
         }
@@ -85,15 +85,15 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
                         JailPermissions.BASE_JAIL,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", pl.getName());
+            return context.errorResult("command.modifiers.level.insufficient", pl.name());
         }
 
-        if (this.handler.isPlayerJailed(pl.getUniqueId())) {
-            return context.errorResult("command.jail.alreadyjailed", pl.getName());
+        if (this.handler.isPlayerJailed(pl.uniqueId())) {
+            return context.errorResult("command.jail.alreadyjailed", pl.name());
         }
 
         if (!context.isConsoleAndBypass() && context.testPermissionFor(pl, JailPermissions.JAIL_EXEMPT_TARGET)) {
-            return context.errorResult("command.jail.exempt", pl.getName());
+            return context.errorResult("command.jail.exempt", pl.name());
         }
 
         return this.onJail(context, pl);
@@ -119,12 +119,12 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
         if (success) {
             if (duration.isPresent()) {
                 final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
-                message = context.getMessage("command.checkjail.jailedfor", user.getName(), jail.getName(),
+                message = context.getMessage("command.checkjail.jailedfor", user.name(), jail.getName(),
                         context.getName(), messageProviderService.getTimeString(context.getAudience(), duration.get()));
                 messageTo = context.getMessage("command.jail.jailedfor", jail.getName(), context.getName(),
                         messageProviderService.getTimeString(context.getLocale(), duration.get()));
             } else {
-                message = context.getMessage("command.checkjail.jailedperm", user.getName(), jail.getName(), context.getName());
+                message = context.getMessage("command.checkjail.jailedperm", user.name(), jail.getName(), context.getName());
                 messageTo = context.getMessage("command.jail.jailedperm", jail.getName(), context.getName());
             }
 

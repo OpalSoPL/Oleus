@@ -58,13 +58,13 @@ public class KickAllCommand implements ICommandExecutor {
         }
 
         // Don't kick self
-        Sponge.server().getOnlinePlayers().stream()
+        Sponge.server().onlinePlayers().stream()
                 .filter(context::is)
                 .collect(Collectors.toList())
                 .forEach(x -> x.kick(r));
 
         // MessageChannel mc = MessageChannel.fixed(Sponge.server().getConsole(), src);
-        final SystemSubject console = Sponge.getSystemSubject();
+        final SystemSubject console = Sponge.systemSubject();
         context.sendMessage("command.kickall.message");
         context.sendMessageTo(console, "command.kickall.message");
         context.sendMessage("command.reason", r);

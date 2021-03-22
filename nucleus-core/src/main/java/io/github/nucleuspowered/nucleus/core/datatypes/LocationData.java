@@ -38,7 +38,7 @@ public class LocationData implements NamedLocation {
     }
 
     @Override public Optional<ServerWorld> getWorld() {
-        return Sponge.server().getWorldManager().world(this.resourceKey);
+        return Sponge.server().worldManager().world(this.resourceKey);
     }
 
     public Vector3d getRotation() {
@@ -50,7 +50,7 @@ public class LocationData implements NamedLocation {
     }
 
     @Override public Optional<ServerLocation> getLocation() {
-        return Sponge.server().getWorldManager().world(this.resourceKey).map(x -> x.getLocation(this.position));
+        return Sponge.server().worldManager().world(this.resourceKey).map(x -> x.location(this.position));
     }
 
     public String toLocationString() {

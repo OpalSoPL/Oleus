@@ -38,21 +38,21 @@ public class CooldownService implements ICooldownService {
     }
 
     @Override public boolean hasCooldown(final String key, final Identifiable identifiable) {
-        return this.cleanUp().containsKey(new DualKey(key, identifiable.getUniqueId()));
+        return this.cleanUp().containsKey(new DualKey(key, identifiable.uniqueId()));
     }
 
     @Override public Optional<Duration> getCooldown(final String key, final Identifiable identifiable) {
         return Optional.ofNullable(this.cleanUp()
-                .get(new DualKey(key, identifiable.getUniqueId())))
+                .get(new DualKey(key, identifiable.uniqueId())))
                 .map(x -> Duration.between(Instant.now(), x));
     }
 
     @Override public void setCooldown(final String key, final Identifiable identifiable, final Duration cooldownLength) {
-        this.cooldowns.put(new DualKey(key, identifiable.getUniqueId()), Instant.now().plus(cooldownLength));
+        this.cooldowns.put(new DualKey(key, identifiable.uniqueId()), Instant.now().plus(cooldownLength));
     }
 
     @Override public void clearCooldown(final String key, final Identifiable identifiable) {
-        this.cooldowns.remove(new DualKey(key, identifiable.getUniqueId()));
+        this.cooldowns.remove(new DualKey(key, identifiable.uniqueId()));
     }
 
     private final static class DualKey {

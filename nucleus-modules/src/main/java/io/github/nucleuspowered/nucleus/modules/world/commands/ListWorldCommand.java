@@ -50,7 +50,7 @@ public class ListWorldCommand implements ICommandExecutor {
 
         listContent.add(context.getMessage("command.world.list.uuid", x.getUniqueId().toString()));
         if (x.isEnabled()) {
-            final boolean worldLoaded = Sponge.server().getWorldManager().getWorld(x.getKey()).isPresent();
+            final boolean worldLoaded = Sponge.server().worldManager().getWorld(x.getKey()).isPresent();
             final String message =
                 (worldLoaded ? "&a" : "&c") + context.getMessageString(worldLoaded ? "standard.true" : "standard.false");
             listContent.add(context.getMessage("command.world.list.enabled", message));
@@ -78,7 +78,7 @@ public class ListWorldCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the worlds
-        final Collection<WorldProperties> cwp = Sponge.server().getWorldManager().getAllProperties();
+        final Collection<WorldProperties> cwp = Sponge.server().worldManager().getAllProperties();
         final List<Component> listContent = new ArrayList<>();
 
         final boolean canSeeSeeds = context.testPermission(WorldPermissions.WORLD_SEED);

@@ -30,23 +30,23 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
 
     @Override
     public boolean serviceExists() {
-        return Sponge.server().getServiceProvider().economyService().isPresent();
+        return Sponge.server().serviceProvider().economyService().isPresent();
     }
 
     @Override public String getCurrencySymbol(final double cost) {
-        final Optional<EconomyService> oes = Sponge.server().getServiceProvider().economyService();
-        return oes.map(economyService -> economyService.getDefaultCurrency().format(BigDecimal.valueOf(cost)).toString())
+        final Optional<EconomyService> oes = Sponge.server().serviceProvider().economyService();
+        return oes.map(economyService -> economyService.defaultCurrency().format(BigDecimal.valueOf(cost)).toString())
                 .orElseGet(() -> String.valueOf(cost));
 
     }
 
     @Override public boolean hasBalance(final UUID src, final double balance) {
-        final Optional<EconomyService> oes = Sponge.server().getServiceProvider().economyService();
+        final Optional<EconomyService> oes = Sponge.server().serviceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
-            final Optional<UniqueAccount> ua = es.getOrCreateAccount(src);
-            return ua.isPresent() && ua.get().getBalance(es.getDefaultCurrency()).doubleValue() >= balance;
+            final Optional<UniqueAccount> ua = es.accountOrCreate(src);
+            return ua.isPresent() && ua.get().balance(es.defaultCurrency()).doubleValue() >= balance;
         }
 
         // No economy
@@ -58,34 +58,34 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
     }
 
     @Override public boolean withdrawFromPlayer(final UUID src, final double cost, final boolean message) {
-        final Optional<EconomyService> oes = Sponge.server().getServiceProvider().economyService();
+        final Optional<EconomyService> oes = Sponge.server().serviceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
-            final Optional<UniqueAccount> a = es.getOrCreateAccount(src);
+            final Optional<UniqueAccount> a = es.accountOrCreate(src);
             if (!a.isPresent()) {
-                Sponge.server().getPlayer(src).ifPresent(x ->
+                Sponge.server().player(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.noaccount"));
                 return false;
             }
 
             // TODO: try (final CauseStackManager.StackFrame frame = )
-            final TransactionResult tr = a.get().withdraw(es.getDefaultCurrency(), BigDecimal.valueOf(cost));
-            if (tr.getResult() == ResultType.ACCOUNT_NO_FUNDS) {
+            final TransactionResult tr = a.get().withdraw(es.defaultCurrency(), BigDecimal.valueOf(cost));
+            if (tr.result() == ResultType.ACCOUNT_NO_FUNDS) {
                 if (message) {
-                    Sponge.server().getPlayer(src).ifPresent(x ->
+                    Sponge.server().player(src).ifPresent(x ->
                             this.messageProviderService.sendMessageTo(x, "cost.nofunds", this.getCurrencySymbol(cost)));
                 }
 
                 return false;
-            } else if (tr.getResult() != ResultType.SUCCESS) {
-                Sponge.server().getPlayer(src).ifPresent(x ->
+            } else if (tr.result() != ResultType.SUCCESS) {
+                Sponge.server().player(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.error"));
                 return false;
             }
 
             if (message) {
-                Sponge.server().getPlayer(src).ifPresent(x ->
+                Sponge.server().player(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.complete", this.getCurrencySymbol(cost)));
             }
         }
@@ -98,26 +98,26 @@ public class EconomyServiceProvider implements IEconomyServiceProvider {
     }
 
     @Override public boolean depositInPlayer(final UUID src, final double cost, final boolean message) {
-        final Optional<EconomyService> oes = Sponge.server().getServiceProvider().economyService();
+        final Optional<EconomyService> oes = Sponge.server().serviceProvider().economyService();
         if (oes.isPresent()) {
             // Check balance.
             final EconomyService es = oes.get();
-            final Optional<UniqueAccount> a = es.getOrCreateAccount(src);
+            final Optional<UniqueAccount> a = es.accountOrCreate(src);
             if (!a.isPresent()) {
-                Sponge.server().getPlayer(src).ifPresent(x ->
+                Sponge.server().player(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.noaccount"));
                 return false;
             }
 
-            final TransactionResult tr = a.get().deposit(es.getDefaultCurrency(), BigDecimal.valueOf(cost));
-            if (tr.getResult() != ResultType.SUCCESS) {
-                Sponge.server().getPlayer(src).ifPresent(x ->
+            final TransactionResult tr = a.get().deposit(es.defaultCurrency(), BigDecimal.valueOf(cost));
+            if (tr.result() != ResultType.SUCCESS) {
+                Sponge.server().player(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.error"));
                 return false;
             }
 
             if (message) {
-                Sponge.server().getPlayer(src).ifPresent(x ->
+                Sponge.server().player(src).ifPresent(x ->
                         this.messageProviderService.sendMessageTo(x, "cost.refund", this.getCurrencySymbol(cost)));
             }
         }

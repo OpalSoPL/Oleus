@@ -79,14 +79,14 @@ public class MeCommand implements ICommandExecutor, IReloadableService.Reloadabl
 
         // We create an event so that other plugins can provide transforms, such as Boop, and that we
         // can catch it in ignore and mutes, and so can other plugins.
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame();
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame();
                 final NoExceptionAutoClosable c =
                         this.chatMessageFormatterService.setPlayerNucleusChannelTemporarily(Util.CONSOLE_FAKE_UUID, new MeChannel(header))) {
             frame.addContext(EventContexts.SHOULD_FORMAT_CHANNEL, false);
             frame.pushCause(player);
 
             final PlayerChatEvent event = player.simulateChat(messageToSend, frame.getCurrentCause());
-            if (Sponge.getEventManager().post(event)) {
+            if (Sponge.eventManager().post(event)) {
                 return context.errorResult("command.me.cancel");
             }
         }

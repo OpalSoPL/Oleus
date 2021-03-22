@@ -146,7 +146,7 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
 
         if (resultCount.get(ResultType.SUCCESS) == 0 && resultCount.get(ResultType.ERROR) == 0
                 && resultCount.get(ResultType.NO_DURABILITY) == 0 && resultCount.get(ResultType.RESTRICTED) == 0) {
-            return context.errorResult("command.repair.empty", pl.getName(), location);
+            return context.errorResult("command.repair.empty", pl.name(), location);
         } else {
             // Non-repairable Message - Only used when all items processed had no durability
             final int durabilityCount = resultCount.get(ResultType.NO_DURABILITY) + resultCount.get(ResultType.NEGATIVE_DURABILITY);
@@ -161,13 +161,13 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
                     context.sendMessage(
                             "command.repair.nodurability.single",
                             name.hoverEvent(item),
-                            Component.text(pl.getName()),
+                            Component.text(pl.name()),
                             Component.text(location)
                     );
                 } else {
                     context.sendMessage(
                             "command.repair.nodurability.multiple",
-                            resultCount.get(ResultType.NO_DURABILITY).toString(), pl.getName(), location
+                            resultCount.get(ResultType.NO_DURABILITY).toString(), pl.name(), location
                     );
                 }
             }
@@ -185,7 +185,7 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             } else if (resultCount.get(ResultType.SUCCESS) > 1) {
                 context.sendMessage(
                         "command.repair.success.multiple",
-                        resultCount.get(ResultType.SUCCESS).toString(), pl.getName(), location
+                        resultCount.get(ResultType.SUCCESS).toString(), pl.name(), location
                 );
             }
 
@@ -202,7 +202,7 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             } else if (resultCount.get(ResultType.ERROR) > 1) {
                 context.sendMessage(
                         "command.repair.error.multiple",
-                        resultCount.get(ResultType.ERROR).toString(), pl.getName(), location
+                        resultCount.get(ResultType.ERROR).toString(), pl.name(), location
                 );
             }
 
@@ -219,7 +219,7 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             } else if (resultCount.get(ResultType.RESTRICTED) > 1) {
                 context.sendMessage(
                         "command.repair.restricted.multiple",
-                        resultCount.get(ResultType.RESTRICTED).toString(), pl.getName(), location
+                        resultCount.get(ResultType.RESTRICTED).toString(), pl.name(), location
                 );
             }
 

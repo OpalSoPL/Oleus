@@ -59,7 +59,7 @@ public final class Util {
     public static final UUID CONSOLE_FAKE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     public static String getNameOrUnkown(final ICommandContext context, final GameProfile profile) {
-        return profile.getName().orElse(
+        return profile.name().orElse(
                 context.getServiceCollection().messageProvider().getMessageString("standard.unknown"));
     }
 
@@ -121,18 +121,18 @@ public final class Util {
      * @return <code>true</code> if the location is within the border.
      */
     public static boolean isLocationInWorldBorder(final ServerLocation location) {
-        return isLocationInWorldBorder(location.getPosition(), location.getWorld());
+        return isLocationInWorldBorder(location.position(), location.world());
     }
 
     public static boolean isLocationInWorldBorder(final Vector3d location, final ServerWorld world) {
 
         // Diameter, not radius - we'll want the radius later. We use long, we want the floor!
-        final long radius = (long)Math.floor(world.getProperties().worldBorder().getDiameter() / 2.0);
+        final long radius = (long)Math.floor(world.properties().worldBorder().diameter() / 2.0);
 
         // We get the current position and subtract the border centre. This gives us an effective distance from the
         // centre in all three dimensions. We just care about the magnitude in the x and z directions, so we get the
         // positive amount.
-        final Vector3d displacement = location.sub(world.getProperties().worldBorder().getCenter()).abs();
+        final Vector3d displacement = location.sub(world.properties().worldBorder().center()).abs();
 
         // Check that we're not too far out.
         return !(displacement.getX() > radius || displacement.getZ() > radius);
@@ -157,7 +157,7 @@ public final class Util {
     }
 
     public static PaginationList.Builder getPaginationBuilder(final boolean isPlayer) {
-        final PaginationList.Builder plb = Sponge.getServiceProvider().paginationService().builder();
+        final PaginationList.Builder plb = Sponge.serviceProvider().paginationService().builder();
         if (!isPlayer) {
             plb.linesPerPage(-1);
         }
@@ -166,7 +166,7 @@ public final class Util {
     }
 
     public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final ServerLocation location) {
-        return dropItemOnFloorAtLocation(itemStackSnapshotToDrop, location.getWorld(), location.getPosition());
+        return dropItemOnFloorAtLocation(itemStackSnapshotToDrop, location.world(), location.position());
     }
 
     public static ItemStack dropItemOnFloorAtLocation(final ItemStackSnapshot itemStackSnapshotToDrop, final ServerWorld world,
@@ -178,7 +178,7 @@ public final class Util {
     }
 
     public static Inventory getStandardInventory(final Carrier player) {
-        return player.getInventory()
+        return player.inventory()
                 .query(QueryTypes.PLAYER_PRIMARY_HOTBAR_FIRST.get().toQuery());
     }
 

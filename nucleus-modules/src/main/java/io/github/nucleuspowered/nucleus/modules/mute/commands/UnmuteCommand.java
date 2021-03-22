@@ -45,7 +45,7 @@ public class UnmuteCommand implements ICommandExecutor, IReloadableService.Reloa
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
-        final User user = either.fold(Function.identity(), Sponge.server().getUserManager()::getOrCreate);
+        final User user = either.fold(Function.identity(), Sponge.server().userManager()::getOrCreate);
         final MuteService handler = context.getServiceCollection().getServiceUnchecked(MuteService.class);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
@@ -53,17 +53,17 @@ public class UnmuteCommand implements ICommandExecutor, IReloadableService.Reloa
                         MutePermissions.BASE_MUTE,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", user.getName());
+            return context.errorResult("command.modifiers.level.insufficient", user.name());
         }
 
         if (!handler.isMuted(user.getUniqueId())) {
-            return context.errorResult("command.unmute.notmuted", user.getName());
+            return context.errorResult("command.unmute.notmuted", user.name());
         }
         // Unmute.
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
             handler.unmutePlayer(user.getUniqueId());
-            context.sendMessage("command.unmute.success", user.getName(), context.getName());
+            context.sendMessage("command.unmute.success", user.name(), context.getName());
             return context.successResult();
         }
     }

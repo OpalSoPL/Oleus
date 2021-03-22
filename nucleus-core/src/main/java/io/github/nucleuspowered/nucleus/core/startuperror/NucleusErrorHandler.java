@@ -42,17 +42,17 @@ public class NucleusErrorHandler {
     }
 
     public void disable() {
-        Sponge.getEventManager().unregisterPluginListeners(this.pluginContainer);
-        Sponge.getAsyncScheduler().getTasksByPlugin(this.pluginContainer).forEach(ScheduledTask::cancel);
+        Sponge.eventManager().unregisterPluginListeners(this.pluginContainer);
+        Sponge.asyncScheduler().tasksByPlugin(this.pluginContainer).forEach(ScheduledTask::cancel);
 
         // Re-register this to warn people about the error.
-        Sponge.getEventManager().registerListeners(this.pluginContainer, this);
+        Sponge.eventManager().registerListeners(this.pluginContainer, this);
     }
 
     @Listener
     public void errorOnStartup(final StartedEngineEvent<Server> event) {
         try {
-            if (Sponge.getPlatform().getType().isServer()) {
+            if (Sponge.platform().type().isServer()) {
                 Sponge.server().setHasWhitelist(true);
             }
         } catch (final Throwable e) {
@@ -88,10 +88,10 @@ public class NucleusErrorHandler {
         prettyPrinter.add();
 
         prettyPrinter.add("Nucleus version: " + this.pluginInfo.version() + ", (Git: " + this.pluginInfo.gitHash() + ")");
-        final Platform platform = Sponge.getPlatform();
-        final PluginContainer api = platform.getContainer(Platform.Component.API);
-        final PluginContainer impl = platform.getContainer(Platform.Component.IMPLEMENTATION);
-        prettyPrinter.add("Minecraft version: %s", platform.getMinecraftVersion().getName());
+        final Platform platform = Sponge.platform();
+        final PluginContainer api = platform.container(Platform.Component.API);
+        final PluginContainer impl = platform.container(Platform.Component.IMPLEMENTATION);
+        prettyPrinter.add("Minecraft version: %s", platform.minecraftVersion().name());
         prettyPrinter.add("Sponge Implementation: %s %s",
                 impl.getMetadata().getName(),
                 impl.getMetadata().getVersion());
@@ -108,7 +108,7 @@ public class NucleusErrorHandler {
     private void printStackTraceIfAny(final PrettyPrinter prettyPrinter) {
         prettyPrinter.add();
         prettyPrinter.add("No commands, listeners or tasks are registered.");
-        if (Sponge.getPlatform().getType().isServer()) {
+        if (Sponge.platform().type().isServer()) {
             prettyPrinter
                     .addWrapped("The server has been automatically whitelisted - this is to protect your server and players if you rely on some of "
                             + "Nucleus' functionality (such as fly states, etc.)");

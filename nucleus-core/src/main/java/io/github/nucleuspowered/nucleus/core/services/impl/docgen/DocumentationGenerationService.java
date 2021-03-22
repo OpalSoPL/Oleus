@@ -68,8 +68,8 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
 
     @Override
     public void generate(final Path directory) throws IOException {
-        try (final CauseStackManager.StackFrame stackFrame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
-            stackFrame.pushCause(Sponge.getSystemSubject());
+        try (final CauseStackManager.StackFrame stackFrame = Sponge.server().causeStackManager().pushCauseFrame()) {
+            stackFrame.pushCause(Sponge.systemSubject());
             final CommandCause cause = CommandCause.create();
 
             final ICommandMetadataService commandMetadataService = this.serviceCollection.commandMetadataService();

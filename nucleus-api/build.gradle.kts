@@ -15,7 +15,7 @@ defaultTasks.add("licenseFormat")
 defaultTasks.add("build")
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven("https://repo-new.spongepowered.org/repository/maven-public")
 }
 

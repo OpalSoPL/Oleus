@@ -27,8 +27,8 @@ public class PermissionMessageChannel implements ForwardingAudience {
     @Override
     public @NonNull Iterable<? extends Audience> audiences() {
         final List<Audience> audiences = new ArrayList<>();
-        audiences.add(Sponge.getSystemSubject());
-        for (final ServerPlayer pl : Sponge.server().getOnlinePlayers()) {
+        audiences.add(Sponge.systemSubject());
+        for (final ServerPlayer pl : Sponge.server().onlinePlayers()) {
             if (this.permissionService.hasPermission(pl, this.permission)) {
                 audiences.add(pl);
             }

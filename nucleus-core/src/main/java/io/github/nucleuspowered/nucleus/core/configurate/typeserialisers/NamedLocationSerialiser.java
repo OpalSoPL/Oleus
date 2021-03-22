@@ -61,7 +61,7 @@ public class NamedLocationSerialiser implements TypeSerializer<NamedLocation> {
 
     @SuppressWarnings("deprecation")
     public static ResourceKey convertUUID(final UUID value, final SerializationException ex) throws SerializationException {
-        return Sponge.server().getWorldManager().worldKey(value)
+        return Sponge.server().worldManager().worldKey(value)
                 .orElseThrow(() -> ex);
     }
 

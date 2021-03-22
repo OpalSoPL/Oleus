@@ -114,7 +114,7 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
     @Override
     public void updateCacheForOnlinePlayers() {
         final IUserQueryObject iuq = new UserQueryObject();
-        iuq.addAllKeys(Sponge.server().getOnlinePlayers().stream().map(Identifiable::getUniqueId).collect(Collectors.toList()));
+        iuq.addAllKeys(Sponge.server().onlinePlayers().stream().map(Identifiable::uniqueId).collect(Collectors.toList()));
         this.storageManager.getUserService().getAll(iuq).thenAccept(result ->
                 result.forEach((uuid, obj) -> this.data.getNode().computeIfAbsent(uuid, x -> new UserCacheDataNode()).set(obj, this.mutedProcessor,
                         this.jailProcessor)));
@@ -149,8 +149,8 @@ public class UserCacheService implements IUserCacheService, IReloadableService.D
 
         try {
             final Map<UUID, UserCacheDataNode> data = new HashMap<>();
-            final List<UUID> knownUsers = Sponge.server().getUserManager().streamAll()
-                    .map(Identifiable::getUniqueId).collect(Collectors.toList());
+            final List<UUID> knownUsers = Sponge.server().userManager().streamAll()
+                    .map(Identifiable::uniqueId).collect(Collectors.toList());
 
             int count = 0;
             final IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> manager = this.storageManager.getUserService();

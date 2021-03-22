@@ -22,7 +22,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 public class PlayerOnlineService implements IPlayerOnlineService {
 
     private static final BiPredicate<ServerPlayer, User> STANDARD_ONLINE =
-            (source, user) -> Sponge.server().getPlayer(user.getUniqueId()).isPresent();
+            (source, user) -> Sponge.server().player(user.uniqueId()).isPresent();
     private static final BiFunction<@Nullable ServerPlayer, User, Optional<Instant>> STANDARD_LAST_PLAYED =
             (source, user) -> user.get(Keys.LAST_DATE_PLAYED);
 

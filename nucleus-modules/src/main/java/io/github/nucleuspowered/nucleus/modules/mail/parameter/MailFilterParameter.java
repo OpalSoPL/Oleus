@@ -43,7 +43,7 @@ public class MailFilterParameter implements ValueParameter<NucleusMailService.Ma
             return Optional.of(Util.CONSOLE_FAKE_UUID);
         }
 
-        final Optional<User> ou = Sponge.server().getUserManager().get(text);
+        final Optional<User> ou = Sponge.server().userManager().find(text);
         return ou.map(Identifiable::getUniqueId);
     }
 

@@ -52,21 +52,21 @@ public class BackListeners implements IReloadableService.Reloadable, ListenerBas
         if (this.backConfig.isOnTeleport() && this.check(event) &&
                 this.getLogBack(pl) && this.permissionService.hasPermission(pl,
                 BackPermissions.BACK_ONTELEPORT)) {
-            this.handler.setLastLocation(pl.getUniqueId(), ServerLocation.of(pl.getWorld(), event.getOriginalPosition()), pl.getRotation());
+            this.handler.setLastLocation(pl.uniqueId(), ServerLocation.of(pl.getWorld(), event.getOriginalPosition()), pl.getRotation());
         }
     }
 
     @Listener(order = Order.LAST)
     public void onWorldTransfer(final ChangeEntityWorldEvent.Reposition event, @Getter("getEntity") final ServerPlayer pl) {
         if (this.backConfig.isOnPortal() && this.getLogBack(pl) && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONPORTAL)) {
-            this.handler.setLastLocation(pl.getUniqueId(), ServerLocation.of(event.getOriginalWorld(), event.getDestinationPosition()), pl.getRotation());
+            this.handler.setLastLocation(pl.uniqueId(), ServerLocation.of(event.getOriginalWorld(), event.getDestinationPosition()), pl.getRotation());
         }
     }
 
     @Listener
     public void onDeathEvent(final DestructEntityEvent.Death event, @Getter("getEntity") final ServerPlayer pl) {
         if (this.backConfig.isOnDeath() && this.getLogBack(pl) && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONDEATH)) {
-            this.handler.setLastLocation(pl.getUniqueId(), pl.getServerLocation(), pl.getRotation());
+            this.handler.setLastLocation(pl.uniqueId(), pl.getServerLocation(), pl.getRotation());
         }
     }
 

@@ -22,7 +22,7 @@ public final class InternalNucleusSendMailEvent extends AbstractEvent implements
     private boolean cancelled = false;
 
     public InternalNucleusSendMailEvent(@Nullable final UUID from, final UUID to, final String message) {
-        this.cause = Sponge.server().getCauseStackManager().getCurrentCause();
+        this.cause = Sponge.server().causeStackManager().getCurrentCause();
         this.from = from;
         this.to = to;
         this.message = message;

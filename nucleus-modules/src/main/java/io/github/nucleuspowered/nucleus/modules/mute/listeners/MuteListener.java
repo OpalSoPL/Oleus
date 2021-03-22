@@ -54,25 +54,25 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
      */
     @Listener
     public void onPlayerLogin(final ServerSideConnectionEvent.Join event) {
-        this.handler.onPlayerLogin(event.getPlayer());
+        this.handler.onPlayerLogin(event.player());
     }
 
     @Listener
     public void onPlayerLogout(final ServerSideConnectionEvent.Disconnect event) {
-        this.handler.clearCacheFor(event.getPlayer().getUniqueId());
+        this.handler.clearCacheFor(event.player().uniqueId());
     }
 
     @Listener(order = Order.LATE)
     public void onChat(final PlayerChatEvent event, @Root final ServerPlayer player) {
         boolean cancel = false;
         if (this.isMutedNotify(player)) {
-            Sponge.getSystemSubject().sendMessage(player,
+            Sponge.systemSubject().sendMessage(player,
                     LinearComponents.linear(
-                            Component.text(player.getName()),
+                            Component.text(player.name()),
                             Component.text(" ("),
-                            this.messageProvider.getMessageFor(Sponge.getSystemSubject(), "standard.muted"),
+                            this.messageProvider.getMessageFor(Sponge.systemSubject(), "standard.muted"),
                             Component.text("): "),
-                            event.getOriginalMessage()
+                            event.originalMessage()
                     ));
             cancel = true;
         }
@@ -87,12 +87,12 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
                 final Component m = LegacyComponentSerializer.legacyAmpersand().deserialize(this.muteConfig.getCancelledTag());
                 final Component mutedMessage;
                 if (m != Component.empty()) {
-                    mutedMessage = LinearComponents.linear(m, event.getOriginalMessage());
+                    mutedMessage = LinearComponents.linear(m, event.originalMessage());
                 } else {
                     mutedMessage = LinearComponents.linear(
-                            Component.text(player.getName()),
+                            Component.text(player.name()),
                             Component.text(" (muted): ", NamedTextColor.GRAY),
-                            event.getOriginalMessage());
+                            event.originalMessage());
                 }
 
                 this.permissionService.permissionMessageChannel(MutePermissions.MUTE_SEEMUTEDCHAT)
@@ -104,7 +104,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     private boolean isMutedNotify(final ServerPlayer player) {
-        final Optional<Mute> mute = this.handler.getPlayerMuteInfo(player.getUniqueId());
+        final Optional<Mute> mute = this.handler.getPlayerMuteInfo(player.uniqueId());
         if (mute.filter(x -> x instanceof MutedEntry).isPresent()) {
             this.handler.onMute((MutedEntry) mute.get(), player);
             return true;
@@ -142,7 +142,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
             return false;
         }
 
-        if (this.handler.isVoiced(player.getUniqueId())) {
+        if (this.handler.isVoiced(player.uniqueId())) {
             return false;
         }
 

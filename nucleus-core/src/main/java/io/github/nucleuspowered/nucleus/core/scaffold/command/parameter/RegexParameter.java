@@ -34,13 +34,13 @@ public final class RegexParameter implements ValueParameter<String> {
     }
 
     @Override
-    public Optional<? extends String> getValue(final Parameter.Key<? super String> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
+    public Optional<? extends String> parseValue(final Parameter.Key<? super String> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
             throws ArgumentParseException {
         final String toParse = reader.parseString();
         if (this.pattern.matcher(toParse).matches()) {
             return Optional.of(toParse);
         }
-        throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), this.key));
+        throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), this.key));
     }
 
 }

@@ -39,7 +39,7 @@ public abstract class AbstractCancelMessageEvent extends AbstractEvent implement
         this.cancelled = cancel;
     }
 
-    @Override public Cause getCause() {
+    @Override public Cause cause() {
         return this.cause;
     }
 }

@@ -103,7 +103,7 @@ public abstract class TitleBase implements ICommandExecutor, IReloadableService.
             final ServerPlayer pl = targets.iterator().next();
             final Component t = textTemplate.getForObjectWithSenderToken(pl, sender);
             pl.showTitle(this.createTitle(textTemplate.getForObjectWithSenderToken(pl, sender), times));
-            context.sendMessage("command.title.player.success.single", this.type, t, pl.getName());
+            context.sendMessage("command.title.player.success.single", this.type, t, pl.name());
         }
         return context.successResult();
     }

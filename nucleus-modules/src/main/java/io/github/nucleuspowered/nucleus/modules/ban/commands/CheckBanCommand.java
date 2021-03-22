@@ -36,7 +36,7 @@ public class CheckBanCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final GameProfile profile = context.requireOne(NucleusParameters.GAME_PROFILE);
-        final BanService service = Sponge.server().getServiceProvider().banService();
+        final BanService service = Sponge.server().serviceProvider().banService();
 
         final Optional<Ban.Profile> obp = service.getBanFor(profile);
         if (!obp.isPresent()) {

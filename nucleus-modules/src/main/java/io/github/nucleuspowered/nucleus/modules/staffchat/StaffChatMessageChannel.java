@@ -84,16 +84,16 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
     @Override
     public void formatMessageEvent(final Audience audience, final PlayerChatEvent event) {
         event.setChatRouter(PlayerChatRouter.toAudience(this.receivers()));
-        event.setMessage(this.formatMessage(audience, event.getMessage()));
+        event.setMessage(this.formatMessage(audience, event.message()));
     }
 
     @Override
     public ForwardingAudience receivers() {
         final List<Audience> audienceList = new ArrayList<>();
-        Sponge.server().getOnlinePlayers().stream()
+        Sponge.server().onlinePlayers().stream()
                 .filter(this::test)
                 .forEach(audienceList::add);
-        audienceList.add(Sponge.getSystemSubject());
+        audienceList.add(Sponge.systemSubject());
         return Audience.audience(audienceList);
     }
 
@@ -105,7 +105,7 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
     private boolean test(final ServerPlayer player) {
         if (this.permissionService.hasPermission(player, StaffChatPermissions.BASE_STAFFCHAT)) {
             return this.userPreferenceService
-                    .getPreferenceFor(player.getUniqueId(), StaffChatKeys.VIEW_STAFF_CHAT)
+                    .getPreferenceFor(player.uniqueId(), StaffChatKeys.VIEW_STAFF_CHAT)
                     .orElse(true);
         }
 

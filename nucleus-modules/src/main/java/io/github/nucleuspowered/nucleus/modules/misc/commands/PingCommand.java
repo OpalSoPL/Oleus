@@ -36,7 +36,7 @@ public class PingCommand implements ICommandExecutor { // extends AbstractComman
         if (context.is(player)) {
             context.sendMessage("command.ping.current.self", player.getConnection().getLatency());
         } else {
-            context.sendMessage("command.ping.current.other", player.getName(), player.getConnection().getLatency());
+            context.sendMessage("command.ping.current.other", player.name(), player.getConnection().getLatency());
         }
 
         return context.successResult();

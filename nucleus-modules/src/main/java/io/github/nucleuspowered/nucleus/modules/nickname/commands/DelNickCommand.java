@@ -35,14 +35,14 @@ public class DelNickCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User pl = context.getUserFromArgs();
         try {
-            context.getServiceCollection().getServiceUnchecked(NicknameService.class).removeNick(pl.getUniqueId());
+            context.getServiceCollection().getServiceUnchecked(NicknameService.class).removeNick(pl.uniqueId());
         } catch (final NicknameException e) {
             e.printStackTrace();
             return context.errorResultLiteral(e.componentMessage());
         }
 
         if (!context.is(pl)) {
-            context.sendMessage("command.delnick.success.other", pl.getName());
+            context.sendMessage("command.delnick.success.other", pl.name());
         }
 
         return context.successResult();

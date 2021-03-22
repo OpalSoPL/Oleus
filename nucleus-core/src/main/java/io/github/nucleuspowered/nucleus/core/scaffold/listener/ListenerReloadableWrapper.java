@@ -18,9 +18,9 @@ public class ListenerReloadableWrapper implements IReloadableService.Reloadable 
 
     @Override
     public void onReload(final INucleusServiceCollection serviceCollection) {
-        Sponge.getEventManager().unregisterListeners(this.listenerBase);
+        Sponge.eventManager().unregisterListeners(this.listenerBase);
         if (this.listenerBase.shouldEnable(serviceCollection)) {
-            Sponge.getEventManager().registerListeners(serviceCollection.pluginContainer(), this.listenerBase);
+            Sponge.eventManager().registerListeners(serviceCollection.pluginContainer(), this.listenerBase);
         }
 
     }

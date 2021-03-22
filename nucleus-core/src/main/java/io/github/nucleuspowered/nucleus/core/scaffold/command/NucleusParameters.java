@@ -61,18 +61,18 @@ public final class NucleusParameters {
     private NucleusParameters() {
     } // entirely static
 
-    public static final Parameter.Value<Boolean> ONE_TRUE_FALSE = Parameter.bool().setKey(Keys.BOOL).build();
+    public static final Parameter.Value<Boolean> ONE_TRUE_FALSE = Parameter.bool().key(Keys.BOOL).build();
 
-    public static final Parameter.Value<Boolean> OPTIONAL_ONE_TRUE_FALSE = Parameter.bool().setKey(Keys.BOOL).optional().build();
+    public static final Parameter.Value<Boolean> OPTIONAL_ONE_TRUE_FALSE = Parameter.bool().key(Keys.BOOL).optional().build();
 
     public static final Parameter.Value<List<Entity>> MANY_ENTITY = Parameter.builder(new TypeToken<List<Entity>>() {})
-            .setKey(Keys.SUBJECT)
-            .parser(ResourceKeyedValueParameters.MANY_ENTITIES)
+            .key(Keys.SUBJECT)
+            .addParser(ResourceKeyedValueParameters.MANY_ENTITIES)
             .build();
 
     public static final Parameter.Value<List<ServerPlayer>> MANY_PLAYER = Parameter.builder(new TypeToken<List<ServerPlayer>>() {})
-            .setKey(Keys.PLAYER)
-            .parser(ResourceKeyedValueParameters.MANY_PLAYERS)
+            .key(Keys.PLAYER)
+            .addParser(ResourceKeyedValueParameters.MANY_PLAYERS)
             .build();
 
     public static final Parameter.Value<ServerPlayer> ONE_PLAYER = CommonParameters.PLAYER;
@@ -81,69 +81,69 @@ public final class NucleusParameters {
 
     public static final Parameter.Value<SystemSubject> CONSOLE_FROM_DASH = Parameter
             .builder(SystemSubject.class)
-            .setKey(Keys.CONSOLE)
-            .parser(VariableValueParameters.literalBuilder(SystemSubject.class)
-                    .setLiteral(Collections.singletonList("-"))
-                    .setReturnValue(Sponge::getSystemSubject)
+            .key(Keys.CONSOLE)
+            .addParser(VariableValueParameters.literalBuilder(SystemSubject.class)
+                    .literal(Collections.singletonList("-"))
+                    .returnValue(Sponge::systemSubject)
                     .build())
             .build();
 
-    public static final Parameter.Value<User> ONE_USER = Parameter.user().setKey(Keys.USER).build();
+    public static final Parameter.Value<User> ONE_USER = Parameter.user().key(Keys.USER).build();
 
     public static final Parameter.Value<GameProfile> GAME_PROFILE =
-            Parameter.builder(TypeToken.get(GameProfile.class)).setKey(Keys.GAME_PROFILE).parser(ResourceKeyedValueParameters.GAME_PROFILE).build();
+            Parameter.builder(TypeToken.get(GameProfile.class)).key(Keys.GAME_PROFILE).addParser(ResourceKeyedValueParameters.GAME_PROFILE).build();
 
-    public static final Parameter.Value<Component> DISPLAY_NAME_COMPONENT = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.DISPLAY_NAME).build();
+    public static final Parameter.Value<Component> DISPLAY_NAME_COMPONENT = Parameter.formattingCodeTextOfRemainingElements().key(Keys.DISPLAY_NAME).build();
 
-    public static final Parameter.Value<String> COMMAND = Parameter.remainingJoinedStrings().setKey(Keys.COMMAND).build();
+    public static final Parameter.Value<String> COMMAND = Parameter.remainingJoinedStrings().key(Keys.COMMAND).build();
 
-    public static final Parameter.Value<String> OPTIONAL_COMMAND = Parameter.remainingJoinedStrings().setKey(Keys.COMMAND).optional().build();
+    public static final Parameter.Value<String> OPTIONAL_COMMAND = Parameter.remainingJoinedStrings().key(Keys.COMMAND).optional().build();
 
-    public static final Parameter.Value<String> DESCRIPTION = Parameter.remainingJoinedStrings().setKey(Keys.DESCRIPTION).build();
+    public static final Parameter.Value<String> DESCRIPTION = Parameter.remainingJoinedStrings().key(Keys.DESCRIPTION).build();
 
     public static final Parameter.Value<Component> OPTIONAL_DESCRIPTION_COMPONENT =
-            Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.DESCRIPTION).optional().build();
+            Parameter.formattingCodeTextOfRemainingElements().key(Keys.DESCRIPTION).optional().build();
 
-    public static final Parameter.Value<Component> LORE = Parameter.formattingCodeTextOfRemainingElements().setKey(Keys.LORE).build();
+    public static final Parameter.Value<Component> LORE = Parameter.formattingCodeTextOfRemainingElements().key(Keys.LORE).build();
 
-    public static final Parameter.Value<String> MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).build();
+    public static final Parameter.Value<String> MESSAGE = Parameter.remainingJoinedStrings().key(Keys.MESSAGE).build();
 
-    public static final Parameter.Value<String> OPTIONAL_MESSAGE = Parameter.remainingJoinedStrings().setKey(Keys.MESSAGE).optional().build();
+    public static final Parameter.Value<String> OPTIONAL_MESSAGE = Parameter.remainingJoinedStrings().key(Keys.MESSAGE).optional().build();
 
-    public static final Parameter.Value<String> REASON = Parameter.remainingJoinedStrings().setKey(Keys.REASON).build();
+    public static final Parameter.Value<String> REASON = Parameter.remainingJoinedStrings().key(Keys.REASON).build();
 
-    public static final Parameter.Value<String> OPTIONAL_REASON = Parameter.remainingJoinedStrings().setKey(Keys.REASON).optional().build();
+    public static final Parameter.Value<String> OPTIONAL_REASON = Parameter.remainingJoinedStrings().key(Keys.REASON).optional().build();
 
     public static final Parameter.Value<ServerWorld> ONLINE_WORLD = CommonParameters.WORLD;
 
-    public static final Parameter.Value<ServerWorld> ONLINE_WORLD_OPTIONAL = Parameter.world().optional().setKey(Keys.WORLD).build();
+    public static final Parameter.Value<ServerWorld> ONLINE_WORLD_OPTIONAL = Parameter.world().optional().key(Keys.WORLD).build();
 
     public static final Parameter.Value<ResourceKey> OFFLINE_WORLD =
             Parameter.builder(ResourceKey.class)
-                    .setKey(Keys.WORLD)
-                    .parser(new OfflineWorldParameter(
-                            key -> Component.text(key.getFormatted() + " is not an unloaded world.")))
+                    .key(Keys.WORLD)
+                    .addParser(new OfflineWorldParameter(
+                            key -> Component.text(key.formatted() + " is not an unloaded world.")))
                     .build();
 
-    public static final Parameter.Value<Duration> DURATION = Parameter.duration().setKey(Keys.DURATION).build();
+    public static final Parameter.Value<Duration> DURATION = Parameter.duration().key(Keys.DURATION).build();
 
-    public static final Parameter.Value<Duration> OPTIONAL_DURATION = Parameter.duration().setKey(Keys.DURATION).optional().build();
+    public static final Parameter.Value<Duration> OPTIONAL_DURATION = Parameter.duration().key(Keys.DURATION).optional().build();
 
-    public static final Parameter.Value<ServerLocation> LOCATION = Parameter.location().setKey(Keys.LOCATION).build();
+    public static final Parameter.Value<ServerLocation> LOCATION = Parameter.location().key(Keys.LOCATION).build();
 
-    public static final Parameter.Value<ServerLocation> OPTIONAL_LOCATION = Parameter.location().setKey(Keys.LOCATION).optional().build();
+    public static final Parameter.Value<ServerLocation> OPTIONAL_LOCATION = Parameter.location().key(Keys.LOCATION).optional().build();
 
     public static final Parameter.Value<List<Audience>> MULTI_AUDIENCE = Parameter.builder(new TypeToken<List<Audience>>() {})
-            .setKey("audience")
-            .parser(new AudienceValueParameter())
+            .key("audience")
+            .addParser(new AudienceValueParameter())
             .build();
 
-    public static final Parameter.Value<String> STRING_NAME = Parameter.string().setKey(Keys.NAME).build();
+    public static final Parameter.Value<String> STRING_NAME = Parameter.string().key(Keys.NAME).build();
 
-    public static final Parameter.Value<Component> OPTIONAL_REASON_COMPONENT = Parameter.formattingCodeText().setKey("reason").optional().build();
+    public static final Parameter.Value<Component> OPTIONAL_REASON_COMPONENT = Parameter.formattingCodeText().key("reason").optional().build();
 
     public static final Parameter.Value<Double> COST =
-            Parameter.builder(Double.class).parser(VariableValueParameters.doubleRange().setMin(0.0).build()).setKey("cost").build();
+            Parameter.builder(Double.class).addParser(VariableValueParameters.doubleRange().min(0.0).build()).key("cost").build();
 
     public static final class Composite {
 

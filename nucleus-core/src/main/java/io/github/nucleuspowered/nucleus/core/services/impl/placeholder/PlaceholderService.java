@@ -109,13 +109,13 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         this.registerToken("suffix", new NamedOptionPlaceholder(permissionService, "suffix"));
 
         this.registerToken("maxplayers", PlaceholderParser.builder()
-                .parser(p -> Component.text(Sponge.server().getMaxPlayers()))
+                .parser(p -> Component.text(Sponge.server().maxPlayers()))
                 .build());
         this.registerToken("onlineplayers", PlaceholderParser.builder()
-                        .parser(p -> Component.text(Sponge.server().getOnlinePlayers().size()))
+                        .parser(p -> Component.text(Sponge.server().onlinePlayers().size()))
                         .build());
         this.registerToken("currentworld", PlaceholderParser.builder()
-                .parser(placeholder -> Component.text(PlaceholderService.getWorld(placeholder).getKey().getFormatted()))
+                .parser(placeholder -> Component.text(PlaceholderService.getWorld(placeholder).key().formatted()))
                 .build());
         this.registerToken("time",
                 PlaceholderParser.builder()
@@ -131,8 +131,8 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
                         .build());
         this.registerToken("ipaddress",
                 PlaceholderParser.builder()
-                        .parser(placeholder -> placeholder.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
-                                .map(x -> Component.text(((ServerPlayer) x).getConnection().getAddress().getAddress().toString()))
+                        .parser(placeholder -> placeholder.associatedObject().filter(x -> x instanceof ServerPlayer)
+                                .map(x -> Component.text(((ServerPlayer) x).connection().address().getAddress().toString()))
                                 .orElse(Component.text("localhost")))
                         .build());
     }
@@ -176,8 +176,8 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
             final String tokenIn = s[0].toLowerCase();
             final String arg = s.length == 2 ? s[1] : null;
             context = PlaceholderContext.builder()
-                    .setAssociatedObject(commandSource)
-                    .setArgumentString(arg)
+                    .associatedObject(commandSource)
+                    .argumentString(arg)
                     .build();
             parser = this.getParser(tokenIn).orElse(this.emptyParser);
         }
@@ -222,14 +222,14 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     private PlaceholderContext contextForSubjectAndOption(final Subject subject, final String option) {
-        return PlaceholderContext.builder().setArgumentString(option).setAssociatedObject(subject).build();
+        return PlaceholderContext.builder().argumentString(option).associatedObject(subject).build();
     }
 
     @Override
     public PlaceholderComponent textForSubjectAndOption(final Subject subject, final String option) {
         return PlaceholderComponent.builder()
-                .setParser(this.optionParser)
-                .setContext(this.contextForSubjectAndOption(subject, option))
+                .parser(this.optionParser)
+                .context(this.contextForSubjectAndOption(subject, option))
                 .build();
     }
 
@@ -240,10 +240,10 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     // --
 
     private static ServerWorldProperties getWorld(final PlaceholderContext placeholder) {
-        return placeholder.getAssociatedObject()
+        return placeholder.associatedObject()
                 .filter(x -> x instanceof Locatable)
-                .map(x -> ((Locatable) x).getServerLocation().getWorld().getProperties())
-                .orElseGet(Sponge.server().getWorldManager().defaultWorld()::getProperties);
+                .map(x -> ((Locatable) x).serverLocation().world().properties())
+                .orElseGet(Sponge.server().worldManager().defaultWorld()::properties);
     }
 
 }

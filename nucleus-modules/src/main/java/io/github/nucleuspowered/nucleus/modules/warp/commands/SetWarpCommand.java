@@ -91,8 +91,8 @@ public class SetWarpCommand implements ICommandExecutor {
                 return context.errorResult("command.warps.nooverwrite");
             }
 
-            final DeleteWarpEvent event = new DeleteWarpEvent(Sponge.server().getCauseStackManager().getCurrentCause(), exists.get());
-            if (Sponge.getEventManager().post(event)) {
+            final DeleteWarpEvent event = new DeleteWarpEvent(Sponge.server().causeStackManager().getCurrentCause(), exists.get());
+            if (Sponge.eventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
             }
@@ -108,8 +108,8 @@ public class SetWarpCommand implements ICommandExecutor {
         }
 
         final ServerPlayer src = context.requirePlayer();
-        final CreateWarpEvent event = new CreateWarpEvent(Sponge.server().getCauseStackManager().getCurrentCause(), warp, src.getServerLocation());
-        if (Sponge.getEventManager().post(event)) {
+        final CreateWarpEvent event = new CreateWarpEvent(Sponge.server().causeStackManager().getCurrentCause(), warp, src.getServerLocation());
+        if (Sponge.eventManager().post(event)) {
             return event.getCancelMessage()
                     .map(context::errorResultLiteral)
                     .orElseGet(() -> context.errorResult("nucleus.eventcancelled")

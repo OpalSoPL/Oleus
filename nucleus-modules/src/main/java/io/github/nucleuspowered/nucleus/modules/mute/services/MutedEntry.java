@@ -21,7 +21,7 @@ public abstract class MutedEntry implements Mute {
         if (muteData.getTimeFromNextLogin() == null) {
             return new MutedEntry.Untimed(muteData);
         }
-        return Sponge.server().getPlayer(user).<MutedEntry>map(x -> new MutedEntry.Ticking(muteData))
+        return Sponge.server().player(user).<MutedEntry>map(x -> new MutedEntry.Ticking(muteData))
                 .orElseGet(() -> isOnlineOnly ? new MutedEntry.Stopped(muteData) : new MutedEntry.Ticking(muteData));
     }
 
@@ -32,7 +32,7 @@ public abstract class MutedEntry implements Mute {
             return new MutedEntry.Untimed(reason, jailer, creationInstant);
         }
 
-        if (Sponge.server().getPlayer(user).isPresent()) {
+        if (Sponge.server().player(user).isPresent()) {
             return new MutedEntry.Ticking(reason, jailer, creationInstant, Instant.now().plus(timeRemaining));
         }
         return new MutedEntry.Stopped(reason, jailer, creationInstant, timeRemaining);

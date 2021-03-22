@@ -71,20 +71,20 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
     }
 
     private void onPlayerChatEvent(final PlayerChatEvent event, @Root final ServerPlayer player) {
-        if (this.chatMessageFormatterService.getNucleusChannel(player.getUniqueId())
+        if (this.chatMessageFormatterService.getNucleusChannel(player.uniqueId())
                 .map(IChatMessageFormatterService.Channel::willFormat).orElse(false)) {
             return;
         }
 
         Component baseMessage;
         if (this.chatConfig.isIgnoreOtherPlugins()) {
-            baseMessage = event.getOriginalMessage();
+            baseMessage = event.originalMessage();
         } else {
-            baseMessage = event.getMessage();
+            baseMessage = event.message();
         }
 
         if (this.chatConfig.isTryRemoveMinecraftPrefix()) {
-            final Pattern removal = Pattern.compile("<" + player.getName() + ">");
+            final Pattern removal = Pattern.compile("<" + player.name() + ">");
             baseMessage = baseMessage.replaceText(function -> function.match(removal).replacement(Component.empty()));
         }
 

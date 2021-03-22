@@ -39,10 +39,10 @@ public class GetUserCommand implements ICommandExecutor {
         return new Parameter[] {
                 Parameter.firstOf(
                         Parameter.builder(UUID.class)
-                                .parser(new UUIDParameter<>(Optional::ofNullable, serviceCollection.messageProvider())).setKey(this.uuidKey).build(),
+                                .addParser(new UUIDParameter<>(Optional::ofNullable, serviceCollection.messageProvider())).key(this.uuidKey).build(),
                         Parameter.builder(String.class)
-                                .setKey(this.playerKey)
-                                .parser(new RegexParameter(Pattern.compile("^[.]{1,16}$"), "command.nucleus.getuser.regex",
+                                .key(this.playerKey)
+                                .addParser(new RegexParameter(Pattern.compile("^[.]{1,16}$"), "command.nucleus.getuser.regex",
                                 serviceCollection.messageProvider())).build()
             )
         };
@@ -51,14 +51,14 @@ public class GetUserCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) {
         final CompletableFuture<GameProfile> profile;
         final String toGet;
-        final GameProfileManager manager = Sponge.server().getGameProfileManager();
+        final GameProfileManager manager = Sponge.server().gameProfileManager();
         if (context.hasAny(this.uuidKey)) {
             final UUID u = context.requireOne(this.uuidKey);
             toGet = u.toString();
-            profile = manager.getProfile(u, false);
+            profile = manager.profile(u, false);
         } else {
             toGet = context.requireOne(this.playerKey);
-            profile = manager.getProfile(toGet, false);
+            profile = manager.profile(toGet, false);
         }
 
         context.sendMessage("command.nucleus.getuser.starting", toGet);
@@ -74,8 +74,8 @@ public class GetUserCommand implements ICommandExecutor {
             }
 
             // We have a game profile, it's been added to the cache. Create the user too, just in case.
-            Sponge.server().getUserManager().getOrCreate(gp);
-            context.sendMessage("command.nucleus.getuser.success", gp.getUniqueId().toString(), gp.getName().orElse("unknown"));
+            Sponge.server().userManager().findOrCreate(gp);
+            context.sendMessage("command.nucleus.getuser.success", gp.uniqueId().toString(), gp.name().orElse("unknown"));
 
             return 0;
         });

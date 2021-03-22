@@ -319,7 +319,7 @@ public class CommandMetadataService implements ICommandMetadataService, IReloada
             if (!tripError) {
                 // Finally, register all commands
                 for (final Tuple3<String, String[], org.spongepowered.api.command.Command.Parameterized> command : builtCommands) {
-                    this.registeredAliases.addAll(event.register(collection.pluginContainer(), command._3, command._1, command._2).mapping().getAllAliases());
+                    this.registeredAliases.addAll(event.register(collection.pluginContainer(), command._3, command._1, command._2).mapping().allAliases());
                 }
 
                 this.registeredCommands.putAll(commands);

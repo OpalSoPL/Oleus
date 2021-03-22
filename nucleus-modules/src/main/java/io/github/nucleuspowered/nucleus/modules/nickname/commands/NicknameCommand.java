@@ -58,7 +58,7 @@ public class NicknameCommand implements ICommandExecutor {
         final Component name = context.requireOne(this.nicknameParameter);
 
         try {
-            context.getServiceCollection().getServiceUnchecked(NicknameService.class).setNick(pl.getUniqueId(), name, false);
+            context.getServiceCollection().getServiceUnchecked(NicknameService.class).setNick(pl.uniqueId(), name, false);
         } catch (final NicknameException e) {
             return context.errorResultLiteral(e.componentMessage());
         }
@@ -66,7 +66,7 @@ public class NicknameCommand implements ICommandExecutor {
         if (!context.is(pl)) {
             context.sendMessageText(
                     LinearComponents.linear(
-                            context.getMessage("command.nick.success.other", pl.getName()),
+                            context.getMessage("command.nick.success.other", pl.name()),
                             Component.text(" - "),
                             name.color(NamedTextColor.WHITE)
                     ));

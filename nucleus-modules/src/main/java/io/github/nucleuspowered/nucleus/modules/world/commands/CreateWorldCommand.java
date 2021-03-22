@@ -100,7 +100,7 @@ public class CreateWorldCommand implements ICommandExecutor, IReloadableService.
         final boolean pvp = context.getOne(this.pvpEnabled).orElse(true);
 
         final ResourceKey projectedKey = ResourceKey.of(context.getServiceCollection().pluginContainer(), nameInput.toLowerCase());
-        if (Sponge.server().getWorldManager().getProperties(projectedKey).isPresent()) {
+        if (Sponge.server().worldManager().getProperties(projectedKey).isPresent()) {
             return context.errorResult("command.world.create.exists", nameInput);
         }
 
@@ -143,7 +143,7 @@ public class CreateWorldCommand implements ICommandExecutor, IReloadableService.
                 String.valueOf(allowCommands),
                 String.valueOf(bonusChest));
 
-        Sponge.game().getServer().getWorldManager().createProperties(worldKey, wa).handle((worldProperties, exception) -> {
+        Sponge.game().getServer().worldManager().createProperties(worldKey, wa).handle((worldProperties, exception) -> {
             if (exception != null) {
                 context.getServiceCollection().schedulerService().runOnMainThread(
                         () -> context.sendMessageText(Component.text(exception.getMessage())));
@@ -156,7 +156,7 @@ public class CreateWorldCommand implements ICommandExecutor, IReloadableService.
                 worldProperties.getWorldBorder().setDiameter(this.worldBorderDefault);
             }
 
-            return Sponge.server().getWorldManager().loadWorld(worldProperties);
+            return Sponge.server().worldManager().loadWorld(worldProperties);
         }).<Void>handle((world, exception) -> {
             if (exception != null) {
                 context.getServiceCollection().schedulerService().runOnMainThread(

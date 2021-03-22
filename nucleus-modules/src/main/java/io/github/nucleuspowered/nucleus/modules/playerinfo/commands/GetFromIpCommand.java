@@ -43,7 +43,7 @@ public class GetFromIpCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final InetAddress ip = context.requireOne(this.ip);
 
-        final UserManager uss = Sponge.server().getUserManager();
+        final UserManager uss = Sponge.server().userManager();
         final List<User> users = context
                 .getServiceCollection()
                 .userCacheService()

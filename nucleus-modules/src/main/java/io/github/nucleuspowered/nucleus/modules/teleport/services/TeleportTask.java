@@ -77,16 +77,16 @@ public class TeleportTask implements CancellableTask {
 
     public void run() {
         // Teleport them
-        final ServerPlayer teleportingPlayer = Sponge.server().getPlayer(this.toTeleport).orElse(null);
-        final ServerPlayer targetPlayer = Sponge.server().getPlayer(this.target).orElse(null);
-        @Nullable final User source = Sponge.server().getUserManager().get(this.requester).orElse(null);
-        final Audience receiver = source != null ? source.getPlayer().map(x -> (Audience) x).orElseGet(Sponge::getSystemSubject) : Sponge.getSystemSubject();
+        final ServerPlayer teleportingPlayer = Sponge.server().player(this.toTeleport).orElse(null);
+        final ServerPlayer targetPlayer = Sponge.server().player(this.target).orElse(null);
+        @Nullable final User source = Sponge.server().userManager().find(this.requester).orElse(null);
+        final Audience receiver = source != null ? source.getPlayer().map(x -> (Audience) x).orElseGet(Sponge::getSystemSubject) : Sponge.systemSubject();
         if (teleportingPlayer != null && targetPlayer != null) {
             // If safe, get the teleport mode
             final INucleusLocationService tpHandler = this.serviceCollection.teleportService();
-            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                 if (source == null) {
-                    frame.pushCause(Sponge.getSystemSubject());
+                    frame.pushCause(Sponge.systemSubject());
                 } else {
                     frame.pushCause(source);
                 }

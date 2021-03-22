@@ -139,10 +139,10 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.errorResult("command.warp.worldnotloaded");
         }
 
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
             final UseWarpEvent event = new UseWarpEvent(frame.getCurrentCause(), player.getUniqueId(), wd);
-            if (Sponge.getEventManager().post(event)) {
+            if (Sponge.eventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
             }

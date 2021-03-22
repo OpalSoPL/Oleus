@@ -58,7 +58,7 @@ public class MessagesUpdateCommand implements ICommandExecutor {
             context.sendMessage("command.nucleus.messageupdate.sometoupdate", String.valueOf(mismatched.size()));
             mismatched.forEach(x -> context.sendMessageText(Component.text(x, NamedTextColor.YELLOW)));
             messageProviderService
-                    .getMessageFor(context.getAudience(),
+                    .getMessageFor(context.audience(),
                             "command.nucleus.messageupdate.confirm",
                             Component.text().content("/nucleus update-messages -y")
                             .clickEvent(ClickEvent.runCommand("/nucleus update-messages -y")).build());

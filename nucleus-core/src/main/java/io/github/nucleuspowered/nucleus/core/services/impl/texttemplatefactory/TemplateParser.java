@@ -339,7 +339,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
         public Component apply(final Object cs, final Map<String, Function<Object, Optional<ComponentLike>>> tokens) {
             final String name;
             if (cs instanceof Nameable) {
-                name = ((Nameable) cs).getName();
+                name = ((Nameable) cs).name();
             } else {
                 name = "";
             }

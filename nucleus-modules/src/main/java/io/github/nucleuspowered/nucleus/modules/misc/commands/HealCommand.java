@@ -48,7 +48,7 @@ public class HealCommand implements ICommandExecutor { // extends AbstractComman
             pl.offer(Keys.FIRE_TICKS, Ticks.zero());
             context.sendMessageTo(pl, "command.heal.success.self");
             if (!context.is(pl)) {
-                context.sendMessage("command.heal.success.other", pl.getName());
+                context.sendMessage("command.heal.success.other", pl.name());
             }
 
             return context.successResult();

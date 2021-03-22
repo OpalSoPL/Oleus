@@ -40,19 +40,19 @@ public final class ResetFirstJoinCommand implements ICommandExecutor, IReloadabl
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User targetUser = context.requireOne(NucleusParameters.ONE_USER);
         context.getServiceCollection().storageManager().getUserService()
-                .setAndSave(targetUser.getUniqueId(), CoreKeys.FIRST_JOIN_PROCESSED, false)
+                .setAndSave(targetUser.uniqueId(), CoreKeys.FIRST_JOIN_PROCESSED, false)
                 .handle((result, exception) -> {
                     if (exception == null) {
                         // all okay
-                        context.sendMessage("command.nucleus.firstjoin.success", targetUser.getName());
+                        context.sendMessage("command.nucleus.firstjoin.success", targetUser.name());
                         if (context.testPermissionFor(targetUser, CorePermissions.EXEMPT_FIRST_JOIN)) {
-                            context.sendMessage("command.nucleus.firstjoin.perm", targetUser.getName(), CorePermissions.EXEMPT_FIRST_JOIN);
+                            context.sendMessage("command.nucleus.firstjoin.perm", targetUser.name(), CorePermissions.EXEMPT_FIRST_JOIN);
                         }
                         if (this.useSponge && targetUser.get(Keys.FIRST_DATE_JOINED).isPresent()) {
-                            context.sendMessage("command.nucleus.firstjoin.date", targetUser.getName());
+                            context.sendMessage("command.nucleus.firstjoin.date", targetUser.name());
                         }
                     } else {
-                        context.sendMessage("command.nucleus.firstjoin.error", targetUser.getName(), exception.getMessage());
+                        context.sendMessage("command.nucleus.firstjoin.error", targetUser.name(), exception.getMessage());
                         exception.printStackTrace();
                     }
                     return (Void) null;

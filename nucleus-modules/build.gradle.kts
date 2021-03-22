@@ -6,7 +6,7 @@ plugins {
 group = "io.github.nucleuspowered"
 
 repositories {
-    jcenter()
+    mavenCentral()
     maven("https://repo-new.spongepowered.org/repository/maven-public")
     // maven("https://jitpack.io")
 }

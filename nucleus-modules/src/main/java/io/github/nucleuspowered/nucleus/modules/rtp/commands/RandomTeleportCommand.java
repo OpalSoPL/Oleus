@@ -86,7 +86,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
         synchronized (this.cachedTasks) {
             this.cachedTasks.keySet().removeIf(task -> !Sponge.server().getScheduler().getTaskById(task.getUniqueId()).isPresent());
             if (this.cachedTasks.containsValue(player.getUniqueId())) {
-                return context.errorResult("command.rtp.inprogress", player.getName());
+                return context.errorResult("command.rtp.inprogress", player.name());
             }
         }
 
@@ -160,7 +160,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
             super(source.getServiceCollection(), target1, cost);
             this.logger = source.getServiceCollection().logger();
             this.pluginContainer = pluginContainer;
-            this.cause = Sponge.server().getCauseStackManager().getCurrentCause();
+            this.cause = Sponge.server().causeStackManager().getCurrentCause();
             this.targetWorld = target;
             this.source = source;
             this.target = target1;
@@ -173,7 +173,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
 
         @Override public void accept(final ScheduledTask task) {
             this.count--;
-            final ServerPlayer serverPlayer = Sponge.server().getPlayer(this.target).orElse(null);
+            final ServerPlayer serverPlayer = Sponge.server().player(this.target).orElse(null);
             if (serverPlayer == null) {
                 this.onCancel();
                 return;
@@ -189,7 +189,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
                                 this.kernel.getLocation(serverPlayer.getServerLocation(), this.targetWorld, this.options);
                         if (optionalLocation.isPresent()) {
                             final ServerLocation targetLocation = optionalLocation.get();
-                            if (Sponge.getEventManager().post(new RTPSelectedLocationEvent(
+                            if (Sponge.eventManager().post(new RTPSelectedLocationEvent(
                                     targetLocation,
                                     serverPlayer,
                                     this.cause

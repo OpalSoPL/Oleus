@@ -45,7 +45,7 @@ public class PlayerMetadataService implements NucleusPlayerMetadataService, Serv
     }
 
     @Override public Optional<Result> getUserData(final UUID uuid) {
-        final Optional<User> user = Sponge.server().getUserManager().get(uuid);
+        final Optional<User> user = Sponge.server().userManager().find(uuid);
         final boolean isEligible;
         if (user.isPresent()) {
             final User u = user.get();
@@ -94,12 +94,12 @@ public class PlayerMetadataService implements NucleusPlayerMetadataService, Serv
         }
 
         @Override public Optional<Tuple<WorldProperties, Vector3d>> getLastLocation() {
-            final Optional<ServerPlayer> pl = Sponge.server().getPlayer(this.uuid);
+            final Optional<ServerPlayer> pl = Sponge.server().player(this.uuid);
             if (pl.isPresent()) {
-                final ServerLocation l = pl.get().getServerLocation();
+                final ServerLocation l = pl.get().serverLocation();
                 return Optional.of(Tuple.of(
-                    l.getWorld().getProperties(),
-                    l.getPosition()
+                    l.world().properties(),
+                    l.position()
                 ));
             }
 

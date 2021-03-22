@@ -39,17 +39,17 @@ public class VoiceCommand implements ICommandExecutor {
 
         final ServerPlayer pl = context.requireOne(NucleusParameters.ONE_PLAYER);
         if (context.testPermissionFor(pl, MutePermissions.VOICE_AUTO)) {
-            return context.errorResult("command.voice.autovoice", pl.getName());
+            return context.errorResult("command.voice.autovoice", pl.name());
         }
 
-        final boolean turnOn = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !muteHandler.isVoiced(pl.getUniqueId()));
+        final boolean turnOn = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !muteHandler.isVoiced(pl.uniqueId()));
 
-        final UUID voice = pl.getUniqueId();
+        final UUID voice = pl.uniqueId();
         if (turnOn == muteHandler.isVoiced(voice)) {
             if (turnOn) {
-                context.sendMessage("command.voice.alreadyvoiced", pl.getName());
+                context.sendMessage("command.voice.alreadyvoiced", pl.name());
             } else {
-                context.sendMessage("command.voice.alreadynotvoiced", pl.getName());
+                context.sendMessage("command.voice.alreadynotvoiced", pl.name());
             }
 
             return context.failResult();
@@ -61,12 +61,12 @@ public class VoiceCommand implements ICommandExecutor {
                     context.getAudience());
 
         if (turnOn) {
-            muteHandler.addVoice(pl.getUniqueId());
-            mmc.sendMessage(context.getMessage("command.voice.voiced.source", pl.getName()));
+            muteHandler.addVoice(pl.uniqueId());
+            mmc.sendMessage(context.getMessage("command.voice.voiced.source", pl.name()));
             context.sendMessageTo(pl, "command.voice.voiced.target");
         } else {
-            muteHandler.removeVoice(pl.getUniqueId());
-            mmc.sendMessage(context.getMessage("command.voice.voiced.source", pl.getName()));
+            muteHandler.removeVoice(pl.uniqueId());
+            mmc.sendMessage(context.getMessage("command.voice.voiced.source", pl.name()));
             context.sendMessageTo(pl, "command.voice.voiced.target");
         }
 

@@ -43,7 +43,7 @@ public class MuteInfoProvider implements NucleusProvider {
                 }
 
                 return Optional.of(Component.join(Component.newline(),
-                        m.clickEvent(ClickEvent.runCommand("/checkmute " + user.getName()))
+                        m.clickEvent(ClickEvent.runCommand("/checkmute " + user.name()))
                                 .hoverEvent(HoverEvent.showText(
                                         messageProviderService.getMessageFor(audience, "standard.clicktoseemore"))),
                         messageProviderService.getMessageFor(audience, "standard.reason", jd.getReason())));

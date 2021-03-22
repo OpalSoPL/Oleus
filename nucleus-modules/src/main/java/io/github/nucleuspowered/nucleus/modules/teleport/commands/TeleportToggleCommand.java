@@ -38,9 +38,9 @@ public class TeleportToggleCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final IUserPreferenceService ups = context.getServiceCollection().userPreferenceService();
         final Player pl = context.getIfPlayer();
-        final boolean toggle = ups.get(pl.getUniqueId(), TeleportKeys.TELEPORT_TOGGLE).orElse(true);
+        final boolean toggle = ups.get(pl.uniqueId(), TeleportKeys.TELEPORT_TOGGLE).orElse(true);
         final boolean flip = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !toggle);
-        ups.set(pl.getUniqueId(), TeleportKeys.TELEPORT_TOGGLE, flip);
+        ups.set(pl.uniqueId(), TeleportKeys.TELEPORT_TOGGLE, flip);
         context.sendMessage(
                 "command.tptoggle.success", flip ? "loc:standard.enabled" : "loc:standard.disabled"
         );

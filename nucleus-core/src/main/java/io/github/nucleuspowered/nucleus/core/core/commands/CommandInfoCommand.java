@@ -44,8 +44,8 @@ public class CommandInfoCommand implements ICommandExecutor {
     @Inject
     public CommandInfoCommand(final IMessageProviderService messageProviderService) {
         this.commandParameter = Parameter.builder(CommandMapping.class)
-                .setKey("command")
-                .parser(new CommandChoicesArgument(messageProviderService))
+                .key("command")
+                .addParser(new CommandChoicesArgument(messageProviderService))
                 .build();
     }
 
@@ -62,27 +62,27 @@ public class CommandInfoCommand implements ICommandExecutor {
         final CommandMapping mapping = context.requireOne(this.commandParameter);
 
         final IMessageProviderService provider = context.getServiceCollection().messageProvider();
-        final Component header = context.getMessage("command.commandinfo.title", mapping.getPrimaryAlias());
+        final Component header = context.getMessage("command.commandinfo.title", mapping.primaryAlias());
 
         final List<Component> content = new ArrayList<>();
 
         // Owner
-        final PluginContainer owner = mapping.getPlugin();
+        final PluginContainer owner = mapping.plugin();
         content.add(provider.getMessage("command.commandinfo.owner", owner.getMetadata().getName()
                 .orElseGet(() -> context.getMessageString("standard.unknown")) + " (" + owner.getMetadata().getId() + ")"));
-        content.add(context.getMessage("command.commandinfo.aliases", String.join(", ", mapping.getAllAliases())));
+        content.add(context.getMessage("command.commandinfo.aliases", String.join(", ", mapping.allAliases())));
 
-        if (mapping.getPlugin().equals(context.getServiceCollection().pluginContainer())) {
+        if (mapping.plugin().equals(context.getServiceCollection().pluginContainer())) {
             // we did it, do we have a control for it?
             this.nucleusCommand(content, context, provider, mapping);
         } else {
             this.lowCommand(content, context, provider, mapping);
         }
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .title(header)
                 .contents(content)
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
         return context.successResult();
     }
 
@@ -93,7 +93,7 @@ public class CommandInfoCommand implements ICommandExecutor {
             final CommandMapping mapping) throws CommandException {
         content.add(context.getMessage("command.commandinfo.type", "loc:command.commandinfo.nucleus"));
         content.add(Component.empty());
-        final CommandControl control = context.getServiceCollection().commandMetadataService().getControl(mapping.getPrimaryAlias());
+        final CommandControl control = context.getServiceCollection().commandMetadataService().getControl(mapping.primaryAlias());
         final Component text = control.getUsage(context);
         if (AdventureUtils.isEmpty(text)) {
             content.add(context.getMessage("command.commandinfo.noinfo"));
@@ -109,7 +109,7 @@ public class CommandInfoCommand implements ICommandExecutor {
             final CommandMapping mapping) throws CommandException {
         content.add(context.getMessage("command.commandinfo.type", "loc:command.commandinfo.callable"));
         content.add(Component.empty());
-        final Optional<Component> help = mapping.getRegistrar().help(context.getCause(), mapping);
+        final Optional<Component> help = mapping.registrar().help(context.cause(), mapping);
         help.ifPresent(content::add);
     }
 
@@ -123,20 +123,20 @@ public class CommandInfoCommand implements ICommandExecutor {
 
         @Override
         public List<String> complete(final CommandContext context, final String string) {
-            return new ArrayList<>(Sponge.server().getCommandManager().suggest(context.getSubject(), context.getCause().getAudience(), string));
+            return new ArrayList<>(Sponge.server().commandManager().suggest(context.subject(), context.cause().audience(), string));
         }
 
         @Override
-        public Optional<? extends CommandMapping> getValue(
+        public Optional<? extends CommandMapping> parseValue(
                 final Parameter.@NonNull Key<? super CommandMapping> parameterKey,
                 final ArgumentReader.@NonNull Mutable reader,
                 final CommandContext.@NonNull Builder context) throws ArgumentParseException {
             final String next = reader.parseString();
-            final Optional<CommandMapping> commandMapping = Sponge.server().getCommandManager().getCommandMapping(next);
-            if (commandMapping.filter(x -> x.getRegistrar().canExecute(context.getCause(), x)).isPresent()) {
+            final Optional<CommandMapping> commandMapping = Sponge.server().commandManager().commandMapping(next);
+            if (commandMapping.filter(x -> x.registrar().canExecute(context.cause(), x)).isPresent()) {
                 return commandMapping;
             }
-            throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "command.commandinfo.nocommand", next));
+            throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "command.commandinfo.nocommand", next));
         }
     }
 }

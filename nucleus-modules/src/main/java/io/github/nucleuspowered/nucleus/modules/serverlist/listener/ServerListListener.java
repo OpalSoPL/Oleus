@@ -62,7 +62,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
 
                 if (list != null) {
                     final NucleusTextTemplate template = list.get(this.random.nextInt(list.size()));
-                    response.setDescription(template.getForObject(Sponge.getSystemSubject()));
+                    response.setDescription(template.getForObject(Sponge.systemSubject()));
                 }
             }
         }
@@ -70,7 +70,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
         if (this.hidePlayerCount) {
             response.setHidePlayers(true);
         } else if (this.hideVanishPlayers) {
-            final Collection<GameProfile> players = Sponge.server().getOnlinePlayers().stream()
+            final Collection<GameProfile> players = Sponge.server().onlinePlayers().stream()
                     .filter(x -> !x.get(Keys.VANISH).orElse(false))
                     .map(ServerPlayer::getProfile)
                     .collect(Collectors.toList());

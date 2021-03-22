@@ -54,7 +54,8 @@ public final class TimespanParameter implements ValueParameter<Long> {
     }
 
     @Override
-    public Optional<? extends Long> getValue(final Parameter.Key<? super Long> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
+    public Optional<? extends Long> parseValue(final Parameter.Key<? super Long> parameterKey, final ArgumentReader.Mutable reader,
+            final CommandContext.Builder context)
             throws ArgumentParseException {
         final String s = reader.parseString();
 
@@ -76,6 +77,6 @@ public final class TimespanParameter implements ValueParameter<Long> {
             }
         }
 
-        throw reader.createException(this.messageProvider.getMessageFor(context.getCause().getAudience(), "args.timespan.incorrectformat", s));
+        throw reader.createException(this.messageProvider.getMessageFor(context.cause().audience(), "args.timespan.incorrectformat", s));
     }
 }

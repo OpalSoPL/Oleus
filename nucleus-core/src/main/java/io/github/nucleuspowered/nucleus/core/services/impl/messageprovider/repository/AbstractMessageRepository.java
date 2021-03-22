@@ -63,9 +63,9 @@ abstract class AbstractMessageRepository implements IMessageRepository {
                 Arrays.stream(args).map(x -> {
                     final Component component;
                     if (x instanceof User) {
-                        component = this.playerDisplayNameService.getDisplayName(((User) x).getUniqueId());
+                        component = this.playerDisplayNameService.getDisplayName(((User) x).uniqueId());
                     } else if (x instanceof ServerPlayer) {
-                        component = this.playerDisplayNameService.getDisplayName(((ServerPlayer) x).getUniqueId());
+                        component = this.playerDisplayNameService.getDisplayName(((ServerPlayer) x).uniqueId());
                     } else if (x instanceof Component) {
                         component = (Component) x;
                     } else if (x instanceof String) {

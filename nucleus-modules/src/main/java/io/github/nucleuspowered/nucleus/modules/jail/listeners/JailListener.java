@@ -68,7 +68,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
         final Optional<Jail> jail = this.handler.getJail(jailing.getJailName()).filter(x -> x.getLocation().isPresent());
         if (!jail.isPresent()) {
             new PermissionMessageChannel(this.permissionService, JailPermissions.JAIL_NOTIFY)
-                    .sendMessage(Component.text("WARNING: No jail is defined for " + user.getName() + " - they're going free!", NamedTextColor.RED));
+                    .sendMessage(Component.text("WARNING: No jail is defined for " + user.name() + " - they're going free!", NamedTextColor.RED));
             this.handler.unjailPlayer(user.getUniqueId());
             return;
         }
@@ -100,7 +100,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
             event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(), "jail.teleportcause.isjailed"));
         } else if (this.handler.isPlayerJailed(player)) {
             event.setCancelled(true);
-            final String p = Sponge.server().getPlayer(player).map(Nameable::getName).orElse("unknown");
+            final String p = Sponge.server().player(player).map(Nameable::getName).orElse("unknown");
             event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(),"jail.teleporttarget.isjailed", p));
         }
     }
@@ -110,7 +110,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
             final NucleusTeleportEvent.AboutToTeleport event, @Root final ServerPlayer cause, @Getter("getPlayer") final UUID player) {
         if (event.getCause().getContext().get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
             if (this.handler.isPlayerJailed(player)) {
-                final String p = Sponge.server().getPlayer(player).map(Nameable::getName).orElse("unknown");
+                final String p = Sponge.server().player(player).map(Nameable::getName).orElse("unknown");
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
                     event.setCancelled(true);
                     event.setCancelMessage(

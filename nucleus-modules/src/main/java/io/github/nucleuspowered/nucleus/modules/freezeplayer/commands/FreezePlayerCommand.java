@@ -42,8 +42,8 @@ public class FreezePlayerCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User pl = context.getUserFromArgs();
         final FreezePlayerService service = context.getServiceCollection().getServiceUnchecked(FreezePlayerService.class);
-        final boolean f = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !service.isFrozen(pl.getUniqueId()));
-        service.setFrozen(pl.getUniqueId(), f);
+        final boolean f = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !service.isFrozen(pl.uniqueId()));
+        service.setFrozen(pl.uniqueId(), f);
         context.sendMessage(
             f ? "command.freezeplayer.success.frozen" : "command.freezeplayer.success.unfrozen",
                 context.getServiceCollection().playerDisplayNameService().getDisplayName(pl));

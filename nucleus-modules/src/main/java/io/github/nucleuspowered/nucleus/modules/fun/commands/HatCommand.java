@@ -73,7 +73,7 @@ public class HatCommand implements ICommandExecutor {
         if (!isSelf) {
             context.sendMessage(
                     "command.hat.success",
-                    context.getServiceCollection().playerDisplayNameService().getDisplayName(pl.getUniqueId()),
+                    context.getServiceCollection().playerDisplayNameService().getDisplayName(pl.uniqueId()),
                     itemName);
         }
 

@@ -59,7 +59,7 @@ public final class CommandContextImpl implements ICommandContext {
     private static String getFriendlyName(final CommandCause cause) {
         final Object root = cause.root();
         if (root instanceof Nameable) {
-            return ((Nameable) root).getName();
+            return ((Nameable) root).name();
         }
         return "Server";
     }
@@ -93,7 +93,7 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override
-    public CommandCause getCause() {
+    public CommandCause cause() {
         return this.cause;
     }
 
@@ -119,22 +119,22 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public <T> Optional<T> getOne(final Parameter.Key<T> name) {
-        return this.context.getOne(name);
+        return this.context.one(name);
     }
 
     @Override
     public <T> Optional<T> getOne(final Parameter.Value<T> name) {
-        return this.context.getOne(name);
+        return this.context.one(name);
     }
 
     @Override
     public <T> Collection<? extends T> getAll(final Parameter.Key<T> name) {
-        return this.context.getAll(name);
+        return this.context.all(name);
     }
 
     @Override
     public <T> Collection<? extends T> getAll(final Parameter.Value<T> name) {
-        return this.context.getAll(name);
+        return this.context.all(name);
     }
 
     @Override
@@ -168,16 +168,16 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public User getUserFromArgs(final Parameter.Value<? extends User> key, final String errorKey) throws CommandException {
-        return this.getUserFromArgs(key.getKey(), errorKey);
+        return this.getUserFromArgs(key.key(), errorKey);
     }
 
     @Override
     public User getUserFromArgs(final Parameter.Key<? extends User> key, final String errorKey) throws CommandException {
-        final Optional<? extends User> user = this.context.getOne(key);
+        final Optional<? extends User> user = this.context.one(key);
         if (user.isPresent()) {
             return user.get();
         } else {
-            return this.getIfPlayer(errorKey).getUser();
+            return this.getIfPlayer(errorKey).user();
         }
     }
 
@@ -229,7 +229,7 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public CommandException createException(final Throwable th, final String key, final Object... args) {
-        final Audience source = this.cause.getAudience();
+        final Audience source = this.cause.audience();
         return new CommandException(
                 this.serviceCollection.messageProvider().getMessageFor(source, key, args),
                 th
@@ -238,7 +238,7 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public CommandException createException(final String key, final Object... args) {
-        final Audience source = this.cause.getAudience();
+        final Audience source = this.cause.audience();
         return new CommandException(
                 this.serviceCollection.messageProvider().getMessageFor(source, key, args)
         );
@@ -270,14 +270,14 @@ public final class CommandContextImpl implements ICommandContext {
         this.failActions.add(action);
     }
 
-    @Override public Audience getAudience() {
-        return this.cause.getAudience();
+    @Override public Audience audience() {
+        return this.cause.audience();
     }
 
     @Override
     public Locale getLocale() {
-        if (this.cause.getAudience() instanceof ServerPlayer) {
-            return ((ServerPlayer) this.cause.getAudience()).getLocale();
+        if (this.cause.audience() instanceof ServerPlayer) {
+            return ((ServerPlayer) this.cause.audience()).locale();
         }
         return null;
     }
@@ -291,7 +291,7 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override public boolean testPermission(final String permission) {
-        return this.testPermissionFor(this.cause.getSubject(), permission);
+        return this.testPermissionFor(this.cause.subject(), permission);
     }
 
     @Override public boolean testPermissionFor(final Subject subject, final String permission) {
@@ -299,16 +299,16 @@ public final class CommandContextImpl implements ICommandContext {
     }
 
     @Override public String getMessageString(final String key, final Object... replacements) {
-        return this.getMessageStringFor(this.cause.getAudience(), key, replacements);
+        return this.getMessageStringFor(this.cause.audience(), key, replacements);
     }
 
     @Override public String getMessageStringFor(final Audience to, final String key, final Object... replacements) {
-        final Audience audience = this.cause.getAudience();
+        final Audience audience = this.cause.audience();
         final Locale locale;
         if (audience instanceof LocaleSource) {
-            locale = ((LocaleSource) audience).getLocale();
+            locale = ((LocaleSource) audience).locale();
         } else {
-            locale = Sponge.server().getLocale();
+            locale = Sponge.server().locale();
         }
         return this.serviceCollection.messageProvider().getMessageString(locale, key, replacements);
     }
@@ -320,17 +320,17 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public Component getMessage(final String key, final Object... replacements) {
-        return this.getMessageFor(this.cause.getAudience(), key, replacements);
+        return this.getMessageFor(this.cause.audience(), key, replacements);
     }
 
     @Override
     public String getTimeString(final long seconds) {
-        return this.serviceCollection.messageProvider().getTimeString(this.getLocaleFromAudience(this.cause.getAudience()), seconds);
+        return this.serviceCollection.messageProvider().getTimeString(this.getLocaleFromAudience(this.cause.audience()), seconds);
     }
 
     @Override
     public void sendMessage(final String key, final Object... replacements) {
-        this.sendMessageTo(this.cause.getAudience(), key, replacements);
+        this.sendMessageTo(this.cause.audience(), key, replacements);
     }
 
     @Override
@@ -362,9 +362,9 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public Optional<ServerWorld> getWorldPropertiesOrFromSelfOptional(final Parameter.Key<ServerWorld> worldKey) {
-        final Optional<ServerWorld> optionalWorldProperties = this.context.getOne(worldKey);
+        final Optional<ServerWorld> optionalWorldProperties = this.context.one(worldKey);
         if (!optionalWorldProperties.isPresent()) {
-            return this.cause.getLocation().map(Location::getWorld);
+            return this.cause.location().map(Location::world);
         }
 
         return Optional.empty();
@@ -372,7 +372,7 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public Component getDisplayName() {
-        return this.getServiceCollection().playerDisplayNameService().getDisplayName(this.cause.getAudience());
+        return this.getServiceCollection().playerDisplayNameService().getDisplayName(this.cause.audience());
     }
 
     @Override
@@ -392,11 +392,11 @@ public final class CommandContextImpl implements ICommandContext {
 
     @Override
     public boolean isPermissionLevelOkay(final Subject actee, final String key, final String permissionIfNoLevel, final boolean isSameLevel) {
-        return this.serviceCollection.permissionService().isPermissionLevelOkay(this.cause.getSubject(), actee, key, permissionIfNoLevel, isSameLevel);
+        return this.serviceCollection.permissionService().isPermissionLevelOkay(this.cause.subject(), actee, key, permissionIfNoLevel, isSameLevel);
     }
 
     @Override
-    public Optional<UUID> getUniqueId() {
+    public Optional<UUID> uniqueId() {
         return Optional.empty();
     }
 
@@ -415,7 +415,7 @@ public final class CommandContextImpl implements ICommandContext {
         }
 
         throw new CommandException(
-                this.getServiceCollection().messageProvider().getMessageFor(this.cause.getAudience(), errorKey)
+                this.getServiceCollection().messageProvider().getMessageFor(this.cause.audience(), errorKey)
         );
     }
 
@@ -423,7 +423,7 @@ public final class CommandContextImpl implements ICommandContext {
     public boolean is(final User x) {
         final Object source = this.getCommandSourceRoot();
         if (source instanceof ServerPlayer) {
-            return ((ServerPlayer) source).getUniqueId().equals(x.getUniqueId());
+            return ((ServerPlayer) source).uniqueId().equals(x.uniqueId());
         }
 
         return false;
@@ -437,9 +437,9 @@ public final class CommandContextImpl implements ICommandContext {
     private Locale getLocaleFromAudience(final Audience audience) {
         final Locale locale;
         if (audience instanceof LocaleSource) {
-            locale = ((LocaleSource) audience).getLocale();
+            locale = ((LocaleSource) audience).locale();
         } else {
-            locale = Sponge.server().getLocale();
+            locale = Sponge.server().locale();
         }
         return locale;
     }

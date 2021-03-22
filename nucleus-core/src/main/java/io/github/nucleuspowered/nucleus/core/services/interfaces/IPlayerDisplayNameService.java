@@ -46,11 +46,11 @@ public interface IPlayerDisplayNameService {
     Component getDisplayName(UUID playerUUID);
 
     default Component getDisplayName(final Player player) {
-        return this.getDisplayName(player.getUniqueId());
+        return this.getDisplayName(player.uniqueId());
     }
 
     default Component getDisplayName(final User user) {
-        return this.getDisplayName(user.getUniqueId());
+        return this.getDisplayName(user.uniqueId());
     }
 
     Component getDisplayName(Audience source);

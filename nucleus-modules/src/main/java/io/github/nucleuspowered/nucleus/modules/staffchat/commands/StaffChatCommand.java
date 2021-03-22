@@ -52,7 +52,7 @@ public class StaffChatCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Optional<String> toSend = context.getOne(NucleusParameters.OPTIONAL_MESSAGE);
         if (toSend.isPresent()) {
-            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+            try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.SHOULD_FORMAT_CHANNEL, StaffChatMessageChannel.getInstance().formatMessages());
                 if (context.is(ServerPlayer.class)) {
                     final ServerPlayer pl = context.requirePlayer();
@@ -60,17 +60,17 @@ public class StaffChatCommand implements ICommandExecutor {
                     frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.getProfile());
 
                     try (final NoExceptionAutoClosable c = this.chatMessageFormatterService
-                            .setPlayerNucleusChannelTemporarily(pl.getUniqueId(), StaffChatMessageChannel.getInstance())) {
+                            .setPlayerNucleusChannelTemporarily(pl.uniqueId(), StaffChatMessageChannel.getInstance())) {
                         pl.simulateChat(
                                 context.getServiceCollection()
                                         .textStyleService()
-                                        .addUrls(toSend.get()), Sponge.server().getCauseStackManager().getCurrentCause());
+                                        .addUrls(toSend.get()), Sponge.server().causeStackManager().getCurrentCause());
                     }
 
                     // If you send a message, you're viewing it again.
                     context.getServiceCollection()
                             .userPreferenceService()
-                            .setPreferenceFor(pl.getUniqueId(), StaffChatKeys.VIEW_STAFF_CHAT, true);
+                            .setPreferenceFor(pl.uniqueId(), StaffChatKeys.VIEW_STAFF_CHAT, true);
                 } else {
                     // mostly to allow plugins to know that's what we're doing.
                     try (final NoExceptionAutoClosable c = this.chatMessageFormatterService

@@ -38,14 +38,14 @@ public class TeleportAskAllHereCommand implements ICommandExecutor {
         final PlayerTeleporterService playerTeleporterService = context
                 .getServiceCollection()
                 .getServiceUnchecked(PlayerTeleporterService.class);
-        for (final ServerPlayer x : Sponge.server().getOnlinePlayers()) {
+        for (final ServerPlayer x : Sponge.server().onlinePlayers()) {
             if (context.is(x)) {
                 continue;
             }
 
             // Before we do all this, check the event.
-            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(Sponge.server().getCauseStackManager().getCurrentCause(), x.getUniqueId());
-            if (Sponge.getEventManager().post(event)) {
+            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(Sponge.server().causeStackManager().getCurrentCause(), x.getUniqueId());
+            if (Sponge.eventManager().post(event)) {
                 cancelled.add(x);
                 continue;
             }

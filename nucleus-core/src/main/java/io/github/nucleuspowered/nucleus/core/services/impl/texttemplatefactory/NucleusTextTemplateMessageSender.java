@@ -39,9 +39,9 @@ public class NucleusTextTemplateMessageSender {
 
     public boolean send(final Audience originalMembers, final boolean isBroadcast) {
         final NucleusTextTemplateEvent event;
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(this.sender);
-            final Cause cause = Sponge.server().getCauseStackManager().getCurrentCause();
+            final Cause cause = Sponge.server().causeStackManager().currentCause();
             if (isBroadcast) {
                 event = new NucleusTextTemplateEventImpl.Broadcast(
                         this.textTemplate,
@@ -58,7 +58,7 @@ public class NucleusTextTemplateMessageSender {
                 );
             }
 
-            if (Sponge.getEventManager().post(event)) {
+            if (Sponge.eventManager().post(event)) {
                 return false;
             }
 
@@ -68,9 +68,7 @@ public class NucleusTextTemplateMessageSender {
                 event.getAudience().sendMessage(text);
             } else {
                 final ForwardingAudience forwardingAudience = (ForwardingAudience) event.getAudience();
-                forwardingAudience.audiences().forEach(x -> {
-                    x.sendMessage(this.textTemplate.getForObjectWithSenderToken(event.getAudience(), this.sender));
-                });
+                forwardingAudience.audiences().forEach(x -> x.sendMessage(this.textTemplate.getForObjectWithSenderToken(event.getAudience(), this.sender)));
             }
             return true;
         }

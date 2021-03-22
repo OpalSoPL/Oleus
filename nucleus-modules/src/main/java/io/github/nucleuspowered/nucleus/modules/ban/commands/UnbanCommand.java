@@ -48,7 +48,7 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final GameProfile profile = context.requireOne(NucleusParameters.GAME_PROFILE);
-        final BanService service = Sponge.server().getServiceProvider().banService();
+        final BanService service = Sponge.server().serviceProvider().banService();
         
         final Optional<Ban.Profile> obp = service.getBanFor(profile);
         if (!obp.isPresent()) {
@@ -56,14 +56,14 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
                     "command.checkban.notset", Util.getNameOrUnkown(context, profile));
         }
 
-        final User user = Sponge.server().getUserManager().getOrCreate(profile);
+        final User user = Sponge.server().userManager().findOrCreate(profile);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
                         BanPermissions.BAN_LEVEL_KEY,
                         BanPermissions.BASE_UNBAN,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", user.getName());
+            return context.errorResult("command.modifiers.level.insufficient", user.name());
         }
 
         service.removeBan(obp.get());

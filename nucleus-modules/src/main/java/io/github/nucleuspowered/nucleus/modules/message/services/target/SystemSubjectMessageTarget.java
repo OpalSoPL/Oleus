@@ -23,7 +23,7 @@ public final class SystemSubjectMessageTarget extends AbstractMessageTarget impl
 
     @Override
     public Optional<Audience> getRepresentedAudience() {
-        return Optional.of(Sponge.getSystemSubject());
+        return Optional.of(Sponge.systemSubject());
     }
 
     @Override
@@ -34,7 +34,7 @@ public final class SystemSubjectMessageTarget extends AbstractMessageTarget impl
     @Override
     public void receiveMessageFrom(final MessageTarget messageTarget, final Component message) {
         this.setReplyTarget(messageTarget);
-        Sponge.getSystemSubject().sendMessage(this.getIdentity(messageTarget), message);
+        Sponge.systemSubject().sendMessage(this.getIdentity(messageTarget), message);
     }
 
     @Override
@@ -44,7 +44,7 @@ public final class SystemSubjectMessageTarget extends AbstractMessageTarget impl
 
     @Override
     public void pushCauseToFrame(final CauseStackManager.StackFrame frame) {
-        frame.pushCause(Sponge.getSystemSubject());
+        frame.pushCause(Sponge.systemSubject());
     }
 
     @Override

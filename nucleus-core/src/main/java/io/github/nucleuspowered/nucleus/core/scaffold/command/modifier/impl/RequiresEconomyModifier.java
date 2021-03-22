@@ -19,7 +19,7 @@ public class RequiresEconomyModifier implements ICommandModifier {
     public Optional<Component> testRequirement(final ICommandContext source, final CommandControl control,
             final INucleusServiceCollection serviceCollection, final CommandModifier modifier) {
         if (!serviceCollection.economyServiceProvider().serviceExists()) {
-            return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getCause().getAudience(), "command.economyrequired"));
+            return Optional.of(serviceCollection.messageProvider().getMessageFor(source.cause().audience(), "command.economyrequired"));
         }
 
         return Optional.empty();

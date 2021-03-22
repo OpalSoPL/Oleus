@@ -57,7 +57,7 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
 
             if (sendMessage) {
                 this.messageProviderService.sendMessageTo(target, "warmup.start",
-                        this.messageProviderService.getTimeString(target.getLocale(), duration));
+                        this.messageProviderService.getTimeString(target.locale(), duration));
                 if (this.warmupConfig.isOnCommand() && this.warmupConfig.isOnMove()) {
                     this.messageProviderService.sendMessageTo(target, "warmup.both");
                 } else if (this.warmupConfig.isOnCommand()) {
@@ -68,12 +68,12 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
             }
 
             // build the task
-            final UUID playerTarget = target.getUniqueId();
+            final UUID playerTarget = target.uniqueId();
             final Consumer<ScheduledTask> taskToSubmit = (ScheduledTask task) -> {
                 this.tasks.remove(playerTarget);
-                this.uuidToWarmup.remove(task.getUniqueId());
+                this.uuidToWarmup.remove(task.uniqueId());
 
-                if (Sponge.server().getPlayer(playerTarget).isPresent()) {
+                if (Sponge.server().player(playerTarget).isPresent()) {
                     // Only run if the player is still on the server.
                     runnable.run();
                 }
@@ -85,9 +85,9 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
                     .execute(taskToSubmit)
                     .plugin(this.pluginContainer)
                     .build();
-            final ScheduledTask scheduledTask = Sponge.server().getScheduler().submit(t);
-            this.tasks.put(playerTarget, scheduledTask.getUniqueId());
-            this.uuidToWarmup.put(scheduledTask.getUniqueId(), runnable);
+            final ScheduledTask scheduledTask = Sponge.server().scheduler().submit(t);
+            this.tasks.put(playerTarget, scheduledTask.uniqueId());
+            this.uuidToWarmup.put(scheduledTask.uniqueId(), runnable);
         }
     }
 
@@ -98,9 +98,9 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
     }
 
     private boolean cancelInternal(final Player player) {
-        final UUID taskUUID = this.tasks.get(player.getUniqueId());
+        final UUID taskUUID = this.tasks.get(player.uniqueId());
         if (taskUUID != null) {
-            Sponge.server().getScheduler().getTaskById(taskUUID).ifPresent(ScheduledTask::cancel);
+            Sponge.server().scheduler().taskById(taskUUID).ifPresent(ScheduledTask::cancel);
             final WarmupTask task = this.uuidToWarmup.get(taskUUID);
             if (task != null) {
                 // if we get here, it was never cancelled.
@@ -109,22 +109,22 @@ public class WarmupService implements IWarmupService, IReloadableService.Reloada
 
             this.uuidToWarmup.remove(taskUUID);
         }
-        this.tasks.remove(player.getUniqueId());
+        this.tasks.remove(player.uniqueId());
         return taskUUID != null;
     }
 
     @Override public boolean awaitingExecution(final Player player) {
         synchronized (this.lockingObject) {
-            final UUID taskUUID = this.tasks.get(player.getUniqueId());
+            final UUID taskUUID = this.tasks.get(player.uniqueId());
             if (taskUUID != null) {
-                if (Sponge.server().getScheduler().getTaskById(taskUUID).isPresent()) {
+                if (Sponge.server().scheduler().taskById(taskUUID).isPresent()) {
                     // remove entries
                     return true;
                 } else {
                     this.uuidToWarmup.remove(taskUUID);
                 }
             }
-            this.tasks.remove(player.getUniqueId());
+            this.tasks.remove(player.uniqueId());
             return false;
         }
     }

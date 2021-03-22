@@ -105,13 +105,13 @@ public class MailHandler implements NucleusMailService, ServiceBase {
         // Message is about to be sent. Send the event out. If canceled, then
         // that's that.
         final IMessageProviderService messageProvider = this.serviceCollection.messageProvider();
-        if (Sponge.getEventManager().post(new InternalNucleusSendMailEvent(playerFrom, playerTo, message))) {
+        if (Sponge.eventManager().post(new InternalNucleusSendMailEvent(playerFrom, playerTo, message))) {
             if (playerFrom == null) {
                 messageProvider.sendMessageTo(
-                        Sponge.getSystemSubject(),
+                        Sponge.systemSubject(),
                         "message.cancel");
             } else {
-                Sponge.server().getPlayer(playerFrom)
+                Sponge.server().player(playerFrom)
                         .ifPresent(x -> messageProvider.sendMessageTo(x, "message.cancel"));
             }
             return;
@@ -124,7 +124,7 @@ public class MailHandler implements NucleusMailService, ServiceBase {
         this.serviceCollection.storageManager().getUserService().save(playerTo, dataObject);
 
         final Component from = this.serviceCollection.playerDisplayNameService().getDisplayName(md.getUuid());
-        Sponge.server().getPlayer(playerTo).ifPresent(x ->
+        Sponge.server().player(playerTo).ifPresent(x ->
                 x.sendMessage(LinearComponents.linear(messageProvider.getMessageFor(x, "mail.youvegotmail"), Component.space(), from)));
     }
 

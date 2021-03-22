@@ -34,12 +34,12 @@ public class LoadWorldCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ResourceKey targetWorld = context.requireOne(NucleusParameters.OFFLINE_WORLD);
-        if (Sponge.server().getWorldManager().world(targetWorld).isPresent()) {
+        if (Sponge.server().worldManager().world(targetWorld).isPresent()) {
             return context.errorResult("command.world.load.alreadyloaded", targetWorld.asString());
         }
 
         context.sendMessage("command.world.load.start", targetWorld.asString());
-        Sponge.server().getWorldManager().loadWorld(targetWorld).handle((world, exception) -> {
+        Sponge.server().worldManager().loadWorld(targetWorld).handle((world, exception) -> {
             if (exception != null) {
                 context.getServiceCollection().schedulerService().runOnMainThread(() ->
                     context.sendMessage("command.world.load.fail", targetWorld.asString()));

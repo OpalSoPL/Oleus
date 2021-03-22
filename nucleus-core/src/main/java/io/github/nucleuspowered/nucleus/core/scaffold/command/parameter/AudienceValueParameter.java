@@ -29,15 +29,15 @@ public final class AudienceValueParameter implements ValueParameter<List<Audienc
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
-    public Optional<? extends List<Audience>> getValue(
+    public Optional<? extends List<Audience>> parseValue(
             final Parameter.Key<? super List<Audience>> parameterKey,
             final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
         final String r = reader.peekString();
         if (r.equals("-")) {
             reader.parseString();
-            return Optional.of(Collections.singletonList(Sponge.getSystemSubject()));
+            return Optional.of(Collections.singletonList(Sponge.systemSubject()));
         }
-        return ResourceKeyedValueParameters.MANY_PLAYERS.get().getValue((Parameter.Key) parameterKey, reader, context);
+        return ResourceKeyedValueParameters.MANY_PLAYERS.get().parseValue((Parameter.Key) parameterKey, reader, context);
     }
 }

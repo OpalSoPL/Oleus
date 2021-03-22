@@ -120,6 +120,6 @@ public class NucleusTextTemplateImpl implements NucleusTextTemplate {
 
     @Override
     public @NonNull Component asComponent() {
-        return this.getForObject(Sponge.getSystemSubject());
+        return this.getForObject(Sponge.systemSubject());
     }
 }

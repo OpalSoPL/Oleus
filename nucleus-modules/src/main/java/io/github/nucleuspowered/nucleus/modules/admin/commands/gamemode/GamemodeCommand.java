@@ -75,7 +75,7 @@ public class GamemodeCommand extends GamemodeBase {
             if (context.is(user)) {
                 context.sendMessage("command.gamemode.get.base", mode);
             } else {
-                context.sendMessage("command.gamemode.get.other", user.getName(), mode);
+                context.sendMessage("command.gamemode.get.other", user.name(), mode);
             }
 
             return context.successResult();

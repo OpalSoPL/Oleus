@@ -32,13 +32,13 @@ public class CommandListener implements ListenerBase.Conditional {
     @Listener
     public void onCommandPreProcess(final ExecuteCommandEvent.Pre event, @Getter("getCommand") final String command) {
         final Cause cause = event.getCause();
-        if (cause.root() == Sponge.getSystemSubject() || cause.root() == Sponge.server()) {
+        if (cause.root() == Sponge.systemSubject() || cause.root() == Sponge.server()) {
             if (command.equalsIgnoreCase("list")) {
                 event.setCommand("minecraft:list");
                 if (!this.messageShown) {
                     this.messageShown = true;
                     Sponge.server().getScheduler().createExecutor(this.pluginContainer).submit(() ->
-                            this.messageProviderService.sendMessageTo(Sponge.getSystemSubject(), "list.listener.multicraftcompat"));
+                            this.messageProviderService.sendMessageTo(Sponge.systemSubject(), "list.listener.multicraftcompat"));
                 }
             }
         }

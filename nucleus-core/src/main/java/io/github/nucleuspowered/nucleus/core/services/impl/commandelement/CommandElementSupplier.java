@@ -30,24 +30,24 @@ public class CommandElementSupplier implements ICommandElementSupplier {
 
     @Override
     public Parameter.Value<Locale> createLocaleElement(final String key) {
-        return Parameter.builder(Locale.class).setKey(key).parser(new LocaleElement(this.serviceCollection)).build();
+        return Parameter.builder(Locale.class).key(key).addParser(new LocaleElement(this.serviceCollection)).build();
     }
 
     @Override
     public Parameter.Value<User> createOnlyOtherUserPermissionElement(final String permission) {
-        return Parameter.user().optional().setKey(NucleusParameters.ONE_USER.getKey()).setRequiredPermission(permission).build();
+        return Parameter.user().optional().key(NucleusParameters.ONE_USER.key()).requiredPermission(permission).build();
     }
 
     @Override
     public Parameter.Value<ServerPlayer> createOnlyOtherPlayerPermissionElement(final String permission) {
-        return Parameter.player().optional().setKey(NucleusParameters.ONE_PLAYER.getKey()).setRequiredPermission(permission).build();
+        return Parameter.player().optional().key(NucleusParameters.ONE_PLAYER.key()).requiredPermission(permission).build();
     }
 
     @Override
     public User getUserFromParametersElseSelf(final ICommandContext context) throws CommandException {
         final Optional<? extends User> user = context.getOne(NucleusParameters.ONE_USER).filter(context::isNot);
         if (!user.isPresent()) {
-            return context.getIfPlayer().getUser();
+            return context.getIfPlayer().user();
         }
 
         // If not self, we set no cooldown etc.

@@ -32,13 +32,13 @@ public class RefreshUniqueVisitors implements ICommandExecutor {
         final UniqueUserService uus = context.getServiceCollection().getServiceUnchecked(UniqueUserService.class);
         context.sendMessage("command.nucleus.debug.refreshuniquevisitors.started", uus.getUniqueUserCount());
 
-        final Optional<UUID> optionalUUID = context.getUniqueId();
+        final Optional<UUID> optionalUUID = context.uniqueId();
         final Supplier<Audience> scs;
         if (optionalUUID.isPresent()) {
             final UUID uuid = optionalUUID.get();
-            scs = () -> Sponge.server().getPlayer(uuid).map(x -> (Audience) x).orElseGet(Sponge::getSystemSubject);
+            scs = () -> Sponge.server().player(uuid).map(x -> (Audience) x).orElseGet(Sponge::systemSubject);
         } else {
-            scs = Sponge::getSystemSubject;
+            scs = Sponge::systemSubject;
         }
 
         uus.resetUniqueUserCount(l -> context.sendMessageTo(scs.get(), "command.nucleus.debug.refreshuniquevisitors.done", l));

@@ -47,7 +47,7 @@ public class NamePlaceholder<T> implements PlaceholderParser {
 
     @Override
     public Component parse(final PlaceholderContext placeholder) {
-        final Optional<Object> associated = placeholder.getAssociatedObject();
+        final Optional<Object> associated = placeholder.associatedObject();
         if (associated.isPresent()) {
             if (this.consoleFilter && associated.get() instanceof SystemSubject || associated.get() instanceof Server) {
                 return CONSOLE;

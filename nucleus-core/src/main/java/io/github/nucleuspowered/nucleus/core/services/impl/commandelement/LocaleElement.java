@@ -30,7 +30,7 @@ public final class LocaleElement implements ValueParameter<Locale> {
     }
 
     @Override
-    public Optional<? extends Locale> getValue(final Parameter.Key<? super Locale> parameterKey, final ArgumentReader.Mutable reader,
+    public Optional<? extends Locale> parseValue(final Parameter.Key<? super Locale> parameterKey, final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
         final String s = reader.parseString();
         return Optional.of(this.serviceCollection.messageProvider().getLocaleFromName(s).orElseGet(() -> Locale.forLanguageTag(s.replace("_", "-"))));

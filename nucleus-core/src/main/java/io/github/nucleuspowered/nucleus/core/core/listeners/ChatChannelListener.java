@@ -39,14 +39,14 @@ public class ChatChannelListener implements ListenerBase {
     @Listener(order = Order.LATE)
     public void onChatMessageLast(final PlayerChatEvent chat, @Root final Player source) {
         final Optional<IChatMessageFormatterService.Channel> channelOptional =
-                this.chatMessageFormatter.getNucleusChannel(source.getUniqueId());
+                this.chatMessageFormatter.getNucleusChannel(source.uniqueId());
         channelOptional.ifPresent(x -> this.onChatChannel(chat, x));
 
     }
 
     private void onChatChannel(final PlayerChatEvent chat, final IChatMessageFormatterService.Channel channel) {
         if (channel.willFormat()) {
-            channel.formatMessageEvent(chat.getCause().first(ServerPlayer.class).get(), chat);
+            channel.formatMessageEvent(chat.cause().first(ServerPlayer.class).get(), chat);
         }
     }
 

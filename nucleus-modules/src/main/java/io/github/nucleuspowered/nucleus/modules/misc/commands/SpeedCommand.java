@@ -137,7 +137,7 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
             context.sendMessage("command.speed.success.base", key.name, String.valueOf(speed));
 
             if (!context.is(pl)) {
-                context.sendMessage("command.speed.success.other", pl.getName(), key.name, String.valueOf(speed));
+                context.sendMessage("command.speed.success.other", pl.name(), key.name, String.valueOf(speed));
             }
 
             return context.successResult();

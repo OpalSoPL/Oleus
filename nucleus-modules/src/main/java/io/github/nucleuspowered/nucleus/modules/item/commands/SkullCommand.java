@@ -94,16 +94,16 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
         }
 
         if (this.isUseMinecraftCommand) {
-            try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
-                frame.addContext(EventContextKeys.SUBJECT, Sponge.getSystemSubject());
+            try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
+                frame.addContext(EventContextKeys.SUBJECT, Sponge.systemSubject());
                 final CommandResult result = Sponge.server().getCommandManager().process(
-                        String.format("minecraft:give %s skull %d 3 {SkullOwner:%s}", player.getName(), amount, user.getName()));
+                        String.format("minecraft:give %s skull %d 3 {SkullOwner:%s}", player.name(), amount, user.name()));
                 if (result.isSuccess()) {
-                    context.sendMessage("command.skull.success.plural", String.valueOf(amount), user.getName());
+                    context.sendMessage("command.skull.success.plural", String.valueOf(amount), user.name());
                     return context.successResult();
                 }
 
-                return context.errorResult("command.skull.error", user.getName());
+                return context.errorResult("command.skull.error", user.name());
             }
         }
 
@@ -151,17 +151,17 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
                 }
 
                 if (accepted == 1) {
-                    context.sendMessage("command.skull.success.single", user.getName());
+                    context.sendMessage("command.skull.success.single", user.name());
                 } else {
-                    context.sendMessage("command.skull.success.plural", accepted, user.getName());
+                    context.sendMessage("command.skull.success.plural", accepted, user.name());
                 }
 
                 return context.successResult();
             }
 
-            return context.errorResult("command.skull.full", user.getName());
+            return context.errorResult("command.skull.full", user.name());
         } else {
-            return context.errorResult("command.skull.error", user.getName());
+            return context.errorResult("command.skull.error", user.name());
         }
     }
 }

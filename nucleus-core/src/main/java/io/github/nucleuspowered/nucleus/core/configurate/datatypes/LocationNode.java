@@ -43,7 +43,7 @@ public class LocationNode {
     }
 
     public LocationNode(final ServerLocation location, final Vector3d rotation) {
-        this(location.getWorldKey(), location.getPosition(), rotation);
+        this(location.worldKey(), location.position(), rotation);
     }
 
     public LocationNode(final ResourceKey world, final Vector3d length, final Vector3d rotation) {
@@ -72,7 +72,7 @@ public class LocationNode {
      * Gets a {@link Location} from the node.
      */
     public Optional<ServerLocation> getLocationIfExists() {
-        return Sponge.server().getWorldManager().world(this.world).map(r -> ServerLocation.of(r, this.getPosition()));
+        return Sponge.server().worldManager().world(this.world).map(r -> ServerLocation.of(r, this.getPosition()));
     }
 
     /**

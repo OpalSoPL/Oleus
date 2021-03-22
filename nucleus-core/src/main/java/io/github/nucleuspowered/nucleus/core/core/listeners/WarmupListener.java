@@ -36,7 +36,7 @@ public class WarmupListener implements IReloadableService.Reloadable, ListenerBa
     @Listener(order = Order.LAST)
     public void onPlayerMovement(final MoveEntityEvent event, @Root final ServerPlayer player) {
         // Rotating is OK!
-        if (this.warmupConfig.isOnMove() && !event.getOriginalDestinationPosition().equals(event.getDestinationPosition())) {
+        if (this.warmupConfig.isOnMove() && !event.originalDestinationPosition().equals(event.destinationPosition())) {
             this.cancelWarmup(player);
         }
     }
@@ -50,7 +50,7 @@ public class WarmupListener implements IReloadableService.Reloadable, ListenerBa
 
     @Listener(order = Order.LAST)
     public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event) {
-        this.cancelWarmup(event.getPlayer());
+        this.cancelWarmup(event.player());
     }
 
     private void cancelWarmup(final ServerPlayer player) {

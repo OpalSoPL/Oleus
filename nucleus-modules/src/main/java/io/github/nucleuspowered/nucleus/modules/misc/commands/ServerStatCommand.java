@@ -78,7 +78,7 @@ public class ServerStatCommand implements ICommandExecutor {
         messages.add(this.createText(context, "command.serverstat.freemem.main", "command.serverstat.freemem.hover", String.valueOf(free)));
 
         if (!context.hasFlag("c")) {
-            for (final ServerWorld world : Sponge.server().getWorldManager().getWorlds()) {
+            for (final ServerWorld world : Sponge.server().worldManager().getWorlds()) {
                 final int numOfEntities = world.getEntities().size();
                 final int loadedChunks = Iterables.size(world.getLoadedChunks());
                 messages.add(Component.empty());

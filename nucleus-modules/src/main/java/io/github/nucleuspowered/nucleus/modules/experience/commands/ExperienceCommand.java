@@ -46,7 +46,7 @@ public class ExperienceCommand implements ICommandExecutor {
         final int exp = pl.get(Keys.EXPERIENCE).orElse(0);
         final int lv = pl.get(Keys.EXPERIENCE_LEVEL).orElse(0);
 
-        context.sendMessage("command.exp.info", pl.getName(), exp, lv);
+        context.sendMessage("command.exp.info", pl.name(), exp, lv);
         return context.successResult();
     }
 
@@ -61,7 +61,7 @@ public class ExperienceCommand implements ICommandExecutor {
         final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         if (!context.is(pl)) {
             context.sendMessage("command.exp.set.new.other",
-                            pl.getName(),
+                            pl.name(),
                             exp,
                             newLvl);
         }
@@ -73,7 +73,7 @@ public class ExperienceCommand implements ICommandExecutor {
     static Optional<ICommandResult> checkGameMode(final ICommandContext source, final Player pl) throws CommandException {
         final GameMode gm = pl.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL.get());
         if (gm == GameModes.CREATIVE || gm == GameModes.SPECTATOR) {
-            return Optional.of(source.errorResult("command.exp.gamemode", pl.getName()));
+            return Optional.of(source.errorResult("command.exp.gamemode", pl.name()));
         }
 
         return Optional.empty();

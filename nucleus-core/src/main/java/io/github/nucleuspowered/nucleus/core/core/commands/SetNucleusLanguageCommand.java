@@ -39,7 +39,7 @@ public class SetNucleusLanguageCommand implements ICommandExecutor {
         this.preferenceService = serviceCollection.userPreferenceService();
         this.displayNameService = serviceCollection.playerDisplayNameService();
 
-        this.userParameter = Parameter.user().setRequiredPermission(CorePermissions.OTHERS_SETNUCLEUSLANGUAGE).setKey("user").build();
+        this.userParameter = Parameter.user().requiredPermission(CorePermissions.OTHERS_SETNUCLEUSLANGUAGE).key("user").build();
         this.localeParameter = serviceCollection.commandElementSupplier().createLocaleElement("locale");
     }
 
@@ -56,10 +56,10 @@ public class SetNucleusLanguageCommand implements ICommandExecutor {
         final NucleusUserPreferenceService.PreferenceKey<Locale> preferenceKey = this.preferenceService.keys().playerLocale().get();
 
         if (locale.toString().isEmpty()) {
-            this.preferenceService.removePreferenceFor(target.getUniqueId(), preferenceKey);
+            this.preferenceService.removePreferenceFor(target.uniqueId(), preferenceKey);
             locale = Locale.UK;
         } else {
-            this.preferenceService.setPreferenceFor(target.getUniqueId(), preferenceKey, locale);
+            this.preferenceService.setPreferenceFor(target.uniqueId(), preferenceKey, locale);
         }
 
         if (!context.is(target)) {
@@ -70,7 +70,7 @@ public class SetNucleusLanguageCommand implements ICommandExecutor {
         }
 
         context.sendMessageTo(
-                context.getAudience(),
+                context.audience(),
                 "command.setnucleuslang.success.self",
                 locale.toString(),
                 locale.getDisplayName()

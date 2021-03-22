@@ -115,7 +115,7 @@ public class RTPConfig {
             return Optional.empty();
         }
 
-        return Sponge.server().getWorldManager().world(ResourceKey.resolve(this.defaultWorld));
+        return Sponge.server().worldManager().world(ResourceKey.resolve(this.defaultWorld));
     }
 
     public Set<Biome> getProhibitedBiomes() {

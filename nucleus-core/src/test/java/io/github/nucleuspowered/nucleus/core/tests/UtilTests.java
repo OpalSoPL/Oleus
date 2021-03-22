@@ -69,11 +69,12 @@ public class UtilTests {
         private WorldBorder getBorder() {
             return new WorldBorder() {
 
-                @Override public double getNewDiameter() {
+
+                @Override public double newDiameter() {
                     return 0;
                 }
 
-                @Override public double getDiameter() {
+                @Override public double diameter() {
                     return 0;
                 }
 
@@ -89,7 +90,7 @@ public class UtilTests {
 
                 }
 
-                @Override public Duration getTimeRemaining() {
+                @Override public Duration timeRemaining() {
                     return null;
                 }
 
@@ -97,11 +98,11 @@ public class UtilTests {
 
                 }
 
-                @Override public Vector3d getCenter() {
+                @Override public Vector3d center() {
                     return null;
                 }
 
-                @Override public Duration getWarningTime() {
+                @Override public Duration warningTime() {
                     return null;
                 }
 
@@ -109,7 +110,7 @@ public class UtilTests {
 
                 }
 
-                @Override public double getWarningDistance() {
+                @Override public double warningDistance() {
                     return 0;
                 }
 
@@ -117,15 +118,16 @@ public class UtilTests {
 
                 }
 
-                @Override public double getDamageThreshold() {
+                @Override public double damageThreshold() {
                     return 0;
                 }
+
 
                 @Override public void setDamageThreshold(final double distance) {
 
                 }
 
-                @Override public double getDamageAmount() {
+                @Override public double damageAmount() {
                     return 0;
                 }
 
@@ -140,11 +142,11 @@ public class UtilTests {
         public void testInWorldBorder() {
             final WorldBorder wb = this.getBorder();
             final ServerWorld world = Mockito.mock(ServerWorld.class);
-            Mockito.when(world.getProperties().getWorldBorder()).thenReturn(wb);
+            Mockito.when(world.properties().worldBorder()).thenReturn(wb);
 
             final ServerLocation lw = Mockito.mock(ServerLocation.class);
-            Mockito.when(lw.getWorld()).thenReturn(world);
-            Mockito.when(lw.getPosition()).thenReturn(new Vector3d(this.x, this.y, this.z));
+            Mockito.when(lw.world()).thenReturn(world);
+            Mockito.when(lw.position()).thenReturn(new Vector3d(this.x, this.y, this.z));
             Assert.assertEquals(this.result, Util.isLocationInWorldBorder(lw));
         }
     }

@@ -101,7 +101,7 @@ public class SpawnCommand implements ICommandExecutor, IReloadableService.Reload
                 }
             });
 
-        final Optional<ServerWorld> ow = Sponge.server().getWorldManager().getWorld(wp.getKey());
+        final Optional<ServerWorld> ow = Sponge.server().worldManager().getWorld(wp.getKey());
         if (!ow.isPresent()) {
             return context.errorResult("command.spawn.noworld");
         } else if (this.sc.isPerWorldPerms() &&

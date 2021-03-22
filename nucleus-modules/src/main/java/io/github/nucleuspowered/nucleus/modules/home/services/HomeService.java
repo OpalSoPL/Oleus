@@ -83,11 +83,11 @@ public class HomeService implements NucleusHomeService, ServiceBase {
     @Override public void createHome(final UUID user, final String name, final ServerLocation location, final Vector3d rotation)
             throws HomeException {
 
-        final Cause cause = Sponge.server().getCauseStackManager().getCurrentCause();
+        final Cause cause = Sponge.server().causeStackManager().getCurrentCause();
         if (!NucleusHomeService.HOME_NAME_PATTERN.matcher(name).matches()) {
             throw new HomeException(
                     this.serviceCollection.messageProvider().getMessageFor(
-                            Sponge.server().getCauseStackManager().getCurrentCause()
+                            Sponge.server().causeStackManager().getCurrentCause()
                                     .first(Audience.class).orElseGet(Sponge::getSystemSubject),
                             "command.sethome.name"),
                     HomeException.Reasons.INVALID_NAME
@@ -134,7 +134,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
     }
 
     public void modifyHomeInternal(final Home home, final ServerLocation location, final Vector3d rotation) throws HomeException {
-        final Cause cause = Sponge.server().getCauseStackManager().getCurrentCause();
+        final Cause cause = Sponge.server().causeStackManager().getCurrentCause();
         final ModifyHomeEvent event = new ModifyHomeEvent(cause, home, location);
         this.postEvent(event);
 
@@ -157,7 +157,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
         final Home home = this.getHome(uuid, homeName)
                 .orElseThrow(() -> new HomeException(Component.text("That home does not exist"), HomeException.Reasons.DOES_NOT_EXIST));
 
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             final Cause cause = frame.getCurrentCause();
             final DeleteHomeEvent event = new DeleteHomeEvent(cause, home);
             this.postEvent(event);
@@ -177,7 +177,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
 
     @Override
     public int getMaximumHomes(final UUID uuid) throws IllegalArgumentException {
-        final Optional<User> user = Sponge.server().getUserManager().get(uuid);
+        final Optional<User> user = Sponge.server().userManager().find(uuid);
         if (!user.isPresent()) {
             throw new IllegalArgumentException("user does not exist.");
         }
@@ -197,7 +197,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
     }
 
     public TeleportResult warpToHome(final ServerPlayer src, final Home home, final boolean safeTeleport) throws HomeException {
-        Sponge.server().getWorldManager().getWorld(home.getResourceKey())
+        Sponge.server().worldManager().getWorld(home.getResourceKey())
                 .orElseThrow(() ->
                         new HomeException(
                                 this.serviceCollection.messageProvider().getMessageFor(src, "command.home.invalid", home.getName()),
@@ -211,7 +211,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
                         )));
                 // ReturnMessageException.fromKey("command.home.invalid", home.getName()));
 
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(src);
             this.postEvent(new UseHomeEvent(frame.getCurrentCause(), src.getUniqueId(), home));
         }
@@ -230,7 +230,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
     }
 
     private void postEvent(final AbstractHomeEvent event) throws HomeException {
-        if (Sponge.getEventManager().post(event)) {
+        if (Sponge.eventManager().post(event)) {
             throw new HomeException(event.getCancelMessage().orElseGet(() ->
                     this.serviceCollection.messageProvider().getMessageFor(
                             event.getCause().first(Audience.class).orElseGet(Sponge::getSystemSubject),

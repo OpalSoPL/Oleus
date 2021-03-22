@@ -46,7 +46,7 @@ public class CoreTask implements TaskBase, IReloadableService.Reloadable {
                 this.serviceCollection.logger().info(this.serviceCollection.messageProvider().getMessageString("core.savetask.complete"));
             }
             this.serviceCollection.storageManager().getUserService().clearCacheUnless(
-                    Sponge.server().getOnlinePlayers().stream().map(Identifiable::getUniqueId).collect(Collectors.toSet()));
+                    Sponge.server().onlinePlayers().stream().map(Identifiable::uniqueId).collect(Collectors.toSet()));
         });
 
     }

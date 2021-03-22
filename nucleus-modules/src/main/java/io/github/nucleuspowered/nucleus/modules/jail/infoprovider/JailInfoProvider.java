@@ -44,7 +44,7 @@ public final class JailInfoProvider implements NucleusProvider {
 
                 return Optional.of(
                         LinearComponents.linear(
-                            m.clickEvent(ClickEvent.runCommand("/nucleus:checkjail " + user.getName()))
+                            m.clickEvent(ClickEvent.runCommand("/nucleus:checkjail " + user.name()))
                                 .hoverEvent(HoverEvent.showText(serviceCollection.messageProvider().getMessageFor(source.getAudience(),
                                         "standard.clicktoseemore"))),
                         Component.newline(),

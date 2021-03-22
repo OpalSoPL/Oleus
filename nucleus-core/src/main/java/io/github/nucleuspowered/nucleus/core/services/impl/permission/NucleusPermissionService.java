@@ -75,31 +75,31 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     @Override
     public void assignUserRoleToDefault() {
-        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.server().getServiceProvider().permissionService().getDefaults());
+        this.assignRoleToGroup(SuggestedLevel.USER, Sponge.server().serviceProvider().permissionService().defaults());
     }
 
     @Override
     public void assignRoleToGroup(final SuggestedLevel role, final Subject subject) {
         for (final Map.Entry<String, IPermissionService.Metadata> permission : this.metadataMap.entrySet()) {
             if (permission.getValue().getSuggestedLevel() == role) {
-                subject.getTransientSubjectData().setPermission(ImmutableSet.of(), permission.getValue().getPermission(), Tristate.TRUE);
+                subject.transientSubjectData().setPermission(ImmutableSet.of(), permission.getValue().getPermission(), Tristate.TRUE);
             }
         }
         for (final Map.Entry<String, IPermissionService.Metadata> permission : this.prefixMetadataMap.entrySet()) {
             if (permission.getValue().getSuggestedLevel() == role) {
-                subject.getTransientSubjectData().setPermission(ImmutableSet.of(), permission.getValue().getPermission(), Tristate.TRUE);
+                subject.transientSubjectData().setPermission(ImmutableSet.of(), permission.getValue().getPermission(), Tristate.TRUE);
             }
         }
     }
 
     @Override
     public void registerContextCalculator(final ContextCalculator<Subject> calculator) {
-        Sponge.server().getServiceProvider().permissionService().registerContextCalculator(calculator);
+        Sponge.server().serviceProvider().permissionService().registerContextCalculator(calculator);
     }
 
     @Override
     public boolean hasPermission(final UUID playerUUID, final String permission) {
-        return this.hasPermission(Sponge.server().getUserManager().get(playerUUID)
+        return this.hasPermission(Sponge.server().userManager().find(playerUUID)
                 .orElseThrow(() -> new IllegalArgumentException("The UUID " + playerUUID + " is not a valid player UUID")), permission);
     }
 
@@ -135,7 +135,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override public void registerDescriptions() {
         Preconditions.checkState(!this.init);
         this.init = true;
-        final PermissionService ps = Sponge.server().getServiceProvider().permissionService();
+        final PermissionService ps = Sponge.server().serviceProvider().permissionService();
         for (final Map.Entry<String, IPermissionService.Metadata> entry : this.metadataMap.entrySet()) {
             final SuggestedLevel level = entry.getValue().getSuggestedLevel();
             if (level.getRole() != null) {
@@ -206,13 +206,13 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
             final String o = option.toLowerCase();
 
             // Option for context.
-            Optional<String> os = player.getOption(player.getActiveContexts(), o);
+            Optional<String> os = player.option(player.activeContexts(), o);
             if (os.isPresent()) {
                 return os.map(r -> r.isEmpty() ? null : r);
             }
 
             // General option
-            os = player.getOption(o);
+            os = player.option(o);
             if (os.isPresent()) {
                 return os.map(r -> r.isEmpty() ? null : r);
             }
@@ -240,15 +240,15 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     private Tristate hasPermissionTristate(final Subject subject, final String permission, final boolean checkRole) {
         if (checkRole && permission.startsWith("nucleus.")) {
-            final Tristate tristate = subject.getPermissionValue(subject.getActiveContexts(), permission);
+            final Tristate tristate = subject.permissionValue(subject.activeContexts(), permission);
             if (tristate == Tristate.UNDEFINED) {
                 final IPermissionService.@Nullable Metadata result = this.metadataMap.get(permission);
                 if (result != null) { // check the "parent" perm
                     final String perm = result.getSuggestedLevel().getPermission();
                     if (perm == null) {
-                        return subject.getPermissionValue(subject.getActiveContexts(), permission);
+                        return subject.permissionValue(subject.activeContexts(), permission);
                     } else {
-                        return subject.getPermissionValue(subject.getActiveContexts(), perm);
+                        return subject.permissionValue(subject.activeContexts(), perm);
                     }
                 }
 
@@ -256,9 +256,9 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
                     if (permission.startsWith(entry.getKey())) {
                         final String perm = entry.getValue().getSuggestedLevel().getPermission();
                         if (perm == null) {
-                            return subject.getPermissionValue(subject.getActiveContexts(), permission);
+                            return subject.permissionValue(subject.activeContexts(), permission);
                         } else {
-                            return subject.getPermissionValue(subject.getActiveContexts(), perm);
+                            return subject.permissionValue(subject.activeContexts(), perm);
                         }
                     }
                 }
@@ -306,7 +306,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override
     public void setContext(final Subject subject, final Context context) {
         if (subject instanceof Identifiable) {
-            this.setContext(((Identifiable) subject).getUniqueId(), context);
+            this.setContext(((Identifiable) subject).uniqueId(), context);
         }
     }
 
@@ -317,7 +317,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override
     public NoExceptionAutoClosable setContextTemporarily(final Subject subject, final Context context) {
         if (subject instanceof Identifiable) {
-            final UUID uuid = ((Identifiable) subject).getUniqueId();
+            final UUID uuid = ((Identifiable) subject).uniqueId();
             final Context old = this.standardContexts.computeIfAbsent(uuid, k -> new HashMap<>()).put(context.getKey().toLowerCase(), context);
             return () -> {
                 this.removeContext(uuid, context.getKey().toLowerCase());
@@ -360,7 +360,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override
     public void accumulateContexts(final Subject target, final Set<Context> accumulator) {
         if (target instanceof Identifiable) {
-            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).getUniqueId());
+            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).uniqueId());
             if (ctxs != null && !ctxs.isEmpty()) {
                 accumulator.addAll(ctxs.values());
             }
@@ -370,7 +370,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     @Override
     public boolean matches(final Context context, final Subject target) {
         if (target instanceof Identifiable) {
-            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).getUniqueId());
+            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).uniqueId());
             if (ctxs != null && !ctxs.isEmpty()) {
                 final Context ctx = ctxs.get(context.getKey());
                 return ctx.equals(context);

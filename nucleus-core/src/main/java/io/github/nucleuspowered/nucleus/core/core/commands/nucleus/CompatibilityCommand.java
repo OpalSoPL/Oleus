@@ -59,10 +59,10 @@ public class CompatibilityCommand implements ICommandExecutor {
                         .append(text2)
                         .build())
                 .orElse(Component.empty());
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .header(context.getMessage("command.nucleus.compat.header"))
                 .contents(text)
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
         return context.successResult();
     }
 }

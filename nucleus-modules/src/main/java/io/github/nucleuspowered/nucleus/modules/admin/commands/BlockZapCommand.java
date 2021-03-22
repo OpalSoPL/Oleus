@@ -53,7 +53,7 @@ public class BlockZapCommand implements ICommandExecutor {
         final BlockType type = location.getBlockType();
         final Component itemTextComponent = type.asComponent();
 
-        try (final CauseStackManager.StackFrame frame = Sponge.server().getCauseStackManager().pushCauseFrame()) {
+        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
             if (location.setBlock(BlockTypes.AIR.get().getDefaultState(), BlockChangeFlags.ALL)) {
                 context.sendMessage("command.blockzap.success", Component.text(location.getPosition().toString()),

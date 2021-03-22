@@ -31,12 +31,12 @@ public abstract class VerticalTeleportScanner implements TeleportScanner {
             final int floorDistance,
             final TeleportHelperFilter filter,
             final TeleportHelperFilter... filters) {
-        final int maxy = world.getBlockMax().getY();
+        final int maxy = world.blockMax().getY();
         final int jumps = ((height * 2) - 1) * (this.isAscending ? 1 : -1);
 
         do {
-            final Optional<ServerLocation> result = Sponge.server().getTeleportHelper()
-                    .getSafeLocation(
+            final Optional<ServerLocation> result = Sponge.server().teleportHelper()
+                    .findSafeLocation(
                             ServerLocation.of(world, position),
                             height,
                             width,

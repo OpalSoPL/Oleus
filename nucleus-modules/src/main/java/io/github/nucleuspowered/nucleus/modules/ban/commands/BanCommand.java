@@ -86,7 +86,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         final String userToFind = context.requireOne(NucleusParameters.STRING_NAME);
 
         // Get the profile async.
-        Sponge.getAsyncScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
+        Sponge.asyncScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
             final GameProfileManager gpm = Sponge.server().getGameProfileManager();
             try {
                 final GameProfile gp = gpm.getProfile(userToFind).get();
@@ -94,9 +94,9 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
                 // Ban the user sync.
                 Sponge.server().getScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
                     // Create the user.
-                    final UserManager uss = Sponge.server().getUserManager();
+                    final UserManager uss = Sponge.server().userManager();
                     final User user = uss.getOrCreate(gp);
-                    context.sendMessage("gameprofile.new", user.getName());
+                    context.sendMessage("gameprofile.new", user.name());
 
                     try {
                         this.executeBan(context, user, r);
@@ -114,7 +114,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
     }
 
     private ICommandResult executeBan(final ICommandContext context, final User user, final String r) {
-        final BanService service = Sponge.server().getServiceProvider().banService();
+        final BanService service = Sponge.server().serviceProvider().banService();
 
         if (!user.isOnline() && !context.testPermission(BanPermissions.BAN_OFFLINE)) {
             return context.errorResult("command.ban.offline.noperms");
@@ -151,7 +151,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         final Component reason = LegacyComponentSerializer.legacyAmpersand().deserialize(r);
         audience.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
-        Sponge.server().getPlayer(user.getUniqueId()).ifPresent(pl -> pl.kick(reason));
+        Sponge.server().player(user.getUniqueId()).ifPresent(pl -> pl.kick(reason));
         return context.successResult();
     }
 
