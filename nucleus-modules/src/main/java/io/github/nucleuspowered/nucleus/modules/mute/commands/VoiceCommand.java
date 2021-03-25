@@ -58,7 +58,7 @@ public class VoiceCommand implements ICommandExecutor {
         final Audience mmc =
                 Audience.audience(
                     context.getServiceCollection().permissionService().permissionMessageChannel(MutePermissions.VOICE_NOTIFY),
-                    context.getAudience());
+                    context.audience());
 
         if (turnOn) {
             muteHandler.addVoice(pl.uniqueId());

@@ -45,8 +45,8 @@ public class SetCategoryCommand implements ICommandExecutor {
     @Inject
     public SetCategoryCommand(final INucleusServiceCollection serviceCollection) {
         this.category = Parameter.builder(SetCategoryCommand.TUPLE_TYPE_TOKEN)
-                .parser(new SetCategoryWarpCategoryArgument(serviceCollection.getServiceUnchecked(WarpService.class)))
-                .setKey("category")
+                .addParser(new SetCategoryWarpCategoryArgument(serviceCollection.getServiceUnchecked(WarpService.class)))
+                .key("category")
                 .optional()
                 .build();
     }

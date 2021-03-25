@@ -47,18 +47,18 @@ public final class WarpParameter implements ValueParameter<Warp> {
             throws ArgumentParseException {
         final String warp = reader.parseString().toLowerCase();
         if (!this.warpService.warpExists(warp)) {
-            throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "args.warps.noexist"));
+            throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "args.warps.noexist"));
         }
 
         if (this.checkPermission && !this.checkPermission(context, warp) && !this.checkPermission(context, warp.toLowerCase())) {
-            throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "args.warps.noperms"));
+            throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "args.warps.noperms"));
         }
 
         final Optional<Warp> optionalWarp = this.warpService.getWarp(warp);
         if (optionalWarp.isPresent()) {
             return optionalWarp;
         }
-        throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "args.warps.notavailable"));
+        throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "args.warps.notavailable"));
     }
 
     private boolean checkPermission(final Subject src, final String name) {

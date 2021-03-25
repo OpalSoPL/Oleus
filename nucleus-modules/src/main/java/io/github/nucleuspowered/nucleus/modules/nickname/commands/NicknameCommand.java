@@ -41,7 +41,7 @@ import org.spongepowered.api.entity.living.player.User;
         notes = "To remove a nickname, use '/delnick'")
 public class NicknameCommand implements ICommandExecutor {
 
-    private final Parameter.Value<Component> nicknameParameter = Parameter.formattingCodeText().setKey("nickname").build();
+    private final Parameter.Value<Component> nicknameParameter = Parameter.formattingCodeText().key("nickname").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {

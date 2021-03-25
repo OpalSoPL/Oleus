@@ -67,9 +67,9 @@ public final class MailReadBase {
                         .map(x -> this.createMessage(context, x, target, name)).collect(Collectors.toList());
 
         // Paginate the mail.
-        final PaginationList.Builder b = Util.getPaginationBuilder(context.getAudience()).padding(Component.text("-", NamedTextColor.GREEN)).title(
+        final PaginationList.Builder b = Util.getPaginationBuilder(context.audience()).padding(Component.text("-", NamedTextColor.GREEN)).title(
                 this.getHeader(context, isSelf ? null : name, !lmf.isEmpty())).contents(mails);
-        b.sendTo(context.getAudience());
+        b.sendTo(context.audience());
         return context.successResult();
     }
 

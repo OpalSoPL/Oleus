@@ -43,15 +43,17 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
      */
     @Listener(order = Order.FIRST)
     @IsCancelled(Tristate.TRUE)
-    public void onPlayerJoinAndCancelled(final ServerSideConnectionEvent.Login event, @Getter("getUser") final User user) {
+    public void onPlayerJoinAndCancelled(final ServerSideConnectionEvent.Login event, @Getter("user") final User user) {
         // Don't affect the banned.
+        // Have to join - we need to handle this event
+        // TODO: Maybe look into getting Sponge to report a ban in this event if there is one.
         final BanService banService = Sponge.server().serviceProvider().banService();
-        if (banService.isBanned(user.getProfile()) || banService.isBanned(event.getConnection().getAddress().getAddress())) {
+        if (banService.isBanned(user.profile()).join() || banService.isBanned(event.connection().address().getAddress()).join()) {
             return;
         }
 
-        if (Sponge.server().hasWhitelist()
-            && !Sponge.server().serviceProvider().whitelistService().isWhitelisted(user.getProfile())) {
+        if (Sponge.server().isWhitelistEnabled()
+            && !Sponge.server().serviceProvider().whitelistService().isWhitelisted(user.profile()).join()) {
             if (this.whitelistMessage != null) {
                 event.setMessage(this.whitelistMessage);
                 event.setCancelled(true);
@@ -61,7 +63,7 @@ public class ConnectionListener implements IReloadableService.Reloadable, Listen
             return;
         }
 
-        final int slotsLeft = Sponge.server().getMaxPlayers() - Sponge.server().onlinePlayers().size();
+        final int slotsLeft = Sponge.server().maxPlayers() - Sponge.server().onlinePlayers().size();
         if (slotsLeft <= 0) {
             if (this.permissionService.hasPermission(user, ConnectionPermissions.CONNECTION_JOINFULLSERVER)) {
 

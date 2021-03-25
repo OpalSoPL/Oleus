@@ -54,8 +54,8 @@ public class NearCommand implements ICommandExecutor, IReloadableService.Reloada
 
     private static final NumberFormat formatter =  NumberFormat.getInstance();
     private final Parameter.Value<Integer> radiusParameter = Parameter.builder(Integer.class)
-            .parser(VariableValueParameters.integerRange().setMin(1).build())
-            .setKey("radius")
+            .addParser(VariableValueParameters.integerRange().min(1).build())
+            .key("radius")
             .optional()
             .build();
     private int maxRadius;
@@ -79,12 +79,12 @@ public class NearCommand implements ICommandExecutor, IReloadableService.Reloada
         final ServerLocation location;
         final Vector3d position;
         if (user.isOnline()) {
-            location = user.getPlayer().get().getServerLocation();
-            position = location.getPosition();
+            location = user.player().get().serverLocation();
+            position = location.position();
         } else {
-            final ServerWorld world = Sponge.server().worldManager().getWorld(user.getWorldKey())
+            final ServerWorld world = Sponge.server().worldManager().world(user.worldKey())
                     .orElseThrow((() -> context.createException("command.near.location.nolocation", user.name())));
-            position = user.getPosition();
+            position = user.position();
             location = ServerLocation.of(world, position);
         }
 
@@ -103,32 +103,32 @@ public class NearCommand implements ICommandExecutor, IReloadableService.Reloada
         final Optional<ServerPlayer> src = context.getAsPlayer();
         final IPlayerOnlineService playerOnlineService = context.getServiceCollection().playerOnlineService();
         final List<Component> messagesToSend =
-                location.getWorld()
-                        .getNearbyEntities(location.getPosition(), radius)
+                location.world()
+                        .nearbyEntities(location.position(), radius)
                         .stream()
                         .filter(ServerPlayer.class::isInstance)
                         .map(ServerPlayer.class::cast)
-                        .filter(e -> e.getUniqueId() != user.getUniqueId() && src.map(x -> playerOnlineService.isOnline(x, e.getUser())).orElse(true))
-                        .map(x -> Tuple.of(x, position.distance(x.getPosition())))
-                        .sorted(Comparator.comparingDouble(Tuple::getSecond))
+                        .filter(e -> e.uniqueId() != user.uniqueId() && src.map(x -> playerOnlineService.isOnline(x, e.user())).orElse(true))
+                        .map(x -> Tuple.of(x, position.distance(x.position())))
+                        .sorted(Comparator.comparingDouble(Tuple::second))
                         .map(tuple -> this.createPlayerLine(context, tuple))
                         .collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                         .title(context.getMessage("command.near.playersnear", user.name()))
                         .contents(messagesToSend)
-                        .sendTo(context.getAudience());
+                        .sendTo(context.audience());
 
         return context.successResult();
     }
 
     private Component createPlayerLine(final ICommandContext context, final Tuple<ServerPlayer, Double> player) {
         final TextComponent.Builder line = Component.text();
-        context.getMessage("command.near.playerdistancefrom", player.getFirst().getName());
-        line.append(context.getMessage("command.near.playerdistancefrom", player.getFirst().getName(),
-                formatter.format(Math.abs(player.getSecond()))))
-                .clickEvent(ClickEvent.runCommand("/tp " + player.getFirst().getName()))
-                .hoverEvent(HoverEvent.showText(context.getMessage("command.near.tpto", player.getFirst().getName())));
+        context.getMessage("command.near.playerdistancefrom", player.first().name());
+        line.append(context.getMessage("command.near.playerdistancefrom", player.first().name(),
+                formatter.format(Math.abs(player.second()))))
+                .clickEvent(ClickEvent.runCommand("/tp " + player.first().name()))
+                .hoverEvent(HoverEvent.showText(context.getMessage("command.near.tpto", player.first().name())));
         return line.build();
     }
 

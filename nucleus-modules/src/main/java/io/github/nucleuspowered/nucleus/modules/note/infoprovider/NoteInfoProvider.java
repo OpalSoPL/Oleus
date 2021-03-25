@@ -26,14 +26,14 @@ public class NoteInfoProvider implements NucleusProvider {
     @Override
     public Optional<Component> get(final User user, final CommandCause source, final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, NotePermissions.BASE_CHECKNOTES)) {
-            final int active = serviceCollection.getServiceUnchecked(NoteHandler.class).getNotes(user.getUniqueId()).join().size();
+            final int active = serviceCollection.getServiceUnchecked(NoteHandler.class).getNotes(user.uniqueId()).join().size();
 
-            final Component r = serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.notes", active);
+            final Component r = serviceCollection.messageProvider().getMessageFor(source.audience(), "seen.notes", active);
             if (active > 0) {
                 return Optional.of(
                         r.clickEvent(ClickEvent.runCommand("/nucleus:checknotes " + user.name()))
                                 .hoverEvent(HoverEvent.showText(
-                                        serviceCollection.messageProvider().getMessageFor(source.getAudience(), "standard.clicktoseemore"))));
+                                        serviceCollection.messageProvider().getMessageFor(source.audience(), "standard.clicktoseemore"))));
             }
 
             return Optional.of(r);

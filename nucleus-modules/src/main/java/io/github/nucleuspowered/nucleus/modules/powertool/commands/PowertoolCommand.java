@@ -59,13 +59,13 @@ public class PowertoolCommand implements ICommandExecutor {
 
     private ICommandResult viewPowertool(final ICommandContext context, final ServerPlayer src, final ItemStack item) {
         final Optional<List<String>> cmds = context.getServiceCollection().getServiceUnchecked(PowertoolService.class)
-                .getPowertoolForItem(src.getUniqueId(), item.getType());
+                .getPowertoolForItem(src.uniqueId(), item.getType());
         if (cmds.isPresent() && !cmds.get().isEmpty()) {
-            Util.getPaginationBuilder(context.getAudience())
+            Util.getPaginationBuilder(context.audience())
                     .contents(cmds.get().stream().map(f -> Component.text(f, NamedTextColor.YELLOW)).collect(Collectors.toList()))
                     .title(context.getMessage("command.powertool.viewcmdstitle", item.getType().asComponent(),
                             Component.text(item.getType().getKey().asString())))
-                    .sendTo(context.getAudience());
+                    .sendTo(context.audience());
         } else {
             src.sendMessage(context.getMessage("command.powertool.nocmds", item.getType().asComponent()));
         }
@@ -80,7 +80,7 @@ public class PowertoolCommand implements ICommandExecutor {
             command = command.substring(1);
         }
 
-        context.getServiceCollection().getServiceUnchecked(PowertoolService.class).setPowertool(src.getUniqueId(), item, Collections.singletonList(command));
+        context.getServiceCollection().getServiceUnchecked(PowertoolService.class).setPowertool(src.uniqueId(), item, Collections.singletonList(command));
         context.sendMessage("command.powertool.set", item.asComponent(), command);
         return context.successResult();
     }

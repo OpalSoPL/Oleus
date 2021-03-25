@@ -43,7 +43,7 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
 
     private boolean isDefaultQuiet = false;
 
-    private final Parameter.Value<Boolean> quietOption = Parameter.bool().setKey("quiet").orDefault(true).build();
+    private final Parameter.Value<Boolean> quietOption = Parameter.bool().key("quiet").orDefault(true).build();
 
     private final Parameter.Value<User> userToWarp;
     private final Parameter.Value<ServerPlayer> playerToWarp;
@@ -52,11 +52,11 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
     public TeleportHereCommand(final INucleusServiceCollection serviceCollection) {
         final IPermissionService permissionService = serviceCollection.permissionService();
         this.userToWarp = Parameter.user()
-                .setKey("Offline player to warp")
+                .key("Offline player to warp")
                 .setRequirements(cause -> permissionService.hasPermission(cause, TeleportPermissions.TPHERE_OFFLINE))
                 .build();
         this.playerToWarp = Parameter.player()
-                .setKey("Player to warp")
+                .key("Player to warp")
                 .build();
     }
 

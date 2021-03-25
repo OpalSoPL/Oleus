@@ -69,7 +69,7 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
             return context.errorResult("command.home.nohomes");
         }
 
-        final Audience audience = context.getAudience();
+        final Audience audience = context.audience();
         final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         if (other) {
             header = messageProviderService.getMessageFor(audience, "home.title.name", user.name());
@@ -92,12 +92,12 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
             } else {
                 final ServerLocation lw = olw.get();
                 final Component textMessage = messageProviderService.getMessageFor(audience, "home.location",
-                                                 lw.getWorldKey().asString(), lw.getBlockX(), lw.getBlockY(), lw.getBlockZ());
+                                                 lw.worldKey().asString(), lw.blockX(), lw.blockY(), lw.blockZ());
 
                 final Optional<ServerPlayer> optional = context.getAsPlayer();
                 if (this.isOnlySameDimension && optional.isPresent() && !other) {
                     final ServerPlayer player = optional.get();
-                    if (!lw.getWorldKey().equals(player.getWorld().getKey())) {
+                    if (!lw.worldKey().equals(player.world().key())) {
                         if (!context.isConsoleAndBypass() && !permissionService.hasPermission(user, HomePermissions.HOME_EXEMPT_SAMEDIMENSION)) {
                             return Component.text()
                                        .append(Component.text().content(x.getName())

@@ -33,14 +33,14 @@ public class CheckMutedCommand implements ICommandExecutor {
         }
 
         // Get the users in this jail, or all jails
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
             .title(context.getMessage("command.checkmuted.header"))
             .contents(usersInMute.stream().map(x -> {
                 final Component name = context.getServiceCollection().playerDisplayNameService().getDisplayName(x);
                 return name
                     .hoverEvent(HoverEvent.showText(context.getMessage("command.checkmuted.hover")))
                     .clickEvent(ClickEvent.runCommand("/nucleus:checkmute " + x.toString()));
-            }).collect(Collectors.toList())).sendTo(context.getAudience());
+            }).collect(Collectors.toList())).sendTo(context.audience());
         return context.successResult();
     }
 }

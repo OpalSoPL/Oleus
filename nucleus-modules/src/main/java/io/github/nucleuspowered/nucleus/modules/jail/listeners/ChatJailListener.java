@@ -30,7 +30,7 @@ public class ChatJailListener implements ListenerBase.Conditional {
 
     @Listener(order = Order.FIRST)
     public void onChat(final PlayerChatEvent event, @Root final ServerPlayer player) {
-        if (this.handler.isPlayerJailed(player.getUniqueId())) {
+        if (this.handler.isPlayerJailed(player.uniqueId())) {
             this.messageProviderService.sendMessageTo(player, "jail.muteonchat");
             event.setCancelled(true);
         }

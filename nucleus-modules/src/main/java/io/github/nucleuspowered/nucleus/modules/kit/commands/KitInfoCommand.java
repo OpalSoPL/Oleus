@@ -37,7 +37,7 @@ public class KitInfoCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Kit kit = context.requireOne(KitService.KIT_KEY);
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .title(context.getMessage("command.kit.info.title", kit.getName()))
                 .contents(
                         this.addViewHover(context, kit),
@@ -53,7 +53,7 @@ public class KitInfoCommand implements ICommandExecutor {
                         context.getMessage("command.kit.info.hidden", this.yesno(context, kit.isHiddenFromList())),
                         context.getMessage("command.kit.info.displayredeem", this.yesno(context, kit.isDisplayMessageOnRedeem())),
                         context.getMessage("command.kit.info.ignoresperm", this.yesno(context, kit.ignoresPermission()))
-                ).sendTo(context.getAudience());
+                ).sendTo(context.audience());
         return context.successResult();
     }
 

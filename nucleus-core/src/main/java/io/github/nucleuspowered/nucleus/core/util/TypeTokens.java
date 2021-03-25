@@ -12,6 +12,7 @@ import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.util.MinecraftDayTime;
+import org.spongepowered.api.world.WorldType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -59,6 +60,8 @@ public final class TypeTokens {
     public static final TypeToken<GameMode> GAME_MODE = TypeToken.get(GameMode.class);
 
     public static final TypeToken<Difficulty> DIFFICULTY = TypeToken.get(Difficulty.class);
+
+    public static final TypeToken<WorldType> WORLD_TYPE = TypeToken.get(WorldType.class);
 
     private TypeTokens() {
         // no-op

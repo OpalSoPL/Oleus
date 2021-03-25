@@ -25,11 +25,11 @@ public class AFKCommand implements ICommandExecutor {
 
         final ServerPlayer src = context.getIfPlayer();
         final AFKHandler afkHandler = context.getServiceCollection().getServiceUnchecked(AFKHandler.class);
-        final boolean isAFK = afkHandler.isAFK(src.getUniqueId());
+        final boolean isAFK = afkHandler.isAFK(src.uniqueId());
 
         if (isAFK) {
             afkHandler.stageUserActivityUpdate(src);
-        } else if (!afkHandler.setAfkInternal(src.getUniqueId(), true)) {
+        } else if (!afkHandler.setAfkInternal(src.uniqueId(), true)) {
             return context.errorResult("command.afk.notset");
         }
 

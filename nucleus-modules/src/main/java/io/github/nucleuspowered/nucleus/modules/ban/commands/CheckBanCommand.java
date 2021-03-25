@@ -64,7 +64,7 @@ public class CheckBanCommand implements ICommandExecutor {
         ));
         context.sendMessage("standard.reasoncoloured", LegacyComponentSerializer.legacyAmpersand().serialize(bp.getReason()
                         .orElse(
-                        context.getServiceCollection().messageProvider().getMessageFor(context.getAudience(), "ban.defaultreason"))));
+                        context.getServiceCollection().messageProvider().getMessageFor(context.audience(), "ban.defaultreason"))));
         return context.successResult();
     }
 

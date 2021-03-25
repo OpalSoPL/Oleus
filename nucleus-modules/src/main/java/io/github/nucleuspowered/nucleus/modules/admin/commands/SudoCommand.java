@@ -67,9 +67,9 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
             try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                 frame.pushCause(context.getCommandSourceRoot());
                 frame.pushCause(pl); // on top
-                frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.getProfile());
+                frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.profile());
 
-                if (pl.simulateChat(rawMessage, frame.getCurrentCause()).isCancelled()) {
+                if (pl.simulateChat(rawMessage, frame.currentCause()).isCancelled()) {
                     return context.errorResult("command.sudo.chatcancelled");
                 }
             }
@@ -78,7 +78,7 @@ public class SudoCommand implements ICommandExecutor, IReloadableService.Reloada
         }
 
         context.sendMessage("command.sudo.force", pl.name(), cmd);
-        Sponge.server().getCommandManager().process(pl, cmd);
+        Sponge.server().commandManager().process(pl, cmd);
         return context.successResult();
     }
 

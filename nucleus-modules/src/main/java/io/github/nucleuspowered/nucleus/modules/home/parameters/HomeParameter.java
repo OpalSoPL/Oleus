@@ -51,13 +51,13 @@ public class HomeParameter implements ValueParameter<Home> {
     }
 
     @Override
-    public Optional<? extends Home> getValue(
+    public Optional<? extends Home> parseValue(
             final Parameter.Key<? super Home> parameterKey,
             final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
 
         final UUID target = this.getTarget(context).orElseThrow(() ->
-                        reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "command.playeronly")));
+                        reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "command.playeronly")));
 
         final String home = reader.parseString();
         try {
@@ -70,14 +70,14 @@ public class HomeParameter implements ValueParameter<Home> {
             throw reader.createException(Component.text("An unspecified error occurred"));
         }
 
-        throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "args.home.nohome", home));
+        throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "args.home.nohome", home));
     }
 
     private Optional<UUID> getTarget(final CommandContext context) {
         if (context.hasAny(HomeParameter.OTHER_PLAYER_KEY)) {
-            return Optional.of(context.requireOne(HomeParameter.OTHER_PLAYER_KEY).getUniqueId());
-        } else if (context.getCause().root() instanceof ServerPlayer) {
-            return Optional.of(((ServerPlayer) context.getCause().root()).getUniqueId());
+            return Optional.of(context.requireOne(HomeParameter.OTHER_PLAYER_KEY).uniqueId());
+        } else if (context.cause().root() instanceof ServerPlayer) {
+            return Optional.of(((ServerPlayer) context.cause().root()).uniqueId());
         } else {
             return Optional.empty();
         }

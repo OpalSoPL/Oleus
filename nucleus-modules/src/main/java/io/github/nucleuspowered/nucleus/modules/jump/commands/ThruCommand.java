@@ -63,11 +63,11 @@ public class ThruCommand implements ICommandExecutor, IReloadableService.Reloada
         final LocatableBlock block = blockRayTraceResult.get().getSelectedObject();
 
         // Get a safe location
-        if (!Util.isLocationInWorldBorder(block.getServerLocation())) {
+        if (!Util.isLocationInWorldBorder(block.serverLocation())) {
             return context.errorResult("command.jump.outsideborder");
         }
 
-        player.setLocation(block.getServerLocation());
+        player.setLocation(block.serverLocation());
         context.sendMessage("command.thru.success");
         return context.successResult();
     }
@@ -90,7 +90,7 @@ public class ThruCommand implements ICommandExecutor, IReloadableService.Reloada
 
         boolean select(final LocatableBlock block) {
             if (this.hitWall) {
-                return RayTrace.onlyAir().test(block) && RayTrace.onlyAir().test(block.getServerLocation().add(0, 1, 0).asLocatableBlock());
+                return RayTrace.onlyAir().test(block) && RayTrace.onlyAir().test(block.serverLocation().add(0, 1, 0).asLocatableBlock());
             }
             return false;
         }

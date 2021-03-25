@@ -52,7 +52,7 @@ public class TopCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer playerToTeleport = context.getPlayerFromArgs();
-        final ServerLocation location = playerToTeleport.getServerLocation().asHighestLocation().add(0, 1, 0);
+        final ServerLocation location = playerToTeleport.serverLocation().asHighestLocation().add(0, 1, 0);
 
         final boolean isSafe = !context.hasFlag("f");
         final TeleportResult result = context.getServiceCollection()
@@ -69,7 +69,7 @@ public class TopCommand implements ICommandExecutor {
         if (result.isSuccessful()) {
             // OK
             if (!context.is(playerToTeleport)) {
-                context.sendMessage("command.top.success.other", context.getDisplayName(playerToTeleport.getUniqueId()));
+                context.sendMessage("command.top.success.other", context.getDisplayName(playerToTeleport.uniqueId()));
             }
 
             context.sendMessageTo(playerToTeleport, "command.top.success.self");

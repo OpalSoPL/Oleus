@@ -149,14 +149,14 @@ public final class JailService implements NucleusJailService, IReloadableService
             throw new IllegalArgumentException("Jail does not have a valid location.");
         }
 
-        final Cause cause = Sponge.server().causeStackManager().getCurrentCause();
+        final Cause cause = Sponge.server().causeStackManager().currentCause();
 
         // Create the jailing
         final JailingEntry jailingEntry = JailingEntry.fromJailingRequest(
                 victim,
                 reason,
                 jail.getName(),
-                cause.first(ServerPlayer.class).map(Identifiable::getUniqueId).orElse(null),
+                cause.first(ServerPlayer.class).map(Identifiable::uniqueId).orElse(null),
                 this.eitherToLocation(this.getUserEither(victim)),
                 Instant.now(),
                 duration);
@@ -235,7 +235,7 @@ public final class JailService implements NucleusJailService, IReloadableService
         });
 
         // Return player to the specified location
-        Sponge.eventManager().post(new JailEvent.Unjailed(user, Sponge.server().causeStackManager().getCurrentCause()));
+        Sponge.eventManager().post(new JailEvent.Unjailed(user, Sponge.server().causeStackManager().currentCause()));
         return true;
     }
 
@@ -300,7 +300,7 @@ public final class JailService implements NucleusJailService, IReloadableService
     }
 
     public void notify(final ServerPlayer user) {
-        this.getPlayerJailData(user.getUniqueId()).ifPresent(entry -> {
+        this.getPlayerJailData(user.uniqueId()).ifPresent(entry -> {
             final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
             final Optional<Duration> timeLeft = entry.getRemainingTime();
             if (timeLeft.isPresent()) {
@@ -326,15 +326,15 @@ public final class JailService implements NucleusJailService, IReloadableService
         if (either.isRight()) {
             return ServerLocation.of(either.get().getWorldKey(), either.get().getPosition());
         } else {
-            return either.getLeft().getServerLocation();
+            return either.getLeft().serverLocation();
         }
     }
 
     public void checkExpiry() {
         for (final ServerPlayer uuid : Sponge.server().onlinePlayers()) {
-            final Jailing jailing = this.jailings.get(uuid.getUniqueId());
+            final Jailing jailing = this.jailings.get(uuid.uniqueId());
             if (jailing != null && jailing != JailService.NOT_JAILED && jailing.expired()) {
-                this.serviceCollection.schedulerService().runOnMainThread(() -> this.unjailPlayer(uuid.getUniqueId()));
+                this.serviceCollection.schedulerService().runOnMainThread(() -> this.unjailPlayer(uuid.uniqueId()));
             }
         }
     }

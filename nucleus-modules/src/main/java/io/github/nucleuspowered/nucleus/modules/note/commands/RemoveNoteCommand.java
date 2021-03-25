@@ -30,8 +30,8 @@ import java.util.UUID;
 public class RemoveNoteCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> index = Parameter.builder(Integer.class)
-            .setKey("index")
-            .parser(VariableValueParameters.integerRange().setMin(1).build())
+            .key("index")
+            .addParser(VariableValueParameters.integerRange().min(1).build())
             .build();
 
     @Override
@@ -45,7 +45,7 @@ public class RemoveNoteCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
         final UUID uuid = NucleusParameters.Composite.parseUserOrGameProfile(context)
-                .fold(Identifiable::getUniqueId, Identifiable::getUniqueId);
+                .fold(Identifiable::uniqueId, Identifiable::uniqueId);
         final Component name = context.getDisplayName(uuid);
         final int idx = context.requireOne(this.index);
 

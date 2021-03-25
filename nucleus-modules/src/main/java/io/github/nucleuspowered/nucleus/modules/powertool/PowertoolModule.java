@@ -4,20 +4,18 @@
  */
 package io.github.nucleuspowered.nucleus.modules.powertool;
 
-import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import io.github.nucleuspowered.nucleus.api.core.event.NucleusRegisterPreferenceKeyEvent;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.modules.powertool.commands.DeletePowertoolCommand;
 import io.github.nucleuspowered.nucleus.modules.powertool.commands.ListPowertoolCommand;
 import io.github.nucleuspowered.nucleus.modules.powertool.commands.PowertoolCommand;
 import io.github.nucleuspowered.nucleus.modules.powertool.commands.TogglePowertoolCommand;
 import io.github.nucleuspowered.nucleus.modules.powertool.listeners.PowertoolListener;
 import io.github.nucleuspowered.nucleus.modules.powertool.services.PowertoolService;
-import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
-import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,8 +49,7 @@ public class PowertoolModule implements IModule {
     }
 
     @Listener
-    // RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event
-    public void onPreferenceKeyRegistration(final RegisterRegistryValueEvent.GameScoped event) {
+    public void onPreferenceKeyRegistration(final NucleusRegisterPreferenceKeyEvent event) {
         event.register(PowertoolKeys.POWERTOOL_ENABLED);
     }
 }

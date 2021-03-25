@@ -29,7 +29,7 @@ import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 )
 public final class KitCreateCommand implements ICommandExecutor {
 
-    private final Parameter.Value<String> nameParameter = Parameter.string().setKey("name").build();
+    private final Parameter.Value<String> nameParameter = Parameter.string().key("name").build();
 
     private final IMessageProviderService messageProviderService;
 

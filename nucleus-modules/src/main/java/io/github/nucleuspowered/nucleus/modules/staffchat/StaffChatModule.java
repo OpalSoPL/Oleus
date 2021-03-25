@@ -4,8 +4,10 @@
  */
 package io.github.nucleuspowered.nucleus.modules.staffchat;
 
-import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.api.core.event.NucleusRegisterPreferenceKeyEvent;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IUserPreferenceService;
 import io.github.nucleuspowered.nucleus.modules.staffchat.commands.StaffChatCommand;
 import io.github.nucleuspowered.nucleus.modules.staffchat.commands.ToggleStaffChatCommand;
 import io.github.nucleuspowered.nucleus.modules.staffchat.config.StaffChatConfig;
@@ -14,7 +16,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,12 +27,21 @@ public class StaffChatModule implements IModule.Configurable<StaffChatConfig> {
 
     public static final String ID = "staff-chat";
 
-    @Override public void init(final INucleusServiceCollection serviceCollection) {
+    private final IUserPreferenceService preferenceService;
+
+    @Inject
+    public StaffChatModule(final IUserPreferenceService userPreferenceService) {
+        this.preferenceService = userPreferenceService;
+    }
+
+    @Override
+    public void init(final INucleusServiceCollection serviceCollection) {
         new StaffChatMessageChannel(serviceCollection);
         serviceCollection.registerService(StaffChatService.class, new StaffChatService(serviceCollection), false);
     }
 
-    @Override public Collection<Class<? extends ICommandExecutor>> getCommands() {
+    @Override
+    public Collection<Class<? extends ICommandExecutor>> getCommands() {
         return Arrays.asList(
                 StaffChatCommand.class,
                 ToggleStaffChatCommand.class
@@ -50,7 +61,7 @@ public class StaffChatModule implements IModule.Configurable<StaffChatConfig> {
     }
 
     @Listener
-    public void onRegisterNucleusPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+    public void onRegisterNucleusPreferenceKeys(final NucleusRegisterPreferenceKeyEvent event) {
         event.register(StaffChatKeys.VIEW_STAFF_CHAT);
     }
 

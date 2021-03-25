@@ -42,8 +42,8 @@ import java.util.concurrent.TimeUnit;
 public class RocketCommand implements ICommandExecutor {
 
     private final Parameter.Value<Double> velocityParameter = Parameter.builder(Double.class)
-            .parser(VariableValueParameters.doubleRange().setMin(0.0).build())
-            .setKey("velocity")
+            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .key("velocity")
             .build();
 
     @Override
@@ -83,17 +83,17 @@ public class RocketCommand implements ICommandExecutor {
 
         if (context.hasFlag("e")) {
             final Explosion ex = Explosion.builder()
-                    .location(target.getServerLocation())
+                    .location(target.serverLocation())
                     .canCauseFire(false)
-                    .location(target.getServerLocation())
+                    .location(target.serverLocation())
                     .shouldBreakBlocks(false)
                     .shouldPlaySmoke(true)
                     .shouldDamageEntities(false)
                     .radius((float) v * 2.0f)
                     .build();
 
-            target.getServerLocation().getWorld().triggerExplosion(ex);
-            Sponge.server().getScheduler().submit(
+            target.serverLocation().getWorld().triggerExplosion(ex);
+            Sponge.server().scheduler().submit(
                     Task.builder()
                             .plugin(context.getServiceCollection().pluginContainer())
                             .execute(() -> ex.getWorld().playSound(

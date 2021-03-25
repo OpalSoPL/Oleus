@@ -57,7 +57,7 @@ public class VanishCommand implements ICommandExecutor {
                 .getServiceCollection()
                 .storageManager()
                 .getUserService()
-                .getOrNewOnThread(ou.getUniqueId())
+                .getOrNewOnThread(ou.uniqueId())
                 .getAndSet(VanishKeys.VANISH_STATUS)) {
             result = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !value.getValue().orElse(false));
             value.setValue(result);
@@ -99,7 +99,7 @@ public class VanishCommand implements ICommandExecutor {
         if (!context.is(playerToVanish)) {
             context.sendMessage(
                     "command.vanish.successplayer",
-                    context.getDisplayName(playerToVanish.getUniqueId()),
+                    context.getDisplayName(playerToVanish.uniqueId()),
                     toVanish ? "loc:command.vanish.vanished" : "loc:command.vanish.visible");
         }
 

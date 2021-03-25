@@ -34,7 +34,7 @@ public class HomeLimitCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.getUserFromArgs();
         final HomeService service = context.getServiceCollection().getServiceUnchecked(HomeService.class);
-        final int current = service.getHomeCount(user.getUniqueId());
+        final int current = service.getHomeCount(user.uniqueId());
         final int max = service.getMaximumHomes(user);
         if (context.is(user)) {
             if (max == Integer.MAX_VALUE) {

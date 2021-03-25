@@ -54,14 +54,14 @@ public final class KitParameter implements ValueParameter<Kit> {
             throws ArgumentParseException {
         final String kitName = reader.parseString();
         if (kitName.isEmpty()) {
-            throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "args.kit.noname"));
+            throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "args.kit.noname"));
         }
 
         final Kit kit = this.kitService.getKit(kitName)
-                .orElseThrow(() -> reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(),"args.kit.noexist")));
+                .orElseThrow(() -> reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(),"args.kit.noexist")));
 
         if (!this.checkPermission(context.getCause(), kit)) {
-            throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(),"args.kit.noperms"));
+            throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(),"args.kit.noperms"));
         }
 
         return Optional.of(kit);

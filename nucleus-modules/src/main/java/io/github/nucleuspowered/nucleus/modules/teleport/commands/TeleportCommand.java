@@ -69,7 +69,7 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
     private final Parameter.Value<User> userToWarpTo;
     private final Parameter.Value<ServerPlayer> playerToWarpTo;
 
-    private final Parameter.Value<Boolean> quietOption = Parameter.bool().setKey("quiet").orDefault(true).build();
+    private final Parameter.Value<Boolean> quietOption = Parameter.bool().key("quiet").orDefault(true).build();
 
     private boolean isDefaultQuiet = false;
 
@@ -77,22 +77,22 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
     public TeleportCommand(final INucleusServiceCollection serviceCollection) {
         final IPermissionService permissionService = serviceCollection.permissionService();
         this.userToWarp = Parameter.user()
-                .setKey("Offline player to warp")
+                .key("Offline player to warp")
                 .setRequirements(cause ->
                         permissionService.hasPermission(cause, TeleportPermissions.OTHERS_TELEPORT) &&
                                 permissionService.hasPermission(cause, TeleportPermissions.TELEPORT_OFFLINE))
                 .build();
         this.playerToWarp = Parameter.player()
-                .setKey("Player to warp")
+                .key("Player to warp")
                 .setRequirements(cause -> permissionService.hasPermission(cause, TeleportPermissions.OTHERS_TELEPORT))
                 .build();
 
         this.userToWarpTo = Parameter.user()
-                .setKey("Offline player to warp to")
+                .key("Offline player to warp to")
                 .setRequirements(cause -> permissionService.hasPermission(cause, TeleportPermissions.TELEPORT_OFFLINE))
                 .build();
         this.playerToWarpTo = Parameter.player()
-                .setKey("Player to warp to")
+                .key("Player to warp to")
                 .build();
     }
 
@@ -127,11 +127,11 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
     public Optional<ICommandResult> preExecute(final ICommandContext context) {
         @Nullable final User source =
                 context.getOne(this.userToWarp).orElseGet(() -> context.getOne(this.playerToWarp).map(ServerPlayer::getUser).orElse(null));
-        final boolean isOther = source != null && context.getUniqueId().filter(x -> !x.equals(source.getUniqueId())).isPresent();
+        final boolean isOther = source != null && context.uniqueId().filter(x -> !x.equals(source.uniqueId())).isPresent();
         final User to = context.getOne(this.userToWarpTo).orElseGet(() -> context.requireOne(this.playerToWarpTo).getUser());
         return context.getServiceCollection()
                     .getServiceUnchecked(PlayerTeleporterService.class)
-                    .canTeleportTo(context.getAudience(), source, to, isOther) ?
+                    .canTeleportTo(context.audience(), source, to, isOther) ?
                 Optional.empty() :
                 Optional.of(context.failResult());
     }
@@ -146,7 +146,7 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
         } else {
             source = context.requirePlayer().getUser();
         }
-        final boolean isOther = source != null && context.getUniqueId().filter(x -> !x.equals(source.getUniqueId())).isPresent();
+        final boolean isOther = source != null && context.uniqueId().filter(x -> !x.equals(source.uniqueId())).isPresent();
         final User to = context.getOne(this.userToWarpTo).orElseGet(() -> context.requireOne(this.playerToWarpTo).getUser());
 
         final boolean beQuiet = context.getOne(this.quietOption).orElse(this.isDefaultQuiet);
@@ -156,7 +156,7 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
                     context.getServiceCollection()
                         .getServiceUnchecked(PlayerTeleporterService.class)
                             .teleportWithMessage(
-                                    context.getAudience(),
+                                    context.audience(),
                                     source.getPlayer().get(),
                                     to.getPlayer().get(),
                                     !context.hasFlag("f"),

@@ -45,39 +45,39 @@ public class GetPosCommand implements ICommandExecutor {
         final User user = context.getUserFromArgs();
         final ServerLocation location;
         if (user.isOnline()) {
-            location = user.getPlayer().get().getServerLocation();
+            location = user.player().get().serverLocation();
         } else {
-            final ServerWorld w = Sponge.server().worldManager().getWorld(user.getWorldKey())
+            final ServerWorld w = Sponge.server().worldManager().world(user.worldKey())
                             .orElseThrow(() -> context.createException("command.getpos.location.nolocation", user.name()));
-            location = ServerLocation.of(w, user.getPosition());
+            location = ServerLocation.of(w, user.position());
         }
 
         final boolean isSelf = context.is(user);
-        final Vector3i blockPos = location.getBlockPosition();
+        final Vector3i blockPos = location.blockPosition();
         if (isSelf) {
             context.sendMessage(
                             "command.getpos.location.self",
-                            location.getWorldKey().getFormatted(),
+                            location.worldKey().formatted(),
                             String.valueOf(blockPos.getX()),
                             String.valueOf(blockPos.getY()),
                             String.valueOf(blockPos.getZ())
             );
         } else {
-            context.getMessage(
+            context.sendMessageText(context.getMessage(
                             "command.getpos.location.other",
-                            context.getDisplayName(user.getUniqueId()),
-                            location.getWorldKey().getFormatted(),
+                            context.getDisplayName(user.uniqueId()),
+                            location.worldKey().formatted(),
                             String.valueOf(blockPos.getX()),
                             String.valueOf(blockPos.getY()),
                             String.valueOf(blockPos.getZ())
                     ).clickEvent(ClickEvent.runCommand(String.join(" ",
                         "/nucleus:tppos",
-                            location.getWorldKey().asString(),
+                            location.worldKey().asString(),
                             String.valueOf(blockPos.getX()),
                             String.valueOf(blockPos.getY()),
                             String.valueOf(blockPos.getZ()))))
-                        .hoverEvent(HoverEvent.showText(
-                                context.getMessage("command.getpos.hover")));
+                    .hoverEvent(HoverEvent.showText(
+                            context.getMessage("command.getpos.hover"))));
         }
 
         return context.successResult();

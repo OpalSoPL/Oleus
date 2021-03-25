@@ -50,7 +50,7 @@ public class ReplyCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final MessageHandler messageHandler = context.getServiceCollection().getServiceUnchecked(MessageHandler.class);
         final MessageTarget sender =
-                context.getUniqueId().<MessageTarget>flatMap(x -> messageHandler.getUserMessageTarget(x).map(Function.identity()))
+                context.uniqueId().<MessageTarget>flatMap(x -> messageHandler.getUserMessageTarget(x).map(Function.identity()))
                         .orElseGet(messageHandler::getSystemMessageTarget);
         final MessageTarget receiver =
                 sender.replyTarget().orElseThrow(() -> context.createException("message.noreply"));

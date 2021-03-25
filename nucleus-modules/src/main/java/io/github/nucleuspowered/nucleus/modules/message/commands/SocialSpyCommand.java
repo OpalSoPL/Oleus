@@ -38,12 +38,12 @@ public class SocialSpyCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer src = context.requirePlayer();
         final MessageHandler handler = context.getServiceCollection().getServiceUnchecked(MessageHandler.class);
-        if (handler.forcedSocialSpyState(src.getUniqueId()).asBoolean()) {
+        if (handler.forcedSocialSpyState(src.uniqueId()).asBoolean()) {
             return context.errorResult("command.socialspy.forced");
         }
 
-        final boolean spy = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !handler.isSocialSpy(src.getUniqueId()));
-        if (handler.setSocialSpy(src.getUniqueId(), spy)) {
+        final boolean spy = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElseGet(() -> !handler.isSocialSpy(src.uniqueId()));
+        if (handler.setSocialSpy(src.uniqueId(), spy)) {
             context.sendMessage(spy ? "command.socialspy.on" : "command.socialspy.off");
             return context.successResult();
         }

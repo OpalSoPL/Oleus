@@ -49,9 +49,9 @@ public class AFKModule implements IModule.Configurable<AFKConfig> {
                 "afk",
                 PlaceholderParser.builder()
                         .key(ResourceKey.of("nucleus", "afk"))
-                        .parser(p -> {
+                        .addParser(p -> {
                             if (p.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
-                                    .map(x -> serviceCollection.getServiceUnchecked(AFKHandler.class).isAFK(((ServerPlayer) x).getUniqueId()))
+                                    .map(x -> serviceCollection.getServiceUnchecked(AFKHandler.class).isAFK(((ServerPlayer) x).uniqueId()))
                                     .orElse(false)) {
                                 return Component.text("[AFK]", NamedTextColor.GRAY);
                             }

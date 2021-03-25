@@ -44,7 +44,7 @@ public class PowertoolListener implements ListenerBase {
 
     @Listener
     public void onLogout(final ServerSideConnectionEvent.Disconnect event) {
-        this.service.reset(event.getPlayer().getUniqueId());
+        this.service.reset(event.getPlayer().uniqueId());
     }
 
     @Listener
@@ -60,9 +60,9 @@ public class PowertoolListener implements ListenerBase {
         final ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).getType();
 
         // If the powertools are toggled on.
-        if (this.userPreferenceService.get(player.getUniqueId(), PowertoolKeys.POWERTOOL_ENABLED).orElse(true)) {
+        if (this.userPreferenceService.get(player.uniqueId(), PowertoolKeys.POWERTOOL_ENABLED).orElse(true)) {
             // Execute all powertools if they exist.
-            this.service.getPowertoolForItem(player.getUniqueId(), item).ifPresent(x -> {
+            this.service.getPowertoolForItem(player.uniqueId(), item).ifPresent(x -> {
                 // Cancel the interaction.
                 event.setCancelled(true);
 
@@ -90,7 +90,7 @@ public class PowertoolListener implements ListenerBase {
                     }
 
                     try {
-                        Sponge.server().getCommandManager().process(s);
+                        Sponge.server().commandManager().process(s);
                     } catch (final CommandException e) {
                         // ignored
                     }

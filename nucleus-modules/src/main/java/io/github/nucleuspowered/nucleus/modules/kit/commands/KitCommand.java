@@ -79,7 +79,7 @@ public class KitCommand implements ICommandExecutor, IReloadableService.Reloadab
         }
 
         // If we have a cost for the kit, check we have funds.
-        if (cost > 0 && !econHelper.hasBalance(player.getUniqueId(), cost)) {
+        if (cost > 0 && !econHelper.hasBalance(player.uniqueId(), cost)) {
             return context.errorResult("command.kit.notenough", kit.getName(), econHelper.getCurrencySymbol(cost));
         }
 
@@ -89,7 +89,7 @@ public class KitCommand implements ICommandExecutor, IReloadableService.Reloadab
                 // If we drop them, tell the user
                 if (this.isDrop) {
                     context.sendMessage("command.kit.itemsdropped");
-                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.getServerLocation()));
+                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.serverLocation()));
                 } else {
                     context.sendMessage("command.kit.fullinventory");
                 }
@@ -101,7 +101,7 @@ public class KitCommand implements ICommandExecutor, IReloadableService.Reloadab
 
             // Charge, if necessary
             if (cost > 0 && econHelper.serviceExists()) {
-                econHelper.withdrawFromPlayer(player.getUniqueId(), cost);
+                econHelper.withdrawFromPlayer(player.uniqueId(), cost);
             }
 
             return context.successResult();

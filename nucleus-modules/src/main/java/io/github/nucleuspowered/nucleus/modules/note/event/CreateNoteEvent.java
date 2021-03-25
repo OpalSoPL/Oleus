@@ -49,7 +49,7 @@ public class CreateNoteEvent implements NucleusNoteEvent.Created {
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 }

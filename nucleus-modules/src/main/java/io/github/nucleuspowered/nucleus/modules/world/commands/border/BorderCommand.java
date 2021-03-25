@@ -58,11 +58,11 @@ public class BorderCommand implements ICommandExecutor {
                     String.valueOf(worldBorder.getTimeRemaining().getSeconds())));
         }
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .contents(worldBorderInfo)
                 .title(context.getMessage("command.world.border.title", wp.getKey().asString()))
                 .padding(Component.text("=", NamedTextColor.GREEN))
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
         return context.successResult();
     }
 }

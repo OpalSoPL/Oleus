@@ -78,7 +78,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
 
     public boolean canTeleportTo(final Audience audience, final User source, final User to, final boolean isOther)  {
         if (!this.canBypassTpToggle(source)) {
-            if (!isOther && !this.userPreferenceService.get(to.getUniqueId(), TeleportKeys.TELEPORT_TOGGLE).orElse(true)) {
+            if (!isOther && !this.userPreferenceService.get(to.uniqueId(), TeleportKeys.TELEPORT_TOGGLE).orElse(true)) {
                 this.messageProviderService.sendMessageTo(audience, "teleport.fail.targettoggle", to.getName());
                 return false;
             }
@@ -115,7 +115,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
         final TeleportResult result =
                 this.safeTeleportService.teleportPlayerSmart(
                                 playerToTeleport,
-                                target.getServerLocation(),
+                                target.serverLocation(),
                                 target.getRotation(),
                                 false,
                                 safe,
@@ -158,22 +158,22 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
 
             final TeleportRequest request = new TeleportRequest(
                     this.serviceCollection,
-                    playerToTeleport.getUniqueId(),
-                    target.getUniqueId(),
+                    playerToTeleport.uniqueId(),
+                    target.uniqueId(),
                     Instant.now().plus(30, ChronoUnit.SECONDS),
                     this.refundOnDeny ? cost : 0,
                     warmup,
-                    requester instanceof ServerPlayer ? ((ServerPlayer) requester).getUniqueId() : null,
+                    requester instanceof ServerPlayer ? ((ServerPlayer) requester).uniqueId() : null,
                     safe,
                     silentTarget,
                     silentSource,
-                    this.useRequestLocation ? target.getServerLocation() : null,
+                    this.useRequestLocation ? target.serverLocation() : null,
                     target.getRotation(),
                     successCallback
             );
 
-            this.activeTeleportRequestsCommand.put(toRequest.getUniqueId(), request);
-            this.activeTeleportRequests.put(toRequest.getUniqueId(), request);
+            this.activeTeleportRequestsCommand.put(toRequest.uniqueId(), request);
+            this.activeTeleportRequests.put(toRequest.uniqueId(), request);
 
             @Nullable final ServerPlayer requesterAsPlayer = src instanceof ServerPlayer ? (ServerPlayer) src : null;
             final Identity requesterIdentity = requesterAsPlayer == null ? Identity.nil() : requesterAsPlayer.identity();
@@ -195,7 +195,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
      * @return The request, if any.
      */
     public Optional<TeleportRequest> getCurrentRequest(final Player player) {
-        return Optional.ofNullable(this.activeTeleportRequestsCommand.get(player.getUniqueId()));
+        return Optional.ofNullable(this.activeTeleportRequestsCommand.get(player.uniqueId()));
     }
 
     /**
@@ -204,8 +204,8 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
      * @param player The player
      */
     public void removeRequestsFor(final Player player) {
-        this.activeTeleportRequests.removeAll(player.getUniqueId()).forEach(x -> x.forceExpire(true));
-        this.activeTeleportRequestsCommand.remove(player.getUniqueId());
+        this.activeTeleportRequests.removeAll(player.uniqueId()).forEach(x -> x.forceExpire(true));
+        this.activeTeleportRequestsCommand.remove(player.uniqueId());
     }
 
     public void removeExpired() {
@@ -215,14 +215,14 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
 
     private Optional<Component> getAcceptDenyMessage(final ServerPlayer forPlayer, final TeleportRequest target) {
         if (this.showAcceptDeny) {
-            final UUID uuid = forPlayer.getUniqueId();
+            final UUID uuid = forPlayer.uniqueId();
             final Component acceptTextComponent =
                     Component.text().append(this.messageProviderService.getMessageFor(forPlayer.getLocale(), "standard.accept"))
                         .style(Style.style(TextDecoration.UNDERLINED))
                         .hoverEvent(HoverEvent.showText(
                             this.messageProviderService.getMessageFor(forPlayer.getLocale(), "teleport.accept.hover")))
                         .clickEvent(SpongeComponents.executeCallback(src -> {
-                            if (!(src.root() instanceof ServerPlayer) || ((ServerPlayer) src.root()).getUniqueId().equals(uuid)) {
+                            if (!(src.root() instanceof ServerPlayer) || ((ServerPlayer) src.root()).uniqueId().equals(uuid)) {
                                 this.messageProviderService.sendMessageTo(src.getAudience(), "command.tpaccept.nothing");
                             }
                             final ServerPlayer root = (ServerPlayer) src.root();
@@ -233,7 +233,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                             if (this.useCommandsOnClickAcceptDeny) {
                                 try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                                     frame.pushCause(root);
-                                    Sponge.server().getCommandManager().process("nucleus:tpaccept");
+                                    Sponge.server().commandManager().process("nucleus:tpaccept");
                                 } catch (final CommandException ex) {
                                     src.sendMessage(Identity.nil(), ex.componentMessage());
                                 }
@@ -246,7 +246,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                     .style(Style.style(TextDecoration.UNDERLINED))
                     .hoverEvent(HoverEvent.showText(this.messageProviderService.getMessageFor(forPlayer.getLocale(), "teleport.deny.hover")))
                     .clickEvent(SpongeComponents.executeCallback(src -> {
-                        if (!(src.root() instanceof ServerPlayer) || ((ServerPlayer) src.root()).getUniqueId().equals(uuid)) {
+                        if (!(src.root() instanceof ServerPlayer) || ((ServerPlayer) src.root()).uniqueId().equals(uuid)) {
                             this.messageProviderService.sendMessageTo(src.getAudience(), "command.tpdeny.fail");
                         }
                         final ServerPlayer root = (ServerPlayer) src.root();
@@ -257,7 +257,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                         if (this.useCommandsOnClickAcceptDeny) {
                             try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                                 frame.pushCause(root);
-                                Sponge.server().getCommandManager().process("nucleus:tpdeny");
+                                Sponge.server().commandManager().process("nucleus:tpdeny");
                             } catch (final CommandException ex) {
                                 src.sendMessage(Identity.nil(), ex.componentMessage());
                             }
@@ -352,7 +352,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
 
                 final User user = op.map(x -> (User) x).orElseGet(() -> Sponge.server().userManager().find(requester).orElse(null));
                 if (user != null) {
-                    serviceCollection.economyServiceProvider().depositInPlayer(user.getUniqueId(), cost);
+                    serviceCollection.economyServiceProvider().depositInPlayer(user.uniqueId(), cost);
                 }
             }
         }

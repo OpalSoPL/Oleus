@@ -31,12 +31,12 @@ public class SetGameruleCommand implements ICommandExecutor {
 
     @SuppressWarnings("unchecked")
     private final Parameter.Value<GameRule<?>> gameMode = Parameter.builder(new TypeToken<GameRule<?>>() {})
-            .parser(VariableValueParameters.registryEntryBuilder(RegistryTypes.GAME_RULE).build())
-            .setKey("gameRule")
+            .addParser(VariableValueParameters.registryEntryBuilder(RegistryTypes.GAME_RULE).build())
+            .key("gameRule")
             .build();
 
-    private final Parameter.Value<Integer> intVal = Parameter.integerNumber().setKey("integer").build();
-    private final Parameter.Value<String> stringVal = Parameter.string().setKey("string").build();
+    private final Parameter.Value<Integer> intVal = Parameter.integerNumber().key("integer").build();
+    private final Parameter.Value<String> stringVal = Parameter.string().key("string").build();
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {

@@ -31,8 +31,8 @@ public class MuteInfoProvider implements NucleusProvider {
             final MuteService jh = serviceCollection.getServiceUnchecked(MuteService.class);
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             final Audience audience = source.getAudience();
-            if (jh.isMuted(user.getUniqueId())) {
-                final Mute jd = jh.getPlayerMuteInfo(user.getUniqueId()).get();
+            if (jh.isMuted(user.uniqueId())) {
+                final Mute jd = jh.getPlayerMuteInfo(user.uniqueId()).get();
                 // Lightweight checkban.
                 final Component m;
                 if (jd.getRemainingTime().isPresent()) {

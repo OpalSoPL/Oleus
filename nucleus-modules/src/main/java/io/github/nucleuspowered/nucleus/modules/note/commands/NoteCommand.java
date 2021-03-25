@@ -47,15 +47,15 @@ public class NoteCommand implements ICommandExecutor {
         final User user = context.requireOne(NucleusParameters.ONE_USER);
         final String note = context.requireOne(NucleusParameters.MESSAGE);
 
-        final UUID noter = context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID);
+        final UUID noter = context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID);
         final UserNote noteData = new UserNote(noter, note, Instant.now());
 
-        context.getServiceCollection().getServiceUnchecked(NoteHandler.class).addNote(user.getUniqueId(), noteData).thenAccept(x -> {
+        context.getServiceCollection().getServiceUnchecked(NoteHandler.class).addNote(user.uniqueId(), noteData).thenAccept(x -> {
             if (x) {
                 final Audience messageChannel =
                         Audience.audience(
                                 context.getServiceCollection().permissionService().permissionMessageChannel(NotePermissions.NOTE_NOTIFY),
-                                context.getAudience());
+                                context.audience());
                 final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
                 context.getServiceCollection().schedulerService().runOnMainThread(() -> {
                         messageProviderService.sendMessageTo(messageChannel, "command.note.success", context.getName(), noteData.getNote(),

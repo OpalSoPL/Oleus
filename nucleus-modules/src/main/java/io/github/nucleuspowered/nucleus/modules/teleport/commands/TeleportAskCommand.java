@@ -96,7 +96,7 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
             return context.errorResult("command.teleport.self");
         }
 
-        final RequestEvent.CauseToPlayer event = new RequestEvent.CauseToPlayer(Sponge.server().causeStackManager().getCurrentCause(), target.getUniqueId());
+        final RequestEvent.CauseToPlayer event = new RequestEvent.CauseToPlayer(Sponge.server().causeStackManager().currentCause(), target.uniqueId());
         if (Sponge.eventManager().post(event)) {
             if (event.getCancelMessage().isPresent()) {
                 return context.errorResultLiteral(event.getCancelMessage().get());
@@ -126,7 +126,7 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
                 "command.tpa.question"
         );
 
-        NucleusAPI.getAFKService().ifPresent(x -> x.notifyIsAfk(context.getAudience(), target.getUniqueId()));
+        NucleusAPI.getAFKService().ifPresent(x -> x.notifyIsAfk(context.audience(), target.uniqueId()));
 
         return context.successResult();
     }

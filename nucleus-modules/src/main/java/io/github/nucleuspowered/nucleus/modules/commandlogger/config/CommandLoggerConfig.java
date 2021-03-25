@@ -31,7 +31,8 @@ public class CommandLoggerConfig {
     @LocalisedComment("config.commandlogger.file")
     private boolean logToFile = false;
 
-    @Setting(value = "cause-enhanced", comment = "config.commandlogger.causeenhanced")
+    @Setting(value = "cause-enhanced")
+    @LocalisedComment("config.commandlogger.causeenhanced")
     private boolean causeEnhanced = true;
 
     public LoggerTargetConfig getLoggerTarget() {

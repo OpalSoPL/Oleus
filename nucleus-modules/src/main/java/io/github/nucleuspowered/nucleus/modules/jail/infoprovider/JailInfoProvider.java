@@ -30,7 +30,7 @@ public final class JailInfoProvider implements NucleusProvider {
         if (serviceCollection.permissionService().hasPermission(source, JailPermissions.BASE_CHECKJAIL)) {
             // If we have a ban service, then check for a ban.
             final JailService jh = serviceCollection.getServiceUnchecked(JailService.class);
-            final Optional<Jailing> jailing = jh.getPlayerJailData(user.getUniqueId());
+            final Optional<Jailing> jailing = jh.getPlayerJailData(user.uniqueId());
             if (jailing.isPresent()) {
                 final Jailing jd = jailing.get();
                 final Component m;

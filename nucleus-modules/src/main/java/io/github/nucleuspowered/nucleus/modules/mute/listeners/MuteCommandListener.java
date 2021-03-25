@@ -42,12 +42,12 @@ public class MuteCommandListener implements ListenerBase.Conditional {
 
     @Listener(order = Order.FIRST)
     public void onPlayerSendCommand(final ExecuteCommandEvent.Pre event, @Root final ServerPlayer player) {
-        if (!this.handler.isMuted(player.getUniqueId())) {
+        if (!this.handler.isMuted(player.uniqueId())) {
             return;
         }
 
         final String command = event.getCommand().toLowerCase();
-        final Optional<? extends CommandMapping> oc = Sponge.server().getCommandManager().getCommandMapping(command);
+        final Optional<? extends CommandMapping> oc = Sponge.server().commandManager().commandMapping(command);
         final Set<String> cmd;
 
         // If the command exists, then get all aliases.
@@ -56,9 +56,9 @@ public class MuteCommandListener implements ListenerBase.Conditional {
 
         // If the command is in the list, block it.
         if (this.blockedCommands.stream().map(String::toLowerCase).anyMatch(cmd::contains)) {
-            final Mute muteData = this.handler.getPlayerMuteInfo(player.getUniqueId()).orElse(null);
+            final Mute muteData = this.handler.getPlayerMuteInfo(player.uniqueId()).orElse(null);
             if (muteData == null || muteData.expired()) {
-                this.handler.unmutePlayer(player.getUniqueId());
+                this.handler.unmutePlayer(player.uniqueId());
             } else {
                 this.handler.onMute(muteData, player);
                 Sponge.systemSubject().sendMessage(LinearComponents.linear(

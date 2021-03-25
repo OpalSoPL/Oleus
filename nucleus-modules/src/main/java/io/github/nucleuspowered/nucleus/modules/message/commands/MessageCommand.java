@@ -59,8 +59,8 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
     public MessageCommand(final INucleusServiceCollection nucleusServiceCollection) {
         this.messageHandler = nucleusServiceCollection.getServiceUnchecked(MessageHandler.class);
         this.customTargetParameter =  Parameter.builder(MessageTarget.class)
-                .setKey("custom target")
-                .parser(new CustomTargetParameter(this.messageHandler))
+                .key("custom target")
+                .addParser(new CustomTargetParameter(this.messageHandler))
                 .build();
     }
 
@@ -88,10 +88,10 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
 
             messageTarget = target.fold(
                     x -> this.messageHandler.getSystemMessageTarget(),
-                    x -> this.messageHandler.getUserMessageTarget(x.getUniqueId()).get());
+                    x -> this.messageHandler.getUserMessageTarget(x.uniqueId()).get());
         }
         final MessageTarget sender;
-        final Optional<UUID> uuidOptional = context.getUniqueId();
+        final Optional<UUID> uuidOptional = context.uniqueId();
         if (uuidOptional.isPresent()) {
             sender = this.messageHandler.getUserMessageTarget(uuidOptional.get()).get();
         } else {
@@ -105,7 +105,7 @@ public class MessageCommand implements ICommandExecutor, IReloadableService.Relo
             final MessageTarget receiver) {
 
         if (receiver instanceof UserMessageTarget) {
-            NucleusAPI.getAFKService().ifPresent(x -> x.notifyIsAfk(context.getAudience(), ((UserMessageTarget) receiver).getUserUUID()));
+            NucleusAPI.getAFKService().ifPresent(x -> x.notifyIsAfk(context.audience(), ((UserMessageTarget) receiver).getUserUUID()));
         }
 
         final boolean b = messageHandler.sendMessage(sender, receiver, context.requireOne(NucleusParameters.MESSAGE));

@@ -51,11 +51,11 @@ public class ExtinguishCommand implements ICommandExecutor {
         final ServerPlayer target = context.getPlayerFromArgs();
                 // this.getUserFromArgs(Player.class, src, NucleusParameters.Keys.PLAYER, args);
         final Ticks ticks = target.get(Keys.FIRE_TICKS).orElseGet(Ticks::zero);
-        if (ticks.getTicks() > 0 && target.offer(Keys.FIRE_TICKS, Ticks.zero()).isSuccessful()) {
-            context.sendMessage("command.extinguish.success", target.getName());
+        if (ticks.ticks() > 0 && target.offer(Keys.FIRE_TICKS, Ticks.zero()).isSuccessful()) {
+            context.sendMessage("command.extinguish.success", target.name());
             return context.successResult();
         }
 
-        return context.errorResult("command.extinguish.failed", target.getName());
+        return context.errorResult("command.extinguish.failed", target.name());
     }
 }

@@ -33,7 +33,7 @@ public class CommandSpyCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final IUserPreferenceService userPreferenceService = context.getServiceCollection().userPreferenceService();
-        final UUID uuid = context.getUniqueId().orElseThrow(() -> new CommandException(Component.text("No UUID was found")));
+        final UUID uuid = context.uniqueId().orElseThrow(() -> new CommandException(Component.text("No UUID was found")));
         final boolean to =
                 context.getOne(NucleusParameters.ONE_TRUE_FALSE)
                     .orElseGet(() -> !userPreferenceService.getUnwrapped(

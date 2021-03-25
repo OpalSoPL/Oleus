@@ -92,7 +92,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
                 final GameProfile gp = gpm.getProfile(userToFind).get();
 
                 // Ban the user sync.
-                Sponge.server().getScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
+                Sponge.server().scheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
                     // Create the user.
                     final UserManager uss = Sponge.server().userManager();
                     final User user = uss.getOrCreate(gp);
@@ -143,7 +143,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
 
         // Get the permission, "quickstart.ban.notify"
         final Audience audience = Audience.audience(
-                context.getAudience(),
+                context.audience(),
                 context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY));
         audience.sendMessage(context.getMessage("command.ban.applied",
                 context.getServiceCollection().playerDisplayNameService().getName(user),
@@ -151,7 +151,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         final Component reason = LegacyComponentSerializer.legacyAmpersand().deserialize(r);
         audience.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
-        Sponge.server().player(user.getUniqueId()).ifPresent(pl -> pl.kick(reason));
+        Sponge.server().player(user.uniqueId()).ifPresent(pl -> pl.kick(reason));
         return context.successResult();
     }
 

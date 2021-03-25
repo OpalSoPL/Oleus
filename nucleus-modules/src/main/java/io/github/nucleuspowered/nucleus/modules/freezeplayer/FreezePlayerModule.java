@@ -37,9 +37,9 @@ public final class FreezePlayerModule implements IModule {
                 "frozen",
                 PlaceholderParser.builder()
                         .key(ResourceKey.of("nucleus", "frozen"))
-                        .parser(p -> {
+                        .addParser(p -> {
                             if (p.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
-                                    .map(x -> service.isFrozen(((ServerPlayer) x).getUniqueId()))
+                                    .map(x -> service.isFrozen(((ServerPlayer) x).uniqueId()))
                                     .orElse(false)) {
                                 return FreezePlayerModule.FROZEN_TAG;
                             }

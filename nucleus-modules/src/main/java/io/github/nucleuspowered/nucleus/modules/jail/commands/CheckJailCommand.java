@@ -50,7 +50,7 @@ public class CheckJailCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
-        final UUID uuid = either.fold(Identifiable::getUniqueId, Identifiable::getUniqueId);
+        final UUID uuid = either.fold(Identifiable::uniqueId, Identifiable::uniqueId);
         final Optional<Jailing> jailing = this.handler.getPlayerJailData(uuid);
         final Component name = context.getDisplayName(uuid);
 
@@ -64,7 +64,7 @@ public class CheckJailCommand implements ICommandExecutor {
         if (md.getRemainingTime().isPresent()) {
             context.sendMessage("command.checkjail.jailedfor", name, md.getJailName(),
                     jailer, messageProviderService.getTimeString(
-                            context.getAudience(),
+                            context.audience(),
                             md.getRemainingTime().get().getSeconds()));
         } else {
             context.sendMessage("command.checkjail.jailedperm", name, md.getJailName(), name);

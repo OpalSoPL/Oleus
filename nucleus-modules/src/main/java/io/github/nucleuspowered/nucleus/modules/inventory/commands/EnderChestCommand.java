@@ -57,11 +57,11 @@ public class EnderChestCommand implements ICommandExecutor {
     @Inject
     public EnderChestCommand(final IPermissionService permissionService) {
         this.onlinePlayerParameter = Parameter.player()
-                .setKey(NucleusParameters.Keys.PLAYER)
+                .key(NucleusParameters.Keys.PLAYER)
                 .setRequirements(cause -> permissionService.hasPermission(cause, InventoryPermissions.OTHERS_ENDERCHEST))
                 .build();
         this.offlinePlayerParameter = Parameter.user()
-                .setKey(NucleusParameters.Keys.USER)
+                .key(NucleusParameters.Keys.USER)
                 .setRequirements(cause -> permissionService.hasPermission(cause, InventoryPermissions.OTHERS_ENDERCHEST) &&
                         permissionService.hasPermission(cause, InventoryPermissions.ENDERCHEST_OFFLINE))
                 .build();

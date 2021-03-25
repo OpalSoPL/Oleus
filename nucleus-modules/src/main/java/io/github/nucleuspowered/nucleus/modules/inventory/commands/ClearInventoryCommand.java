@@ -50,21 +50,21 @@ public class ClearInventoryCommand implements ICommandExecutor {
         final User user = context.getUserFromArgs();
         final boolean all = context.hasFlag("a");
         final Carrier target;
-        if (user.getPlayer().isPresent()) {
-            target = user.getPlayer().get();
+        if (user.player().isPresent()) {
+            target = user.player().get();
         } else {
             target = user;
         }
 
         try {
-            return this.clear(context, target, user.getUniqueId(), user.name(), all);
+            return this.clear(context, target, user.uniqueId(), user.name(), all);
         } catch (final UnsupportedOperationException ex) {
             return context.errorResult("command.clearinventory.offlinenotsupported");
         }
     }
 
     private ICommandResult clear(final ICommandContext context, final Carrier target, final UUID uuid, final String name, final boolean all) {
-        if (Sponge.eventManager().post(new ClearInventoryEvent.Pre(Sponge.server().causeStackManager().getCurrentCause(), uuid, all))) {
+        if (Sponge.eventManager().post(new ClearInventoryEvent.Pre(Sponge.server().causeStackManager().currentCause(), uuid, all))) {
             return context.errorResult("command.clearinventory.cancelled", name);
         }
         if (all) {
@@ -72,7 +72,7 @@ public class ClearInventoryCommand implements ICommandExecutor {
         } else {
             Util.getStandardInventory(target).clear();
         }
-        Sponge.eventManager().post(new ClearInventoryEvent.Post(Sponge.server().causeStackManager().getCurrentCause(), uuid, all));
+        Sponge.eventManager().post(new ClearInventoryEvent.Post(Sponge.server().causeStackManager().currentCause(), uuid, all));
         context.sendMessage("command.clearinventory.success", name);
         return context.successResult();
     }

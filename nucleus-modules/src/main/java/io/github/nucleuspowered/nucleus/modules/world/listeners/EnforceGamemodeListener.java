@@ -38,7 +38,7 @@ public class EnforceGamemodeListener implements ListenerBase.Conditional {
 
     @Listener(order = Order.POST)
     public void onPlayerLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
-        Sponge.server().getScheduler().submit(
+        Sponge.server().scheduler().submit(
                 Task.builder().execute(() -> this.enforce(player, player.getWorld())).plugin(this.pluginContainer).build()
         );
     }

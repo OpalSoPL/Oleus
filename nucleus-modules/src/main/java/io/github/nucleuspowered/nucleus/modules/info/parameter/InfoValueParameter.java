@@ -49,7 +49,7 @@ public final class InfoValueParameter implements ValueParameter<InfoValueParamet
             return Optional.of(new Result(this.handler.getInfoSections().stream().filter(a::equalsIgnoreCase).findFirst().get(), list.get()));
         }
 
-        throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "args.info.noinfo", a));
+        throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "args.info.noinfo", a));
     }
 
     public static class Result {

@@ -29,7 +29,7 @@ public class AFKInfoProvider implements NucleusProvider {
             final AFKHandler handler = serviceCollection.getServiceUnchecked(AFKHandler.class);
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             if (user.isOnline()) {
-                final UUID uuid = user.getUniqueId();
+                final UUID uuid = user.uniqueId();
                 final String timeToNow = messageProviderService.getTimeToNow(source.getAudience(), handler.lastActivity(uuid));
                 if (handler.canGoAFK(uuid)) {
                     if (handler.isAFK(uuid)) {

@@ -44,7 +44,7 @@ public class TeleportAskAllHereCommand implements ICommandExecutor {
             }
 
             // Before we do all this, check the event.
-            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(Sponge.server().causeStackManager().getCurrentCause(), x.getUniqueId());
+            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(Sponge.server().causeStackManager().currentCause(), x.uniqueId());
             if (Sponge.eventManager().post(event)) {
                 cancelled.add(x);
                 continue;

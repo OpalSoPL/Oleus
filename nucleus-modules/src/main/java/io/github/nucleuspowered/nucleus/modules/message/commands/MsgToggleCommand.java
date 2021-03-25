@@ -38,7 +38,7 @@ public class MsgToggleCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final UserPreferenceService userPreferenceService = context.getServiceCollection().getServiceUnchecked(UserPreferenceService.class);
-        final UUID player = context.getIfPlayer().getUniqueId();
+        final UUID player = context.getIfPlayer().uniqueId();
         final NucleusUserPreferenceService.PreferenceKey<Boolean> key =
                 context.getServiceCollection().userPreferenceService().keys().messageReceivingEnabled().orElseThrow(IllegalStateException::new);
         final boolean flip = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE)

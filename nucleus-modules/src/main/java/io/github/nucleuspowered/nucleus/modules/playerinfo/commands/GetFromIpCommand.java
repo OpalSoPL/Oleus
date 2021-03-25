@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
         commandDescriptionKey = "getfromip")
 public class GetFromIpCommand implements ICommandExecutor {
 
-    private final Parameter.Value<InetAddress> ip = Parameter.ip().setKey("IP address").build();
+    private final Parameter.Value<InetAddress> ip = Parameter.ip().key("IP address").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -48,25 +48,28 @@ public class GetFromIpCommand implements ICommandExecutor {
                 .getServiceCollection()
                 .userCacheService()
                 .getForIp(ip.toString())
-                .stream().map(uss::get).filter(Optional::isPresent)
-                .map(Optional::get).collect(Collectors.toList());
+                .stream()
+                .map(uss::find)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
 
         if (users.isEmpty()) {
             context.sendMessage("command.getfromip.nousers");
             return context.successResult();
         }
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .title(context.getMessage("command.getfromip.title", ip))
                 .contents(
                     users.stream().map(y -> {
-                        final Component name = context.getDisplayName(y.getUniqueId());
+                        final Component name = context.getDisplayName(y.uniqueId());
                         return name
-                                .clickEvent(ClickEvent.runCommand("/nucleus:seen " + y.getName()))
+                                .clickEvent(ClickEvent.runCommand("/nucleus:seen " + y.name()))
                                 .hoverEvent(HoverEvent.showText(context.getMessage("command.getfromip.hover", name)));
                     }).collect(Collectors.toList())
                 )
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
         return context.successResult();
     }
 }

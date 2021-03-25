@@ -70,13 +70,13 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
         final Component header;
         if (showVanished && hiddenCount > 0) {
             header = context.getMessage("command.list.playercount.hidden", String.valueOf(playerCount),
-                    String.valueOf(Sponge.server().getMaxPlayers()), String.valueOf(hiddenCount));
+                    String.valueOf(Sponge.server().maxPlayers()), String.valueOf(hiddenCount));
         } else {
             header = context.getMessage("command.list.playercount.base", String.valueOf(playerCount - hiddenCount),
-                    String.valueOf(Sponge.server().getMaxPlayers()));
+                    String.valueOf(Sponge.server().maxPlayers()));
         }
 
-        final PaginationList.Builder builder = Util.getPaginationBuilder(context.getAudience()).title(header);
+        final PaginationList.Builder builder = Util.getPaginationBuilder(context.audience()).title(header);
 
         if (this.listConfig.isGroupByPermissionGroup()) {
             builder.contents(this.listByPermissionGroup(context, showVanished));
@@ -85,7 +85,7 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
             builder.contents(this.getPlayerList(players, showVanished, context));
         }
 
-        builder.sendTo(context.getAudience());
+        builder.sendTo(context.audience());
         return context.successResult();
     }
 
@@ -133,7 +133,7 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
         final IPermissionService permissionService = context.getServiceCollection().permissionService();
         final Map<String, List<ServerPlayer>> map = new HashMap<>();
         for (final ServerPlayer player : Sponge.server().onlinePlayers()) {
-            if (showVanished || context.getAsPlayer().map(x -> playerOnlineService.isOnline(x, player.getUser())).orElse(true)) {
+            if (showVanished || context.getAsPlayer().map(x -> playerOnlineService.isOnline(x, player.user())).orElse(true)) {
                 String perm = permissionService.getOptionFromSubject(player, LIST_OPTION).orElse(def);
                 if (perm.trim().isEmpty()) {
                     perm = def;
@@ -177,10 +177,10 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
         final Component hidden = context.getMessage("command.list.hidden");
 
         final List<Component> playerList = playersToList.stream().filter(x -> showVanished || !x.get(Keys.VANISH).orElse(false))
-                .sorted((x, y) -> x.getName().compareToIgnoreCase(y.getName())).map(x -> {
+                .sorted((x, y) -> x.name().compareToIgnoreCase(y.name())).map(x -> {
                     final TextComponent.Builder tb = Component.text();
                     boolean appendSpace = false;
-                    if (afkService != null && afkService.isAFK(x.getUniqueId())) {
+                    if (afkService != null && afkService.isAFK(x.uniqueId())) {
                         tb.append(afk);
                         appendSpace = true;
                     }
@@ -197,7 +197,7 @@ public class ListPlayerCommand implements ICommandExecutor, IReloadableService.R
                     if (template != null) { // it shouldn't be, but if it is, fallback...
                         return tb.append(template.getForObject(x)).build();
                     } else {
-                        return tb.append(context.getDisplayName(x.getUniqueId())).build();
+                        return tb.append(context.getDisplayName(x.uniqueId())).build();
                     }
                 }).collect(Collectors.toList());
 

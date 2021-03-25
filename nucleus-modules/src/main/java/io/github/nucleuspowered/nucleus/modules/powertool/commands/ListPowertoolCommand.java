@@ -40,7 +40,7 @@ public class ListPowertoolCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer serverPlayer = context.requirePlayer();
-        final UUID uuid = serverPlayer.getUniqueId();
+        final UUID uuid = serverPlayer.uniqueId();
         final boolean toggle = context.getServiceCollection().userPreferenceService()
                 .getUnwrapped(uuid, PowertoolKeys.POWERTOOL_ENABLED);
 
@@ -57,11 +57,11 @@ public class ListPowertoolCommand implements ICommandExecutor {
                 .map(k -> this.from(service, serverPlayer, context, k.getKey(), k.getValue())).collect(Collectors.toList());
 
         // Paginate the tools.
-        Util.getPaginationBuilder(context.getAudience()).title(
+        Util.getPaginationBuilder(context.audience()).title(
                 context.getMessage("command.powertool.list.header", toggle ? "&aenabled" : "&cdisabled"))
                 .padding(Component.text("-", NamedTextColor.YELLOW))
                 .contents(mesl)
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
 
         return context.successResult();
     }
@@ -73,8 +73,8 @@ public class ListPowertoolCommand implements ICommandExecutor {
             final String powertool,
             final List<String> commands) {
 
-        final Optional<ItemType> oit = Sponge.getRegistry().getCatalogRegistry().get(ItemType.class, ResourceKey.resolve(powertool));
-        final UUID uuid = src.getUniqueId();
+        final Optional<ItemType> oit = Sponge.registry().getCatalogRegistry().get(ItemType.class, ResourceKey.resolve(powertool));
+        final UUID uuid = src.uniqueId();
 
         // Create the click actions.
         final ClickEvent viewAction = SpongeComponents.executeCallback(pl -> Util.getPaginationBuilder(src)

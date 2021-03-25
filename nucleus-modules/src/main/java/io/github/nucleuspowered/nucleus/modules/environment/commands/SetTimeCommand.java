@@ -42,8 +42,8 @@ public class SetTimeCommand implements ICommandExecutor {
 
     @Inject
     public SetTimeCommand(final INucleusServiceCollection serviceCollection) {
-        this.timeParameter = Parameter.builder(TypeTokens.MINECRAFT_DAY_TIME).setKey("time")
-                .parser(new WorldTimeParameter(true, serviceCollection.messageProvider()))
+        this.timeParameter = Parameter.builder(TypeTokens.MINECRAFT_DAY_TIME).key("time")
+                .addParser(new WorldTimeParameter(true, serviceCollection.messageProvider()))
                 .build();
     }
 

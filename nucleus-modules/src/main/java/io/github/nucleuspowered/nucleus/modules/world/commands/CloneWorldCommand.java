@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 public class CloneWorldCommand implements ICommandExecutor {
 
     private final Parameter.Value<String> newNameParameter = Parameter.string()
-            .setKey("new name")
+            .key("new name")
             .build();
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -58,8 +58,8 @@ public class CloneWorldCommand implements ICommandExecutor {
 
         // Well, you never know, the player might die or disconnect - we have to be vigilant.
         final Supplier<Audience> mr;
-        if (context.getAudience() instanceof ServerPlayer) {
-            final UUID uuid = ((ServerPlayer) context.getAudience()).getUniqueId();
+        if (context.audience() instanceof ServerPlayer) {
+            final UUID uuid = ((ServerPlayer) context.audience()).uniqueId();
             mr = () -> Sponge.server().player(uuid).map(x -> (Audience) x).orElseGet(Audience::empty);
         } else {
             mr = context::getAudience;

@@ -49,14 +49,14 @@ public class KitListCommand implements ICommandExecutor {
             return context.errorResult("command.kit.list.empty");
         }
 
-        final PaginationList.Builder paginationService = Util.getPaginationBuilder(context.getAudience());
+        final PaginationList.Builder paginationService = Util.getPaginationBuilder(context.audience());
         final ArrayList<Component> kitText = new ArrayList<>();
 
         final Map<String, Instant> redeemed =
                 context.is(Player.class) ? context.getServiceCollection()
                         .storageManager()
                         .getUserService()
-                        .getOrNewOnThread(context.getIfPlayer().getUniqueId())
+                        .getOrNewOnThread(context.getIfPlayer().uniqueId())
                         .getNullable(KitKeys.REDEEMED_KITS) : null;
 
         final boolean showHidden = context.testPermission(KitPermissions.KIT_SHOWHIDDEN);
@@ -67,7 +67,7 @@ public class KitListCommand implements ICommandExecutor {
         final PaginationList.Builder paginationBuilder = paginationService.contents(kitText)
                 .title(context.getMessage("command.kit.list.kits"))
                 .padding(Component.text("-", NamedTextColor.GREEN));
-        paginationBuilder.sendTo(context.getAudience());
+        paginationBuilder.sendTo(context.audience());
 
         return context.successResult();
     }

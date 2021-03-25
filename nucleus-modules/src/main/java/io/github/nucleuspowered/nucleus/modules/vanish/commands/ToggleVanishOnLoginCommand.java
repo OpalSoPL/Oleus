@@ -33,7 +33,7 @@ public class ToggleVanishOnLoginCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final IUserPreferenceService ups = context.getServiceCollection().userPreferenceService();
-        final UUID uuid = context.getIfPlayer().getUniqueId();
+        final UUID uuid = context.getIfPlayer().uniqueId();
         final boolean keys = ups.get(uuid, VanishKeys.VANISH_ON_LOGIN).orElse(true);
 
         // If specified - get the key. Else, the inverse of what we have now.

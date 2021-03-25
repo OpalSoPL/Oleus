@@ -60,12 +60,12 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
 
     private final Parameter.Value<SpeedType> speedTypeParameter;
     private final Parameter.Value<Double> speed = Parameter.builder(Double.class)
-            .parser(VariableValueParameters.doubleRange().setMin(0.0).build())
-            .setKey("speed")
+            .addParser(VariableValueParameters.doubleRange().min(0.0).build())
+            .key("speed")
             .build();
     private final Parameter.Value<Boolean> reset = Parameter.builder(Boolean.class)
-            .setKey("reset")
-            .parser(VariableValueParameters.literalBuilder(Boolean.class).setLiteral(Collections.singleton("reset")).build())
+            .key("reset")
+            .addParser(VariableValueParameters.literalBuilder(Boolean.class).literal(Collections.singleton("reset")).build())
             .build();
 
     @Inject
@@ -79,9 +79,9 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
         keysMap.put("w", SpeedType.WALKING);
 
         this.speedTypeParameter = Parameter.builder(SpeedType.class)
-                .setKey("type")
+                .key("type")
                 .optional()
-                .parser(VariableValueParameters.staticChoicesBuilder(SpeedType.class).choices(keysMap).build())
+                .addParser(VariableValueParameters.staticChoicesBuilder(SpeedType.class).addChoices(keysMap).build())
                 .build();
     }
 
@@ -151,8 +151,8 @@ public class SpeedCommand implements ICommandExecutor, IReloadableService.Reload
     }
 
     private enum SpeedType {
-        WALKING(Keys.WALKING_SPEED.get(), "loc:standard.walking"),
-        FLYING(Keys.FLYING_SPEED.get(), "loc:standard.flying");
+        WALKING(Keys.WALKING_SPEED, "loc:standard.walking"),
+        FLYING(Keys.FLYING_SPEED, "loc:standard.flying");
 
         final Key<Value<Double>> speedKey;
         final String name;

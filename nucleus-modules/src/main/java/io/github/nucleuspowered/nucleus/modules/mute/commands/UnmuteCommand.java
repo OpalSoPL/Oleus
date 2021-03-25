@@ -56,13 +56,13 @@ public class UnmuteCommand implements ICommandExecutor, IReloadableService.Reloa
             return context.errorResult("command.modifiers.level.insufficient", user.name());
         }
 
-        if (!handler.isMuted(user.getUniqueId())) {
+        if (!handler.isMuted(user.uniqueId())) {
             return context.errorResult("command.unmute.notmuted", user.name());
         }
         // Unmute.
         try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
-            handler.unmutePlayer(user.getUniqueId());
+            handler.unmutePlayer(user.uniqueId());
             context.sendMessage("command.unmute.success", user.name(), context.getName());
             return context.successResult();
         }

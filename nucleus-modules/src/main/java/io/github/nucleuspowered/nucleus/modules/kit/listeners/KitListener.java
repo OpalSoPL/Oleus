@@ -26,7 +26,7 @@ public class KitListener implements ListenerBase {
     @Listener
     public void onPlayerFirstJoin(final NucleusFirstJoinEvent event, @Getter("getPlayer") final ServerPlayer player) {
         for (final Kit kit : this.handler.getFirstJoinKits()) {
-            this.handler.redeemKit(kit, player.getUniqueId(), true, true);
+            this.handler.redeemKit(kit, player.uniqueId(), true, true);
         }
     }
 

@@ -29,10 +29,10 @@ import java.time.Duration;
 )
 public class SetBorderCommand implements ICommandExecutor {
 
-    private final Parameter.Value<Integer> xParam = Parameter.integerNumber().setKey("x").build();
-    private final Parameter.Value<Integer> zParam = Parameter.integerNumber().setKey("z").build();
-    private final Parameter.Value<Integer> diameterParameter = Parameter.rangedInteger(1, Integer.MAX_VALUE).setKey("diameter").build();
-    private final Parameter.Value<Duration> durationParameter = Parameter.duration().setKey("delay").optional().build();
+    private final Parameter.Value<Integer> xParam = Parameter.integerNumber().key("x").build();
+    private final Parameter.Value<Integer> zParam = Parameter.integerNumber().key("z").build();
+    private final Parameter.Value<Integer> diameterParameter = Parameter.rangedInteger(1, Integer.MAX_VALUE).key("diameter").build();
+    private final Parameter.Value<Duration> durationParameter = Parameter.duration().key("delay").optional().build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -57,7 +57,7 @@ public class SetBorderCommand implements ICommandExecutor {
         final Duration delay = context.getOne(this.durationParameter).orElse(Duration.ZERO);
 
         if (context.is(Locatable.class)) {
-            final ServerLocation lw = ((Locatable) context.getCommandSourceRoot()).getServerLocation();
+            final ServerLocation lw = ((Locatable) context.getCommandSourceRoot()).serverLocation();
             if (context.hasAny(this.zParam)) {
                 x = context.requireOne(this.xParam);
                 z = context.requireOne(this.zParam);

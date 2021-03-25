@@ -25,7 +25,7 @@ public class SetFirstSpawnCommand implements ICommandExecutor {
         final ServerPlayer player = context.requirePlayer();
         context.getServiceCollection().storageManager().getGeneralService().getOrNewOnThread()
                 .set(SpawnKeys.FIRST_SPAWN_LOCATION,
-                        new LocationNode(player.getServerLocation(), player.getRotation()));
+                        new LocationNode(player.serverLocation(), player.getRotation()));
         context.sendMessage("command.setfirstspawn.success");
         context.sendMessage("command.setfirstspawn.success2");
 

@@ -56,10 +56,10 @@ public class GameruleCommand implements ICommandExecutor {
                                     x.getKey()))))
                 .collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
             .title(context.getMessage("command.world.gamerule.header", worldProperties.getKey().asString()))
             .contents(text)
-            .sendTo(context.getAudience());
+            .sendTo(context.audience());
 
         return context.successResult();
     }

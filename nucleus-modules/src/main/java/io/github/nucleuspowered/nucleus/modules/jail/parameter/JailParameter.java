@@ -40,6 +40,6 @@ public class JailParameter implements ValueParameter<Jail> {
         if (jail.isPresent()) {
             return jail;
         }
-        throw reader.createException(this.messageProvider.getMessageFor(context.getCause().getAudience(), "args.jail.nojail"));
+        throw reader.createException(this.messageProvider.getMessageFor(context.cause().audience(), "args.jail.nojail"));
     }
 }

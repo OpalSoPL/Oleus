@@ -48,33 +48,33 @@ public class BackListeners implements IReloadableService.Reloadable, ListenerBas
 
     @Listener(order = Order.LAST)
     @Exclude(ChangeEntityWorldEvent.Reposition.class)
-    public void onTeleportPlayer(final MoveEntityEvent event, @Getter("getEntity") final ServerPlayer pl) {
+    public void onTeleportPlayer(final MoveEntityEvent event, @Getter("entity") final ServerPlayer pl) {
         if (this.backConfig.isOnTeleport() && this.check(event) &&
                 this.getLogBack(pl) && this.permissionService.hasPermission(pl,
                 BackPermissions.BACK_ONTELEPORT)) {
-            this.handler.setLastLocation(pl.uniqueId(), ServerLocation.of(pl.getWorld(), event.getOriginalPosition()), pl.getRotation());
+            this.handler.setLastLocation(pl.uniqueId(), ServerLocation.of(pl.world(), event.originalPosition()), pl.rotation());
         }
     }
 
     @Listener(order = Order.LAST)
-    public void onWorldTransfer(final ChangeEntityWorldEvent.Reposition event, @Getter("getEntity") final ServerPlayer pl) {
+    public void onWorldTransfer(final ChangeEntityWorldEvent.Reposition event, @Getter("entity") final ServerPlayer pl) {
         if (this.backConfig.isOnPortal() && this.getLogBack(pl) && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONPORTAL)) {
-            this.handler.setLastLocation(pl.uniqueId(), ServerLocation.of(event.getOriginalWorld(), event.getDestinationPosition()), pl.getRotation());
+            this.handler.setLastLocation(pl.uniqueId(), ServerLocation.of(event.originalWorld(), event.destinationPosition()), pl.rotation());
         }
     }
 
     @Listener
-    public void onDeathEvent(final DestructEntityEvent.Death event, @Getter("getEntity") final ServerPlayer pl) {
+    public void onDeathEvent(final DestructEntityEvent.Death event, @Getter("entity") final ServerPlayer pl) {
         if (this.backConfig.isOnDeath() && this.getLogBack(pl) && this.permissionService.hasPermission(pl, BackPermissions.BACK_ONDEATH)) {
-            this.handler.setLastLocation(pl.uniqueId(), pl.getServerLocation(), pl.getRotation());
+            this.handler.setLastLocation(pl.uniqueId(), pl.serverLocation(), pl.rotation());
         }
     }
 
     private boolean check(final MoveEntityEvent event) {
-        return !event.getOriginalPosition().equals(event.getDestinationPosition());
+        return !event.originalPosition().equals(event.destinationPosition());
     }
 
     private boolean getLogBack(final ServerPlayer player) {
-        return !(this.jailService != null && this.jailService.isPlayerJailed(player.getUniqueId())) && this.handler.isLoggingLastLocation(player.getUniqueId());
+        return !(this.jailService != null && this.jailService.isPlayerJailed(player.uniqueId())) && this.handler.isLoggingLastLocation(player.uniqueId());
     }
 }

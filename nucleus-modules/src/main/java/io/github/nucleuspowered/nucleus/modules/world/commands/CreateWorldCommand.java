@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.world.commands;
 
+import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.config.WorldConfig;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
@@ -20,11 +21,16 @@ import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.world.WorldArchetype;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.registry.DefaultedRegistryReference;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.WorldType;
+import org.spongepowered.api.world.WorldTypes;
 import org.spongepowered.api.world.difficulty.Difficulty;
-import org.spongepowered.api.world.dimension.DimensionType;
-import org.spongepowered.api.world.gen.GeneratorModifierType;
+import org.spongepowered.api.world.generation.config.WorldGenerationConfig;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.WorldManager;
+import org.spongepowered.api.world.server.WorldTemplate;
 
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -39,35 +45,28 @@ public class CreateWorldCommand implements ICommandExecutor, IReloadableService.
 
     @Nullable private Long worldBorderDefault;
 
-    private final Parameter.Value<WorldArchetype> presetValue = Parameter.catalogedElement(WorldArchetype.class)
-            .setKey("world preset")
+    private final Parameter.Value<WorldType> worldType = Parameter.registryElement(TypeTokens.WORLD_TYPE, RegistryTypes.WORLD_TYPE)
+            .key("world type")
             .build();
-    private final Parameter.Value<DimensionType> dimensionType = Parameter.catalogedElement(DimensionType.class)
-            .setKey("dimension type")
-            .build();
-    private final Parameter.Value<Difficulty> difficultyValue = Parameter.catalogedElement(Difficulty.class).setKey("difficulty").build();
-    private final Parameter.Value<GeneratorModifierType> generatorModifierTypeValue = Parameter.catalogedElement(GeneratorModifierType.class)
-            .setKey("modifier type")
-            .build();
-    private final Parameter.Value<GameMode> gameMode = Parameter.catalogedElement(GameMode.class).setKey("gamemode").build();
-    private final Parameter.Value<Long> seedValue = Parameter.longNumber().setKey("seed").build();
-    private final Parameter.Value<Boolean> loadOnStartup = Parameter.bool().setKey("loadOnStartup").build();
-    private final Parameter.Value<Boolean> keepSpawnLoaded = Parameter.bool().setKey("keepSpawnLoaded").build();
-    private final Parameter.Value<Boolean> allowCommands = Parameter.bool().setKey("allowCommands").build();
-    private final Parameter.Value<Boolean> structures = Parameter.bool().setKey("structures").build();
-    private final Parameter.Value<Boolean> bonusChest = Parameter.bool().setKey("bonusChest").build();
-    private final Parameter.Value<String> nameValue = Parameter.string().setKey("name").build();
-    private final Parameter.Value<Boolean> pvpEnabled = Parameter.bool().setKey("pvp").build();
+    private final Parameter.Value<Difficulty> difficultyValue =
+            Parameter.registryElement(TypeTokens.DIFFICULTY, RegistryTypes.DIFFICULTY).key("difficulty").build();
+    private final Parameter.Value<GameMode> gameMode = Parameter.registryElement(TypeTokens.GAME_MODE, RegistryTypes.GAME_MODE).key("gamemode").build();
+    private final Parameter.Value<Long> seedValue = Parameter.longNumber().key("seed").build();
+    private final Parameter.Value<Boolean> loadOnStartup = Parameter.bool().key("loadOnStartup").build();
+    private final Parameter.Value<Boolean> keepSpawnLoaded = Parameter.bool().key("keepSpawnLoaded").build();
+    private final Parameter.Value<Boolean> allowCommands = Parameter.bool().key("allowCommands").build();
+    private final Parameter.Value<Boolean> structures = Parameter.bool().key("structures").build();
+    private final Parameter.Value<Boolean> bonusChest = Parameter.bool().key("bonusChest").build();
+    private final Parameter.Value<String> nameValue = Parameter.string().key("name").build();
+    private final Parameter.Value<Boolean> pvpEnabled = Parameter.bool().key("pvp").build();
 
     @Override
     public Flag[] flags(final INucleusServiceCollection serviceCollection) {
         return new Flag[] {
                 Flag.of(this.allowCommands, "c", "allowcommands"),
                 Flag.of(this.bonusChest, "b", "bonuschest"),
-                Flag.of(this.presetValue, "p", "preset"),
-                Flag.of(this.dimensionType, "di", "dimension"),
+                Flag.of(this.worldType, "w", "worldtype"),
                 Flag.of(this.difficultyValue, "d", "difficulty"),
-                Flag.of(this.generatorModifierTypeValue, "m", "modifier"),
                 Flag.of(this.gameMode, "gm", "gamemode"),
                 Flag.of(this.seedValue, "s", "seed"),
                 Flag.of(this.loadOnStartup, "l", "loadonstartup"),
@@ -84,14 +83,13 @@ public class CreateWorldCommand implements ICommandExecutor, IReloadableService.
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         final String nameInput = context.requireOne(this.nameValue);
-        final Optional<DimensionType> dimensionInput = context.getOne(this.dimensionType);
+        final Optional<WorldType> dimensionInput = context.getOne(this.worldType);
         final Optional<GameMode> gamemodeInput = context.getOne(this.gameMode);
         final Optional<Difficulty> difficultyInput = context.getOne(this.difficultyValue);
-        final Optional<GeneratorModifierType> modifiers = context.getOne(this.generatorModifierTypeValue);
         final Optional<Long> seedInput = context.getOne(this.seedValue);
-        final Optional<WorldArchetype> preset = context.getOne(this.presetValue);
         final boolean genStructures = context.getOne(this.structures).orElse(true);
         final boolean loadOnStartup = context.getOne(this.loadOnStartup).orElse(true);
         final boolean keepSpawnLoaded = context.getOne(this.keepSpawnLoaded).orElse(true);
@@ -100,42 +98,39 @@ public class CreateWorldCommand implements ICommandExecutor, IReloadableService.
         final boolean pvp = context.getOne(this.pvpEnabled).orElse(true);
 
         final ResourceKey projectedKey = ResourceKey.of(context.getServiceCollection().pluginContainer(), nameInput.toLowerCase());
-        if (Sponge.server().worldManager().getProperties(projectedKey).isPresent()) {
+        final WorldManager worldManager = Sponge.server().worldManager();
+        if (worldManager.templateExists(projectedKey)) {
             return context.errorResult("command.world.create.exists", nameInput);
         }
 
-        // Generate preset key.
-        final ResourceKey worldKey = ResourceKey.of(context.getServiceCollection().pluginContainer(), nameInput.toLowerCase());
-        ResourceKey toSet = worldKey;
-        int i = 0;
-        while (!Sponge.getRegistry().getCatalogRegistry().get(WorldArchetype.class, toSet).isPresent()) {
-            ++i;
-            toSet = ResourceKey.of(context.getServiceCollection().pluginContainer(), nameInput.toLowerCase() + i);
-        }
+        final DefaultedRegistryReference<WorldType> type = dimensionInput.map(x -> x.asDefaultedReference(RegistryTypes.WORLD_TYPE))
+                .orElse(WorldTypes.OVERWORLD);
 
-        final WorldArchetype.Builder worldSettingsBuilder = WorldArchetype.builder().enabled(true);
-        preset.ifPresent(worldSettingsBuilder::from);
-        dimensionInput.ifPresent(worldSettingsBuilder::dimensionType);
-        gamemodeInput.ifPresent(worldSettingsBuilder::gameMode);
-        difficultyInput.ifPresent(worldSettingsBuilder::difficulty);
-        modifiers.ifPresent(worldSettingsBuilder::generatorModifierType);
+        final WorldTemplate.Builder template = WorldTemplate.builder().worldType(type);
 
-        worldSettingsBuilder.loadOnStartup(loadOnStartup)
-                .keepSpawnLoaded(keepSpawnLoaded)
-                .generateStructures(genStructures)
-                .commandsEnabled(allowCommands)
+        template.key(projectedKey);
+        gamemodeInput.ifPresent(x -> template.gameMode(x.asDefaultedReference(RegistryTypes.GAME_MODE)));
+        difficultyInput.ifPresent(x -> template.difficulty(x.asDefaultedReference(RegistryTypes.DIFFICULTY)));
+
+        final WorldGenerationConfig.Mutable.Builder genConfig = WorldGenerationConfig.Mutable.builder()
                 .generateBonusChest(bonusChest)
-                .pvpEnabled(pvp);
-        seedInput.ifPresent(worldSettingsBuilder::seed);
+                .generateFeatures(genStructures);
 
-        final WorldArchetype wa = worldSettingsBuilder.key(toSet).build();
+        seedInput.ifPresent(genConfig::seed);
+
+        template.loadOnStartup(loadOnStartup)
+                .generationConfig(genConfig.build())
+                .commands(allowCommands)
+                .pvp(pvp);
+
+        final WorldTemplate completedTemplate = template.build();
 
         context.sendMessage("command.world.create.begin", nameInput);
         context.sendMessage("command.world.create.newparams",
-                wa.getDimensionType().key().asString(),
-                wa.getGeneratorModifier().getKey().asString(),
-                wa.getGameMode().getKey().asString(),
-                wa.getDifficulty().asComponent());
+                type.location().asString(),
+                "-",
+                completedTemplate.gameMode().orElse(GameModes.NOT_SET).location().asString(),
+                completedTemplate.difficulty().map(x -> x.location().asString()).orElseGet(() -> context.getMessageString("standard.notset")));
         context.sendMessage("command.world.create.newparams2",
                 String.valueOf(loadOnStartup),
                 String.valueOf(keepSpawnLoaded),
@@ -143,32 +138,37 @@ public class CreateWorldCommand implements ICommandExecutor, IReloadableService.
                 String.valueOf(allowCommands),
                 String.valueOf(bonusChest));
 
-        Sponge.game().getServer().worldManager().createProperties(worldKey, wa).handle((worldProperties, exception) -> {
+        worldManager.saveTemplate(template.build()).handle((created, exception) -> {
             if (exception != null) {
                 context.getServiceCollection().schedulerService().runOnMainThread(
                         () -> context.sendMessageText(Component.text(exception.getMessage())));
                 final CompletableFuture<ServerWorld> worldCompletableFuture = new CompletableFuture<>();
                 worldCompletableFuture.complete(null);
                 return worldCompletableFuture;
-            }
-
-            if (this.worldBorderDefault != null && this.worldBorderDefault > 0) {
-                worldProperties.getWorldBorder().setDiameter(this.worldBorderDefault);
-            }
-
-            return Sponge.server().worldManager().loadWorld(worldProperties);
-        }).<Void>handle((world, exception) -> {
-            if (exception != null) {
+            } else if (!created) {
                 context.getServiceCollection().schedulerService().runOnMainThread(
                         () -> context.sendMessage("command.world.create.worldfailedtoload", nameInput));
-                return null;
+                final CompletableFuture<ServerWorld> worldCompletableFuture = new CompletableFuture<>();
+                worldCompletableFuture.complete(null);
+                return worldCompletableFuture;
             }
 
-            if (world != null) {
-                context.getServiceCollection().schedulerService().runOnMainThread(
-                        () -> context.sendMessage("command.world.create.success", nameInput));
-            }
-            return null;
+            return Sponge.server().worldManager().loadWorld(projectedKey).<Void>handle((world, innerException) -> {
+                if (innerException != null) {
+                    context.getServiceCollection().schedulerService().runOnMainThread(
+                            () -> context.sendMessage("command.world.create.worldfailedtoload", nameInput));
+                    return null;
+                }
+
+                if (world != null) {
+                    if (this.worldBorderDefault != null && this.worldBorderDefault > 0) {
+                        world.border().setDiameter(this.worldBorderDefault);
+                    }
+                    context.getServiceCollection().schedulerService().runOnMainThread(
+                            () -> context.sendMessage("command.world.create.success", nameInput));
+                }
+                return null;
+            });
         });
         return context.successResult();
     }

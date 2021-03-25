@@ -65,17 +65,17 @@ public class StaffChatService implements NucleusStaffChatService, ServiceBase {
     }
 
     public boolean isToggledChat(final Player player) {
-        return this.chatMessageFormatService.getNucleusChannel(player.getUniqueId()).filter(x -> x instanceof StaffChatMessageChannel).isPresent();
+        return this.chatMessageFormatService.getNucleusChannel(player.uniqueId()).filter(x -> x instanceof StaffChatMessageChannel).isPresent();
     }
 
     public void toggle(final ServerPlayer player, final boolean toggle) {
         if (toggle) {
-            this.chatMessageFormatService.setPlayerNucleusChannel(player.getUniqueId(), StaffChatMessageChannel.getInstance());
+            this.chatMessageFormatService.setPlayerNucleusChannel(player.uniqueId(), StaffChatMessageChannel.getInstance());
 
             // If you switch, you're switching to the staff chat channel so you should want to listen to it.
-            this.userPreferenceService.setPreferenceFor(player.getUniqueId(), StaffChatKeys.VIEW_STAFF_CHAT, true);
+            this.userPreferenceService.setPreferenceFor(player.uniqueId(), StaffChatKeys.VIEW_STAFF_CHAT, true);
         } else {
-            this.chatMessageFormatService.setPlayerNucleusChannel(player.getUniqueId(), null);
+            this.chatMessageFormatService.setPlayerNucleusChannel(player.uniqueId(), null);
         }
     }
 }

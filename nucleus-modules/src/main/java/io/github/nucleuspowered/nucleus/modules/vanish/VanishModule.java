@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.vanish;
 
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import io.github.nucleuspowered.nucleus.api.core.event.NucleusRegisterPreferenceKeyEvent;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.modules.vanish.commands.ToggleVanishOnLoginCommand;
 import io.github.nucleuspowered.nucleus.modules.vanish.commands.VanishCommand;
@@ -18,7 +19,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.util.Identifiable;
 
@@ -38,11 +38,10 @@ public final class VanishModule implements IModule.Configurable<VanishConfig> {
                 .registerToken(
                         "vanished",
                         PlaceholderParser.builder()
-                                .key(ResourceKey.of("nucleus", "vanished"))
                                 .parser(p -> {
-                                    if (p.getAssociatedObject()
+                                    if (p.associatedObject()
                                             .filter(x -> x instanceof Identifiable)
-                                            .map(x -> serviceCollection.getServiceUnchecked(VanishService.class).isVanished(((Identifiable) x).getUniqueId()))
+                                            .map(x -> serviceCollection.getServiceUnchecked(VanishService.class).isVanished(((Identifiable) x).uniqueId()))
                                             .orElse(false)) {
                                         return Component.text("[Vanished]", NamedTextColor.GRAY);
                                     }
@@ -71,7 +70,7 @@ public final class VanishModule implements IModule.Configurable<VanishConfig> {
     }
 
     @Listener
-    public void onRegisterNucleusPreferenceKeys(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
+    public void onRegisterNucleusPreferenceKeys(final NucleusRegisterPreferenceKeyEvent event) {
         event.register(VanishKeys.VANISH_ON_LOGIN);
     }
 

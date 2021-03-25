@@ -33,7 +33,7 @@ public class DeletePowertoolCommand implements ICommandExecutor {
         }
 
         final ItemType type = itemStack.getType();
-        final UUID uuid = context.getUniqueId().get();
+        final UUID uuid = context.uniqueId().get();
         final PowertoolService service = context.getServiceCollection().getServiceUnchecked(PowertoolService.class);
         service.getPowertoolForItem(uuid, type)
                 .orElseThrow(() -> context.createException("command.powertool.nocmds", itemStack.getType().asComponent()));

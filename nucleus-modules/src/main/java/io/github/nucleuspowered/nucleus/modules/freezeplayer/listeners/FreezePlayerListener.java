@@ -53,15 +53,15 @@ public class FreezePlayerListener implements ListenerBase {
 
     @Listener
     public void onPlayerDisconnect(final ServerSideConnectionEvent.Disconnect event) {
-        this.service.invalidate(event.getPlayer().getUniqueId());
+        this.service.invalidate(event.getPlayer().uniqueId());
     }
 
     private boolean checkForFrozen(final Player player, final String message) {
-        if (this.service.getFromUUID(player.getUniqueId())) {
+        if (this.service.getFromUUID(player.uniqueId())) {
             final Instant now = Instant.now();
-            if (this.lastFreezeNotification.getOrDefault(player.getUniqueId(), now).isBefore(now)) {
+            if (this.lastFreezeNotification.getOrDefault(player.uniqueId(), now).isBefore(now)) {
                 this.messageProviderService.sendMessageTo(player, message);
-                this.lastFreezeNotification.put(player.getUniqueId(), now.plus(2, ChronoUnit.SECONDS));
+                this.lastFreezeNotification.put(player.uniqueId(), now.plus(2, ChronoUnit.SECONDS));
             }
 
             return true;

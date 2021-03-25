@@ -48,9 +48,9 @@ public class JailsCommand implements ICommandExecutor {
                 .map(x -> this.createJail(context, x.getValue(), x.getKey()))
                 .collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
             .title(context.getMessage("command.jails.list.header")).padding(Component.text("-", NamedTextColor.GREEN))
-            .contents(lt).sendTo(context.getAudience());
+            .contents(lt).sendTo(context.audience());
         return context.successResult();
     }
 

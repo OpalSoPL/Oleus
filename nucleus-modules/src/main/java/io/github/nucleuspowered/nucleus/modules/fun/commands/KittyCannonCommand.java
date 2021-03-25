@@ -64,8 +64,8 @@ public class KittyCannonCommand implements ICommandExecutor {
     @Inject
     public KittyCannonCommand(final INucleusServiceCollection serviceCollection) {
         this.players = Parameter.builder(new TypeToken<Collection<ServerPlayer>>() {})
-            .parser(ResourceKeyedValueParameters.MANY_PLAYERS)
-            .setKey("players")
+            .addParser(ResourceKeyedValueParameters.MANY_PLAYERS)
+            .key("players")
             .optional()
             .setRequirements(cause -> serviceCollection.permissionService().hasPermission(cause, FunPermissions.OTHERS_KITTYCANNON))
             .build();
@@ -113,11 +113,11 @@ public class KittyCannonCommand implements ICommandExecutor {
                 spawnAt.getLocation().getPosition().add(0, 1, 0).add(spawnAt.getTransform().getRotationAsQuaternion().getDirection()));
         cat.offer(Keys.CAT_TYPE, catTypes.get(this.random.nextInt(catTypes.size())));
 
-        Sponge.server().getScheduler().submit(
+        Sponge.server().scheduler().submit(
                 Task.builder().interval(Ticks.of(5))
                         .delay(Ticks.of(5))
                         .execute(new CatTimer(world.getKey(),
-                                cat.getUniqueId(),
+                                cat.uniqueId(),
                                 spawnAt,
                                 this.random.nextInt(60) + 20,
                                 damageEntities,
@@ -179,7 +179,7 @@ public class KittyCannonCommand implements ICommandExecutor {
             this.ticksToDestruction -= 5;
             if (this.ticksToDestruction <= 0 || e.onGround().get()) {
                 // Cat explodes.
-                final Explosion explosion = Explosion.builder().location(e.getServerLocation()).canCauseFire(this.causeFire)
+                final Explosion explosion = Explosion.builder().location(e.serverLocation()).canCauseFire(this.causeFire)
                     .shouldDamageEntities(this.damageEntities).shouldPlaySmoke(true).shouldBreakBlocks(this.breakBlocks)
                     .radius(2).build();
                 e.remove();

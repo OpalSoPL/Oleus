@@ -37,8 +37,8 @@ import org.spongepowered.api.util.Ticks;
 public class IgniteCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> ticks = Parameter.builder(Integer.class)
-            .setKey("ticks")
-            .parser(VariableValueParameters.integerRange().setMin(0).build())
+            .key("ticks")
+            .addParser(VariableValueParameters.integerRange().setMin(0).build())
             .build();
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {

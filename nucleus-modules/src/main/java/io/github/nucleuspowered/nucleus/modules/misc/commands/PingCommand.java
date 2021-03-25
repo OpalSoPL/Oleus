@@ -34,9 +34,9 @@ public class PingCommand implements ICommandExecutor { // extends AbstractComman
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer player = context.getPlayerFromArgs();
         if (context.is(player)) {
-            context.sendMessage("command.ping.current.self", player.getConnection().getLatency());
+            context.sendMessage("command.ping.current.self", player.connection().latency());
         } else {
-            context.sendMessage("command.ping.current.other", player.name(), player.getConnection().getLatency());
+            context.sendMessage("command.ping.current.other", player.name(), player.connection().latency());
         }
 
         return context.successResult();

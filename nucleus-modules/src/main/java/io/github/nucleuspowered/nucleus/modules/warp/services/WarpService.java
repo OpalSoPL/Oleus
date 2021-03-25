@@ -58,24 +58,24 @@ public class WarpService implements NucleusWarpService, ServiceBase {
     public WarpService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.warpPermissionArgument = Parameter.builder(Warp.class)
-                .parser(new WarpParameter(
+                .addParser(new WarpParameter(
                     serviceCollection.permissionService(),
                     serviceCollection.messageProvider(),
                     this,
                     true))
-                .setKey("warp")
+                .key("warp")
                 .build();
         this.warpNoPermissionArgument = Parameter.builder(Warp.class)
-                .parser(new WarpParameter(
+                .addParser(new WarpParameter(
                         serviceCollection.permissionService(),
                         serviceCollection.messageProvider(),
                         this,
                         false))
-                .setKey("warp")
+                .key("warp")
                 .build();
         this.warpCategoryParameter = Parameter.builder(WarpCategory.class)
-                .setKey("category")
-                .parser(new WarpCategoryParameter(
+                .key("category")
+                .addParser(new WarpCategoryParameter(
                         serviceCollection,
                         this))
                 .build();

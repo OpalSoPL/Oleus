@@ -13,6 +13,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.data.Key;
@@ -20,6 +21,7 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.util.blockray.RayTrace;
 import org.spongepowered.api.util.blockray.RayTraceResult;
 
@@ -61,25 +63,27 @@ public class EntityInfoCommand implements ICommandExecutor {
 
 
         // Display info about the entity
-        final Entity entity = rayTraceResult.getSelectedObject();
-        final EntityType<?> type = entity.getType();
+        final Entity entity = rayTraceResult.selectedObject();
+        final EntityType<?> type = entity.type();
 
         final List<Component> lt = new ArrayList<>();
-        lt.add(context.getMessage("command.entityinfo.id", type.getKey().asString(), type.asComponent()));
-        lt.add(context.getMessage("command.entityinfo.uuid", entity.getUniqueId().toString()));
+        lt.add(context.getMessage("command.entityinfo.id", type.findKey(RegistryTypes.ENTITY_TYPE)
+                .map(ResourceKey::asString)
+                .orElseGet(() -> context.getMessageString("standard.unknown")), type.asComponent()));
+        lt.add(context.getMessage("command.entityinfo.uuid", entity.uniqueId().toString()));
 
         if (context.hasFlag("e")) {
             for (final Key<? extends Value<?>> key : entity.getKeys()) {
                 final Optional<?> value = entity.get((Key) key); // this is the only way I could get this to work
-                value.ifPresent(o -> lt.add(context.getMessage("command.entityinfo.key", key.getKey(), String.valueOf(o))));
+                value.ifPresent(o -> lt.add(context.getMessage("command.entityinfo.key", key.key(), String.valueOf(o))));
             }
         }
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .contents(lt)
                 .padding(Component.text("-", NamedTextColor.GREEN))
-            .title(context.getMessage("command.entityinfo.list.header", entity.getPosition()))
-            .sendTo(context.getAudience());
+            .title(context.getMessage("command.entityinfo.list.header", entity.position()))
+            .sendTo(context.audience());
 
         return context.successResult();
     }

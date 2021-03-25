@@ -33,7 +33,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 )
 public class ItemNameSetCommand implements ICommandExecutor {
 
-    private final Parameter.Value<Component> parameter = Parameter.formattingCodeTextOfRemainingElements().setKey("name").build();
+    private final Parameter.Value<Component> parameter = Parameter.formattingCodeTextOfRemainingElements().key("name").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {

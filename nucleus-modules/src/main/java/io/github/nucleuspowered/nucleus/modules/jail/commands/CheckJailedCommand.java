@@ -40,9 +40,9 @@ public class CheckJailedCommand implements ICommandExecutor {
     @Inject
     public CheckJailedCommand(final INucleusServiceCollection serviceCollection) {
         this.parameter = Parameter.builder(Jail.class)
-                .setKey("jail")
+                .key("jail")
                 .optional()
-                .parser(new JailParameter(serviceCollection.getServiceUnchecked(JailService.class), serviceCollection.messageProvider()))
+                .addParser(new JailParameter(serviceCollection.getServiceUnchecked(JailService.class), serviceCollection.messageProvider()))
                 .build();
     }
 
@@ -72,7 +72,7 @@ public class CheckJailedCommand implements ICommandExecutor {
         }
 
         // Get the users in this jail, or all jails
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
             .title(context.getMessage("command.checkjailed.header", jailName))
             .contents(usersInJail.stream().map(x -> {
                 Component name;
@@ -83,7 +83,7 @@ public class CheckJailedCommand implements ICommandExecutor {
                         }
                 return name.hoverEvent(HoverEvent.showText(context.getMessage("command.checkjailed.hover")))
                         .clickEvent(ClickEvent.runCommand("/nucleus:checkjail " + x.toString()));
-                }).collect(Collectors.toList())).sendTo(context.getAudience());
+                }).collect(Collectors.toList())).sendTo(context.audience());
         return context.successResult();
     }
 }

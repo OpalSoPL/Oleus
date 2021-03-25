@@ -40,8 +40,8 @@ public class LoreDeleteCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> loreLine =
             Parameter.builder(Integer.class)
-                    .parser(VariableValueParameters.integerRange().setMin(0).build())
-                    .setKey("line")
+                    .addParser(VariableValueParameters.integerRange().setMin(0).build())
+                    .key("line")
                     .build();
 
     @Override

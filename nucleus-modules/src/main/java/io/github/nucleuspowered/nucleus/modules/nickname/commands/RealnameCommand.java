@@ -33,7 +33,7 @@ import java.util.Map;
 )
 public class RealnameCommand implements ICommandExecutor {
 
-    private final Parameter.Value<String> parameter = Parameter.string().setKey("name").build();
+    private final Parameter.Value<String> parameter = Parameter.string().key("name").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -62,11 +62,11 @@ public class RealnameCommand implements ICommandExecutor {
                         entry.getValue().color(NamedTextColor.WHITE)));
             }
 
-            final PaginationList.Builder plb = Util.getPaginationBuilder(context.getAudience())
+            final PaginationList.Builder plb = Util.getPaginationBuilder(context.audience())
                     .contents(realNames)
                     .padding(Component.text(" - ", NamedTextColor.GREEN))
                     .title(context.getMessage("command.realname.title", argname));
-            plb.sendTo(context.getAudience());
+            plb.sendTo(context.audience());
         }
 
         return context.successResult();

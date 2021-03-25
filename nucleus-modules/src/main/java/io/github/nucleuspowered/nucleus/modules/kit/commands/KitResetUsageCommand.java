@@ -43,13 +43,13 @@ public class KitResetUsageCommand implements ICommandExecutor {
         final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
         final User u = context.requireOne(NucleusParameters.ONE_USER);
         final IStorageManager storageManager = context.getServiceCollection().storageManager();
-        final IUserDataObject userDataObject = storageManager.getUserService().getOrNewOnThread(u.getUniqueId());
+        final IUserDataObject userDataObject = storageManager.getUserService().getOrNewOnThread(u.uniqueId());
         final Map<String, Instant> data = userDataObject.getNullable(KitKeys.REDEEMED_KITS);
         if (data != null && data.containsKey(kitInfo.getName().toLowerCase())) {
             // Remove the key.
             data.remove(kitInfo.getName().toLowerCase());
             userDataObject.set(KitKeys.REDEEMED_KITS, data);
-            storageManager.getUserService().save(u.getUniqueId(), userDataObject);
+            storageManager.getUserService().save(u.uniqueId(), userDataObject);
             context.sendMessage("command.kit.resetuser.success", u.getName(), kitInfo.getName());
             return context.successResult();
         }

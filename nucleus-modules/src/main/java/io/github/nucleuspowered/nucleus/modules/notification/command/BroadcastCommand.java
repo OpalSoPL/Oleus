@@ -51,7 +51,7 @@ public class BroadcastCommand implements ICommandExecutor, IReloadableService.Re
                 context.getServiceCollection().textTemplateFactory(),
                 textTemplate,
                 context.getCommandSourceRoot()
-        ).send(context.getCause().getAudience());
+        ).send(context.cause().audience());
         return context.successResult();
     }
 

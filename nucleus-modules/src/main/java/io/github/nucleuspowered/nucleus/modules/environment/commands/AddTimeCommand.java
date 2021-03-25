@@ -40,8 +40,8 @@ public class AddTimeCommand implements ICommandExecutor {
 
     @Inject
     public AddTimeCommand(final INucleusServiceCollection serviceCollection) {
-        this.timeParameter = Parameter.builder(TypeTokens.MINECRAFT_DAY_TIME).setKey("time")
-                .parser(new WorldTimeParameter(false, serviceCollection.messageProvider()))
+        this.timeParameter = Parameter.builder(TypeTokens.MINECRAFT_DAY_TIME).key("time")
+                .addParser(new WorldTimeParameter(false, serviceCollection.messageProvider()))
                 .build();
     }
 

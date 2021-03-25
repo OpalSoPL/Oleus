@@ -45,9 +45,9 @@ public class MuteModule implements IModule.Configurable<MuteConfig> { // Configu
                 "muted",
                 PlaceholderParser.builder()
                         .key(ResourceKey.of(serviceCollection.pluginContainer(), "muted"))
-                        .parser(p -> {
+                        .addParser(p -> {
                             if (p.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
-                                    .map(x -> serviceCollection.getServiceUnchecked(MuteService.class).isMuted(((ServerPlayer) x).getUniqueId()))
+                                    .map(x -> serviceCollection.getServiceUnchecked(MuteService.class).isMuted(((ServerPlayer) x).uniqueId()))
                                     .orElse(false)) {
                                 return Component.text("[Muted]", NamedTextColor.GRAY);
                             }

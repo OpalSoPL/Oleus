@@ -66,7 +66,7 @@ public class HatCommand implements ICommandExecutor {
         // If the old item can't be placed back in the subject inventory, drop the item.
         if (!helment.isEmpty()) {
             Util.getStandardInventory(pl).offer(helment)
-                    .getRejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, pl.getServerLocation().getWorld(),
+                    .getRejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, pl.serverLocation().getWorld(),
                         pl.getLocation().getPosition()));
         }
 

@@ -10,8 +10,8 @@ import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.ValueParameter;
-import org.spongepowered.api.world.weather.Weather;
-import org.spongepowered.api.world.weather.Weathers;
+import org.spongepowered.api.world.weather.WeatherType;
+import org.spongepowered.api.world.weather.WeatherTypes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,19 +19,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class WeatherArgument implements ValueParameter<Weather> {
+public class WeatherArgument implements ValueParameter<WeatherType> {
 
-    private static final Map<String, Weather> WEATHERS = new HashMap<>();
+    private static final Map<String, WeatherType> WEATHERS = new HashMap<>();
 
     static {
-        WEATHERS.put("clear", Weathers.CLEAR.get());
-        WEATHERS.put("c", Weathers.CLEAR.get());
-        WEATHERS.put("sun", Weathers.CLEAR.get());
-        WEATHERS.put("rain", Weathers.RAIN.get());
-        WEATHERS.put("r", Weathers.RAIN.get());
-        WEATHERS.put("storm", Weathers.THUNDER.get());
-        WEATHERS.put("thunder", Weathers.THUNDER.get());
-        WEATHERS.put("t", Weathers.THUNDER.get());
+        WEATHERS.put("clear", WeatherTypes.CLEAR.get());
+        WEATHERS.put("c", WeatherTypes.CLEAR.get());
+        WEATHERS.put("sun", WeatherTypes.CLEAR.get());
+        WEATHERS.put("rain", WeatherTypes.RAIN.get());
+        WEATHERS.put("r", WeatherTypes.RAIN.get());
+        WEATHERS.put("storm", WeatherTypes.THUNDER.get());
+        WEATHERS.put("thunder", WeatherTypes.THUNDER.get());
+        WEATHERS.put("t", WeatherTypes.THUNDER.get());
     }
 
     private final IMessageProviderService messageProvider;
@@ -48,8 +48,8 @@ public class WeatherArgument implements ValueParameter<Weather> {
     }
 
     @Override
-    public Optional<? extends Weather> getValue(
-            final Parameter.Key<? super Weather> parameterKey,
+    public Optional<? extends WeatherType> parseValue(
+            final Parameter.Key<? super WeatherType> parameterKey,
             final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
         final String arg = reader.parseString().toLowerCase();
@@ -57,6 +57,6 @@ public class WeatherArgument implements ValueParameter<Weather> {
             return Optional.of(WeatherArgument.WEATHERS.get(arg));
         }
 
-        throw reader.createException(this.messageProvider.getMessageFor(context.getCause().getAudience(), "args.weather.noexist", "clear, rain, storm"));
+        throw reader.createException(this.messageProvider.getMessageFor(context.cause().audience(), "args.weather.noexist", "clear, rain, storm"));
     }
 }

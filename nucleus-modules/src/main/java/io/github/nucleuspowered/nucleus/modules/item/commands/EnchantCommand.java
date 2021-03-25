@@ -46,12 +46,12 @@ import java.util.List;
 public class EnchantCommand implements ICommandExecutor {
 
     private final Parameter.Value<EnchantmentType> enchantmentType = Parameter.builder(EnchantmentType.class)
-            .parser(VariableValueParameters.catalogedElementParameterBuilder(EnchantmentType.class).defaultNamespace("minecraft").build())
-            .setKey("enchantment")
+            .addParser(VariableValueParameters.catalogedElementParameterBuilder(EnchantmentType.class).defaultNamespace("minecraft").build())
+            .key("enchantment")
             .build();
     private final Parameter.Value<Integer> level = Parameter.builder(Integer.class)
-            .parser(VariableValueParameters.integerRange().setMin(0).setMax((int) Short.MAX_VALUE).build())
-            .setKey("level")
+            .addParser(VariableValueParameters.integerRange().setMin(0).setMax((int) Short.MAX_VALUE).build())
+            .key("level")
             .build();
 
     @Override

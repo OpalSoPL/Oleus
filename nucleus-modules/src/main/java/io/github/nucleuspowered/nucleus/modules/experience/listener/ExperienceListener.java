@@ -49,41 +49,41 @@ public class ExperienceListener implements ListenerBase {
     // * FALSE (Explicitly set): remove EXP
     // * UNDEFINED: do whatever the system wants us to do.
     @Listener(order = Order.POST)
-    public void onPlayerDeathMonitor(final DestructEntityEvent.Death deathEvent, @Getter("getEntity") final ServerPlayer player) {
+    public void onPlayerDeathMonitor(final DestructEntityEvent.Death deathEvent, @Getter("entity") final ServerPlayer player) {
         final Tristate tristate = this.permissionService.hasPermissionTristate(player, ExperiencePermissions.KEEP_EXP_PERMISSION);
         if (tristate == Tristate.TRUE) {
             final int exp = player.get(Keys.EXPERIENCE).orElse(0);
-            this.deadExpPlayers.put(player.getUniqueId(), exp);
+            this.deadExpPlayers.put(player.uniqueId(), exp);
         } else if (tristate == Tristate.FALSE) {
-            this.deadExpPlayers.put(player.getUniqueId(), 0);
+            this.deadExpPlayers.put(player.uniqueId(), 0);
         }
     }
 
     @Listener
     public void preventExperienceDroppingOrb(final SpawnEntityEvent event, @Root final Player player) {
-        if (this.deadExpPlayers.getOrDefault(player.getUniqueId(), 0) > 0) {
+        if (this.deadExpPlayers.getOrDefault(player.uniqueId(), 0) > 0) {
             // don't drop orbs for people who die, unless we're setting to zero.
             event.filterEntities(entity -> !(entity instanceof ExperienceOrb));
         }
     }
 
     @Listener
-    public void onPlayerRespawn(final RespawnPlayerEvent.Post event, @Getter("getEntity") final ServerPlayer player) {
+    public void onPlayerRespawn(final RespawnPlayerEvent.Post event, @Getter("entity") final ServerPlayer player) {
         this.applyExperience(player);
     }
 
     @Listener
-    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer player) {
         this.applyExperience(player);
     }
 
     private void applyExperience(final ServerPlayer player) {
-        if (this.deadExpPlayers.containsKey(player.getUniqueId())) {
-            final int exp = this.deadExpPlayers.get(player.getUniqueId());
+        if (this.deadExpPlayers.containsKey(player.uniqueId())) {
+            final int exp = this.deadExpPlayers.get(player.uniqueId());
             final Task task =
                     Task.builder().delay(Ticks.of(1)).execute(() -> player.offer(Keys.EXPERIENCE, exp)).plugin(this.pluginContainer).build();
-            Sponge.server().getScheduler().submit(task);
-            this.deadExpPlayers.remove(player.getUniqueId());
+            Sponge.server().scheduler().submit(task);
+            this.deadExpPlayers.remove(player.uniqueId());
         }
     }
 

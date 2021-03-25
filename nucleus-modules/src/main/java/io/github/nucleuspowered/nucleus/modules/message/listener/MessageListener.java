@@ -25,12 +25,12 @@ public final class MessageListener implements ListenerBase {
 
     @Listener(order = Order.LAST)
     public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer serverPlayer) {
-        this.messageHandler.addPlayer(serverPlayer.getUniqueId());
+        this.messageHandler.addPlayer(serverPlayer.uniqueId());
     }
 
     @Listener(order = Order.LAST)
     public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer serverPlayer) {
-        this.messageHandler.removePlayer(serverPlayer.getUniqueId());
+        this.messageHandler.removePlayer(serverPlayer.uniqueId());
     }
 
 }

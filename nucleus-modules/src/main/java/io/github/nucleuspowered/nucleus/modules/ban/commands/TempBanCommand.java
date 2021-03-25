@@ -104,16 +104,16 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
         service.addBan(bp);
 
         final Audience send = Audience.audience(
-                context.getAudience(),
+                context.audience(),
                 context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY)
         );
         send.sendMessage(context.getMessage("command.tempban.applied",
-                        context.getDisplayName(u.getUniqueId()),
+                        context.getDisplayName(u.uniqueId()),
                         context.getTimeString(time),
                         src));
         send.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
-        Sponge.server().player(u.getUniqueId()).ifPresent(x -> x.kick(r));
+        Sponge.server().player(u.uniqueId()).ifPresent(x -> x.kick(r));
         return context.successResult();
     }
 }

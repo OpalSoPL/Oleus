@@ -56,9 +56,9 @@ public class InfoCommand implements ICommandExecutor, IReloadableService.Reloada
     public InfoCommand(final INucleusServiceCollection serviceCollection) {
         this.infoService = serviceCollection.getServiceUnchecked(InfoHandler.class);
         this.parameter = Parameter.builder(InfoValueParameter.Result.class)
-                .setKey("info")
+                .key("info")
                 .optional()
-                .parser(new InfoValueParameter(this.infoService, serviceCollection))
+                .addParser(new InfoValueParameter(this.infoService, serviceCollection))
                 .build();
     }
 
@@ -100,9 +100,9 @@ public class InfoCommand implements ICommandExecutor, IReloadableService.Reloada
             final TextFileController controller = oir.get().text;
             final Component def = LegacyComponentSerializer.legacyAmpersand().deserialize(oir.get().name);
             final Component title = context.getMessage("command.info.title.section",
-                    controller.getTitle(context.getAudience()).orElse(def));
+                    controller.getTitle(context.audience()).orElse(def));
 
-            controller.sendToAudience(context.getAudience(), title);
+            controller.sendToAudience(context.audience(), title);
             return context.successResult();
         }
 
@@ -122,19 +122,19 @@ public class InfoCommand implements ICommandExecutor, IReloadableService.Reloada
                         .clickEvent(ClickEvent.runCommand("/nucleus:info " + x)).build());
 
             // If there is a title, then add it.
-            this.infoService.getSection(x).get().getTitle(context.getAudience()).ifPresent(sub ->
+            this.infoService.getSection(x).get().getTitle(context.audience()).ifPresent(sub ->
                 tb.append(Component.text(" - ").color(NamedTextColor.GOLD)).append(sub)
             );
 
             s.add(tb.build());
         });
 
-        Util.getPaginationBuilder(context.getAudience()).contents()
+        Util.getPaginationBuilder(context.audience()).contents()
                 .header(context.getMessage("command.info.header.default"))
                 .title(context.getMessage("command.info.title.default"))
                 .contents(s.stream().sorted(Comparator.comparing(x -> PlainComponentSerializer.plain().serialize(x))).collect(Collectors.toList()))
                 .padding(Component.text().content("-").color(NamedTextColor.GOLD).build())
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
         return context.successResult();
     }
 }

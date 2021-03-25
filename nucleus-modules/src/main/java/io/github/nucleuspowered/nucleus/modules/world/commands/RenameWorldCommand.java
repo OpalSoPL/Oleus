@@ -25,7 +25,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 )
 public class RenameWorldCommand implements ICommandExecutor {
 
-    private final Parameter.Value<String> nameKey = Parameter.string().setKey("new name").build();
+    private final Parameter.Value<String> nameKey = Parameter.string().key("new name").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {

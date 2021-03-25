@@ -56,8 +56,8 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
     public JailCommand(final INucleusServiceCollection serviceCollection) {
         this.handler = serviceCollection.getServiceUnchecked(JailService.class);
         this.parameter = Parameter.builder(Jail.class)
-                .setKey("jail")
-                .parser(new JailParameter(this.handler, serviceCollection.messageProvider()))
+                .key("jail")
+                .addParser(new JailParameter(this.handler, serviceCollection.messageProvider()))
                 .build();
     }
 
@@ -110,7 +110,7 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
         final Component messageTo;
 
         final boolean success = this.handler.jailPlayer(
-                user.getUniqueId(),
+                user.uniqueId(),
                 jail,
                 reason,
                 duration.orElse(null)
@@ -120,7 +120,7 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
             if (duration.isPresent()) {
                 final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
                 message = context.getMessage("command.checkjail.jailedfor", user.name(), jail.getName(),
-                        context.getName(), messageProviderService.getTimeString(context.getAudience(), duration.get()));
+                        context.getName(), messageProviderService.getTimeString(context.audience(), duration.get()));
                 messageTo = context.getMessage("command.jail.jailedfor", jail.getName(), context.getName(),
                         messageProviderService.getTimeString(context.getLocale(), duration.get()));
             } else {
@@ -130,12 +130,12 @@ public class JailCommand implements ICommandExecutor, IReloadableService.Reloada
 
             final Audience audience = Audience.audience(
                     new PermissionMessageChannel(context.getServiceCollection().permissionService(), JailPermissions.JAIL_NOTIFY),
-                    context.getAudience());
+                    context.audience());
 
             audience.sendMessage(message);
             audience.sendMessage(context.getMessage("standard.reasoncoloured", reason));
 
-            user.getPlayer().ifPresent(x -> {
+            user.player().ifPresent(x -> {
                 x.sendMessage(messageTo);
                 x.sendMessage(context.getMessage("standard.reasoncoloured", reason));
             });

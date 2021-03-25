@@ -24,6 +24,7 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class ItemInfoCommand implements ICommandExecutor {
 
     private final String key = "key";
 
-    private final Parameter.Value<ItemStackSnapshot> itemTypeParameter = Parameter.itemStackSnapshot().optional().setKey("item").build();
+    private final Parameter.Value<ItemStackSnapshot> itemTypeParameter = Parameter.itemStackSnapshot().optional().key("item").build();
 
     @Override
     public Flag[] flags(final INucleusServiceCollection serviceCollection) {
@@ -64,30 +65,30 @@ public class ItemInfoCommand implements ICommandExecutor {
         final ItemStackSnapshot is;
         if (catalogTypeOptional.isPresent()) {
             is = catalogTypeOptional.get();
-        } else if (context.is(ServerPlayer.class) && !context.requirePlayer().getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
-            is = context.getIfPlayer().getItemInHand(HandTypes.MAIN_HAND).createSnapshot();
+        } else if (context.is(ServerPlayer.class) && !context.requirePlayer().itemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+            is = context.getIfPlayer().itemInHand(HandTypes.MAIN_HAND).createSnapshot();
         } else {
             return context.errorResult("command.iteminfo.none");
         }
 
-        final ItemType it = is.getType();
+        final ItemType it = is.type();
         final List<Component> lt = new ArrayList<>();
-        lt.add(context.getMessage("command.iteminfo.id", it.getKey(), it.asComponent()));
+        lt.add(context.getMessage("command.iteminfo.id", it.key(RegistryTypes.ITEM_TYPE).asString(), it.asComponent()));
 
-        it.getBlock().ifPresent(block -> lt.add(context.getMessage("command.iteminfo.extendedid", block.getKey().asString())));
+        it.block().ifPresent(block -> lt.add(context.getMessage("command.iteminfo.extendedid", block.key(RegistryTypes.BLOCK_TYPE).asString())));
 
         if (context.hasFlag("e")) {
             for (final Key<? extends Value<?>> key : is.getKeys()) {
                 final Optional<?> value = is.get((Key) key); // this is the only way I could get this to work
-                value.ifPresent(o -> lt.add(context.getMessage("command.iteminfo.key", key.getKey(), String.valueOf(o))));
+                value.ifPresent(o -> lt.add(context.getMessage("command.iteminfo.key", key.key(), String.valueOf(o))));
             }
         }
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .contents(lt)
                 .padding(Component.text("-", NamedTextColor.GREEN))
                 .title(context.getMessage("command.iteminfo.list.header"))
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
         return context.successResult();
     }
 }

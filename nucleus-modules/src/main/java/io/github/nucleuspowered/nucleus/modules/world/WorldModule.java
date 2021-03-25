@@ -24,8 +24,6 @@ import io.github.nucleuspowered.nucleus.modules.world.commands.WorldSpawnCommand
 import io.github.nucleuspowered.nucleus.modules.world.commands.border.BorderCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.border.ResetBorderCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.border.SetBorderCommand;
-import io.github.nucleuspowered.nucleus.modules.world.commands.lists.AvailableModifiersCommand;
-import io.github.nucleuspowered.nucleus.modules.world.commands.lists.AvailablePresetsCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetHardcoreCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetKeepSpawnLoaded;
 import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetLoadOnStartup;
@@ -55,8 +53,6 @@ public class WorldModule implements IModule.Configurable<WorldConfig> {
                 BorderCommand.class,
                 ResetBorderCommand.class,
                 SetBorderCommand.class,
-                AvailableModifiersCommand.class,
-                AvailablePresetsCommand.class,
                 SetHardcoreCommand.class,
                 SetKeepSpawnLoaded.class,
                 SetLoadOnStartup.class,

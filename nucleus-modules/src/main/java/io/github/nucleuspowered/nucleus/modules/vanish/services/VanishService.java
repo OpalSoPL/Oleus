@@ -59,7 +59,7 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
 
     public boolean isOnline(@Nullable final ServerPlayer src, final User player) {
         if (player.isOnline()) {
-            if (src != null && this.isVanished(player.getUniqueId())) {
+            if (src != null && this.isVanished(player.uniqueId())) {
                 return this.permissionService.hasPermission(src, VanishPermissions.VANISH_SEE);
             }
 
@@ -70,10 +70,10 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
     }
 
     public Optional<Instant> lastSeen(@Nullable final ServerPlayer src, final User player) {
-        if (src == null || this.isOnline(src, player) || !player.isOnline() || !this.getLastVanishTime(player.getUniqueId()).isPresent()) {
+        if (src == null || this.isOnline(src, player) || !player.isOnline() || !this.getLastVanishTime(player.uniqueId()).isPresent()) {
             return player.get(Keys.LAST_DATE_PLAYED);
         } else {
-            return this.getLastVanishTime(player.getUniqueId());
+            return this.getLastVanishTime(player.uniqueId());
         }
 
     }
@@ -91,14 +91,14 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
 
     public void vanishPlayer(final User player, final boolean delay) {
         this.storageManager.getUserService()
-                .getOrNewOnThread(player.getUniqueId())
+                .getOrNewOnThread(player.uniqueId())
                 .set(VanishKeys.VANISH_STATUS, true);
 
         if (player.isOnline()) {
             if (delay) {
                 this.schedulerService.runOnMainThread(() -> this.vanishPlayerInternal(player.getPlayer().get()));
             } else {
-                this.lastVanish.put(player.getUniqueId(), Instant.now());
+                this.lastVanish.put(player.uniqueId(), Instant.now());
                 this.vanishPlayerInternal((Player) player);
             }
         }
@@ -107,7 +107,7 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
     private void vanishPlayerInternal(final Player player) {
         this.vanishPlayerInternal(player,
                 this.storageManager.getUserService()
-                        .getOrNewOnThread(player.getUniqueId())
+                        .getOrNewOnThread(player.uniqueId())
                         .get(VanishKeys.VANISH_STATUS)
                         .orElse(false));
     }
@@ -121,23 +121,23 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
             if (this.isAlter) {
                 Sponge.server().onlinePlayers().stream().filter(x -> !player.equals(x) || !this.permissionService
                         .hasPermission(x, VanishPermissions.VANISH_SEE))
-                        .forEach(x -> x.getTabList().removeEntry(player.getUniqueId()));
+                        .forEach(x -> x.getTabList().removeEntry(player.uniqueId()));
             }
         }
     }
 
     public void unvanishPlayer(final User user) {
         this.storageManager.getUserService()
-                .getOrNew(user.getUniqueId())
+                .getOrNew(user.uniqueId())
                 .thenAccept(x -> x.set(VanishKeys.VANISH_STATUS, false));
         user.offer(Keys.VANISH, false);
         user.offer(Keys.VANISH_IGNORES_COLLISION, false);
         user.offer(Keys.VANISH_PREVENTS_TARGETING, false);
 
         if (this.isAlter && user.isOnline()) {
-            final ServerPlayer player = user.getPlayer().get();
+            final ServerPlayer player = user.player().get();
             Sponge.server().onlinePlayers().forEach(x -> {
-                if (!x.getTabList().getEntry(player.getUniqueId()).isPresent()) {
+                if (!x.getTabList().getEntry(player.uniqueId()).isPresent()) {
                     x.getTabList().addEntry(TabListEntry.builder()
                             .displayName(Component.text(player.name()))
                             .profile(player.getProfile())

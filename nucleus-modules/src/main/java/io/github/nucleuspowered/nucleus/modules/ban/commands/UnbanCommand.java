@@ -69,7 +69,7 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
         service.removeBan(obp.get());
 
         final Audience send = Audience.audience(
-                context.getAudience(),
+                context.audience(),
                 context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY)
         );
         send.sendMessage(context.getMessage("command.unban.success", Util.getNameOrUnkown(context, obp.get().getProfile()), context.getName()));

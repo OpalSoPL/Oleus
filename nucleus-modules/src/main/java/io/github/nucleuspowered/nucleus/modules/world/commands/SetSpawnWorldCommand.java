@@ -39,7 +39,7 @@ public class SetSpawnWorldCommand implements ICommandExecutor {
         if (serverLocation.isPresent()) {
             location = serverLocation.get();
         } else {
-            location = context.requirePlayer().getServerLocation();
+            location = context.requirePlayer().serverLocation();
         }
 
         Sponge.server().worldManager().getProperties(location.getWorldKey())

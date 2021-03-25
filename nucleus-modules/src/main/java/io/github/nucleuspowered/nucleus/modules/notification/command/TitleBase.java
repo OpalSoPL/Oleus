@@ -32,16 +32,16 @@ public abstract class TitleBase implements ICommandExecutor, IReloadableService.
     private final String multiplePerm;
     private final String type;
     private final Parameter.Value<Double> fadeIn = Parameter.builder(Double.class)
-            .setKey("fade in")
-            .parser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .key("fade in")
+            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
             .build();
     private final Parameter.Value<Double> fadeOut = Parameter.builder(Double.class)
-            .setKey("fade out")
-            .parser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .key("fade out")
+            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
             .build();
     private final Parameter.Value<Double> timeOnScreen = Parameter.builder(Double.class)
-            .setKey("time on screen")
-            .parser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .key("time on screen")
+            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
             .build();
 
     private TitleConfig titleConfig = new TitleConfig();

@@ -32,7 +32,7 @@ public class BackHandler implements NucleusBackService, ServiceBase {
 
     @Override
     public void setLastLocation(final UUID user, final ServerLocation location, final Vector3d rotation) {
-        this.lastLocation.put(user, new WorldPositionRotationImpl(location.getPosition(), rotation, location.getWorldKey()));
+        this.lastLocation.put(user, new WorldPositionRotationImpl(location.position(), rotation, location.worldKey()));
     }
 
     @Override

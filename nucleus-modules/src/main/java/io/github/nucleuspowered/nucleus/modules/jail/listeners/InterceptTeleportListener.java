@@ -40,7 +40,7 @@ public class InterceptTeleportListener implements ListenerBase.Conditional {
         final EventContext context = event.getCause().getContext();
         if (!context.get(EventContexts.BYPASS_JAILING_RESTRICTION).orElse(false) &&
                 context.get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
-            if (this.handler.isPlayerJailed(player.getUniqueId())) {
+            if (this.handler.isPlayerJailed(player.uniqueId())) {
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
                     event.setCancelled(true);
                     this.messageProvider.sendMessageTo(cause.getAudience(), "jail.abouttoteleporttarget.isjailed", player.name());

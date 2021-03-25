@@ -53,10 +53,10 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
     public void addName(final String name, final String reason) throws NameBanException {
         if (Util.USERNAME_REGEX_PATTERN.matcher(name).matches()) {
             this.entries.put(name.toLowerCase(), reason);
-            Sponge.eventManager().post(new NameBanEvent.Banned(name, reason, Sponge.server().causeStackManager().getCurrentCause()));
+            Sponge.eventManager().post(new NameBanEvent.Banned(name, reason, Sponge.server().causeStackManager().currentCause()));
             Sponge.server().onlinePlayers().stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst()
                     .ifPresent(x -> x.kick(LegacyComponentSerializer.legacyAmpersand().deserialize(reason)));
-            Sponge.server().getScheduler().submit(Task.builder().execute(this::save).plugin(this.pluginContainer).build());
+            Sponge.server().scheduler().submit(Task.builder().execute(this::save).plugin(this.pluginContainer).build());
         } else {
             throw new NameBanException(
                     Component.text("That is not a valid username."), NameBanException.Reason.DISALLOWED_NAME);
@@ -73,7 +73,7 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
         if (Util.USERNAME_REGEX_PATTERN.matcher(name).matches()) {
             final Optional<String> reason = this.getReasonForBan(name);
             if (reason.isPresent() && this.entries.remove(name.toLowerCase()) != null) {
-                Sponge.eventManager().post(new NameBanEvent.Unbanned(name, reason.get(), Sponge.server().causeStackManager().getCurrentCause()));
+                Sponge.eventManager().post(new NameBanEvent.Unbanned(name, reason.get(), Sponge.server().causeStackManager().currentCause()));
             } else {
                 throw new NameBanException(Component.text("Entry does not exist."), NameBanException.Reason.DOES_NOT_EXIST);
             }

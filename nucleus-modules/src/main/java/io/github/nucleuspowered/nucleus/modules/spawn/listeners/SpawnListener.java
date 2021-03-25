@@ -54,7 +54,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
 
     @Listener
     public void onJoin(final ServerSideConnectionEvent.Login loginEvent) {
-        final UUID pl = loginEvent.getProfile().getUniqueId();
+        final UUID pl = loginEvent.getProfile().uniqueId();
         final IStorageManager storageManager = this.serviceCollection.storageManager();
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         final boolean first;
@@ -170,7 +170,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
                 .get(event.getDestinationWorld().getKey())
                 .thenAccept(x -> {
                     x.flatMap(y -> y.get(SpawnKeys.WORLD_SPAWN_ROTATION)).ifPresent(y -> {
-                        Sponge.server().getScheduler().createExecutor(this.serviceCollection.pluginContainer())
+                        Sponge.server().scheduler().createExecutor(this.serviceCollection.pluginContainer())
                                 .execute(() -> player.setRotation(y));
                     });
                 });

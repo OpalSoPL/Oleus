@@ -33,8 +33,8 @@ public class JailTeleportCommand implements ICommandExecutor {
     public JailTeleportCommand(final INucleusServiceCollection serviceCollection) {
         final JailService handler = serviceCollection.getServiceUnchecked(JailService.class);
         this.parameter = Parameter.builder(Jail.class)
-                .setKey("jail")
-                .parser(new JailParameter(handler, serviceCollection.messageProvider()))
+                .key("jail")
+                .addParser(new JailParameter(handler, serviceCollection.messageProvider()))
                 .build();
     }
 

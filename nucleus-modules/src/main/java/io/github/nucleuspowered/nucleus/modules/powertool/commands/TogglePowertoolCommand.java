@@ -34,11 +34,11 @@ public class TogglePowertoolCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer src = context.requirePlayer();
         final IUserPreferenceService ups = context.getServiceCollection().userPreferenceService();
-        final boolean keys = ups.get(src.getUniqueId(), PowertoolKeys.POWERTOOL_ENABLED).orElse(true);
+        final boolean keys = ups.get(src.uniqueId(), PowertoolKeys.POWERTOOL_ENABLED).orElse(true);
 
         // If specified - get the key. Else, the inverse of what we have now.
         final boolean toggle = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElse(!keys);
-        ups.set(src.getUniqueId(), PowertoolKeys.POWERTOOL_ENABLED, toggle);
+        ups.set(src.uniqueId(), PowertoolKeys.POWERTOOL_ENABLED, toggle);
 
         context.sendMessage("command.powertool.toggle", context.getMessage(toggle ? "standard.enabled" : "standard.disabled"));
         return context.successResult();

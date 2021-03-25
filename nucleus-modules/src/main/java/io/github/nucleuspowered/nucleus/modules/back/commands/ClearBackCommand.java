@@ -39,8 +39,8 @@ public class ClearBackCommand implements ICommandExecutor {
             }
         }
 
-        context.getServiceCollection().getServiceUnchecked(BackHandler.class).removeLastLocation(target.getUniqueId());
-        context.sendMessage("command.clearback.success", target.getName());
+        context.getServiceCollection().getServiceUnchecked(BackHandler.class).removeLastLocation(target.uniqueId());
+        context.sendMessage("command.clearback.success", target.name());
         return context.successResult();
     }
 }

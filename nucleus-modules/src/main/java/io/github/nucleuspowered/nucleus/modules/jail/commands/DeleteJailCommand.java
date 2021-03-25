@@ -32,9 +32,9 @@ public class DeleteJailCommand implements ICommandExecutor {
     @Inject
     public DeleteJailCommand(final INucleusServiceCollection serviceCollection) {
         this.parameter = Parameter.builder(Jail.class)
-                .setKey("jail")
+                .key("jail")
                 .optional()
-                .parser(new JailParameter(serviceCollection.getServiceUnchecked(JailService.class), serviceCollection.messageProvider()))
+                .addParser(new JailParameter(serviceCollection.getServiceUnchecked(JailService.class), serviceCollection.messageProvider()))
                 .build();
     }
 

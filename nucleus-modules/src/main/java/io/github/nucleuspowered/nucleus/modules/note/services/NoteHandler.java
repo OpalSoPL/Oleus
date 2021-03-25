@@ -61,7 +61,7 @@ public class NoteHandler implements NucleusNoteService, ServiceBase {
                 note.getNote(),
                 note.getDate(),
                 user,
-                Sponge.server().causeStackManager().getCurrentCause()
+                Sponge.server().causeStackManager().currentCause()
         );
         Sponge.eventManager().post(event);
 

@@ -95,7 +95,7 @@ public class ServerListCommand implements ICommandExecutor, IReloadableService.R
             throw context.createException("command.serverlist.nomessages");
         }
 
-        final Audience source = context.getAudience();
+        final Audience source = context.audience();
         final List<Component> m = new ArrayList<>();
         messages.stream()
                 .map(x -> context.getServiceCollection().textTemplateFactory().createFromAmpersandStringIgnoringExceptions(x).orElse(null))

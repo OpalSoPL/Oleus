@@ -24,7 +24,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
         parentCommand = JailsCommand.class)
 public class SetJailCommand implements ICommandExecutor {
 
-    private final Parameter.Value<String> parameter = Parameter.string().setKey("jail").build();
+    private final Parameter.Value<String> parameter = Parameter.string().key("jail").build();
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -42,7 +42,7 @@ public class SetJailCommand implements ICommandExecutor {
         }
 
         final ServerPlayer src = context.getIfPlayer();
-        if (handler.setJail(name, src.getServerLocation(), src.getRotation()).isPresent()) {
+        if (handler.setJail(name, src.serverLocation(), src.getRotation()).isPresent()) {
             context.sendMessage("command.jails.set.success", name);
             return context.successResult();
         } else {

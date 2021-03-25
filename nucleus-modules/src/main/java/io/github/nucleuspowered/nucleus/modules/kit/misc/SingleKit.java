@@ -167,7 +167,7 @@ public class SingleKit implements Kit {
             frame.pushCause(pl);
             for (final String x : this.getCommands()) {
                 try {
-                    Sponge.server().getCommandManager().process(source, x.replace("{{player}}", pl.name()));
+                    Sponge.server().commandManager().process(source, x.replace("{{player}}", pl.name()));
                 } catch (final CommandException e) {
                     e.printStackTrace();
                 }

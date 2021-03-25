@@ -24,7 +24,7 @@ public class FreezeInfoProvider implements NucleusProvider {
     @Override
     public Optional<Component> get(final User user, final CommandCause source, final INucleusServiceCollection serviceCollection) {
         if (serviceCollection.permissionService().hasPermission(source, FreezePlayerPermissions.OTHERS_FREEZEPLAYER)) {
-            if (serviceCollection.getServiceUnchecked(FreezePlayerService.class).getFromUUID(user.getUniqueId())) {
+            if (serviceCollection.getServiceUnchecked(FreezePlayerService.class).getFromUUID(user.uniqueId())) {
                 return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.frozen"));
             }
 

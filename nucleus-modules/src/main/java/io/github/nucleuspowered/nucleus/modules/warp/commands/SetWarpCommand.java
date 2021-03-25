@@ -53,7 +53,7 @@ public class SetWarpCommand implements ICommandExecutor {
 //    private final WarpService qs = getServiceUnchecked(WarpService.class);
     private final Pattern warpRegex = Pattern.compile("^[A-Za-z][A-Za-z0-9]{0,25}$");
 
-    private final Parameter.Value<String> warpParameter = Parameter.string().setKey("warp").build();
+    private final Parameter.Value<String> warpParameter = Parameter.string().key("warp").build();
 
     @Override
     public Flag[] flags(final INucleusServiceCollection serviceCollection) {
@@ -91,7 +91,7 @@ public class SetWarpCommand implements ICommandExecutor {
                 return context.errorResult("command.warps.nooverwrite");
             }
 
-            final DeleteWarpEvent event = new DeleteWarpEvent(Sponge.server().causeStackManager().getCurrentCause(), exists.get());
+            final DeleteWarpEvent event = new DeleteWarpEvent(Sponge.server().causeStackManager().currentCause(), exists.get());
             if (Sponge.eventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
@@ -108,7 +108,7 @@ public class SetWarpCommand implements ICommandExecutor {
         }
 
         final ServerPlayer src = context.requirePlayer();
-        final CreateWarpEvent event = new CreateWarpEvent(Sponge.server().causeStackManager().getCurrentCause(), warp, src.getServerLocation());
+        final CreateWarpEvent event = new CreateWarpEvent(Sponge.server().causeStackManager().currentCause(), warp, src.serverLocation());
         if (Sponge.eventManager().post(event)) {
             return event.getCancelMessage()
                     .map(context::errorResultLiteral)
@@ -117,7 +117,7 @@ public class SetWarpCommand implements ICommandExecutor {
         }
 
         // OK! Set it.
-        if (warpService.setWarp(warp, src.getServerLocation(), src.getRotation())) {
+        if (warpService.setWarp(warp, src.serverLocation(), src.getRotation())) {
             // Worked. Tell them.
             context.sendMessage("command.warps.set", warp);
             return context.successResult();

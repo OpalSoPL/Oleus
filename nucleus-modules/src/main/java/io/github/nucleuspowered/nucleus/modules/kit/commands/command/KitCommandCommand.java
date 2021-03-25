@@ -68,10 +68,10 @@ public class KitCommandCommand implements ICommandExecutor {
                 cc.add(t);
             }
 
-            Util.getPaginationBuilder(context.getAudience())
+            Util.getPaginationBuilder(context.audience())
                 .title(context.getMessage("command.kit.command.commands.title", kit.getName()))
                 .contents(cc)
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
         }
 
         return context.successResult();

@@ -33,7 +33,7 @@ public class MailCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         return MailReadBase.INSTANCE.executeCommand(
                 context,
-                context.requirePlayer().getUniqueId(),
+                context.requirePlayer().uniqueId(),
                 context.getAll(context.getServiceCollection().getServiceUnchecked(MailHandler.class).getMailFilterParameter()));
     }
 }

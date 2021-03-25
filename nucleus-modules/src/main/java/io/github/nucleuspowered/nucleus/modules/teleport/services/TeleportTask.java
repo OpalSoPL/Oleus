@@ -80,7 +80,7 @@ public class TeleportTask implements CancellableTask {
         final ServerPlayer teleportingPlayer = Sponge.server().player(this.toTeleport).orElse(null);
         final ServerPlayer targetPlayer = Sponge.server().player(this.target).orElse(null);
         @Nullable final User source = Sponge.server().userManager().find(this.requester).orElse(null);
-        final Audience receiver = source != null ? source.getPlayer().map(x -> (Audience) x).orElseGet(Sponge::getSystemSubject) : Sponge.systemSubject();
+        final Audience receiver = source != null ? source.getPlayer().map(x -> (Audience) x).orElseGet(Sponge::systemSubject) : Sponge.systemSubject();
         if (teleportingPlayer != null && targetPlayer != null) {
             // If safe, get the teleport mode
             final INucleusLocationService tpHandler = this.serviceCollection.teleportService();
@@ -93,7 +93,7 @@ public class TeleportTask implements CancellableTask {
 
                 final TeleportResult result = tpHandler.teleportPlayerSmart(
                         teleportingPlayer,
-                        this.requestLocation == null ? targetPlayer.getServerLocation() : this.requestLocation,
+                        this.requestLocation == null ? targetPlayer.serverLocation() : this.requestLocation,
                         this.rotation,
                         false,
                         this.safe,

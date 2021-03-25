@@ -48,7 +48,7 @@ public class ListWorldCommand implements ICommandExecutor {
         listContent.add(context.getMessage("command.world.list.spawnpoint",
                 String.valueOf(spawnPosition.getX()), String.valueOf(spawnPosition.getY()), String.valueOf(spawnPosition.getZ())));
 
-        listContent.add(context.getMessage("command.world.list.uuid", x.getUniqueId().toString()));
+        listContent.add(context.getMessage("command.world.list.uuid", x.uniqueId().toString()));
         if (x.isEnabled()) {
             final boolean worldLoaded = Sponge.server().worldManager().getWorld(x.getKey()).isPresent();
             final String message =
@@ -85,9 +85,9 @@ public class ListWorldCommand implements ICommandExecutor {
         cwp.stream().sorted(Comparator.comparing(x -> x.getKey().asString()))
                 .forEach(x -> getWorldInfo(context, listContent, x, canSeeSeeds));
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
             .contents(listContent).title(context.getMessage("command.world.list.title"))
-            .sendTo(context.getAudience());
+            .sendTo(context.audience());
 
         return context.successResult();
     }

@@ -4,8 +4,11 @@
  */
 package io.github.nucleuspowered.nucleus.modules.message;
 
-import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.api.core.event.NucleusRegisterPreferenceKeyEvent;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
+import io.github.nucleuspowered.nucleus.core.services.impl.userprefs.UserPreferenceService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IUserPreferenceService;
 import io.github.nucleuspowered.nucleus.modules.message.commands.HelpOpCommand;
 import io.github.nucleuspowered.nucleus.modules.message.commands.MessageCommand;
 import io.github.nucleuspowered.nucleus.modules.message.commands.MsgToggleCommand;
@@ -17,8 +20,9 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.modules.message.services.MessageHandler;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,6 +32,13 @@ import java.util.Optional;
 public final class MessageModule implements IModule.Configurable<MessageConfig> {
 
     public static final String ID = "message";
+
+    private final IUserPreferenceService preferenceService;
+
+    @Inject
+    public MessageModule(final INucleusServiceCollection serviceCollection) {
+        this.preferenceService = serviceCollection.userPreferenceService();
+    }
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
@@ -61,9 +72,8 @@ public final class MessageModule implements IModule.Configurable<MessageConfig> 
     }
 
     @Listener
-    public void onPreferenceKeyRegistration(final RegisterCatalogEvent<NucleusUserPreferenceService.PreferenceKey<?>> event) {
-        event.register(MessageKeys.MESSAGE_TOGGLE);
-        event.register(MessageKeys.SOCIAL_SPY);
+    public void onPreferenceKeyRegistration(final NucleusRegisterPreferenceKeyEvent event) {
+        event.register(MessageKeys.MESSAGE_TOGGLE).register(MessageKeys.SOCIAL_SPY);
     }
 
 }

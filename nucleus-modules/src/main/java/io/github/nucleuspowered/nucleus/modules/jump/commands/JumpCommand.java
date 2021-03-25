@@ -60,13 +60,13 @@ public class JumpCommand implements ICommandExecutor, IReloadableService.Reloada
 
         final LocatableBlock block = blockRayTraceResult.get().getSelectedObject();
         final ServerLocation targetLocation;
-        if (RayTrace.onlyAir().test(block.getServerLocation().add(0, 1, 0).asLocatableBlock()) &&
-                        RayTrace.onlyAir().test(block.getServerLocation().add(0, 2, 0).asLocatableBlock())) {
-            targetLocation = block.getServerLocation().add(0, 1, 0);
+        if (RayTrace.onlyAir().test(block.serverLocation().add(0, 1, 0).asLocatableBlock()) &&
+                        RayTrace.onlyAir().test(block.serverLocation().add(0, 2, 0).asLocatableBlock())) {
+            targetLocation = block.serverLocation().add(0, 1, 0);
         } else {
             // safe teleport
             targetLocation = context.getServiceCollection().teleportService()
-                    .getSafeLocation(block.getServerLocation(), TeleportScanners.NO_SCAN.get(), TeleportHelperFilters.CONFIG.get())
+                    .getSafeLocation(block.serverLocation(), TeleportScanners.NO_SCAN.get(), TeleportHelperFilters.CONFIG.get())
                     .orElseThrow(() -> context.createException("command.jump.notsafe"));
         }
 

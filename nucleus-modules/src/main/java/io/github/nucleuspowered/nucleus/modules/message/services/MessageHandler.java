@@ -179,20 +179,20 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
         // Get those who aren't the subjects and have social spy on.
         final Set<ServerPlayer> sources = Sponge.server().onlinePlayers()
                 .stream()
-                .filter(x -> !uuidsToSpyOn.contains(x.getUniqueId()))
-                .filter(x -> this.isSocialSpy(x.getUniqueId()))
+                .filter(x -> !uuidsToSpyOn.contains(x.uniqueId()))
+                .filter(x -> this.isSocialSpy(x.uniqueId()))
                 .collect(Collectors.toSet());
 
         if (!this.useLevels) {
-            return sources.stream().map(Identifiable::getUniqueId).collect(Collectors.toSet());
+            return sources.stream().map(Identifiable::uniqueId).collect(Collectors.toSet());
         }
 
         // Get the highest level from the sources to spy on.
         final int highestLevel = toSpyOn.stream().mapToInt(this::getSocialSpyLevelForSource).max().orElse(0);
         return sources.stream()
-            .filter(x -> this.sameLevel ? this.getSocialSpyLevel(x.getUniqueId()) >= highestLevel :
-                    this.getSocialSpyLevel(x.getUniqueId()) > highestLevel)
-            .map(Identifiable::getUniqueId)
+            .filter(x -> this.sameLevel ? this.getSocialSpyLevel(x.uniqueId()) >= highestLevel :
+                    this.getSocialSpyLevel(x.uniqueId()) > highestLevel)
+            .map(Identifiable::uniqueId)
             .collect(Collectors.toSet());
     }
 
@@ -211,7 +211,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
             } else {
                 frame.pushCause(sender);
             }
-            boolean isCancelled = Sponge.eventManager().post(new InternalNucleusMessageEvent(frame.getCurrentCause(), sender, receiver, message));
+            boolean isCancelled = Sponge.eventManager().post(new InternalNucleusMessageEvent(frame.currentCause(), sender, receiver, message));
             if (isCancelled) {
 
                 sender.getRepresentedAudience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, "message.cancel"));
@@ -352,7 +352,7 @@ public class MessageHandler implements NucleusPrivateMessagingService, IReloadab
     private Component constructMessage(final MessageTarget sender, final Component message, final NucleusTextTemplateImpl template,
             final Map<String, Function<Object, Optional<ComponentLike>>> tokens) {
         return this.serviceCollection.textStyleService().joinTextsWithColoursFlowing(
-                template.getForObjectWithTokens(sender.getRepresentedAudience().orElseGet(Sponge::getSystemSubject), tokens),
+                template.getForObjectWithTokens(sender.getRepresentedAudience().orElseGet(Sponge::systemSubject), tokens),
                 message);
     }
 

@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.admin.commands.gamemode;
 
 import com.google.inject.Inject;
+import io.github.nucleuspowered.nucleus.core.Registry;
 import io.github.nucleuspowered.nucleus.modules.admin.AdminPermissions;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
@@ -13,6 +14,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.standard.VariableValueParameters;
@@ -21,6 +23,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.Optional;
 
@@ -40,8 +43,8 @@ public class GamemodeCommand extends GamemodeBase {
 
     private final Parameter.Value<GameMode> gameModeParameter =
             Parameter.builder(GameMode.class)
-                    .setKey("Game Mode")
-                    .parser(VariableValueParameters.catalogedElementParameterBuilder(GameMode.class).defaultNamespace("minecraft").build())
+                    .key("Game Mode")
+                    .addParser(VariableValueParameters.registryEntryBuilder(RegistryTypes.GAME_MODE).defaultNamespace("minecraft").build())
                     .build();
 
     final Parameter.Value<ServerPlayer> playerValue;
@@ -71,7 +74,7 @@ public class GamemodeCommand extends GamemodeBase {
         ogm = context.getOne(this.gameModeParameter);
 
         if (!ogm.isPresent()) {
-            final String mode = user.get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL).getKey().getFormatted();
+            final Component mode = user.get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL::get).asComponent();
             if (context.is(user)) {
                 context.sendMessage("command.gamemode.get.base", mode);
             } else {

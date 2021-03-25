@@ -46,6 +46,6 @@ public class WarpCategoryParameter implements ValueParameter<WarpCategory> {
             return category;
         }
 
-        throw reader.createException(this.messageProvider.getMessageFor(context.getCause().getAudience(), "args.warpcategory.noexist", arg));
+        throw reader.createException(this.messageProvider.getMessageFor(context.cause().audience(), "args.warpcategory.noexist", arg));
     }
 }

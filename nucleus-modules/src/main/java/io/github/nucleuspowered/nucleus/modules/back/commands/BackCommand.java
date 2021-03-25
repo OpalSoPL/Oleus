@@ -67,20 +67,20 @@ public class BackCommand implements ICommandExecutor, IReloadableService.Reloada
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final BackHandler handler = context.getServiceCollection().getServiceUnchecked(BackHandler.class);
         final ServerPlayer src = context.getIfPlayer();
-        final Optional<WorldPositionRotation> ol = handler.getLastLocation(src.getUniqueId());
+        final Optional<WorldPositionRotation> ol = handler.getLastLocation(src.uniqueId());
         if (!ol.isPresent()) {
             return context.errorResult("command.back.noloc");
         }
 
         final boolean border = context.hasFlag("b");
         final WorldPositionRotation loc = ol.get();
-        if (this.sameDimensionCheck && src.getWorld().getKey() != loc.getResourceKey()) {
+        if (this.sameDimensionCheck && src.world().key() != loc.getResourceKey()) {
             if (!context.testPermission(BackPermissions.BACK_EXEMPT_SAMEDIMENSION)) {
                 return context.errorResult("command.back.sameworld");
             }
         }
 
-        final ServerWorld world = Sponge.server().worldManager().getWorld(loc.getResourceKey()).get();
+        final ServerWorld world = Sponge.server().worldManager().world(loc.getResourceKey()).get();
         final INucleusLocationService service = context.getServiceCollection().teleportService();
         try (final INucleusLocationService.BorderDisableSession ac = service.temporarilyDisableBorder(border, world)) {
             final TeleportResult result = service.teleportPlayerSmart(

@@ -108,7 +108,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
         }
 
         final String costWithUnit = economyServiceProvider.getCurrencySymbol(cost);
-        if (economyServiceProvider.hasBalance(target.getUniqueId(), cost)) {
+        if (economyServiceProvider.hasBalance(target.uniqueId(), cost)) {
             final String command = String.format("/nucleus:warp -y %s", wd.getName());
             context.sendMessage("command.warp.cost.details", wd.getName(), costWithUnit);
             context.sendMessageText(
@@ -141,7 +141,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
 
         try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
-            final UseWarpEvent event = new UseWarpEvent(frame.getCurrentCause(), player.getUniqueId(), wd);
+            final UseWarpEvent event = new UseWarpEvent(frame.currentCause(), player.uniqueId(), wd);
             if (Sponge.eventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)
                         .orElseGet(() -> context.errorResult("nucleus.eventcancelled"));
@@ -154,7 +154,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
             final IEconomyServiceProvider economyServiceProvider = context.getServiceCollection().economyServiceProvider();
             if (!isOther && economyServiceProvider.serviceExists() && cost > 0 &&
                     !context.testPermission(WarpPermissions.EXEMPT_COST_WARP)) {
-                if (economyServiceProvider.withdrawFromPlayer(player.getUniqueId(), cost, false)) {
+                if (economyServiceProvider.withdrawFromPlayer(player.uniqueId(), cost, false)) {
                     charge = true; // only true for a warp by the current subject.
                 } else {
                     return context.errorResult("command.warp.cost.nomoney", wd.getName(),
@@ -165,7 +165,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
             // We have a warp data, warp them.
             if (isOther) {
                 context.sendMessage("command.warps.namedstart",
-                        context.getDisplayName(player.getUniqueId()),
+                        context.getDisplayName(player.uniqueId()),
                         wd.getName());
             } else {
                 context.sendMessage("command.warps.start", wd.getName());
@@ -188,7 +188,7 @@ public class WarpCommand implements ICommandExecutor, IReloadableService.Reloada
 
             if (!result.isSuccessful()) {
                 if (charge) {
-                    economyServiceProvider.depositInPlayer(player.getUniqueId(), cost, false);
+                    economyServiceProvider.depositInPlayer(player.uniqueId(), cost, false);
                 }
 
                 // Don't add the cooldown if enabled.

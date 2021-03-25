@@ -54,8 +54,8 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
 
     private final Parameter.Value<User> userParameter;
     private final Parameter.Value<Integer> amountParameter = Parameter.builder(Integer.class)
-            .setKey("amount")
-            .parser(VariableValueParameters.integerRange().setMin(1).build())
+            .key("amount")
+            .addParser(VariableValueParameters.integerRange().setMin(1).build())
             .orDefault(1)
             .build();
 
@@ -96,7 +96,7 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
         if (this.isUseMinecraftCommand) {
             try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                 frame.addContext(EventContextKeys.SUBJECT, Sponge.systemSubject());
-                final CommandResult result = Sponge.server().getCommandManager().process(
+                final CommandResult result = Sponge.server().commandManager().process(
                         String.format("minecraft:give %s skull %d 3 {SkullOwner:%s}", player.name(), amount, user.name()));
                 if (result.isSuccess()) {
                     context.sendMessage("command.skull.success.plural", String.valueOf(amount), user.name());

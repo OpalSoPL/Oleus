@@ -60,7 +60,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     // fires after spawn login event
     @Listener
     public void onPlayerLogin(final NucleusOnLoginEvent event, @Getter("getTargetUser") final User user, @Getter("getUserService") final IUserDataObject qs) {
-        final Jailing jailing = this.handler.onPlayerLogin(user.getUniqueId());
+        final Jailing jailing = this.handler.onPlayerLogin(user.uniqueId());
         if (jailing == JailService.NOT_JAILED) {
             return;
         }
@@ -69,7 +69,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
         if (!jail.isPresent()) {
             new PermissionMessageChannel(this.permissionService, JailPermissions.JAIL_NOTIFY)
                     .sendMessage(Component.text("WARNING: No jail is defined for " + user.name() + " - they're going free!", NamedTextColor.RED));
-            this.handler.unjailPlayer(user.getUniqueId());
+            this.handler.unjailPlayer(user.uniqueId());
             return;
         }
 
@@ -84,7 +84,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
      */
     @Listener(order = Order.LATE)
     public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer serverPlayer) {
-        final Optional<Jailing> jailing = this.handler.getPlayerJailData(serverPlayer.getUniqueId());
+        final Optional<Jailing> jailing = this.handler.getPlayerJailData(serverPlayer.uniqueId());
         if (!jailing.filter(x -> x instanceof JailingEntry).isPresent()) {
             return;
         }
@@ -95,7 +95,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onRequestSent(final NucleusTeleportEvent.Request event, @Root final ServerPlayer cause, @Getter("getPlayer") final UUID player) {
-        if (this.handler.isPlayerJailed(cause.getUniqueId())) {
+        if (this.handler.isPlayerJailed(cause.uniqueId())) {
             event.setCancelled(true);
             event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(), "jail.teleportcause.isjailed"));
         } else if (this.handler.isPlayerJailed(player)) {
@@ -127,7 +127,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     @Listener
     public void onCommand(final ExecuteCommandEvent.Pre event, @Root final ServerPlayer player) {
         // Only if the command is not in the control list.
-        if (this.handler.isPlayerJailed(player.getUniqueId()) && this.allowedCommands.stream().noneMatch(x -> event.getCommand().equalsIgnoreCase(x))) {
+        if (this.handler.isPlayerJailed(player.uniqueId()) && this.allowedCommands.stream().noneMatch(x -> event.getCommand().equalsIgnoreCase(x))) {
             event.setCancelled(true);
 
             // This is the easiest way to send the messages.
@@ -137,7 +137,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onBlockChange(final ChangeBlockEvent.Pre event, @Root final ServerPlayer player) {
-        if (this.handler.isPlayerJailed(player.getUniqueId())) {
+        if (this.handler.isPlayerJailed(player.uniqueId())) {
             event.setCancelled(true);
             this.handler.notify(player);
         }
@@ -145,7 +145,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onInteract(final InteractEvent event, @Root final ServerPlayer player) {
-        if (this.handler.isPlayerJailed(player.getUniqueId())) {
+        if (this.handler.isPlayerJailed(player.uniqueId())) {
             event.setCancelled(true);
             this.handler.notify(player);
         }
@@ -153,13 +153,13 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener(order = Order.LAST)
     public void onSpawn(final RespawnPlayerEvent.SelectWorld event, @Getter("getEntity") final ServerPlayer player) {
-        this.handler.getPlayerJail(player.getUniqueId()).flatMap(NamedLocation::getLocation).map(Location::getWorld)
+        this.handler.getPlayerJail(player.uniqueId()).flatMap(NamedLocation::getLocation).map(Location::getWorld)
                 .ifPresent(event::setDestinationWorld);
     }
 
     @Listener(order = Order.LAST)
     public void onSpawn(final RespawnPlayerEvent.Recreate event, @Getter("getEntity") final ServerPlayer player) {
-        this.handler.getPlayerJail(player.getUniqueId()).flatMap(NamedLocation::getLocation)
+        this.handler.getPlayerJail(player.uniqueId()).flatMap(NamedLocation::getLocation)
                 .filter(x -> x.getWorld().equals(event.getDestinationWorld()))
                 .map(Location::getPosition)
                 .ifPresent(event::setDestinationPosition);
@@ -167,7 +167,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onLogout(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer serverPlayer) {
-        this.handler.clearCacheFor(serverPlayer.getUniqueId());
+        this.handler.clearCacheFor(serverPlayer.uniqueId());
     }
 
     @Override

@@ -44,7 +44,7 @@ public class MailFilterParameter implements ValueParameter<NucleusMailService.Ma
         }
 
         final Optional<User> ou = Sponge.server().userManager().find(text);
-        return ou.map(Identifiable::getUniqueId);
+        return ou.map(Identifiable::uniqueId);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class MailFilterParameter implements ValueParameter<NucleusMailService.Ma
                 case "p:":
                     final String playerName = toParse.split(":", 2)[1];
                     final UUID uuid = this.player(playerName).orElseThrow(() -> reader.createException(
-                            this.messageProviderService.getMessageFor(context.getCause().getAudience(), "command.mail.param.noplayer", playerName)
+                            this.messageProviderService.getMessageFor(context.cause().audience(), "command.mail.param.noplayer", playerName)
                     ));
                     return Optional.of(this.handler.createSenderFilter(false, Collections.singleton(uuid)));
                 case "m:":
@@ -79,7 +79,7 @@ public class MailFilterParameter implements ValueParameter<NucleusMailService.Ma
                     }
 
                     throw reader.createException(
-                            this.messageProviderService.getMessageFor(context.getCause().getAudience(), "command.mail.param.invalidtime")
+                            this.messageProviderService.getMessageFor(context.cause().audience(), "command.mail.param.invalidtime")
                     );
                 case "a:":
                     final Matcher a = early.matcher(toParse);
@@ -90,13 +90,13 @@ public class MailFilterParameter implements ValueParameter<NucleusMailService.Ma
                     }
 
                     throw reader.createException(
-                            this.messageProviderService.getMessageFor(context.getCause().getAudience(), "command.mail.param.invalidtime")
+                            this.messageProviderService.getMessageFor(context.cause().audience(), "command.mail.param.invalidtime")
                     );
             }
         } catch (final Exception e) {
             // ignored
         }
 
-        throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "command.mail.param.invalidfilter"));
+        throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "command.mail.param.invalidfilter"));
     }
 }

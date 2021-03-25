@@ -52,7 +52,7 @@ public class FlyCommand implements ICommandExecutor { // extends AbstractCommand
         }
 
         context.getServiceCollection().storageManager()
-                .getOrCreateUser(player.getUniqueId()).thenAccept(x -> x.set(FlyKeys.FLY_TOGGLE, fly));
+                .getOrCreateUser(player.uniqueId()).thenAccept(x -> x.set(FlyKeys.FLY_TOGGLE, fly));
         if (!context.is(player)) {
             context.sendMessage(fly ? "command.fly.player.on" : "command.fly.player.off", player.name());
         }

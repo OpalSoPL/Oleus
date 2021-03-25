@@ -94,12 +94,12 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         this.logger = serviceCollection.logger();
 
         this.withPermission = Parameter.builder(Kit.class)
-                .parser(new KitParameter(serviceCollection, this, true))
-                .setKey(KitService.KIT_KEY)
+                .addParser(new KitParameter(serviceCollection, this, true))
+                .key(KitService.KIT_KEY)
                 .build();
         this.withoutPermission = Parameter.builder(Kit.class)
-                .parser(new KitParameter(serviceCollection, this, false))
-                .setKey(KitService.KIT_KEY)
+                .addParser(new KitParameter(serviceCollection, this, false))
+                .key(KitService.KIT_KEY)
                 .build();
     }
 
@@ -195,10 +195,10 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
             final boolean checkCooldown,
             final boolean isMustGetAll,
             final boolean isFirstJoin) {
-        final UUID playerUUID = player.getUniqueId();
+        final UUID playerUUID = player.uniqueId();
         KitRedeemResult result = null;
 
-        final Map<String, Instant> redeemed = this.getUserRedemptionData(player.getUniqueId()).join();
+        final Map<String, Instant> redeemed = this.getUserRedemptionData(player.uniqueId()).join();
 
         final Instant timeOfLastUse = redeemed.get(kit.getName().toLowerCase());
         final Instant now = Instant.now();
@@ -216,7 +216,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                 // if it's one time only and the user does not have an exemption...
                 if (checkOneTime && !this.checkOneTime(kit, playerUUID)) {
                     Sponge.eventManager().post(
-                            new KitEvent.FailedRedeem(frame.getCurrentCause(), timeOfLastUse, kit, player,
+                            new KitEvent.FailedRedeem(frame.currentCause(), timeOfLastUse, kit, player,
                                     original, null, commands, null, KitRedeemResult.Status.ALREADY_REDEEMED_ONE_TIME));
                     result = new KitRedeemResultImpl(
                             KitRedeemResult.Status.ALREADY_REDEEMED_ONE_TIME,
@@ -227,7 +227,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                 } else if (checkCooldown) {
                     if (instant.isPresent()) {
                         Sponge.eventManager().post(
-                                new KitEvent.FailedRedeem(frame.getCurrentCause(), timeOfLastUse, kit, player,
+                                new KitEvent.FailedRedeem(frame.currentCause(), timeOfLastUse, kit, player,
                                         original, null, commands, null, KitRedeemResult.Status.COOLDOWN_NOT_EXPIRED));
                         result = new KitRedeemResultImpl(
                                 KitRedeemResult.Status.COOLDOWN_NOT_EXPIRED,
@@ -241,10 +241,10 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
             }
             if (result == null) {
                 final NucleusKitEvent.Redeem.Pre preEvent =
-                        new KitEvent.PreRedeem(frame.getCurrentCause(), timeOfLastUse, kit, player, original, commands);
+                        new KitEvent.PreRedeem(frame.currentCause(), timeOfLastUse, kit, player, original, commands);
                 if (Sponge.eventManager().post(preEvent)) {
                     Sponge.eventManager().post(
-                            new KitEvent.FailedRedeem(frame.getCurrentCause(), timeOfLastUse, kit, player, original,
+                            new KitEvent.FailedRedeem(frame.currentCause(), timeOfLastUse, kit, player, original,
                                     preEvent.getStacksToRedeem().orElse(null),
                                     commands,
                                     preEvent.getCommandsToExecute().orElse(null),
@@ -297,7 +297,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                             this.setUserRedemptionData(playerUUID, redeemed);
                         }
 
-                        Sponge.eventManager().post(new KitEvent.PostRedeem(frame.getCurrentCause(), timeOfLastUse, kit, player, original,
+                        Sponge.eventManager().post(new KitEvent.PostRedeem(frame.currentCause(), timeOfLastUse, kit, player, original,
                                 preEvent.getStacksToRedeem().orElse(null),
                                 commands,
                                 preEvent.getCommandsToExecute().orElse(null)));
@@ -317,7 +317,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                                 inventoryTransactionResult.getRejectedItems(),
                                 instant.orElse(null),
                                 null) : ex;
-                        Sponge.eventManager().post(new KitEvent.FailedRedeem(frame.getCurrentCause(), timeOfLastUse, kit, player, original,
+                        Sponge.eventManager().post(new KitEvent.FailedRedeem(frame.currentCause(), timeOfLastUse, kit, player, original,
                                 preEvent.getStacksToRedeem().orElse(null),
                                 commands,
                                 preEvent.getCommandsToExecute().orElse(null),
@@ -339,7 +339,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
             frame.pushCause(Sponge.systemSubject());
             for (final String command : commands) {
                 try {
-                    Sponge.server().getCommandManager().process(command.replace("{{player}}", playerName));
+                    Sponge.server().commandManager().process(command.replace("{{player}}", playerName));
                 } catch (final CommandException e) {
                     e.printStackTrace();
                     success = false;

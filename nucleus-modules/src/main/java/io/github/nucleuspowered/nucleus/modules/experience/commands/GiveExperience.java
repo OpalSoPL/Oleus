@@ -34,11 +34,11 @@ public class GiveExperience implements ICommandExecutor {
     @Inject
     public GiveExperience(final INucleusServiceCollection serviceCollection) {
         this.experienceLevelParameter =
-                Parameter.integerNumber().parser(new ExperienceLevelArgument(serviceCollection))
-                        .setKey("experience").build();
+                Parameter.integerNumber().addParser(new ExperienceLevelArgument(serviceCollection))
+                        .key("experience").build();
         this.experienceValueParameter =
-                Parameter.integerNumber().parser(VariableValueParameters.integerRange().setMin(0).setMax(Integer.MAX_VALUE).build())
-                        .setKey("experience").build();
+                Parameter.integerNumber().addParser(VariableValueParameters.integerRange().min(0).max(Integer.MAX_VALUE).build())
+                        .key("experience").build();
     }
 
     @Override

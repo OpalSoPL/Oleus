@@ -58,7 +58,7 @@ public class SpawnCommand implements ICommandExecutor, IReloadableService.Reload
     @Inject
     public SpawnCommand(final IPermissionService permissionService) {
         this.worldPropertiesValueParameter = Parameter.worldProperties(true)
-                .setKey("world")
+                .key("world")
                 .optional()
                 .setRequirements(cause -> permissionService.hasPermission(cause, SpawnPermissions.SPAWN_OTHERWORLDS))
                 .build();

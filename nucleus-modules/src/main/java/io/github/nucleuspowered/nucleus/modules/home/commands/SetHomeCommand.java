@@ -44,7 +44,7 @@ import java.util.Optional;
 )
 public class SetHomeCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private final Parameter.Value<String> homeKey = Parameter.string().optional().setKey("home name").build();
+    private final Parameter.Value<String> homeKey = Parameter.string().optional().key("home name").build();
 
     private boolean preventOverhang = true;
 
@@ -80,7 +80,7 @@ public class SetHomeCommand implements ICommandExecutor, IReloadableService.Relo
         }
 
         final HomeService homeService = context.getServiceCollection().getServiceUnchecked(HomeService.class);
-        final Optional<Home> currentHome = homeService.getHome(player.getUniqueId(), home);
+        final Optional<Home> currentHome = homeService.getHome(player.uniqueId(), home);
         final boolean overwrite = currentHome.isPresent() && context.hasFlag("o");
         if (currentHome.isPresent() && !overwrite) {
             context.sendMessage("command.sethome.seterror", home);
@@ -92,18 +92,18 @@ public class SetHomeCommand implements ICommandExecutor, IReloadableService.Relo
 
         try {
             if (overwrite) {
-                final int max = homeService.getMaximumHomes(player.getUniqueId());
-                final int c = homeService.getHomeCount(player.getUniqueId());
+                final int max = homeService.getMaximumHomes(player.uniqueId());
+                final int c = homeService.getHomeCount(player.uniqueId());
                 if (this.preventOverhang && max < c) {
                     // If the player has too many homes, tell them
                     context.errorResult("command.sethome.overhang", max, c);
                 }
 
                 final Home current = currentHome.get();
-                homeService.modifyHomeInternal(current, player.getServerLocation(), player.getRotation());
+                homeService.modifyHomeInternal(current, player.serverLocation(), player.rotation());
                 context.sendMessage("command.sethome.overwrite", home);
             } else {
-                homeService.createHome(player.getUniqueId(), home, player.getServerLocation(), player.getRotation());
+                homeService.createHome(player.uniqueId(), home, player.serverLocation(), player.rotation());
             }
         } catch (final HomeException e) {
             return context.errorResultLiteral(Component.text(e.getMessage() == null ? "null" : e.getMessage()));

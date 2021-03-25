@@ -95,7 +95,7 @@ public class TeleportAskHereCommand implements ICommandExecutor {
         try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(src);
             // Before we do all this, check the event.
-            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(frame.getCurrentCause(), target.getUniqueId());
+            final RequestEvent.PlayerToCause event = new RequestEvent.PlayerToCause(frame.currentCause(), target.uniqueId());
             if (Sponge.eventManager().post(event)) {
                 return event.getCancelMessage()
                         .map(context::errorResultLiteral)

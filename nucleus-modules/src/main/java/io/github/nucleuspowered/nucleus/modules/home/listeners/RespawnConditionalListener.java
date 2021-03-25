@@ -30,18 +30,16 @@ public class RespawnConditionalListener implements ListenerBase.Conditional {
     }
 
     @Listener
-    public void onRespawn(final RespawnPlayerEvent.SelectWorld event, @Getter("getEntity") final ServerPlayer player) {
-        final Optional<Home> oh = this.homeService.getHome(player.getUniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
-        oh.flatMap(x -> x.getWorld().flatMap(WorldProperties::getWorld)).ifPresent(event::setDestinationWorld);
+    public void onRespawn(final RespawnPlayerEvent.SelectWorld event, @Getter("entity") final ServerPlayer player) {
+        final Optional<Home> oh = this.homeService.getHome(player.uniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
+        oh.flatMap(NamedLocation::getWorld).ifPresent(event::setDestinationWorld);
     }
 
     @Listener
-    public void onRespawn(final RespawnPlayerEvent.Recreate event, @Getter("getEntity") final ServerPlayer player) {
-        final Optional<Home> oh = this.homeService.getHome(player.getUniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
+    public void onRespawn(final RespawnPlayerEvent.Recreate event, @Getter("entity") final ServerPlayer player) {
+        final Optional<Home> oh = this.homeService.getHome(player.uniqueId(), NucleusHomeService.DEFAULT_HOME_NAME);
         oh.map(NamedLocation::getPosition).ifPresent(event::setDestinationPosition);
     }
-
-
 
     @Override public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
         return serviceCollection.configProvider().getModuleConfig(HomeConfig.class).isRespawnAtHome();

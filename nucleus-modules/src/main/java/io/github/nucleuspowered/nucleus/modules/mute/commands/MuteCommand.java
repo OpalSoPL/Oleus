@@ -64,7 +64,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
 
         final Optional<Duration> time = context.getOne(NucleusParameters.DURATION);
         final User user = either.fold(Function.identity(), Sponge.server().userManager()::getOrCreate);
-        final Optional<Mute> omd = handler.getPlayerMuteInfo(user.getUniqueId());
+        final Optional<Mute> omd = handler.getPlayerMuteInfo(user.uniqueId());
         final Optional<String> reas = context.getOne(NucleusParameters.OPTIONAL_REASON);
 
         if (!context.isConsoleAndBypass() && context.testPermissionFor(user, MutePermissions.MUTE_EXEMPT_TARGET)) {
@@ -89,12 +89,12 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
 
         try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             context.getAsPlayer().ifPresent(frame::pushCause);
-            if (handler.mutePlayer(user.getUniqueId(), rs, time.orElse(null))) {
+            if (handler.mutePlayer(user.uniqueId(), rs, time.orElse(null))) {
                 // Success.
                 final Audience mc =
                         context.getServiceCollection().permissionService().permissionMessageChannel(MutePermissions.MUTE_NOTIFY);
-                final Audience toSendTo = Audience.audience(mc, context.getAudience());
-                final Mute mute = handler.getPlayerMuteInfo(user.getUniqueId()).get(); // we know it exists
+                final Audience toSendTo = Audience.audience(mc, context.audience());
+                final Mute mute = handler.getPlayerMuteInfo(user.uniqueId()).get(); // we know it exists
 
                 if (time.isPresent()) {
                     this.timedMute(context, user, mute, toSendTo);
@@ -116,8 +116,8 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
         mc.sendMessage(context.getMessage("standard.reasoncoloured", data.getReason()));
 
         if (user.isOnline()) {
-            context.sendMessageTo(user.getPlayer().get(), "mute.playernotify.time", ts);
-            context.sendMessageTo(user.getPlayer().get(), "command.reason", data.getReason());
+            context.sendMessageTo(user.player().get(), "mute.playernotify.time", ts);
+            context.sendMessageTo(user.player().get(), "command.reason", data.getReason());
         }
     }
 
@@ -126,8 +126,8 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
         mc.sendMessage(context.getMessage("standard.reasoncoloured", data.getReason()));
 
         if (user.isOnline()) {
-            context.sendMessageTo(user.getPlayer().get(), "mute.playernotify.standard");
-            context.sendMessageTo(user.getPlayer().get(), "command.reason", data.getReason());
+            context.sendMessageTo(user.player().get(), "mute.playernotify.standard");
+            context.sendMessageTo(user.player().get(), "command.reason", data.getReason());
         }
     }
 

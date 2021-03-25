@@ -25,7 +25,7 @@ import org.spongepowered.api.command.parameter.Parameter;
 public class KitRenameCommand implements ICommandExecutor {
 
     private final Parameter.Value<String> target = Parameter.string()
-            .setKey("target name")
+            .key("target name")
             .build();
 
     @Override

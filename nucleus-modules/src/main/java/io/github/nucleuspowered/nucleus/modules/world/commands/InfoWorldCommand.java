@@ -41,10 +41,10 @@ public class InfoWorldCommand implements ICommandExecutor {
         final List<Component> listContent = new ArrayList<>();
         final boolean canSeeSeeds = context.testPermission(WorldPermissions.WORLD_SEED);
         ListWorldCommand.getWorldInfo(context, listContent, wp.getProperties(), canSeeSeeds);
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .contents(listContent)
                 .title(context.getMessage("command.world.info.title", wp.getKey().asString()))
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
 
         return context.successResult();
     }

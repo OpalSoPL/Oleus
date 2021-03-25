@@ -14,8 +14,8 @@ public final class AdminParameters {
 
     public final static Parameter.Value<Predicate<Entity>> ENTITY_PARAMETER = Parameter
             .builder(new TypeToken<Predicate<Entity>>() {})
-            .parser(new EntityTypeValueParameter())
-            .setKey("type")
+            .addParser(new EntityTypeValueParameter())
+            .key("type")
             .consumeAllRemaining()
             .build();
 

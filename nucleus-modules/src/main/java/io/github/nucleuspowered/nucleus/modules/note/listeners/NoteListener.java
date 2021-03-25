@@ -47,10 +47,10 @@ public class NoteListener implements ListenerBase.Conditional {
      */
     @Listener
     public void onPlayerLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
-        this.noteHandler.getNotes(player.getUniqueId()).thenAccept(notes -> {
+        this.noteHandler.getNotes(player.uniqueId()).thenAccept(notes -> {
             if (notes != null && !notes.isEmpty()) {
                 final Audience audience = this.permissionService.permissionMessageChannel(NotePermissions.NOTE_SHOWONLOGIN);
-                Sponge.server().getScheduler().createExecutor(this.pluginContainer).execute(() ->
+                Sponge.server().scheduler().createExecutor(this.pluginContainer).execute(() ->
                         audience.sendMessage(this.messageService.getMessage("note.login.notify", player.name(), String.valueOf(notes.size()))
                             .hoverEvent(HoverEvent.showText(this.messageService.getMessage("note.login.view", player.name())))
                             .clickEvent(ClickEvent.runCommand("/nucleus:checknotes " + player.name()))));

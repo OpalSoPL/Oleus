@@ -15,12 +15,16 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryType;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.state.StateProperty;
 import org.spongepowered.api.util.blockray.RayTrace;
 import org.spongepowered.api.util.blockray.RayTraceResult;
@@ -63,7 +67,7 @@ public class BlockInfoCommand implements ICommandExecutor {
         if (context.hasAny(NucleusParameters.OPTIONAL_LOCATION)) {
             // get the location
             loc = context.getOne(NucleusParameters.OPTIONAL_LOCATION)
-                    .filter(x -> !x.getBlockType().isAnyOf(
+                    .filter(x -> !x.blockType().isAnyOf(
                             BlockTypes.CAVE_AIR.get(),
                             BlockTypes.AIR.get(),
                             BlockTypes.VOID_AIR.get()
@@ -74,39 +78,40 @@ public class BlockInfoCommand implements ICommandExecutor {
             loc = RayTrace.block().sourceEyePosition(serverPlayer).direction(serverPlayer)
                     .select(RayTrace.nonAir())
                     .continueWhileBlock(RayTrace.onlyAir())
-                    .execute().map(RayTraceResult::getSelectedObject);
+                    .execute().map(RayTraceResult::selectedObject);
         }
 
         if (loc.isPresent()) {
             // get the information.
             final LocatableBlock block = loc.get();
-            final BlockState blockState = block.getBlockState();
+            final BlockState blockState = block.blockState();
             final List<Component> lt = new ArrayList<>();
             lt.add(context.getMessage("command.blockinfo.id",
-                    blockState.getType().getKey().asString(),
-                    blockState.getType().asComponent()));
+                    blockState.type().findKey(RegistryTypes.BLOCK_TYPE).map(ResourceKey::formatted)
+                            .orElseGet(() -> context.getMessageString("standard.unknown")),
+                    blockState.type().asComponent()));
             lt.add(context.getMessage("command.iteminfo.extendedid", blockState.toString()));
 
             if (context.hasFlag("e")) {
-                final Collection<StateProperty<?>> cp = blockState.getStateProperties();
+                final Collection<StateProperty<?>> cp = blockState.stateProperties();
                 if (!cp.isEmpty()) {
-                    cp.forEach(x -> blockState.getStateProperty(x).map(String::valueOf)
+                    cp.forEach(x -> blockState.stateProperty(x).map(String::valueOf)
                         .ifPresent(y -> context.getServiceCollection().messageProvider().getMessageFor(
-                                context.getAudience(),
+                                context.audience(),
                                 "command.blockinfo.property.item",
-                                x.getKey().asString(),
+                                x.name(),
                                 y)));
                 }
             }
 
-            final Vector3i pos = block.getBlockPosition();
-            Util.getPaginationBuilder(context.getAudience()).contents(lt)
+            final Vector3i pos = block.blockPosition();
+            Util.getPaginationBuilder(context.audience()).contents(lt)
                     .padding(Component.text("-", NamedTextColor.GREEN))
                     .title(context.getMessage("command.blockinfo.list.header",
                             pos.getX(),
                             pos.getY(),
                             pos.getZ()))
-                    .sendTo(context.getAudience());
+                    .sendTo(context.audience());
 
             return context.successResult();
         }

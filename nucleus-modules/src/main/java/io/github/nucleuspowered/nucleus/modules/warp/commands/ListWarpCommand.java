@@ -101,11 +101,11 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
                 .clickEvent(SpongeComponents.executeCallback(source -> this.createSub(context, null, warps))).build());
         }
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
             .header(context.getMessage("command.warps.list.headercategory"))
             .title(context.getMessage("command.warps.list.maincategory")).padding(ListWarpCommand.DASH)
             .contents(lt)
-            .sendTo(context.getAudience());
+            .sendTo(context.audience());
     }
 
     private void createSub(final ICommandContext context,
@@ -116,12 +116,12 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
         final List<Component> lt = warpDataList.get(category).stream().sorted(Comparator.comparing(Warp::getName))
             .map(s -> this.createWarp(s, s.getName(), econExists, this.defaultCost, context)).collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
             .title(context.getMessage("command.warps.list.category", name)).padding(ListWarpCommand.DASH)
             .contents(lt)
             .footer(context.getMessage("command.warps.list.back")
                 .clickEvent(SpongeComponents.executeCallback(s -> this.createMain(context, warpDataList))))
-            .sendTo(context.getAudience());
+            .sendTo(context.audience());
     }
 
     private ICommandResult noCategories(final WarpService service, final ICommandContext context) {
@@ -133,10 +133,10 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
             return this.createWarp(wd.orElse(null), s, econExists, this.defaultCost, context);
         }).collect(Collectors.toList());
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
             .title(context.getMessage("command.warps.list.header")).padding(ListWarpCommand.DASH)
             .contents(lt)
-            .sendTo(context.getAudience());
+            .sendTo(context.audience());
 
         return context.successResult();
     }

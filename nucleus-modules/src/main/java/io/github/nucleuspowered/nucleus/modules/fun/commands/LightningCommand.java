@@ -58,8 +58,8 @@ public class LightningCommand implements ICommandExecutor {
         this.manyLivingParameter = Parameter.builder(new TypeToken<Collection<Entity>>() {})
             .optional()
             .setRequirements(cause -> permissionService.hasPermission(cause, FunPermissions.OTHERS_LIGHTNING))
-            .setKey("targets")
-            .parser(ResourceKeyedValueParameters.MANY_ENTITIES)
+            .key("targets")
+            .addParser(ResourceKeyedValueParameters.MANY_ENTITIES)
             .build();
     }
 
@@ -87,8 +87,8 @@ public class LightningCommand implements ICommandExecutor {
             // Smite above, but not on.
             final ServerLocation lightningLocation =
                     result.map(RayTraceResult::getHitPosition)
-                            .map(x -> ServerLocation.of(pl.getServerLocation().getWorld(), x.getX(), x.getY(), x.getZ()))
-                            .orElseGet(() -> pl.getServerLocation().add(0.0, 3.0, 0.0));
+                            .map(x -> ServerLocation.of(pl.serverLocation().getWorld(), x.getX(), x.getY(), x.getZ()))
+                            .orElseGet(() -> pl.serverLocation().add(0.0, 3.0, 0.0));
 
             this.spawnLightning(lightningLocation, context, null);
             return context.successResult();
@@ -96,7 +96,7 @@ public class LightningCommand implements ICommandExecutor {
 
         for (final Living pl : playerCollection) {
             this.spawnLightning(
-                    pl.getServerLocation(),
+                    pl.serverLocation(),
                     context,
                     pl instanceof Player ? (Player)pl : null);
         }
@@ -116,12 +116,12 @@ public class LightningCommand implements ICommandExecutor {
             world.spawnEntity(bolt);
             if (target != null) {
                 context.sendMessage("command.lightning.success.other",
-                        context.getServiceCollection().playerDisplayNameService().getDisplayName(target.getUniqueId()));
+                        context.getServiceCollection().playerDisplayNameService().getDisplayName(target.uniqueId()));
             }
         }
 
         if (target != null) {
-            throw context.createException("command.lightning.errorplayer", context.getServiceCollection().playerDisplayNameService().getDisplayName(target.getUniqueId()));
+            throw context.createException("command.lightning.errorplayer", context.getServiceCollection().playerDisplayNameService().getDisplayName(target.uniqueId()));
         } else {
             throw context.createException("command.lightning.error");
         }

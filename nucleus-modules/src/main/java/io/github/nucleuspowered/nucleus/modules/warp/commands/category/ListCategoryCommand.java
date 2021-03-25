@@ -34,7 +34,7 @@ public class ListCategoryCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the categories.
         final WarpService handler = context.getServiceCollection().getServiceUnchecked(WarpService.class);
-        Util.getPaginationBuilder(context.getAudience()).contents(
+        Util.getPaginationBuilder(context.audience()).contents(
                 handler.getWarpsWithCategories().keySet().stream().filter(Objects::nonNull)
                 .sorted(Comparator.comparing(WarpCategory::getId)).map(x -> {
             final List<Component> t = new ArrayList<>();
@@ -44,7 +44,7 @@ public class ListCategoryCommand implements ICommandExecutor {
         }).flatMap(Collection::stream).collect(Collectors.toList()))
         .title(context.getMessage("command.warp.category.listitem.title"))
         .padding(Component.text("-", NamedTextColor.GREEN))
-        .sendTo(context.getAudience());
+        .sendTo(context.audience());
 
         return context.successResult();
     }

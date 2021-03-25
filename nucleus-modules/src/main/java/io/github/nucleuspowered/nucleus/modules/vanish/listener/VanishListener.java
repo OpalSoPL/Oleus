@@ -49,7 +49,7 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
     @Listener(order = Order.LAST)
     public void onAuth(final ServerSideConnectionEvent.Auth auth) {
         if (this.vanishConfig.isTryHidePlayers()) {
-            final UUID uuid = auth.getProfile().getUniqueId();
+            final UUID uuid = auth.getProfile().uniqueId();
             Sponge.server().userManager()
                                 .get(uuid)
                                 .flatMap(x -> x.get(Keys.LAST_DATE_PLAYED))
@@ -59,10 +59,10 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
 
     @Listener
     public void onLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
-        final boolean persist = this.service.isVanished(player.getUniqueId());
+        final boolean persist = this.service.isVanished(player.uniqueId());
 
         final boolean shouldVanish = (this.permissionService.hasPermission(player, VanishPermissions.VANISH_ONLOGIN)
-                && this.userPreferenceService.get(player.getUniqueId(), VanishKeys.VANISH_ON_LOGIN).orElse(false))
+                && this.userPreferenceService.get(player.uniqueId(), VanishKeys.VANISH_ON_LOGIN).orElse(false))
                 || persist;
 
         if (shouldVanish) {
@@ -91,14 +91,14 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
     @Listener
     public void onQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer player) {
         if (player.get(Keys.VANISH).orElse(false)) {
-            this.storageManager.getUserService().get(player.getUniqueId())
+            this.storageManager.getUserService().get(player.uniqueId())
                     .thenAccept(x -> x.ifPresent(t -> t.set(VanishKeys.VANISH_STATUS, false)));
             if (this.vanishConfig.isSuppressMessagesOnVanish()) {
                 event.setAudience(Audience.empty());
             }
         }
 
-        this.service.clearLastVanishTime(player.getUniqueId());
+        this.service.clearLastVanishTime(player.uniqueId());
     }
 
     @Override

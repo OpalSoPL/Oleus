@@ -58,7 +58,7 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
 
     @Listener(order = Order.LAST)
     public void onCommand(final ExecuteCommandEvent.Post event) {
-        final Object source = event.getCause().root();
+        final Object source = event.cause().root();
         // Check source.
         final boolean accept;
         if (source instanceof Player) {
@@ -76,21 +76,21 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
         }
         final String name = PlainComponentSerializer.plain().serialize(this.displayNameProvider.getName(source, Component.text("unknown")));
 
-        final String command = event.getCommand().toLowerCase();
-        final Set<String> commands = CommandNameCache.INSTANCE.getFromCommandAndSource(command, event.getCommandCause());
+        final String command = event.command().toLowerCase();
+        final Set<String> commands = CommandNameCache.INSTANCE.getFromCommandAndSource(command, event.commandCause());
         commands.retainAll(this.commandsToFilter);
 
         // If whitelist, and we have the command, or if not blacklist, and we do not have the command.
         if (this.c.isWhitelist() == !commands.isEmpty()) {
             final String cause;
             if (this.c.isCauseEnhanced()) {
-                final List<String> l = event.getCause()
+                final List<String> l = event.cause()
                         .all()
                         .stream()
                         .filter(x -> (x instanceof PluginContainer || x instanceof Nameable || x instanceof SystemSubject) && x != source)
                         .map(x -> {
                             if (x instanceof Nameable) {
-                                return ((Nameable) x).getName();
+                                return ((Nameable) x).name();
                             } else if (x instanceof SystemSubject) {
                                 return "Server";
                             } else {
@@ -110,8 +110,8 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
             }
             final String message = this.messageProvider.getMessageString("commandlog.message",
                     cause,
-                    event.getCommand(),
-                    event.getArguments());
+                    event.command(),
+                    event.arguments());
             this.logger.info(message);
             this.handler.queueEntry(message);
         }

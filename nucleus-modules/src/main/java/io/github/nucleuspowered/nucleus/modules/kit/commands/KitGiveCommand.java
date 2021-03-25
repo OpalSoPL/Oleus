@@ -68,15 +68,15 @@ public class KitGiveCommand implements ICommandExecutor, IReloadableService.Relo
             return context.errorResult("command.kit.give.self");
         }
 
-        final Component playerName = context.getDisplayName(player.getUniqueId());
+        final Component playerName = context.getDisplayName(player.uniqueId());
         final Component kitName = Component.text(kit.getName());
-        final KitRedeemResult redeemResult = service.redeemKit(kit, player.getUniqueId(), !skip, this.mustGetAll);
+        final KitRedeemResult redeemResult = service.redeemKit(kit, player.uniqueId(), !skip, this.mustGetAll);
         if (redeemResult.isSuccess()) {
             if (!redeemResult.rejectedItems().isEmpty()) {
                 // If we drop them, tell the user
                 if (this.isDrop) {
                     context.sendMessage("command.kit.give.itemsdropped", playerName);
-                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.getServerLocation()));
+                    redeemResult.rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, player.serverLocation()));
                 } else {
                     context.sendMessage("command.kit.give.fullinventory", playerName);
                 }

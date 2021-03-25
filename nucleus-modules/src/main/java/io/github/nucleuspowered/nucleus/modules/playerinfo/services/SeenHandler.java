@@ -61,13 +61,13 @@ public class SeenHandler implements NucleusSeenService, ServiceBase {
         }
 
         for (final Map.Entry<String, List<SeenInformationProvider>> entry : this.pluginInformationProviders.entrySet()) {
-            entry.getValue().stream().filter(sip -> sip.hasPermission(requester, user.getUniqueId())).forEach(sip -> {
-                final Collection<Component> input = sip.getInformation(requester, user.getUniqueId());
+            entry.getValue().stream().filter(sip -> sip.hasPermission(requester, user.uniqueId())).forEach(sip -> {
+                final Collection<Component> input = sip.getInformation(requester, user.uniqueId());
                 if (input != null && !input.isEmpty()) {
                     if (information.isEmpty()) {
                         information.add(Component.empty());
                         information.add(Component.text("-----"));
-                        information.add(this.serviceCollection.messageProvider().getMessageFor(requester.getAudience(), "seen.header.plugins"));
+                        information.add(this.serviceCollection.messageProvider().getMessageFor(requester.audience(), "seen.header.plugins"));
                         information.add(Component.text("-----"));
                     }
 

@@ -39,7 +39,7 @@ public class MotdCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.errorResult("command.motd.nocontroller");
         }
 
-        final Audience src = context.getAudience();
+        final Audience src = context.audience();
         if (this.usePagination) {
             otfc.get().sendToAudience(src, this.title);
         } else {

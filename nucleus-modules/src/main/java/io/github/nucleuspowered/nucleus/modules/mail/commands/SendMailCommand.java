@@ -48,7 +48,7 @@ public class SendMailCommand implements ICommandExecutor {
                 .orElseThrow(() -> context.createException("args.message.none"));
         final MailHandler handler = context.getServiceCollection().getServiceUnchecked(MailHandler.class);
         if (context.is(Player.class)) {
-            handler.sendMail(context.getIfPlayer().getUniqueId(), pl.uniqueId(), m);
+            handler.sendMail(context.getIfPlayer().uniqueId(), pl.uniqueId(), m);
         } else {
             handler.sendMailFromConsole(pl.uniqueId(), m);
         }

@@ -56,7 +56,7 @@ public class UnjailCommand implements ICommandExecutor, IReloadableService.Reloa
         }
 
         try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
-            if (context.getServiceCollection().getServiceUnchecked(JailService.class).unjailPlayer(user.getUniqueId())) {
+            if (context.getServiceCollection().getServiceUnchecked(JailService.class).unjailPlayer(user.uniqueId())) {
                 context.sendMessage("command.jail.unjail.success", user.name());
                 return context.successResult();
             } else {

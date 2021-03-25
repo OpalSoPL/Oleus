@@ -64,7 +64,7 @@ public class StaffChatCommand implements ICommandExecutor {
                         pl.simulateChat(
                                 context.getServiceCollection()
                                         .textStyleService()
-                                        .addUrls(toSend.get()), Sponge.server().causeStackManager().getCurrentCause());
+                                        .addUrls(toSend.get()), Sponge.server().causeStackManager().currentCause());
                     }
 
                     // If you send a message, you're viewing it again.
@@ -74,9 +74,9 @@ public class StaffChatCommand implements ICommandExecutor {
                 } else {
                     // mostly to allow plugins to know that's what we're doing.
                     try (final NoExceptionAutoClosable c = this.chatMessageFormatterService
-                            .setAudienceNucleusChannelTemporarily(context.getAudience(), StaffChatMessageChannel.getInstance())) {
+                            .setAudienceNucleusChannelTemporarily(context.audience(), StaffChatMessageChannel.getInstance())) {
                         StaffChatMessageChannel.getInstance()
-                                .sendMessageFrom(context.getAudience(),
+                                .sendMessageFrom(context.audience(),
                                         context.getServiceCollection().textStyleService().addUrls(toSend.get()));
                     }
                 }

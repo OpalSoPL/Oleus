@@ -44,12 +44,12 @@ public class DeleteHomeCommand implements ICommandExecutor {
         final IPermissionService permissionService = serviceCollection.permissionService();
         this.userParameter =
                 Parameter.user().optional()
-                        .setRequirements(x -> permissionService.hasPermission(x, HomePermissions.BASE_HOME_DELETEOTHER))
-                        .setKey(HomeParameter.OTHER_PLAYER_KEY)
+                        .requirements(x -> permissionService.hasPermission(x, HomePermissions.BASE_HOME_DELETEOTHER))
+                        .key(HomeParameter.OTHER_PLAYER_KEY)
                         .build();
         this.parameter = Parameter.builder(Home.class)
-                .parser(new HomeParameter(serviceCollection.getServiceUnchecked(HomeService.class), serviceCollection.messageProvider()))
-                .setKey("home")
+                .addParser(new HomeParameter(serviceCollection.getServiceUnchecked(HomeService.class), serviceCollection.messageProvider()))
+                .key("home")
                 .build();
     }
 
@@ -70,7 +70,7 @@ public class DeleteHomeCommand implements ICommandExecutor {
             frame.pushCause(context.getCommandSourceRoot());
             context.getServiceCollection().getServiceUnchecked(HomeService.class).removeHome(wl.getOwnersUniqueId(), wl.getName());
             if (target.isPresent()) {
-                context.sendMessage("command.home.delete.other.success", target.get().getName(), wl.getName());
+                context.sendMessage("command.home.delete.other.success", target.get().name(), wl.getName());
             } else {
                 context.sendMessage("command.home.delete.success", wl.getName());
             }

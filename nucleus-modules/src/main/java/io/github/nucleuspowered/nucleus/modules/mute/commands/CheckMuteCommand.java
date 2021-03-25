@@ -39,7 +39,7 @@ public class CheckMuteCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the user.
         final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
-        final UUID uuid = either.fold(Identifiable::getUniqueId, GameProfile::uuid);
+        final UUID uuid = either.fold(Identifiable::uniqueId, GameProfile::uuid);
         final Component name = context.getServiceCollection().playerDisplayNameService().getName(uuid);
         final MuteService muteHandler = context.getServiceCollection().getServiceUnchecked(MuteService.class);
 

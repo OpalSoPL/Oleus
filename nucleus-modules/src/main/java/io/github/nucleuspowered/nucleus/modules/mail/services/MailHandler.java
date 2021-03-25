@@ -47,8 +47,8 @@ public class MailHandler implements NucleusMailService, ServiceBase {
         this.mailFilterParameter = Parameter.builder(MailFilter.class)
                 .consumeAllRemaining()
                 .optional()
-                .setKey("mail filters")
-                .parser(new MailFilterParameter(this, serviceCollection.messageProvider()))
+                .key("mail filters")
+                .addParser(new MailFilterParameter(this, serviceCollection.messageProvider()))
                 .build();
     }
 

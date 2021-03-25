@@ -56,14 +56,14 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
                 if (Sponge.server().onMainThread()) {
                     this.exec(pl);
                 } else {
-                    Sponge.server().getScheduler().submit(
+                    Sponge.server().scheduler().submit(
                             Task.builder().execute(() -> this.exec(pl)).plugin(this.serviceCollection.pluginContainer()).build());
                 }
             } else {
                 if (Sponge.server().onMainThread()) {
                     this.safeTeleport(pl);
                 } else {
-                    Sponge.server().getScheduler().submit(
+                    Sponge.server().scheduler().submit(
                             Task.builder().execute(() -> this.safeTeleport(pl)).plugin(this.serviceCollection.pluginContainer()).build());
                 }
             }
@@ -110,7 +110,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
         // If we're moving world...
         if (!twfrom.getKey().equals(twto.getKey())) {
             // Next tick, they can fly... if they have permission to do so.
-            Sponge.server().getScheduler().submit(Task.builder().execute(() -> {
+            Sponge.server().scheduler().submit(Task.builder().execute(() -> {
                 if (this.serviceCollection.permissionService().hasPermission(pl, FlyPermissions.BASE_FLY)) {
                     pl.offer(Keys.CAN_FLY, true);
                     if (isFlying) {
@@ -147,7 +147,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
                     .teleportService()
                     .teleportPlayerSmart(
                             pl,
-                            pl.getServerLocation(),
+                            pl.serverLocation(),
                             false,
                             true,
                             TeleportScanners.DESCENDING_SCAN.get()

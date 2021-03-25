@@ -50,13 +50,13 @@ public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Rel
 
     @SuppressWarnings("unchecked")
     private final Parameter.Value<EntityType<?>> entityTypeParameter = Parameter.builder(new TypeToken<EntityType<?>>() {})
-            .parser((ValueParameter<EntityType<?>>) (Object) VariableValueParameters.catalogedElementParameterBuilder(EntityType.class).build())
-            .setKey("entity type")
+            .addParser((ValueParameter<EntityType<?>>) (Object) VariableValueParameters.catalogedElementParameterBuilder(EntityType.class).build())
+            .key("entity type")
             .build();
 
     private final Parameter.Value<Integer> amount = Parameter.builder(Integer.class)
-            .setKey("amount")
-            .parser(VariableValueParameters.integerRange().setMin(1).build())
+            .key("amount")
+            .addParser(VariableValueParameters.integerRange().setMin(1).build())
             .optional()
             .build();
 
@@ -88,7 +88,7 @@ public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Rel
         }
 
 
-        final ServerLocation loc = pl.getServerLocation();
+        final ServerLocation loc = pl.serverLocation();
         final ServerWorld w = loc.getWorld();
 
         // Count the number of entities spawned.

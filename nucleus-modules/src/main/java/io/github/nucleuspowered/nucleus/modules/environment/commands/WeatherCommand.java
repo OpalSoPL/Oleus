@@ -23,11 +23,13 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableServ
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.weather.Weather;
+import org.spongepowered.api.world.weather.WeatherType;
 
 import java.time.Duration;
 import java.util.Optional;
@@ -46,13 +48,13 @@ import java.util.Optional;
 )
 public class WeatherCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private final Parameter.Value<Weather> weatherParameter;
+    private final Parameter.Value<WeatherType> weatherParameter;
 
     @Inject
     public WeatherCommand(final IMessageProviderService messageProviderService) {
-        this.weatherParameter = Parameter.builder(Weather.class)
-                .parser(new WeatherArgument(messageProviderService))
-                .setKey("weather")
+        this.weatherParameter = Parameter.builder(WeatherType.class)
+                .addParser(new WeatherArgument(messageProviderService))
+                .key("weather")
                 .build();
     }
 
@@ -74,19 +76,17 @@ public class WeatherCommand implements ICommandExecutor, IReloadableService.Relo
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         // We can predict the weather on multiple worlds now!
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelf(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey());
-        final ServerWorld w = wp.getWorld()
-            .orElseThrow(() -> context.createException("args.worldproperties.notloaded", wp.getKey().asString()));
+        final ServerWorld w = context.getWorldPropertiesOrFromSelf(NucleusParameters.ONLINE_WORLD_OPTIONAL);
 
         // Get whether we locked the weather.
-        if (context.getServiceCollection().storageManager().getWorldOnThread(w.getKey())
+        if (context.getServiceCollection().storageManager().getWorldOnThread(w.key())
                 .map(x -> x.get(EnvironmentKeys.LOCKED_WEATHER).orElse(false)).orElse(false)) {
             // Tell the user to unlock first.
-            return context.errorResult("command.weather.locked", w.getKey().asString());
+            return context.errorResult("command.weather.locked", w.key().asString());
         }
 
         // Houston, we have a world! Now, what was the forecast?
-        final Weather we = context.requireOne(this.weatherParameter);
+        final WeatherType we = context.requireOne(this.weatherParameter);
 
         // Have we gotten an accurate forecast? Do we know how long this weather spell will go on for?
         final Optional<Long> oi = context.getOne(NucleusParameters.OPTIONAL_DURATION).map(Duration::getSeconds);
@@ -98,16 +98,17 @@ public class WeatherCommand implements ICommandExecutor, IReloadableService.Relo
 
         if (oi.isPresent()) {
             // YES! I should get a job at the weather service and show them how it's done!
-            Sponge.server().getScheduler().submit(Task.builder()
+            Sponge.server().scheduler().submit(Task.builder()
                     .execute(() -> w.setWeather(we, Ticks.ofWallClockSeconds(Sponge.server(), oi.get().intValue())))
                     .plugin(context.getServiceCollection().pluginContainer()).build());
-            context.sendMessage("command.weather.time", we.getKey().asString(), w.getKey().asString(), context.getTimeString(oi.get()));
+            context.sendMessage("command.weather.time", we.key(RegistryTypes.WEATHER_TYPE).asString(), w.key().asString(),
+                    context.getTimeString(oi.get()));
         } else {
             // No, probably because I've already gotten a job at the weather service...
-            Sponge.server().getScheduler().submit(
+            Sponge.server().scheduler().submit(
                     Task.builder().execute(() -> w.setWeather(we)).plugin(context.getServiceCollection().pluginContainer()).build()
             );
-            context.sendMessage("command.weather.set", we.getKey().asString(), w.getKey().asString());
+            context.sendMessage("command.weather.set", we.key(RegistryTypes.WEATHER_TYPE).asString(), w.key().asString());
         }
 
         // The weather control device has been activated!

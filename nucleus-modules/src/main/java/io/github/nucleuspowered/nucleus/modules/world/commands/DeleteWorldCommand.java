@@ -53,8 +53,8 @@ public class DeleteWorldCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerWorld properties = context.requireOne(NucleusParameters.ONLINE_WORLD);
         if (this.confirm != null && this.confirm._1().isAfter(Instant.now()) &&
-                this.confirm._2().equals(context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID)) &&
-                this.confirm._3().getUniqueId().equals(properties.getUniqueId())) {
+                this.confirm._2().equals(context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID)) &&
+                this.confirm._3().uniqueId().equals(properties.uniqueId())) {
             try {
                 return this.completeDeletion(context, properties.getProperties());
             } finally {
@@ -63,7 +63,7 @@ public class DeleteWorldCommand implements ICommandExecutor {
         }
 
         // Scary warning.
-        this.confirm = new Tuple3<>(Instant.now().plus(30, ChronoUnit.SECONDS), context.getUniqueId().orElse(Util.CONSOLE_FAKE_UUID), properties.getProperties());
+        this.confirm = new Tuple3<>(Instant.now().plus(30, ChronoUnit.SECONDS), context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID), properties.getProperties());
         context.sendMessage("command.world.delete.warning1", properties.getKey().asString());
         context.sendMessage("command.world.delete.warning3", properties.getKey().asString());
         return context.successResult();
@@ -85,8 +85,8 @@ public class DeleteWorldCommand implements ICommandExecutor {
         // Now request deletion
         final CompletableFuture<Boolean> completableFuture = Sponge.server().worldManager().deleteWorld(properties.getKey());
         final Supplier<Optional<? extends Audience>> source;
-        if (context.getAudience() instanceof ServerPlayer) {
-            final UUID uuid = ((ServerPlayer) context.getAudience()).getUniqueId();
+        if (context.audience() instanceof ServerPlayer) {
+            final UUID uuid = ((ServerPlayer) context.audience()).uniqueId();
             source = () -> Sponge.server().player(uuid);
         } else {
             source = Optional::empty;

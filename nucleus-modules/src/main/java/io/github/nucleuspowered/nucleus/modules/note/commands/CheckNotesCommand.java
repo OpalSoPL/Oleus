@@ -49,7 +49,7 @@ public class CheckNotesCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final NoteHandler handler = context.getServiceCollection().getServiceUnchecked(NoteHandler.class);
-        final UUID uuid = NucleusParameters.Composite.parseUserOrGameProfile(context).fold(Identifiable::getUniqueId, Identifiable::getUniqueId);
+        final UUID uuid = NucleusParameters.Composite.parseUserOrGameProfile(context).fold(Identifiable::uniqueId, Identifiable::uniqueId);
 
         handler.getNotes(uuid).thenAccept(notes -> {
             final Component name = context.getServiceCollection().playerDisplayNameService().getName(uuid);
@@ -65,12 +65,12 @@ public class CheckNotesCommand implements ICommandExecutor {
             messages.add(0, context.getMessage("command.checknotes.info"));
 
             context.getServiceCollection().schedulerService().runOnMainThread(() ->
-                    Util.getPaginationBuilder(context.getAudience())
+                    Util.getPaginationBuilder(context.audience())
                         .title(
                                 context.getMessage("command.checknotes.header", name))
                         .padding(Component.text("=", NamedTextColor.YELLOW))
                         .contents(messages)
-                        .sendTo(context.getAudience()));
+                        .sendTo(context.audience()));
         });
         return context.successResult();
     }

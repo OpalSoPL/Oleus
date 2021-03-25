@@ -94,28 +94,28 @@ public class SeenCommand implements ICommandExecutor {
 
     @Nullable
     private Component getUUID(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
-        return context.getMessage("command.seen.uuid", user.getUniqueId());
+        return context.getMessage("command.seen.uuid", user.uniqueId());
     }
 
     @Nullable
     private Component getIP(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
-        @Nullable final Tuple<Component, String> res = user.getPlayer()
+        @Nullable final Tuple<Component, String> res = user.player()
                     .map(pl -> Tuple.of(
                             context.getMessage("command.seen.ipaddress",
-                                    pl.getConnection().getAddress().getAddress().toString()),
-                                    pl.getConnection().getAddress().getAddress().toString()))
+                                    pl.connection().address().getAddress().toString()),
+                                    pl.connection().address().getAddress().toString()))
                     .orElseGet(() -> userDataModule.get(CoreKeys.IP_ADDRESS).map(x ->
                             Tuple.of(
                                     context.getMessage("command.seen.lastipaddress", x),
                                     x
                             )).orElse(null));
         if (res != null) {
-            if (Sponge.server().getCommandManager().getCommandMapping("nucleus:getfromip").isPresent()) {
-                return res.getFirst()
+            if (Sponge.server().commandManager().commandMapping("nucleus:getfromip").isPresent()) {
+                return res.first()
                         .hoverEvent(HoverEvent.showText(context.getMessage("command.seen.ipclick")))
-                        .clickEvent(ClickEvent.runCommand("/nucleus:getfromip " + res.getSecond().replaceAll("^/", "")));
+                        .clickEvent(ClickEvent.runCommand("/nucleus:getfromip " + res.second().replaceAll("^/", "")));
             }
-            return res.getFirst();
+            return res.first();
         }
 
         return null;
@@ -145,13 +145,10 @@ public class SeenCommand implements ICommandExecutor {
     @Nullable
     private Component getLocation(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
         if (user.isOnline()) {
-            return this.getLocationString("command.seen.currentlocation", user.getPlayer().get().getServerLocation(), context);
+            return this.getLocationString("command.seen.currentlocation", user.player().get().serverLocation(), context);
         }
 
-        final Optional<WorldProperties> wp = Sponge.server().worldManager().getProperties(user.getWorldKey());
-        return wp.map(worldProperties ->
-                this.getLocationString("command.seen.lastlocation", worldProperties.getKey(), user.getPosition(), context))
-                .orElseGet(() -> context.getMessage("standard.unknown"));
+        return this.getLocationString("command.seen.lastlocation", user.worldKey(), user.position(), context);
     }
 
     @Nullable
@@ -180,7 +177,7 @@ public class SeenCommand implements ICommandExecutor {
 
     @Nullable
     private Component getGameMode(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
-        return user.get(Keys.GAME_MODE).map(x -> context.getMessage("command.seen.gamemode", x.getKey().asString())).orElse(null);
+        return user.get(Keys.GAME_MODE).map(x -> context.getMessage("command.seen.gamemode", x.asComponent())).orElse(null);
     }
 
     @Override
@@ -197,7 +194,7 @@ public class SeenCommand implements ICommandExecutor {
         final IUserDataObject userDataObject = context.getServiceCollection()
                 .storageManager()
                 .getUserService()
-                .getOrNewOnThread(user.getUniqueId());
+                .getOrNewOnThread(user.uniqueId());
 
         final List<Component> messages = new ArrayList<>();
 
@@ -213,7 +210,7 @@ public class SeenCommand implements ICommandExecutor {
                     context.getMessage("command.seen.loggedoff", context.getTimeString(Duration.between(Instant.now(), x)))));
         }
 
-        messages.add(context.getMessage("command.seen.displayname", context.getDisplayName(user.getUniqueId())));
+        messages.add(context.getMessage("command.seen.displayname", context.getDisplayName(user.uniqueId())));
 
         messages.add(Component.empty());
         for (final Map.Entry<String, TriFunction<ICommandContext, User, IUserDataObject, Component>> entry : this.entries.entrySet()) {
@@ -229,35 +226,35 @@ public class SeenCommand implements ICommandExecutor {
         // TODO: Ordering
         final IPlayerInformationService playerInformationService = context.getServiceCollection().playerInformationService();
         for (final IPlayerInformationService.Provider provider : playerInformationService.getProviders()) {
-            provider.get(user, context.getCause(), context.getServiceCollection()).ifPresent(messages::add);
+            provider.get(user, context.cause(), context.getServiceCollection()).ifPresent(messages::add);
         }
 
         messages.addAll(context.getServiceCollection().getServiceUnchecked(SeenHandler.class)
-                .getText(context.getCause(), user));
+                .getText(context.cause(), user));
 
-        Util.getPaginationBuilder(context.getAudience())
+        Util.getPaginationBuilder(context.audience())
                 .contents(messages)
                 .padding(Component.text("-", NamedTextColor.GREEN))
-                .title(context.getMessage("command.seen.title", user.name())).sendTo(context.getAudience());
+                .title(context.getMessage("command.seen.title", user.name())).sendTo(context.audience());
         return context.successResult();
     }
 
     private Component getLocationString(final String key, final ServerLocation lw, final ICommandContext source) {
-        return this.getLocationString(key, lw.getWorldKey(), lw.getPosition(), source);
+        return this.getLocationString(key, lw.worldKey(), lw.position(), source);
     }
 
     private Component getLocationString(final String key, final ResourceKey worldKey, final Vector3d position, final ICommandContext context) {
         final Component text = context.getMessage(key, context.getMessage("command.seen.locationtemplate", worldKey.asString(),
                 position.toInt().toString()));
-        if (Sponge.server().getCommandManager().getCommandMapping("nucleus:tppos")
-                .map(x -> x.getRegistrar().canExecute(context.getCause(), x))
+        if (Sponge.server().commandManager().commandMapping("nucleus:tppos")
+                .map(x -> x.registrar().canExecute(context.cause(), x))
                 .orElse(false)) {
 
             final TextComponent.Builder building = Component.text().append(text)
                     .hoverEvent(HoverEvent.showText(context.getMessage("command.seen.teleportposition")
             ));
 
-            Sponge.server().worldManager().getWorld(worldKey).ifPresent(
+            Sponge.server().worldManager().world(worldKey).ifPresent(
                     x -> building.clickEvent(SpongeComponents.executeCallback(cs -> {
                         if (cs.root() instanceof ServerPlayer) {
                             ((ServerPlayer) cs.root()).setLocation(ServerLocation.of(x, position));

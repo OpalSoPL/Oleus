@@ -20,14 +20,14 @@ public final class NucleusAPIMetaService {
     private final int patchVersion;
     private final boolean release;
 
-    public NucleusAPIMetaService(String version) {
+    public NucleusAPIMetaService(final String version) {
         this.version = version;
 
-        String[] sp = version.split("\\.", 3);
-        String[] patch = sp[2].split("-", 2);
-        this.majorVersion = parse(sp[0]);
-        this.minorVersion = parse(sp[1]);
-        this.patchVersion = parse(patch[0]);
+        final String[] sp = version.split("\\.", 3);
+        final String[] patch = sp[2].split("-", 2);
+        this.majorVersion = this.parse(sp[0]);
+        this.minorVersion = this.parse(sp[1]);
+        this.patchVersion = this.parse(patch[0]);
         this.semver = String.format("%d.%d.%d", this.majorVersion, this.minorVersion, this.patchVersion);
         this.release = patch.length == 2 && !patch[1].isEmpty();
     }
@@ -86,10 +86,10 @@ public final class NucleusAPIMetaService {
         return this.release;
     }
 
-    private int parse(String string) {
+    private int parse(final String string) {
         try {
             return Integer.parseUnsignedInt(string);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return -1;
         }
     }

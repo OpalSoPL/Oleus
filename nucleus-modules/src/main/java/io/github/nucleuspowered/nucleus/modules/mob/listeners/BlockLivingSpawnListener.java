@@ -32,7 +32,7 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
     public void onSpawn(final SpawnEntityEvent event) {
         event.filterEntities(x -> {
             final Class<? extends Entity> entityType = x.getClass();
-            return this.checkIsValid(entityType) || this.isSpawnable(x.getType(), x.getServerLocation().getWorld());
+            return this.checkIsValid(entityType) || this.isSpawnable(x.getType(), x.serverLocation().getWorld());
         });
     }
 
@@ -63,7 +63,7 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
             if (conf.entrySet().stream().anyMatch(x -> Sponge.server().worldManager().getProperties(ResourceKey.resolve(x.getKey().toLowerCase())).isPresent())) {
                 for (final BlockSpawnsConfig s : conf.values()) {
                     final List<String> idsToBlock = s.getIdsToBlock();
-                    if (s.isBlockVanillaMobs() || Sponge.getRegistry().getCatalogRegistry().getAllOf(EntityType.class).stream().anyMatch(x -> idsToBlock.contains(x.getKey().asString()))) {
+                    if (s.isBlockVanillaMobs() || Sponge.registry().getCatalogRegistry().getAllOf(EntityType.class).stream().anyMatch(x -> idsToBlock.contains(x.getKey().asString()))) {
                         return true;
                     }
                 }

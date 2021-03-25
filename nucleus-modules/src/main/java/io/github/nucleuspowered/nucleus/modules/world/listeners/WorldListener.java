@@ -52,12 +52,12 @@ public class WorldListener implements ListenerBase.Conditional {
         if (!permissionService.isConsoleOverride(event.getCause().first(Subject.class).orElse(player)) &&
                 !this.serviceCollection.permissionService().hasPermission(player, WorldPermissions.getWorldAccessPermission(target.getKey().asString()))) {
             event.setCancelled(true);
-            if (!this.messageSent.contains(player.getUniqueId())) {
+            if (!this.messageSent.contains(player.uniqueId())) {
                 this.serviceCollection.messageProvider().sendMessageTo(player, "world.access.denied", target.getKey().asString());
             }
 
-            this.messageSent.add(player.getUniqueId());
-            Sponge.server().getScheduler().submit(
+            this.messageSent.add(player.uniqueId());
+            Sponge.server().scheduler().submit(
                     Task.builder()
                             .delay(Ticks.of(1))
                             .execute(this.relocate(player))
@@ -75,14 +75,14 @@ public class WorldListener implements ListenerBase.Conditional {
         return task -> {
             final Optional<ServerLocation> location = Sponge.server()
                     .getTeleportHelper()
-                    .getSafeLocationWithBlacklist(player.getServerLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL.get());
+                    .getSafeLocationWithBlacklist(player.serverLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL.get());
             if (location.isPresent()) {
                 player.setLocation(location.get());
             } else {
                 player.setPosition(player.getWorld().getProperties().getSpawnPosition().toDouble());
             }
 
-            this.messageSent.remove(player.getUniqueId());
+            this.messageSent.remove(player.uniqueId());
         };
     }
 

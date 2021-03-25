@@ -65,13 +65,13 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
         final IPermissionService permissionService = serviceCollection.permissionService();
         this.userParameter =
                 Parameter.user()
-                        .setRequirements(x -> permissionService.hasPermission(x, HomePermissions.BASE_HOME_OTHER))
-                        .setKey(HomeParameter.OTHER_PLAYER_KEY)
+                        .requirements(x -> permissionService.hasPermission(x, HomePermissions.BASE_HOME_OTHER))
+                        .key(HomeParameter.OTHER_PLAYER_KEY)
                         .build();
         this.parameter = Parameter.builder(Home.class)
-                .parser(new HomeParameter(serviceCollection.getServiceUnchecked(HomeService.class), serviceCollection.messageProvider()))
+                .addParser(new HomeParameter(serviceCollection.getServiceUnchecked(HomeService.class), serviceCollection.messageProvider()))
                 .optional()
-                .setKey("home")
+                .key("home")
                 .build();
     }
 
@@ -97,11 +97,11 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
         final boolean isOther;
         if (context.hasAny(this.userParameter)) {
             user = context.requireOne(this.userParameter);
-            target = user.getUniqueId();
+            target = user.uniqueId();
             isOther = true;
         } else {
-            user = invokingPlayer.getUser();
-            target = invokingPlayer.getUniqueId();
+            user = invokingPlayer.user();
+            target = invokingPlayer.uniqueId();
             isOther = false;
         }
         final int max = homeService.getMaximumHomes(target);
@@ -124,13 +124,13 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
             wl = home.get();
         }
 
-        Sponge.server().worldManager().getWorld(wl.getWorld().get().getKey())
+        Sponge.server().worldManager().world(wl.getWorld().get().key())
                 .orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
 
         final ServerLocation targetLocation = wl.getLocation().orElseThrow(() -> context.createException("command.home.invalid", wl.getName()));
 
         if (this.isOnlySameDimension) {
-            if (!targetLocation.getWorldKey().equals(user.getWorldKey())) {
+            if (!targetLocation.worldKey().equals(user.worldKey())) {
                 if (!context.testPermission(HomePermissions.HOME_EXEMPT_SAMEDIMENSION)) {
                     return context.errorResult("command.home.invalid", wl.getName());
                 }
@@ -138,7 +138,7 @@ public class HomeCommand implements ICommandExecutor, IReloadableService.Reloada
         }
 
         try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
-            final UseHomeEvent event = new UseHomeEvent(frame.getCurrentCause(), target, wl);
+            final UseHomeEvent event = new UseHomeEvent(frame.currentCause(), target, wl);
 
             if (Sponge.eventManager().post(event)) {
                 return event.getCancelMessage().map(context::errorResultLiteral)

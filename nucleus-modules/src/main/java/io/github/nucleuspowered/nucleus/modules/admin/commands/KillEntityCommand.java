@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
         })
 public class KillEntityCommand implements ICommandExecutor {
 
-    private final Parameter.Value<Integer> radius = Parameter.builder(Integer.class).setKey("radius").parser(
+    private final Parameter.Value<Integer> radius = Parameter.builder(Integer.class).key("radius").addParser(
             VariableValueParameters.integerRange().setMin(0).setMax(Integer.MAX_VALUE).build()
     ).build();
 
@@ -73,13 +73,13 @@ public class KillEntityCommand implements ICommandExecutor {
         if (context.hasAny(this.radius)) {
             final Locatable l = ((Locatable) src);
             final int r = context.requireOne(this.radius);
-            l.getServerLocation().getWorld().getNearbyEntities(l.getServerLocation().getPosition(), r);
+            l.serverLocation().getWorld().getNearbyEntities(l.serverLocation().getPosition(), r);
         } else {
             final WorldProperties worldProperties;
             if (context.hasAny(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY)) {
                 worldProperties = context.requireOne(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY);
             } else {
-                worldProperties = ((Locatable) src).getServerLocation().getWorld().getProperties();
+                worldProperties = ((Locatable) src).serverLocation().getWorld().getProperties();
             }
             worldProperties.getWorld().ifPresent(x -> currentEntities.addAll(x.getEntities()));
         }

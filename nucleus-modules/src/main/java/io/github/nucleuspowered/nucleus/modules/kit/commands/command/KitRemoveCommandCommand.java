@@ -28,8 +28,8 @@ import java.util.List;
 public class KitRemoveCommandCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> commands = Parameter.builder(Integer.class)
-            .parser(VariableValueParameters.integerRange().setMin(1).build())
-            .setKey("index")
+            .addParser(VariableValueParameters.integerRange().setMin(1).build())
+            .key("index")
             .build();
 
     @Override

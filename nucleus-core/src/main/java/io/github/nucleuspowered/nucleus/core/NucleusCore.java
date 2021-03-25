@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.core;
 
 import com.google.inject.Injector;
 import io.github.nucleuspowered.nucleus.api.core.NucleusUserPreferenceService;
+import io.github.nucleuspowered.nucleus.api.core.event.NucleusRegisterPreferenceKeyEvent;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.core.core.CoreKeys;
@@ -16,6 +17,7 @@ import io.github.nucleuspowered.nucleus.core.core.teleport.filters.NoCheckFilter
 import io.github.nucleuspowered.nucleus.core.core.teleport.filters.WallCheckFilter;
 import io.github.nucleuspowered.nucleus.core.core.teleport.scanners.NoTeleportScanner;
 import io.github.nucleuspowered.nucleus.core.core.teleport.scanners.VerticalTeleportScanner;
+import io.github.nucleuspowered.nucleus.core.event.RegisterPreferenceKeyEvent;
 import io.github.nucleuspowered.nucleus.core.guice.NucleusInjectorModule;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.core.module.IModuleProvider;
@@ -62,6 +64,7 @@ import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
 import org.spongepowered.api.placeholder.PlaceholderParser;
+import org.spongepowered.api.registry.DefaultedRegistryType;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.scheduler.Task;
@@ -218,6 +221,13 @@ public final class NucleusCore {
         this.serviceCollection.placeholderService().getNucleusParsers().forEach((key, value) ->
                 placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, key), value.getParser()));
         this.serviceCollection.logger().info("Registered placeholder parsers.");
+
+        final NucleusRegisterPreferenceKeyEvent registerPreferenceKeyEvent = new RegisterPreferenceKeyEvent(
+                this.serviceCollection.userPreferenceService().getRegistryResourceType(),
+                event.cause().with(this.pluginContainer)
+        );
+        Sponge.eventManager().post(registerPreferenceKeyEvent);
+        this.serviceCollection.logger().info("Registered user preference keys.");
     }
 
     @Listener

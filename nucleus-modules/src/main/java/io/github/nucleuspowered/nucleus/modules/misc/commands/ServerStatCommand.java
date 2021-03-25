@@ -50,12 +50,12 @@ public class ServerStatCommand implements ICommandExecutor {
 
         final List<Component> messages = new ArrayList<>();
 
-        messages.add(context.getMessage("command.serverstat.tps", this.getTPS(Sponge.server().getTicksPerSecond())));
+        messages.add(context.getMessage("command.serverstat.tps", this.getTPS(Sponge.server().ticksPerSecond())));
 
         final Optional<Instant> oi = context.getServiceCollection().platformService().gameStartedTime();
         oi.ifPresent(instant -> {
             final Duration duration = Duration.between(instant, Instant.now());
-            final double averageTPS = Math.min(20, ((double) Sponge.server().getRunningTimeTicks() / ((double) (duration.toMillis() + 50) / 1000.0d)));
+            final double averageTPS = Math.min(20, ((double) Sponge.server().runningTimeTicks() / ((double) (duration.toMillis() + 50) / 1000.0d)));
             messages.add(context.getMessage("command.serverstat.averagetps", this.getTPS(averageTPS)));
             messages.add(this.createText(context, "command.serverstat.uptime.main", "command.serverstat.uptime.hover",
                     context.getTimeString(duration.getSeconds())));
@@ -78,27 +78,27 @@ public class ServerStatCommand implements ICommandExecutor {
         messages.add(this.createText(context, "command.serverstat.freemem.main", "command.serverstat.freemem.hover", String.valueOf(free)));
 
         if (!context.hasFlag("c")) {
-            for (final ServerWorld world : Sponge.server().worldManager().getWorlds()) {
-                final int numOfEntities = world.getEntities().size();
-                final int loadedChunks = Iterables.size(world.getLoadedChunks());
+            for (final ServerWorld world : Sponge.server().worldManager().worlds()) {
+                final int numOfEntities = world.entities().size();
+                final int loadedChunks = Iterables.size(world.loadedChunks());
                 messages.add(Component.empty());
-                messages.add(context.getMessage("command.serverstat.world.title", world.getKey().asString()));
+                messages.add(context.getMessage("command.serverstat.world.title", world.key().asString()));
 
                 // https://github.com/NucleusPowered/Nucleus/issues/888
                 messages.add(context.getMessage(
                         "command.serverstat.world.info",
-                        world.getDimensionType().getKey().asString(),
-                        world.getProperties().getGeneratorModifierType().getKey().asString(),
+                        "-", // world.worldType().getKey().asString(),
+                        "-",// world.getProperties().getGeneratorModifierType().getKey().asString(),
                         String.valueOf(numOfEntities),
                         String.valueOf(loadedChunks)));
             }
         }
 
-        final PaginationList.Builder plb = Util.getPaginationBuilder(context.getAudience())
+        final PaginationList.Builder plb = Util.getPaginationBuilder(context.audience())
                 .title(context.getMessage("command.serverstat.title")).padding(Component.text("="))
                 .contents(messages);
 
-        plb.sendTo(context.getAudience());
+        plb.sendTo(context.audience());
         return context.successResult();
     }
 

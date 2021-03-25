@@ -31,8 +31,8 @@ public class NameUnbanCommand implements ICommandExecutor {
     @Inject
     public NameUnbanCommand(final INucleusServiceCollection serviceCollection) {
         this.regexParameter = Parameter.builder(String.class)
-                .setKey("name")
-                .parser(new RegexParameter(Pattern.compile(Util.USERNAME_REGEX_STRING), "command.nameban.notvalid", serviceCollection.messageProvider()))
+                .key("name")
+                .addParser(new RegexParameter(Pattern.compile(Util.USERNAME_REGEX_STRING), "command.nameban.notvalid", serviceCollection.messageProvider()))
                 .build();
     }
 

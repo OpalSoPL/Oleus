@@ -40,7 +40,7 @@ public class ChatService implements IReloadableService.Reloadable, ServiceBase {
             return this.defaultTemplate;
         }
 
-        return subject.getOption("nucleus.chat.group")
+        return subject.option("nucleus.chat.group")
                 .map(this::getTemplateCache)
                 .orElse(this.defaultTemplate);
     }

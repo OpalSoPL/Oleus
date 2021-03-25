@@ -35,7 +35,7 @@ public class PlainBroadcastCommand implements ICommandExecutor {
                     context.getServiceCollection().textTemplateFactory()
                         .createFromAmpersandString(context.requireOne(NucleusParameters.MESSAGE)),
                     context.getCommandSourceRoot())
-                    .send(context.getCause().getAudience());
+                    .send(context.cause().audience());
             
         } catch (final Throwable throwable) {
             throwable.printStackTrace();

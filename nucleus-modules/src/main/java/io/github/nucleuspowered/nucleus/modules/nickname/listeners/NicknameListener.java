@@ -29,10 +29,10 @@ public class NicknameListener implements ListenerBase {
 
     @Listener(order = Order.FIRST)
     public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
-        final Optional<Component> nickname = this.nicknameService.getNickname(player.getUniqueId());
-        this.nicknameService.markRead(player.getUniqueId());
+        final Optional<Component> nickname = this.nicknameService.getNickname(player.uniqueId());
+        this.nicknameService.markRead(player.uniqueId());
         if (nickname.isPresent()) {
-            this.nicknameService.updateCache(player.getUniqueId(), nickname.get());
+            this.nicknameService.updateCache(player.uniqueId(), nickname.get());
             player.offer(Keys.CUSTOM_NAME, nickname.get());
         } else {
             player.remove(Keys.CUSTOM_NAME);
@@ -41,7 +41,7 @@ public class NicknameListener implements ListenerBase {
 
     @Listener(order = Order.LAST)
     public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer player) {
-        this.nicknameService.removeFromCache(player.getUniqueId());
+        this.nicknameService.removeFromCache(player.uniqueId());
     }
 
 }

@@ -32,7 +32,7 @@ public class ExperienceLevelArgument implements ValueParameter<Integer> {
     }
 
     @Override
-    public Optional<? extends Integer> getValue(
+    public Optional<? extends Integer> parseValue(
             final Parameter.Key<? super Integer> parameterKey,
             final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
@@ -42,7 +42,7 @@ public class ExperienceLevelArgument implements ValueParameter<Integer> {
             return Optional.of(Integer.parseInt(m.group(2)));
         }
 
-        throw reader.createException(this.messageProviderService.getMessageFor(context.getCause().getAudience(), "args.explevel.error"));
+        throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(), "args.explevel.error"));
     }
 
     @Override
