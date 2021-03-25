@@ -61,7 +61,7 @@ public class InvSeeCommand implements ICommandExecutor {
 
         // Just in case, get the subject inventory if they are online.
         final ServerPlayer src = context.requirePlayer();
-        final Inventory targetInv = target.isOnline() ? target.getPlayer().get().getInventory() : target.getInventory();
+        final Inventory targetInv = target.isOnline() ? target.getPlayer().get().inventory() : target.inventory();
         if (!context.testPermission(InventoryPermissions.INVSEE_MODIFY)
                 || context.testPermissionFor(target, InventoryPermissions.INVSEE_EXEMPT_INTERACT)) {
             final UUID uuid = UUID.randomUUID();

@@ -167,8 +167,8 @@ public class WarpService implements NucleusWarpService, ServiceBase {
                     null,
                     0,
                     null,
-                    location.getWorldKey(),
-                    location.getPosition(),
+                    location.worldKey(),
+                    location.position(),
                     rotation,
                     warpName
             ));

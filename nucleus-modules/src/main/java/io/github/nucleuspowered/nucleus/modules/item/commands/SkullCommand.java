@@ -55,8 +55,8 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
     private final Parameter.Value<User> userParameter;
     private final Parameter.Value<Integer> amountParameter = Parameter.builder(Integer.class)
             .key("amount")
-            .addParser(VariableValueParameters.integerRange().setMin(1).build())
-            .orDefault(1)
+            .addParser(VariableValueParameters.integerRange().min(1).build())
+            .optional()
             .build();
 
     private int amountLimit = Integer.MAX_VALUE;
@@ -86,7 +86,7 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = context.getUserFromArgs();
         final ServerPlayer player = context.getIfPlayer();
-        final int amount = context.requireOne(this.amountParameter);
+        final int amount = context.getOne(this.amountParameter).orElse(1);
 
         if (amount > this.amountLimit && !(context.isConsoleAndBypass() || context.testPermission(ItemPermissions.SKULL_EXEMPT_LIMIT))) {
             // fail
@@ -114,7 +114,7 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
         final ItemStack skullStack = ItemStack.builder().itemType(ItemTypes.PLAYER_HEAD).quantity(64).build();
 
         // Set it to subject skull type and set the owner to the specified subject
-        if (skullStack.offer(Keys.GAME_PROFILE, user.getProfile()).isSuccessful()) {
+        if (skullStack.offer(Keys.GAME_PROFILE, user.profile()).isSuccessful()) {
             final List<ItemStack> itemStackList = new ArrayList<>();
 
             // If there were stacks, create as many as needed.
@@ -135,11 +135,11 @@ public class SkullCommand implements ICommandExecutor, IReloadableService.Reload
             int accepted = 0;
             int failed = 0;
 
-            final Inventory inventoryToOfferTo = player.getInventory().query(QueryTypes.PLAYER_PRIMARY_HOTBAR_FIRST.get().toQuery());
+            final Inventory inventoryToOfferTo = player.inventory().query(QueryTypes.PLAYER_PRIMARY_HOTBAR_FIRST.get().toQuery());
             for (final ItemStack itemStack : itemStackList) {
-                final int stackSize = itemStack.getQuantity();
+                final int stackSize = itemStack.quantity();
                 final InventoryTransactionResult itr = inventoryToOfferTo.offer(itemStack);
-                final int currentFail = itr.getRejectedItems().stream().mapToInt(ItemStackSnapshot::getQuantity).sum();
+                final int currentFail = itr.rejectedItems().stream().mapToInt(ItemStackSnapshot::quantity).sum();
                 failed += currentFail;
                 accepted += stackSize - currentFail;
             }

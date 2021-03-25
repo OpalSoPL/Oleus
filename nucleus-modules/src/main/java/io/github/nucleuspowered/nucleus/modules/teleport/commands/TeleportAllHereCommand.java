@@ -33,7 +33,7 @@ public class TeleportAllHereCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer serverPlayer = context.requirePlayer();
         final ServerLocation toLocation = serverPlayer.serverLocation();
-        final Vector3d toRotation = serverPlayer.getRotation();
+        final Vector3d toRotation = serverPlayer.rotation();
         context.sendMessageTo(Sponge.server(), "command.tpall.broadcast", context.getName());
         Sponge.server().onlinePlayers().forEach(x -> {
             if (!context.is(x)) {

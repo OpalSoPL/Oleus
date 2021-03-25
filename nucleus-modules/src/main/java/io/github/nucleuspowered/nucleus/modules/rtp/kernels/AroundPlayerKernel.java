@@ -20,8 +20,8 @@ public class AroundPlayerKernel extends DefaultKernel {
     }
 
     @Override Vector3i getCentralLocation(@Nullable final ServerLocation currentLocation, final ServerWorld world) {
-        if (currentLocation != null && world.getKey().equals(currentLocation.getWorldKey())) {
-            return currentLocation.getBlockPosition();
+        if (currentLocation != null && world.key().equals(currentLocation.worldKey())) {
+            return currentLocation.blockPosition();
         }
 
         return super.getCentralLocation(currentLocation, world);

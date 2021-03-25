@@ -29,7 +29,8 @@ public abstract class MuteEvent extends AbstractEvent implements NucleusMuteEven
         return this.mutedUser;
     }
 
-    @Override public Cause getCause() {
+    @Override
+    public Cause cause() {
         return this.cause;
     }
 

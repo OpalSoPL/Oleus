@@ -42,7 +42,7 @@ import java.util.concurrent.TimeUnit;
 public class RocketCommand implements ICommandExecutor {
 
     private final Parameter.Value<Double> velocityParameter = Parameter.builder(Double.class)
-            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .addParser(VariableValueParameters.doubleRange().min(0.0).build())
             .key("velocity")
             .build();
 
@@ -92,18 +92,18 @@ public class RocketCommand implements ICommandExecutor {
                     .radius((float) v * 2.0f)
                     .build();
 
-            target.serverLocation().getWorld().triggerExplosion(ex);
+            target.serverLocation().world().triggerExplosion(ex);
             Sponge.server().scheduler().submit(
                     Task.builder()
                             .plugin(context.getServiceCollection().pluginContainer())
-                            .execute(() -> ex.getWorld().playSound(
+                            .execute(() -> ex.world().playSound(
                                     // TODO: what are Volume and Pitch defaults?
                                     Sound.sound(
-                                            SoundTypes.ENTITY_FIREWORK_ROCKET_LAUNCH.get().getKey(),
+                                            SoundTypes.ENTITY_FIREWORK_ROCKET_LAUNCH.get().key(),
                                             Sound.Source.MASTER,
                                             2,
                                             1),
-                                    target.getLocation().getPosition()))
+                                    target.location().position()))
                             .delay(500, TimeUnit.MILLISECONDS)
                             .build()
             );
@@ -116,7 +116,7 @@ public class RocketCommand implements ICommandExecutor {
         }
 
         if (!isSelf) {
-            context.sendMessage("command.rocket.other", target.getName());
+            context.sendMessage("command.rocket.other", target.name());
         }
 
         return context.successResult();

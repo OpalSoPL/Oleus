@@ -36,7 +36,7 @@ public class MoreCommand implements ICommandExecutor {
             final ItemStack stack = player.getItemInHand(HandTypes.MAIN_HAND);
             stack.setQuantity(stack.getMaxStackQuantity());
             player.setItemInHand(HandTypes.MAIN_HAND, stack);
-            context.sendMessage("command.more.success", stack.getType().asComponent(), stack.getType().getMaxStackQuantity());
+            context.sendMessage("command.more.success", stack.type().asComponent(), stack.type().getMaxStackQuantity());
             return context.successResult();
         }
 

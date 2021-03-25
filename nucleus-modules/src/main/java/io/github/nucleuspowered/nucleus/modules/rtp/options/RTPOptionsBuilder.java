@@ -19,7 +19,7 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
     int maxheight = 255;
     final Set<Biome> prohibitedBiomes = new HashSet<>();
 
-    @Override public NucleusRTPService.RTPOptions.Builder setMaxRadius(final int max) {
+    @Override public NucleusRTPService.RTPOptions.Builder maxRadius(final int max) {
         if (max <= 0) {
             throw new IllegalArgumentException("Max must be positive");
         }
@@ -27,7 +27,7 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder setMinRadius(final int min) {
+    @Override public NucleusRTPService.RTPOptions.Builder minRadius(final int min) {
         if (min < 0) {
             throw new IllegalArgumentException("Min cannot be negative");
         }
@@ -35,7 +35,7 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder setMinHeight(final int min) throws IllegalArgumentException {
+    @Override public NucleusRTPService.RTPOptions.Builder minHeight(final int min) throws IllegalArgumentException {
         if (min < 0) {
             throw new IllegalArgumentException("Min must be non-negative");
         }
@@ -43,7 +43,7 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
         return this;
     }
 
-    @Override public NucleusRTPService.RTPOptions.Builder setMaxHeight(final int max) throws IllegalArgumentException {
+    @Override public NucleusRTPService.RTPOptions.Builder maxHeight(final int max) throws IllegalArgumentException {
         if (max > 255) {
             throw new IllegalArgumentException("Max must be less than 255");
         }
@@ -57,10 +57,10 @@ public class RTPOptionsBuilder implements NucleusRTPService.RTPOptions.Builder {
     }
 
     @Override public NucleusRTPService.RTPOptions.Builder from(final NucleusRTPService.RTPOptions options) {
-        return this.setMinRadius(options.minRadius())
-                .setMaxRadius(options.maxRadius())
-                .setMaxHeight(options.maxHeight())
-                .setMinHeight(options.minHeight());
+        return this.minRadius(options.minRadius())
+                .maxRadius(options.maxRadius())
+                .maxHeight(options.maxHeight())
+                .minHeight(options.minHeight());
     }
 
     @Override public NucleusRTPService.RTPOptions build() {

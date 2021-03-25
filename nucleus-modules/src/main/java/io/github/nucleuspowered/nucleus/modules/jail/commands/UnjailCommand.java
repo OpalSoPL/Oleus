@@ -45,7 +45,7 @@ public class UnjailCommand implements ICommandExecutor, IReloadableService.Reloa
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user = NucleusParameters.Composite.parseUserOrGameProfile(context)
-                .fold(Function.identity(), Sponge.server().userManager()::getOrCreate);
+                .fold(Function.identity(), Sponge.server().userManager()::findOrCreate);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,
                         JailPermissions.JAIL_LEVEL_KEY,

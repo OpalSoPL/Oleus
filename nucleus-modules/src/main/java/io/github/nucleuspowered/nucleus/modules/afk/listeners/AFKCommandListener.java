@@ -29,7 +29,7 @@ public class AFKCommandListener extends AbstractAFKListener implements ListenerB
     public void onPlayerCommand(final ExecuteCommandEvent.Pre event, @Root final ServerPlayer player) {
         // Did the subject run /afk? Then don't do anything, we'll toggle it
         // anyway.
-        if (!this.commands.contains(event.getCommand().toLowerCase())) {
+        if (!this.commands.contains(event.command().toLowerCase())) {
             this.update(player);
         }
     }

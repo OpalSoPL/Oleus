@@ -26,7 +26,7 @@ public class MobProtectionListener implements IReloadableService.Reloadable, Lis
 
     @Listener
     public void onMobChangeBlock(final ChangeBlockEvent.All event, @Root final Living living) {
-        if (living instanceof ServerPlayer || this.whitelistedTypes.contains(living.getType())) {
+        if (living instanceof ServerPlayer || this.whitelistedTypes.contains(living.type())) {
             return;
         }
 

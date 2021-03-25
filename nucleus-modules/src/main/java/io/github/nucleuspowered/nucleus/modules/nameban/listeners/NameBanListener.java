@@ -24,7 +24,7 @@ public class NameBanListener implements ListenerBase {
 
     @Listener
     public void onPlayerLogin(final ServerSideConnectionEvent.Auth event) {
-        event.getProfile().getName().flatMap(name -> this.nameBanHandler.getReasonForBan(name.toLowerCase())).ifPresent(x -> {
+        event.profile().name().flatMap(name -> this.nameBanHandler.getReasonForBan(name.toLowerCase())).ifPresent(x -> {
             event.setCancelled(true);
             event.setMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(x));
         });

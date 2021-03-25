@@ -29,7 +29,7 @@ public class VanishInfoProvider implements NucleusProvider.Permission {
         final IMessageProviderService providerService = serviceCollection.messageProvider();
         final boolean isVanished = user.get(Keys.VANISH).orElse(false);
         final String yesNo = providerService.getMessageString(isVanished ? "standard.yesno.true" : "standard.yesno.false");
-        return providerService.getMessageFor(source.getAudience(), "seen.vanish", yesNo);
+        return providerService.getMessageFor(source.audience(), "seen.vanish", yesNo);
     }
 
 }

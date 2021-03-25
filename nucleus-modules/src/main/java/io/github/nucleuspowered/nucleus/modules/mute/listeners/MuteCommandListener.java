@@ -46,12 +46,12 @@ public class MuteCommandListener implements ListenerBase.Conditional {
             return;
         }
 
-        final String command = event.getCommand().toLowerCase();
+        final String command = event.command().toLowerCase();
         final Optional<? extends CommandMapping> oc = Sponge.server().commandManager().commandMapping(command);
         final Set<String> cmd;
 
         // If the command exists, then get all aliases.
-        cmd = oc.map(commandMapping -> commandMapping.getAllAliases().stream().map(String::toLowerCase).collect(Collectors.toSet()))
+        cmd = oc.map(commandMapping -> commandMapping.allAliases().stream().map(String::toLowerCase).collect(Collectors.toSet()))
                 .orElseGet(() -> Sets.newHashSet(command));
 
         // If the command is in the list, block it.
@@ -65,7 +65,7 @@ public class MuteCommandListener implements ListenerBase.Conditional {
                         Component.text(player.name() + "("),
                         this.serviceCollection.messageProvider().getMessage("standard.muted"),
                         Component.text("): "),
-                        Component.text("/" + event.getCommand() + " " + event.getArguments())
+                        Component.text("/" + event.command() + " " + event.arguments())
                 ));
                 event.setCancelled(true);
             }

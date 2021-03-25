@@ -59,11 +59,11 @@ public class TeleportPositionCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User pl = context.getUserFromArgs();
         final ServerLocation location = context.requireOne(NucleusParameters.LOCATION);
-        final ServerWorld world = location.getWorld();
+        final ServerWorld world = location.world();
 
-        double xx = location.getX();
-        double zz = location.getZ();
-        double yy = location.getY();
+        double xx = location.x();
+        double zz = location.z();
+        double yy = location.y();
         if (yy < 0) {
             return context.errorResult("command.tppos.ysmall");
         }
@@ -76,8 +76,8 @@ public class TeleportPositionCommand implements ICommandExecutor {
             context.sendMessage("command.tppos.fromchunk", xx, yy, zz);
         }
 
-        final Vector3i max = world.getBlockMax();
-        final Vector3i min = world.getBlockMin();
+        final Vector3i max = world.blockMax();
+        final Vector3i min = world.blockMin();
         if (!(this.isBetween(xx, max.getX(), min.getX()) && this.isBetween(yy, max.getY(), min.getY()) && this.isBetween(zz, max.getZ(), min.getZ()))) {
             return context.errorResult("command.tppos.invalid");
         }
@@ -90,14 +90,14 @@ public class TeleportPositionCommand implements ICommandExecutor {
         final boolean border = context.hasFlag("b");
 
         if (!pl.isOnline()) {
-            pl.setLocation(loc.getWorldKey(), loc.getPosition());
+            pl.setLocation(loc.worldKey(), loc.position());
             context.sendMessage("command.tppos.success.other", pl.name());
             return context.successResult();
         }
 
-        final ServerPlayer player = pl.getPlayer().get();
+        final ServerPlayer player = pl.player().get();
         try (final INucleusLocationService.BorderDisableSession ac =
-                teleportHandler.temporarilyDisableBorder(!safe && border, loc.getWorld())) {
+                teleportHandler.temporarilyDisableBorder(!safe && border, loc.world())) {
             final TeleportResult result = teleportHandler.teleportPlayerSmart(
                     player,
                     loc,

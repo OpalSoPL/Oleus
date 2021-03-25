@@ -96,7 +96,7 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
 
         if (player.isOnline()) {
             if (delay) {
-                this.schedulerService.runOnMainThread(() -> this.vanishPlayerInternal(player.getPlayer().get()));
+                this.schedulerService.runOnMainThread(() -> this.vanishPlayerInternal(player.player().get()));
             } else {
                 this.lastVanish.put(player.uniqueId(), Instant.now());
                 this.vanishPlayerInternal((Player) player);
@@ -121,7 +121,7 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
             if (this.isAlter) {
                 Sponge.server().onlinePlayers().stream().filter(x -> !player.equals(x) || !this.permissionService
                         .hasPermission(x, VanishPermissions.VANISH_SEE))
-                        .forEach(x -> x.getTabList().removeEntry(player.uniqueId()));
+                        .forEach(x -> x.tabList().removeEntry(player.uniqueId()));
             }
         }
     }
@@ -137,13 +137,13 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
         if (this.isAlter && user.isOnline()) {
             final ServerPlayer player = user.player().get();
             Sponge.server().onlinePlayers().forEach(x -> {
-                if (!x.getTabList().getEntry(player.uniqueId()).isPresent()) {
-                    x.getTabList().addEntry(TabListEntry.builder()
+                if (!x.tabList().entry(player.uniqueId()).isPresent()) {
+                    x.tabList().addEntry(TabListEntry.builder()
                             .displayName(Component.text(player.name()))
-                            .profile(player.getProfile())
+                            .profile(player.profile())
                             .gameMode(player.gameMode().get())
-                            .latency(player.getConnection().getLatency())
-                            .list(x.getTabList()).build());
+                            .latency(player.connection().latency())
+                            .list(x.tabList()).build());
                 }
             });
         }

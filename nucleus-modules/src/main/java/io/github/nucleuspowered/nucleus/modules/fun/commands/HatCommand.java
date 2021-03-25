@@ -42,21 +42,21 @@ public class HatCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer pl = context.getPlayerFromArgs();
         final boolean isSelf = context.is(pl);
-        final ItemStack helment = pl.getHead();
+        final ItemStack helment = pl.head();
 
-        final ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack stack = pl.itemInHand(HandTypes.MAIN_HAND);
         if (stack.isEmpty()) {
             return context.errorResult("command.generalerror.handempty");
         }
         final ItemStack hand = stack.copy();
         hand.setQuantity(1);
         pl.setHead(hand);
-        final Component itemName = hand.getType().asComponent();
+        final Component itemName = hand.type().asComponent();
 
         final GameMode gameMode = pl.get(Keys.GAME_MODE).orElseGet(GameModes.NOT_SET);
-        if (gameMode != GameModes.CREATIVE) {
-            if (stack.getQuantity() > 1) {
-                stack.setQuantity(stack.getQuantity() - 1);
+        if (gameMode != GameModes.CREATIVE.get()) {
+            if (stack.quantity() > 1) {
+                stack.setQuantity(stack.quantity() - 1);
                 pl.setItemInHand(HandTypes.MAIN_HAND, stack);
             } else {
                 pl.setItemInHand(HandTypes.MAIN_HAND, null);
@@ -66,8 +66,8 @@ public class HatCommand implements ICommandExecutor {
         // If the old item can't be placed back in the subject inventory, drop the item.
         if (!helment.isEmpty()) {
             Util.getStandardInventory(pl).offer(helment)
-                    .getRejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, pl.serverLocation().getWorld(),
-                        pl.getLocation().getPosition()));
+                    .rejectedItems().forEach(x -> Util.dropItemOnFloorAtLocation(x, pl.serverLocation().world(),
+                        pl.position()));
         }
 
         if (!isSelf) {

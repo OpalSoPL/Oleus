@@ -34,9 +34,8 @@ public class FlyModule implements IModule.Configurable<FlyConfig> {
         serviceCollection.placeholderService().registerToken(
                 "flying",
                 PlaceholderParser.builder()
-                        .key(ResourceKey.of("nucleus", "flying"))
-                        .addParser(p -> {
-                            if (p.getAssociatedObject().filter(x -> x instanceof Player).flatMap(x -> ((Player) x).get(Keys.IS_FLYING))
+                        .parser(p -> {
+                            if (p.associatedObject().filter(x -> x instanceof Player).flatMap(x -> ((Player) x).get(Keys.IS_FLYING))
                                     .orElse(false)) {
                                 return FlyModule.FLYING_TOKEN;
                             }

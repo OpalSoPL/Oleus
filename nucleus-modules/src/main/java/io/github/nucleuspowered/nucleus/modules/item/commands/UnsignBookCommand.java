@@ -61,7 +61,7 @@ public class UnsignBookCommand implements ICommandExecutor {
 
         // Very basic for now, unsign book in hand.
         final ItemStack bookToUnsign = target.getItemInHand(HandTypes.MAIN_HAND);
-        if (bookToUnsign.getType().equals(ItemTypes.WRITTEN_BOOK.get())) {
+        if (bookToUnsign.type().equals(ItemTypes.WRITTEN_BOOK.get())) {
             final ItemStack unsignedBook = ItemStack.builder()
                     .itemType(ItemTypes.WRITABLE_BOOK)
                     .add(Keys.PLAIN_PAGES, this.from(bookToUnsign))

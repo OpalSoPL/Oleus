@@ -30,7 +30,7 @@ public class MuteInfoProvider implements NucleusProvider {
             // If we have a ban service, then check for a ban.
             final MuteService jh = serviceCollection.getServiceUnchecked(MuteService.class);
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
-            final Audience audience = source.getAudience();
+            final Audience audience = source.audience();
             if (jh.isMuted(user.uniqueId())) {
                 final Mute jd = jh.getPlayerMuteInfo(user.uniqueId()).get();
                 // Lightweight checkban.

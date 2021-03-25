@@ -43,9 +43,9 @@ public class SetDifficultyWorldCommand implements ICommandExecutor {
         final ServerWorld worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL)
                         .orElseThrow(() -> context.createException("command.world.player"));
 
-        worldProperties.getProperties().setDifficulty(difficultyInput);
+        worldProperties.properties().setDifficulty(difficultyInput);
         context.sendMessage("command.world.setdifficulty.success",
-                worldProperties.getKey().asString(),
+                worldProperties.key().asString(),
                 difficultyInput.asComponent());
 
         return context.successResult();

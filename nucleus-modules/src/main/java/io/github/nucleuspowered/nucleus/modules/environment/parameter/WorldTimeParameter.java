@@ -85,7 +85,7 @@ public class WorldTimeParameter implements ValueParameter<MinecraftDayTime> {
         if (this.allowAliases && TICK_ALIASES.containsKey(arg)) {
             return WorldTimeParameter.TICK_ALIASES.get(arg);
         }
-        final Audience audience = source.getCause().getAudience();
+        final Audience audience = source.getCause().audience();
 
         // <number>h
         final Matcher m1 = tfh.matcher(arg);

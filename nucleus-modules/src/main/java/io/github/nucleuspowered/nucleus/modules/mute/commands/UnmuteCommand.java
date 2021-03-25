@@ -45,7 +45,7 @@ public class UnmuteCommand implements ICommandExecutor, IReloadableService.Reloa
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
-        final User user = either.fold(Function.identity(), Sponge.server().userManager()::getOrCreate);
+        final User user = either.fold(Function.identity(), Sponge.server().userManager()::findOrCreate);
         final MuteService handler = context.getServiceCollection().getServiceUnchecked(MuteService.class);
         if (this.levelConfig.isUseLevels() &&
                 !context.isPermissionLevelOkay(user,

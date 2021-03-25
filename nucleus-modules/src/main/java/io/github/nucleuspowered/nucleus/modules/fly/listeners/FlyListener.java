@@ -41,7 +41,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
 
     // Do it first, so other plugins can have a say.
     @Listener(order = Order.FIRST)
-    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer pl) {
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer pl) {
         if (shouldIgnoreFromGameMode(pl)) {
             return;
         }
@@ -74,13 +74,13 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
         pl.offer(Keys.CAN_FLY, true);
 
         // If in the air, flying!
-        if (pl.getLocation().add(0, -1, 0).getBlockType() == BlockTypes.AIR.get()) {
+        if (pl.location().add(0, -1, 0).blockType() == BlockTypes.AIR.get()) {
             pl.offer(Keys.IS_FLYING, true);
         }
     }
 
     @Listener
-    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer pl) {
+    public void onPlayerQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("player") final ServerPlayer pl) {
         if (!this.flyConfig.isSaveOnQuit()) {
             return;
         }
@@ -97,9 +97,9 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
     // Only fire if there is no cancellation at the end.
     @Listener(order = Order.LAST)
     public void onPlayerTransferWorld(final ChangeEntityWorldEvent.Post event,
-                                      @Getter("getEntity") final ServerPlayer pl,
-                                      @Getter("getOriginalWorld") final ServerWorld twfrom,
-                                      @Getter("getDestinationWorld") final ServerWorld twto) {
+                                      @Getter("entity") final ServerPlayer pl,
+                                      @Getter("originalWorld") final ServerWorld twfrom,
+                                      @Getter("destinationWorld") final ServerWorld twto) {
         if (shouldIgnoreFromGameMode(pl)) {
             return;
         }
@@ -108,7 +108,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
         final boolean isFlying = pl.get(Keys.IS_FLYING).orElse(false);
 
         // If we're moving world...
-        if (!twfrom.getKey().equals(twto.getKey())) {
+        if (!twfrom.key().equals(twto.key())) {
             // Next tick, they can fly... if they have permission to do so.
             Sponge.server().scheduler().submit(Task.builder().execute(() -> {
                 if (this.serviceCollection.permissionService().hasPermission(pl, FlyPermissions.BASE_FLY)) {

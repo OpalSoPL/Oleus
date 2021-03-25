@@ -73,7 +73,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
             }
 
             if (!context.isConsoleAndBypass() && context.testPermissionFor(optionalUser.get(), BanPermissions.BAN_EXEMPT_TARGET)) {
-                return context.errorResult("command.ban.exempt", optionalUser.get().getName());
+                return context.errorResult("command.ban.exempt", optionalUser.get().name());
             }
 
             return this.executeBan(context, optionalUser.get(), r);
@@ -87,15 +87,15 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
 
         // Get the profile async.
         Sponge.asyncScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
-            final GameProfileManager gpm = Sponge.server().getGameProfileManager();
+            final GameProfileManager gpm = Sponge.server().gameProfileManager();
             try {
-                final GameProfile gp = gpm.getProfile(userToFind).get();
+                final GameProfile gp = gpm.profile(userToFind).get();
 
                 // Ban the user sync.
                 Sponge.server().scheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
                     // Create the user.
                     final UserManager uss = Sponge.server().userManager();
-                    final User user = uss.getOrCreate(gp);
+                    final User user = uss.findOrCreate(gp);
                     context.sendMessage("gameprofile.new", user.name());
 
                     try {
@@ -120,7 +120,8 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
             return context.errorResult("command.ban.offline.noperms");
         }
 
-        if (service.isBanned(user.getProfile())) {
+        // TODO: Fix joins to be async
+        if (service.isBanned(user.profile()).join()) {
             return context.errorResult("command.ban.alreadyset",
                     context.getServiceCollection().playerDisplayNameService().getName(user));
         }
@@ -136,7 +137,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         }
 
         // Create the ban.
-        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(user.getProfile())
+        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(user.profile())
                 .source(context.getDisplayName())
                 .reason(LegacyComponentSerializer.legacyAmpersand().deserialize(r)).build();
         service.addBan(bp);

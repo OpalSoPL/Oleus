@@ -27,7 +27,7 @@ import org.spongepowered.api.command.parameter.managed.standard.VariableValuePar
 public class KitCostCommand implements ICommandExecutor {
 
     private final Parameter.Value<Double> costParameter = Parameter.builder(Double.class)
-            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .addParser(VariableValueParameters.doubleRange().min(0.0).build())
             .key("cost")
             .build();
 

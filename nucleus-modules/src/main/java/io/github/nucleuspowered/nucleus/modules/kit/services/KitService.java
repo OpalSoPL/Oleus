@@ -265,7 +265,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                     if (!kit.getStacks().isEmpty()) {
                         inventoryTransactionResult =
                                 this.addToStandardInventory(player, preEvent.getStacksToRedeem().orElseGet(preEvent::getOriginalStacksToRedeem));
-                        if (!isFirstJoin && !inventoryTransactionResult.getRejectedItems().isEmpty() && isMustGetAll) {
+                        if (!isFirstJoin && !inventoryTransactionResult.rejectedItems().isEmpty() && isMustGetAll) {
                             final Inventory inventory = Util.getStandardInventory(player);
 
                             // Slots
@@ -282,12 +282,12 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
                             ex = new KitRedeemResultImpl(
                                     KitRedeemResult.Status.NO_SPACE,
-                                    inventoryTransactionResult.getRejectedItems(),
+                                    inventoryTransactionResult.rejectedItems(),
                                     instant.orElse(null),
                                     preEvent.getCancelMessage().orElse(null));
                         }
                     }// If something was consumed, consider a success.
-                    if (ex == null && inventoryTransactionResult.getType() == InventoryTransactionResult.Type.SUCCESS) {
+                    if (ex == null && inventoryTransactionResult.type() == InventoryTransactionResult.Type.SUCCESS) {
                         this.redeemKitCommands(preEvent.getCommandsToExecute().orElse(commands), player);
 
                         // Register the last used time. Do it for everyone, in case
@@ -305,16 +305,16 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
                         final Optional<Instant> nextCooldown = this.getNextUseTime(kit, playerUUID, Instant.now());
 
                         result = new KitRedeemResultImpl(
-                                inventoryTransactionResult.getRejectedItems().isEmpty() ?
+                                inventoryTransactionResult.rejectedItems().isEmpty() ?
                                         KitRedeemResult.Status.SUCCESS : KitRedeemResult.Status.PARTIAL_SUCCESS,
-                                inventoryTransactionResult.getRejectedItems(),
+                                inventoryTransactionResult.rejectedItems(),
                                 nextCooldown.orElse(null),
                                 null);
                     } else {
                         // Failed.
                         ex = ex == null ? new KitRedeemResultImpl(
                                 KitRedeemResult.Status.UNKNOWN,
-                                inventoryTransactionResult.getRejectedItems(),
+                                inventoryTransactionResult.rejectedItems(),
                                 instant.orElse(null),
                                 null) : ex;
                         Sponge.eventManager().post(new KitEvent.FailedRedeem(frame.currentCause(), timeOfLastUse, kit, player, original,
@@ -495,8 +495,8 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         boolean success = false;
         for (final ItemStack stack : toOffer) {
             final InventoryTransactionResult itr = target.offer(stack);
-            success = success || itr.getType() == InventoryTransactionResult.Type.SUCCESS;
-            for (final ItemStackSnapshot iss : itr.getRejectedItems()) {
+            success = success || itr.type() == InventoryTransactionResult.Type.SUCCESS;
+            for (final ItemStackSnapshot iss : itr.rejectedItems()) {
                 resultBuilder.reject(iss.createStack());
             }
 

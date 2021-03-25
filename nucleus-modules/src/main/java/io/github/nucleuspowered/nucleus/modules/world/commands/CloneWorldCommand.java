@@ -62,7 +62,7 @@ public class CloneWorldCommand implements ICommandExecutor {
             final UUID uuid = ((ServerPlayer) context.audience()).uniqueId();
             mr = () -> Sponge.server().player(uuid).map(x -> (Audience) x).orElseGet(Audience::empty);
         } else {
-            mr = context::getAudience;
+            mr = context::audience;
         }
 
         Sponge.server().worldManager().copyWorld(oldName, newName).handle((result, ex) -> {

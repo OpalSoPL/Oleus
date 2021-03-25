@@ -60,7 +60,7 @@ public abstract class KitEvent extends AbstractEvent implements NucleusKitEvent 
             return this.targetPlayer;
         }
 
-        @Override public Cause getCause() {
+        @Override public Cause cause() {
             return this.cause;
         }
 

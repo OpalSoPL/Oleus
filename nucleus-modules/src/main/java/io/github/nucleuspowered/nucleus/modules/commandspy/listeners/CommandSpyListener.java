@@ -55,8 +55,8 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
         if (!this.permissionService.hasPermission(player, CommandSpyPermissions.COMMANDSPY_EXEMPT_TARGET)) {
             boolean isInList = false;
             if (!this.listIsEmpty) {
-                final String command = event.getCommand().toLowerCase();
-                final Set<String> cmd = CommandNameCache.INSTANCE.getFromCommandAndSource(command, event.getCommandCause());
+                final String command = event.command().toLowerCase();
+                final Set<String> cmd = CommandNameCache.INSTANCE.getFromCommandAndSource(command, event.commandCause());
                 cmd.retainAll(this.toSpy);
                 isInList = !cmd.isEmpty();
             }
@@ -80,7 +80,7 @@ public class CommandSpyListener implements IReloadableService.Reloadable, Listen
                             Component.text()
                                     .color(st.colour().orElse(null))
                                     .style(st.style())
-                                    .content("/" + event.getCommand() + " " + event.getArguments())
+                                    .content("/" + event.command() + " " + event.arguments())
                                     .build()
                     );
                     playerList.forEach(x -> x.sendMessage(messageToSend));

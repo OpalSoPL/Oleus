@@ -16,6 +16,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.vavr.Tuple3;
 import net.kyori.adventure.audience.Audience;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.exception.CommandException;
@@ -27,6 +28,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -40,7 +42,7 @@ import java.util.function.Supplier;
 )
 public class DeleteWorldCommand implements ICommandExecutor {
 
-    @Nullable private Tuple3<Instant, UUID, ServerWorldProperties> confirm = null;
+    @Nullable private Tuple3<Instant, UUID, ResourceKey> confirm = null;
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -54,26 +56,27 @@ public class DeleteWorldCommand implements ICommandExecutor {
         final ServerWorld properties = context.requireOne(NucleusParameters.ONLINE_WORLD);
         if (this.confirm != null && this.confirm._1().isAfter(Instant.now()) &&
                 this.confirm._2().equals(context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID)) &&
-                this.confirm._3().uniqueId().equals(properties.uniqueId())) {
+                this.confirm._3().equals(properties.key())) {
             try {
-                return this.completeDeletion(context, properties.getProperties());
+                return this.completeDeletion(context);
             } finally {
                 this.confirm = null;
             }
         }
 
         // Scary warning.
-        this.confirm = new Tuple3<>(Instant.now().plus(30, ChronoUnit.SECONDS), context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID), properties.getProperties());
-        context.sendMessage("command.world.delete.warning1", properties.getKey().asString());
-        context.sendMessage("command.world.delete.warning3", properties.getKey().asString());
+        this.confirm = new Tuple3<>(Instant.now().plus(30, ChronoUnit.SECONDS), context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID), properties.key());
+        context.sendMessage("command.world.delete.warning1", properties.key().asString());
+        context.sendMessage("command.world.delete.warning3", properties.key().asString());
         return context.successResult();
     }
 
-    private ICommandResult completeDeletion(final ICommandContext context, final ServerWorldProperties properties) throws CommandException {
-        Preconditions.checkNotNull(this.confirm);
-        final String worldName = this.confirm._3().getKey().asString();
-        if (Sponge.server().worldManager().world(properties.getKey()).isPresent()) {
-            return context.errorResult("command.world.delete.loaded", this.confirm._3().getKey().asString());
+    private ICommandResult completeDeletion(final ICommandContext context) throws CommandException {
+        Objects.requireNonNull(this.confirm);
+        final ResourceKey key = this.confirm._3;
+        final String worldName = key.asString();
+        if (Sponge.server().worldManager().world(key).isPresent()) {
+            return context.errorResult("command.world.delete.loaded", worldName);
         }
 
         final SystemSubject consoleSource = Sponge.systemSubject();
@@ -83,7 +86,7 @@ public class DeleteWorldCommand implements ICommandExecutor {
         }
 
         // Now request deletion
-        final CompletableFuture<Boolean> completableFuture = Sponge.server().worldManager().deleteWorld(properties.getKey());
+        final CompletableFuture<Boolean> completableFuture = Sponge.server().worldManager().deleteWorld(key);
         final Supplier<Optional<? extends Audience>> source;
         if (context.audience() instanceof ServerPlayer) {
             final UUID uuid = ((ServerPlayer) context.audience()).uniqueId();

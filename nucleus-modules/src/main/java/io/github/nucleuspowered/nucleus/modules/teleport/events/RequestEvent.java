@@ -47,7 +47,7 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
         this.isCancelled = cancel;
     }
 
-    @Override public Cause getCause() {
+    @Override public Cause cause() {
         return this.cause;
     }
 

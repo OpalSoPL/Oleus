@@ -57,7 +57,7 @@ public class LightningCommand implements ICommandExecutor {
     public LightningCommand(final IPermissionService permissionService) {
         this.manyLivingParameter = Parameter.builder(new TypeToken<Collection<Entity>>() {})
             .optional()
-            .setRequirements(cause -> permissionService.hasPermission(cause, FunPermissions.OTHERS_LIGHTNING))
+            .requirements(cause -> permissionService.hasPermission(cause, FunPermissions.OTHERS_LIGHTNING))
             .key("targets")
             .addParser(ResourceKeyedValueParameters.MANY_ENTITIES)
             .build();
@@ -86,8 +86,8 @@ public class LightningCommand implements ICommandExecutor {
                     RayTrace.block().sourceEyePosition(pl).limit(100).select(RayTrace.nonAir()).continueWhileBlock(RayTrace.onlyAir()).execute();
             // Smite above, but not on.
             final ServerLocation lightningLocation =
-                    result.map(RayTraceResult::getHitPosition)
-                            .map(x -> ServerLocation.of(pl.serverLocation().getWorld(), x.getX(), x.getY(), x.getZ()))
+                    result.map(RayTraceResult::hitPosition)
+                            .map(x -> ServerLocation.of(pl.serverLocation().world(), x.getX(), x.getY(), x.getZ()))
                             .orElseGet(() -> pl.serverLocation().add(0.0, 3.0, 0.0));
 
             this.spawnLightning(lightningLocation, context, null);
@@ -109,8 +109,8 @@ public class LightningCommand implements ICommandExecutor {
             final ICommandContext context,
             @Nullable final Player target) throws CommandException {
 
-        final ServerWorld world = location.getWorld();
-        final Entity bolt = world.createEntity(EntityTypes.LIGHTNING_BOLT.get(), location.getPosition());
+        final ServerWorld world = location.world();
+        final Entity bolt = world.createEntity(EntityTypes.LIGHTNING_BOLT.get(), location.position());
 
         try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             world.spawnEntity(bolt);

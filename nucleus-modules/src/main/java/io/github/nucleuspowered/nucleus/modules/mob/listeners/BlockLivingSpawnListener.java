@@ -32,7 +32,7 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
     public void onSpawn(final SpawnEntityEvent event) {
         event.filterEntities(x -> {
             final Class<? extends Entity> entityType = x.getClass();
-            return this.checkIsValid(entityType) || this.isSpawnable(x.getType(), x.serverLocation().getWorld());
+            return this.checkIsValid(entityType) || this.isSpawnable(x.type(), x.serverLocation().getWorld());
         });
     }
 

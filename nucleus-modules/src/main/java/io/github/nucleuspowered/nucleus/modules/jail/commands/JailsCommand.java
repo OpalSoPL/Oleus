@@ -67,6 +67,6 @@ public class JailsCommand implements ICommandExecutor {
 
         return LinearComponents.linear(
                 inner.build(),
-                context.getMessage("command.warps.warploc", world.getWorldKey(), world.getBlockPosition().toString()));
+                context.getMessage("command.warps.warploc", world.worldKey(), world.getBlockPosition().toString()));
     }
 }

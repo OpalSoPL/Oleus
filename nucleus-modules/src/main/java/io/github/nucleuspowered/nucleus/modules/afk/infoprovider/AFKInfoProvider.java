@@ -30,22 +30,22 @@ public class AFKInfoProvider implements NucleusProvider {
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             if (user.isOnline()) {
                 final UUID uuid = user.uniqueId();
-                final String timeToNow = messageProviderService.getTimeToNow(source.getAudience(), handler.lastActivity(uuid));
+                final String timeToNow = messageProviderService.getTimeToNow(source.audience(), handler.lastActivity(uuid));
                 if (handler.canGoAFK(uuid)) {
                     if (handler.isAFK(uuid)) {
                         return Optional.of(
-                                messageProviderService.getMessageFor(source.getAudience(), "command.seen.afk",
-                                        messageProviderService.getMessageFor(source.getAudience(), "standard.yesno.true"),
+                                messageProviderService.getMessageFor(source.audience(), "command.seen.afk",
+                                        messageProviderService.getMessageFor(source.audience(), "standard.yesno.true"),
                                         timeToNow));
                     } else {
                         return Optional.of(
-                                messageProviderService.getMessageFor(source.getAudience(), "command.seen.afk",
-                                        messageProviderService.getMessageFor(source.getAudience(), "standard.yesno.false"), timeToNow));
+                                messageProviderService.getMessageFor(source.audience(), "command.seen.afk",
+                                        messageProviderService.getMessageFor(source.audience(), "standard.yesno.false"), timeToNow));
                     }
                 } else {
                     return Optional.of(
-                            messageProviderService.getMessageFor(source.getAudience(), "command.seen.afk",
-                                    messageProviderService.getMessageFor(source.getAudience(), "standard.yesno.false"), timeToNow));
+                            messageProviderService.getMessageFor(source.audience(), "command.seen.afk",
+                                    messageProviderService.getMessageFor(source.audience(), "standard.yesno.false"), timeToNow));
                 }
             }
         }

@@ -30,7 +30,7 @@ import java.util.Optional;
 public class TemporaryMessageCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> lines = Parameter.builder(Integer.class)
-            .addParser(VariableValueParameters.integerRange().setMin(1).setMax(2).build())
+            .addParser(VariableValueParameters.integerRange().min(1).max(2).build())
             .key("line")
             .build();
 

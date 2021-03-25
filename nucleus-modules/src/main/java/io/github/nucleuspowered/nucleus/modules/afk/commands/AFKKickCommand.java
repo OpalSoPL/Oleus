@@ -46,7 +46,7 @@ public class AFKKickCommand implements ICommandExecutor {
 
         final IMessageProviderService messageProviderService = context.getServiceCollection().messageProvider();
         final int number = playersToKick.size();
-        playersToKick.forEach(x -> x.kick(reason.orElseGet(() -> messageProviderService.getMessageFor(x.getLocale(), "afk.kickreason"))));
+        playersToKick.forEach(x -> x.kick(reason.orElseGet(() -> messageProviderService.getMessageFor(x, "afk.kickreason"))));
 
         context.sendMessage("command.afkkick.success", number);
         return context.successResult();

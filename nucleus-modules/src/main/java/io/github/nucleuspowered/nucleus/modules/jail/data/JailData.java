@@ -63,7 +63,7 @@ public final class JailData {
         this.jailName = jailName;
 
         if (previousLocation != null) {
-            this.worldKey = previousLocation.getWorldKey();
+            this.worldKey = previousLocation.worldKey();
             this.previousx = previousLocation.getX();
             this.previousy = previousLocation.getY();
             this.previousz = previousLocation.getZ();
@@ -97,7 +97,7 @@ public final class JailData {
         return this.previousz;
     }
 
-    public ResourceKey getWorldKey() {
+    public ResourceKey worldKey() {
         return this.worldKey;
     }
 

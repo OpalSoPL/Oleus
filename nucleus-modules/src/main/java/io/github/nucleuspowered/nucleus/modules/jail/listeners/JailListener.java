@@ -100,7 +100,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
             event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(), "jail.teleportcause.isjailed"));
         } else if (this.handler.isPlayerJailed(player)) {
             event.setCancelled(true);
-            final String p = Sponge.server().player(player).map(Nameable::getName).orElse("unknown");
+            final String p = Sponge.server().player(player).map(Nameable::name).orElse("unknown");
             event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(),"jail.teleporttarget.isjailed", p));
         }
     }
@@ -110,7 +110,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
             final NucleusTeleportEvent.AboutToTeleport event, @Root final ServerPlayer cause, @Getter("getPlayer") final UUID player) {
         if (event.getCause().getContext().get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
             if (this.handler.isPlayerJailed(player)) {
-                final String p = Sponge.server().player(player).map(Nameable::getName).orElse("unknown");
+                final String p = Sponge.server().player(player).map(Nameable::name).orElse("unknown");
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
                     event.setCancelled(true);
                     event.setCancelMessage(
@@ -161,7 +161,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     public void onSpawn(final RespawnPlayerEvent.Recreate event, @Getter("getEntity") final ServerPlayer player) {
         this.handler.getPlayerJail(player.uniqueId()).flatMap(NamedLocation::getLocation)
                 .filter(x -> x.getWorld().equals(event.getDestinationWorld()))
-                .map(Location::getPosition)
+                .map(Location::position)
                 .ifPresent(event::setDestinationPosition);
     }
 

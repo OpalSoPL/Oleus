@@ -68,7 +68,7 @@ public class ClearInventoryCommand implements ICommandExecutor {
             return context.errorResult("command.clearinventory.cancelled", name);
         }
         if (all) {
-            target.getInventory().clear();
+            target.inventory().clear();
         } else {
             Util.getStandardInventory(target).clear();
         }

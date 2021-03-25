@@ -151,7 +151,7 @@ public interface NucleusRTPService {
              * @param max the max radius
              * @return This builder, for chaining
              */
-            Builder setMaxRadius(int max);
+            Builder maxRadius(int max);
 
             /**
              * Sets the minimum radius for the RTP.
@@ -159,7 +159,7 @@ public interface NucleusRTPService {
              * @param min the min radius
              * @return This builder, for chaining
              */
-            Builder setMinRadius(int min);
+            Builder minRadius(int min);
 
             /**
              * Sets the minimum height for the RTP. Must be greater than zero.
@@ -168,7 +168,7 @@ public interface NucleusRTPService {
              * @throws IllegalArgumentException if the height is not acceptable
              * @return This builder, for chaining
              */
-            Builder setMinHeight(int max) throws IllegalArgumentException;
+            Builder minHeight(int max) throws IllegalArgumentException;
 
             /**
              * Sets the maximum height for the RTP. Must be greater than zero.
@@ -177,7 +177,7 @@ public interface NucleusRTPService {
              * @throws IllegalArgumentException if the height to too high
              * @return This builder, for chaining
              */
-            Builder setMaxHeight(int min) throws IllegalArgumentException;
+            Builder maxHeight(int min) throws IllegalArgumentException;
 
             /**
              * Adds a {@link Biome} to the prohibited biomes set.

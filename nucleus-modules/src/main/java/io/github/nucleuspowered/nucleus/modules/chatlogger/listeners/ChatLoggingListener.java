@@ -24,7 +24,7 @@ public class ChatLoggingListener extends AbstractLoggerListener {
     @Listener(order = Order.LAST)
     public void onChat(final PlayerChatEvent event) {
         this.log(PlainComponentSerializer.plain().serialize(event.getMessage()),
-                event.getCause().first(Nameable.class).map(Nameable::getName).orElse("unknown"));
+                event.getCause().first(Nameable.class).map(Nameable::name).orElse("unknown"));
     }
 
     @Listener(order = Order.LAST)

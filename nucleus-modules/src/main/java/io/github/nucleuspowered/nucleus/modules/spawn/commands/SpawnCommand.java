@@ -60,7 +60,7 @@ public class SpawnCommand implements ICommandExecutor, IReloadableService.Reload
         this.worldPropertiesValueParameter = Parameter.worldProperties(true)
                 .key("world")
                 .optional()
-                .setRequirements(cause -> permissionService.hasPermission(cause, SpawnPermissions.SPAWN_OTHERWORLDS))
+                .requirements(cause -> permissionService.hasPermission(cause, SpawnPermissions.SPAWN_OTHERWORLDS))
                 .build();
     }
 

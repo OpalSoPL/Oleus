@@ -53,7 +53,7 @@ public class MailFilterParameter implements ValueParameter<NucleusMailService.Ma
     }
 
     @Override
-    public Optional<? extends NucleusMailService.MailFilter> getValue(final Parameter.Key<? super NucleusMailService.MailFilter> parameterKey,
+    public Optional<? extends NucleusMailService.MailFilter> parseValue(final Parameter.Key<? super NucleusMailService.MailFilter> parameterKey,
             final ArgumentReader.Mutable reader, final CommandContext.Builder context) throws ArgumentParseException {
         final String toParse = reader.parseString();
         try {

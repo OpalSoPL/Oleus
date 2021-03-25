@@ -65,7 +65,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
                 .orElseGet(() -> context.getMessageString("ban.defaultreason"));
 
         if (!context.isConsoleAndBypass() && context.testPermissionFor(u, BanPermissions.TEMPBAN_EXEMPT_TARGET)) {
-            return context.errorResult("command.tempban.exempt", u.getName());
+            return context.errorResult("command.tempban.exempt", u.name());
         }
 
         if (!u.isOnline() && !context.testPermission(BanPermissions.TEMPBAN_OFFLINE)) {
@@ -81,8 +81,9 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
 
         final BanService service = Sponge.server().serviceProvider().banService();
 
-        if (service.isBanned(u.getProfile())) {
-            return context.errorResult("command.ban.alreadyset", u.getName());
+        // TODO: Fix joins to be async
+        if (service.isBanned(u.profile()).join()) {
+            return context.errorResult("command.ban.alreadyset", u.name());
         }
 
         if (this.banConfig.getLevelConfig().isUseLevels() &&
@@ -91,7 +92,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
                         BanPermissions.BASE_TEMPBAN,
                         this.banConfig.getLevelConfig().isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", u.getName());
+            return context.errorResult("command.modifiers.level.insufficient", u.name());
         }
 
         // Expiration date
@@ -100,7 +101,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
         // Create the ban.
         final Component src = context.getDisplayName();
         final Component r = LegacyComponentSerializer.legacyAmpersand().deserialize(reason);
-        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u.getProfile()).source(src).expirationDate(date).reason(r).build();
+        final Ban bp = Ban.builder().type(BanTypes.PROFILE).profile(u.profile()).source(src).expirationDate(date).reason(r).build();
         service.addBan(bp);
 
         final Audience send = Audience.audience(

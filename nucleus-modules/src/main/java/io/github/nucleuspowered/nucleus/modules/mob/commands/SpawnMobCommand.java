@@ -26,6 +26,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 
@@ -50,13 +51,13 @@ public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Rel
 
     @SuppressWarnings("unchecked")
     private final Parameter.Value<EntityType<?>> entityTypeParameter = Parameter.builder(new TypeToken<EntityType<?>>() {})
-            .addParser((ValueParameter<EntityType<?>>) (Object) VariableValueParameters.catalogedElementParameterBuilder(EntityType.class).build())
+            .addParser((ValueParameter<EntityType<?>>) (Object) VariableValueParameters.registryEntryBuilder(RegistryTypes.ENTITY_TYPE).build())
             .key("entity type")
             .build();
 
     private final Parameter.Value<Integer> amount = Parameter.builder(Integer.class)
             .key("amount")
-            .addParser(VariableValueParameters.integerRange().setMin(1).build())
+            .addParser(VariableValueParameters.integerRange().min(1).build())
             .optional()
             .build();
 
@@ -81,22 +82,22 @@ public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Rel
             return context.errorResult("command.spawnmob.mobnoperm", et.asComponent());
         }
 
-        final String id = et.getKey().asString().toLowerCase();
-        final Optional<BlockSpawnsConfig> config = this.mobConfig.getBlockSpawnsConfigForWorld(pl.getWorld());
+        final String id = et.key(RegistryTypes.ENTITY_TYPE).asString().toLowerCase();
+        final Optional<BlockSpawnsConfig> config = this.mobConfig.getBlockSpawnsConfigForWorld(pl.world());
         if (config.isPresent() && (config.get().isBlockVanillaMobs() && id.startsWith("minecraft:") || config.get().getIdsToBlock().contains(id))) {
             return context.errorResult("command.spawnmob.blockedinconfig", et.asComponent());
         }
 
 
         final ServerLocation loc = pl.serverLocation();
-        final ServerWorld w = loc.getWorld();
+        final ServerWorld w = loc.world();
 
         // Count the number of entities spawned.
         int i = 0;
 
         Entity entityone = null;
         do {
-            final Entity e = w.createEntity(et, loc.getPosition());
+            final Entity e = w.createEntity(et, loc.position());
             if (!(e instanceof Living)) {
                 e.remove();
                 return context.errorResult("command.spawnmob.livingonly", et.asComponent());

@@ -44,7 +44,7 @@ public abstract class JailingEntry implements Jailing {
         if (jailData.getPreviousy() == -1) {
             return null;
         }
-        return ServerLocation.of(jailData.getWorldKey(), jailData.getPreviousx(), jailData.getPreviousy(), jailData.getPreviousz());
+        return ServerLocation.of(jailData.worldKey(), jailData.getPreviousx(), jailData.getPreviousy(), jailData.getPreviousz());
     }
 
     final String reason;

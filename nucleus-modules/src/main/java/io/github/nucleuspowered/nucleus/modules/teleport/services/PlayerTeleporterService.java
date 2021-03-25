@@ -73,21 +73,21 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
     }
 
     public boolean canTeleportTo(final ServerPlayer source, final User to)  {
-        return this.canTeleportTo(source, source.getUser(), to, false);
+        return this.canTeleportTo(source, source.user(), to, false);
     }
 
     public boolean canTeleportTo(final Audience audience, final User source, final User to, final boolean isOther)  {
         if (!this.canBypassTpToggle(source)) {
             if (!isOther && !this.userPreferenceService.get(to.uniqueId(), TeleportKeys.TELEPORT_TOGGLE).orElse(true)) {
-                this.messageProviderService.sendMessageTo(audience, "teleport.fail.targettoggle", to.getName());
+                this.messageProviderService.sendMessageTo(audience, "teleport.fail.targettoggle", to.name());
                 return false;
             }
         }
 
         if (!isOther && this.isOnlySameDimension) {
-            if (!source.getWorldKey().equals(to.getWorldKey())) {
+            if (!source.worldKey().equals(to.worldKey())) {
                 if (!this.permissionService.hasPermission(source, "nucleus.teleport.exempt.samedimension")) {
-                    this.messageProviderService.sendMessageTo(audience, "teleport.fail.samedimension", to.getName());
+                    this.messageProviderService.sendMessageTo(audience, "teleport.fail.samedimension", to.name());
                     return false;
                 }
             }
@@ -116,7 +116,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                 this.safeTeleportService.teleportPlayerSmart(
                                 playerToTeleport,
                                 target.serverLocation(),
-                                target.getRotation(),
+                                target.rotation(),
                                 false,
                                 safe,
                                 TeleportScanners.NO_SCAN.get()
@@ -124,13 +124,13 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
         if (result.isSuccessful()) {
             if (!source.equals(target) && !quietSource) {
                 this.messageProviderService.sendMessageTo(source, "teleport.success.source",
-                        playerToTeleport.getName(),
-                        target.getName());
+                        playerToTeleport.name(),
+                        target.name());
             }
 
-            this.messageProviderService.sendMessageTo(playerToTeleport, "teleport.to.success", target.getName());
+            this.messageProviderService.sendMessageTo(playerToTeleport, "teleport.to.success", target.name());
             if (!quietTarget) {
-                this.messageProviderService.sendMessageTo(target, "teleport.from.success", playerToTeleport.getName());
+                this.messageProviderService.sendMessageTo(target, "teleport.from.success", playerToTeleport.name());
             }
         } else if (!quietSource) {
             this.messageProviderService.sendMessageTo(source, result == TeleportResult.FAIL_NO_LOCATION ? "teleport.nosafe" : "teleport.cancelled");
@@ -153,7 +153,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
             final String messageKey) {
         this.removeExpired();
 
-        if (this.canTeleportTo(playerToTeleport, target.getUser())) {
+        if (this.canTeleportTo(playerToTeleport, target.user())) {
             final Audience src = requester == null ? Sponge.systemSubject() : requester;
 
             final TeleportRequest request = new TeleportRequest(
@@ -168,7 +168,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                     silentTarget,
                     silentSource,
                     this.useRequestLocation ? target.serverLocation() : null,
-                    target.getRotation(),
+                    target.rotation(),
                     successCallback
             );
 
@@ -177,11 +177,11 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
 
             @Nullable final ServerPlayer requesterAsPlayer = src instanceof ServerPlayer ? (ServerPlayer) src : null;
             final Identity requesterIdentity = requesterAsPlayer == null ? Identity.nil() : requesterAsPlayer.identity();
-            this.messageProviderService.sendMessageTo(toRequest, messageKey, src instanceof ServerPlayer ? ((ServerPlayer) src).getName() : "Server");
+            this.messageProviderService.sendMessageTo(toRequest, messageKey, src instanceof ServerPlayer ? ((ServerPlayer) src).name() : "Server");
             this.getAcceptDenyMessage(toRequest, request).ifPresent(x -> toRequest.sendMessage(requesterIdentity, x));
 
             if (!silentSource) {
-                this.messageProviderService.sendMessageTo(src, "command.tpask.sent", toRequest.getName());
+                this.messageProviderService.sendMessageTo(src, "command.tpask.sent", toRequest.name());
             }
             return true;
         }
@@ -217,17 +217,17 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
         if (this.showAcceptDeny) {
             final UUID uuid = forPlayer.uniqueId();
             final Component acceptTextComponent =
-                    Component.text().append(this.messageProviderService.getMessageFor(forPlayer.getLocale(), "standard.accept"))
+                    Component.text().append(this.messageProviderService.getMessageFor(forPlayer, "standard.accept"))
                         .style(Style.style(TextDecoration.UNDERLINED))
                         .hoverEvent(HoverEvent.showText(
-                            this.messageProviderService.getMessageFor(forPlayer.getLocale(), "teleport.accept.hover")))
+                            this.messageProviderService.getMessageFor(forPlayer, "teleport.accept.hover")))
                         .clickEvent(SpongeComponents.executeCallback(src -> {
                             if (!(src.root() instanceof ServerPlayer) || ((ServerPlayer) src.root()).uniqueId().equals(uuid)) {
-                                this.messageProviderService.sendMessageTo(src.getAudience(), "command.tpaccept.nothing");
+                                this.messageProviderService.sendMessageTo(src.audience(), "command.tpaccept.nothing");
                             }
                             final ServerPlayer root = (ServerPlayer) src.root();
                             if (!target.isActive() || !this.permissionService.hasPermission(src, TeleportPermissions.BASE_TPACCEPT)) {
-                                this.messageProviderService.sendMessageTo(src.getAudience(), "command.tpaccept.nothing");
+                                this.messageProviderService.sendMessageTo(src.audience(), "command.tpaccept.nothing");
                                 return;
                             }
                             if (this.useCommandsOnClickAcceptDeny) {
@@ -242,16 +242,16 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
                             }
                         })).build();
             final Component denyTextComponent =
-                    Component.text().append(this.messageProviderService.getMessageFor(forPlayer.getLocale(), "standard.deny"))
+                    Component.text().append(this.messageProviderService.getMessageFor(forPlayer, "standard.deny"))
                     .style(Style.style(TextDecoration.UNDERLINED))
-                    .hoverEvent(HoverEvent.showText(this.messageProviderService.getMessageFor(forPlayer.getLocale(), "teleport.deny.hover")))
+                    .hoverEvent(HoverEvent.showText(this.messageProviderService.getMessageFor(forPlayer, "teleport.deny.hover")))
                     .clickEvent(SpongeComponents.executeCallback(src -> {
                         if (!(src.root() instanceof ServerPlayer) || ((ServerPlayer) src.root()).uniqueId().equals(uuid)) {
-                            this.messageProviderService.sendMessageTo(src.getAudience(), "command.tpdeny.fail");
+                            this.messageProviderService.sendMessageTo(src.audience(), "command.tpdeny.fail");
                         }
                         final ServerPlayer root = (ServerPlayer) src.root();
                         if (!target.isActive() || !this.permissionService.hasPermission(src, TeleportPermissions.BASE_TPDENY)) {
-                            this.messageProviderService.sendMessageTo(src.getAudience(), "command.tpdeny.fail");
+                            this.messageProviderService.sendMessageTo(src.audience(), "command.tpdeny.fail");
                             return;
                         }
                         if (this.useCommandsOnClickAcceptDeny) {

@@ -67,7 +67,7 @@ public class KittyCannonCommand implements ICommandExecutor {
             .addParser(ResourceKeyedValueParameters.MANY_PLAYERS)
             .key("players")
             .optional()
-            .setRequirements(cause -> serviceCollection.permissionService().hasPermission(cause, FunPermissions.OTHERS_KITTYCANNON))
+            .requirements(cause -> serviceCollection.permissionService().hasPermission(cause, FunPermissions.OTHERS_KITTYCANNON))
             .build();
     }
 
@@ -103,20 +103,20 @@ public class KittyCannonCommand implements ICommandExecutor {
     private void getACat(final ICommandContext context, final ServerPlayer spawnAt, final boolean damageEntities, final boolean breakBlocks,
             final boolean causeFire) {
         // Fire it in the direction that the subject is facing with a speed of 0.5 to 3.5, plus the subject's current velocity.
-        final Vector3d headRotation = spawnAt.getHeadDirection();
+        final Vector3d headRotation = spawnAt.headDirection();
         final Quaterniond rot = Quaterniond.fromAxesAnglesDeg(headRotation.getX(), -headRotation.getY(), headRotation.getZ());
         final Vector3d velocity = spawnAt.get(Keys.VELOCITY).orElse(Vector3d.ZERO).add(rot.rotate(Vector3d.UNIT_Z).mul(5 * this.random.nextDouble() + 1));
-        final ServerWorld world = spawnAt.getWorld();
+        final ServerWorld world = spawnAt.world();
         final List<CatType> catTypes = RegistryTypes.CAT_TYPE.get().stream().collect(Collectors.toList());
         final Entity cat = world.createEntity(
                 EntityTypes.CAT.get(),
-                spawnAt.getLocation().getPosition().add(0, 1, 0).add(spawnAt.getTransform().getRotationAsQuaternion().getDirection()));
+                spawnAt.position().add(0, 1, 0).add(spawnAt.direction()));
         cat.offer(Keys.CAT_TYPE, catTypes.get(this.random.nextInt(catTypes.size())));
 
         Sponge.server().scheduler().submit(
                 Task.builder().interval(Ticks.of(5))
                         .delay(Ticks.of(5))
-                        .execute(new CatTimer(world.getKey(),
+                        .execute(new CatTimer(world.key(),
                                 cat.uniqueId(),
                                 spawnAt,
                                 this.random.nextInt(60) + 20,
@@ -164,7 +164,7 @@ public class KittyCannonCommand implements ICommandExecutor {
                 return;
             }
 
-            final Optional<Entity> oe = oWorld.get().getEntity(this.entity);
+            final Optional<Entity> oe = oWorld.get().entity(this.entity);
             if (!oe.isPresent()) {
                 task.cancel();
                 return;

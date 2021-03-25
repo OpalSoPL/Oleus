@@ -45,24 +45,24 @@ public class BlockZapCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final ServerLocation location = context.requireOne(CommonParameters.LOCATION_ONLINE_ONLY.getKey());
-        if (!location.getBlockType().getItem().isPresent()) {
-            return context.errorResult("command.blockzap.alreadyair", location.getPosition().toString(), location.getWorldKey().asString());
+        final ServerLocation location = context.requireOne(CommonParameters.LOCATION_ONLINE_ONLY.key());
+        if (!location.blockType().item().isPresent()) {
+            return context.errorResult("command.blockzap.alreadyair", location.position().toString(), location.worldKey().asString());
         }
 
-        final BlockType type = location.getBlockType();
+        final BlockType type = location.blockType();
         final Component itemTextComponent = type.asComponent();
 
         try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
             frame.pushCause(context.getCommandSourceRoot());
-            if (location.setBlock(BlockTypes.AIR.get().getDefaultState(), BlockChangeFlags.ALL)) {
-                context.sendMessage("command.blockzap.success", Component.text(location.getPosition().toString()),
-                        Component.text(location.getWorldKey().getFormatted()),
+            if (location.setBlock(BlockTypes.AIR.get().defaultState(), BlockChangeFlags.ALL)) {
+                context.sendMessage("command.blockzap.success", Component.text(location.position().toString()),
+                        Component.text(location.worldKey().formatted()),
                         itemTextComponent);
                 return context.successResult();
             }
         }
 
-        return context.errorResult("command.blockzap.fail", location.getPosition().toString(), location.getWorldKey().getFormatted());
+        return context.errorResult("command.blockzap.fail", location.position().toString(), location.worldKey().formatted());
     }
 }

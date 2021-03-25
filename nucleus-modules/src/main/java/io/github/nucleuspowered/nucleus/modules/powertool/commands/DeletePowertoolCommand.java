@@ -32,13 +32,13 @@ public class DeletePowertoolCommand implements ICommandExecutor {
             return context.errorResult("command.powertool.noitem");
         }
 
-        final ItemType type = itemStack.getType();
+        final ItemType type = itemStack.type();
         final UUID uuid = context.uniqueId().get();
         final PowertoolService service = context.getServiceCollection().getServiceUnchecked(PowertoolService.class);
         service.getPowertoolForItem(uuid, type)
-                .orElseThrow(() -> context.createException("command.powertool.nocmds", itemStack.getType().asComponent()));
+                .orElseThrow(() -> context.createException("command.powertool.nocmds", itemStack.type().asComponent()));
         service.clearPowertool(uuid, type);
-        context.sendMessage("command.powertool.removed", itemStack.getType().asComponent());
+        context.sendMessage("command.powertool.removed", itemStack.type().asComponent());
         return context.successResult();
     }
 }

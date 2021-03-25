@@ -202,7 +202,7 @@ public final class MuteService implements NucleusMuteService, IReloadableService
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         if (md.getRemainingTime().isPresent()) {
             messageProviderService.sendMessageTo(user, "mute.playernotify.time",
-                    messageProviderService.getTimeString(user.getLocale(), md.getRemainingTime().get().getSeconds()));
+                    messageProviderService.getTimeString(user.locale(), md.getRemainingTime().get().getSeconds()));
         } else {
             messageProviderService.sendMessageTo(user, "mute.playernotify.standard");
         }

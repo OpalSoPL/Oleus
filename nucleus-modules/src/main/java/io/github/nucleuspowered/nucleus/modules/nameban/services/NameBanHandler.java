@@ -54,7 +54,7 @@ public class NameBanHandler implements NucleusNameBanService, ServiceBase, IRelo
         if (Util.USERNAME_REGEX_PATTERN.matcher(name).matches()) {
             this.entries.put(name.toLowerCase(), reason);
             Sponge.eventManager().post(new NameBanEvent.Banned(name, reason, Sponge.server().causeStackManager().currentCause()));
-            Sponge.server().onlinePlayers().stream().filter(x -> x.getName().equalsIgnoreCase(name)).findFirst()
+            Sponge.server().onlinePlayers().stream().filter(x -> x.name().equalsIgnoreCase(name)).findFirst()
                     .ifPresent(x -> x.kick(LegacyComponentSerializer.legacyAmpersand().deserialize(reason)));
             Sponge.server().scheduler().submit(Task.builder().execute(this::save).plugin(this.pluginContainer).build());
         } else {

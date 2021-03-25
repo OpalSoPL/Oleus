@@ -39,7 +39,7 @@ public final class InternalNucleusSendMailEvent extends AbstractEvent implements
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 

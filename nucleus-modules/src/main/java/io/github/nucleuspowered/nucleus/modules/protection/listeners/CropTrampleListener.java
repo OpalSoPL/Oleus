@@ -30,8 +30,8 @@ public class CropTrampleListener implements IReloadableService.Reloadable, Liste
             // Go from Farmland to Dirt.
             breakEvent.getTransactions().stream()
                     .filter(Transaction::isValid)
-                    .filter(x -> x.getOriginal().getState().getType().equals(BlockTypes.FARMLAND.get()))
-                    .filter(x -> x.getFinal().getState().getType().equals(BlockTypes.DIRT.get()))
+                    .filter(x -> x.getOriginal().getState().type().equals(BlockTypes.FARMLAND.get()))
+                    .filter(x -> x.getFinal().getState().type().equals(BlockTypes.DIRT.get()))
                     .forEach(x -> x.setValid(false));
         }
     }

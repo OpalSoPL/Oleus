@@ -68,7 +68,7 @@ public class KitEditCommand implements ICommandExecutor {
         inventory.registerClose((cause, container) -> {
             final Optional<Kit> kit = service.getKit(kitName);
             if (kit.isPresent()) {
-                service.saveKit(kit.get().updateKitInventory(inventory.getInventory()));
+                service.saveKit(kit.get().updateKitInventory(inventory.inventory()));
                 this.messageProviderService.sendMessageTo(player, "command.kit.edit.success", kitName);
             } else {
                 this.messageProviderService.sendMessageTo(player, "command.kit.edit.error", kitName);

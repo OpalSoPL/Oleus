@@ -42,7 +42,7 @@ public class SetSpawnWorldCommand implements ICommandExecutor {
             location = context.requirePlayer().serverLocation();
         }
 
-        Sponge.server().worldManager().getProperties(location.getWorldKey())
+        Sponge.server().worldManager().getProperties(location.worldKey())
                 .get()
                 .setSpawnPosition(location.getBlockPosition());
         context.sendMessage("command.world.setspawn.success");

@@ -60,10 +60,10 @@ public class KillCommand implements ICommandExecutor {
                 final Player pl = (Player) x;
                 playerKillCount++;
                 context.sendMessage("command.kill.killed", pl.name());
-                final Object root = context.getCause().root();
+                final Object root = context.cause().root();
                 final String name;
                 if (root instanceof Nameable) {
-                    name = ((Nameable) root).getName();
+                    name = ((Nameable) root).name();
                 } else if (root instanceof SystemSubject) {
                     name = context.getMessageStringFor(pl, "standard.console");
                 } else {

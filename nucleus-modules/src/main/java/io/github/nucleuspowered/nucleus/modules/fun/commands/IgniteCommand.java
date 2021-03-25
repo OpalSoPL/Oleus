@@ -38,7 +38,7 @@ public class IgniteCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> ticks = Parameter.builder(Integer.class)
             .key("ticks")
-            .addParser(VariableValueParameters.integerRange().setMin(0).build())
+            .addParser(VariableValueParameters.integerRange().min(0).build())
             .build();
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -54,14 +54,14 @@ public class IgniteCommand implements ICommandExecutor {
         final int ticksInput = context.requireOne(this.ticks);
         final GameMode gm = target.get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL);
         if (gm == GameModes.CREATIVE.get() || gm == GameModes.SPECTATOR.get()) {
-            return context.errorResult("command.ignite.gamemode", target.getName());
+            return context.errorResult("command.ignite.gamemode", target.name());
         }
 
         if (target.offer(Keys.FIRE_TICKS, Ticks.of(ticksInput)).isSuccessful()) {
-            context.sendMessage("command.ignite.success", target.getName(), String.valueOf(ticksInput));
+            context.sendMessage("command.ignite.success", target.name(), String.valueOf(ticksInput));
             return context.successResult();
         } else {
-            return context.errorResult("command.ignite.error", target.getName());
+            return context.errorResult("command.ignite.error", target.name());
         }
     }
 }

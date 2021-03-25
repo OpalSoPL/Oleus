@@ -86,7 +86,7 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
         final Player pl = context.getIfPlayer();
         String location = "inventory";
         if (context.hasFlag("a")) {
-            this.repairInventory(pl.getInventory(), checkRestrictions, resultCount, lastItem);
+            this.repairInventory(pl.inventory(), checkRestrictions, resultCount, lastItem);
         } else {
             final boolean repairHotbar = context.hasFlag("h");
             final boolean repairEquip = context.hasFlag("e");
@@ -104,8 +104,8 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             }
 
             // Repair item in main hand
-            if (repairMainhand && !pl.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
-                final ItemStack stack = pl.getItemInHand(HandTypes.MAIN_HAND);
+            if (repairMainhand && !pl.itemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+                final ItemStack stack = pl.itemInHand(HandTypes.MAIN_HAND);
                 final RepairResult result = this.repairStack(stack, checkRestrictions);
                 resultCount.compute(result.type, (t, i) -> i += 1);
                 lastItem.put(result.type, result.stack.createSnapshot());
@@ -115,8 +115,8 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
             }
 
             // Repair item in off hand
-            if (repairOffhand && !pl.getItemInHand(HandTypes.OFF_HAND).isEmpty()) {
-                final ItemStack stack = pl.getItemInHand(HandTypes.OFF_HAND);
+            if (repairOffhand && !pl.itemInHand(HandTypes.OFF_HAND).isEmpty()) {
+                final ItemStack stack = pl.itemInHand(HandTypes.OFF_HAND);
                 final RepairResult result = this.repairStack(stack, checkRestrictions);
                 resultCount.compute(result.type, (t, i) -> i += 1);
                 lastItem.put(result.type, result.stack.createSnapshot());
@@ -127,12 +127,12 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
 
             // Repair worn equipment
             if (repairEquip) {
-                this.repairInventory(pl.getInventory().getEquipment(), checkRestrictions, resultCount, lastItem);
+                this.repairInventory(pl.inventory().equipment(), checkRestrictions, resultCount, lastItem);
             }
 
             // Repair Hotbar
             if (repairHotbar) {
-                this.repairInventory(pl.getInventory().getHotbar(), checkRestrictions, resultCount, lastItem);
+                this.repairInventory(pl.inventory().hotbar(), checkRestrictions, resultCount, lastItem);
             }
         }
 
@@ -247,7 +247,7 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
     }
 
     private RepairResult repairStack(final ItemStack stack, final boolean checkRestrictions) {
-        if (checkRestrictions && (this.whitelist && !this.restrictions.contains(stack.getType()) || this.restrictions.contains(stack.getType()))) {
+        if (checkRestrictions && (this.whitelist && !this.restrictions.contains(stack.type()) || this.restrictions.contains(stack.type()))) {
             return new RepairResult(stack, ResultType.RESTRICTED);
         }
         try {
@@ -267,7 +267,7 @@ public class RepairCommand implements ICommandExecutor, IReloadableService.Reloa
     }
 
     private Component getFromItem(final ItemStackSnapshot stack) {
-        return stack.get(Keys.CUSTOM_NAME).orElseGet(() -> stack.getType().asComponent()).hoverEvent(stack);
+        return stack.get(Keys.CUSTOM_NAME).orElseGet(() -> stack.type().asComponent()).hoverEvent(stack);
     }
 
     private enum ResultType {

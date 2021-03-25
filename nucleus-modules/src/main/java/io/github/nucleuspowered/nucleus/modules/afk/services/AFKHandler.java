@@ -147,9 +147,9 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
 
                     final Component toSend = t instanceof NucleusTextTemplateImpl ? ((NucleusTextTemplateImpl) t).getForObject(player) : t.asComponent();
                     Sponge.server().scheduler().createExecutor(this.serviceCollection.pluginContainer()).execute(() -> player.kick(toSend));
-                    final Component eventMessage = events.getMessage();
+                    final Component eventMessage = events.message();
                     if (!AdventureUtils.isEmpty(eventMessage)) {
-                        events.getAudience().ifPresent(x -> x.sendMessage(eventMessage, MessageType.SYSTEM));
+                        events.audience().ifPresent(x -> x.sendMessage(eventMessage, MessageType.SYSTEM));
                     }
                 });
             }
@@ -243,15 +243,15 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
     }
 
     private void actionEvent(final AFKEvents event, final String key, @Nullable final String consoleKey) {
-        final Component message = event.getMessage();
+        final Component message = event.message();
         if (AdventureUtils.getContent(message).matches("^\\s*$")) {
-            event.getAudience().ifPresent(x -> x.sendMessage(message, MessageType.SYSTEM));
+            event.audience().ifPresent(x -> x.sendMessage(message, MessageType.SYSTEM));
         } else {
-            event.getAudience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, key));
+            event.audience().ifPresent(x -> this.serviceCollection.messageProvider().sendMessageTo(x, key));
             if (consoleKey != null) {
                 this.serviceCollection.messageProvider()
                         .sendMessageTo(Sponge.systemSubject(), consoleKey, Sponge.server()
-                                .getPlayer(event.getTargetPlayer()).map(Nameable::getName).orElse("unknown"));
+                                .player(event.getTargetPlayer()).map(Nameable::name).orElse("unknown"));
             }
         }
     }
@@ -318,7 +318,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
                 final AFKEvents.Notify event = new AFKEvents.Notify(player.uniqueId(), messageToSend, audience,
                         Sponge.server().causeStackManager().currentCause());
                 Sponge.eventManager().post(event);
-                if (event.getMessage() != null && !AdventureUtils.isEmpty(event.getMessage())) {
+                if (event.message() != null && !AdventureUtils.isEmpty(event.message())) {
                     audience.sendMessage(this.afkNotifyCommandMessage);
                     return AFKNotificationResult.AFK_NOTIFIED;
                 }
@@ -351,7 +351,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
 
         return () -> {
             task.cancel();
-            n.getConsumer().accept(task);
+            n.consumer().accept(task);
         };
     }
 

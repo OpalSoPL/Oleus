@@ -54,12 +54,12 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
 
     @Listener
     public void onJoin(final ServerSideConnectionEvent.Login loginEvent) {
-        final UUID pl = loginEvent.getProfile().uniqueId();
+        final UUID pl = loginEvent.profile().uniqueId();
         final IStorageManager storageManager = this.serviceCollection.storageManager();
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
         final boolean first;
         if (!storageManager.getOrCreateUserOnThread(pl).get(CoreKeys.FIRST_JOIN_PROCESSED).orElse(false)) {
-            first = !this.checkSponge || !Util.hasPlayedBeforeSponge(loginEvent.getUser());
+            first = !this.checkSponge || !Util.hasPlayedBeforeSponge(loginEvent.user());
         } else {
             first = false;
         }
@@ -76,7 +76,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
                 if (ofs.isPresent()) {
                     @Nullable final ServerLocation location;
                     if (this.spawnConfig.isSafeTeleport()) {
-                        location = Sponge.server().getTeleportHelper().getSafeLocation(ofs.get()).orElse(null);
+                        location = Sponge.server().teleportHelper().findSafeLocation(ofs.get()).orElse(null);
                     } else {
                         location = ofs.get();
                     }
@@ -91,7 +91,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
                             .warn(
                                     messageProviderService.getMessageString(
                                             "spawn.firstspawn.failed",
-                                            loginEvent.getProfile().getName().orElseGet(() ->
+                                            loginEvent.profile().name().orElseGet(() ->
                                                     messageProviderService.getMessageString("standard.unknown")))
                             );
                 }
@@ -101,11 +101,11 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
         }
 
         // Throw them to the default world spawn if the config suggests so.
-        final User user = Sponge.server().userManager().findOrCreate(loginEvent.getProfile());
+        final User user = Sponge.server().userManager().findOrCreate(loginEvent.profile());
         if (this.spawnConfig.isSpawnOnLogin() && !this.serviceCollection.permissionService().hasPermission(user, SpawnPermissions.SPAWN_EXEMPT_LOGIN)) {
 
-            ServerWorld world = loginEvent.getFromLocation().getWorld();
-            final ResourceKey worldName = world.getKey();
+            ServerWorld world = loginEvent.fromLocation().world();
+            final ResourceKey worldName = world.key();
             if (this.spawnConfig.getOnLoginExemptWorlds().stream().anyMatch(x -> x.equalsIgnoreCase(worldName.asString()))) {
                 // we don't do this, exempt
                 return;
@@ -113,10 +113,10 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
 
             final GlobalSpawnConfig sc = this.spawnConfig.getGlobalSpawn();
             if (sc.isOnLogin()) {
-                world = sc.getWorld().flatMap(WorldProperties::getWorld).orElse(world);
+                world = sc.getWorld().orElse(world);
             }
 
-            final ServerLocation lw = ServerLocation.of(world.getKey(), world.getProperties().getSpawnPosition().add(0.5, 0, 0.5));
+            final ServerLocation lw = ServerLocation.of(world.key(), world.properties().spawnPosition().add(0.5, 0, 0.5));
             final Optional<ServerLocation> safe = this.serviceCollection.teleportService()
                     .getSafeLocation(
                             lw,
@@ -129,7 +129,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
                 try {
                     storageManager
                             .getWorldService()
-                            .getOrNewOnThread(world.getKey())
+                            .getOrNewOnThread(world.key())
                             .get(SpawnKeys.WORLD_SPAWN_ROTATION)
                             .ifPresent(loginEvent::setToRotation);
                 } catch (final Exception e) {
@@ -140,34 +140,34 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
     }
 
     @Listener(order = Order.LAST)
-    public void onRespawn(final RespawnPlayerEvent.SelectWorld event, @Getter("getEntity") final ServerPlayer player) {
+    public void onRespawn(final RespawnPlayerEvent.SelectWorld event, @Getter("entity") final ServerPlayer player) {
 
         final GlobalSpawnConfig sc = this.spawnConfig.getGlobalSpawn();
 
         // Get the world.
         if (sc.isOnRespawn()) {
-            sc.getWorld().flatMap(WorldProperties::getWorld).ifPresent(event::setDestinationWorld);
+            sc.getWorld().ifPresent(event::setDestinationWorld);
         }
     }
 
     @Listener
-    public void onRespawn(final RespawnPlayerEvent.Recreate event, @Getter("getRecreatedPlayer") final ServerPlayer player) {
+    public void onRespawn(final RespawnPlayerEvent.Recreate event, @Getter("recreatedPlayer") final ServerPlayer player) {
         if (event.isBedSpawn() && !this.spawnConfig.isRedirectBedSpawn()) {
             // Nope, we don't care.
             return;
         }
 
-        if (!event.getOriginalDestinationPosition().equals(event.getDestinationPosition())) {
+        if (!event.originalDestinationPosition().equals(event.destinationPosition())) {
             // Something else has made a change, we do not.
             return;
         }
 
-        event.setDestinationPosition(SpawnListener.process(event.getDestinationWorld().getProperties().getSpawnPosition()));
+        event.setDestinationPosition(SpawnListener.process(event.destinationWorld().properties().spawnPosition()));
 
         // Set rotation.
         this.serviceCollection.storageManager()
                 .getWorldService()
-                .get(event.getDestinationWorld().getKey())
+                .get(event.destinationWorld().key())
                 .thenAccept(x -> {
                     x.flatMap(y -> y.get(SpawnKeys.WORLD_SPAWN_ROTATION)).ifPresent(y -> {
                         Sponge.server().scheduler().createExecutor(this.serviceCollection.pluginContainer())
@@ -182,7 +182,7 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
     }
 
     private static ServerLocation process(final ServerLocation v3d) {
-        return ServerLocation.of(v3d.getWorld(), SpawnListener.process(v3d.getPosition()));
+        return ServerLocation.of(v3d.world(), SpawnListener.process(v3d.position()));
     }
     private static Vector3d process(final Vector3i v3i) {
         return SpawnListener.process(v3i.toDouble());

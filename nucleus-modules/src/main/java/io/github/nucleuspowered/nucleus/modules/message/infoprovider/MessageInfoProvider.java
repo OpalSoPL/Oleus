@@ -35,19 +35,19 @@ public class MessageInfoProvider implements NucleusProvider {
             final IMessageProviderService mp = serviceCollection.messageProvider();
             final String yesOrNo = socialSpy ? "standard.yesno.true" : "standard.yesno.false";
             final List<Component> lt = Lists.newArrayList(
-                    mp.getMessageFor(source.getAudience(), "seen.socialspy", mp.getMessageFor(source.getAudience(), yesOrNo)));
+                    mp.getMessageFor(source.audience(), "seen.socialspy", mp.getMessageFor(source.audience(), yesOrNo)));
 
             /*this.serviceCollection.moduleConfigProvider()
                     .getModuleConfig(MessageConfig.class)*/
             lt.add(
-                    mp.getMessageFor(source.getAudience(),
+                    mp.getMessageFor(source.audience(),
                             "seen.socialspylevel",
                             serviceCollection.permissionService()
                                     .getPositiveIntOptionFromSubject(user, MessagePermissions.SOCIALSPY_LEVEL_KEY).orElse(0))
             );
 
             final String msgToggleText = msgToggle ? "standard.yesno.true" : "standard.yesno.false";
-            lt.add(mp.getMessageFor(source.getAudience(), "seen.msgtoggle", mp.getMessageFor(source.getAudience(), msgToggleText)));
+            lt.add(mp.getMessageFor(source.audience(), "seen.msgtoggle", mp.getMessageFor(source.audience(), msgToggleText)));
 
             return Optional.of(Component.join(Component.newline(), lt));
         }

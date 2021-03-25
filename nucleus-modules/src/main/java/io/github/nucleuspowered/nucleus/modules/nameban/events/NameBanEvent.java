@@ -28,7 +28,7 @@ public abstract class NameBanEvent extends AbstractEvent implements NucleusNameB
         return this.reason;
     }
 
-    @Override public Cause getCause() {
+    @Override public Cause cause() {
         return this.cause;
     }
 

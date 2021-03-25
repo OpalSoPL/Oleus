@@ -21,7 +21,7 @@ public class InternalNucleusHelpOpEvent extends AbstractEvent implements Nucleus
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 

@@ -33,15 +33,15 @@ public abstract class TitleBase implements ICommandExecutor, IReloadableService.
     private final String type;
     private final Parameter.Value<Double> fadeIn = Parameter.builder(Double.class)
             .key("fade in")
-            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .addParser(VariableValueParameters.doubleRange().min(0.0).build())
             .build();
     private final Parameter.Value<Double> fadeOut = Parameter.builder(Double.class)
             .key("fade out")
-            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .addParser(VariableValueParameters.doubleRange().min(0.0).build())
             .build();
     private final Parameter.Value<Double> timeOnScreen = Parameter.builder(Double.class)
             .key("time on screen")
-            .addParser(VariableValueParameters.doubleRange().setMin(0.0).build())
+            .addParser(VariableValueParameters.doubleRange().min(0.0).build())
             .build();
 
     private TitleConfig titleConfig = new TitleConfig();
@@ -74,7 +74,7 @@ public abstract class TitleBase implements ICommandExecutor, IReloadableService.
         final Collection<ServerPlayer> targets =
                 context.getOne(NucleusParameters.MANY_PLAYER)
                         .map(Collections::unmodifiableCollection)
-                        .orElseGet(Sponge.server()::getOnlinePlayers);
+                        .orElseGet(Sponge.server()::onlinePlayers);
 
         if (targets.isEmpty()) {
             return context.errorResult("command.title.noonline");

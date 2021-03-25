@@ -80,7 +80,7 @@ public class TeleportTask implements CancellableTask {
         final ServerPlayer teleportingPlayer = Sponge.server().player(this.toTeleport).orElse(null);
         final ServerPlayer targetPlayer = Sponge.server().player(this.target).orElse(null);
         @Nullable final User source = Sponge.server().userManager().find(this.requester).orElse(null);
-        final Audience receiver = source != null ? source.getPlayer().map(x -> (Audience) x).orElseGet(Sponge::systemSubject) : Sponge.systemSubject();
+        final Audience receiver = source != null ? source.player().map(x -> (Audience) x).orElseGet(Sponge::systemSubject) : Sponge.systemSubject();
         if (teleportingPlayer != null && targetPlayer != null) {
             // If safe, get the teleport mode
             final INucleusLocationService tpHandler = this.serviceCollection.teleportService();
@@ -113,16 +113,16 @@ public class TeleportTask implements CancellableTask {
 
                 if (!this.toTeleport.equals(this.requester) && !this.silentSource) {
                     this.serviceCollection.messageProvider()
-                        .sendMessageTo(receiver, "teleport.success.source", teleportingPlayer.getName(), targetPlayer.getName());
+                        .sendMessageTo(receiver, "teleport.success.source", teleportingPlayer.name(), targetPlayer.name());
                 }
 
-                this.serviceCollection.messageProvider().sendMessageTo(teleportingPlayer, "teleport.to.success", targetPlayer.getName());
+                this.serviceCollection.messageProvider().sendMessageTo(teleportingPlayer, "teleport.to.success", targetPlayer.name());
                 if (!this.silentTarget) {
-                    this.serviceCollection.messageProvider().sendMessageTo(targetPlayer,"teleport.from.success", teleportingPlayer.getName());
+                    this.serviceCollection.messageProvider().sendMessageTo(targetPlayer,"teleport.from.success", teleportingPlayer.name());
                 }
 
                 if (this.successCallback != null && source != null) {
-                    source.getPlayer().ifPresent(this.successCallback);
+                    source.player().ifPresent(this.successCallback);
                 }
             }
         } else {

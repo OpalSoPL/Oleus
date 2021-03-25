@@ -50,10 +50,10 @@ public class KitResetUsageCommand implements ICommandExecutor {
             data.remove(kitInfo.getName().toLowerCase());
             userDataObject.set(KitKeys.REDEEMED_KITS, data);
             storageManager.getUserService().save(u.uniqueId(), userDataObject);
-            context.sendMessage("command.kit.resetuser.success", u.getName(), kitInfo.getName());
+            context.sendMessage("command.kit.resetuser.success", u.name(), kitInfo.getName());
             return context.successResult();
         }
 
-        return context.errorResult("command.kit.resetuser.empty", u.getName(), kitInfo.getName());
+        return context.errorResult("command.kit.resetuser.empty", u.name(), kitInfo.getName());
     }
 }

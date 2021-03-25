@@ -149,7 +149,7 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
                             context.getMessage("command.warps.unavailable"))).build();
         }
 
-        final String pos = data.getLocation().map(Location::getBlockPosition).orElseGet(() -> data.getPosition().toInt()).toString();
+        final String pos = data.getLocation().map(Location::getBlockPosition).orElseGet(() -> data.position().toInt()).toString();
         final String worldName = data.getResourceKey().asString();
 
         final TextComponent.Builder inner = Component.text().content(name).color(NamedTextColor.GREEN).style(Style.style(TextDecoration.ITALIC))

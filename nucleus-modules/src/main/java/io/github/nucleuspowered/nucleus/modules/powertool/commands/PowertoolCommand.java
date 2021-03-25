@@ -53,21 +53,21 @@ public class PowertoolCommand implements ICommandExecutor {
 
         final Optional<String> command = context.getOne(NucleusParameters.COMMAND);
         return command
-                .map(s -> this.setPowertool(context, src, itemStack.getType(), s))
+                .map(s -> this.setPowertool(context, src, itemStack.type(), s))
                 .orElseGet(() -> this.viewPowertool(context, src, itemStack));
     }
 
     private ICommandResult viewPowertool(final ICommandContext context, final ServerPlayer src, final ItemStack item) {
         final Optional<List<String>> cmds = context.getServiceCollection().getServiceUnchecked(PowertoolService.class)
-                .getPowertoolForItem(src.uniqueId(), item.getType());
+                .getPowertoolForItem(src.uniqueId(), item.type());
         if (cmds.isPresent() && !cmds.get().isEmpty()) {
             Util.getPaginationBuilder(context.audience())
                     .contents(cmds.get().stream().map(f -> Component.text(f, NamedTextColor.YELLOW)).collect(Collectors.toList()))
-                    .title(context.getMessage("command.powertool.viewcmdstitle", item.getType().asComponent(),
-                            Component.text(item.getType().getKey().asString())))
+                    .title(context.getMessage("command.powertool.viewcmdstitle", item.type().asComponent(),
+                            Component.text(item.type().getKey().asString())))
                     .sendTo(context.audience());
         } else {
-            src.sendMessage(context.getMessage("command.powertool.nocmds", item.getType().asComponent()));
+            src.sendMessage(context.getMessage("command.powertool.nocmds", item.type().asComponent()));
         }
 
         return context.successResult();

@@ -22,7 +22,7 @@ public final class JailLocationEntry implements Jail, NamedLocation {
     private final String name;
 
     public JailLocationEntry(final NamedLocation location) {
-        this(location.getResourceKey(), location.getPosition(), location.getRotation(), location.getName());
+        this(location.getResourceKey(), location.position(), location.getRotation(), location.getName());
     }
 
     public JailLocationEntry(final ResourceKey worldKey, final Vector3d position, final Vector3d rotation, final String name) {
@@ -48,7 +48,7 @@ public final class JailLocationEntry implements Jail, NamedLocation {
     }
 
     @Override
-    public Vector3d getPosition() {
+    public Vector3d position() {
         return this.position;
     }
 

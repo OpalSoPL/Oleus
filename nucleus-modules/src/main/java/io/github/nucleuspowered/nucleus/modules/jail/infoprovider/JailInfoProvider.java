@@ -36,22 +36,22 @@ public final class JailInfoProvider implements NucleusProvider {
                 final Component m;
                 final Optional<Duration> duration = jd.getRemainingTime();
                 if (duration.isPresent()) {
-                    m = serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.isjailed.temp",
-                            serviceCollection.messageProvider().getTimeString(source.getAudience(), duration.get()));
+                    m = serviceCollection.messageProvider().getMessageFor(source.audience(), "seen.isjailed.temp",
+                            serviceCollection.messageProvider().getTimeString(source.audience(), duration.get()));
                 } else {
-                    m = serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.isjailed.perm");
+                    m = serviceCollection.messageProvider().getMessageFor(source.audience(), "seen.isjailed.perm");
                 }
 
                 return Optional.of(
                         LinearComponents.linear(
                             m.clickEvent(ClickEvent.runCommand("/nucleus:checkjail " + user.name()))
-                                .hoverEvent(HoverEvent.showText(serviceCollection.messageProvider().getMessageFor(source.getAudience(),
+                                .hoverEvent(HoverEvent.showText(serviceCollection.messageProvider().getMessageFor(source.audience(),
                                         "standard.clicktoseemore"))),
                         Component.newline(),
-                        serviceCollection.messageProvider().getMessageFor(source.getAudience(), "standard.reason", jd.getReason())));
+                        serviceCollection.messageProvider().getMessageFor(source.audience(), "standard.reason", jd.getReason())));
             }
 
-            return Optional.of(serviceCollection.messageProvider().getMessageFor(source.getAudience(), "seen.notjailed"));
+            return Optional.of(serviceCollection.messageProvider().getMessageFor(source.audience(), "seen.notjailed"));
         }
         return Optional.empty();
     }

@@ -54,7 +54,7 @@ public class ShowAttributesCommand implements ICommandExecutor {
         itemStack.offer(Keys.HIDE_ATTRIBUTES, !b);
         src.setItemInHand(HandTypes.MAIN_HAND, itemStack);
 
-        context.sendMessage("command.showitemattributes.success." + b, itemStack.getType().asComponent());
+        context.sendMessage("command.showitemattributes.success." + b, itemStack.type().asComponent());
         return context.successResult();
     }
 

@@ -43,7 +43,7 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
 
     private boolean isDefaultQuiet = false;
 
-    private final Parameter.Value<Boolean> quietOption = Parameter.bool().key("quiet").orDefault(true).build();
+    private final Parameter.Value<Boolean> quietOption = Parameter.bool().key("quiet").build();
 
     private final Parameter.Value<User> userToWarp;
     private final Parameter.Value<ServerPlayer> playerToWarp;
@@ -53,7 +53,7 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
         final IPermissionService permissionService = serviceCollection.permissionService();
         this.userToWarp = Parameter.user()
                 .key("Offline player to warp")
-                .setRequirements(cause -> permissionService.hasPermission(cause, TeleportPermissions.TPHERE_OFFLINE))
+                .requirements(cause -> permissionService.hasPermission(cause, TeleportPermissions.TPHERE_OFFLINE))
                 .build();
         this.playerToWarp = Parameter.player()
                 .key("Player to warp")
@@ -89,12 +89,12 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer source = context.requirePlayer();
         final boolean beQuiet = context.getOne(this.quietOption).orElse(this.isDefaultQuiet);
-        final User target = context.getOne(this.userToWarp).orElseGet(() -> context.requireOne(this.playerToWarp).getUser());
+        final User target = context.getOne(this.userToWarp).orElseGet(() -> context.requireOne(this.playerToWarp).user());
         final PlayerTeleporterService sts = context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class);
-        if (target.getPlayer().isPresent()) {
+        if (target.player().isPresent()) {
             final TeleportResult result = sts.teleportWithMessage(
                     source,
-                    target.getPlayer().get(),
+                    target.player().get(),
                     source,
                     false,
                     false,
@@ -103,9 +103,9 @@ public class TeleportHereCommand implements ICommandExecutor, IReloadableService
             return result.isSuccessful() ? context.successResult() : context.failResult();
         } else {
             // Update the offline player's next location
-            target.setLocation(source.getWorld().getKey(), source.getPosition());
-            target.setRotation(source.getRotation());
-            context.sendMessage("command.tphere.offlinesuccess", target.getName());
+            target.setLocation(source.world().key(), source.position());
+            target.setRotation(source.rotation());
+            context.sendMessage("command.tphere.offlinesuccess", target.name());
         }
 
         return context.successResult();

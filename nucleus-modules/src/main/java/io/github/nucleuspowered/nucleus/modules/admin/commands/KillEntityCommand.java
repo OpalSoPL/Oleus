@@ -22,6 +22,7 @@ import org.spongepowered.api.command.parameter.managed.standard.VariableValuePar
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.HashSet;
@@ -38,14 +39,14 @@ import java.util.stream.Collectors;
 public class KillEntityCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> radius = Parameter.builder(Integer.class).key("radius").addParser(
-            VariableValueParameters.integerRange().setMin(0).setMax(Integer.MAX_VALUE).build()
+            VariableValueParameters.integerRange().min(0).max(Integer.MAX_VALUE).build()
     ).build();
 
     @Override
     public Flag[] flags(final INucleusServiceCollection serviceCollection) {
         return new Flag[] {
                 Flag.builder().alias("r").setParameter(this.radius).build(),
-                Flag.builder().alias("w").setParameter(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY).build()
+                Flag.builder().alias("w").setParameter(CommonParameters.WORLD).build()
         };
     }
 
@@ -58,13 +59,13 @@ public class KillEntityCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final CommandCause src = context.getCause();
-        if (!(src.getLocation().isPresent()) && context.hasAny(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY)) {
+        final CommandCause src = context.cause();
+        if (!(src.location().isPresent()) && context.hasAny(CommonParameters.WORLD)) {
             // We can't do that.
             return context.errorResult("command.killentity.commandsourceradius");
         }
 
-        if (context.hasAny(this.radius) && context.hasAny(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY)) {
+        if (context.hasAny(this.radius) && context.hasAny(CommonParameters.WORLD)) {
             // Can't do that, either.
             return context.errorResult("command.killentity.radiusworld");
         }
@@ -73,15 +74,15 @@ public class KillEntityCommand implements ICommandExecutor {
         if (context.hasAny(this.radius)) {
             final Locatable l = ((Locatable) src);
             final int r = context.requireOne(this.radius);
-            l.serverLocation().getWorld().getNearbyEntities(l.serverLocation().getPosition(), r);
+            l.serverLocation().world().nearbyEntities(l.serverLocation().position(), r);
         } else {
-            final WorldProperties worldProperties;
-            if (context.hasAny(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY)) {
-                worldProperties = context.requireOne(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY);
+            final ServerWorld worldProperties;
+            if (context.hasAny(CommonParameters.WORLD)) {
+                worldProperties = context.requireOne(CommonParameters.WORLD);
             } else {
-                worldProperties = ((Locatable) src).serverLocation().getWorld().getProperties();
+                worldProperties = ((Locatable) src).serverLocation().world();
             }
-            worldProperties.getWorld().ifPresent(x -> currentEntities.addAll(x.getEntities()));
+            currentEntities.addAll(worldProperties.entities());
         }
 
         final Predicate<Entity> entityPredicate = context.getAll(AdminParameters.ENTITY_PARAMETER)

@@ -80,7 +80,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         serviceCollection.playerDisplayNameService().provideDisplayNameQuery(
                 new IPlayerDisplayNameService.DisplayNameQuery() {
                     @Override public Optional<User> resolve(final String name) {
-                        return NicknameService.this.getFromCache(name).map(ServerPlayer::getUser);
+                        return NicknameService.this.getFromCache(name).map(ServerPlayer::user);
                     }
 
                     @Override public Map<UUID, String> startsWith(final String name) {
@@ -131,7 +131,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
         final ImmutableMap.Builder<Player, Component> mapToReturn = ImmutableMap.builder();
         Sponge.server().onlinePlayers().stream()
                 .filter(x -> !this.cache.containsKey(x.uniqueId()))
-                .filter(x -> x.getName().toLowerCase().startsWith(prefix))
+                .filter(x -> x.name().toLowerCase().startsWith(prefix))
                 .forEach(player -> mapToReturn.put(player, player.get(Keys.CUSTOM_NAME).orElseGet(
                         () -> Component.text(player.name() + "*"))));
 
@@ -222,7 +222,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
 
         final Optional<User> user = Sponge.server().userManager().find(uuid);
         if (user.isPresent()) {
-            final Optional<ServerPlayer> player = user.get().getPlayer();
+            final Optional<ServerPlayer> player = user.get().player();
             if (player.isPresent()) {
                 this.messageProviderService.sendMessageTo(player.get(), "command.delnick.success.base");
                 player.get().remove(Keys.CUSTOM_NAME);
@@ -309,7 +309,7 @@ public class NicknameService implements NucleusNicknameService, IReloadableServi
                 currentNickname, nickname, pl));
         final Optional<User> user = Sponge.server().userManager().find(pl);
         if (user.isPresent()) {
-            final Optional<ServerPlayer> player = user.get().getPlayer();
+            final Optional<ServerPlayer> player = user.get().player();
             if (player.isPresent()) {
                 player.get().sendMessage(LinearComponents.linear(
                         this.messageProviderService.getMessage("command.nick.success.base"),

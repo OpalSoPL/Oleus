@@ -144,7 +144,7 @@ public final class JailService implements NucleusJailService, IReloadableService
 
         final ServerLocation location = jail.getLocation().orElseThrow(() -> new IllegalArgumentException("Jail does not have a valid location."));
         if (location.isValid()) {
-            this.serviceCollection.schedulerService().runOnMainThread(() -> Sponge.server().worldManager().loadWorld(location.getWorldKey())).join();
+            this.serviceCollection.schedulerService().runOnMainThread(() -> Sponge.server().worldManager().loadWorld(location.worldKey())).join();
         } else {
             throw new IllegalArgumentException("Jail does not have a valid location.");
         }
@@ -210,7 +210,7 @@ public final class JailService implements NucleusJailService, IReloadableService
                 return ServerLocation.of(def.getKey(), def.getSpawnPosition());
             }
             final WorldProperties target =
-                    Sponge.server().worldManager().getWorld(u.getWorldKey()).map(ServerWorld::getProperties).orElse(def);
+                    Sponge.server().worldManager().getWorld(u.worldKey()).map(ServerWorld::getProperties).orElse(def);
             return ServerLocation.of(target.getKey(), target.getSpawnPosition());
         }));
 
@@ -230,7 +230,7 @@ public final class JailService implements NucleusJailService, IReloadableService
                 either.getLeft().setLocation(serverLocation);
                 this.serviceCollection.messageProvider().sendMessageTo(either.getLeft(), "jail.elapsed");
             } else if (either.get() != null) {
-                either.get().setLocation(serverLocation.getWorldKey(), serverLocation.getPosition());
+                either.get().setLocation(serverLocation.worldKey(), serverLocation.position());
             }
         });
 
@@ -324,7 +324,7 @@ public final class JailService implements NucleusJailService, IReloadableService
 
     private ServerLocation eitherToLocation(final Either<ServerPlayer, User> either) {
         if (either.isRight()) {
-            return ServerLocation.of(either.get().getWorldKey(), either.get().getPosition());
+            return ServerLocation.of(either.get().worldKey(), either.get().position());
         } else {
             return either.getLeft().serverLocation();
         }

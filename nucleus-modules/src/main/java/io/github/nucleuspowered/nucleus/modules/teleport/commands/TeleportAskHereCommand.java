@@ -81,7 +81,7 @@ public class TeleportAskHereCommand implements ICommandExecutor {
         final ServerPlayer target = context.requireOne(NucleusParameters.ONE_PLAYER);
         final boolean cont = context.getServiceCollection()
                 .getServiceUnchecked(PlayerTeleporterService.class)
-                .canTeleportTo(context.requirePlayer(), target.getUser());
+                .canTeleportTo(context.requirePlayer(), target.user());
         return cont ? Optional.empty() : Optional.of(context.failResult());
     }
 

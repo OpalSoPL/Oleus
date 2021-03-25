@@ -93,9 +93,9 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
             return context.errorResult("command.spawnother.offline.permission");
         }
 
-        user.setLocation(worldTransform.getWorldKey(), worldTransform.getPosition());
+        user.setLocation(worldTransform.worldKey(), worldTransform.position());
         user.setRotation(rotation);
-        context.sendMessage("command.spawnother.offline.sendonlogin", user.name(), worldTransform.getWorldKey().asString());
+        context.sendMessage("command.spawnother.offline.sendonlogin", user.name(), worldTransform.worldKey().asString());
         return context.successResult();
     }
 }

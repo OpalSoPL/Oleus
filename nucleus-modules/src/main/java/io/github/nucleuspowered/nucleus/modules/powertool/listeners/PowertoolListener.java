@@ -57,7 +57,7 @@ public class PowertoolListener implements ListenerBase {
         }
 
         // Get the item and the user.
-        final ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).getType();
+        final ItemType item = player.getItemInHand(HandTypes.MAIN_HAND).type();
 
         // If the powertools are toggled on.
         if (this.userPreferenceService.get(player.uniqueId(), PowertoolKeys.POWERTOOL_ENABLED).orElse(true)) {

@@ -43,10 +43,10 @@ public class InterceptTeleportListener implements ListenerBase.Conditional {
             if (this.handler.isPlayerJailed(player.uniqueId())) {
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
                     event.setCancelled(true);
-                    this.messageProvider.sendMessageTo(cause.getAudience(), "jail.abouttoteleporttarget.isjailed", player.name());
+                    this.messageProvider.sendMessageTo(cause.audience(), "jail.abouttoteleporttarget.isjailed", player.name());
                 } else if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTTOJAILED)) {
                     event.setCancelled(true);
-                    this.messageProvider.sendMessageTo(cause.getAudience(),"jail.abouttoteleportcause.targetisjailed", player.name());
+                    this.messageProvider.sendMessageTo(cause.audience(),"jail.abouttoteleportcause.targetisjailed", player.name());
                 }
             }
         }

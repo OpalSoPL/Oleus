@@ -68,7 +68,7 @@ public class TeleportAskAllHereCommand implements ICommandExecutor {
         context.sendMessage("command.tpaall.success");
         if (!cancelled.isEmpty()) {
             context.sendMessage("command.tpall.cancelled",
-                    cancelled.stream().map(Nameable::getName).collect(Collectors.joining(", ")));
+                    cancelled.stream().map(Nameable::name).collect(Collectors.joining(", ")));
         }
 
         return context.successResult();

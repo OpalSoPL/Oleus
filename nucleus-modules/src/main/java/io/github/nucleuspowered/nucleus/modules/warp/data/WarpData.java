@@ -71,7 +71,7 @@ public class WarpData implements Warp {
     }
 
     @Override
-    public Vector3d getPosition() {
+    public Vector3d position() {
         return this.position;
     }
 

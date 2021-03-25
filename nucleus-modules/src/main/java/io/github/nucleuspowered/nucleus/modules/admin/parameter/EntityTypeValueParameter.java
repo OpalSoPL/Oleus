@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class EntityTypeValueParameter implements ValueParameter<Predicate<Entity>> {
 
-    private static final Predicate<Entity> armourStand = e -> e.getType().equals(EntityTypes.ARMOR_STAND.get());
+    private static final Predicate<Entity> armourStand = e -> e.type().equals(EntityTypes.ARMOR_STAND.get());
     private static final Predicate<Entity> hostile = e -> e instanceof Monster;
     private static final Predicate<Entity> passive = e -> e instanceof Living && !(e instanceof Player || e instanceof Monster);
 
@@ -47,7 +47,7 @@ public class EntityTypeValueParameter implements ValueParameter<Predicate<Entity
     }
 
     @Override
-    public Optional<? extends Predicate<Entity>> getValue(
+    public Optional<? extends Predicate<Entity>> parseValue(
             final Parameter.Key<? super Predicate<Entity>> parameterKey,
             final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {

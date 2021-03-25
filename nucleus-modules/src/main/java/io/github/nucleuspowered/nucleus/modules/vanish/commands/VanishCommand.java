@@ -49,7 +49,7 @@ public class VanishCommand implements ICommandExecutor {
         }
 
         if (!context.testPermissionFor(ou, "persist")) {
-            return context.errorResult("command.vanish.noperm", ou.getName());
+            return context.errorResult("command.vanish.noperm", ou.name());
         }
 
         final boolean result;
@@ -71,7 +71,7 @@ public class VanishCommand implements ICommandExecutor {
 
         context.sendMessage(
                 "command.vanish.successuser",
-                ou.getName(),
+                ou.name(),
                 result ? "loc:command.vanish.vanished" : "loc:command.vanish.visible");
 
         return context.successResult();

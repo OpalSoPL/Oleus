@@ -49,7 +49,7 @@ public final class PlayerMessageTarget extends AbstractMessageTarget implements 
 
     @Override
     public String getName() {
-        return Sponge.server().player(this.uuid).map(Nameable::getName).orElse("");
+        return Sponge.server().player(this.uuid).map(Nameable::name).orElse("");
     }
 
     @Override

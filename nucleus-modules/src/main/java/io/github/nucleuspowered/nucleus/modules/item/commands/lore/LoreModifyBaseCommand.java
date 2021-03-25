@@ -25,7 +25,7 @@ abstract class LoreModifyBaseCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> loreLine =
             Parameter.builder(Integer.class)
-                    .addParser(VariableValueParameters.integerRange().setMin(1).build())
+                    .addParser(VariableValueParameters.integerRange().min(1).build())
                     .key("line")
                     .build();
 

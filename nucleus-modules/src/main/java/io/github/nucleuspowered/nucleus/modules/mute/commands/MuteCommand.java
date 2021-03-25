@@ -63,7 +63,7 @@ public class MuteCommand implements ICommandExecutor, IReloadableService.Reloada
         final Either<User, GameProfile> either = NucleusParameters.Composite.parseUserOrGameProfile(context);
 
         final Optional<Duration> time = context.getOne(NucleusParameters.DURATION);
-        final User user = either.fold(Function.identity(), Sponge.server().userManager()::getOrCreate);
+        final User user = either.fold(Function.identity(), Sponge.server().userManager()::findOrCreate);
         final Optional<Mute> omd = handler.getPlayerMuteInfo(user.uniqueId());
         final Optional<String> reas = context.getOne(NucleusParameters.OPTIONAL_REASON);
 

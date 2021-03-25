@@ -37,7 +37,7 @@ public class BanInfoProvider implements NucleusProvider {
             final BanService obs = Sponge.server().serviceProvider().banService();
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             final Optional<Ban.Profile> bs = obs.getBanFor(user.getProfile());
-            final Audience audience = source.getAudience();
+            final Audience audience = source.audience();
             if (bs.isPresent()) {
 
                 // Lightweight checkban.

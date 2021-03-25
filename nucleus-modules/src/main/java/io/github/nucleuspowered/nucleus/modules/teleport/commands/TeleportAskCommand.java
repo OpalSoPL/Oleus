@@ -80,7 +80,7 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
         if (context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
                 .canTeleportTo(
                         context.requirePlayer(),
-                        context.requireOne(NucleusParameters.ONE_PLAYER).getUser()
+                        context.requireOne(NucleusParameters.ONE_PLAYER).user()
                 )) {
             return Optional.of(context.failResult());
         }

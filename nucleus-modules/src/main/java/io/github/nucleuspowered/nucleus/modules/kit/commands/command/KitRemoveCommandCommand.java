@@ -28,7 +28,7 @@ import java.util.List;
 public class KitRemoveCommandCommand implements ICommandExecutor {
 
     private final Parameter.Value<Integer> commands = Parameter.builder(Integer.class)
-            .addParser(VariableValueParameters.integerRange().setMin(1).build())
+            .addParser(VariableValueParameters.integerRange().min(1).build())
             .key("index")
             .build();
 

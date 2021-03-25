@@ -26,6 +26,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,11 +47,11 @@ import java.util.List;
 public class EnchantCommand implements ICommandExecutor {
 
     private final Parameter.Value<EnchantmentType> enchantmentType = Parameter.builder(EnchantmentType.class)
-            .addParser(VariableValueParameters.catalogedElementParameterBuilder(EnchantmentType.class).defaultNamespace("minecraft").build())
+            .addParser(VariableValueParameters.registryEntryBuilder(RegistryTypes.ENCHANTMENT_TYPE).defaultNamespace("minecraft").build())
             .key("enchantment")
             .build();
     private final Parameter.Value<Integer> level = Parameter.builder(Integer.class)
-            .addParser(VariableValueParameters.integerRange().setMin(0).setMax((int) Short.MAX_VALUE).build())
+            .addParser(VariableValueParameters.integerRange().min(0).max((int) Short.MAX_VALUE).build())
             .key("level")
             .build();
 
@@ -77,7 +78,7 @@ public class EnchantCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player src = context.getIfPlayer();
         // Check for item in hand
-        final ItemStack itemInHand = src.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemInHand = src.itemInHand(HandTypes.MAIN_HAND);
         if (itemInHand.isEmpty()) {
             return context.errorResult("command.enchant.noitem");
         }
@@ -94,7 +95,7 @@ public class EnchantCommand implements ICommandExecutor {
                 return context.errorResult("command.enchant.nounsafe.enchant", itemInHand);
             }
 
-            if (level > enchantment.getMaximumLevel()) {
+            if (level > enchantment.maximumLevel()) {
                 return context.errorResult("command.enchant.nounsafe.level", itemInHand);
             }
         }
@@ -105,19 +106,19 @@ public class EnchantCommand implements ICommandExecutor {
         final List<Enchantment> enchantsToSet;
         if (level == 0) {
             // we want to remove only.
-            enchantsToSet = Stream.ofAll(enchantments).filter(x -> !x.getType().equals(enchantment)).asJava();
+            enchantsToSet = Stream.ofAll(enchantments).filter(x -> !x.type().equals(enchantment)).asJava();
             if (enchantsToSet.size() == enchantments.size()) {
                 return context.errorResult("command.enchant.noenchantment", enchantment);
             }
         } else {
 
             final Stream<Enchantment> toRemove = Stream.ofAll(enchantments)
-                    .filter(x -> x.getType().isCompatibleWith(enchantment) || x.getType().equals(enchantment));
+                    .filter(x -> x.type().isCompatibleWith(enchantment) || x.type().equals(enchantment));
 
             if (!allowOverwrite && toRemove.isEmpty()) {
                 // Build the list of the enchantment names, and send it.
                 return context.errorResult("command.enchant.overwrite",
-                        Component.join(Component.text(", "), toRemove.map(Enchantment::getType).toJavaList()));
+                        Component.join(Component.text(", "), toRemove.map(Enchantment::type).toJavaList()));
             }
 
             enchantsToSet = new ArrayList<>(enchantments);

@@ -20,7 +20,7 @@ public class AroundPlayerAndSurfaceKernel extends SurfaceKernel {
     }
 
     @Override Vector3i getCentralLocation(@Nullable final ServerLocation currentLocation, final ServerWorld world) {
-        if (currentLocation != null && world.getKey().equals(currentLocation.getWorldKey())) {
+        if (currentLocation != null && world.getKey().equals(currentLocation.worldKey())) {
             return currentLocation.getBlockPosition();
         }
 

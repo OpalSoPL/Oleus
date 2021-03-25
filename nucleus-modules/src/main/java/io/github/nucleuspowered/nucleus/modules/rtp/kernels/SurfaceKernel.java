@@ -23,8 +23,8 @@ public class SurfaceKernel extends DefaultKernel {
     @Override
     ServerLocation getStartingLocation(final ServerLocation location) {
         return super.getStartingLocation(
-                ServerLocation.of(location.getWorld(), location.getBlockX(), location.getWorld().getHighestYAt(location.getBlockX(), location.getBlockZ()),
-                        location.getBlockZ()));
+                ServerLocation.of(location.world(), location.blockX(), location.world().highestYAt(location.blockX(), location.blockZ()),
+                        location.blockZ()));
     }
 
     @Override

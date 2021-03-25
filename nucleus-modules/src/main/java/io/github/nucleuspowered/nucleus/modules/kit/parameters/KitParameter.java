@@ -27,7 +27,7 @@ public final class KitParameter implements ValueParameter<Kit> {
     private final KitService kitService;
     private final IPermissionService permissionService;
     private final IMessageProviderService messageProviderService;
-    private boolean permissionCheck;
+    private final boolean permissionCheck;
 
     public KitParameter(final INucleusServiceCollection serviceCollection, final KitService kitService, final boolean permissionCheck) {
         this.kitService = kitService;
@@ -50,7 +50,8 @@ public final class KitParameter implements ValueParameter<Kit> {
     }
 
     @Override
-    public Optional<? extends Kit> getValue(final Parameter.Key<? super Kit> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
+    public Optional<? extends Kit> parseValue(final Parameter.Key<? super Kit> parameterKey, final ArgumentReader.Mutable reader,
+            final CommandContext.Builder context)
             throws ArgumentParseException {
         final String kitName = reader.parseString();
         if (kitName.isEmpty()) {
@@ -60,7 +61,7 @@ public final class KitParameter implements ValueParameter<Kit> {
         final Kit kit = this.kitService.getKit(kitName)
                 .orElseThrow(() -> reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(),"args.kit.noexist")));
 
-        if (!this.checkPermission(context.getCause(), kit)) {
+        if (!this.checkPermission(context.cause(), kit)) {
             throw reader.createException(this.messageProviderService.getMessageFor(context.cause().audience(),"args.kit.noperms"));
         }
 

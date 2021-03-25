@@ -42,22 +42,22 @@ public class GameruleCommand implements ICommandExecutor {
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final ServerWorld serverWorld = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD.getKey())
+        final ServerWorld serverWorld = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD.key())
                 .orElseThrow(() -> context.createException("command.world.player"));
-        final ServerWorldProperties worldProperties = serverWorld.getProperties();
-        final Map<GameRule<?>, ?> gameRules = worldProperties.getGameRules();
+        final ServerWorldProperties worldProperties = serverWorld.properties();
+        final Map<GameRule<?>, ?> gameRules = worldProperties.gameRules();
 
         final String message = context.getMessageString("command.world.gamerule.key");
-        final List<Component> text = gameRules.entrySet().stream().sorted(Comparator.comparing(x -> x.getKey().getName()))
+        final List<Component> text = gameRules.entrySet().stream().sorted(Comparator.comparing(x -> x.getKey().name()))
             .map(x -> LegacyComponentSerializer.legacyAmpersand()
                             .deserialize(MessageFormat.format(message, x.getKey(), String.valueOf(x.getValue())))
                             .clickEvent(ClickEvent.suggestCommand(String.format("/nucleus:world gamerule set %s %s ",
-                                    worldProperties.getKey().asString(),
+                                    worldProperties.key().asString(),
                                     x.getKey()))))
                 .collect(Collectors.toList());
 
         Util.getPaginationBuilder(context.audience())
-            .title(context.getMessage("command.world.gamerule.header", worldProperties.getKey().asString()))
+            .title(context.getMessage("command.world.gamerule.header", worldProperties.key().asString()))
             .contents(text)
             .sendTo(context.audience());
 
