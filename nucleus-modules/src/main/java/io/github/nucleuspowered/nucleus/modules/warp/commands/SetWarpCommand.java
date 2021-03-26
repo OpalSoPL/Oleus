@@ -117,7 +117,7 @@ public class SetWarpCommand implements ICommandExecutor {
         }
 
         // OK! Set it.
-        if (warpService.setWarp(warp, src.serverLocation(), src.getRotation())) {
+        if (warpService.setWarp(warp, src.serverLocation(), src.rotation())) {
             // Worked. Tell them.
             context.sendMessage("command.warps.set", warp);
             return context.successResult();

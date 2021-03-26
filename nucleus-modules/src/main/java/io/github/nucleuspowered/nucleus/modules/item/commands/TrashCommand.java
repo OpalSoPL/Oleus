@@ -32,7 +32,7 @@ public class TrashCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer src = context.getIfPlayer();
         if (src.openInventory(ViewableInventory.builder()
-                .type(ContainerTypes.GENERIC_9x6)
+                .type(ContainerTypes.GENERIC_9X6)
                 .fillDummy()
                 .completeStructure()
                 .build()).isPresent()) {

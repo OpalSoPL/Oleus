@@ -46,7 +46,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
     }
 
     @Listener
-    public void onServerListPing(final ClientPingServerEvent event, @Getter("getResponse") final ClientPingServerEvent.Response response) {
+    public void onServerListPing(final ClientPingServerEvent event, @Getter("response") final ClientPingServerEvent.Response response) {
         if (this.modifyServerList) {
             List<NucleusTextTemplate> list = null;
             final Optional<Component> ott = this.service.getMessage();
@@ -54,7 +54,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
             if (ott.isPresent()) {
                 response.setDescription(ott.get());
             } else {
-                if (Sponge.server().hasWhitelist() && !this.whitelist.isEmpty()) {
+                if (Sponge.server().isWhitelistEnabled() && !this.whitelist.isEmpty()) {
                     list = this.whitelist;
                 } else if (!this.messages.isEmpty()) {
                     list = this.messages;
@@ -72,12 +72,12 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
         } else if (this.hideVanishPlayers) {
             final Collection<GameProfile> players = Sponge.server().onlinePlayers().stream()
                     .filter(x -> !x.get(Keys.VANISH).orElse(false))
-                    .map(ServerPlayer::getProfile)
+                    .map(ServerPlayer::profile)
                     .collect(Collectors.toList());
 
-            response.getPlayers().ifPresent(y -> {
-                y.getProfiles().clear();
-                y.getProfiles().addAll(players);
+            response.players().ifPresent(y -> {
+                y.profiles().clear();
+                y.profiles().addAll(players);
                 y.setOnline(players.size());
             });
         }

@@ -73,7 +73,7 @@ public class RTPService implements NucleusRTPService, IReloadableService.Reloada
     }
 
     @Override public RTPKernel getKernel(final ServerWorld world) {
-        return this.getKernel(world.getKey().asString());
+        return this.getKernel(world.key().asString());
     }
 
     @Override public RTPKernel getKernel(final String world) {

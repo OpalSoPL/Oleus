@@ -56,7 +56,7 @@ public class LoreDeleteCommand implements ICommandExecutor {
         final Player src = context.getIfPlayer();
         final int line = context.requireOne(this.loreLine) - 1;
 
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack stack = src.itemInHand(HandTypes.MAIN_HAND);
         if (stack.isEmpty()) {
             return context.errorResult("command.lore.clear.noitem");
         }

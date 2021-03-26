@@ -26,8 +26,8 @@ public class AFKMoveOnlyListener extends AbstractAFKListener implements Listener
 
     @Listener(order = Order.LAST)
     public void onPlayerMove(final MoveEntityEvent event, @Root final ServerPlayer player,
-            @Getter("getOriginalPosition") final Vector3d from,
-            @Getter("getDestinationPosition") final Vector3d to) {
+            @Getter("originalPosition") final Vector3d from,
+            @Getter("destinationPosition") final Vector3d to) {
         if (!from.equals(to)) {
             this.update(player);
         }

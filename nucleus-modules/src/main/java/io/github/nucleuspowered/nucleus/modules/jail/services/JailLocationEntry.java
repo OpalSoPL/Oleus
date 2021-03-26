@@ -9,6 +9,7 @@ import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -22,7 +23,7 @@ public final class JailLocationEntry implements Jail, NamedLocation {
     private final String name;
 
     public JailLocationEntry(final NamedLocation location) {
-        this(location.getResourceKey(), location.position(), location.getRotation(), location.getName());
+        this(location.getResourceKey(), location.getPosition(), location.getRotation(), location.getName());
     }
 
     public JailLocationEntry(final ResourceKey worldKey, final Vector3d position, final Vector3d rotation, final String name) {
@@ -38,8 +39,8 @@ public final class JailLocationEntry implements Jail, NamedLocation {
     }
 
     @Override
-    public Optional<WorldProperties> getWorld() {
-        return Sponge.server().worldManager().getProperties(this.worldKey);
+    public Optional<ServerWorld> getWorld() {
+        return Sponge.server().worldManager().world(this.worldKey);
     }
 
     @Override
@@ -48,7 +49,7 @@ public final class JailLocationEntry implements Jail, NamedLocation {
     }
 
     @Override
-    public Vector3d position() {
+    public Vector3d getPosition() {
         return this.position;
     }
 

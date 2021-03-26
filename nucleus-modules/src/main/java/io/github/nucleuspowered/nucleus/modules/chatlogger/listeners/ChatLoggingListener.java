@@ -23,17 +23,17 @@ public class ChatLoggingListener extends AbstractLoggerListener {
 
     @Listener(order = Order.LAST)
     public void onChat(final PlayerChatEvent event) {
-        this.log(PlainComponentSerializer.plain().serialize(event.getMessage()),
-                event.getCause().first(Nameable.class).map(Nameable::name).orElse("unknown"));
+        this.log(PlainComponentSerializer.plain().serialize(event.message()),
+                event.cause().first(Nameable.class).map(Nameable::name).orElse("unknown"));
     }
 
     @Listener(order = Order.LAST)
     public void onCommand(final ExecuteCommandEvent.Post event) {
-        if (event.getCommand().equalsIgnoreCase("say") || event.getCommand().equalsIgnoreCase("minecraft:say")) {
-            if (event.getCause().root() instanceof Nameable) {
-                this.log(event.getArguments(), ((Nameable) event.getCause().root()).getName());
+        if (event.command().equalsIgnoreCase("say") || event.command().equalsIgnoreCase("minecraft:say")) {
+            if (event.cause().root() instanceof Nameable) {
+                this.log(event.arguments(), ((Nameable) event.cause().root()).name());
             } else {
-                this.log(event.getArguments(), "Server");
+                this.log(event.arguments(), "Server");
             }
         }
     }

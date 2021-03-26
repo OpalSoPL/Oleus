@@ -18,6 +18,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -40,14 +41,14 @@ public class BorderCommand implements ICommandExecutor {
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final WorldProperties wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey())
+        final ServerWorld wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.key())
                 .orElseThrow(() -> context.createException("command.world.player"));
         final List<Component> worldBorderInfo = new ArrayList<>();
 
-        final WorldBorder worldBorder = wp.getWorldBorder();
-        final Vector3d centre = worldBorder.getCenter();
-        final int currentDiameter = (int) worldBorder.getDiameter();
-        final int targetDiameter = (int) worldBorder.getNewDiameter();
+        final WorldBorder worldBorder = wp.properties().worldBorder();
+        final Vector3d centre = worldBorder.center();
+        final int currentDiameter = (int) worldBorder.diameter();
+        final int targetDiameter = (int) worldBorder.newDiameter();
 
         // Border centre
         worldBorderInfo.add(context.getMessage("command.world.border.centre", String.valueOf(centre.getFloorX()), String.valueOf(centre.getFloorZ())));
@@ -55,12 +56,12 @@ public class BorderCommand implements ICommandExecutor {
 
         if (currentDiameter != targetDiameter) {
             worldBorderInfo.add(context.getMessage("command.world.border.targetdiameter", targetDiameter,
-                    String.valueOf(worldBorder.getTimeRemaining().getSeconds())));
+                    String.valueOf(worldBorder.timeRemaining().getSeconds())));
         }
 
         Util.getPaginationBuilder(context.audience())
                 .contents(worldBorderInfo)
-                .title(context.getMessage("command.world.border.title", wp.getKey().asString()))
+                .title(context.getMessage("command.world.border.title", wp.key().asString()))
                 .padding(Component.text("=", NamedTextColor.GREEN))
                 .sendTo(context.audience());
         return context.successResult();

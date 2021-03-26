@@ -38,12 +38,13 @@ public final class WarpParameter implements ValueParameter<Warp> {
     @Override public List<String> complete(final CommandContext context, final String currentInput) {
         return this.warpService.getWarpNames().stream()
             .filter(s -> s.startsWith(currentInput))
-            .filter(s -> !this.checkPermission || this.checkPermission(context.getCause(), s))
+            .filter(s -> !this.checkPermission || this.checkPermission(context.cause(), s))
             .collect(Collectors.toList());
     }
 
     @Override
-    public Optional<? extends Warp> getValue(final Parameter.Key<? super Warp> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
+    public Optional<? extends Warp> parseValue(final Parameter.Key<? super Warp> parameterKey, final ArgumentReader.Mutable reader,
+            final CommandContext.Builder context)
             throws ArgumentParseException {
         final String warp = reader.parseString().toLowerCase();
         if (!this.warpService.warpExists(warp)) {

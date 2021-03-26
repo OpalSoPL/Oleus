@@ -25,7 +25,7 @@ public class MailLoggingListener extends AbstractLoggerListener {
     @Listener(order = Order.LAST)
     public void onCommand(final NucleusSendMailEvent event, @First final ServerPlayer source) {
         final String message = this.messageProviderService.getMessageString("chatlog.mail",
-            source.getName(), Sponge.server().userManager().find(event.getRecipient()).map(User::getName).orElse("null"),
+            source.name(), Sponge.server().userManager().find(event.getRecipient()).map(User::name).orElse("null"),
                 event.getMessage());
         this.handler.queueEntry(message);
     }

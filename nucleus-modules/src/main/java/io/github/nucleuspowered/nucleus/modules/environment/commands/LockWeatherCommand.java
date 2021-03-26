@@ -36,22 +36,22 @@ public class LockWeatherCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Optional<ServerWorld> world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey());
+        final Optional<ServerWorld> world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.key());
         if (!world.isPresent()) {
             return context.errorResult("command.specifyworld");
         }
 
         final ServerWorld wp = world.get();
         try (final IKeyedDataObject.Value<Boolean> vb = context.getServiceCollection().storageManager()
-                .getOrCreateWorldOnThread(wp.getKey())
+                .getOrCreateWorldOnThread(wp.key())
                 .getAndSet(EnvironmentKeys.LOCKED_WEATHER)) {
             final boolean current = vb.getValue().orElse(false);
             final boolean toggle = context.getOne(NucleusParameters.ONE_TRUE_FALSE).orElse(!current);
             vb.setValue(toggle);
             if (toggle) {
-                context.sendMessage("command.lockweather.locked", wp.getKey().asString());
+                context.sendMessage("command.lockweather.locked", wp.key().asString());
             } else {
-                context.sendMessage( "command.lockweather.unlocked", wp.getKey().asString());
+                context.sendMessage( "command.lockweather.unlocked", wp.key().asString());
             }
         }
 

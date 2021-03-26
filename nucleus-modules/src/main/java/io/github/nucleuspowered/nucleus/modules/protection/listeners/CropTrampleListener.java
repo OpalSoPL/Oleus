@@ -28,10 +28,11 @@ public class CropTrampleListener implements IReloadableService.Reloadable, Liste
         final boolean isPlayer = entity instanceof ServerPlayer;
         if (this.cropplayer && isPlayer || this.cropentity && !isPlayer) {
             // Go from Farmland to Dirt.
-            breakEvent.getTransactions().stream()
+            breakEvent.transactions()
+                    .stream()
                     .filter(Transaction::isValid)
-                    .filter(x -> x.getOriginal().getState().type().equals(BlockTypes.FARMLAND.get()))
-                    .filter(x -> x.getFinal().getState().type().equals(BlockTypes.DIRT.get()))
+                    .filter(x -> x.original().state().type().equals(BlockTypes.FARMLAND.get()))
+                    .filter(x -> x.finalReplacement().state().type().equals(BlockTypes.DIRT.get()))
                     .forEach(x -> x.setValid(false));
         }
     }

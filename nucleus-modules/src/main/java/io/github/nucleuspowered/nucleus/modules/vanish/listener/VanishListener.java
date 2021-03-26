@@ -49,16 +49,16 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
     @Listener(order = Order.LAST)
     public void onAuth(final ServerSideConnectionEvent.Auth auth) {
         if (this.vanishConfig.isTryHidePlayers()) {
-            final UUID uuid = auth.getProfile().uniqueId();
+            final UUID uuid = auth.profile().uuid();
             Sponge.server().userManager()
-                                .get(uuid)
+                                .find(uuid)
                                 .flatMap(x -> x.get(Keys.LAST_DATE_PLAYED))
                                 .ifPresent(y -> this.service.setLastVanishedTime(uuid, y));
         }
     }
 
     @Listener
-    public void onLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onLogin(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer player) {
         final boolean persist = this.service.isVanished(player.uniqueId());
 
         final boolean shouldVanish = (this.permissionService.hasPermission(player, VanishPermissions.VANISH_ONLOGIN)
@@ -68,13 +68,13 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
         if (shouldVanish) {
             if (!this.permissionService.hasPermission(player, VanishPermissions.VANISH_PERSIST)) {
                 // No permission, no vanish.
-                this.service.unvanishPlayer(player.getUser());
+                this.service.unvanishPlayer(player.user());
                 return;
             } else if (this.vanishConfig.isSuppressMessagesOnVanish()) {
                 event.setMessageCancelled(true);
             }
 
-            this.service.vanishPlayer(player.getUser(), true);
+            this.service.vanishPlayer(player.user(), true);
             this.messageProviderService.sendMessageTo(player, "vanish.login");
 
             if (!persist) {
@@ -84,12 +84,12 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
             }
         } else if (this.vanishConfig.isForceNucleusVanish()) {
             // unvanish
-            this.service.unvanishPlayer(player.getUser());
+            this.service.unvanishPlayer(player.user());
         }
     }
 
     @Listener
-    public void onQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("player") final ServerPlayer player) {
         if (player.get(Keys.VANISH).orElse(false)) {
             this.storageManager.getUserService().get(player.uniqueId())
                     .thenAccept(x -> x.ifPresent(t -> t.set(VanishKeys.VANISH_STATUS, false)));

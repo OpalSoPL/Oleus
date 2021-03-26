@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.world.server.ServerWorld;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 
 abstract class AbstractPropertiesSetCommand implements ICommandExecutor {
 
@@ -33,15 +33,15 @@ abstract class AbstractPropertiesSetCommand implements ICommandExecutor {
         final ServerWorld worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL)
                 .orElseThrow(() -> context.createException("command.world.player"));
         final boolean set = context.requireOne(NucleusParameters.ONE_TRUE_FALSE);
-        this.setter(worldProperties.getProperties(), set);
-        context.sendMessage("command.world.setproperty.success", this.name, worldProperties.getKey().asString(), String.valueOf(set));
-        this.extraLogic(context, worldProperties.getProperties(), set);
+        this.setter(worldProperties.properties(), set);
+        context.sendMessage("command.world.setproperty.success", this.name, worldProperties.key().asString(), String.valueOf(set));
+        this.extraLogic(context, worldProperties.properties(), set);
         return context.successResult();
     }
 
-    protected abstract void setter(WorldProperties worldProperties, boolean set) throws CommandException;
+    protected abstract void setter(ServerWorldProperties worldProperties, boolean set) throws CommandException;
 
-    protected void extraLogic(final ICommandContext context, final WorldProperties worldProperties, final boolean set) throws CommandException {
+    protected void extraLogic(final ICommandContext context, final ServerWorldProperties worldProperties, final boolean set) throws CommandException {
         // noop
     }
 

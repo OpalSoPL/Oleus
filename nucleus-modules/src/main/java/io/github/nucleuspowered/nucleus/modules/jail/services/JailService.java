@@ -202,16 +202,16 @@ public final class JailService implements NucleusJailService, IReloadableService
                 .orElseGet(() -> this.getUserEither(user));
 
         final ServerLocation destination = jailing.getPreviousLocation().orElseGet(() -> either.fold(player -> {
-            final WorldProperties worldProperties = player.getWorld().getProperties();
-            return ServerLocation.of(worldProperties.getKey(), worldProperties.getSpawnPosition());
+            final ServerWorld world = player.world();
+            return ServerLocation.of(world.key(), world.properties().spawnPosition());
         }, u -> {
-            final WorldProperties def = Sponge.server().worldManager().getDefaultProperties().get();
+            final ServerWorld def = Sponge.server().worldManager().defaultWorld();
             if (u == null) {
-                return ServerLocation.of(def.getKey(), def.getSpawnPosition());
+                return ServerLocation.of(def.key(), def.properties().spawnPosition());
             }
-            final WorldProperties target =
-                    Sponge.server().worldManager().getWorld(u.worldKey()).map(ServerWorld::getProperties).orElse(def);
-            return ServerLocation.of(target.getKey(), target.getSpawnPosition());
+            final ServerWorld target =
+                    Sponge.server().worldManager().world(u.worldKey()).orElse(def);
+            return ServerLocation.of(target.key(), target.properties().spawnPosition());
         }));
 
         this.jailings.put(user, JailService.NOT_JAILED);
@@ -222,8 +222,8 @@ public final class JailService implements NucleusJailService, IReloadableService
                     TeleportScanners.NO_SCAN.get(),
                     TeleportHelperFilters.DEFAULT.get()
             ).orElseGet(() -> {
-                final WorldProperties def = Sponge.server().worldManager().getDefaultProperties().get();
-                return ServerLocation.of(def.getKey(), def.getSpawnPosition());
+                final ServerWorld def = Sponge.server().worldManager().defaultWorld();
+                return ServerLocation.of(def.key(), def.properties().spawnPosition());
             });
 
             if (either.isLeft()) {
@@ -289,7 +289,7 @@ public final class JailService implements NucleusJailService, IReloadableService
                             "command.jail.jailedfor",
                             entry.getJailName(),
                             playerDisplayNameService.getDisplayName(entry.getJailer().orElse(Util.CONSOLE_FAKE_UUID)),
-                            messageProviderService.getTimeString(serverPlayer.getLocale(), duration.getSeconds()))
+                            messageProviderService.getTimeString(serverPlayer.locale(), duration.getSeconds()))
             )
                     .orElseGet(() -> messageProviderService.getMessageFor(serverPlayer, "command.jail.jailedperm", entry.getJailName(),
                             playerDisplayNameService.getDisplayName(entry.getJailer().orElse(Util.CONSOLE_FAKE_UUID)), "", ""));
@@ -306,7 +306,7 @@ public final class JailService implements NucleusJailService, IReloadableService
             if (timeLeft.isPresent()) {
                 messageProviderService.sendMessageTo(
                         user, "jail.playernotify.time",
-                        messageProviderService.getTimeString(user.getLocale(), timeLeft.get().getSeconds())
+                        messageProviderService.getTimeString(user.locale(), timeLeft.get().getSeconds())
                 );
             } else {
                 messageProviderService.sendMessageTo(user, "jail.playernotify.standard");

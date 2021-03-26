@@ -60,19 +60,19 @@ public class UnsignBookCommand implements ICommandExecutor {
         final boolean isSelf = context.is(target);
 
         // Very basic for now, unsign book in hand.
-        final ItemStack bookToUnsign = target.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack bookToUnsign = target.itemInHand(HandTypes.MAIN_HAND);
         if (bookToUnsign.type().equals(ItemTypes.WRITTEN_BOOK.get())) {
             final ItemStack unsignedBook = ItemStack.builder()
                     .itemType(ItemTypes.WRITABLE_BOOK)
                     .add(Keys.PLAIN_PAGES, this.from(bookToUnsign))
-                    .quantity(bookToUnsign.getQuantity())
+                    .quantity(bookToUnsign.quantity())
                     .build();
             target.setItemInHand(HandTypes.MAIN_HAND, unsignedBook);
 
             if (isSelf) {
                 context.sendMessage("command.unsignbook.success.self");
             } else {
-                context.sendMessage("command.unsignbook.success.other", target.getName());
+                context.sendMessage("command.unsignbook.success.other", target.name());
             }
             return context.successResult();
         }
@@ -80,7 +80,7 @@ public class UnsignBookCommand implements ICommandExecutor {
         if (isSelf) {
             return context.errorResult("command.unsignbook.notinhand.self");
         } else {
-            return context.errorResult("command.unsignbook.notinhand.other", target.getName());
+            return context.errorResult("command.unsignbook.notinhand.other", target.name());
         }
     }
 

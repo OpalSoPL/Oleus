@@ -27,14 +27,14 @@ public final class SpawnHelper {
     public static Tuple<ServerLocation, Vector3d> getSpawn(@NonNull final ServerWorld wp, @Nullable final ServerPlayer player,
             final ICommandContext context) throws CommandException {
 
-        final ResourceKey worldKey = Objects.requireNonNull(wp, "WorldProperties").getKey();
+        final ResourceKey worldKey = Objects.requireNonNull(wp, "WorldProperties").key();
         return new Tuple<>(
-                ServerLocation.of(worldKey, wp.getProperties().spawnPosition().toDouble().add(0.5, 0, 0.5)),
+                ServerLocation.of(worldKey, wp.properties().spawnPosition().toDouble().add(0.5, 0, 0.5)),
                 context.getServiceCollection()
                         .storageManager()
                         .getWorldService()
                         .getOrNewOnThread(worldKey)
                         .get(SpawnKeys.WORLD_SPAWN_ROTATION)
-                        .orElseGet(() -> player == null ? new Vector3d(0, 0, 0) : player.getRotation()));
+                        .orElseGet(() -> player == null ? new Vector3d(0, 0, 0) : player.rotation()));
     }
 }

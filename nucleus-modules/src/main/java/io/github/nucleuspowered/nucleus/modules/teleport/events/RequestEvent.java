@@ -19,11 +19,11 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
     private boolean isCancelled = false;
 
     private final Cause cause;
-    private final UUID targetEntity;
+    private final UUID player;
 
-    private RequestEvent(final Cause cause, final UUID targetEntity) {
+    private RequestEvent(final Cause cause, final UUID player) {
         this.cause = cause;
-        this.targetEntity = targetEntity;
+        this.player = player;
     }
 
     @Override public Optional<Component> getCancelMessage() {
@@ -36,7 +36,7 @@ public abstract class RequestEvent extends AbstractEvent implements NucleusTelep
 
     @Override
     public UUID getPlayer() {
-        return this.targetEntity;
+        return this.player;
     }
 
     @Override public boolean isCancelled() {

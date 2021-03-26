@@ -84,21 +84,21 @@ public class SetCategoryCommand implements ICommandExecutor {
         }
 
         final Tuple<String, Boolean> category = categoryOp.get();
-        if (!context.hasFlag("n") && !category.getSecond()) {
-            context.sendMessageText(context.getMessage("command.warp.category.requirenew", category.getFirst())
-                    .clickEvent(ClickEvent.runCommand("/warp setcategory -n " + warpName + " " + category.getFirst()))
+        if (!context.hasFlag("n") && !category.second()) {
+            context.sendMessageText(context.getMessage("command.warp.category.requirenew", category.first())
+                    .clickEvent(ClickEvent.runCommand("/warp setcategory -n " + warpName + " " + category.first()))
             );
 
             return context.failResult();
         }
 
         // Add the category.
-        if (handler.setWarpCategory(warpName, category.getFirst())) {
-            context.sendMessage("command.warp.category.added", category.getFirst(), warpName);
+        if (handler.setWarpCategory(warpName, category.first())) {
+            context.sendMessage("command.warp.category.added", category.first(), warpName);
             return context.successResult();
         }
 
-        return context.errorResult("command.warp.category.couldnotadd", Component.text(category.getFirst()), Component.text(warpName));
+        return context.errorResult("command.warp.category.couldnotadd", Component.text(category.first()), Component.text(warpName));
     }
 
     private static final class SetCategoryWarpCategoryArgument implements ValueParameter<Tuple<String, Boolean>> {
@@ -119,7 +119,8 @@ public class SetCategoryCommand implements ICommandExecutor {
                     .collect(Collectors.toList());
         }
 
-        @Override public Optional<? extends Tuple<String, Boolean>> getValue(final Parameter.Key<? super Tuple<String, Boolean>> parameterKey,
+        @Override
+        public Optional<? extends Tuple<String, Boolean>> parseValue(final Parameter.Key<? super Tuple<String, Boolean>> parameterKey,
                 final ArgumentReader.Mutable reader, final CommandContext.Builder context) throws ArgumentParseException {
             final String arg = reader.parseString();
             return Optional.of(Tuple.of(arg,

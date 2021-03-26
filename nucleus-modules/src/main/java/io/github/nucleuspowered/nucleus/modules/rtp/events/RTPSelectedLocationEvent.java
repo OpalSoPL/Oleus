@@ -44,7 +44,7 @@ public class RTPSelectedLocationEvent extends AbstractEvent implements NucleusRT
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 }

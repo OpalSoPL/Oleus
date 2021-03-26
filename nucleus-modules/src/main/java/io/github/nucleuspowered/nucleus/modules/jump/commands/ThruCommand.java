@@ -45,7 +45,7 @@ public class ThruCommand implements ICommandExecutor, IReloadableService.Reloada
 
         final Optional<RayTraceResult<LocatableBlock>> blockRayTraceResult = RayTrace.block()
                 .sourceEyePosition(player)
-                .direction(player.getDirection())
+                .direction(player.direction())
                 .limit(this.maxThru)
                 .select(state::select)
                 .continueWhileBlock(state::continueWhile)
@@ -60,7 +60,7 @@ public class ThruCommand implements ICommandExecutor, IReloadableService.Reloada
             }
         }
 
-        final LocatableBlock block = blockRayTraceResult.get().getSelectedObject();
+        final LocatableBlock block = blockRayTraceResult.get().selectedObject();
 
         // Get a safe location
         if (!Util.isLocationInWorldBorder(block.serverLocation())) {

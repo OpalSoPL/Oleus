@@ -28,7 +28,7 @@ public abstract class ClearInventoryEvent extends AbstractEvent implements Nucle
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 

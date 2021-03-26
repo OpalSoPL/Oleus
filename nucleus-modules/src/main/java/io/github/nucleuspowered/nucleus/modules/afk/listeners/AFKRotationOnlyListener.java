@@ -26,8 +26,8 @@ public class AFKRotationOnlyListener extends AbstractAFKListener implements List
 
     @Listener(order = Order.LAST)
     public void onPlayerMove(final RotateEntityEvent event, @Root final ServerPlayer player,
-            @Getter("getFromRotation") final Vector3d from,
-            @Getter("getToRotation") final Vector3d to) {
+            @Getter("fromRotation") final Vector3d from,
+            @Getter("toRotation") final Vector3d to) {
         if (!from.equals(to)) {
             this.update(player);
         }

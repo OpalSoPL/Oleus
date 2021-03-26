@@ -42,7 +42,7 @@ public class ShowAttributesCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer src = context.getIfPlayer();
-        final ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemStack = src.itemInHand(HandTypes.MAIN_HAND);
         if (itemStack.isEmpty()) {
             return context.errorResult("command.generalerror.handempty");
         }

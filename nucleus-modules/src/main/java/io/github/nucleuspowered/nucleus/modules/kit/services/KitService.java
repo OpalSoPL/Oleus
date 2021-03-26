@@ -127,7 +127,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
     @Override
     public Collection<ItemStack> getItemsForPlayer(final Kit kit, final UUID uuid) {
-        final ServerPlayer serverPlayer = this.getPlayer(uuid);
+        final ServerPlayer serverPlayer = this.player(uuid);
         final Collection<ItemStack> cis = kit.getStacks().stream().map(ItemStackSnapshot::createStack).collect(Collectors.toList());
         if (this.isProcessTokens) {
             this.processTokensInItemStacks(serverPlayer, cis);
@@ -136,7 +136,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         return cis;
     }
 
-    private ServerPlayer getPlayer(final UUID uuid) {
+    private ServerPlayer player(final UUID uuid) {
         return Sponge.server().player(uuid)
                 .orElseThrow(() -> new IllegalArgumentException("Player with supplied UUID is not online"));
     }
@@ -181,12 +181,12 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
     @Override
     public KitRedeemResult redeemKit(final Kit kit, final UUID player, final boolean performChecks) {
-        return this.redeemKit(kit, this.getPlayer(player), performChecks, performChecks, this.isMustGetAll, false);
+        return this.redeemKit(kit, this.player(player), performChecks, performChecks, this.isMustGetAll, false);
     }
 
     @Override
     public KitRedeemResult redeemKit(final Kit kit, final UUID player, final boolean performChecks, final boolean mustRedeemAll) {
-        return this.redeemKit(kit, this.getPlayer(player), performChecks, performChecks, mustRedeemAll, false);
+        return this.redeemKit(kit, this.player(player), performChecks, performChecks, mustRedeemAll, false);
     }
 
     public KitRedeemResult redeemKit(final Kit kit,

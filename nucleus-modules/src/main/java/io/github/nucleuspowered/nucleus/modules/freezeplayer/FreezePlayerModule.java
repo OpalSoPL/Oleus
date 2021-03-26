@@ -36,9 +36,8 @@ public final class FreezePlayerModule implements IModule {
         serviceCollection.placeholderService().registerToken(
                 "frozen",
                 PlaceholderParser.builder()
-                        .key(ResourceKey.of("nucleus", "frozen"))
-                        .addParser(p -> {
-                            if (p.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
+                        .parser(p -> {
+                            if (p.associatedObject().filter(x -> x instanceof ServerPlayer)
                                     .map(x -> service.isFrozen(((ServerPlayer) x).uniqueId()))
                                     .orElse(false)) {
                                 return FreezePlayerModule.FROZEN_TAG;

@@ -23,6 +23,7 @@ import org.spongepowered.api.adventure.SpongeComponents;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,7 @@ public class ListPowertoolCommand implements ICommandExecutor {
             final String powertool,
             final List<String> commands) {
 
-        final Optional<ItemType> oit = Sponge.registry().getCatalogRegistry().get(ItemType.class, ResourceKey.resolve(powertool));
+        final Optional<ItemType> oit = RegistryTypes.ITEM_TYPE.get().findValue(ResourceKey.resolve(powertool));
         final UUID uuid = src.uniqueId();
 
         // Create the click actions.

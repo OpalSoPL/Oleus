@@ -35,9 +35,9 @@ public class InterceptTeleportListener implements ListenerBase.Conditional {
     }
 
     @Listener(order = Order.LAST)
-    public void onTeleport(final MoveEntityEvent event, @Getter("getEntity") final ServerPlayer player) {
+    public void onTeleport(final MoveEntityEvent event, @Getter("entity") final ServerPlayer player) {
         final CommandCause cause = CommandCause.create();
-        final EventContext context = event.getCause().getContext();
+        final EventContext context = event.cause().context();
         if (!context.get(EventContexts.BYPASS_JAILING_RESTRICTION).orElse(false) &&
                 context.get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
             if (this.handler.isPlayerJailed(player.uniqueId())) {

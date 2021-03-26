@@ -22,7 +22,7 @@ public class BasicAFKListener extends AbstractAFKListener {
     }
 
     @Listener(order = Order.FIRST)
-    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer player) {
         this.update(player);
     }
 

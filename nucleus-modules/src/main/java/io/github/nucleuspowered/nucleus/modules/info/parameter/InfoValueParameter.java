@@ -40,7 +40,7 @@ public final class InfoValueParameter implements ValueParameter<InfoValueParamet
     }
 
     @Override
-    public Optional<? extends Result> getValue(final Parameter.Key<? super Result> parameterKey, final ArgumentReader.Mutable reader,
+    public Optional<? extends Result> parseValue(final Parameter.Key<? super Result> parameterKey, final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
 
         final String a = reader.parseString();

@@ -43,9 +43,9 @@ public class SetGamemodeWorldCommand implements ICommandExecutor {
         final ServerWorld worldProperties = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL)
                 .orElseThrow(() -> context.createException("command.world.player"));
 
-        worldProperties.getProperties().setGameMode(gamemodeInput);
+        worldProperties.properties().setGameMode(gamemodeInput);
         context.sendMessage("command.world.setgamemode.success",
-            worldProperties.getKey().asString(),
+            worldProperties.key().asString(),
             gamemodeInput.asComponent());
 
         return context.successResult();

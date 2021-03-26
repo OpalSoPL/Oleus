@@ -45,7 +45,7 @@ public class CloneWorldCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerWorld worldToCopy = context.requireOne(NucleusParameters.ONLINE_WORLD);
-        final ResourceKey oldName = worldToCopy.getKey();
+        final ResourceKey oldName = worldToCopy.key();
         final ResourceKey newName = ResourceKey.of(context.getServiceCollection().pluginContainer(), context.requireOne(this.newNameParameter));
         if (Sponge.server().worldManager().world(newName).isPresent()) {
             return context.errorResult("command.world.clone.alreadyexists", newName.asString());

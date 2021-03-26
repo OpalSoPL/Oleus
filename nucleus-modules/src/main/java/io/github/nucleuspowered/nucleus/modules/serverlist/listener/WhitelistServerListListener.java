@@ -37,8 +37,8 @@ public class WhitelistServerListListener implements IReloadableService.Reloadabl
     }
 
     @Listener(order = Order.LATE)
-    public void onServerListPing(final ClientPingServerEvent event, @Getter("getResponse") final ClientPingServerEvent.Response response) {
-        if (!Sponge.server().hasWhitelist()) {
+    public void onServerListPing(final ClientPingServerEvent event, @Getter("response") final ClientPingServerEvent.Response response) {
+        if (!Sponge.server().isWhitelistEnabled()) {
             return;
         }
 

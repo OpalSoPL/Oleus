@@ -36,16 +36,18 @@ public class BanInfoProvider implements NucleusProvider {
             // If we have a ban service, then check for a ban.
             final BanService obs = Sponge.server().serviceProvider().banService();
             final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
-            final Optional<Ban.Profile> bs = obs.getBanFor(user.getProfile());
+
+            // TODO: Async
+            final Optional<Ban.Profile> bs = obs.banFor(user.profile()).join();
             final Audience audience = source.audience();
             if (bs.isPresent()) {
 
                 // Lightweight checkban.
                 final Component m;
-                if (bs.get().getExpirationDate().isPresent()) {
+                if (bs.get().expirationDate().isPresent()) {
                     m = messageProviderService.getMessageFor(audience, "seen.isbanned.temp",
                             messageProviderService.getTimeString(audience,
-                                    Duration.between(Instant.now(), bs.get().getExpirationDate().get())));
+                                    Duration.between(Instant.now(), bs.get().expirationDate().get())));
                 } else {
                     m = messageProviderService.getMessageFor(audience, "seen.isbanned.perm");
                 }
@@ -58,7 +60,7 @@ public class BanInfoProvider implements NucleusProvider {
                             Component.newline(),
                             messageProviderService.getMessageFor(audience, "standard.reason",
                                 LegacyComponentSerializer.legacyAmpersand().serialize(
-                                        bs.get().getReason().orElseGet(() ->
+                                        bs.get().reason().orElseGet(() ->
                                                 messageProviderService.getMessageFor(audience,"standard.unknown"))))));
             }
 

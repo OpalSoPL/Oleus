@@ -27,6 +27,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.action.InteractEvent;
@@ -35,6 +36,7 @@ import org.spongepowered.api.event.command.ExecuteCommandEvent;
 import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
+import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.util.Nameable;
 import org.spongepowered.api.world.Location;
@@ -83,7 +85,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
      * @param event The event.
      */
     @Listener(order = Order.LATE)
-    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer serverPlayer) {
+    public void onPlayerJoin(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer serverPlayer) {
         final Optional<Jailing> jailing = this.handler.getPlayerJailData(serverPlayer.uniqueId());
         if (!jailing.filter(x -> x instanceof JailingEntry).isPresent()) {
             return;
@@ -97,18 +99,18 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     public void onRequestSent(final NucleusTeleportEvent.Request event, @Root final ServerPlayer cause, @Getter("getPlayer") final UUID player) {
         if (this.handler.isPlayerJailed(cause.uniqueId())) {
             event.setCancelled(true);
-            event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(), "jail.teleportcause.isjailed"));
+            event.setCancelMessage(this.messageProviderService.getMessageFor(cause.locale(), "jail.teleportcause.isjailed"));
         } else if (this.handler.isPlayerJailed(player)) {
             event.setCancelled(true);
             final String p = Sponge.server().player(player).map(Nameable::name).orElse("unknown");
-            event.setCancelMessage(this.messageProviderService.getMessageFor(cause.getLocale(),"jail.teleporttarget.isjailed", p));
+            event.setCancelMessage(this.messageProviderService.getMessageFor(cause.locale(),"jail.teleporttarget.isjailed", p));
         }
     }
 
     @Listener
     public void onAboutToTeleport(
             final NucleusTeleportEvent.AboutToTeleport event, @Root final ServerPlayer cause, @Getter("getPlayer") final UUID player) {
-        if (event.getCause().getContext().get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
+        if (event.cause().context().get(EventContexts.IS_JAILING_ACTION).orElse(false)) {
             if (this.handler.isPlayerJailed(player)) {
                 final String p = Sponge.server().player(player).map(Nameable::name).orElse("unknown");
                 if (!this.permissionService.hasPermission(cause, JailPermissions.JAIL_TELEPORTJAILED)) {
@@ -127,7 +129,7 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
     @Listener
     public void onCommand(final ExecuteCommandEvent.Pre event, @Root final ServerPlayer player) {
         // Only if the command is not in the control list.
-        if (this.handler.isPlayerJailed(player.uniqueId()) && this.allowedCommands.stream().noneMatch(x -> event.getCommand().equalsIgnoreCase(x))) {
+        if (this.handler.isPlayerJailed(player.uniqueId()) && this.allowedCommands.stream().noneMatch(x -> event.command().equalsIgnoreCase(x))) {
             event.setCancelled(true);
 
             // This is the easiest way to send the messages.
@@ -143,30 +145,32 @@ public class JailListener implements IReloadableService.Reloadable, ListenerBase
         }
     }
 
+    // TODO: split this to appropriate events
     @Listener
+    @Include(Cancellable.class)
     public void onInteract(final InteractEvent event, @Root final ServerPlayer player) {
-        if (this.handler.isPlayerJailed(player.uniqueId())) {
-            event.setCancelled(true);
+        if (this.handler.isPlayerJailed(player.uniqueId()) && event instanceof Cancellable) {
+            ((Cancellable) event).setCancelled(true);
             this.handler.notify(player);
         }
     }
 
     @Listener(order = Order.LAST)
-    public void onSpawn(final RespawnPlayerEvent.SelectWorld event, @Getter("getEntity") final ServerPlayer player) {
-        this.handler.getPlayerJail(player.uniqueId()).flatMap(NamedLocation::getLocation).map(Location::getWorld)
+    public void onSpawn(final RespawnPlayerEvent.SelectWorld event, @Getter("entity") final ServerPlayer player) {
+        this.handler.getPlayerJail(player.uniqueId()).flatMap(NamedLocation::getLocation).map(Location::world)
                 .ifPresent(event::setDestinationWorld);
     }
 
     @Listener(order = Order.LAST)
-    public void onSpawn(final RespawnPlayerEvent.Recreate event, @Getter("getEntity") final ServerPlayer player) {
+    public void onSpawn(final RespawnPlayerEvent.Recreate event, @Getter("entity") final ServerPlayer player) {
         this.handler.getPlayerJail(player.uniqueId()).flatMap(NamedLocation::getLocation)
-                .filter(x -> x.getWorld().equals(event.getDestinationWorld()))
+                .filter(x -> x.world().equals(event.destinationWorld()))
                 .map(Location::position)
                 .ifPresent(event::setDestinationPosition);
     }
 
     @Listener
-    public void onLogout(final ServerSideConnectionEvent.Disconnect event, @Getter("getPlayer") final ServerPlayer serverPlayer) {
+    public void onLogout(final ServerSideConnectionEvent.Disconnect event, @Getter("player") final ServerPlayer serverPlayer) {
         this.handler.clearCacheFor(serverPlayer.uniqueId());
     }
 

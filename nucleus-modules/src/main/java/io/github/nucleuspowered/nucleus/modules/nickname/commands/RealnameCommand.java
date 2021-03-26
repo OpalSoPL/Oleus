@@ -57,7 +57,7 @@ public class RealnameCommand implements ICommandExecutor {
             final List<Component> realNames = new ArrayList<>();
             for (final Map.Entry<Player, Component> entry : names.entrySet()) {
                 realNames.add(LinearComponents.linear(
-                        Component.text(entry.getKey().getName()),
+                        Component.text(entry.getKey().name()),
                         Component.text(" -> ", NamedTextColor.GRAY),
                         entry.getValue().color(NamedTextColor.WHITE)));
             }

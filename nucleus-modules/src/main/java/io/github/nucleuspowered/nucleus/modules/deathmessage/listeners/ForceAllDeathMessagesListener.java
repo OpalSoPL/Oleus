@@ -18,7 +18,7 @@ import org.spongepowered.api.event.filter.Getter;
 public class ForceAllDeathMessagesListener implements ListenerBase.Conditional {
 
     @Listener(order = Order.LATE)
-    public void onDeath(final DestructEntityEvent.Death event, @Getter("getEntity") final Living living) {
+    public void onDeath(final DestructEntityEvent.Death event, @Getter("entity") final Living living) {
         if (living instanceof Player) {
             event.setAudience(Sponge.server());
         }

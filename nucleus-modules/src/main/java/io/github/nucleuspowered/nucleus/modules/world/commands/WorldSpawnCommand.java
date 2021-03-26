@@ -30,8 +30,8 @@ public class WorldSpawnCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer serverPlayer = context.requirePlayer();
-        final WorldProperties properties = serverPlayer.getWorld().getProperties();
-        serverPlayer.setPosition(properties.getSpawnPosition().toDouble());
+        final WorldProperties properties = serverPlayer.world().properties();
+        serverPlayer.setPosition(properties.spawnPosition().toDouble());
         context.sendMessage("command.world.spawn.success");
         return context.successResult();
     }

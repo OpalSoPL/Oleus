@@ -15,6 +15,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandMo
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 @EssentialsEquivalent("more")
@@ -31,12 +32,12 @@ import org.spongepowered.api.item.inventory.ItemStack;
 public class MoreCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player player = context.getIfPlayer();
-        if (!player.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
-            final ItemStack stack = player.getItemInHand(HandTypes.MAIN_HAND);
-            stack.setQuantity(stack.getMaxStackQuantity());
+        final ServerPlayer player = context.getIfPlayer();
+        if (!player.itemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+            final ItemStack stack = player.itemInHand(HandTypes.MAIN_HAND);
+            stack.setQuantity(stack.maxStackQuantity());
             player.setItemInHand(HandTypes.MAIN_HAND, stack);
-            context.sendMessage("command.more.success", stack.type().asComponent(), stack.type().getMaxStackQuantity());
+            context.sendMessage("command.more.success", stack.type().asComponent(), stack.type().maxStackQuantity());
             return context.successResult();
         }
 

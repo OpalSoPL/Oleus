@@ -37,17 +37,17 @@ public class EnforceGamemodeListener implements ListenerBase.Conditional {
     }
 
     @Listener(order = Order.POST)
-    public void onPlayerLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onPlayerLogin(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer player) {
         Sponge.server().scheduler().submit(
-                Task.builder().execute(() -> this.enforce(player, player.getWorld())).plugin(this.pluginContainer).build()
+                Task.builder().execute(() -> this.enforce(player, player.world())).plugin(this.pluginContainer).build()
         );
     }
 
     @Listener(order = Order.POST)
     public void onPlayerTeleport(final ChangeEntityWorldEvent.Post event,
-            @Getter("getEntity") final ServerPlayer player,
-            @Getter("getOriginalWorld") final ServerWorld from,
-            @Getter("getDestinationWorld") final ServerWorld to) {
+            @Getter("entity") final ServerPlayer player,
+            @Getter("originalWorld") final ServerWorld from,
+            @Getter("destinationWorld") final ServerWorld to) {
         if (!from.equals(to)) {
             this.enforce(player, to);
         }
@@ -55,25 +55,25 @@ public class EnforceGamemodeListener implements ListenerBase.Conditional {
 
     @Listener(order = Order.POST)
     public void onPlayerTeleport(final RespawnPlayerEvent.Post event,
-            @Getter("getEntity") final ServerPlayer player,
-            @Getter("getOriginalWorld") final ServerWorld from,
-            @Getter("getDestinationWorld") final ServerWorld to) {
+            @Getter("entity") final ServerPlayer player,
+            @Getter("originalWorld") final ServerWorld from,
+            @Getter("destinationWorld") final ServerWorld to) {
         if (!from.equals(to)) {
             this.enforce(player, to);
         }
     }
 
     private void enforce(final ServerPlayer player, final ServerWorld world) {
-        if (world.getProperties().getGameMode() == GameModes.NOT_SET.get()) {
+        if (world.properties().gameMode() == GameModes.NOT_SET.get()) {
             return;
         }
 
-        final Set<Context> contextSet = new HashSet<>(player.getActiveContexts());
+        final Set<Context> contextSet = new HashSet<>(player.activeContexts());
         contextSet.removeIf(x -> x.getKey().equals(Context.WORLD_KEY));
-        contextSet.add(new Context(Context.WORLD_KEY, world.getKey().asString()));
+        contextSet.add(new Context(Context.WORLD_KEY, world.key().asString()));
         if (!player.hasPermission(contextSet, WorldPermissions.WORLD_FORCE_GAMEMODE_OVERRIDE)) {
             // set their gamemode accordingly.
-            player.offer(Keys.GAME_MODE, world.getProperties().getGameMode());
+            player.offer(Keys.GAME_MODE, world.properties().gameMode());
         }
     }
 

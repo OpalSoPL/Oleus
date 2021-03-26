@@ -46,7 +46,7 @@ public class NoteListener implements ListenerBase.Conditional {
      * @param player The {@link Player} that has just logged in.
      */
     @Listener
-    public void onPlayerLogin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+    public void onPlayerLogin(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer player) {
         this.noteHandler.getNotes(player.uniqueId()).thenAccept(notes -> {
             if (notes != null && !notes.isEmpty()) {
                 final Audience audience = this.permissionService.permissionMessageChannel(NotePermissions.NOTE_SHOWONLOGIN);

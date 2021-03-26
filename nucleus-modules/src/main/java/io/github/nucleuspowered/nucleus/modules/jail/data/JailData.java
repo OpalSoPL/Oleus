@@ -64,9 +64,9 @@ public final class JailData {
 
         if (previousLocation != null) {
             this.worldKey = previousLocation.worldKey();
-            this.previousx = previousLocation.getX();
-            this.previousy = previousLocation.getY();
-            this.previousz = previousLocation.getZ();
+            this.previousx = previousLocation.x();
+            this.previousy = previousLocation.y();
+            this.previousz = previousLocation.z();
         }
         this.creationTime = creationTime == null ? Instant.now().getEpochSecond() : creationTime.getEpochSecond();
         this.absoluteTime = absoluteTime == null ? null : absoluteTime.getEpochSecond();

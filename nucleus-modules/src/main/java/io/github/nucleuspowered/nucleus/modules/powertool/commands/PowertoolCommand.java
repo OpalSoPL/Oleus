@@ -46,7 +46,7 @@ public class PowertoolCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer src = context.requirePlayer();
-        final ItemStack itemStack = src.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemStack = src.itemInHand(HandTypes.MAIN_HAND);
         if (itemStack.isEmpty()) {
             return context.errorResult("command.powertool.noitem");
         }
@@ -63,8 +63,7 @@ public class PowertoolCommand implements ICommandExecutor {
         if (cmds.isPresent() && !cmds.get().isEmpty()) {
             Util.getPaginationBuilder(context.audience())
                     .contents(cmds.get().stream().map(f -> Component.text(f, NamedTextColor.YELLOW)).collect(Collectors.toList()))
-                    .title(context.getMessage("command.powertool.viewcmdstitle", item.type().asComponent(),
-                            Component.text(item.type().getKey().asString())))
+                    .title(context.getMessage("command.powertool.viewcmdstitle", item.type().asComponent(), item.type().asComponent()))
                     .sendTo(context.audience());
         } else {
             src.sendMessage(context.getMessage("command.powertool.nocmds", item.type().asComponent()));

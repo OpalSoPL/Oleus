@@ -39,16 +39,16 @@ public class UnstuckCommand implements ICommandExecutor, IReloadableService.Relo
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get the player location, find a safe location. Prevent players trying this to get out of sticky situations, height and width is 1.
         final ServerPlayer src = context.requirePlayer();
-        final ServerLocation location = Sponge.server().getTeleportHelper().getSafeLocation(src.serverLocation(), this.height, this.radius)
+        final ServerLocation location = Sponge.server().teleportHelper().findSafeLocation(src.serverLocation(), this.height, this.radius)
             .orElseThrow(() -> context.createException("command.unstuck.nolocation"));
-        if (location.getBlockPosition().equals(src.getLocation().getBlockPosition())) {
+        if (location.blockPosition().equals(src.location().blockPosition())) {
             return context.errorResult("command.unstuck.notneeded");
         }
 
         if (context.getServiceCollection().teleportService().teleportPlayer(
                 src,
                 location,
-                src.getRotation(),
+                src.rotation(),
                 false,
                 TeleportScanners.NO_SCAN.get(),
                 TeleportHelperFilters.DEFAULT.get()).isSuccessful()) {

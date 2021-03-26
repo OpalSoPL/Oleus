@@ -49,8 +49,9 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final GameProfile profile = context.requireOne(NucleusParameters.GAME_PROFILE);
         final BanService service = Sponge.server().serviceProvider().banService();
-        
-        final Optional<Ban.Profile> obp = service.getBanFor(profile);
+
+        // TODO: Async
+        final Optional<Ban.Profile> obp = service.banFor(profile).join();
         if (!obp.isPresent()) {
             return context.errorResult(
                     "command.checkban.notset", Util.getNameOrUnkown(context, profile));
@@ -72,7 +73,7 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
                 context.audience(),
                 context.getServiceCollection().permissionService().permissionMessageChannel(BanPermissions.BAN_NOTIFY)
         );
-        send.sendMessage(context.getMessage("command.unban.success", Util.getNameOrUnkown(context, obp.get().getProfile()), context.getName()));
+        send.sendMessage(context.getMessage("command.unban.success", Util.getNameOrUnkown(context, obp.get().profile()), context.getName()));
         return context.successResult();
     }
 

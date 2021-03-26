@@ -19,6 +19,8 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.util.MinecraftDayTime;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.Optional;
@@ -55,15 +57,15 @@ public class AddTimeCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) {
-        final Optional<WorldProperties> pr = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey());
+        final Optional<ServerWorld> pr = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.key());
         if (!pr.isPresent()) {
             return context.errorResult("command.world.player");
         }
 
-        final WorldProperties worldProperties = pr.get();
-        final MinecraftDayTime dayTime = context.requireOne(this.timeParameter.getKey());
-        worldProperties.setDayTime(worldProperties.getGameTime().add(dayTime.asTicks()));
-        context.sendMessage("command.settime.done2", worldProperties.getKey().asString(),
+        final ServerWorldProperties worldProperties = pr.get().properties();
+        final MinecraftDayTime dayTime = context.requireOne(this.timeParameter.key());
+        worldProperties.setDayTime(worldProperties.gameTime().add(dayTime.asTicks()));
+        context.sendMessage("command.settime.done2", worldProperties.key().asString(),
                 Util.getTimeFromDayTime(context.getServiceCollection().messageProvider(), dayTime));
         return context.successResult();
     }

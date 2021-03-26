@@ -27,7 +27,7 @@ public class DeletePowertoolCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer player = context.requirePlayer();
-        final ItemStack itemStack = player.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemStack = player.itemInHand(HandTypes.MAIN_HAND);
         if (itemStack.isEmpty()) {
             return context.errorResult("command.powertool.noitem");
         }

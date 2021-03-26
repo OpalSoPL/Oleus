@@ -47,7 +47,7 @@ public class JumpCommand implements ICommandExecutor, IReloadableService.Reloada
         final ServerPlayer player = context.requirePlayer();
         final Optional<RayTraceResult<LocatableBlock>> blockRayTraceResult = RayTrace.block()
                 .sourceEyePosition(player)
-                .direction(player.getDirection())
+                .direction(player.direction())
                 .limit(this.maxJump)
                 .select(RayTrace.nonAir())
                 .continueWhileBlock(RayTrace.onlyAir())
@@ -58,7 +58,7 @@ public class JumpCommand implements ICommandExecutor, IReloadableService.Reloada
             return context.errorResult("command.jump.noblock");
         }
 
-        final LocatableBlock block = blockRayTraceResult.get().getSelectedObject();
+        final LocatableBlock block = blockRayTraceResult.get().selectedObject();
         final ServerLocation targetLocation;
         if (RayTrace.onlyAir().test(block.serverLocation().add(0, 1, 0).asLocatableBlock()) &&
                         RayTrace.onlyAir().test(block.serverLocation().add(0, 2, 0).asLocatableBlock())) {

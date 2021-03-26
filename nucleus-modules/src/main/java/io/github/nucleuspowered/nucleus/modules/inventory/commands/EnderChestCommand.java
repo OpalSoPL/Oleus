@@ -89,15 +89,15 @@ public class EnderChestCommand implements ICommandExecutor {
         if (!either.fold(context::is, context::is)) {
             final Subject subject = either.fold(Function.identity(), Function.identity());
             if (context.testPermissionFor(subject, InventoryPermissions.ENDERCHEST_EXEMPT_INSPECT)) {
-                return context.errorResult("command.enderchest.targetexempt", either.fold(Function.identity(), Function.identity()).getName());
+                return context.errorResult("command.enderchest.targetexempt", either.fold(Function.identity(), Function.identity()).name());
             }
 
-            final Inventory ec = either.fold(ServerPlayer::getEnderChestInventory, User::getEnderChestInventory);
+            final Inventory ec = either.fold(ServerPlayer::enderChestInventory, User::enderChestInventory);
             if (!context.testPermission(InventoryPermissions.ENDERCHEST_MODIFY)
                     || context.testPermissionFor(subject, InventoryPermissions.ENDERCHEST_EXEMPT_MODIFY)) {
                 final UUID uuid = UUID.randomUUID();
                 final InventoryMenu menu =
-                        ViewableInventory.builder().type(ContainerTypes.GENERIC_9x5).slots(ec.slots(), 0).completeStructure()
+                        ViewableInventory.builder().type(ContainerTypes.GENERIC_9X5).slots(ec.slots(), 0).completeStructure()
                                 .identity(uuid).build().asMenu();
                 menu.setReadOnly(true);
                 return menu.open(currentPlayer)
@@ -109,7 +109,7 @@ public class EnderChestCommand implements ICommandExecutor {
                         .orElseGet(() -> context.errorResult("command.invsee.failed"));
             }
         } else {
-            return context.requirePlayer().openInventory(currentPlayer.getEnderChestInventory())
+            return context.requirePlayer().openInventory(currentPlayer.enderChestInventory())
                     .map(x -> context.successResult())
                     .orElseGet(() -> context.errorResult("command.invsee.failed"));
         }

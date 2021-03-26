@@ -143,13 +143,8 @@ public class ListWarpCommand implements ICommandExecutor, IReloadableService.Rel
 
     private TextComponent createWarp(@Nullable final Warp data, final String name, final boolean econExists, final double defaultCost,
             final ICommandContext context) {
-        if (data == null || !data.getWorld().map(WorldProperties::isEnabled).orElse(false)) {
-            return Component.text().content(name).color(NamedTextColor.RED)
-                    .hoverEvent(HoverEvent.showText(
-                            context.getMessage("command.warps.unavailable"))).build();
-        }
 
-        final String pos = data.getLocation().map(Location::getBlockPosition).orElseGet(() -> data.position().toInt()).toString();
+        final String pos = data.getLocation().map(Location::blockPosition).orElseGet(() -> data.getPosition().toInt()).toString();
         final String worldName = data.getResourceKey().asString();
 
         final TextComponent.Builder inner = Component.text().content(name).color(NamedTextColor.GREEN).style(Style.style(TextDecoration.ITALIC))

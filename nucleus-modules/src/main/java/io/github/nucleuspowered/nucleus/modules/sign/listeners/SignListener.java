@@ -31,7 +31,7 @@ public class SignListener implements ListenerBase {
     @Listener(order = Order.EARLY)
     public void onPlayerChangeSign(final ChangeSignEvent event, @Root final ServerPlayer player) {
         if (this.permissionService.hasPermission(player, SignPermissions.SIGN_FORMATTING)) {
-            final ListValue.Mutable<Component> signText = event.getText();
+            final ListValue.Mutable<Component> signText = event.text();
             for (int i = 0; i < signText.size(); i++) {
                 signText.set(i, LegacyComponentSerializer.legacyAmpersand().deserialize(
                         PlainComponentSerializer.plain().serialize(signText.get(i))));

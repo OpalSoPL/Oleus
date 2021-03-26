@@ -44,7 +44,7 @@ public class InfoListener implements IReloadableService.Reloadable, ListenerBase
     private int delay = 500;
 
     @Listener
-    public void playerJoin(final ServerSideConnectionEvent.Join event, @Getter("getPlayer") final ServerPlayer player) {
+    public void playerJoin(final ServerSideConnectionEvent.Join event, @Getter("player") final ServerPlayer player) {
         // Send message one second later on the Async thread.
         Sponge.asyncScheduler().createExecutor(this.pluginContainer).schedule(() -> {
                 if (this.permissionService.hasPermission(player, InfoPermissions.MOTD_JOIN)) {

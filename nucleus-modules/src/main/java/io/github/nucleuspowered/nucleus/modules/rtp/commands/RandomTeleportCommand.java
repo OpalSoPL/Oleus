@@ -84,7 +84,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer player = context.getPlayerFromArgs();
         synchronized (this.cachedTasks) {
-            this.cachedTasks.keySet().removeIf(task -> !Sponge.server().scheduler().getTaskById(task.uniqueId()).isPresent());
+            this.cachedTasks.keySet().removeIf(task -> !Sponge.server().scheduler().taskById(task.uniqueId()).isPresent());
             if (this.cachedTasks.containsValue(player.uniqueId())) {
                 return context.errorResult("command.rtp.inprogress", player.name());
             }
@@ -95,11 +95,11 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
         if (this.rc.getDefaultWorld().isPresent()) {
             wp = context.getOne(NucleusParameters.ONLINE_WORLD_OPTIONAL).orElseGet(() -> this.rc.getDefaultWorld().get());
         } else {
-            wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey()).get();
+            wp = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.key()).get();
         }
 
         if (this.rc.isPerWorldPermissions()) {
-            final String name = wp.getKey().asString();
+            final String name = wp.key().asString();
             if (!context.testPermission(RTPPermissions.RTP_WORLDS + "." + name.toLowerCase())) {
                 return context.errorResult("command.rtp.worldnoperm", name);
             }
@@ -107,7 +107,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
 
         context.sendMessage("command.rtp.searching");
 
-        final RTPOptions options = new RTPOptions(this.rc, wp.getKey().asString());
+        final RTPOptions options = new RTPOptions(this.rc, wp.key().asString());
         final RTPTask rtask = new RTPTask(
                 context.getServiceCollection().pluginContainer(),
                 wp,
@@ -180,7 +180,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
             }
 
             try (final Timing dummy = RandomTeleportCommand.this.timings.startTiming()) {
-                this.logger.debug(String.format("RTP of %s, attempt %s of %s", serverPlayer.getName(), this.maxCount - this.count, this.maxCount));
+                this.logger.debug(String.format("RTP of %s, attempt %s of %s", serverPlayer.name(), this.maxCount - this.count, this.maxCount));
 
                 int counter = 0;
                 while (++counter <= 10) {
@@ -198,24 +198,24 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
                             }
 
                             this.source.getServiceCollection().logger().debug(String.format("RTP of %s, found location %s, %s, %s",
-                                    serverPlayer.getName(),
-                                    targetLocation.getBlockX(),
-                                    targetLocation.getBlockY(),
-                                    targetLocation.getBlockZ()));
+                                    serverPlayer.name(),
+                                    targetLocation.blockX(),
+                                    targetLocation.blockY(),
+                                    targetLocation.blockZ()));
                             if (serverPlayer.setLocation(targetLocation)) {
                                 if (!this.isSelf) {
                                     this.source.sendMessageTo(serverPlayer, "command.rtp.other");
                                     this.source.sendMessage("command.rtp.successother",
-                                            serverPlayer.getName(),
-                                            targetLocation.getBlockX(),
-                                            targetLocation.getBlockY(),
-                                            targetLocation.getBlockZ());
+                                            serverPlayer.name(),
+                                            targetLocation.blockX(),
+                                            targetLocation.blockY(),
+                                            targetLocation.blockZ());
                                 }
 
                                 this.source.sendMessageTo(serverPlayer, "command.rtp.success",
-                                        targetLocation.getBlockX(),
-                                        targetLocation.getBlockY(),
-                                        targetLocation.getBlockZ());
+                                        targetLocation.blockX(),
+                                        targetLocation.blockY(),
+                                        targetLocation.blockZ());
                                 if (this.isSelf) {
                                     this.source.getServiceCollection()
                                             .cooldownService()
@@ -232,12 +232,11 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
                                         RandomTeleportCommand.this.cachedTasks.remove(task);
                                     }
                                 }
-                                return;
                             } else {
                                 this.source.sendMessage("command.rtp.cancelled");
                                 this.onCancel();
-                                return;
                             }
+                            return;
                         }
                     } catch (final PositionOutOfBoundsException ignore) {
                         // treat as fail.
@@ -252,7 +251,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
             synchronized (RandomTeleportCommand.this.cachedTasks) {
                 if (this.count <= 0) {
                     this.source.getServiceCollection().logger()
-                            .debug(String.format("RTP of %s was unsuccessful", serverPlayer.getName()));
+                            .debug(String.format("RTP of %s was unsuccessful", serverPlayer.name()));
                     this.source.sendMessage("command.rtp.error");
                     this.onCancel();
                 } else {

@@ -42,7 +42,7 @@ public class SetJailCommand implements ICommandExecutor {
         }
 
         final ServerPlayer src = context.getIfPlayer();
-        if (handler.setJail(name, src.serverLocation(), src.getRotation()).isPresent()) {
+        if (handler.setJail(name, src.serverLocation(), src.rotation()).isPresent()) {
             context.sendMessage("command.jails.set.success", name);
             return context.successResult();
         } else {

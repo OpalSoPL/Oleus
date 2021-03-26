@@ -7,7 +7,7 @@ package io.github.nucleuspowered.nucleus.modules.world.commands.properties;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
 import io.github.nucleuspowered.nucleus.modules.world.commands.WorldCommand;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 
 @Command(
         aliases = {"setloadonstartup"},
@@ -21,7 +21,8 @@ public class SetLoadOnStartup extends AbstractPropertiesSetCommand {
         super("load on startup");
     }
 
-    @Override protected void setter(final WorldProperties worldProperties, final boolean set) {
+    @Override
+    protected void setter(final ServerWorldProperties worldProperties, final boolean set) {
         worldProperties.setLoadOnStartup(set);
     }
 }

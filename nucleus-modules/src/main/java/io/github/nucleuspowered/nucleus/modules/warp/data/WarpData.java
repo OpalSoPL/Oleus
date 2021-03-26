@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.server.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -61,8 +62,8 @@ public class WarpData implements Warp {
     }
 
     @Override
-    public Optional<WorldProperties> getWorld() {
-        return Sponge.server().worldManager().getProperties(this.worldKey);
+    public Optional<ServerWorld> getWorld() {
+        return Sponge.server().worldManager().world(this.worldKey);
     }
 
     @Override
@@ -71,13 +72,13 @@ public class WarpData implements Warp {
     }
 
     @Override
-    public Vector3d position() {
+    public Vector3d getPosition() {
         return this.position;
     }
 
     @Override
     public Optional<ServerLocation> getLocation() {
-        return Sponge.server().worldManager().getWorld(this.worldKey).map(x -> ServerLocation.of(x, this.position));
+        return Sponge.server().worldManager().world(this.worldKey).map(x -> ServerLocation.of(x, this.position));
     }
 
     @Override

@@ -18,6 +18,7 @@ import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 @Command(
@@ -44,12 +45,12 @@ public class ItemNameSetCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player src = context.getIfPlayer();
-        if (src.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+        final ServerPlayer src = context.getIfPlayer();
+        if (src.itemInHand(HandTypes.MAIN_HAND).isEmpty()) {
             return context.errorResult("command.itemname.set.noitem");
         }
 
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack stack = src.itemInHand(HandTypes.MAIN_HAND);
         final Component name = context.requireOne(this.parameter);
 
         if (stack.offer(Keys.CUSTOM_NAME, name).isSuccessful()) {

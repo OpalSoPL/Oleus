@@ -4,9 +4,12 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mob;
 
+import io.github.nucleuspowered.nucleus.core.Registry;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.annotation.PermissionMetadata;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.data.SuggestedLevel;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.registry.RegistryTypes;
 
 public final class MobPermissions {
     private MobPermissions() {
@@ -32,7 +35,8 @@ public final class MobPermissions {
     public static final String OTHERS_SPAWNMOB = "nucleus.spawnmob.others";
 
     public static String getSpawnMobPermissionFor(final EntityType<?> entityType) {
-        return SPAWNMOB_MOB + "." + entityType.getKey().asString().toLowerCase().replace(":", ".");
+        return SPAWNMOB_MOB + "." + RegistryTypes.ENTITY_TYPE.get().findValueKey(entityType).map(ResourceKey::asString).orElse("unknown")
+                .toLowerCase().replace(":", ".");
     }
 
 }

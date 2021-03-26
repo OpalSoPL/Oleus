@@ -31,7 +31,7 @@ abstract class LoreSetBaseCommand implements ICommandExecutor {
 
     ICommandResult setLore(final ICommandContext context, final boolean replace) throws CommandException {
         final Player src = context.getIfPlayer();
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack stack = src.itemInHand(HandTypes.MAIN_HAND);
         if (stack.isEmpty()) {
             return context.errorResult("command.lore.set.noitem");
         }

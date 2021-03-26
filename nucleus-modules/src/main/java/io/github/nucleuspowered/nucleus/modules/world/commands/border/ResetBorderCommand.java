@@ -39,15 +39,15 @@ public class ResetBorderCommand implements ICommandExecutor {
         final ServerWorld world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL)
                 .orElseThrow(() -> context.createException("command.world.player"));
 
-        final WorldBorder worldBorder = world.getProperties().worldBorder();
+        final WorldBorder worldBorder = world.properties().worldBorder();
         worldBorder.setCenter(0, 0);
 
         // +1 includes the final block (1 -> -1 would otherwise give 2, not 3).
-        final long diameter = Math.abs(world.getBlockMax().getX() - world.getBlockMin().getX()) + 1;
+        final long diameter = Math.abs(world.blockMax().getX() - world.blockMin().getX()) + 1;
         worldBorder.setDiameter(diameter);
 
         context.sendMessage("command.world.setborder.set",
-                world.getKey().asString(),
+                world.key().asString(),
                 "0",
                 "0",
                 String.valueOf(diameter));

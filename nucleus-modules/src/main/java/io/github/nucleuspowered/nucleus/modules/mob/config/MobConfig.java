@@ -45,7 +45,7 @@ public class MobConfig {
     }
 
     public Optional<BlockSpawnsConfig> getBlockSpawnsConfigForWorld(final ServerWorld world) {
-        return Optional.ofNullable(this.blockSpawnsConfig.get(world.getKey().asString()));
+        return Optional.ofNullable(this.blockSpawnsConfig.get(world.key().asString()));
     }
 
     public boolean isPerMobPermission() {

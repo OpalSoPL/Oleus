@@ -5,6 +5,10 @@
 package io.github.nucleuspowered.nucleus.modules.world.commands;
 
 import net.kyori.adventure.text.Component;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.math.vector.Vector3i;
 import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.modules.world.WorldPermissions;
@@ -33,56 +37,50 @@ import java.util.List;
 public class ListWorldCommand implements ICommandExecutor {
 
     static void getWorldInfo(
-            final ICommandContext context, final List<Component> listContent, final WorldProperties x, final boolean canSeeSeeds) {
+            final ICommandContext context, final List<Component> listContent, final ServerWorld world, final boolean canSeeSeeds) {
         // Name of world
         if (!listContent.isEmpty()) {
             listContent.add(Component.space());
         }
 
-        listContent.add(context.getMessage("command.world.list.worlditem", x.getKey().asString()));
+        final ServerWorldProperties properties = world.properties();
+        listContent.add(context.getMessage("command.world.list.worlditem", world.key().asString()));
 
         // As requested by Pixelmon for use in their config.
         // x.getAdditionalProperties().getInt(DataQuery.of("SpongeData", "dimensionId")).ifPresent(i ->
         //    listContent.add(context.getMessage("command.world.list.dimensionid", String.valueOf(i))));
-        final Vector3i spawnPosition = x.getSpawnPosition();
+        final Vector3i spawnPosition = properties.spawnPosition();
         listContent.add(context.getMessage("command.world.list.spawnpoint",
                 String.valueOf(spawnPosition.getX()), String.valueOf(spawnPosition.getY()), String.valueOf(spawnPosition.getZ())));
 
-        listContent.add(context.getMessage("command.world.list.uuid", x.uniqueId().toString()));
-        if (x.isEnabled()) {
-            final boolean worldLoaded = Sponge.server().worldManager().getWorld(x.getKey()).isPresent();
-            final String message =
-                (worldLoaded ? "&a" : "&c") + context.getMessageString(worldLoaded ? "standard.true" : "standard.false");
-            listContent.add(context.getMessage("command.world.list.enabled", message));
-        } else {
-            listContent.add(context.getMessage("command.world.list.disabled"));
-        }
+        listContent.add(context.getMessage("command.world.list.uuid", world.uniqueId().toString()));
 
         if (canSeeSeeds) {
-            listContent.add(context.getMessage("command.world.list.seed", String.valueOf(x.getSeed())));
+            listContent.add(context.getMessage("command.world.list.seed", String.valueOf(world.seed())));
         }
 
         listContent.add(context.getMessage("command.world.list.params",
-            x.getDimensionType().getKey().asString(),
-            x.getGeneratorModifierType().getKey().asString(),
-            x.getGameMode().getKey().asString(),
-            x.getDifficulty().asComponent()));
+            world.worldType().findKey(RegistryTypes.WORLD_TYPE).map(ResourceKey::asString).orElse("custom"),
+            "-",
+            properties.gameMode().asComponent(),
+            properties.difficulty().asComponent()));
 
         listContent.add(context.getMessage("command.world.list.params2",
-            String.valueOf(x.isHardcore()),
-            String.valueOf(x.doesLoadOnStartup()),
-            String.valueOf(x.isPVPEnabled()),
-            String.valueOf(x.doesKeepSpawnLoaded())
+            String.valueOf(properties.hardcore()),
+            String.valueOf(properties.loadOnStartup()),
+            String.valueOf(properties.pvp()),
+            "-"
         ));
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    public ICommandResult execute(final ICommandContext context) throws CommandException {
         // Get all the worlds
-        final Collection<WorldProperties> cwp = Sponge.server().worldManager().getAllProperties();
+        final Collection<ServerWorld> cwp = Sponge.server().worldManager().worlds();
         final List<Component> listContent = new ArrayList<>();
 
         final boolean canSeeSeeds = context.testPermission(WorldPermissions.WORLD_SEED);
-        cwp.stream().sorted(Comparator.comparing(x -> x.getKey().asString()))
+        cwp.stream().sorted(Comparator.comparing(x -> x.key().asString()))
                 .forEach(x -> getWorldInfo(context, listContent, x, canSeeSeeds));
 
         Util.getPaginationBuilder(context.audience())

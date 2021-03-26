@@ -33,7 +33,8 @@ public class JailParameter implements ValueParameter<Jail> {
     }
 
     @Override
-    public Optional<? extends Jail> getValue(final Parameter.Key<? super Jail> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
+    public Optional<? extends Jail> parseValue(final Parameter.Key<? super Jail> parameterKey, final ArgumentReader.Mutable reader,
+            final CommandContext.Builder context)
             throws ArgumentParseException {
         final String r = reader.parseString();
         final Optional<Jail> jail = this.handler.getJail(r);

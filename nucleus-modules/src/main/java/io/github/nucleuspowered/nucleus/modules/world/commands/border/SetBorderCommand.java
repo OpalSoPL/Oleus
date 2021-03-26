@@ -62,29 +62,29 @@ public class SetBorderCommand implements ICommandExecutor {
                 x = context.requireOne(this.xParam);
                 z = context.requireOne(this.zParam);
             } else {
-                x = lw.getBlockX();
-                z = lw.getBlockZ();
+                x = lw.blockX();
+                z = lw.blockZ();
             }
         } else {
             x = context.requireOne(this.xParam);
             z = context.requireOne(this.zParam);
         }
 
-        final WorldBorder border = wp.getProperties().worldBorder();
+        final WorldBorder border = wp.properties().worldBorder();
         // Now, if we have an x and a z key, get the centre from that.
         border.setCenter(x, z);
 
         if (delay == Duration.ZERO) {
             border.setDiameter(dia);
             context.sendMessage("command.world.setborder.set",
-                    wp.getKey().asString(),
+                    wp.key().asString(),
                     String.valueOf(x),
                     String.valueOf(z),
                     String.valueOf(dia));
         } else {
             border.setDiameter(dia, delay);
             context.sendMessage("command.world.setborder.setdelay",
-                    wp.getKey().asString(),
+                    wp.key().asString(),
                     String.valueOf(x),
                     String.valueOf(z),
                     String.valueOf(dia),

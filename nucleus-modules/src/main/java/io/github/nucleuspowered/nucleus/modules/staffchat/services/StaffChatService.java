@@ -42,7 +42,7 @@ public class StaffChatService implements NucleusStaffChatService, ServiceBase {
 
     @Override
     public boolean isDirectedToStaffChat(final MessageChannelEvent event) {
-        final Object root = event.getCause().root();
+        final Object root = event.cause().root();
         if (root instanceof Audience) {
             return this.isCurrentlyChattingInStaffChat((Audience) root);
         }

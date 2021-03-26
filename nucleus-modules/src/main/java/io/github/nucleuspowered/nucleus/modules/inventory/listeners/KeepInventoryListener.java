@@ -13,6 +13,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.event.filter.Getter;
 
 public final class KeepInventoryListener implements ListenerBase {
 
@@ -24,11 +25,9 @@ public final class KeepInventoryListener implements ListenerBase {
     }
 
     @Listener
-    public void onEntityDeath(final DestructEntityEvent.Death event) {
-        if (event.getEntity() instanceof ServerPlayer) {
-            if (this.permissionService.hasPermission((ServerPlayer) event.getEntity(), InventoryPermissions.INVENTORY_KEEP)) {
-                event.setKeepInventory(true);
-            }
+    public void onEntityDeath(final DestructEntityEvent.Death event, @Getter("entity") final ServerPlayer player) {
+        if (this.permissionService.hasPermission(player, InventoryPermissions.INVENTORY_KEEP)) {
+            event.setKeepInventory(true);
         }
     }
 

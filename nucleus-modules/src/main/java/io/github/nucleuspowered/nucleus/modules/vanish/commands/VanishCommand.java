@@ -44,8 +44,8 @@ public class VanishCommand implements ICommandExecutor {
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User ou = context.getUserFromArgs();
-        if (ou.getPlayer().isPresent()) {
-            return this.onPlayer(context, ou.getPlayer().get());
+        if (ou.player().isPresent()) {
+            return this.onPlayer(context, ou.player().get());
         }
 
         if (!context.testPermissionFor(ou, "persist")) {
@@ -86,9 +86,9 @@ public class VanishCommand implements ICommandExecutor {
         final boolean toVanish = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElse(!playerToVanish.get(Keys.VANISH).orElse(false));
         final VanishService service = context.getServiceCollection().getServiceUnchecked(VanishService.class);
         if (toVanish) {
-            service.vanishPlayer(playerToVanish.getUser());
+            service.vanishPlayer(playerToVanish.user());
         } else {
-            service.unvanishPlayer(playerToVanish.getUser());
+            service.unvanishPlayer(playerToVanish.user());
         }
 
         context.sendMessageTo(

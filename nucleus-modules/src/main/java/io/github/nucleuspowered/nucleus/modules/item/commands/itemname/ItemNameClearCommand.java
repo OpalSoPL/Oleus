@@ -16,6 +16,7 @@ import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
@@ -35,12 +36,12 @@ public class ItemNameClearCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final Player src = context.getIfPlayer();
-        if (src.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+        final ServerPlayer src = context.getIfPlayer();
+        if (src.itemInHand(HandTypes.MAIN_HAND).isEmpty()) {
             return context.errorResult("command.itemname.clear.noitem");
         }
 
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack stack = src.itemInHand(HandTypes.MAIN_HAND);
         final Optional<Component> data = stack.get(Keys.CUSTOM_NAME);
 
         if (!data.isPresent()) {

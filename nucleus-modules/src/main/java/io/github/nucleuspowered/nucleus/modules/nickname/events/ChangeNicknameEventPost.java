@@ -42,7 +42,7 @@ public class ChangeNicknameEventPost extends AbstractEvent implements NucleusCha
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 }

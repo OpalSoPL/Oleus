@@ -48,7 +48,8 @@ public class UnloadWorldCommand implements ICommandExecutor {
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerWorld world = context.requireOne(NucleusParameters.ONLINE_WORLD);
         final Optional<ServerWorld> transferWorld = context.getOne(NucleusParameters.ONLINE_WORLD);
-        final List<Player> playerCollection = Sponge.server().onlinePlayers().stream().filter(x -> x.getWorld().equals(world)).collect(Collectors.toList());
+        final List<Player> playerCollection =
+                Sponge.server().onlinePlayers().stream().filter(x -> x.world().key().equals(world.key())).collect(Collectors.toList());
 
         transferWorld.ifPresent(serverWorld -> playerCollection.forEach(x -> x.transferToWorld(serverWorld)));
 
@@ -56,13 +57,13 @@ public class UnloadWorldCommand implements ICommandExecutor {
     }
 
     private static ICommandResult unloadWorld(final ICommandContext context, final ServerWorld world) {
-        context.sendMessage("command.world.unload.start", world.getKey().asString());
+        context.sendMessage("command.world.unload.start", world.key().asString());
         Sponge.server().worldManager().unloadWorld(world).handle((result, exception) -> {
             context.getServiceCollection().schedulerService().runOnMainThread(() -> {
                 if (exception == null && result) {
-                    context.sendMessage("command.world.unload.success", world.getKey().asString());
+                    context.sendMessage("command.world.unload.success", world.key().asString());
                 } else {
-                    context.sendMessage("command.world.unload.failed", world.getKey().asString());
+                    context.sendMessage("command.world.unload.failed", world.key().asString());
                 }
             });
             return null;

@@ -41,19 +41,19 @@ public class WorldListener implements ListenerBase.Conditional {
     }
 
     @Listener(order = Order.LAST)
-    public void onPlayerTeleport(final ChangeEntityWorldEvent.Pre event, @Getter("getEntity") final ServerPlayer player) {
-        final ServerWorld target = event.getOriginalWorld();
-        if (player.getWorld().equals(target)) {
+    public void onPlayerTeleport(final ChangeEntityWorldEvent.Pre event, @Getter("entity") final ServerPlayer player) {
+        final ServerWorld target = event.originalWorld();
+        if (player.world().equals(target)) {
             // I mean, this is a change world event, but you never know.
             return;
         }
 
         final IPermissionService permissionService = this.serviceCollection.permissionService();
-        if (!permissionService.isConsoleOverride(event.getCause().first(Subject.class).orElse(player)) &&
-                !this.serviceCollection.permissionService().hasPermission(player, WorldPermissions.getWorldAccessPermission(target.getKey().asString()))) {
+        if (!permissionService.isConsoleOverride(event.cause().first(Subject.class).orElse(player)) &&
+                !this.serviceCollection.permissionService().hasPermission(player, WorldPermissions.getWorldAccessPermission(target.key().asString()))) {
             event.setCancelled(true);
             if (!this.messageSent.contains(player.uniqueId())) {
-                this.serviceCollection.messageProvider().sendMessageTo(player, "world.access.denied", target.getKey().asString());
+                this.serviceCollection.messageProvider().sendMessageTo(player, "world.access.denied", target.key().asString());
             }
 
             this.messageSent.add(player.uniqueId());
@@ -74,12 +74,12 @@ public class WorldListener implements ListenerBase.Conditional {
     private Consumer<ScheduledTask> relocate(final ServerPlayer player) {
         return task -> {
             final Optional<ServerLocation> location = Sponge.server()
-                    .getTeleportHelper()
-                    .getSafeLocationWithBlacklist(player.serverLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL.get());
+                    .teleportHelper()
+                    .findSafeLocationWithBlacklist(player.serverLocation(), 5, 5, 5, TeleportHelperFilters.NO_PORTAL.get());
             if (location.isPresent()) {
                 player.setLocation(location.get());
             } else {
-                player.setPosition(player.getWorld().getProperties().getSpawnPosition().toDouble());
+                player.setPosition(player.world().properties().spawnPosition().toDouble());
             }
 
             this.messageSent.remove(player.uniqueId());

@@ -39,7 +39,7 @@ public final class WarpSerialiser implements TypeSerializer<Warp> {
                 value.node("cost").getDouble(0d),
                 res,
                 NamedLocationSerialiser.getWorldResourceKey(value),
-                NamedLocationSerialiser.position(value),
+                NamedLocationSerialiser.getPosition(value),
                 NamedLocationSerialiser.getRotation(value),
                 NamedLocationSerialiser.getName(value)
         );

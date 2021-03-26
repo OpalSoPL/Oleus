@@ -5,6 +5,9 @@
 package io.github.nucleuspowered.nucleus.modules.world;
 
 import io.github.nucleuspowered.nucleus.core.module.IModule;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
+import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
+import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.modules.world.commands.CloneWorldCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.CreateWorldCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.DeleteWorldCommand;
@@ -25,15 +28,11 @@ import io.github.nucleuspowered.nucleus.modules.world.commands.border.BorderComm
 import io.github.nucleuspowered.nucleus.modules.world.commands.border.ResetBorderCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.border.SetBorderCommand;
 import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetHardcoreCommand;
-import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetKeepSpawnLoaded;
 import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetLoadOnStartup;
 import io.github.nucleuspowered.nucleus.modules.world.commands.properties.SetPvpEnabled;
 import io.github.nucleuspowered.nucleus.modules.world.config.WorldConfig;
 import io.github.nucleuspowered.nucleus.modules.world.listeners.EnforceGamemodeListener;
 import io.github.nucleuspowered.nucleus.modules.world.listeners.WorldListener;
-import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
-import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
-import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,7 +53,6 @@ public class WorldModule implements IModule.Configurable<WorldConfig> {
                 ResetBorderCommand.class,
                 SetBorderCommand.class,
                 SetHardcoreCommand.class,
-                SetKeepSpawnLoaded.class,
                 SetLoadOnStartup.class,
                 SetPvpEnabled.class,
                 CloneWorldCommand.class,

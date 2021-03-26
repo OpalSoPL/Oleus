@@ -60,7 +60,7 @@ public class TopCommand implements ICommandExecutor {
                 .teleportPlayer(
                         playerToTeleport,
                         location,
-                        playerToTeleport.getRotation(),
+                        playerToTeleport.rotation(),
                         false,
                         TeleportScanners.NO_SCAN.get(),
                         isSafe ? TeleportHelperFilters.SURFACE_ONLY.get() : NucleusTeleportHelperFilters.NO_CHECK.get()

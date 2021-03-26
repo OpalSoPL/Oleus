@@ -25,7 +25,7 @@ public class InternalNucleusMessageEvent extends AbstractEvent implements Nucleu
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 

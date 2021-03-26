@@ -55,14 +55,14 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
             try {
                 Files.createDirectories(infoDir);
 
-                final AssetManager am = Sponge.getAssetManager();
+                final AssetManager am = Sponge.assetManager();
 
                 final PluginContainer pluginContainer = serviceCollection.pluginContainer();
 
                 // They exist.
-                am.getAsset(pluginContainer, "info.txt").get().copyToFile(infoDir.resolve("info.txt"));
-                am.getAsset(pluginContainer, "colors.txt").get().copyToFile(infoDir.resolve("colors.txt"));
-                am.getAsset(pluginContainer, "links.txt").get().copyToFile(infoDir.resolve("links.txt"));
+                am.asset(pluginContainer, "info.txt").get().copyToFile(infoDir.resolve("info.txt"));
+                am.asset(pluginContainer, "colors.txt").get().copyToFile(infoDir.resolve("colors.txt"));
+                am.asset(pluginContainer, "links.txt").get().copyToFile(infoDir.resolve("links.txt"));
             } catch (final IOException e) {
                 e.printStackTrace();
                 return;

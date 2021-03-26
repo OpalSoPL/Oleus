@@ -31,7 +31,7 @@ public class InfoModule implements IModule.Configurable<InfoConfig> {
         serviceCollection.registerService(InfoHandler.class, new InfoHandler(), false);
         final TextFileController motdController = new TextFileController(
                 serviceCollection.textTemplateFactory(),
-                Sponge.getAssetManager().getAsset(serviceCollection.pluginContainer(), "motd.txt").get(),
+                Sponge.assetManager().asset(serviceCollection.pluginContainer(), "motd.txt").get(),
                 serviceCollection.configDir().resolve("motd.txt"));
         serviceCollection.textFileControllerCollection().register(InfoModule.MOTD_KEY, motdController);
 

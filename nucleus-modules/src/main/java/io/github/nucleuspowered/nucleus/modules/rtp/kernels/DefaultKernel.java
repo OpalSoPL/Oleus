@@ -27,7 +27,6 @@ public class DefaultKernel implements RTPKernel {
 
     private static final ResourceKey DEFAULT_KERNEL_KEY = ResourceKey.of("nucleus", "default");
 
-    @Override
     public ResourceKey getKey() {
         return DefaultKernel.DEFAULT_KERNEL_KEY;
     }
@@ -51,7 +50,7 @@ public class DefaultKernel implements RTPKernel {
             return Optional.empty();
         }
 
-        final Optional<ServerLocation> targetLocation = Sponge.server().getTeleportHelper().getSafeLocation(worldLocation,
+        final Optional<ServerLocation> targetLocation = Sponge.server().teleportHelper().findSafeLocation(worldLocation,
                 TeleportHelper.DEFAULT_HEIGHT,
                 TeleportHelper.DEFAULT_WIDTH,
                 TeleportHelper.DEFAULT_FLOOR_CHECK_DISTANCE,
@@ -60,9 +59,9 @@ public class DefaultKernel implements RTPKernel {
         if (targetLocation.isPresent()) {
             // Is it in the world border?
             if (!Util.isLocationInWorldBorder(worldLocation)
-                    || options.prohibitedBiomes().contains(worldLocation.getBiome())
-                    || options.minHeight() > worldLocation.getBlockY()
-                    || options.maxHeight() < worldLocation.getBlockY()) {
+                    || options.prohibitedBiomes().contains(worldLocation.biome())
+                    || options.minHeight() > worldLocation.blockX()
+                    || options.maxHeight() < worldLocation.blockY()) {
                 return Optional.empty();
             }
 
@@ -77,12 +76,12 @@ public class DefaultKernel implements RTPKernel {
     }
 
     Vector3i getCentralLocation(@Nullable final ServerLocation currentLocation, final ServerWorld world) {
-        return world.getProperties().getSpawnPosition();
+        return world.properties().spawnPosition();
     }
 
     @Nullable ServerLocation getStartingLocation(ServerLocation world) {
-        while (world.getBlockType() == BlockTypes.AIR.get()) {
-            if (world.getY() < 1) {
+        while (world.blockType() == BlockTypes.AIR.get()) {
+            if (world.y() < 1) {
                 return null;
             }
             world = world.sub(0, 1, 0);

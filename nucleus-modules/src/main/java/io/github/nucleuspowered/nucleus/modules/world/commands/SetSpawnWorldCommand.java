@@ -42,10 +42,12 @@ public class SetSpawnWorldCommand implements ICommandExecutor {
             location = context.requirePlayer().serverLocation();
         }
 
-        Sponge.server().worldManager().getProperties(location.worldKey())
-                .get()
-                .setSpawnPosition(location.getBlockPosition());
-        context.sendMessage("command.world.setspawn.success");
-        return context.successResult();
+        return location.worldIfAvailable()
+                .map(world -> {
+                    world.properties().setSpawnPosition(location.blockPosition());
+                    context.sendMessage("command.world.setspawn.success");
+                    return context.successResult();
+                })
+                .orElseGet(() -> context.errorResult("command.world.setspawn.worldnotloaded", location.worldKey()));
     }
 }

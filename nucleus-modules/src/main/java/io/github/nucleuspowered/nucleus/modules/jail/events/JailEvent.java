@@ -30,7 +30,7 @@ public abstract class JailEvent extends AbstractEvent implements NucleusJailEven
     }
 
     @Override
-    public Cause getCause() {
+    public Cause cause() {
         return this.cause;
     }
 

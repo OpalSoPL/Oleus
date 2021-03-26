@@ -31,14 +31,15 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("UnstableApiUsage")
 public class SanityTests {
 
     @Test
     @SuppressWarnings("unchecked")
     public void testThatIHaventMessedUpWithMultipleCommandsWithSameAlias() throws IOException {
-        Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
+        final Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
                 .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");
-        Set<Class<? extends ICommandExecutor>> sc = ci.stream().map(ClassPath.ClassInfo::load)
+        final Set<Class<? extends ICommandExecutor>> sc = ci.stream().map(ClassPath.ClassInfo::load)
                 .filter(ICommandExecutor.class::isAssignableFrom)
                 .map(x -> (Class<? extends ICommandExecutor>) x)
                 .collect(Collectors.toSet());
@@ -83,30 +84,30 @@ public class SanityTests {
     @Test
     @SuppressWarnings("unchecked")
     public void testCommandKeysExistInMessagesFile() throws IOException {
-        Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
+        final Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
                 .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");
-        Set<Class<? extends ICommandExecutor>> sc = ci.stream().map(ClassPath.ClassInfo::load).filter(ICommandExecutor.class::isAssignableFrom)
+        final Set<Class<? extends ICommandExecutor>> sc = ci.stream().map(ClassPath.ClassInfo::load).filter(ICommandExecutor.class::isAssignableFrom)
                 .map(x -> (Class<? extends ICommandExecutor>)x).collect(Collectors.toSet());
 
         // Get the resource
-        String bundle = "assets.nucleus.messages";
+        final String bundle = "assets.nucleus.messages";
 
         // Get the resource
-        ResourceBundle rb = ResourceBundle.getBundle(bundle, Locale.getDefault());
-        Enumeration<String> keys = rb.getKeys();
-        Set<String> s = new HashSet<>();
+        final ResourceBundle rb = ResourceBundle.getBundle(bundle, Locale.getDefault());
+        final Enumeration<String> keys = rb.getKeys();
+        final Set<String> s = new HashSet<>();
 
         while (keys.hasMoreElements()) {
             s.add(keys.nextElement());
         }
 
-        List<Class<? extends ICommandExecutor>> keyRoots = sc.stream()
+        final List<Class<? extends ICommandExecutor>> keyRoots = sc.stream()
                 .filter(x -> x.isAnnotationPresent(Command.class))
                 .filter(x -> !s.contains(x.getAnnotation(Command.class).commandDescriptionKey() + ".desc"))
                 .collect(Collectors.toList());
 
         if (!keyRoots.isEmpty()) {
-            StringBuilder sb = new StringBuilder("Some command keys are not set: ");
+            final StringBuilder sb = new StringBuilder("Some command keys are not set: ");
             keyRoots.forEach(x -> sb.append("Key: ").append(x.getAnnotation(Command.class).commandDescriptionKey())
                     .append(".desc").append(" - ").append(x.getName())
                     .append(System.lineSeparator()));
@@ -117,15 +118,15 @@ public class SanityTests {
     @Test
     @SuppressWarnings("unchecked")
     public void testThatAnyServicesHaveANoArgsOrInjectableCtor() throws IOException {
-        Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
+        final Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
                 .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");
-        List<Class<?>> fails = new ArrayList<>();
+        final List<Class<?>> fails = new ArrayList<>();
         ci.stream().map(ClassPath.ClassInfo::load)
                 .filter(ServiceBase.class::isAssignableFrom)
                 .map(x -> (Class<? extends ServiceBase>)x)
                 .forEach(x -> {
-                    Constructor<?>[] constructors = x.getDeclaredConstructors();
-                    for (Constructor<?> constructor : constructors) {
+                    final Constructor<?>[] constructors = x.getDeclaredConstructors();
+                    for (final Constructor<?> constructor : constructors) {
                         if (constructor.getAnnotation(com.google.inject.Inject.class) != null) {
                             return;
                         }
@@ -133,17 +134,17 @@ public class SanityTests {
 
                     // if not, then if we have a no-args, that's okay too.
                     try {
-                        Constructor<?> ctor = x.getConstructor();
-                    } catch (NoSuchMethodException e) {
+                        final Constructor<?> ctor = x.getConstructor();
+                    } catch (final NoSuchMethodException e) {
                         // Nope
                         fails.add(x);
                     }
                 });
 
         if (!fails.isEmpty()) {
-            StringBuilder stringBuilder = new StringBuilder("Some services do not have no-args or injectable ctors:")
+            final StringBuilder stringBuilder = new StringBuilder("Some services do not have no-args or injectable ctors:")
                     .append(System.lineSeparator());
-            for (Class<?> fail : fails) {
+            for (final Class<?> fail : fails) {
                 stringBuilder.append(fail.getName()).append(System.lineSeparator());
             }
 
@@ -154,31 +155,30 @@ public class SanityTests {
     @Test
     public void testThatNoResourceKeyIsAParentOfAnother() throws Exception {
         // Get the resource
-        String bundle = "assets.nucleus.messages";
+        final String bundle = "assets.nucleus.messages";
 
         // Get the resource
-        ResourceBundle rb = ResourceBundle.getBundle(bundle, Locale.getDefault());
-        Enumeration<String> keys = rb.getKeys();
-        Set<String> s = new HashSet<>();
+        final ResourceBundle rb = ResourceBundle.getBundle(bundle, Locale.getDefault());
+        final Enumeration<String> keys = rb.getKeys();
+        final Set<String> s = new HashSet<>();
 
         while (keys.hasMoreElements()) {
             s.add(keys.nextElement());
         }
 
-        Map<String, List<String>> filter = s.parallelStream()
+        final Map<String, List<String>> filter = s.parallelStream()
                 .map(x -> Tuple.of(x.toLowerCase(),
                         s.stream().filter(y -> x.toLowerCase().startsWith(y.toLowerCase() + ".") && !x.equalsIgnoreCase(y)).collect(Collectors.toList())))
-                .filter(x -> !x.getSecond().isEmpty())
-                .collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
+                .filter(x -> !x.second().isEmpty())
+                .collect(Collectors.toMap(Tuple::first, Tuple::second));
         if (!filter.isEmpty()) {
-            StringBuilder sb = new StringBuilder("Some keys are parents of others!").append(System.lineSeparator());
+            final StringBuilder sb = new StringBuilder("Some keys are parents of others!").append(System.lineSeparator());
             filter.forEach((x, y) -> sb.append(x).append("->").append(y).append(System.lineSeparator()));
             Assert.fail(sb.toString());
         }
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testCommandsListenersTasksAreInjectable() throws IOException {
         final Set<ClassPath.ClassInfo> ci = ClassPath.from(this.getClass().getClassLoader())
                 .getTopLevelClassesRecursive("io.github.nucleuspowered.nucleus.modules");

@@ -58,34 +58,34 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User target = context.requireOne(NucleusParameters.ONE_USER);
-        final ServerWorld world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.getKey())
+        final ServerWorld world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.key())
             .orElseGet(() -> this.gsc.isOnSpawnCommand() ? this.gsc.getWorld().get() :
                     Sponge.server().worldManager().defaultWorld());
 
-        final Tuple<ServerLocation, Vector3d> worldTransform = SpawnHelper.getSpawn(world, target.getPlayer().orElse(null), context);
+        final Tuple<ServerLocation, Vector3d> worldTransform = SpawnHelper.getSpawn(world, target.player().orElse(null), context);
 
         if (!target.isOnline()) {
-            return this.isOffline(context, target, worldTransform.getFirst(), worldTransform.getSecond());
+            return this.isOffline(context, target, worldTransform.first(), worldTransform.second());
         }
 
         // If we don't have a rotation, then use the current rotation
-        final Player player = target.getPlayer().get();
+        final Player player = target.player().get();
         final TeleportResult result = context.getServiceCollection()
                 .teleportService()
                 .teleportPlayerSmart(
-                        target.getPlayer().get(),
-                        worldTransform.getFirst(),
-                        worldTransform.getSecond(), true,
+                        target.player().get(),
+                        worldTransform.first(),
+                        worldTransform.second(), true,
                         this.safeTeleport,
                         TeleportScanners.NO_SCAN.get()
                 );
         if (result.isSuccessful()) {
-            context.sendMessage("command.spawnother.success.source", target.getName(), world.getKey().asString());
-            context.sendMessageTo(player, "command.spawnother.success.target", world.getKey().asString());
+            context.sendMessage("command.spawnother.success.source", target.name(), world.key().asString());
+            context.sendMessageTo(player, "command.spawnother.success.target", world.key().asString());
             return context.successResult();
         }
 
-        return context.errorResult("command.spawnother.fail", target.getName(), world.getKey().asString());
+        return context.errorResult("command.spawnother.fail", target.name(), world.key().asString());
     }
 
     private ICommandResult isOffline(final ICommandContext context, final User user, final ServerLocation worldTransform, final Vector3d rotation) throws CommandException {

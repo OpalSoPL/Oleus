@@ -31,7 +31,7 @@ public final class CustomTargetParameter implements ValueParameter<MessageTarget
     }
 
     @Override
-    public Optional<? extends MessageTarget> getValue(final Parameter.Key<? super MessageTarget> parameterKey, final ArgumentReader.Mutable reader,
+    public Optional<? extends MessageTarget> parseValue(final Parameter.Key<? super MessageTarget> parameterKey, final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
         final Optional<MessageTarget> messageTarget = this.messageHandler.getTarget(reader.parseString());
         if (messageTarget.isPresent()) {

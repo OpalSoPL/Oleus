@@ -38,7 +38,8 @@ public class CheckBanCommand implements ICommandExecutor {
         final GameProfile profile = context.requireOne(NucleusParameters.GAME_PROFILE);
         final BanService service = Sponge.server().serviceProvider().banService();
 
-        final Optional<Ban.Profile> obp = service.getBanFor(profile);
+        // TODO: Async
+        final Optional<Ban.Profile> obp = service.banFor(profile).join();
         if (!obp.isPresent()) {
             return context.errorResult("command.checkban.notset", Util.getNameOrUnkown(context, profile));
         }
@@ -46,25 +47,24 @@ public class CheckBanCommand implements ICommandExecutor {
         final Ban.Profile bp = obp.get();
 
         final Component name;
-        if (bp.getBanSource().isPresent()) {
-            name = bp.getBanSource().get();
+        if (bp.banSource().isPresent()) {
+            name = bp.banSource().get();
         } else {
             name = context.getMessage("standard.unknown");
         }
 
-        if (bp.getExpirationDate().isPresent()) {
+        if (bp.expirationDate().isPresent()) {
             context.sendMessage("command.checkban.bannedfor", Util.getNameOrUnkown(context, profile), name,
-                    context.getTimeToNowString(bp.getExpirationDate().get()));
+                    context.getTimeToNowString(bp.expirationDate().get()));
         } else {
             context.sendMessage("command.checkban.bannedperm", Util.getNameOrUnkown(context, profile), name);
         }
 
         context.sendMessage("command.checkban.created", Util.FULL_TIME_FORMATTER.withLocale(context.getLocale())
-                .format(bp.getCreationDate()
+                .format(bp.creationDate()
         ));
-        context.sendMessage("standard.reasoncoloured", LegacyComponentSerializer.legacyAmpersand().serialize(bp.getReason()
-                        .orElse(
-                        context.getServiceCollection().messageProvider().getMessageFor(context.audience(), "ban.defaultreason"))));
+        context.sendMessage("standard.reasoncoloured", LegacyComponentSerializer.legacyAmpersand().serialize(bp.reason()
+                        .orElseGet(() -> context.getServiceCollection().messageProvider().getMessageFor(context.audience(), "ban.defaultreason"))));
         return context.successResult();
     }
 

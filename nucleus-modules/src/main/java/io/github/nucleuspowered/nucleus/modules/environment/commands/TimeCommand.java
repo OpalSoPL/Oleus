@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.environment.commands;
 
+import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.modules.environment.EnvironmentPermissions;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
@@ -16,6 +17,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.parameter.CommonParameters;
 import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 @EssentialsEquivalent(value = {"time"}, isExact = false, notes = "This just displays the time. Use '/settime' to set the time.")
@@ -34,17 +36,16 @@ public class TimeCommand implements ICommandExecutor {
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
-            CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY_OPTIONAL
+                NucleusParameters.ONLINE_WORLD_OPTIONAL
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) {
-        final WorldProperties pr = context.getWorldPropertiesOrFromSelfOptional(CommonParameters.ONLINE_WORLD_PROPERTIES_ONLY_OPTIONAL.getKey())
-                .orElseGet(() -> Sponge.server().worldManager().getDefaultProperties().get()
-        );
+        final ServerWorld pr = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.key())
+                .orElseGet(() -> Sponge.server().worldManager().defaultWorld());
 
-        context.sendMessage("command.time", pr.getKey().asString(), context.getTimeString(pr.getDayTime().asInGameDuration()));
+        context.sendMessage("command.time", pr.key().asString(), context.getTimeString(pr.properties().dayTime().asInGameDuration()));
         return context.successResult();
     }
 }

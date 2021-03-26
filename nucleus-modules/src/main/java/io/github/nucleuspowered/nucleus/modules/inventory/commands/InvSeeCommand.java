@@ -56,17 +56,17 @@ public class InvSeeCommand implements ICommandExecutor {
         }
 
         if (context.testPermissionFor(target, InventoryPermissions.INVSEE_EXEMPT_INSPECT)) {
-            return context.errorResult("command.invsee.targetexempt", target.getName());
+            return context.errorResult("command.invsee.targetexempt", target.name());
         }
 
         // Just in case, get the subject inventory if they are online.
         final ServerPlayer src = context.requirePlayer();
-        final Inventory targetInv = target.isOnline() ? target.getPlayer().get().inventory() : target.inventory();
+        final Inventory targetInv = target.isOnline() ? target.player().get().inventory() : target.inventory();
         if (!context.testPermission(InventoryPermissions.INVSEE_MODIFY)
                 || context.testPermissionFor(target, InventoryPermissions.INVSEE_EXEMPT_INTERACT)) {
             final UUID uuid = UUID.randomUUID();
             final InventoryMenu menu =
-                    ViewableInventory.builder().type(ContainerTypes.GENERIC_9x5).slots(targetInv.slots(), 0).completeStructure()
+                    ViewableInventory.builder().type(ContainerTypes.GENERIC_9X5).slots(targetInv.slots(), 0).completeStructure()
                             .identity(uuid).build().asMenu();
             menu.setReadOnly(true);
             return menu.open(src)

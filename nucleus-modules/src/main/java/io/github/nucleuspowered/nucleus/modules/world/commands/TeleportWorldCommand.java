@@ -51,18 +51,18 @@ public class TeleportWorldCommand implements ICommandExecutor {
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer player = context.getIfPlayer("command.world.player");
         final ServerWorld worldProperties = context.requireOne(NucleusParameters.ONLINE_WORLD);
-        final Vector3d pos = worldProperties.getProperties().spawnPosition().toDouble();
+        final Vector3d pos = worldProperties.properties().spawnPosition().toDouble();
         if (!player.transferToWorld(worldProperties, pos)) {
-            return context.errorResult("command.world.teleport.failed", worldProperties.getKey().asString());
+            return context.errorResult("command.world.teleport.failed", worldProperties.key().asString());
         }
 
         if (context.is(player)) {
-            context.sendMessage("command.world.teleport.success", worldProperties.getKey().asString());
+            context.sendMessage("command.world.teleport.success", worldProperties.key().asString());
         } else {
             context.sendMessage("command.world.teleport.successplayer",
                     context.getServiceCollection().playerDisplayNameService().getDisplayName(player),
-                    worldProperties.getKey().asString());
-            context.sendMessageTo(player, "command.world.teleport.success", worldProperties.getKey().asString());
+                    worldProperties.key().asString());
+            context.sendMessageTo(player, "command.world.teleport.success", worldProperties.key().asString());
         }
 
         return context.successResult();

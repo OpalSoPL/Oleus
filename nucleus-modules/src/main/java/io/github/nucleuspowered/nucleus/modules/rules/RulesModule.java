@@ -27,7 +27,7 @@ public class RulesModule implements IModule.Configurable<RulesConfig> {
                 .register(ID,
                         new TextFileController(
                                 serviceCollection.textTemplateFactory(),
-                                Sponge.getAssetManager().getAsset(serviceCollection.pluginContainer(), "rules.txt").get(),
+                                Sponge.assetManager().asset(serviceCollection.pluginContainer(), "rules.txt").get(),
                                 serviceCollection.configDir().resolve("rules.txt")
                         ));
     }

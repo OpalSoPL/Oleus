@@ -37,7 +37,7 @@ public class WarpCategoryParameter implements ValueParameter<WarpCategory> {
     }
 
     @Override
-    public Optional<? extends WarpCategory> getValue(final Parameter.Key<? super WarpCategory> parameterKey, final ArgumentReader.Mutable reader,
+    public Optional<? extends WarpCategory> parseValue(final Parameter.Key<? super WarpCategory> parameterKey, final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {
         final String arg = reader.parseString();
         final Optional<WarpCategory> category =

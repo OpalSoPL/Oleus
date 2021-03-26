@@ -21,17 +21,13 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandMo
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
-import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
-
-import java.util.Optional;
 
 @EssentialsEquivalent("spawn")
 @Command(
@@ -51,13 +47,13 @@ import java.util.Optional;
 )
 public class SpawnCommand implements ICommandExecutor, IReloadableService.Reloadable {
 
-    private final Parameter.Value<WorldProperties> worldPropertiesValueParameter;
+    private final Parameter.Value<ServerWorld> worldPropertiesValueParameter;
 
     private SpawnConfig sc = new SpawnConfig();
 
     @Inject
     public SpawnCommand(final IPermissionService permissionService) {
-        this.worldPropertiesValueParameter = Parameter.worldProperties(true)
+        this.worldPropertiesValueParameter = Parameter.world()
                 .key("world")
                 .optional()
                 .requirements(cause -> permissionService.hasPermission(cause, SpawnPermissions.SPAWN_OTHERWORLDS))
@@ -92,28 +88,24 @@ public class SpawnCommand implements ICommandExecutor, IReloadableService.Reload
         final ServerPlayer src = context.requirePlayer();
         final boolean force = context.hasFlag("f");
         final GlobalSpawnConfig gsc = this.sc.getGlobalSpawn();
-        final WorldProperties wp = context.getOne(this.worldPropertiesValueParameter)
+        final ServerWorld targetWorld = context.getOne(this.worldPropertiesValueParameter)
             .orElseGet(() -> {
                 if (gsc.isOnSpawnCommand()) {
-                    return gsc.getWorld().orElseGet(() -> src.getWorld().getProperties());
+                    return gsc.getWorld().orElseGet(() -> src.world());
                 } else {
-                    return src.getWorld().getProperties();
+                    return src.world();
                 }
             });
 
-        final Optional<ServerWorld> ow = Sponge.server().worldManager().getWorld(wp.getKey());
-        if (!ow.isPresent()) {
-            return context.errorResult("command.spawn.noworld");
-        } else if (this.sc.isPerWorldPerms() &&
-                !context.testPermission(SpawnPermissions.SPAWN_WORLDS + "." + ow.get().getKey().asString().toLowerCase())) {
-            return context.errorResult("command.spawn.nopermsworld", ow.get().getKey().asString().toLowerCase());
+        if (this.sc.isPerWorldPerms() &&
+                !context.testPermission(SpawnPermissions.SPAWN_WORLDS + "." + targetWorld.key().asString().toLowerCase())) {
+            return context.errorResult("command.spawn.nopermsworld", targetWorld.key().asString().toLowerCase());
         }
 
-        final ServerWorld targetWorld = ow.get();
         final Vector3d rotation = context.getServiceCollection().storageManager()
-                .getOrCreateWorldOnThread(ow.get().getKey())
+                .getOrCreateWorldOnThread(targetWorld.key())
                 .get(SpawnKeys.WORLD_SPAWN_ROTATION)
-                .orElseGet(src::getRotation);
+                .orElseGet(src::rotation);
 
         // If we don't have a rotation, then use the current rotation
         final TeleportResult result = context
@@ -121,7 +113,7 @@ public class SpawnCommand implements ICommandExecutor, IReloadableService.Reload
                 .teleportService()
                 .teleportPlayerSmart(
                         src,
-                        ServerLocation.of(targetWorld, targetWorld.getProperties().getSpawnPosition()),
+                        ServerLocation.of(targetWorld, targetWorld.properties().spawnPosition()),
                         rotation,
                         true,
                         !force && this.sc.isSafeTeleport(),
@@ -129,14 +121,14 @@ public class SpawnCommand implements ICommandExecutor, IReloadableService.Reload
                 );
 
         if (result.isSuccessful()) {
-            context.sendMessage("command.spawn.success", wp.getKey().asString());
+            context.sendMessage("command.spawn.success", targetWorld.key().asString());
             return context.successResult();
         }
 
         if (result == TeleportResult.FAIL_NO_LOCATION) {
-            return context.errorResult("command.spawn.fail", wp.getKey().asString());
+            return context.errorResult("command.spawn.fail", targetWorld.key().asString());
         }
 
-        return context.errorResult("command.spawn.cancelled", wp.getKey().asString());
+        return context.errorResult("command.spawn.cancelled", targetWorld.key().asString());
     }
 }

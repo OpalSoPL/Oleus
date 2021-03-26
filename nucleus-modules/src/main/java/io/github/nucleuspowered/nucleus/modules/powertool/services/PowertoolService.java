@@ -10,6 +10,8 @@ import io.github.nucleuspowered.nucleus.modules.powertool.PowertoolKeys;
 import io.github.nucleuspowered.nucleus.core.scaffold.service.ServiceBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.ItemType;
 
 import java.util.ArrayList;
@@ -20,9 +22,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import com.google.inject.Inject;
+import org.spongepowered.api.registry.RegistryTypes;
 
 public class PowertoolService implements ServiceBase {
 
+    private final Map<ItemType, String> cache = new HashMap<>();
     private final Map<UUID, Map<String, List<String>>> powertools = new HashMap<>();
 
     private final IStorageManager storageManager;
@@ -31,7 +35,6 @@ public class PowertoolService implements ServiceBase {
     public PowertoolService(final INucleusServiceCollection serviceCollection) {
         this.storageManager = serviceCollection.storageManager();
     }
-
 
     public Map<String, List<String>> getPowertools(final UUID uuid) {
         Map<String, List<String>> m = this.powertools.get(uuid);
@@ -47,22 +50,37 @@ public class PowertoolService implements ServiceBase {
         return ImmutableMap.copyOf(m);
     }
 
+    // TODO: Fix powertools - the module needs redoing to properly handle items types and not just do this
+    //  hackjob right now
+    private @Nullable String getKey(final ItemType type) {
+        return this.cache.computeIfAbsent(type, t -> RegistryTypes.ITEM_TYPE.get().findValueKey(t).map(ResourceKey::asString).orElse(null));
+    }
+
     public Optional<List<String>> getPowertoolForItem(final UUID uuid, final ItemType item) {
-        final List<String> tools = this.getPowertools(uuid).get(item.getKey().asString());
-        if (tools != null) {
-            return Optional.of(ImmutableList.copyOf(tools));
+        final String key = this.getKey(item);
+        if (key != null) {
+            final List<String> tools = this.getPowertools(uuid).get(key);
+            if (tools != null) {
+                return Optional.of(ImmutableList.copyOf(tools));
+            }
         }
 
         return Optional.empty();
     }
 
     public void setPowertool(final UUID uuid, final ItemType type, final List<String> commands) {
-        this.getPowertools(uuid).put(type.getKey().asString(), new ArrayList<>(commands));
-        this.setBack(uuid);
+        final String key = this.getKey(type);
+        if (key != null) {
+            this.getPowertools(uuid).put(key, new ArrayList<>(commands));
+            this.setBack(uuid);
+        }
     }
 
     public void clearPowertool(final UUID uuid, final ItemType type) {
-        this.clearPowertool(uuid, type.getKey().asString());
+        final String key = this.getKey(type);
+        if (key != null) {
+            this.clearPowertool(uuid, key);
+        }
     }
 
     public void clearPowertool(final UUID uuid, final String type) {

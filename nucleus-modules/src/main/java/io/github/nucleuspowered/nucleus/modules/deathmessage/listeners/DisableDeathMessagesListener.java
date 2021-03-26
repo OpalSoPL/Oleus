@@ -17,7 +17,7 @@ import org.spongepowered.api.event.filter.Getter;
 public class DisableDeathMessagesListener implements ListenerBase.Conditional {
 
     @Listener(order = Order.BEFORE_POST)
-    public void onDeath(final DestructEntityEvent.Death event, @Getter("getEntity") final Living living) {
+    public void onDeath(final DestructEntityEvent.Death event, @Getter("entity") final Living living) {
         if (living instanceof Player) {
             event.setMessageCancelled(true);
         }

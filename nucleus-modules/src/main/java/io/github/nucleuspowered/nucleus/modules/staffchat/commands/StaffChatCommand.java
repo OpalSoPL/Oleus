@@ -57,7 +57,7 @@ public class StaffChatCommand implements ICommandExecutor {
                 if (context.is(ServerPlayer.class)) {
                     final ServerPlayer pl = context.requirePlayer();
                     frame.pushCause(pl);
-                    frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.getProfile());
+                    frame.addContext(EventContextKeys.SIMULATED_PLAYER, pl.profile());
 
                     try (final NoExceptionAutoClosable c = this.chatMessageFormatterService
                             .setPlayerNucleusChannelTemporarily(pl.uniqueId(), StaffChatMessageChannel.getInstance())) {

@@ -85,7 +85,7 @@ public class WorldTimeParameter implements ValueParameter<MinecraftDayTime> {
         if (this.allowAliases && TICK_ALIASES.containsKey(arg)) {
             return WorldTimeParameter.TICK_ALIASES.get(arg);
         }
-        final Audience audience = source.getCause().audience();
+        final Audience audience = source.cause().audience();
 
         // <number>h
         final Matcher m1 = tfh.matcher(arg);
@@ -135,7 +135,7 @@ public class WorldTimeParameter implements ValueParameter<MinecraftDayTime> {
     }
 
     @Override
-    public Optional<? extends MinecraftDayTime> getValue(
+    public Optional<? extends MinecraftDayTime> parseValue(
             final Parameter.Key<? super MinecraftDayTime> parameterKey,
             final ArgumentReader.Mutable reader,
             final CommandContext.Builder context) throws ArgumentParseException {

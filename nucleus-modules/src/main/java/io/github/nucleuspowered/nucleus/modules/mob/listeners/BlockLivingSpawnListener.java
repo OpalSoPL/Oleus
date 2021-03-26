@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.mob.listeners;
 
+import io.github.nucleuspowered.nucleus.core.Registry;
 import io.github.nucleuspowered.nucleus.modules.mob.config.BlockSpawnsConfig;
 import io.github.nucleuspowered.nucleus.modules.mob.config.MobConfig;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
@@ -18,6 +19,7 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
     public void onSpawn(final SpawnEntityEvent event) {
         event.filterEntities(x -> {
             final Class<? extends Entity> entityType = x.getClass();
-            return this.checkIsValid(entityType) || this.isSpawnable(x.type(), x.serverLocation().getWorld());
+            return this.checkIsValid(entityType) || this.isSpawnable(x.type(), x.serverLocation().world());
         });
     }
 
@@ -44,12 +46,11 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
 
     private boolean isSpawnable(final EntityType<?> type, final ServerWorld world) {
         final Optional<BlockSpawnsConfig> bsco = this.config.getBlockSpawnsConfigForWorld(world);
-        if (!bsco.isPresent()) {
-            return true;
-        }
+        return bsco.flatMap(blockSpawnsConfig -> RegistryTypes.ENTITY_TYPE.get().findValueKey(type).map(x -> {
+            final String id = x.asString().toLowerCase();
+            return !(blockSpawnsConfig.isBlockVanillaMobs() && id.startsWith("minecraft:") || blockSpawnsConfig.getIdsToBlock().contains(id));
+        })).orElse(true);
 
-        final String id = type.getKey().asString().toLowerCase();
-        return !(bsco.get().isBlockVanillaMobs() && id.startsWith("minecraft:") || bsco.get().getIdsToBlock().contains(id));
     }
 
     @Override
@@ -60,10 +61,10 @@ public class BlockLivingSpawnListener implements IReloadableService.Reloadable, 
     @Override
     public boolean shouldEnable(final INucleusServiceCollection serviceCollection) {
             final Map<String, BlockSpawnsConfig> conf = serviceCollection.configProvider().getModuleConfig(MobConfig.class).getBlockSpawnsConfig();
-            if (conf.entrySet().stream().anyMatch(x -> Sponge.server().worldManager().getProperties(ResourceKey.resolve(x.getKey().toLowerCase())).isPresent())) {
+            if (conf.entrySet().stream().anyMatch(x -> Sponge.server().worldManager().world(ResourceKey.resolve(x.getKey().toLowerCase())).isPresent())) {
                 for (final BlockSpawnsConfig s : conf.values()) {
                     final List<String> idsToBlock = s.getIdsToBlock();
-                    if (s.isBlockVanillaMobs() || Sponge.registry().getCatalogRegistry().getAllOf(EntityType.class).stream().anyMatch(x -> idsToBlock.contains(x.getKey().asString()))) {
+                    if (s.isBlockVanillaMobs() || RegistryTypes.ENTITY_TYPE.get().streamEntries().anyMatch(x -> idsToBlock.contains(x.key().asString()))) {
                         return true;
                     }
                 }

@@ -33,11 +33,11 @@ public class LoreClearCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final Player src = context.getIfPlayer();
-        if (src.getItemInHand(HandTypes.MAIN_HAND).isEmpty()) {
+        if (src.itemInHand(HandTypes.MAIN_HAND).isEmpty()) {
             return context.errorResult("command.lore.clear.noitem");
         }
 
-        final ItemStack stack = src.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack stack = src.itemInHand(HandTypes.MAIN_HAND);
         if (stack.remove(Keys.LORE).isSuccessful()) {
             src.setItemInHand(HandTypes.MAIN_HAND, stack);
             context.errorResult("command.lore.clear.success");

@@ -30,9 +30,9 @@ public class MobProtectionListener implements IReloadableService.Reloadable, Lis
             return;
         }
 
-        event.getTransactions().stream().filter(x -> {
-            final Operation operation = x.getOperation();
-            return operation != Operations.GROWTH && operation != Operations.DECAY;
+        event.transactions().stream().filter(x -> {
+            final Operation operation = x.operation();
+            return operation != Operations.GROWTH.get() && operation != Operations.DECAY.get();
         }).forEach(x -> x.setValid(false));
     }
 

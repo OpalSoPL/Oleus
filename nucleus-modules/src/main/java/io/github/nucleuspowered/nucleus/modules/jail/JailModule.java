@@ -49,9 +49,8 @@ public class JailModule implements IModule.Configurable<JailConfig> {
         serviceCollection.userCacheService().setJailProcessor(x -> x.get(JailKeys.JAIL_DATA).map(JailData::getJailName).orElse(null));
         final IPlaceholderService placeholderService = serviceCollection.placeholderService();
         placeholderService.registerToken("jailed", PlaceholderParser.builder()
-                .key(ResourceKey.of(serviceCollection.pluginContainer(), "jailed"))
-                .addParser(p -> {
-                    if (p.getAssociatedObject().filter(x -> x instanceof ServerPlayer)
+                .parser(p -> {
+                    if (p.associatedObject().filter(x -> x instanceof ServerPlayer)
                             .map(x -> handler.isPlayerJailed(((ServerPlayer) x).uniqueId()))
                             .orElse(false)) {
                         return Component.text("[Jailed]", NamedTextColor.GRAY);
@@ -59,11 +58,10 @@ public class JailModule implements IModule.Configurable<JailConfig> {
                     return Component.empty();
                 }).build());
         placeholderService.registerToken("jail", PlaceholderParser.builder()
-                .key(ResourceKey.of(serviceCollection.pluginContainer(), "jail"))
-                .addParser(placeholder -> {
-                    if (placeholder.getAssociatedObject().filter(x -> x instanceof ServerPlayer).isPresent()) {
+                .parser(placeholder -> {
+                    if (placeholder.associatedObject().filter(x -> x instanceof ServerPlayer).isPresent()) {
                         return handler
-                                .getPlayerJailData(((ServerPlayer) placeholder.getAssociatedObject().get()).uniqueId())
+                                .getPlayerJailData(((ServerPlayer) placeholder.associatedObject().get()).uniqueId())
                                 .<Component>map(x -> Component.text(x.getJailName()))
                                 .orElseGet(Component::empty);
                     }
