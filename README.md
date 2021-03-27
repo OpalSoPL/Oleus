@@ -17,7 +17,7 @@ tidbits that you might need. Extremely configurable, only loading up the command
 plugins to disable modules that they replace the functionality of), and providing a simple and rich API, Nucleus is an
 elite plugin for providing simple server tasks, and an essential addition to your server!
 
-Nucleus is being actively developed for Sponge API 7. 
+Nucleus is being actively developed for Sponge API 8. 
 
 ## Contributions
 
@@ -29,6 +29,8 @@ be grateful for your contributions - we're an open community that appreciates an
 * Open an issue if you have a bug to report, or a pull request with your changes.
 
 ## Getting and Building Nucleus
+
+Nucleus currently uses Gradle 6.8.3 and is compiled using JDK 11 (but to a Java 8 target). 
 
 To get a copy of the Nucleus source, ensure you have Git installed, and run the following commands from a command prompt
 or terminal:

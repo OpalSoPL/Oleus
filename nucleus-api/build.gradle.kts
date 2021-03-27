@@ -23,6 +23,11 @@ dependencies {
     api("org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"])
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 val filenameSuffix = "SpongeAPI${rootProject.properties["declaredApiVersion"]}"
 
 val sourcesJar by tasks.registering(Jar::class) {
