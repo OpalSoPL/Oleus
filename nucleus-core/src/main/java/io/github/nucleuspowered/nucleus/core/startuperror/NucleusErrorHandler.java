@@ -78,7 +78,7 @@ public class NucleusErrorHandler {
         prettyPrinter.hr('-');
         this.createTopLevelMessage(prettyPrinter);
         this.printStackTraceIfAny(prettyPrinter);
-        prettyPrinter.addWrapped("If this error persists, check your configuration files and ensure that you have the latest version of Nucleus which "
+        prettyPrinter.add("If this error persists, check your configuration files and ensure that you have the latest version of Nucleus which "
                 + "matches the current version of the Sponge API.");
         this.createPostStackTraceMessage(prettyPrinter);
         prettyPrinter.add();
