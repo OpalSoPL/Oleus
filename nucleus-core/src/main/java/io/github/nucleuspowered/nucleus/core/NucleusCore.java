@@ -143,11 +143,15 @@ public final class NucleusCore {
             provider.prepareCoreConfig(this.coreConfigurationTransformations());
         } catch (final ConfigurateException e) {
             new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getCoreConfigFileName(), this.pluginInfo);
+            this.logger.error("Could not load Nucleus core config. Aborting initialisation.");
+            return;
         }
         try {
             provider.prepareModuleConfig();
         } catch (final ConfigurateException e) {
             new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getModuleConfigFileName(), this.pluginInfo);
+            this.logger.error("Could not load Nucleus module config. Aborting initialisation.");
+            return;
         }
         this.completeModuleInit(tuple);
     }

@@ -59,7 +59,7 @@ public class NucleusErrorHandler {
             //ignored
         }
 
-        this.generatePrettyPrint(this.logger, Level.FATAL);
+        this.generatePrettyPrint(this.logger, Level.ERROR);
 
         if (this.shouldShutdown) {
             Sponge.server().shutdown();
