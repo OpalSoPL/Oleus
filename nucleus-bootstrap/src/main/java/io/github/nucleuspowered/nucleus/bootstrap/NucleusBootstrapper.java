@@ -9,7 +9,7 @@ import com.google.inject.Injector;
 import io.github.nucleuspowered.nucleus.bootstrap.error.InitialisationNucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.core.IPluginInfo;
 import io.github.nucleuspowered.nucleus.core.NucleusCore;
-import io.github.nucleuspowered.nucleus.core.startuperror.ConfigErrorHandler;
+import io.github.nucleuspowered.nucleus.bootstrap.error.ConfigErrorHandler;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusConfigException;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.modules.NucleusModuleProvider;

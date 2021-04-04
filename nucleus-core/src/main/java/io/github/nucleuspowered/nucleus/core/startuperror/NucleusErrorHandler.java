@@ -105,14 +105,7 @@ public class NucleusErrorHandler {
         prettyPrinter.add("Nucleus encountered an error during server start up and did not enable successfully.");
     }
 
-    private void printStackTraceIfAny(final PrettyPrinter prettyPrinter) {
-        prettyPrinter.add();
-        prettyPrinter.add("No commands, listeners or tasks are registered.");
-        if (Sponge.platform().type().isServer()) {
-            prettyPrinter
-                    .add("The server has been automatically whitelisted - this is to protect your server and players if you rely on some of "
-                            + "Nucleus' functionality (such as fly states, etc.)");
-        }
+    protected void printStackTrace(final PrettyPrinter prettyPrinter) {
         prettyPrinter.add("The error that Nucleus encountered will be reproduced below for your convenience.");
         prettyPrinter.hr('-');
 
@@ -122,6 +115,17 @@ public class NucleusErrorHandler {
             prettyPrinter.add("Captured stacktace:");
             prettyPrinter.add(this.capturedThrowable);
         }
+    }
+
+    private void printStackTraceIfAny(final PrettyPrinter prettyPrinter) {
+        prettyPrinter.add();
+        prettyPrinter.add("No commands, listeners or tasks are registered.");
+        if (Sponge.platform().type().isServer()) {
+            prettyPrinter
+                    .add("The server has been automatically whitelisted - this is to protect your server and players if you rely on some of "
+                            + "Nucleus' functionality (such as fly states, etc.)");
+        }
+        this.printStackTrace(prettyPrinter);
         prettyPrinter.hr('-');
     }
 
