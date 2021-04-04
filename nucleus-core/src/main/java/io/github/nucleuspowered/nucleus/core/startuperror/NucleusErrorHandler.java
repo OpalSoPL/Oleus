@@ -126,7 +126,7 @@ public class NucleusErrorHandler {
     }
 
     protected void createPostStackTraceMessage(final PrettyPrinter prettyPrinter) {
-        prettyPrinter.addWrapped("If you continue to have this error, please report this error to the Nucleus "
+        prettyPrinter.add("If you continue to have this error, please report this error to the Nucleus "
                 + "team at https://github.com/NucleusPowered/Nucleus/issues");
     }
 

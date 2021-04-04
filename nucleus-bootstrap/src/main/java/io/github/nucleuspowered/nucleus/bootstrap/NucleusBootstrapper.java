@@ -9,6 +9,8 @@ import com.google.inject.Injector;
 import io.github.nucleuspowered.nucleus.bootstrap.error.InitialisationNucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.core.IPluginInfo;
 import io.github.nucleuspowered.nucleus.core.NucleusCore;
+import io.github.nucleuspowered.nucleus.core.startuperror.ConfigErrorHandler;
+import io.github.nucleuspowered.nucleus.core.startuperror.NucleusConfigException;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.modules.NucleusModuleProvider;
 import io.github.nucleuspowered.nucleus.bootstrap.error.InvalidVersionErrorHandler;
@@ -108,6 +110,7 @@ public class NucleusBootstrapper {
     public void startPlugin(final ConstructPluginEvent event) {
         final IPluginInfo pluginInfo = new NucleusPluginInfo();
         if (this.versionCheck(pluginInfo)) {
+            final NucleusErrorHandler errorHandler;
             try {
                 this.logger.info("Nucleus {} running on Sponge API {} ({} version {})", pluginInfo.version(),
                         Sponge.platform().container(Platform.Component.API).getMetadata().getVersion(),
@@ -120,16 +123,17 @@ public class NucleusBootstrapper {
                 core.init();
                 Sponge.eventManager().registerListeners(this.pluginContainer, core);
                 this.logger.info("Nucleus has completed initialisation successfully. Awaiting Sponge lifecycle events.");
+                return;
+            } catch (final NucleusConfigException e) {
+                errorHandler = new ConfigErrorHandler(this.pluginContainer, e.getWrapped(), e.isDocgen(), this.logger, e.getFileName(), pluginInfo);
             } catch (final Exception e) {
-                this.logger.fatal("Nucleus did not complete initialisation. Nucleus will not boot.");
-                // Inserts itself into the listeners
-                final NucleusErrorHandler errorHandler =
-                        new InitialisationNucleusErrorHandler(this.pluginContainer, e,
+                errorHandler = new InitialisationNucleusErrorHandler(this.pluginContainer, e,
                                 System.getProperty(NucleusCore.DOCGEN_PROPERTY) != null,
                                 this.logger,
                                 pluginInfo);
-                errorHandler.generatePrettyPrint(this.logger, Level.ERROR);
             }
+            this.logger.error("Nucleus did not complete initialisation. Nucleus will not boot.");
+            errorHandler.generatePrettyPrint(this.logger, Level.ERROR);
         }
     }
 

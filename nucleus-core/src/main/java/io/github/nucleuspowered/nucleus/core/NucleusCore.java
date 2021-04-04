@@ -40,6 +40,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigProvider
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.core.startuperror.ConfigErrorHandler;
+import io.github.nucleuspowered.nucleus.core.startuperror.NucleusConfigException;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.core.util.functional.Action;
 import io.leangen.geantyref.TypeToken;
@@ -135,23 +136,29 @@ public final class NucleusCore {
     /**
      * Begin setup, read module config, load modules that are important.
      */
-    public void init() {
+    public void init() throws NucleusConfigException {
         final Collection<Tuple<ModuleContainer, IModule>> tuple = this.startModuleLoading();
         this.serviceCollection.configurateHelper().complete();
         final IConfigProvider provider = this.serviceCollection.configProvider();
         try {
             provider.prepareCoreConfig(this.coreConfigurationTransformations());
         } catch (final ConfigurateException e) {
-            new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getCoreConfigFileName(), this.pluginInfo);
-            this.logger.error("Could not load Nucleus core config. Aborting initialisation.");
-            return;
+            throw new NucleusConfigException(
+                    "Could not load Nucleus core config. Aborting initialisation.",
+                    provider.getCoreConfigFileName(),
+                    this.runDocGen,
+                    e
+            );
         }
         try {
             provider.prepareModuleConfig();
         } catch (final ConfigurateException e) {
-            new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getModuleConfigFileName(), this.pluginInfo);
-            this.logger.error("Could not load Nucleus module config. Aborting initialisation.");
-            return;
+            throw new NucleusConfigException(
+                    "Could not load Nucleus module config. Aborting initialisation.",
+                    provider.getModuleConfigFileName(),
+                    this.runDocGen,
+                    e
+            );
         }
         this.completeModuleInit(tuple);
     }
