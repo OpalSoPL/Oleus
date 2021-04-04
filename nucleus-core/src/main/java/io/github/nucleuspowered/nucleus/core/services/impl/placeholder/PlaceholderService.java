@@ -35,6 +35,7 @@ import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,7 +86,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
                 "nucleus:name"
         );
         this.registerToken("name", normalName);
-        this.registerToken("playername", normalName);
+        this.registerToken("playername", normalName, true, true);
         this.registerToken("subject", new NamePlaceholder<>(
                 Nameable.class,
                 serviceCollection.playerDisplayNameService(),
@@ -100,8 +101,8 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
                 "nucleus:displayname"
         );
         this.registerToken("player", displayName);
-        this.registerToken("playerdisplayname", displayName);
-        this.registerToken("displayname", displayName);
+        this.registerToken("playerdisplayname", displayName, true, true);
+        this.registerToken("displayname", displayName, true, true);
 
         final IPermissionService permissionService = serviceCollection.permissionService();
         this.registerToken("option", this.optionParser);
@@ -187,18 +188,22 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
 
     @Override
     public void registerToken(final String tokenName, final PlaceholderParser parser) {
-        this.registerToken(tokenName, parser, true);
+        this.registerToken(tokenName, parser, true, false);
     }
 
     @Override
     public void registerToken(final String tokenName, final PlaceholderParser parser, final boolean document) {
+        this.registerToken(tokenName, parser, document, false);
+    }
+
+    private void registerToken(final String tokenName, final PlaceholderParser parser, final boolean document, final boolean isDuplicate) {
         if (SEPARATOR.asPredicate().test(tokenName)) {
             // can't be registered.
             throw new IllegalArgumentException("Tokens must not contain |, :, _ or space characters.");
         }
         final String token = tokenName.toLowerCase();
         if (!this.parsers.containsKey(token)) {
-            this.parsers.put(token, new PlaceholderMetadata(token, parser, document));
+            this.parsers.put(token, new PlaceholderMetadata(token, parser, document, isDuplicate));
         } else {
             throw new IllegalStateException("Token " + tokenName.toLowerCase() + " has already been registered.");
         }
@@ -234,7 +239,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
     }
 
     @Override public Map<String, PlaceholderMetadata> getNucleusParsers() {
-        return ImmutableMap.copyOf(this.parsers);
+        return Collections.unmodifiableMap(this.parsers);
     }
 
     // --

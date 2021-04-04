@@ -28,6 +28,7 @@ plugins {
     id("org.cadixdev.licenser") version "0.5.1" apply false
     id("net.kyori.blossom") version "1.2.0"
     id("com.github.johnrengelman.shadow") version "5.2.0"
+    id("org.spongepowered.gradle.plugin") version "1.0.2"
     // id("org.spongepowered.gradle.plugin") version "0.11.0-SNAPSHOT"
     kotlin("jvm") version "1.3.61"
 }
@@ -68,6 +69,7 @@ allprojects {
 
 }
 
+
 extra["gitHash"] = getGitCommit()
 
 // Get the Level
@@ -91,6 +93,30 @@ group = "io.github.nucleuspowered"
 
 defaultTasks.add("licenseFormat")
 defaultTasks.add("build")
+
+sponge {
+    apiVersion("${project.properties["spongeApiVersion"]}")
+    platform(org.spongepowered.gradle.common.SpongePlatform.VANILLA)
+    plugin("nucleus") {
+        loader(org.spongepowered.gradle.plugin.config.PluginLoaders.JAVA_PLAIN)
+        displayName("Nucleus")
+        mainClass("io.github.nucleuspowered.nucleus.bootstrap.NucleusBootstrapper")
+        description("Nucleus")
+        version(versionString)
+        links {
+            homepage("https://nucleuspowered.org")
+            source("https://github.com/NucleusPowered/Nucleus")
+            issues("https://github.com/NucleusPowered/Nucleus/issues")
+        }
+        contributor("dualspiral") {
+            description("Lead Developer")
+        }
+        dependency("spongeapi") {
+            loadOrder(org.spongepowered.plugin.metadata.PluginDependency.LoadOrder.AFTER)
+            optional(false)
+        }
+    }
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8

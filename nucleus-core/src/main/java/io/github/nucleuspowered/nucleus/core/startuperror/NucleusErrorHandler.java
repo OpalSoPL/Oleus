@@ -93,10 +93,10 @@ public class NucleusErrorHandler {
         final PluginContainer impl = platform.container(Platform.Component.IMPLEMENTATION);
         prettyPrinter.add("Minecraft version: %s", platform.minecraftVersion().name());
         prettyPrinter.add("Sponge Implementation: %s %s",
-                impl.getMetadata().getName(),
+                impl.getMetadata().getName().orElse("unknown"),
                 impl.getMetadata().getVersion());
         prettyPrinter.add("SpongeAPI: %s %s",
-                api.getMetadata().getName(),
+                api.getMetadata().getName().orElse("unknown"),
                 api.getMetadata().getVersion());
         prettyPrinter.log(logger, loggerLevel);
     }
@@ -110,7 +110,7 @@ public class NucleusErrorHandler {
         prettyPrinter.add("No commands, listeners or tasks are registered.");
         if (Sponge.platform().type().isServer()) {
             prettyPrinter
-                    .addWrapped("The server has been automatically whitelisted - this is to protect your server and players if you rely on some of "
+                    .add("The server has been automatically whitelisted - this is to protect your server and players if you rely on some of "
                             + "Nucleus' functionality (such as fly states, etc.)");
         }
         prettyPrinter.add("The error that Nucleus encountered will be reproduced below for your convenience.");

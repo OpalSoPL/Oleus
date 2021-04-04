@@ -150,7 +150,6 @@ public final class NucleusCore {
             new ConfigErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, provider.getModuleConfigFileName(), this.pluginInfo);
         }
         this.completeModuleInit(tuple);
-        this.serviceCollection.userPreferenceService().postInit();
     }
 
     public INucleusServiceCollection getServiceCollection() {
@@ -182,6 +181,8 @@ public final class NucleusCore {
                 factoryMap.put(CoreKeys.LOCALE_PREFERENCE_KEY.getKey(), CoreKeys.LOCALE_PREFERENCE_KEY);
                 return factoryMap;
             });
+            // now we can post init the UPS
+            this.serviceCollection.userPreferenceService().postInit();
             event.register(Registry.Keys.COMMAND_MODIFIER_FACTORY_KEY, false, () -> {
                 final Map<ResourceKey, CommandModifierFactory> factoryMap = new HashMap<>();
 
@@ -218,8 +219,11 @@ public final class NucleusCore {
 
         final RegisterRegistryValueEvent.RegistryStep<PlaceholderParser> placeholderParserRegistryStep =
                 event.registry(RegistryTypes.PLACEHOLDER_PARSER);
-        this.serviceCollection.placeholderService().getNucleusParsers().forEach((key, value) ->
-                placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, key), value.getParser()));
+        this.serviceCollection.placeholderService().getNucleusParsers().forEach((key, value) -> {
+            if (!value.isDuplicate()) {
+                placeholderParserRegistryStep.register(ResourceKey.of(this.pluginContainer, key), value.getParser());
+            }
+        });
         this.serviceCollection.logger().info("Registered placeholder parsers.");
 
         final NucleusRegisterPreferenceKeyEvent registerPreferenceKeyEvent = new RegisterPreferenceKeyEvent(
@@ -228,11 +232,6 @@ public final class NucleusCore {
         );
         Sponge.eventManager().post(registerPreferenceKeyEvent);
         this.serviceCollection.logger().info("Registered user preference keys.");
-    }
-
-    @Listener
-    public void onGameLoadComplete(final LoadedGameEvent event) {
-        this.serviceCollection.userPreferenceService().postInit();
     }
 
     @Listener

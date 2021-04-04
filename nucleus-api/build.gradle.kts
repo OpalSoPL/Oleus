@@ -60,7 +60,7 @@ tasks {
             attributes["Implementation-Title"] = rootProject.name
             attributes["API-Version"] = project.version
             attributes["Implementation-Version"] = rootProject.version
-            attributes["Git-Hash"] = project.name
+            attributes["Git-Hash"] = rootProject.extra["gitHash"]
 
         }
 
