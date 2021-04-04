@@ -24,8 +24,9 @@ plugins {
     idea
     eclipse
     `maven-publish`
-    id("com.github.hierynomus.license") version "0.15.0" apply false
-    id("ninja.miserable.blossom") version "1.0.1"
+    // id("com.github.hierynomus.license") version "0.15.0" apply false
+    id("org.cadixdev.licenser") version "0.5.1" apply false
+    id("net.kyori.blossom") version "1.2.0"
     id("com.github.johnrengelman.shadow") version "5.2.0"
     // id("org.spongepowered.gradle.plugin") version "0.11.0-SNAPSHOT"
     kotlin("jvm") version "1.3.61"
@@ -52,26 +53,17 @@ fun getGitCommit() : String {
 
 allprojects {
 
-    apply(plugin = "com.github.hierynomus.license")
+    apply(plugin = "org.cadixdev.licenser")
 
-    configure<nl.javadude.gradle.plugins.license.LicenseExtension> {
-        // ext.name = project.name
-
+    configure<org.cadixdev.gradle.licenser.LicenseExtension> {
+        header = rootProject.file("HEADER.txt")
+        newLine = false
         exclude("**/*.info")
         exclude("assets/**")
         exclude("*.kts")
         exclude("**/*.json")
         exclude("*.properties")
         exclude("*.txt")
-
-        header = rootProject.projectDir.resolve("HEADER.txt") //File("HEADER.txt")
-
-        // sourceSets.addLater(ProviderFactory.provider(() -> project(":nucleus-core").sourceSets))
-
-        ignoreFailures = false
-        strictCheck = true
-
-        mapping("java", "SLASHSTAR_STYLE")
     }
 
 }

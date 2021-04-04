@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     eclipse
-    id("ninja.miserable.blossom")
+    id("net.kyori.blossom")
 }
 
 repositories {

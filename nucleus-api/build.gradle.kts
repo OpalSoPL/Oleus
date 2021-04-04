@@ -3,7 +3,6 @@ plugins {
     `java-library`
     idea
     eclipse
-    maven
     `maven-publish`
 }
 
