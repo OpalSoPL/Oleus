@@ -30,7 +30,8 @@ public final class ConfigErrorHandler extends NucleusErrorHandler {
         this.file = file;
     }
 
-    @Override public String getTitle() {
+    @Override
+    public String getTitle() {
         return "NUCLEUS CONFIGURATION FAILED TO LOAD (" + this.file + ")";
     }
 
@@ -41,7 +42,8 @@ public final class ConfigErrorHandler extends NucleusErrorHandler {
         }
     }
 
-    @Override protected void createPostStackTraceMessage(final PrettyPrinter prettyPrinter) {
+    @Override
+    protected void createPostStackTraceMessage(final PrettyPrinter prettyPrinter) {
         // it's a config error.
     }
 

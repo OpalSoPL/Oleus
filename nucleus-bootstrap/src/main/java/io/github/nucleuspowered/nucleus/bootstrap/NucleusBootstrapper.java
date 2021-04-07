@@ -10,6 +10,7 @@ import io.github.nucleuspowered.nucleus.bootstrap.error.InitialisationNucleusErr
 import io.github.nucleuspowered.nucleus.core.IPluginInfo;
 import io.github.nucleuspowered.nucleus.core.NucleusCore;
 import io.github.nucleuspowered.nucleus.bootstrap.error.ConfigErrorHandler;
+import io.github.nucleuspowered.nucleus.core.NucleusJavaProperties;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusConfigException;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.github.nucleuspowered.nucleus.modules.NucleusModuleProvider;
@@ -72,7 +73,7 @@ public class NucleusBootstrapper {
                     this.logger.fatal("Unable to start Nucleus: SpongeAPI major version {} does not match Nucleus expectation of {}", major, maj);
                     new InvalidVersionErrorHandler(
                             this.pluginContainer,
-                            System.getProperty(NucleusCore.DOCGEN_PROPERTY) != null,
+                            NucleusJavaProperties.RUN_DOCGEN,
                             this.logger,
                             NucleusPluginInfo.SPONGE_API_VERSION,
                             pluginInfo
@@ -94,7 +95,7 @@ public class NucleusBootstrapper {
                     this.logger.fatal("Unable to start Nucleus: SpongeAPI version {} is lower than Nucleus' requirement {}", v, version);
                     new InvalidVersionErrorHandler(
                             this.pluginContainer,
-                            System.getProperty(NucleusCore.DOCGEN_PROPERTY) != null,
+                            NucleusJavaProperties.RUN_DOCGEN,
                             this.logger,
                             NucleusPluginInfo.SPONGE_API_VERSION,
                             pluginInfo
@@ -128,7 +129,7 @@ public class NucleusBootstrapper {
                 errorHandler = new ConfigErrorHandler(this.pluginContainer, e.getWrapped(), e.isDocgen(), this.logger, e.getFileName(), pluginInfo);
             } catch (final Exception e) {
                 errorHandler = new InitialisationNucleusErrorHandler(this.pluginContainer, e,
-                                System.getProperty(NucleusCore.DOCGEN_PROPERTY) != null,
+                                NucleusJavaProperties.RUN_DOCGEN,
                                 this.logger,
                                 pluginInfo);
             }

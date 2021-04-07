@@ -93,14 +93,12 @@ import java.util.stream.Collectors;
 
 public final class NucleusCore {
 
-    public static final String DOCGEN_PROPERTY = "nucleus.docgen";
-
     private final PluginContainer pluginContainer;
     private final Path configDirectory;
     private final Logger logger;
     private final Injector injector;
     private final IModuleProvider provider;
-    private final boolean runDocGen = System.getProperty(DOCGEN_PROPERTY) != null;
+    private final boolean runDocGen = NucleusJavaProperties.RUN_DOCGEN;
     private final List<Action> onStartedActions = new LinkedList<>();
     private final IPluginInfo pluginInfo;
 
@@ -283,10 +281,10 @@ public final class NucleusCore {
 
     @Listener
     public void serverStarted(final StartedEngineEvent<Server> event) {
-        if (this.runDocGen) {
+        if (NucleusJavaProperties.DOCGEN_PATH != null) {
             final Path finalPath;
             try {
-                final String docgenPath = System.getProperty(DOCGEN_PROPERTY);
+                final String docgenPath = NucleusJavaProperties.DOCGEN_PATH;
                 if (docgenPath.isEmpty()) {
                     finalPath = this.getDataDirectory();
                 } else {

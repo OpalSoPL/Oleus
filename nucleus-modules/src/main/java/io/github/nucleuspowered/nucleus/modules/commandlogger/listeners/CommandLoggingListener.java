@@ -57,7 +57,7 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
     }
 
     @Listener(order = Order.LAST)
-    public void onCommand(final ExecuteCommandEvent.Post event) {
+    public void onCommand(final ExecuteCommandEvent.Pre event) {
         final Object source = event.cause().root();
         // Check source.
         final boolean accept;
