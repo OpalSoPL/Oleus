@@ -48,36 +48,36 @@ public interface NucleusTextTemplate extends ComponentLike {
 
     /**
      * Gets the {@link Component} where the tokens have been parsed from the
-     * viewpoint of the supplied {@link CommandSource}. Any unknown tokens in
+     * viewpoint of the supplied {@link Object}. Any unknown tokens in
      * the parsed text will be left blank.
      *
-     * <p>Unlike {@link #getForCommandSource(CommandSource)}, this will
+     * <p>Unlike {@link #getForObject(Object)}, this will
      * <strong>not</strong> contain the prefix and suffix in the message.</p>
      *
-     * @param source The {@link CommandSource} that will influence what is
+     * @param source The {@link Object} that will influence what is
      *               displayed by the tokens.
-     * @return The parsed {@link Text}
+     * @return The parsed {@link Component}
      */
     Component getBody(Object source);
 
     /**
-     * Gets the {@link Text} where the tokens have been parsed from the
-     * viewpoint of the supplied {@link CommandSource}. Any unknown tokens in
+     * Gets the {@link Component} where the tokens have been parsed from the
+     * viewpoint of the supplied {@link Object}. Any unknown tokens in
      * the parsed text will be left blank.
      *
-     * <p>Unlike {@link #getForCommandSource(CommandSource, CommandSource)},
+     * <p>Unlike {@link #getForObjectWithSenderToken(Object, Object)},
      * this will <strong>not</strong> contain the prefix and suffix in the
      * message.</p>
      *
-     * @param source The {@link CommandSource} that will influence what is displayed by the tokens.
-     * @param sender The {@link CommandSource} that can be considered the <code>{{sender}}</code>
-     * @return The parsed {@link Text}
+     * @param source The {@link Object} that will influence what is displayed by the tokens.
+     * @param sender The {@link Object} that can be considered the <code>{{sender}}</code>
+     * @return The parsed {@link Component}
      */
     Component getBody(Object source, Object sender);
 
     /**
-     * Gets the {@link Text} where the tokens have been parsed from the
-     * viewpoint of the supplied {@link CommandSource}.
+     * Gets the {@link Component} where the tokens have been parsed from the
+     * viewpoint of the supplied {@link Object}.
      *
      * <p>
      *     By supplying a token array, these token identifiers act as additional
@@ -88,13 +88,13 @@ public interface NucleusTextTemplate extends ComponentLike {
      *     not contain the token start or end delimiters.
      * </p>
      *
-     * <p>Unlike {@link #getForCommandSource(CommandSource, CommandSource)},
+     * <p>Unlike {@link #getForObjectWithTokens(Object, Map)},
      * this will <strong>not</strong> contain the prefix and suffix in the
      * message.</p>
      *
-     * @param source The {@link CommandSource} that will influence what is displayed by the tokens.
+     * @param source The {@link Object} that will influence what is displayed by the tokens.
      * @param tokensArray The extra tokens that can be used to parse a text.
-     * @return The parsed {@link Text}
+     * @return The parsed {@link Component}
      */
     Component getBody(Object source,
             @Nullable Map<String, Function<Object, Optional<ComponentLike>>> tokensArray);

@@ -4,9 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.core.services.impl.permission;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.api.util.NoExceptionAutoClosable;
@@ -22,6 +19,7 @@ import io.github.nucleuspowered.nucleus.core.util.PrettyPrinter;
 import io.github.nucleuspowered.nucleus.core.util.functional.ThrownFunction;
 import net.kyori.adventure.text.Component;
 import org.apache.logging.log4j.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
@@ -35,9 +33,10 @@ import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.util.Tristate;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -46,8 +45,6 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Singleton
 public class NucleusPermissionService implements IPermissionService, IReloadableService.Reloadable, ContextCalculator<Subject> {
@@ -82,12 +79,12 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     public void assignRoleToGroup(final SuggestedLevel role, final Subject subject) {
         for (final Map.Entry<String, IPermissionService.Metadata> permission : this.metadataMap.entrySet()) {
             if (permission.getValue().getSuggestedLevel() == role) {
-                subject.transientSubjectData().setPermission(ImmutableSet.of(), permission.getValue().getPermission(), Tristate.TRUE);
+                subject.transientSubjectData().setPermission(Collections.emptySet(), permission.getValue().getPermission(), Tristate.TRUE);
             }
         }
         for (final Map.Entry<String, IPermissionService.Metadata> permission : this.prefixMetadataMap.entrySet()) {
             if (permission.getValue().getSuggestedLevel() == role) {
-                subject.transientSubjectData().setPermission(ImmutableSet.of(), permission.getValue().getPermission(), Tristate.TRUE);
+                subject.transientSubjectData().setPermission(Collections.emptySet(), permission.getValue().getPermission(), Tristate.TRUE);
             }
         }
     }
@@ -133,7 +130,9 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     @Override public void registerDescriptions() {
-        Preconditions.checkState(!this.init);
+        if (this.init) {
+            throw new IllegalStateException("Init has already started");
+        }
         this.init = true;
         final PermissionService ps = Sponge.server().serviceProvider().permissionService();
         for (final Map.Entry<String, IPermissionService.Metadata> entry : this.metadataMap.entrySet()) {
@@ -225,8 +224,8 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         return new PermissionMessageChannel(this, permission);
     }
 
-    @Override public List<IPermissionService.Metadata> getAllMetadata() {
-        return ImmutableList.copyOf(this.metadataMap.values());
+    @Override public Collection<IPermissionService.Metadata> getAllMetadata() {
+        return Collections.unmodifiableCollection(this.metadataMap.values());
     }
 
     private boolean hasPermission(final Subject subject, final String permission, final boolean checkRole) {

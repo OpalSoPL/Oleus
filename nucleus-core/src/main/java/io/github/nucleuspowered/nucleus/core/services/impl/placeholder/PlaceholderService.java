@@ -4,8 +4,6 @@
  */
 package io.github.nucleuspowered.nucleus.core.services.impl.placeholder;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.core.Util;
@@ -159,7 +157,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
 
             token = token.replaceAll(SUFFIX_PATTERN.pattern(), "");
         } else {
-            modifiersCollection = ImmutableList.of();
+            modifiersCollection = Collections.emptyList();
         }
 
         final PlaceholderParser parser;
