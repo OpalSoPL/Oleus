@@ -79,10 +79,9 @@ public class LocationNode {
      * Gets a {@link Location} from the node.
      *
      * @return The Location
-     * @throws NoSuchWorldException The world does not exist.
      */
-    public ServerLocation getLocation() throws NoSuchWorldException {
-        return this.getLocationIfExists().orElseThrow(NoSuchWorldException::new);
+    public ServerLocation getLocation() {
+        return this.getLocationIfExists().orElseThrow(IllegalStateException::new);
     }
 
     public Vector3d getRotation() {
