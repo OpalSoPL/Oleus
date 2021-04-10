@@ -1,7 +1,8 @@
-Nucleus v2
+Nucleus v3
 ====
 
-For version 1, see the sponge-api/7 branch.
+For version 1, the legacy version for Sponge API 7.1 (Minecraft 1.12), see the tag "S7.1-v1-FINAL".
+For version 2, the current version for Sponge API 7.3 (Minecraft 1.12), see the branch "v2/S7".
 
 * [Source]
 * [Issues]
@@ -10,7 +11,7 @@ For version 1, see the sponge-api/7 branch.
 * [Documentation]
 * [Discord]
 
-Licence: [MIT](LICENSE.md) (except for the Nucleus logo, which is all rights reserved)
+Licence: [MIT](LICENSE.md) (except for the Nucleus logo, which is all rights reserved, and any third party shaded code)
 
 Nucleus is a Sponge plugin that forms a solid base for your server, providing essential commands, events, and other
 tidbits that you might need. Extremely configurable, only loading up the commands and modules you want (and providing a way for
@@ -30,7 +31,7 @@ be grateful for your contributions - we're an open community that appreciates an
 
 ## Getting and Building Nucleus
 
-Nucleus currently uses Gradle 6.8.3 and is compiled using JDK 11 (but to a Java 8 target). 
+Nucleus currently uses Gradle 7.0.0 and is compiled using JDK 11 (but to a Java 8 target). 
 
 To get a copy of the Nucleus source, ensure you have Git installed, and run the following commands from a command prompt
 or terminal:
@@ -65,7 +66,7 @@ You can also use [JitPack](https://jitpack.io/#NucleusPowered/Nucleus) as a repo
 
 The compiled Nucleus plugin includes the following libraries (with their licences in parentheses):
 
-* QuickStart Module Loader (MIT)
+* Vavr 0.10.3 (Apache 2.0)
 
 See [THIRDPARTY.md](THIRDPARTY.md) for more details.
 
