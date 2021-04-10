@@ -52,6 +52,7 @@ fun getGitCommit() : String {
     }
 }
 
+val verbose = rootProject.properties["verbose-compile"] != null
 allprojects {
 
     apply(plugin = "org.cadixdev.licenser")
@@ -67,8 +68,15 @@ allprojects {
         exclude("*.txt")
     }
 
+    if (verbose) {
+        gradle.projectsEvaluated {
+            tasks.withType(JavaCompile::class.java) {
+                options.compilerArgs.add("-Xlint:unchecked")
+                options.isDeprecation = true
+            }
+        }
+    }
 }
-
 
 extra["gitHash"] = getGitCommit()
 
@@ -86,7 +94,6 @@ val versionString: String = if (nucSuffix == null) {
 val filenameSuffix = "SpongeAPI$spongeVersion"
 version = versionString
 
-project(":nucleus-api").version = versionString
 project(":nucleus-core").version = versionString
 
 group = "io.github.nucleuspowered"

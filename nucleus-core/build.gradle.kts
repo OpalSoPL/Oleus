@@ -13,15 +13,7 @@ repositories {
 }
 
 sourceSets {
-    main {
-        java {
-            srcDir("src/main/java")
-        }
-        resources {
-            srcDir("src/main/resources")
-            exclude("assets/nucleus/suggestions/**")
-        }
-    }
+    main
 }
 
 java {
