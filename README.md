@@ -1,7 +1,7 @@
 Nucleus v3
 ====
 
-For version 1, the legacy version for Sponge API 7.1 (Minecraft 1.12), see the tag "S7.1-v1-FINAL".
+For version 1, the legacy version for Sponge API 7.1 (Minecraft 1.12), see the tag "S7.1-v1-FINAL".\
 For version 2, the current version for Sponge API 7.3 (Minecraft 1.12), see the branch "v2/S7".
 
 * [Source]
@@ -52,7 +52,7 @@ javadocs jar will also exist.
 
 Nucleus is available via a Maven repository.
 
-* Repo: `http://repo.drnaylor.co.uk/artifactory/list/minecraft`
+* Repo: `https://repo.drnaylor.co.uk/artifactory/list/minecraft`
 * Group ID: `io.github.nucleuspowered`
 * Artifact Name: `nucleus-api`
 
