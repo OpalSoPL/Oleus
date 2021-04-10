@@ -94,6 +94,7 @@ val versionString: String = if (nucSuffix == null) {
 val filenameSuffix = "SpongeAPI$spongeVersion"
 version = versionString
 
+project(":nucleus-api").version = versionString
 project(":nucleus-core").version = versionString
 
 group = "io.github.nucleuspowered"
