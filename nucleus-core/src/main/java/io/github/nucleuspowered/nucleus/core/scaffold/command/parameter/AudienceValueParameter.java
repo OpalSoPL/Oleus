@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.core.scaffold.command.parameter;
 
 import net.kyori.adventure.audience.Audience;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -20,9 +21,9 @@ import java.util.Optional;
 public final class AudienceValueParameter implements ValueParameter<List<Audience>> {
 
     @Override
-    public List<String> complete(final CommandContext context, final String currentInput) {
+    public List<CommandCompletion> complete(final CommandContext context, final String currentInput) {
         if (currentInput.equals("-")) {
-            return Collections.singletonList("-");
+            return Collections.singletonList(CommandCompletion.of("-"));
         }
         return ResourceKeyedValueParameters.MANY_PLAYERS.get().complete(context, currentInput);
     }

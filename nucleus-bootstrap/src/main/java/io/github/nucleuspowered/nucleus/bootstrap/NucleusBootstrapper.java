@@ -54,7 +54,7 @@ public class NucleusBootstrapper {
     private boolean versionCheck(final IPluginInfo pluginInfo) throws IllegalStateException {
         if (System.getProperty(NO_VERSION_CHECK) != null) {
             final Pattern matching = Pattern.compile("^(?<major>\\d+)\\.(?<minor>\\d+)");
-            final String v = Sponge.platform().container(Platform.Component.API).getMetadata().getVersion();
+            final String v = Sponge.platform().container(Platform.Component.API).metadata().version();
 
             final Matcher version = matching.matcher(NucleusPluginInfo.SPONGE_API_VERSION);
             if (!version.find()) {
@@ -114,9 +114,9 @@ public class NucleusBootstrapper {
             final NucleusErrorHandler errorHandler;
             try {
                 this.logger.info("Nucleus {} running on Sponge API {} ({} version {})", pluginInfo.version(),
-                        Sponge.platform().container(Platform.Component.API).getMetadata().getVersion(),
-                        Sponge.platform().container(Platform.Component.IMPLEMENTATION).getMetadata().getName().orElse("Unknown Implementation"),
-                        Sponge.platform().container(Platform.Component.IMPLEMENTATION).getMetadata().getVersion());
+                        Sponge.platform().container(Platform.Component.API).metadata().version(),
+                        Sponge.platform().container(Platform.Component.IMPLEMENTATION).metadata().name().orElse("Unknown Implementation"),
+                        Sponge.platform().container(Platform.Component.IMPLEMENTATION).metadata().version());
                 this.logger.info("Nucleus is starting...");
                 final NucleusCore core =
                         new NucleusCore(this.pluginContainer, this.configDirectory, this.logger, this.injector, new NucleusModuleProvider(),

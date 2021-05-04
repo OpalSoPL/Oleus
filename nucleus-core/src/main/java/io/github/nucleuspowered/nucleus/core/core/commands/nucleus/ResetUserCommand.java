@@ -12,7 +12,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.UUIDParameter;
+import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.UUIDParameterModifier;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.queryobjects.IUserQueryObject;
@@ -55,8 +55,7 @@ import java.util.function.Consumer;
 )
 public class ResetUserCommand implements ICommandExecutor {
 
-    private final String userKey = "user";
-    private final String uuidKey = "UUID";
+    private final Parameter.Key<UUID> uuidKey = Parameter.key("UUID", UUID.class);
 
     private final Map<UUID, Delete> callbacks = new HashMap<>();
 
@@ -72,9 +71,9 @@ public class ResetUserCommand implements ICommandExecutor {
         return new Parameter[] {
                 Parameter.firstOf(
                         NucleusParameters.ONE_USER,
-                        Parameter.builder(User.class)
-                                .key(NucleusParameters.ONE_USER.key())
-                                .addParser(UUIDParameter.user(serviceCollection.messageProvider()))
+                        Parameter.uuid()
+                                .key(this.uuidKey)
+                                .modifier(UUIDParameterModifier.user(serviceCollection.messageProvider()))
                                 .build()
                 )
         };
@@ -82,7 +81,11 @@ public class ResetUserCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final User user = context.requireOne(NucleusParameters.ONE_USER);
+        final User user = context.getOne(NucleusParameters.ONE_USER)
+                .orElseGet(() -> Sponge.server().userManager().find(context.requireOne(this.uuidKey)).orElse(null));
+        if (user == null) {
+            return context.errorResultLiteral(Component.text("User UUID could not be found."));
+        }
         final boolean deleteall = context.hasFlag("a");
         final UUID responsible = context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID);
 

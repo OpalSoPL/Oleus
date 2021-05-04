@@ -5,13 +5,16 @@
 package io.github.nucleuspowered.nucleus.core.scaffold.command.parameter;
 
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.ValueParameter;
+import org.spongepowered.api.command.parameter.managed.ValueParameterModifier;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.profile.GameProfile;
@@ -23,48 +26,40 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
-public final class UUIDParameter<T> implements ValueParameter<T> {
+public final class UUIDParameterModifier<T> implements ValueParameterModifier<UUID> {
 
     private final Function<UUID, Optional<T>> validator;
     private final IMessageProviderService messageProvider;
 
-    public static UUIDParameter<GameProfile> gameProfile(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.server().gameProfileManager().cache().byId(x), messageProvider);
+    public static UUIDParameterModifier<GameProfile> gameProfile(final IMessageProviderService messageProvider) {
+        return new UUIDParameterModifier<>(x -> Sponge.server().gameProfileManager().cache().findById(x), messageProvider);
     }
 
-    public static UUIDParameter<User> user(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.server().userManager().find(x), messageProvider);
+    public static UUIDParameterModifier<User> user(final IMessageProviderService messageProvider) {
+        return new UUIDParameterModifier<>(x -> Sponge.server().userManager().find(x), messageProvider);
     }
 
-    public static UUIDParameter<ServerPlayer> player(final IMessageProviderService messageProvider) {
-        return new UUIDParameter<>(x -> Sponge.server().player(x), messageProvider);
+    public static UUIDParameterModifier<ServerPlayer> player(final IMessageProviderService messageProvider) {
+        return new UUIDParameterModifier<>(x -> Sponge.server().player(x), messageProvider);
     }
 
-    public UUIDParameter(@Nullable final Function<UUID, Optional<T>> validator, final IMessageProviderService messageProviderService) {
+    public UUIDParameterModifier(@Nullable final Function<UUID, Optional<T>> validator, final IMessageProviderService messageProviderService) {
         this.validator = Objects.requireNonNull(validator);
         this.messageProvider = messageProviderService;
     }
 
     @Override
-    public List<String> complete(final CommandContext context, final String currentInput) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public Optional<? extends T> parseValue(final Parameter.Key<? super T> parameterKey, final ArgumentReader.Mutable reader, final CommandContext.Builder context)
-            throws ArgumentParseException {
-        String a = reader.parseString();
+    public Optional<? extends UUID> modifyResult(Parameter.Key<? super UUID> parameterKey, ArgumentReader.Immutable reader, CommandContext.Builder context, @Nullable UUID value) throws ArgumentParseException {
+        if (value == null) {
+            throw reader.createException(Component.text("UUID cannot be null"));
+        }
         try {
-            if (!a.contains("-") && a.matches("[0-9a-f]{32}")) {
-                a = String.format("%s-%s-%s-%s-%s", a.substring(0, 8), a.substring(8, 12), a.substring(12, 16), a.substring(16, 20), a.substring(20));
-            }
-
-            final UUID uuid = UUID.fromString(a);
-            final T result = this.validator.apply(uuid).orElseThrow(() ->
+            this.validator.apply(value).orElseThrow(() ->
                     reader.createException(this.messageProvider.getMessageFor(context.cause().audience(), "args.uuid.notvalid.nomatch")));
-            return Optional.of(result);
+            return Optional.of(value);
         } catch (final IllegalArgumentException e) {
             throw reader.createException(this.messageProvider.getMessageFor(context.cause().audience(), "args.uuid.notvalid.malformed"));
         }
     }
+
 }

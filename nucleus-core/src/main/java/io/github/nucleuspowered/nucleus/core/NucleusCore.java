@@ -321,7 +321,7 @@ public final class NucleusCore {
         // Teardown data here
         final IStorageManager manager = this.serviceCollection.storageManager();
         manager.saveAndInvalidateAllCaches().whenComplete((v, t) -> manager.detachAll());
-        Sponge.asyncScheduler().tasksByPlugin(this.pluginContainer).forEach(ScheduledTask::cancel);
+        Sponge.asyncScheduler().tasks(this.pluginContainer).forEach(ScheduledTask::cancel);
     }
 
     @Listener

@@ -51,7 +51,7 @@ public class BorderCommand implements ICommandExecutor {
         final int targetDiameter = (int) worldBorder.newDiameter();
 
         // Border centre
-        worldBorderInfo.add(context.getMessage("command.world.border.centre", String.valueOf(centre.getFloorX()), String.valueOf(centre.getFloorZ())));
+        worldBorderInfo.add(context.getMessage("command.world.border.centre", String.valueOf(centre.floorX()), String.valueOf(centre.floorZ())));
         worldBorderInfo.add(context.getMessage("command.world.border.currentdiameter", currentDiameter));
 
         if (currentDiameter != targetDiameter) {

@@ -40,7 +40,7 @@ public class SeenHandler implements NucleusSeenService, ServiceBase {
         Objects.requireNonNull(plugin);
         Objects.requireNonNull(seenInformationProvider);
 
-        final String name = plugin.getMetadata().getName().orElseGet(plugin.getMetadata()::getId);
+        final String name = plugin.metadata().name().orElseGet(plugin.metadata()::id);
         final List<SeenInformationProvider> providers;
         if (this.pluginInformationProviders.containsKey(name)) {
             providers = this.pluginInformationProviders.get(name);

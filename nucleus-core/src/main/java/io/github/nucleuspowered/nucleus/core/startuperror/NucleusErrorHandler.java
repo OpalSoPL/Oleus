@@ -43,7 +43,7 @@ public class NucleusErrorHandler {
 
     public void disable() {
         Sponge.eventManager().unregisterPluginListeners(this.pluginContainer);
-        Sponge.asyncScheduler().tasksByPlugin(this.pluginContainer).forEach(ScheduledTask::cancel);
+        Sponge.asyncScheduler().tasks(this.pluginContainer).forEach(ScheduledTask::cancel);
 
         // Re-register this to warn people about the error.
         Sponge.eventManager().registerListeners(this.pluginContainer, this);
@@ -93,11 +93,11 @@ public class NucleusErrorHandler {
         final PluginContainer impl = platform.container(Platform.Component.IMPLEMENTATION);
         prettyPrinter.add("Minecraft version: %s", platform.minecraftVersion().name());
         prettyPrinter.add("Sponge Implementation: %s %s",
-                impl.getMetadata().getName().orElse("unknown"),
-                impl.getMetadata().getVersion());
+                impl.metadata().name().orElse("unknown"),
+                impl.metadata().version());
         prettyPrinter.add("SpongeAPI: %s %s",
-                api.getMetadata().getName().orElse("unknown"),
-                api.getMetadata().getVersion());
+                api.metadata().name().orElse("unknown"),
+                api.metadata().version());
         prettyPrinter.log(logger, loggerLevel);
     }
 

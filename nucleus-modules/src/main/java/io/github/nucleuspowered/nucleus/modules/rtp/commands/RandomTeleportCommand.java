@@ -84,7 +84,7 @@ public class RandomTeleportCommand implements ICommandExecutor, IReloadableServi
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
         final ServerPlayer player = context.getPlayerFromArgs();
         synchronized (this.cachedTasks) {
-            this.cachedTasks.keySet().removeIf(task -> !Sponge.server().scheduler().taskById(task.uniqueId()).isPresent());
+            this.cachedTasks.keySet().removeIf(task -> !Sponge.server().scheduler().findTask(task.uniqueId()).isPresent());
             if (this.cachedTasks.containsValue(player.uniqueId())) {
                 return context.errorResult("command.rtp.inprogress", player.name());
             }

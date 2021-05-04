@@ -43,7 +43,7 @@ public class ResetBorderCommand implements ICommandExecutor {
         worldBorder.setCenter(0, 0);
 
         // +1 includes the final block (1 -> -1 would otherwise give 2, not 3).
-        final long diameter = Math.abs(world.blockMax().getX() - world.blockMin().getX()) + 1;
+        final long diameter = Math.abs(world.blockMax().x() - world.blockMin().z()) + 1;
         worldBorder.setDiameter(diameter);
 
         context.sendMessage("command.world.setborder.set",

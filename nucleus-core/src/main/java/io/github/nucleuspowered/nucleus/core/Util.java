@@ -135,7 +135,7 @@ public final class Util {
         final Vector3d displacement = location.sub(world.properties().worldBorder().center()).abs();
 
         // Check that we're not too far out.
-        return !(displacement.getX() > radius || displacement.getZ() > radius);
+        return !(displacement.x() > radius || displacement.z() > radius);
     }
 
     public static void compressAndDeleteFile(final Path from) throws IOException {

@@ -182,8 +182,8 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
 
         WorldBorderReset(final WorldBorder border) {
             this.border = border;
-            this.x = border.center().getX();
-            this.z = border.center().getZ();
+            this.x = border.center().x();
+            this.z = border.center().z();
             this.diameter = border.diameter();
         }
 
