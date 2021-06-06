@@ -42,9 +42,11 @@ public class HomeParameter implements ValueParameter<Home> {
     public List<CommandCompletion> complete(final CommandContext context, final String currentInput) {
         final Collection<String> s;
         try {
-            s = this.getTarget(context).map(this.homeService::getHomeNames).orElseGet(Collections::emptyList);
+            s = this.getTarget(context)
+                    .map(this.homeService::getHomeNames)
+                    .orElseGet(Collections::emptyList);
         } catch (final Exception e) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
 
         final String name = currentInput.toLowerCase();

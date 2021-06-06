@@ -115,8 +115,9 @@ public class SetCategoryCommand implements ICommandExecutor {
                     .keySet()
                     .stream()
                     .filter(Objects::nonNull)
-                    .filter(x -> x.getId().startsWith(currentInput))
-                    .map(x -> CommandCompletion.of(x.getId(), x.getDisplayName()))
+                    .map(WarpCategory::getId)
+                    .filter(x -> x.startsWith(currentInput))
+                    .map(CommandCompletion::of)
                     .collect(Collectors.toList());
         }
 

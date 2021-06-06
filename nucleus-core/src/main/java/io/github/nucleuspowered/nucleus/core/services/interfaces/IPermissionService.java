@@ -30,7 +30,7 @@ public interface IPermissionService {
 
     void assignRoleToGroup(SuggestedLevel role, Subject subject);
 
-    void registerContextCalculator(ContextCalculator<Subject> calculator);
+    void registerContextCalculator(ContextCalculator calculator);
 
     boolean hasPermission(UUID playerUUID, String permission);
 

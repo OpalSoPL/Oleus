@@ -22,13 +22,14 @@ java {
 }
 
 dependencies {
-    implementation(project(":nucleus-api"))
+    api(project(":nucleus-api"))
 
     val dep = "org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]
     annotationProcessor(dep)
     api(dep)
 
     api("io.vavr:vavr:0.10.3")
+    implementation("org.spongepowered:timings:1.0-SNAPSHOT")
 
     testImplementation("org.mockito:mockito-all:1.10.19")
     testImplementation("org.powermock:powermock-module-junit4:1.6.4")

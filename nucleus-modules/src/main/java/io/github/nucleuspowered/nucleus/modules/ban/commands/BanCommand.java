@@ -121,7 +121,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         }
 
         // TODO: Fix joins to be async
-        if (service.isBanned(user.profile()).join()) {
+        if (service.banFor(user.profile()).join().isPresent()) {
             return context.errorResult("command.ban.alreadyset",
                     context.getServiceCollection().playerDisplayNameService().getName(user));
         }

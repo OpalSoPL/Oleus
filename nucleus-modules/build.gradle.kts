@@ -30,7 +30,7 @@ java {
 
 dependencies {
     api(project(":nucleus-api"))
-    api(project(":nucleus-core"))
+    implementation(project(":nucleus-core"))
 
     testImplementation("org.mockito:mockito-all:1.10.19")
     testImplementation("org.powermock:powermock-module-junit4:1.6.4")

@@ -24,6 +24,8 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.block.entity.CommandBlock;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -45,9 +47,10 @@ import java.util.OptionalLong;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 @Singleton
-public class NucleusPermissionService implements IPermissionService, IReloadableService.Reloadable, ContextCalculator<Subject> {
+public class NucleusPermissionService implements IPermissionService, IReloadableService.Reloadable, ContextCalculator {
 
     private final IMessageProviderService messageProviderService;
     private final INucleusServiceCollection serviceCollection;
@@ -59,7 +62,6 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     private final Map<String, IPermissionService.Metadata> prefixMetadataMap = new HashMap<>();
 
     private final Map<UUID, Map<String, Context>> standardContexts = new ConcurrentHashMap<>();
-    private final Map<SuggestedLevel, Set<SubjectReference>> appliedRoles = new HashMap<>();
 
     @Inject
     public NucleusPermissionService(
@@ -90,8 +92,8 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
     }
 
     @Override
-    public void registerContextCalculator(final ContextCalculator<Subject> calculator) {
-        Sponge.server().serviceProvider().permissionService().registerContextCalculator(calculator);
+    public void registerContextCalculator(final ContextCalculator calculator) {
+        Sponge.server().serviceProvider().contextService().registerContextCalculator(calculator);
     }
 
     @Override
@@ -205,7 +207,7 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
             final String o = option.toLowerCase();
 
             // Option for context.
-            Optional<String> os = player.option(player.activeContexts(), o);
+            Optional<String> os = player.option(o, player.contextCause());
             if (os.isPresent()) {
                 return os.map(r -> r.isEmpty() ? null : r);
             }
@@ -239,15 +241,15 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
 
     private Tristate hasPermissionTristate(final Subject subject, final String permission, final boolean checkRole) {
         if (checkRole && permission.startsWith("nucleus.")) {
-            final Tristate tristate = subject.permissionValue(subject.activeContexts(), permission);
+            final Tristate tristate = subject.permissionValue(permission, subject.contextCause());
             if (tristate == Tristate.UNDEFINED) {
                 final IPermissionService.@Nullable Metadata result = this.metadataMap.get(permission);
                 if (result != null) { // check the "parent" perm
                     final String perm = result.getSuggestedLevel().getPermission();
                     if (perm == null) {
-                        return subject.permissionValue(subject.activeContexts(), permission);
+                        return subject.permissionValue(permission, subject.contextCause());
                     } else {
-                        return subject.permissionValue(subject.activeContexts(), perm);
+                        return subject.permissionValue(perm, subject.contextCause());
                     }
                 }
 
@@ -255,9 +257,9 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
                     if (permission.startsWith(entry.getKey())) {
                         final String perm = entry.getValue().getSuggestedLevel().getPermission();
                         if (perm == null) {
-                            return subject.permissionValue(subject.activeContexts(), permission);
+                            return subject.permissionValue(permission, subject.contextCause());
                         } else {
-                            return subject.permissionValue(subject.activeContexts(), perm);
+                            return subject.permissionValue(perm, subject.contextCause());
                         }
                     }
                 }
@@ -356,34 +358,22 @@ public class NucleusPermissionService implements IPermissionService, IReloadable
         }
     }
 
-    @Override
-    public void accumulateContexts(final Subject target, final Set<Context> accumulator) {
-        if (target instanceof Identifiable) {
-            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).uniqueId());
-            if (ctxs != null && !ctxs.isEmpty()) {
-                accumulator.addAll(ctxs.values());
-            }
-        }
-    }
-
-    @Override
-    public boolean matches(final Context context, final Subject target) {
-        if (target instanceof Identifiable) {
-            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) target).uniqueId());
-            if (ctxs != null && !ctxs.isEmpty()) {
-                final Context ctx = ctxs.get(context.getKey());
-                return ctx.equals(context);
-            }
-        }
-        return false;
-    }
-
     private int getDefaultLevel(final Subject subject) {
         if (subject instanceof SystemSubject || subject instanceof Server || subject instanceof CommandBlock) {
             return Integer.MAX_VALUE;
         }
 
         return 1;
+    }
+
+    @Override
+    public void accumulateContexts(final Cause source, final Consumer<Context> accumulator) {
+        if (source.root() instanceof Identifiable) {
+            final Map<String, Context> ctxs = this.standardContexts.get(((Identifiable) source.root()).uniqueId());
+            if (ctxs != null && !ctxs.isEmpty()) {
+                ctxs.values().forEach(accumulator);
+            }
+        }
     }
 
     public static class Metadata implements IPermissionService.Metadata {

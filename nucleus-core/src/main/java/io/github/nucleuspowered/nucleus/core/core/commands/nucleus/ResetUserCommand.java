@@ -12,7 +12,6 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandResult;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
-import io.github.nucleuspowered.nucleus.core.scaffold.command.parameter.UUIDParameterModifier;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.modular.IUserDataObject;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.queryobjects.IUserQueryObject;
@@ -55,7 +54,7 @@ import java.util.function.Consumer;
 )
 public class ResetUserCommand implements ICommandExecutor {
 
-    private final Parameter.Key<UUID> uuidKey = Parameter.key("UUID", UUID.class);
+    private static final Parameter.Value<UUID> UUID_PARAMETER = Parameter.uuid().key("user").build();
 
     private final Map<UUID, Delete> callbacks = new HashMap<>();
 
@@ -71,20 +70,20 @@ public class ResetUserCommand implements ICommandExecutor {
         return new Parameter[] {
                 Parameter.firstOf(
                         NucleusParameters.ONE_USER,
-                        Parameter.uuid()
-                                .key(this.uuidKey)
-                                .modifier(UUIDParameterModifier.user(serviceCollection.messageProvider()))
-                                .build()
+                        ResetUserCommand.UUID_PARAMETER
                 )
         };
     }
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final User user = context.getOne(NucleusParameters.ONE_USER)
-                .orElseGet(() -> Sponge.server().userManager().find(context.requireOne(this.uuidKey)).orElse(null));
-        if (user == null) {
-            return context.errorResultLiteral(Component.text("User UUID could not be found."));
+        final User user;
+        final Optional<User> o = context.getOne(NucleusParameters.ONE_USER);
+        if (o.isPresent()) {
+            user = o.get();
+        } else {
+            final UUID uuid = context.requireOne(ResetUserCommand.UUID_PARAMETER);
+            user = Sponge.server().userManager().find(uuid).orElseThrow(() -> context.createException("args.uuid.notvalid.nomatch"));
         }
         final boolean deleteall = context.hasFlag("a");
         final UUID responsible = context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID);

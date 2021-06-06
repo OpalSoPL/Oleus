@@ -82,7 +82,7 @@ public class TempBanCommand implements ICommandExecutor, IReloadableService.Relo
         final BanService service = Sponge.server().serviceProvider().banService();
 
         // TODO: Fix joins to be async
-        if (service.isBanned(u.profile()).join()) {
+        if (service.banFor(u.profile()).join().isPresent()) {
             return context.errorResult("command.ban.alreadyset", u.name());
         }
 
