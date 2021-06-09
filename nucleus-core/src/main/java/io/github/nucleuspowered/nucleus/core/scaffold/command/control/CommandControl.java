@@ -246,7 +246,9 @@ public final class CommandControl {
         if (result.isSuccess()) {
             this.onSuccess(contextSource);
         } else if (!result.isWillContinue()) {
-            this.onFail(contextSource, result.getErrorMessage(contextSource).orElse(null));
+            // This occurs when no exception is thrown, so the error in the command result
+            // will be returned.
+            this.onFail(contextSource, null);
         }
 
         // The command will continue later. Don't do anything.

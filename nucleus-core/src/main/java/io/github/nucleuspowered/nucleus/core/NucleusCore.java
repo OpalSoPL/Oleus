@@ -473,9 +473,9 @@ public final class NucleusCore {
         for (final ModuleContainer moduleContainer : moduleContainers) {
             if (event.shouldLoad(moduleContainer.getId())) {
                 containersToReturn.add(moduleContainer);
-                this.serviceCollection.moduleReporter().provideEnabledModule(moduleContainer);
             }
         }
+        containersToReturn.forEach(this.serviceCollection.moduleReporter()::provideEnabledModule);
         return containersToReturn;
     }
 
