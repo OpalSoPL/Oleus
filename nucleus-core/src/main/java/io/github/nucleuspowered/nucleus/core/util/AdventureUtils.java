@@ -5,7 +5,6 @@
 package io.github.nucleuspowered.nucleus.core.util;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public final class AdventureUtils {

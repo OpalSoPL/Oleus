@@ -26,6 +26,9 @@ import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.jvm.Plugin;
 
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,11 +59,18 @@ public class NucleusBootstrapper {
             final Pattern matching = Pattern.compile("^(?<major>\\d+)\\.(?<minor>\\d+)");
             final String v = Sponge.platform().container(Platform.Component.API).metadata().version();
 
-            final Matcher version = matching.matcher(NucleusPluginInfo.SPONGE_API_VERSION);
-            if (!version.find()) {
-                return false; // can't compare.
+            final Optional<Matcher> versionResult = Arrays.stream(pluginInfo.validVersions()).map(x -> {
+                final Matcher version1 = matching.matcher(NucleusPluginInfo.SPONGE_API_VERSION);
+                if (version1.find()) {
+                    return version1;
+                }
+                return null;
+            }).filter(Objects::nonNull).findFirst();
+            if (!versionResult.isPresent()) {
+                return false;
             }
 
+            final Matcher version = versionResult.get();
             final int maj = Integer.parseInt(version.group("major"));
             final int min = Integer.parseInt(version.group("minor"));
             //noinspection MismatchedStringCase,ConstantConditions

@@ -61,4 +61,10 @@ blossom {
     replaceToken("@gitHash@", rootProject.extra["gitHash"])
 
     replaceToken("@spongeversion@", rootProject.properties["declaredApiVersion"]) //declaredApiVersion
+    val r = rootProject.properties["validVersions"]
+    if (r == null) {
+        replaceToken("@validversions@", rootProject.properties["declaredApiVersion"]) //validVersions
+    } else {
+        replaceToken("@validversions@", r) //validVersions
+    }
 }
