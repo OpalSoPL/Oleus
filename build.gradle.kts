@@ -81,15 +81,18 @@ allprojects {
 extra["gitHash"] = getGitCommit()
 
 // Get the Level
-val nucVersion = project.properties["nucleusVersion"]?.toString()!!
-val nucSuffix : String? = project.properties["nucleusVersionSuffix"]?.toString()
+val nucleusVersion: String by project // = project.properties["nucleusVersion"]?.toString()!!
+val nucleusVersionSuffix : String? by project // = project.properties["nucleusVersionSuffix"]?.toString()
+val vavrVersion: String by project
+val declaredApiVersion: String by project
+val spongeApiVersion: String by project
 
-var level = getLevel(nucVersion, nucSuffix)
-val spongeVersion: String = project.properties["declaredApiVersion"]!!.toString()
-val versionString: String = if (nucSuffix == null) {
-    nucVersion
+var level = getLevel(nucleusVersion, nucleusVersionSuffix)
+val spongeVersion: String = declaredApiVersion
+val versionString: String = if (nucleusVersionSuffix == null) {
+    nucleusVersion
 } else {
-    "$nucVersion-$nucSuffix"
+    "$nucleusVersion-$nucleusVersionSuffix"
 }
 val filenameSuffix = "SpongeAPI$spongeVersion"
 version = versionString
@@ -103,7 +106,7 @@ defaultTasks.add("licenseFormat")
 defaultTasks.add("build")
 
 sponge {
-    apiVersion("${project.properties["spongeApiVersion"]}")
+    apiVersion("$spongeApiVersion")
     platform(org.spongepowered.gradle.common.SpongePlatform.VANILLA)
     plugin("nucleus") {
         loader(org.spongepowered.gradle.plugin.config.PluginLoaders.JAVA_PLAIN)
@@ -193,7 +196,7 @@ val relNotes by tasks.registering(RelNotesTask::class) {
 val writeRelNotes by tasks.registering {
     dependsOn(relNotes)
     doLast {
-        Files.write(project.projectDir.toPath().resolve("changelogs").resolve("${nucVersion}.md"),
+        Files.write(project.projectDir.toPath().resolve("changelogs").resolve("${nucleusVersion}.md"),
                 relNotes.get().relNotes!!.toByteArray(StandardCharsets.UTF_8))
     }
 }
@@ -201,7 +204,7 @@ val writeRelNotes by tasks.registering {
 val outputRelNotes by tasks.registering {
     dependsOn(relNotes)
     doLast {
-        Files.write(project.projectDir.toPath().resolve("output").resolve("${nucVersion}.md"),
+        Files.write(project.projectDir.toPath().resolve("output").resolve("${nucleusVersion}.md"),
                 relNotes.get().relNotes!!.toByteArray(StandardCharsets.UTF_8))
     }
 }
@@ -267,7 +270,7 @@ tasks {
         doFirst {
             manifest {
                 attributes["Implementation-Title"] = project.name
-                attributes["SpongeAPI-Version"] = project.properties["spongeApiVersion"]
+                attributes["SpongeAPI-Version"] = spongeApiVersion
                 attributes["Implementation-Version"] = project.version
                 attributes["Git-Hash"] = gitHash.get().result
             }
@@ -278,16 +281,23 @@ tasks {
             include(project(":nucleus-core"))
             include(project(":nucleus-modules"))
             include(project(":nucleus-bootstrap"))
-            include(dependency("io.vavr:vavr:0.10.3"))
+            include(dependency("io.vavr:vavr:$vavrVersion"))
         }
 
         if (!project.properties.containsKey("norelocate")) {
             relocate("io.vavr", "io.github.nucleuspowered.relocate.io.vavr")
         }
 
+        minimize {
+            exclude(project(":nucleus-api"))
+            exclude(project(":nucleus-core"))
+            exclude(project(":nucleus-modules"))
+            exclude(project(":nucleus-bootstrap"))
+        }
+
         exclude("io/github/nucleuspowered/nucleus/api/NucleusAPIMod.class")
-        val minecraftVersion = project.properties["minecraftversion"]
-        archiveFileName.set("Nucleus-${versionString}-MC${minecraftVersion}-$filenameSuffix-plugin.jar")
+        val minecraftversion: String by project
+        archiveFileName.set("Nucleus-${versionString}-MC${minecraftversion}-$filenameSuffix-plugin.jar")
     }
 
     build {

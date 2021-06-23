@@ -21,14 +21,17 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+val spongeApiVersion: String by rootProject
+val vavrVersion: String by rootProject
+
 dependencies {
     api(project(":nucleus-api"))
 
-    val dep = "org.spongepowered:spongeapi:" + rootProject.properties["spongeApiVersion"]
+    val dep = "org.spongepowered:spongeapi:$spongeApiVersion"
     annotationProcessor(dep)
     api(dep)
 
-    api("io.vavr:vavr:0.10.3")
+    api("io.vavr:vavr:$vavrVersion")
     implementation("org.spongepowered:timings:1.0-SNAPSHOT")
 
     testImplementation("org.mockito:mockito-all:1.10.19")
