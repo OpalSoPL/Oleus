@@ -78,12 +78,12 @@ public class ResetUserCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         final User user;
-        final Optional<User> o = context.getOne(NucleusParameters.ONE_USER);
+        final Optional<UUID> o = context.getOne(NucleusParameters.ONE_USER);
         if (o.isPresent()) {
-            user = o.get();
+            user = context.getUserFromArgs();
         } else {
             final UUID uuid = context.requireOne(ResetUserCommand.UUID_PARAMETER);
-            user = Sponge.server().userManager().find(uuid).orElseThrow(() -> context.createException("args.uuid.notvalid.nomatch"));
+            user = Sponge.server().userManager().load(uuid).join().orElseThrow(() -> context.createException("args.uuid.notvalid.nomatch"));
         }
         final boolean deleteall = context.hasFlag("a");
         final UUID responsible = context.uniqueId().orElse(Util.CONSOLE_FAKE_UUID);
@@ -173,7 +173,7 @@ public class ResetUserCommand implements ICommandExecutor {
         @Override
         public void accept(final Audience source) {
             final IMessageProviderService messageProvider = this.serviceCollection.messageProvider();
-            final User user = Sponge.server().userManager().find(this.user).get();
+            final User user = Sponge.server().userManager().load(this.user).join().get();
             if (user.isOnline()) {
                 final ServerPlayer player = user.player().get();
                 final Component kickReason = messageProvider.getMessageFor(player, "command.kick.defaultreason");
@@ -196,7 +196,7 @@ public class ResetUserCommand implements ICommandExecutor {
                             .build());
 
             // Unload the player in a second, just to let events fire.
-            Sponge.asyncScheduler().createExecutor(this.serviceCollection.pluginContainer()).schedule(() -> {
+            Sponge.asyncScheduler().executor(this.serviceCollection.pluginContainer()).schedule(() -> {
                 // TODO: Do this properly
                 final Optional<? extends Ban> ban = future.join();
                 final IStorageService.Keyed<UUID, IUserQueryObject, IUserDataObject> userStorageService =
@@ -206,9 +206,10 @@ public class ResetUserCommand implements ICommandExecutor {
                 try {
                     // Remove them from the cache immediately.
                     userStorageService.clearCache();
-                    userStorageService.delete(user.uniqueId());
+                    final UUID uuid = user.uniqueId();
+                    userStorageService.delete(uuid);
                     if (this.all) {
-                        if (Sponge.server().userManager().delete(user)) {
+                        if (Sponge.server().userManager().delete(uuid).join()) {
                             source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.completeall", user.name()));
                         } else {
                             source.sendMessage(messageProvider.getMessageFor(source, "command.nucleus.reset.completenonm", user.name()));

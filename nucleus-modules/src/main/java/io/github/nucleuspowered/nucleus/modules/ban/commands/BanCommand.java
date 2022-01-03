@@ -65,7 +65,7 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         final String r = context.getOne(NucleusParameters.REASON)
                 .orElseGet(() -> context.getMessageString("ban.defaultreason"));
 
-        final Optional<? extends User> optionalUser = context.getOne(NucleusParameters.ONE_USER);
+        final Optional<? extends User> optionalUser = context.getOptionalUserFromUUID(NucleusParameters.ONE_USER);
         if (optionalUser.isPresent()) {
             // power check
             if (!optionalUser.get().isOnline() && !context.testPermission(BanPermissions.BAN_OFFLINE)) {
@@ -86,16 +86,16 @@ public class BanCommand implements ICommandExecutor, IReloadableService.Reloadab
         final String userToFind = context.requireOne(NucleusParameters.STRING_NAME);
 
         // Get the profile async.
-        Sponge.asyncScheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
+        Sponge.asyncScheduler().executor(context.getServiceCollection().pluginContainer()).execute(() -> {
             final GameProfileManager gpm = Sponge.server().gameProfileManager();
             try {
                 final GameProfile gp = gpm.profile(userToFind).get();
 
                 // Ban the user sync.
-                Sponge.server().scheduler().createExecutor(context.getServiceCollection().pluginContainer()).execute(() -> {
+                Sponge.server().scheduler().executor(context.getServiceCollection().pluginContainer()).execute(() -> {
                     // Create the user.
                     final UserManager uss = Sponge.server().userManager();
-                    final User user = uss.findOrCreate(gp);
+                    final User user = uss.loadOrCreate(gp.uuid()).join();
                     context.sendMessage("gameprofile.new", user.name());
 
                     try {

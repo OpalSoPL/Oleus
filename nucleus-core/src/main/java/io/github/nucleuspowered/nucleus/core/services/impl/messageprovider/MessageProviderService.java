@@ -20,14 +20,21 @@ import io.github.nucleuspowered.nucleus.core.services.impl.messageprovider.repos
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IUserPreferenceService;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.resource.Resource;
+import org.spongepowered.api.resource.ResourcePath;
+import org.spongepowered.api.resource.pack.Pack;
+import org.spongepowered.api.resource.pack.PackType;
 import org.spongepowered.api.util.locale.LocaleSource;
 import org.spongepowered.api.util.locale.Locales;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -42,12 +49,13 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
 @Singleton
 public class MessageProviderService implements IMessageProviderService, IReloadableService.Reloadable {
 
     private static final String LANGUAGE_KEY_PREFIX = "language.";
-    private static final String MESSAGES_BUNDLE = "assets.nucleus.messages";
+    private static final String MESSAGES_BUNDLE = "data.plugin-nucleus.messages";
 
     private static final String MESSAGES_BUNDLE_RESOURCE_LOC = "messages_{0}.properties";
 
@@ -298,17 +306,24 @@ public class MessageProviderService implements IMessageProviderService, IReloada
 
     private PropertiesMessageRepository getPropertiesMessagesRepository(final Locale locale) {
         return this.messagesMap.computeIfAbsent(locale, key -> {
-            if (Sponge.assetManager().asset(
-                    this.serviceCollection.pluginContainer(),
-                    MessageFormat.format(MESSAGES_BUNDLE_RESOURCE_LOC, locale.toString())).isPresent()) {
-                // it exists
-                return new PropertiesMessageRepository(
-                        this.serviceCollection.textStyleService(),
-                        this.serviceCollection.playerDisplayNameService(),
-                        ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, UTF8Control.INSTANCE));
-            } else {
-                return this.defaultMessagesResource;
-            }
+            final Pack pack = Sponge.server().packRepository().pack(this.serviceCollection.pluginContainer());
+            return Try.of(() ->
+                        pack.contents().resource(PackType.server(), ResourcePath.of(this.serviceCollection.pluginContainer(),
+                                MessageFormat.format(MESSAGES_BUNDLE_RESOURCE_LOC, locale.toString())))
+                    )
+                    .flatMap(optionalResource -> Option.ofOptional(optionalResource).toTry())
+                            .map(r -> {
+                                // we don't need it any more
+                                Try.of(() -> {
+                                    r.close();
+                                    return null;
+                                });
+                                return new PropertiesMessageRepository(
+                                        this.serviceCollection.textStyleService(),
+                                        this.serviceCollection.playerDisplayNameService(),
+                                        ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, UTF8Control.INSTANCE));
+                            })
+                            .getOrElse(this.defaultMessagesResource);
         });
     }
 

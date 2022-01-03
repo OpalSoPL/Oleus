@@ -1,21 +1,23 @@
 import io.github.nucleuspowered.gradle.enums.getLevel
 import io.github.nucleuspowered.gradle.task.RelNotesTask
 import io.github.nucleuspowered.gradle.task.StdOutExec
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.spongepowered.gradle.plugin.config.PluginLoaders
+import org.spongepowered.plugin.metadata.model.PluginDependency
 import java.io.ByteArrayOutputStream
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
-val kotlin_version: String by extra
+val kotlinVersion: String? by project
+var kotlin_version: String by extra
+kotlin_version = kotlinVersion!!
 buildscript {
-    var kotlin_version: String by extra
-    kotlin_version = "1.3.61"
+    val kotlinVersion: String? by project
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath(kotlin("gradle-plugin", kotlin_version))
+        classpath(kotlin("gradle-plugin", kotlinVersion))
     }
 }
 
@@ -25,15 +27,10 @@ plugins {
     eclipse
     `maven-publish`
     // id("com.github.hierynomus.license") version "0.15.0" apply false
-    id("org.cadixdev.licenser") version "0.5.1" apply false
+    id("org.cadixdev.licenser") version "0.6.1" apply false
     id("net.kyori.blossom") version "1.2.0"
     id("com.github.johnrengelman.shadow") version "5.2.0"
-    id("org.spongepowered.gradle.plugin") version "1.0.2"
-    // id("org.spongepowered.gradle.plugin") version "0.11.0-SNAPSHOT"
-    kotlin("jvm") version "1.3.61"
-}
-apply {
-    plugin("kotlin")
+    id("org.spongepowered.gradle.plugin") version "2.0.0"
 }
 
 // Until I can figure out how to get Blossom to accept task outputs, if at all
@@ -58,13 +55,13 @@ allprojects {
     apply(plugin = "org.cadixdev.licenser")
 
     configure<org.cadixdev.gradle.licenser.LicenseExtension> {
-        header = rootProject.file("HEADER.txt")
-        newLine = false
+        header(rootProject.file("HEADER.txt"))
+        newLine(false)
         exclude("**/*.info")
         exclude("assets/**")
         exclude("*.kts")
         exclude("**/*.json")
-        exclude("*.properties")
+        exclude("**/*.properties")
         exclude("*.txt")
     }
 
@@ -106,12 +103,15 @@ defaultTasks.add("licenseFormat")
 defaultTasks.add("build")
 
 sponge {
-    apiVersion("$spongeApiVersion")
-    platform(org.spongepowered.gradle.common.SpongePlatform.VANILLA)
+    apiVersion(spongeApiVersion)
+    license("MIT")
+    loader {
+        name(PluginLoaders.JAVA_PLAIN)
+        version("1.0")
+    }
     plugin("nucleus") {
-        loader(org.spongepowered.gradle.plugin.config.PluginLoaders.JAVA_PLAIN)
         displayName("Nucleus")
-        mainClass("io.github.nucleuspowered.nucleus.bootstrap.NucleusBootstrapper")
+        entrypoint("io.github.nucleuspowered.nucleus.bootstrap.NucleusBootstrapper")
         description("Nucleus")
         version(versionString)
         links {
@@ -123,7 +123,7 @@ sponge {
             description("Lead Developer")
         }
         dependency("spongeapi") {
-            loadOrder(org.spongepowered.plugin.metadata.PluginDependency.LoadOrder.AFTER)
+            loadOrder(PluginDependency.LoadOrder.AFTER)
             optional(false)
         }
     }
@@ -143,7 +143,7 @@ dependencies {
     implementation(project(":nucleus-api"))
     implementation(project(":nucleus-core"))
     implementation(project(":nucleus-bootstrap"))
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.13.2")
 }
 
 /**
@@ -219,15 +219,6 @@ val upload by tasks.registering(io.github.nucleuspowered.gradle.task.UploadToOre
     releaseLevel = { level }
     apiKey = properties["ore_apikey"]?.toString() ?: System.getenv("NUCLEUS_ORE_APIKEY")
     pluginid = "nucleus"
-}
-
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
 }
 
 val setupDocGen by tasks.registering(io.github.nucleuspowered.gradle.task.SetupServer::class) {

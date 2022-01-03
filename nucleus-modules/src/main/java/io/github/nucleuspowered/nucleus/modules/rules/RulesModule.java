@@ -12,6 +12,8 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.resource.ResourcePath;
+import org.spongepowered.api.resource.pack.Pack;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,11 +25,13 @@ public class RulesModule implements IModule.Configurable<RulesConfig> {
 
     @Override
     public void init(final INucleusServiceCollection serviceCollection) {
+        final Pack pack = Sponge.server().packRepository().pack(serviceCollection.pluginContainer());
         serviceCollection.textFileControllerCollection()
                 .register(ID,
                         new TextFileController(
+                                serviceCollection.pluginContainer(),
                                 serviceCollection.textTemplateFactory(),
-                                Sponge.assetManager().asset(serviceCollection.pluginContainer(), "rules.txt").get(),
+                                ResourcePath.of(pack.id(), "rules.txt"),
                                 serviceCollection.configDir().resolve("rules.txt")
                         ));
     }

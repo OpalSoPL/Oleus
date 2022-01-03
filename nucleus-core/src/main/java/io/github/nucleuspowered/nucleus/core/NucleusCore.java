@@ -309,7 +309,7 @@ public final class NucleusCore {
         }
         this.onStartedActions.forEach(Action::action);
         this.serviceCollection.getServiceUnchecked(UniqueUserService.class).resetUniqueUserCount();
-        Sponge.asyncScheduler().createExecutor(this.pluginContainer)
+        Sponge.asyncScheduler().executor(this.pluginContainer)
                 .submit(() -> this.serviceCollection.userCacheService().startFilewalkIfNeeded());
         this.serviceCollection.platformService().setGameStartedTime();
     }
@@ -392,7 +392,7 @@ public final class NucleusCore {
                     this.serviceCollection.reloadableService().registerReloadable((IReloadableService.Reloadable) taskBase);
                 }
                 this.onStartedActions.add(() -> Sponge.asyncScheduler()
-                        .createExecutor(this.pluginContainer)
+                        .executor(this.pluginContainer)
                         .scheduleAtFixedRate(
                                 taskBase,
                                 taskBase.interval().getSeconds(),

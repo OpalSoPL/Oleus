@@ -57,14 +57,13 @@ public class UnbanCommand implements ICommandExecutor, IReloadableService.Reload
                     "command.checkban.notset", Util.getNameOrUnkown(context, profile));
         }
 
-        final User user = Sponge.server().userManager().findOrCreate(profile);
         if (this.levelConfig.isUseLevels() &&
-                !context.isPermissionLevelOkay(user,
+                !context.isPermissionLevelOkay(profile.uuid(),
                         BanPermissions.BAN_LEVEL_KEY,
                         BanPermissions.BASE_UNBAN,
                         this.levelConfig.isCanAffectSameLevel())) {
             // Failure.
-            return context.errorResult("command.modifiers.level.insufficient", user.name());
+            return context.errorResult("command.modifiers.level.insufficient", profile.name());
         }
 
         service.remove(obp.get());

@@ -37,7 +37,7 @@ public class UserPreferenceService implements IUserPreferenceService {
     public UserPreferenceService(final INucleusServiceCollection serviceCollection) {
         this.serviceCollection = serviceCollection;
         this.resourceKey = ResourceKey.of(serviceCollection.pluginContainer(), "preference_service");
-        this.registryType = RegistryType.of(RegistryRoots.SPONGE, this.resourceKey).asDefaultedType(() -> Sponge.game().registries());
+        this.registryType = RegistryType.of(RegistryRoots.SPONGE, this.resourceKey).asDefaultedType(Sponge::game);
         this.provider = new NucleusKeysProvider(this.registryType);
     }
 
