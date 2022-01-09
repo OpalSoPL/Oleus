@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -61,7 +62,7 @@ public final class TextFileController {
     /**
      * The internal {@link ResourcePath} that represents the default file.
      */
-    @Nullable private final ResourcePath resourcePath;
+    @Nullable private final Supplier<ResourcePath> resourcePath;
 
     /**
      * Holds the file location.
@@ -91,13 +92,16 @@ public final class TextFileController {
 
     public TextFileController(
             final PluginContainer pluginContainer,
-            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final ResourcePath asset, final Path fileLocation) {
-        this(pluginContainer, textTemplateFactory, asset, fileLocation, false);
+            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final String path, final Path fileLocation) {
+        this(pluginContainer, textTemplateFactory, path == null ? null : () -> {
+            final Pack pluginPack = Sponge.server().packRepository().pack(pluginContainer);
+            return ResourcePath.of(pluginPack.id(), path);
+        }, fileLocation, false);
     }
 
     private TextFileController(
             final PluginContainer pluginContainer,
-            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final ResourcePath resourcePath, final Path fileLocation,
+            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final Supplier<ResourcePath> resourcePath, final Path fileLocation,
             final boolean getTitle) {
         this.textTemplateFactory = textTemplateFactory;
         this.resourcePath = resourcePath;
@@ -115,10 +119,10 @@ public final class TextFileController {
         if (this.resourcePath != null && !Files.exists(this.fileLocation)) {
             final Pack pluginPack = Sponge.server().packRepository().pack(this.pluginContainer);
             // Create the file
-            final Optional<Resource> o = pluginPack.contents().resource(PackType.server(), this.resourcePath);
+            final Optional<Resource> o = pluginPack.contents().resource(PackType.server(), this.resourcePath.get());
             if (o.isPresent()) {
                 try (final Resource resource = o.get()) {
-                    Files.copy(resource.inputStream(), this.fileLocation, StandardCopyOption.ATOMIC_MOVE);
+                    Files.copy(resource.inputStream(), this.fileLocation);
                 }
             }
         }

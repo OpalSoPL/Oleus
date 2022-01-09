@@ -33,7 +33,7 @@ public class InfoModule implements IModule.Configurable<InfoConfig> {
         final TextFileController motdController = new TextFileController(
                 serviceCollection.pluginContainer(),
                 serviceCollection.textTemplateFactory(),
-                ResourcePath.of("nucleus", "motd.txt"),
+                "motd.txt",
                 serviceCollection.configDir().resolve("motd.txt"));
         serviceCollection.textFileControllerCollection().register(InfoModule.MOTD_KEY, motdController);
 

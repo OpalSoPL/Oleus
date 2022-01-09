@@ -54,7 +54,7 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
     private void copyIfNotExists(final Logger logger, final Pack pack, final ResourcePath path, final Path target) {
         if (Files.notExists(target)) {
             try (final Resource resource = pack.contents().requireResource(PackType.server(), path)) {
-                Files.copy(resource.inputStream(), target, StandardCopyOption.ATOMIC_MOVE);
+                Files.copy(resource.inputStream(), target);
             } catch (final IOException e) {
                 logger.error("Could not find resource {} when it should exist.", path.toString());
             }

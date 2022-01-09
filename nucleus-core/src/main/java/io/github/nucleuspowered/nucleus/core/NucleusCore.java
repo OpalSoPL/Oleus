@@ -46,6 +46,8 @@ import io.leangen.geantyref.TypeToken;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.Client;
+import org.spongepowered.api.Engine;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;

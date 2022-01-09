@@ -35,6 +35,7 @@ import org.spongepowered.api.util.locale.LocaleSource;
 import org.spongepowered.api.util.locale.Locales;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -56,8 +57,11 @@ public class MessageProviderService implements IMessageProviderService, IReloada
 
     private static final String LANGUAGE_KEY_PREFIX = "language.";
     private static final String MESSAGES_BUNDLE = "data.plugin-nucleus.messages";
+    private static final String MESSAGES_BUNDLE_PATH = "/" + MessageProviderService.MESSAGES_BUNDLE.replace('.', '/');
 
     private static final String MESSAGES_BUNDLE_RESOURCE_LOC = "messages_{0}.properties";
+    private static final String MESSAGES_BUNDLE_RESOURCE_PATH_AND_LOC =
+            MessageProviderService.MESSAGES_BUNDLE_PATH + "/" + MessageProviderService.MESSAGES_BUNDLE_RESOURCE_LOC;
 
     private static final Set<Locale> KNOWN_LOCALES;
     private static final Map<String, Locale> LOCALES = new HashMap<>();
@@ -306,24 +310,21 @@ public class MessageProviderService implements IMessageProviderService, IReloada
 
     private PropertiesMessageRepository getPropertiesMessagesRepository(final Locale locale) {
         return this.messagesMap.computeIfAbsent(locale, key -> {
-            final Pack pack = Sponge.server().packRepository().pack(this.serviceCollection.pluginContainer());
-            return Try.of(() ->
-                        pack.contents().resource(PackType.server(), ResourcePath.of(this.serviceCollection.pluginContainer(),
-                                MessageFormat.format(MESSAGES_BUNDLE_RESOURCE_LOC, locale.toString())))
-                    )
-                    .flatMap(optionalResource -> Option.ofOptional(optionalResource).toTry())
-                            .map(r -> {
-                                // we don't need it any more
-                                Try.of(() -> {
-                                    r.close();
-                                    return null;
-                                });
-                                return new PropertiesMessageRepository(
-                                        this.serviceCollection.textStyleService(),
-                                        this.serviceCollection.playerDisplayNameService(),
-                                        ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, UTF8Control.INSTANCE));
-                            })
-                            .getOrElse(this.defaultMessagesResource);
+            final InputStream toClose = this.getClass().getResourceAsStream(
+                    MessageFormat.format(MessageProviderService.MESSAGES_BUNDLE_RESOURCE_PATH_AND_LOC, locale.toString()));
+            final boolean found = toClose != null;
+            if (found) {
+                try {
+                    toClose.close();
+                } catch (final IOException ignored) {
+                }
+                return new PropertiesMessageRepository(
+                        this.serviceCollection.textStyleService(),
+                        this.serviceCollection.playerDisplayNameService(),
+                        ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, UTF8Control.INSTANCE));
+            }
+
+            return this.defaultMessagesResource;
         });
     }
 
