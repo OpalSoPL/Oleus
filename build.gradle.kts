@@ -29,8 +29,8 @@ plugins {
     // id("com.github.hierynomus.license") version "0.15.0" apply false
     id("org.cadixdev.licenser") version "0.6.1" apply false
     id("net.kyori.blossom") version "1.2.0"
-    id("com.github.johnrengelman.shadow") version "5.2.0"
-    id("org.spongepowered.gradle.plugin") version "2.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("org.spongepowered.gradle.plugin") version "2.0.1"
 }
 
 // Until I can figure out how to get Blossom to accept task outputs, if at all
@@ -53,6 +53,7 @@ val verbose = rootProject.properties["verbose-compile"] != null
 allprojects {
 
     apply(plugin = "org.cadixdev.licenser")
+    apply(plugin = "java-library")
 
     configure<org.cadixdev.gradle.licenser.LicenseExtension> {
         header(rootProject.file("HEADER.txt"))
@@ -72,6 +73,14 @@ allprojects {
                 options.isDeprecation = true
             }
         }
+    }
+
+    dependencies {
+        testImplementation("org.mockito:mockito-all:1.10.19")
+        testImplementation("org.powermock:powermock-module-junit4:2.0.9")
+        testImplementation("org.powermock:powermock-api-mockito:1.7.4")
+        testImplementation("org.hamcrest:hamcrest-junit:2.0.0.0")
+        testImplementation("junit", "junit", "4.12")
     }
 }
 
@@ -220,7 +229,8 @@ val upload by tasks.registering(io.github.nucleuspowered.gradle.task.UploadToOre
     apiKey = properties["ore_apikey"]?.toString() ?: System.getenv("NUCLEUS_ORE_APIKEY")
     pluginid = "nucleus"
 }
-
+/*
+// TODO: Re-enable
 val setupDocGen by tasks.registering(io.github.nucleuspowered.gradle.task.SetupServer::class) {
     dependsOn(shadowJar)
     spongeVanillaDownload = URL("https://repo.spongepowered.org/maven/org/spongepowered/spongevanilla/1.12.2-7.2.3-RC372/spongevanilla-1.12.2-7.2.3-RC372.jar")
@@ -251,6 +261,7 @@ val docGen by tasks.registering {
 val deleteDocGenServer by tasks.registering(Delete::class) {
     delete("run")
 }
+ */
 
 tasks {
     shadowJar {
