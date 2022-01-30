@@ -32,7 +32,6 @@ dependencies {
     api(dep)
 
     api("io.vavr:vavr:$vavrVersion")
-    implementation("org.spongepowered:timings:1.0-SNAPSHOT")
 }
 
 val downloadCompat by tasks.registering(de.undercouch.gradle.tasks.download.Download::class) {
