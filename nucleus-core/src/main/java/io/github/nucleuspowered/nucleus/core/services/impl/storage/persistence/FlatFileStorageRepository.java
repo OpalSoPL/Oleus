@@ -71,6 +71,11 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         this.logger = logger;
     }
 
+    @Override
+    public boolean startup() {
+        return true;
+    }
+
     Optional<DataContainer> get(@Nullable final Path path) throws DataLoadException {
         if (path != null) {
             try {
@@ -132,7 +137,6 @@ abstract class FlatFileStorageRepository implements IStorageRepository {
         public void save(final DataContainer object) throws DataSaveException {
             this.save(this.FILENAME_RESOLVER.get(), object);
         }
-
     }
 
     abstract static class AbstractKeyed<K, Q extends IQueryObject<K, Q>>
