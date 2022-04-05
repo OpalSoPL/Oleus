@@ -4,11 +4,14 @@
  */
 package io.github.nucleuspowered.nucleus.core.services.impl.storage;
 
+import io.github.nucleuspowered.nucleus.core.Registry;
+import io.github.nucleuspowered.nucleus.core.core.config.StorageConfig;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataaccess.AbstractDataContainerDataTranslator;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataaccess.KeyBasedDataTranslator;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.keyed.AbstractKeyBasedDataObject;
 import io.github.nucleuspowered.nucleus.core.util.TypeTokens;
 import io.leangen.geantyref.TypeToken;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.data.persistence.DataContainer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -40,6 +43,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.registry.RegistryKey;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.plugin.PluginContainer;
 
@@ -48,33 +52,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Singleton
 public final class StorageManager implements IStorageManager {
 
     private final FlatFileStorageRepositoryFactory flatFileStorageRepositoryFactory;
-    private final IConfigurateHelper configurateHelper;
     private final IConfigProvider configProvider;
     private final IStorageService.SingleCached<IGeneralDataObject> generalService;
     private final UserService userService;
     private final WorldService worldService;
 
     private final Map<Class<? extends IStorageModule<?, ?, ?, ?>>, IStorageModule<?, ?, ?, ?>> additionalStorageServices = new HashMap<>();
+    private final Game game;
+    private final Logger logger;
 
     @Inject
     public StorageManager(
             @DataDirectory final Supplier<Path> dataDirectory,
             final Logger logger,
-            final IConfigurateHelper configurateHelper,
             final IConfigProvider configProvider,
             final IDataVersioning dataVersioning,
-            final PluginContainer pluginContainer) {
+            final PluginContainer pluginContainer,
+            final Game game) {
+        this.logger = logger;
         this.flatFileStorageRepositoryFactory = new FlatFileStorageRepositoryFactory(dataDirectory, logger);
-        this.configurateHelper = configurateHelper;
         this.configProvider = configProvider;
         this.userService = new UserService(this, pluginContainer, dataVersioning);
         this.worldService = new WorldService(this, pluginContainer, dataVersioning);
@@ -84,10 +91,11 @@ public final class StorageManager implements IStorageManager {
                 pluginContainer,
                 dataVersioning::setVersion,
                 dataVersioning::migrate);
+        this.game = game;
     }
 
     @Override
-    public final IStorageRepositoryFactory getFlatFileRepositoryFactory() {
+    public IStorageRepositoryFactory getFlatFileRepositoryFactory() {
         return this.flatFileStorageRepositoryFactory;
     }
 
@@ -201,13 +209,48 @@ public final class StorageManager implements IStorageManager {
     @Override
     public void attachAll() {
         this.detachAll();
-        // TODO: attach based on core config
-        final CoreConfig config = this.configProvider.getCoreConfig();
+        final StorageConfig storageConfig = this.configProvider.getCoreConfig().getStorageConfig();
+        this.userRepository = this.getOrDefault("user", storageConfig.getUserData(), IStorageRepositoryFactory::userRepository);
+        this.worldRepository = this.getOrDefault("world", storageConfig.getUserData(), IStorageRepositoryFactory::worldRepository);
+        this.generalRepository = this.getOrDefault("general", storageConfig.getUserData(), IStorageRepositoryFactory::generalRepository);
+    }
+
+    private <T extends IStorageRepository> T getOrDefault(final String type, final @Nullable String key, final Function<IStorageRepositoryFactory, T> factoryToType) {
+        if (key == null) {
+            this.logger.warn("No storage engine specified for {} data, using default flat file storage.", type);
+            return factoryToType.apply(this.flatFileStorageRepositoryFactory);
+        }
+
+        if (key.equalsIgnoreCase(Registry.Keys.FLAT_FILE_STORAGE_KEY.asString())) {
+            this.logger.info("Using default flat file storage for {} data.", type);
+            return factoryToType.apply(this.flatFileStorageRepositoryFactory);
+        }
+
+        if (key.contains(":")) {
+            final Optional<IStorageRepositoryFactory> factory = game.registry(Registry.Types.STORAGE_REPOSITORY)
+                    .findValue(ResourceKey.resolve(key));
+
+            if (factory.isPresent()) {
+                try {
+                    final T repo = factoryToType.apply(factory.get());
+                    if (repo.startup()) {
+                        this.logger.info("Using {} storage engine for {} data", key, type);
+                        return repo;
+                    }
+                } catch (final Exception ex) {
+                    this.logger.error("An exception was reported when attempting to start the {} storage engine for {}: ", key, type, ex);
+                }
+                this.logger.error("Storage engine {} failed to start for {} data. Falling back to default flat file storage.", key, type);
+                return factoryToType.apply(this.flatFileStorageRepositoryFactory);
+            }
+        }
+
+        this.logger.warn("Could not find {} storage engine for {} data, using default flat file storage.", key, type);
+        return factoryToType.apply(this.flatFileStorageRepositoryFactory);
     }
 
     @Override
     public void detachAll() {
-        // TODO: Data registry
         if (this.generalRepository != null) {
             this.generalRepository.shutdown();
         }

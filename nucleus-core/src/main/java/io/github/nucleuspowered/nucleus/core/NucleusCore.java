@@ -214,7 +214,7 @@ public final class NucleusCore {
                 return factoryMap;
             });
             event.register(Registry.Keys.STORAGE_REPOSITORY_KEY, true,
-                    () -> Collections.singletonMap(IStorageManager.FLAT_FILE_KEY, this.serviceCollection.storageManager().getFlatFileRepositoryFactory()));
+                    () -> Collections.singletonMap(Registry.Keys.FLAT_FILE_STORAGE_KEY, this.serviceCollection.storageManager().getFlatFileRepositoryFactory()));
         } catch (final Exception e) {
             new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
                     .generatePrettyPrint(this.logger, Level.ERROR);

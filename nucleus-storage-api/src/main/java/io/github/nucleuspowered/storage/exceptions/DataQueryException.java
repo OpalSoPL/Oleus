@@ -8,7 +8,7 @@ import io.github.nucleuspowered.storage.query.IQueryObject;
 
 public class DataQueryException extends Exception {
 
-    public DataQueryException(final String message, final IQueryObject queryObject) {
+    public DataQueryException(final String message, final IQueryObject<?, ?> queryObject) {
         super(message + " - " + queryObject.toString());
     }
 }

@@ -29,6 +29,20 @@ import java.util.UUID;
 public interface IStorageRepository {
 
     /**
+     * Perform any startup for this repository.
+     *
+     * <p>This will be called when the storage engine is being used for some element of Nucleus data, but
+     * before any data is accessed or written. Plugins should not respond to a startup call once it has
+     * started up, unless it has then been shutdown and your plugin reuses repositories.</p>
+     *
+     * <p>This method returns whether startup is successful. If your repository fails to start, return
+     * <code>false</code> here. Nucleus will fall back to the default storage in this case.</p>
+     *
+     * @return whether startup was successful.
+     */
+    boolean startup();
+
+    /**
      * Shutdown the repository, finishing any operations.
      *
      * <p>This will be called in one of three situations:</p>

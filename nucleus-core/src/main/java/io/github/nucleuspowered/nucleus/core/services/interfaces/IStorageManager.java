@@ -27,8 +27,6 @@ import java.util.concurrent.CompletableFuture;
 @ImplementedBy(StorageManager.class)
 public interface IStorageManager {
 
-    ResourceKey FLAT_FILE_KEY = ResourceKey.of("nucleus", "flat_file");
-
     IStorageRepositoryFactory getFlatFileRepositoryFactory();
 
     // ugh

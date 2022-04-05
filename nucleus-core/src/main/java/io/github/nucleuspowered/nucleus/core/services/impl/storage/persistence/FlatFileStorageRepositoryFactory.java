@@ -25,8 +25,6 @@ import org.spongepowered.api.data.persistence.DataContainer;
 @Singleton
 public final class FlatFileStorageRepositoryFactory implements IStorageRepositoryFactory {
 
-    private final ResourceKey key = ResourceKey.of("nucleus", "flat_file");
-
     private static final String WORLD_DATA_DIRECTORY = "worlddata";
     private static final String USER_DATA_DIRECTORY = "userdata";
     private static final String GENERAL_FILE = "general.json";
