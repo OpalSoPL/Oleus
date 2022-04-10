@@ -1,12 +1,23 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import io.github.nucleuspowered.gradle.data.*
+import io.github.nucleuspowered.gradle.data.Dependency as PluginDep
 import io.github.nucleuspowered.gradle.enums.getLevel
 import io.github.nucleuspowered.gradle.task.RelNotesTask
 import io.github.nucleuspowered.gradle.task.StdOutExec
 import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
+import shadow.org.apache.tools.zip.ZipOutputStream
+import shadow.org.apache.tools.zip.ZipEntry
 import java.io.ByteArrayOutputStream
+import java.io.InputStreamReader
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
+import kotlin.streams.toList
 
 val kotlinVersion: String? by project
 var kotlin_version: String by extra
@@ -18,6 +29,7 @@ buildscript {
     }
     dependencies {
         classpath(kotlin("gradle-plugin", kotlinVersion))
+        classpath("com.google.code.gson:gson:2.9.0")
     }
 }
 
@@ -220,6 +232,21 @@ val outputRelNotes by tasks.registering {
 
 val shadowJar: com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar by tasks
 
+val shadowJarDocgen by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class)
+
+val copyDocGenJar by tasks.registering(Copy::class) {
+    dependsOn(copyJars)
+    dependsOn(shadowJarDocgen)
+    from(shadowJarDocgen)
+    into(project.file("output"))
+}
+
+
+val buildDocgen by tasks.registering {
+    dependsOn(shadowJarDocgen)
+    dependsOn(copyDocGenJar)
+}
+
 val upload by tasks.registering(io.github.nucleuspowered.gradle.task.UploadToOre::class) {
     dependsOn(shadowJar)
     dependsOn(relNotes)
@@ -263,6 +290,53 @@ val deleteDocGenServer by tasks.registering(Delete::class) {
 }
  */
 
+class SpongePluginJsonTransformer(pluginsToMerge: List<SpongePlugin>) : Transformer {
+    companion object Companion {
+        val location: String = "META-INF/sponge-plugins.json"
+        val gson: Gson = com.google.gson.GsonBuilder().setFieldNamingPolicy(com.google.gson.FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create()
+    }
+
+    private val pluginJson: JsonArray by lazy {
+        pluginsToMerge.stream().map(gson::toJsonTree).collect(::JsonArray, JsonArray::add, JsonArray::addAll)
+    }
+    private var completedJson: JsonElement? = null
+
+    override fun getName(): String {
+        return "Sponge Plugins Json transformer"
+    }
+
+    override fun canTransformResource(element: FileTreeElement?): Boolean {
+        return element?.relativePath?.equals("META-INF/sponge-plugins.json") ?: false
+    }
+
+    override fun transform(p0: TransformerContext?) {
+        try {
+            completedJson = p0?.`is`?.let {
+                merge(com.google.gson.JsonParser.parseReader(InputStreamReader(it, "UTF-8")))
+            }
+        } catch (e: Exception) {
+            throw RuntimeException("Unable to merge Json:", e)
+        }
+    }
+
+    override fun hasTransformedResource(): Boolean {
+        return completedJson != null
+    }
+
+    override fun modifyOutputStream(p0: ZipOutputStream?, preserveFileTimestamps: Boolean) {
+        val zipEntry = ZipEntry(location)
+        zipEntry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, zipEntry.time)
+        p0?.putNextEntry(zipEntry)
+        p0?.write(gson.toJson(completedJson!!).toByteArray())
+
+        completedJson = null
+    }
+
+    private fun merge(input: JsonElement): JsonElement {
+        return input
+    }
+}
+
 tasks {
     shadowJar {
         dependsOn(":nucleus-api:build")
@@ -296,12 +370,37 @@ tasks {
             exclude(project(":nucleus-core"))
             exclude(project(":nucleus-modules"))
             exclude(project(":nucleus-bootstrap"))
-            include(project(":nucleus-storage-api"))
+            exclude(project(":nucleus-storage-api"))
         }
 
         exclude("io/github/nucleuspowered/nucleus/api/NucleusAPIMod.class")
         val minecraftversion: String by project
         archiveFileName.set("Nucleus-${versionString}-MC${minecraftversion}-$filenameSuffix-plugin.jar")
+    }
+
+    shadowJarDocgen {
+        dependsOn("shadowJar")
+        dependsOn(":nucleus-docgen:build")
+        from(shadowJar)
+        dependencies {
+            include(project(":nucleus-docgen"))
+        }
+
+        transform(SpongePluginJsonTransformer(listOf(
+                SpongePlugin(
+                    "nucleus-docgen",
+                    "Nucleus Docgen",
+                    "io.github.nucleuspowered.docgen.NucleusDocgenPlugin",
+                    "Docgen for Nucleus",
+                    "1.0.0-SNAPSHOT",
+                    Links("https://nucleuspowered.org", "https://github.com/NucleusPowered/Nucleus", "https://github.com/NucleusPowered/Nucleus/issues"),
+                    listOf(Contributor("dualspiral", "Lead Developer")),
+                    listOf(PluginDep.sponge(spongeApiVersion), PluginDep("nucleus", "after", versionString, false))
+                )
+        )))
+
+        val minecraftversion: String by project
+        archiveFileName.set("Nucleus-${versionString}-MC${minecraftversion}-$filenameSuffix-docgen-plugin.jar")
     }
 
     build {

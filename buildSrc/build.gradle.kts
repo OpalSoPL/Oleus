@@ -1,4 +1,5 @@
 buildscript {
+
     val properties = java.util.Properties()
     val input = java.io.FileInputStream(file("../gradle.properties"))
     properties.load(input)

@@ -25,6 +25,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionServ
 import io.github.nucleuspowered.nucleus.core.services.interfaces.data.SuggestedLevel;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.event.CauseStackManager;
@@ -90,93 +91,93 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                         return m;
                     },
                     control -> {
-                        final CommandMetadata metadata = control.getMetadata();
-                        final CommandDoc commandDoc = new CommandDoc();
-                        final String cmdPath = metadata.getCommandKey().replaceAll("\\.", " ");
-                        commandDoc.setCommandName(cmdPath);
-                        commandDoc.setModule(metadata.getModuleid());
+                        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
+                            final CommandMetadata metadata = control.getMetadata();
+                            final CommandDoc commandDoc = new CommandDoc();
+                            final String cmdPath = metadata.getCommandKey().replaceAll("\\.", " ");
+                            commandDoc.setCommandName(cmdPath);
+                            commandDoc.setModule(metadata.getModuleid());
 
-                        if (metadata.isRoot()) {
-                            commandDoc.setAliases(String.join(", ", metadata.getAliases()));
-                        } else {
-                            final String key = metadata.getCommandKey()
-                                    .replaceAll("\\.[a-z]+$", " ")
-                                    .replaceAll("\\.", " ");
-                            commandDoc.setAliases(key + Arrays.stream(metadata.getAliases())
-                                    .filter(x -> !x.startsWith("#"))
-                                    .map(x -> x.replace("^$", ""))
-                                    .collect(Collectors.joining(", " + key)));
-                            if (!metadata.getRootAliases().isEmpty()) {
-                                commandDoc.setRootAliases(String.join(", ", metadata.getRootAliases()));
-                            }
-                        }
-
-                        final Set<PermissionDoc> permissionDocs = new HashSet<>();
-                        final Command annotation = metadata.getCommandAnnotation();
-                        for (final CommandModifier modifier : annotation.modifiers()) {
-                            switch (modifier.value()) {
-                                case CommandModifiers.HAS_COOLDOWN:
-                                    commandDoc.setCooldown(true);
-                                    break;
-                                case CommandModifiers.HAS_COST:
-                                    commandDoc.setCost(true);
-                                    break;
-                                case CommandModifiers.HAS_WARMUP:
-                                    commandDoc.setWarmup(true);
-                                    break;
-                            }
-                            this.getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
-                        }
-
-                        for (final String perm : metadata.getCommandAnnotation().associatedPermissions()) {
-                            this.getPermissionDoc(perm).ifPresent(permissionDocs::add);
-                        }
-
-                        final EssentialsEquivalent essentialsEquivalent = metadata.getEssentialsEquivalent();
-                        if (essentialsEquivalent != null) {
-                            final List<String> eqiv = Arrays.asList(essentialsEquivalent.value());
-                            commandDoc.setEssentialsEquivalents(eqiv);
-                            commandDoc.setEssNotes(essentialsEquivalent.notes());
-                            commandDoc.setExactEssEquiv(essentialsEquivalent.isExact());
-                            essentialsDocs.add(
-                                    new EssentialsDoc()
-                                            .setExact(essentialsEquivalent.isExact())
-                                            .setNotes(essentialsEquivalent.notes())
-                                            .setEssentialsCommands(eqiv)
-                                            .setNucleusEquiv(metadata.getRootAliases())
-                            );
-                        }
-
-                        final String[] base = metadata.getCommandAnnotation().basePermission();
-                        SuggestedLevel level = SuggestedLevel.USER;
-                        if (base.length > 0) {
-                            commandDoc.setPermissionbase(base[0]);
-                            for (final String permission : base) {
-                                final Optional<IPermissionService.Metadata> pm =
-                                        this.serviceCollection.permissionService().getMetadataFor(permission);
-                                if (pm.isPresent()) {
-                                    if (pm.get().getSuggestedLevel().compareTo(level) > 0) {
-                                        level = pm.get().getSuggestedLevel();
-                                    }
-                                    permissionDocs.add(this.getFor(pm.get()));
+                            if (metadata.isRoot()) {
+                                commandDoc.setAliases(String.join(", ", metadata.getAliases()));
+                            } else {
+                                final String key = metadata.getCommandKey()
+                                        .replaceAll("\\.[a-z]+$", " ")
+                                        .replaceAll("\\.", " ");
+                                commandDoc.setAliases(key + Arrays.stream(metadata.getAliases())
+                                        .filter(x -> !x.startsWith("#"))
+                                        .map(x -> x.replace("^$", ""))
+                                        .collect(Collectors.joining(", " + key)));
+                                if (!metadata.getRootAliases().isEmpty()) {
+                                    commandDoc.setRootAliases(String.join(", ", metadata.getRootAliases()));
                                 }
                             }
+
+                            final Set<PermissionDoc> permissionDocs = new HashSet<>();
+                            final Command annotation = metadata.getCommandAnnotation();
+                            for (final CommandModifier modifier : annotation.modifiers()) {
+                                switch (modifier.value()) {
+                                    case CommandModifiers.HAS_COOLDOWN:
+                                        commandDoc.setCooldown(true);
+                                        break;
+                                    case CommandModifiers.HAS_COST:
+                                        commandDoc.setCost(true);
+                                        break;
+                                    case CommandModifiers.HAS_WARMUP:
+                                        commandDoc.setWarmup(true);
+                                        break;
+                                }
+                                this.getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
+                            }
+
+                            for (final String perm : metadata.getCommandAnnotation().associatedPermissions()) {
+                                this.getPermissionDoc(perm).ifPresent(permissionDocs::add);
+                            }
+
+                            final EssentialsEquivalent essentialsEquivalent = metadata.getEssentialsEquivalent();
+                            if (essentialsEquivalent != null) {
+                                final List<String> eqiv = Arrays.asList(essentialsEquivalent.value());
+                                commandDoc.setEssentialsEquivalents(eqiv);
+                                commandDoc.setEssNotes(essentialsEquivalent.notes());
+                                commandDoc.setExactEssEquiv(essentialsEquivalent.isExact());
+                                essentialsDocs.add(
+                                        new EssentialsDoc()
+                                                .setExact(essentialsEquivalent.isExact())
+                                                .setNotes(essentialsEquivalent.notes())
+                                                .setEssentialsCommands(eqiv)
+                                                .setNucleusEquiv(metadata.getRootAliases())
+                                );
+                            }
+
+                            final String[] base = metadata.getCommandAnnotation().basePermission();
+                            SuggestedLevel level = SuggestedLevel.USER;
+                            if (base.length > 0) {
+                                commandDoc.setPermissionbase(base[0]);
+                                for (final String permission : base) {
+                                    final Optional<IPermissionService.Metadata> pm =
+                                            this.serviceCollection.permissionService().getMetadataFor(permission);
+                                    if (pm.isPresent()) {
+                                        if (pm.get().getSuggestedLevel().compareTo(level) > 0) {
+                                            level = pm.get().getSuggestedLevel();
+                                        }
+                                        permissionDocs.add(this.getFor(pm.get()));
+                                    }
+                                }
+                            }
+
+                            commandDoc.setDefaultLevel(level.getRole());
+                            commandDoc.setOneLineDescription(control.getShortDescription(cause)
+                                    .map(Component::toString).orElse("No description provided"));
+                            commandDoc.setExtendedDescription(control.getExtendedDescription(cause)
+                                    .map(Component::toString)
+                                    .orElse(null));
+
+                            commandDoc.setUsageString(PlainTextComponentSerializer.plainText().serialize(control.getUsage(CommandCause.create())));
+                            commandDoc.setPermissions(new ArrayList<>(permissionDocs));
+                            commandDoc.setContext(control.getContext().getValue());
+
+                            return commandDoc;
                         }
-
-                        commandDoc.setDefaultLevel(level.getRole());
-                        commandDoc.setOneLineDescription(control.getShortDescription(cause)
-                                .map(Component::toString).orElse("No description provided"));
-                        commandDoc.setExtendedDescription(control.getExtendedDescription(cause)
-                                .map(Component::toString)
-                                .orElse(null));
-
-                        // TODO: Usage
-                        // commandDoc.setUsageString(control.getUsage().toPlain());
-                        commandDoc.setPermissions(new ArrayList<>(permissionDocs));
-                        // commandDoc.setSimpleUsage(control.getUsageText(cause).toPlain());
-                        commandDoc.setContext(control.getContext().getValue());
-
-                        return commandDoc;
                     });
 
             final List<PermissionDoc> permdocs = permissionService.getAllMetadata()
