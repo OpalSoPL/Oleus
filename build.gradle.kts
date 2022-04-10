@@ -292,8 +292,11 @@ val deleteDocGenServer by tasks.registering(Delete::class) {
 
 class SpongePluginJsonTransformer(pluginsToMerge: List<SpongePlugin>) : Transformer {
     companion object Companion {
-        val location: String = "META-INF/sponge-plugins.json"
-        val gson: Gson = com.google.gson.GsonBuilder().setFieldNamingPolicy(com.google.gson.FieldNamingPolicy.LOWER_CASE_WITH_DASHES).create()
+        val location: String = "META-INF/sponge_plugins.json"
+        val gson: Gson = com.google.gson.GsonBuilder()
+                .setFieldNamingPolicy(com.google.gson.FieldNamingPolicy.LOWER_CASE_WITH_DASHES)
+                .setPrettyPrinting()
+                .create()
     }
 
     private val pluginJson: JsonArray by lazy {
@@ -306,10 +309,11 @@ class SpongePluginJsonTransformer(pluginsToMerge: List<SpongePlugin>) : Transfor
     }
 
     override fun canTransformResource(element: FileTreeElement?): Boolean {
-        return element?.relativePath?.equals("META-INF/sponge-plugins.json") ?: false
+        return element?.relativePath?.toString().equals("META-INF/sponge_plugins.json")
     }
 
     override fun transform(p0: TransformerContext?) {
+        println(p0)
         try {
             completedJson = p0?.`is`?.let {
                 merge(com.google.gson.JsonParser.parseReader(InputStreamReader(it, "UTF-8")))
@@ -333,6 +337,7 @@ class SpongePluginJsonTransformer(pluginsToMerge: List<SpongePlugin>) : Transfor
     }
 
     private fun merge(input: JsonElement): JsonElement {
+        input.asJsonObject["plugins"].asJsonArray.addAll(this.pluginJson)
         return input
     }
 }
