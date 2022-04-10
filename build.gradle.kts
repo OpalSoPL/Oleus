@@ -386,10 +386,7 @@ tasks {
     shadowJarDocgen {
         dependsOn("shadowJar")
         dependsOn(":nucleus-docgen:build")
-        from(shadowJar)
-        dependencies {
-            include(project(":nucleus-docgen"))
-        }
+        from(shadowJar, project(":nucleus-docgen").sourceSets.main.get().output)
 
         transform(SpongePluginJsonTransformer(listOf(
                 SpongePlugin(
