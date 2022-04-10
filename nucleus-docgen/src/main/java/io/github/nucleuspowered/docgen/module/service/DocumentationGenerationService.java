@@ -2,10 +2,8 @@
  * This file is part of Nucleus, licensed under the MIT License (MIT). See the LICENSE.txt file
  * at the root of this project for more details.
  */
-package io.github.nucleuspowered.nucleus.core.services.impl.docgen;
+package io.github.nucleuspowered.docgen.module.service;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import io.github.nucleuspowered.nucleus.core.core.docgen.CommandDoc;
 import io.github.nucleuspowered.nucleus.core.core.docgen.EssentialsDoc;
 import io.github.nucleuspowered.nucleus.core.core.docgen.PermissionDoc;
@@ -17,9 +15,8 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.control.CommandCon
 import io.github.nucleuspowered.nucleus.core.scaffold.command.control.CommandMetadata;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
-import io.github.nucleuspowered.nucleus.core.services.impl.placeholder.PlaceholderMetadata;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandMetadataService;
-import io.github.nucleuspowered.nucleus.core.services.interfaces.IDocumentationGenerationService;
+import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.data.SuggestedLevel;
@@ -53,30 +50,25 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Singleton
-public class DocumentationGenerationService implements IDocumentationGenerationService {
+public class DocumentationGenerationService {
+
+    public static final class Holder {
+        public final static DocumentationGenerationService INSTANCE = new DocumentationGenerationService();
+    }
 
     private final static TypeToken<List<CommandDoc>> COMMAND_DOC_LIST_TYPE_TOKEN = new TypeToken<List<CommandDoc>>() {};
     private final static TypeToken<List<PermissionDoc>> PERMISSION_DOC_LIST_TYPE_TOKEN = new TypeToken<List<PermissionDoc>>() {};
     private final static TypeToken<List<TokenDoc>> TOKEN_DOC_LIST_TYPE_TOKEN = new TypeToken<List<TokenDoc>>() {};
     private final static TypeToken<List<EssentialsDoc>> ESSENTIALS_DOC_LIST_TYPE_TOKEN = new TypeToken<List<EssentialsDoc>>() {};
 
-    private final INucleusServiceCollection serviceCollection;
-
-    @Inject
-    public DocumentationGenerationService(final INucleusServiceCollection serviceCollection) {
-        this.serviceCollection = serviceCollection;
-    }
-
-    @Override
-    public void generate(final Path directory) throws IOException {
+    public void generate(final Path directory, final INucleusServiceCollection serviceCollection) throws IOException {
         try (final CauseStackManager.StackFrame stackFrame = Sponge.server().causeStackManager().pushCauseFrame()) {
             stackFrame.pushCause(Sponge.systemSubject());
             final CommandCause cause = CommandCause.create();
 
-            final ICommandMetadataService commandMetadataService = this.serviceCollection.commandMetadataService();
-            final IPermissionService permissionService = this.serviceCollection.permissionService();
-            final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
+            final ICommandMetadataService commandMetadataService = serviceCollection.commandMetadataService();
+            final IPermissionService permissionService = serviceCollection.permissionService();
+            final IMessageProviderService messageProviderService = serviceCollection.messageProvider();
             final Collection<CommandControl> commands = commandMetadataService.getCommandsAndSubcommands();
 
             final List<EssentialsDoc> essentialsDocs = new ArrayList<>();
@@ -127,11 +119,11 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                                         commandDoc.setWarmup(true);
                                         break;
                                 }
-                                this.getPermissionDoc(modifier.exemptPermission()).ifPresent(permissionDocs::add);
+                                this.getPermissionDoc(permissionService, modifier.exemptPermission(), messageProviderService).ifPresent(permissionDocs::add);
                             }
 
                             for (final String perm : metadata.getCommandAnnotation().associatedPermissions()) {
-                                this.getPermissionDoc(perm).ifPresent(permissionDocs::add);
+                                this.getPermissionDoc(permissionService, perm, messageProviderService).ifPresent(permissionDocs::add);
                             }
 
                             final EssentialsEquivalent essentialsEquivalent = metadata.getEssentialsEquivalent();
@@ -155,12 +147,12 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                                 commandDoc.setPermissionbase(base[0]);
                                 for (final String permission : base) {
                                     final Optional<IPermissionService.Metadata> pm =
-                                            this.serviceCollection.permissionService().getMetadataFor(permission);
+                                            serviceCollection.permissionService().getMetadataFor(permission);
                                     if (pm.isPresent()) {
                                         if (pm.get().getSuggestedLevel().compareTo(level) > 0) {
                                             level = pm.get().getSuggestedLevel();
                                         }
-                                        permissionDocs.add(this.getFor(pm.get()));
+                                        permissionDocs.add(this.getFor(messageProviderService, pm.get()));
                                     }
                                 }
                             }
@@ -182,12 +174,12 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
 
             final List<PermissionDoc> permdocs = permissionService.getAllMetadata()
                     .stream()
-                    .map(this::getFor)
+                    .map(x -> this.getFor(messageProviderService, x))
                     .filter(x -> x.getPermission() != null)
                     .sorted(Comparator.comparing(PermissionDoc::getPermission))
                     .collect(Collectors.toList());
 
-            final List<TokenDoc> tokenDocs = this.serviceCollection
+            final List<TokenDoc> tokenDocs = serviceCollection
                     .placeholderService()
                     .getNucleusParsers()
                     .entrySet()
@@ -195,7 +187,7 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
                     .filter(x -> x.getValue().isDocument())
                     .filter(x -> {
                         if (!messageProviderService.hasKey("nucleus.token." + x.getValue().getToken().toLowerCase())) {
-                            this.serviceCollection.logger().warn("Could not find message key for nucleus.token.{}", x.getValue().getToken().toLowerCase());
+                            serviceCollection.logger().warn("Could not find message key for nucleus.token.{}", x.getValue().getToken().toLowerCase());
                             return false;
                         }
                         return true;
@@ -213,13 +205,13 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
 
             // Now do all the saving
             // Config files
-            final Map<String, Class<?>> configs = this.serviceCollection
+            final Map<String, Class<?>> configs = serviceCollection
                     .configProvider()
                     .getModuleToConfigType();
             final ConfigurationNode configNode = configurationLoader.createNode();
             for (final Map.Entry<String, Class<?>> entry : configs.entrySet()) {
                 try {
-                    configNode.node(entry.getKey()).set(this.createConfigString(entry.getValue().getDeclaredConstructor().newInstance()));
+                    configNode.node(entry.getKey()).set(this.createConfigString(serviceCollection.configurateHelper(), entry.getValue().getDeclaredConstructor().newInstance()));
                 } catch (final InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
                     e.printStackTrace();
                 }
@@ -266,25 +258,25 @@ public class DocumentationGenerationService implements IDocumentationGenerationS
         return list.stream().sorted(comparator).map(mapper).collect(Collectors.toList());
     }
 
-    private Optional<PermissionDoc> getPermissionDoc(final String permission) {
-        return this.serviceCollection.permissionService().getMetadataFor(permission).map(this::getFor);
+    private Optional<PermissionDoc> getPermissionDoc(final IPermissionService permissionService, final String permission, final IMessageProviderService messageProviderService) {
+        return permissionService.getMetadataFor(permission).map(x -> this.getFor(messageProviderService, x));
     }
 
-    private PermissionDoc getFor(final IPermissionService.Metadata metadata) {
+    private PermissionDoc getFor(final IMessageProviderService messageProviderService, final IPermissionService.Metadata metadata) {
         return new PermissionDoc()
                 .setDefaultLevel(metadata.getSuggestedLevel().getRole())
-                .setDescription(metadata.getDescription(this.serviceCollection.messageProvider()))
+                .setDescription(metadata.getDescription(messageProviderService))
                 .setPermission(metadata.getPermission())
                 .setModule(metadata.getModuleId());
     }
 
-    private String createConfigString(final Object obj) throws IOException {
+    private String createConfigString(final IConfigurateHelper configurateHelper, final Object obj) throws IOException {
         try (final StringWriter sw = new StringWriter(); final BufferedWriter writer = new BufferedWriter(sw)) {
             final HoconConfigurationLoader hcl = HoconConfigurationLoader.builder()
-                    .defaultOptions(this.serviceCollection.configurateHelper().getOptions())
+                    .defaultOptions(configurateHelper.getOptions())
                     .sink(() -> writer)
                     .build();
-            final CommentedConfigurationNode cn = hcl.createNode(this.serviceCollection.configurateHelper().getOptions());
+            final CommentedConfigurationNode cn = hcl.createNode(configurateHelper.getOptions());
             this.applyToNode(obj.getClass(), obj, cn);
             hcl.save(cn);
             return sw.toString();

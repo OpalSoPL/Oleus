@@ -17,7 +17,6 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandMetadat
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICompatibilityService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICooldownService;
-import io.github.nucleuspowered.nucleus.core.services.interfaces.IDocumentationGenerationService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigProvider;
@@ -82,7 +81,6 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     private final Supplier<ICompatibilityService> compatibilityServiceProvider;
     private final Supplier<IChatMessageFormatterService> chatMessageFormatterProvider;
     private final Supplier<IPlaceholderService> placeholderServiceProvider;
-    private final Supplier<IDocumentationGenerationService> documentationGenerationServiceProvider;
     private final Supplier<ITextStyleService> textStyleServiceProvider;
     private final Supplier<IModuleReporter> moduleReporterSupplier;
     private final Supplier<ISchedulerService> schedulerServiceProvider;
@@ -126,7 +124,6 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         this.compatibilityServiceProvider = new LazyLoad<>(this, injector, ICompatibilityService.class);
         this.chatMessageFormatterProvider = new LazyLoad<>(this, injector, IChatMessageFormatterService.class);
         this.placeholderServiceProvider = new LazyLoad<>(this, injector, IPlaceholderService.class);
-        this.documentationGenerationServiceProvider = new LazyLoad<>(this, injector, IDocumentationGenerationService.class);
         this.moduleReporterSupplier = new LazyLoad<>(this, injector, IModuleReporter.class);
         this.schedulerServiceProvider = new LazyLoad<>(this, injector, ISchedulerService.class);
         this.timingsServiceProvider = new LazyLoad<>(this, injector, ITimingsService.class);
@@ -247,10 +244,6 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
 
     @Override public IChatMessageFormatterService chatMessageFormatter() {
         return this.chatMessageFormatterProvider.get();
-    }
-
-    @Override public IDocumentationGenerationService documentationGenerationService() {
-        return this.documentationGenerationServiceProvider.get();
     }
 
     @Override public IModuleReporter moduleReporter() {

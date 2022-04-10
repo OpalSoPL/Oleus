@@ -13,7 +13,6 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandMetadat
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICompatibilityService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigurateHelper;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICooldownService;
-import io.github.nucleuspowered.nucleus.core.services.interfaces.IDocumentationGenerationService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IEconomyServiceProvider;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigProvider;
@@ -82,8 +81,6 @@ public interface INucleusServiceCollection {
     IUserCacheService userCacheService();
 
     IPlatformService platformService();
-
-    IDocumentationGenerationService documentationGenerationService();
 
     IModuleReporter moduleReporter();
 

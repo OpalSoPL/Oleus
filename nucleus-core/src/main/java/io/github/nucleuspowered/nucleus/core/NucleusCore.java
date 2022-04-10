@@ -17,6 +17,8 @@ import io.github.nucleuspowered.nucleus.core.core.teleport.filters.NoCheckFilter
 import io.github.nucleuspowered.nucleus.core.core.teleport.filters.WallCheckFilter;
 import io.github.nucleuspowered.nucleus.core.core.teleport.scanners.NoTeleportScanner;
 import io.github.nucleuspowered.nucleus.core.core.teleport.scanners.VerticalTeleportScanner;
+import io.github.nucleuspowered.nucleus.core.event.NucleusRegisterModuleEvent;
+import io.github.nucleuspowered.nucleus.core.event.RegisterModuleEvent;
 import io.github.nucleuspowered.nucleus.core.event.RegisterPreferenceKeyEvent;
 import io.github.nucleuspowered.nucleus.core.guice.NucleusInjectorModule;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
@@ -99,7 +101,7 @@ public final class NucleusCore {
     private final Path configDirectory;
     private final Logger logger;
     private final Injector injector;
-    private final IModuleProvider provider;
+    private final IModuleProvider coreProvider;
     private final boolean runDocGen = NucleusJavaProperties.RUN_DOCGEN;
     private final List<Runnable> onStartedActions = new LinkedList<>();
     private final IPluginInfo pluginInfo;
@@ -115,7 +117,7 @@ public final class NucleusCore {
             final Path configDirectory,
             final Logger logger,
             final Injector injector,
-            final IModuleProvider provider,
+            final IModuleProvider coreProvider,
             final IPluginInfo pluginInfo) {
         this.game = game;
         this.pluginContainer = pluginContainer;
@@ -123,7 +125,7 @@ public final class NucleusCore {
         this.logger = logger;
         this.pluginInfo = pluginInfo;
         this.injector = injector.createChildInjector(new NucleusInjectorModule(() -> this, pluginInfo));
-        this.provider = provider;
+        this.coreProvider = coreProvider;
         this.serviceCollection = new NucleusServiceCollection(
                 this.game,
                 this.injector,
@@ -285,34 +287,6 @@ public final class NucleusCore {
 
     @Listener
     public void serverStarted(final StartedEngineEvent<Server> event) {
-        if (NucleusJavaProperties.DOCGEN_PATH != null) {
-            final Path finalPath;
-            try {
-                final String docgenPath = NucleusJavaProperties.DOCGEN_PATH;
-                if (docgenPath.isEmpty()) {
-                    finalPath = this.getDataDirectory();
-                } else {
-                    final Path path = this.game.gameDirectory().resolve(docgenPath);
-                    boolean isOk = path.toAbsolutePath().startsWith(this.game.gameDirectory().toAbsolutePath());
-                    isOk &= Files.notExists(path) || Files.isDirectory(path);
-                    if (isOk) {
-                        Files.createDirectories(path);
-                        finalPath = path;
-                    } else {
-                        finalPath = this.getDataDirectory();
-                    }
-                }
-                this.logger.info("Starting generation of documentation, saving files to: {}", finalPath.toString());
-                this.serviceCollection.documentationGenerationService().generate(finalPath);
-                this.logger.info("Generation is complete. Server will shut down.");
-            } catch (final Exception ex) {
-                this.logger.error("Could not generate. Server will shut down.");
-                ex.printStackTrace();
-            }
-
-            this.game.server().shutdown();
-            return;
-        }
         this.onStartedActions.forEach(Runnable::run);
         this.serviceCollection.getServiceUnchecked(UniqueUserService.class).resetUniqueUserCount();
         this.game.asyncScheduler().executor(this.pluginContainer)
@@ -337,7 +311,13 @@ public final class NucleusCore {
     // -- Module loading
 
     private LinkedList<Tuple<ModuleContainer, IModule>> startModuleLoading() {
-        final Collection<ModuleContainer> moduleContainerCollection = this.provider.getModules();
+        final List<ModuleContainer> moduleContainerCollection = new ArrayList<>(this.coreProvider.getModules());
+
+        // Now ask other plugins for their modules
+        final NucleusRegisterModuleEvent event = new NucleusRegisterModuleEvent(Cause.of(EventContext.empty(), this.pluginContainer));
+        Sponge.eventManager().post(event);
+        event.getProviders().stream().map(IModuleProvider::getModules).forEach(moduleContainerCollection::addAll);
+
         final LinkedList<Tuple<ModuleContainer, IModule>> modules = new LinkedList<>();
         for (final ModuleContainer container : this.filterModules(moduleContainerCollection)) {
             final IModule module;

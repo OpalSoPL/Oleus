@@ -58,7 +58,6 @@ public class CoreModule implements IModule.Configurable<CoreConfig> {
                 ClearCacheCommand.class,
                 CompatibilityCommand.class,
                 DebugCommand.class,
-                DocGenCommand.class,
                 GetUserCommand.class,
                 InfoCommand.class,
                 MessagesUpdateCommand.class,
