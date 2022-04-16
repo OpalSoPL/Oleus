@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.docgen.module.service;
 
+import io.github.nucleuspowered.docgen.NucleusDocgenPlugin;
 import io.github.nucleuspowered.nucleus.core.core.docgen.CommandDoc;
 import io.github.nucleuspowered.nucleus.core.core.docgen.EssentialsDoc;
 import io.github.nucleuspowered.nucleus.core.core.docgen.PermissionDoc;
@@ -48,6 +49,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class DocumentationGenerationService {
@@ -72,8 +74,9 @@ public class DocumentationGenerationService {
             final Collection<CommandControl> commands = commandMetadataService.getCommandsAndSubcommands();
 
             final List<EssentialsDoc> essentialsDocs = new ArrayList<>();
-            final List<CommandDoc> lcd = this.getAndSort(
+            final List<CommandDoc> lcd = this.getFilterAndSort(
                     commands,
+                    control -> !control.getMetadata().getModuleid().equals(NucleusDocgenPlugin.MODULE_ID),
                     (CommandControl first, CommandControl second) -> {
                         final int m = first.getMetadata().getModuleid().compareToIgnoreCase(second.getMetadata().getModuleid());
                         if (m == 0) {
@@ -83,7 +86,7 @@ public class DocumentationGenerationService {
                         return m;
                     },
                     control -> {
-                        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
+                        try (final CauseStackManager.StackFrame ignored = Sponge.server().causeStackManager().pushCauseFrame()) {
                             final CommandMetadata metadata = control.getMetadata();
                             final CommandDoc commandDoc = new CommandDoc();
                             final String cmdPath = metadata.getCommandKey().replaceAll("\\.", " ");
@@ -174,6 +177,7 @@ public class DocumentationGenerationService {
 
             final List<PermissionDoc> permdocs = permissionService.getAllMetadata()
                     .stream()
+                    .filter(x -> !x.getModuleId().equals(NucleusDocgenPlugin.MODULE_ID))
                     .map(x -> this.getFor(messageProviderService, x))
                     .filter(x -> x.getPermission() != null)
                     .sorted(Comparator.comparing(PermissionDoc::getPermission))
@@ -251,11 +255,12 @@ public class DocumentationGenerationService {
         }
     }
 
-    private <T, R> List<R> getAndSort(
+    private <T, R> List<R> getFilterAndSort(
             final Collection<T> list,
+            final Predicate<T> filter,
             final Comparator<T> comparator,
             final Function<T, R> mapper) {
-        return list.stream().sorted(comparator).map(mapper).collect(Collectors.toList());
+        return list.stream().filter(filter).sorted(comparator).map(mapper).collect(Collectors.toList());
     }
 
     private Optional<PermissionDoc> getPermissionDoc(final IPermissionService permissionService, final String permission, final IMessageProviderService messageProviderService) {

@@ -23,18 +23,20 @@ import java.util.Collections;
 @Plugin("nucleus-docgen")
 public class NucleusDocgenPlugin {
 
+    public final static String MODULE_ID = "docgen";
+
     private final Logger logger;
-    private final Game game;
 
     @Inject
-    public NucleusDocgenPlugin(final Logger logger, final Game game) {
+    public NucleusDocgenPlugin(final Logger logger) {
         this.logger = logger;
-        this.game = game;
     }
 
     @Listener
     public void onModuleContainerRegistration(final RegisterModuleEvent event) {
-        event.registerModuleProvider(() -> Collections.singleton(ModuleContainer.createContainer("docgen", "Docgen", DocgenModule.class)));
+        this.logger.info("Injecting DocGen module");
+        event.registerModuleProvider(
+                () -> Collections.singleton(ModuleContainer.createContainer(NucleusDocgenPlugin.MODULE_ID, "Docgen", DocgenModule.class)));
     }
 
 }
