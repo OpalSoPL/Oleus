@@ -21,6 +21,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IConfigurateHel
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.data.SuggestedLevel;
+import io.github.nucleuspowered.nucleus.core.util.AdventureUtils;
 import io.leangen.geantyref.TypeToken;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -162,12 +163,12 @@ public class DocumentationGenerationService {
 
                             commandDoc.setDefaultLevel(level.getRole());
                             commandDoc.setOneLineDescription(control.getShortDescription(cause)
-                                    .map(Component::toString).orElse("No description provided"));
+                                    .map(AdventureUtils::getContent).orElse("No description provided"));
                             commandDoc.setExtendedDescription(control.getExtendedDescription(cause)
-                                    .map(Component::toString)
+                                    .map(AdventureUtils::getContent)
                                     .orElse(null));
 
-                            commandDoc.setUsageString(PlainTextComponentSerializer.plainText().serialize(control.getUsage(CommandCause.create())));
+                            commandDoc.setUsageString(AdventureUtils.getContent(control.getUsage(CommandCause.create())));
                             commandDoc.setPermissions(new ArrayList<>(permissionDocs));
                             commandDoc.setContext(control.getContext().getValue());
 

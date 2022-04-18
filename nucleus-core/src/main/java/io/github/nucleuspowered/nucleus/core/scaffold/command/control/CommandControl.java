@@ -17,8 +17,11 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.ICommandM
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.util.PrettyPrinter;
+import io.github.nucleuspowered.nucleus.core.util.functional.NucleusCollectors;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -27,9 +30,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.exception.CommandPermissionException;
+import org.spongepowered.api.command.manager.CommandMapping;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
@@ -68,6 +73,8 @@ public final class CommandControl {
     private boolean acceptingRegistration = true;
 
     private org.spongepowered.api.command.Command.@Nullable Parameterized lazy$builtCommand;
+
+    private @Nullable CommandMapping mapping = null;
 
     public CommandControl(
             @Nullable final ICommandExecutor executor,
@@ -431,9 +438,25 @@ public final class CommandControl {
     }
 
     public Component getUsage(final CommandCause commandCause) {
-        if (this.lazy$builtCommand != null) {
-            return this.lazy$builtCommand.usage(commandCause);
+        if (this.mapping != null) {
+            try {
+                return this.mapping.registrar()
+                        .complete(commandCause, mapping, this.command, "")
+                        .stream()
+                        .map(completion -> {
+                            final TextComponent.Builder componentBuilder = Component.text().append(Component.text(completion.completion()));
+                            completion.tooltip().ifPresent(x -> componentBuilder.hoverEvent(HoverEvent.showText(x)));
+                            return componentBuilder.build();
+                        })
+                        .collect(NucleusCollectors.joiningComponents(JoinConfiguration.separator(Component.text(" "))));
+            } catch (final CommandException e) {
+                throw new RuntimeException(e);
+            }
         }
         return Component.empty();
+    }
+
+    public void setMapping(final CommandMapping mapping) {
+        this.mapping = mapping;
     }
 }
