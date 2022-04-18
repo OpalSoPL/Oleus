@@ -10,7 +10,7 @@ import io.github.nucleuspowered.nucleus.api.core.event.NucleusRegisterPreference
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanner;
 import io.github.nucleuspowered.nucleus.api.teleport.data.TeleportScanners;
 import io.github.nucleuspowered.nucleus.core.core.CoreKeys;
-import io.github.nucleuspowered.nucleus.core.core.CoreModule;
+import io.github.nucleuspowered.nucleus.core.core.CoreModuleProvider;
 import io.github.nucleuspowered.nucleus.core.core.config.CoreConfig;
 import io.github.nucleuspowered.nucleus.core.core.services.UniqueUserService;
 import io.github.nucleuspowered.nucleus.core.core.teleport.filters.NoCheckFilter;
@@ -18,7 +18,6 @@ import io.github.nucleuspowered.nucleus.core.core.teleport.filters.WallCheckFilt
 import io.github.nucleuspowered.nucleus.core.core.teleport.scanners.NoTeleportScanner;
 import io.github.nucleuspowered.nucleus.core.core.teleport.scanners.VerticalTeleportScanner;
 import io.github.nucleuspowered.nucleus.core.event.NucleusRegisterModuleEvent;
-import io.github.nucleuspowered.nucleus.core.event.RegisterModuleEvent;
 import io.github.nucleuspowered.nucleus.core.event.RegisterPreferenceKeyEvent;
 import io.github.nucleuspowered.nucleus.core.guice.NucleusInjectorModule;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
@@ -44,6 +43,11 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusConfigException;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.leangen.geantyref.TypeToken;
+import io.vavr.Tuple2;
+import io.vavr.collection.HashSet;
+import io.vavr.collection.Seq;
+import io.vavr.collection.Set;
+import io.vavr.control.Try;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -52,8 +56,6 @@ import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.Command;
-import org.spongepowered.api.data.persistence.DataBuilder;
-import org.spongepowered.api.data.persistence.DataSerializable;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.EventContext;
 import org.spongepowered.api.event.Listener;
@@ -93,7 +95,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public final class NucleusCore {
 
@@ -101,7 +102,8 @@ public final class NucleusCore {
     private final Path configDirectory;
     private final Logger logger;
     private final Injector injector;
-    private final IModuleProvider coreProvider;
+    private final IModuleProvider coreModuleProvider = new CoreModuleProvider();
+    private final IModuleProvider nucleusModulesProvider;
     private final boolean runDocGen = NucleusJavaProperties.RUN_DOCGEN;
     private final List<Runnable> onStartedActions = new LinkedList<>();
     private final IPluginInfo pluginInfo;
@@ -117,7 +119,7 @@ public final class NucleusCore {
             final Path configDirectory,
             final Logger logger,
             final Injector injector,
-            final IModuleProvider coreProvider,
+            final IModuleProvider nucleusModulesProvider,
             final IPluginInfo pluginInfo) {
         this.game = game;
         this.pluginContainer = pluginContainer;
@@ -125,7 +127,7 @@ public final class NucleusCore {
         this.logger = logger;
         this.pluginInfo = pluginInfo;
         this.injector = injector.createChildInjector(new NucleusInjectorModule(() -> this, pluginInfo));
-        this.coreProvider = coreProvider;
+        this.nucleusModulesProvider = nucleusModulesProvider;
         this.serviceCollection = new NucleusServiceCollection(
                 this.game,
                 this.injector,
@@ -311,12 +313,15 @@ public final class NucleusCore {
     // -- Module loading
 
     private LinkedList<Tuple<ModuleContainer, IModule>> startModuleLoading() {
-        final List<ModuleContainer> moduleContainerCollection = new ArrayList<>(this.coreProvider.getModules());
+        final io.vavr.collection.Set<ModuleContainer> initialModuleContainerCollection = io.vavr.collection.LinkedHashSet
+                .ofAll(this.coreModuleProvider.getModules())
+                .addAll(this.nucleusModulesProvider.getModules());
 
         // Now ask other plugins for their modules
         final NucleusRegisterModuleEvent event = new NucleusRegisterModuleEvent(Cause.of(EventContext.empty(), this.pluginContainer));
         Sponge.eventManager().post(event);
-        event.getProviders().stream().map(IModuleProvider::getModules).forEach(moduleContainerCollection::addAll);
+        final io.vavr.collection.Set<ModuleContainer> moduleContainerCollection = initialModuleContainerCollection
+                .addAll(HashSet.ofAll(event.getProviders()).flatMap(IModuleProvider::getModules));
 
         final LinkedList<Tuple<ModuleContainer, IModule>> modules = new LinkedList<>();
         for (final ModuleContainer container : this.filterModules(moduleContainerCollection)) {
@@ -412,12 +417,7 @@ public final class NucleusCore {
         modules.forEach(tuple -> tuple.second().postLoad(this.serviceCollection));
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends DataSerializable> void registerDataBuilder(final Class<T> clazz, final DataBuilder<?> builder) {
-        this.game.dataManager().registerBuilder(clazz, (DataBuilder<T>) builder);
-    }
-
-    private Collection<ModuleContainer> filterModules(final Collection<ModuleContainer> moduleContainers) {
+    private Collection<ModuleContainer> filterModules(final Set<ModuleContainer> moduleContainers) {
         final CommentedConfigurationNode defaults = this.serviceCollection.configurateHelper().createConfigNode();
         for (final ModuleContainer moduleContainer : moduleContainers) {
             try {
@@ -426,9 +426,8 @@ public final class NucleusCore {
                 // ignored
             }
         }
-        final Collection<String> modules = moduleContainers.stream().map(ModuleContainer::getId).collect(Collectors.toList());
-        modules.add("core");
-        this.serviceCollection.moduleReporter().provideDiscoveredModules(modules);
+        final Set<String> modules = moduleContainers.map(ModuleContainer::getId);
+        this.serviceCollection.moduleReporter().provideDiscoveredModules(modules.toJavaList());
 
         final ConfigurationLoader<CommentedConfigurationNode> moduleConfig = HoconConfigurationLoader.builder()
                 .path(this.configDirectory.resolve("modules.conf"))
@@ -445,22 +444,35 @@ public final class NucleusCore {
         }
 
         final CommentedConfigurationNode finalNode = node;
+        final Set<String> containerIds = HashSet
+                .ofAll(moduleContainers)
+                .map(ModuleContainer::getId)
+                .filter(x -> {
+                    try {
+                        return finalNode.node(x).get(TypeToken.get(ModuleState.class), ModuleState.TRUE).isShouldLoad();
+                    } catch (final SerializationException e) {
+                        return true;
+                    }
+                });
+        final Map<String, ModuleState> stateMap = HashSet
+                .ofAll(moduleContainers)
+                .toJavaMap(container -> {
+                    final String id = container.getId();
+                    final ModuleState state = Try.of(() ->
+                            container.isRequired() ? ModuleState.FORCE :
+                                    finalNode.node(id).get(TypeToken.get(ModuleState.class), ModuleState.TRUE)
+                    ).recover(thr -> ModuleState.TRUE).get();
+                    return new Tuple2<>(id, state);
+                });
+
         final ModuleEvent event = new ModuleEvent(
                 Cause.of(EventContext.empty(), this.pluginContainer),
-                moduleContainers.stream().map(ModuleContainer::getId).collect(Collectors.toSet()),
-                moduleContainers.stream().map(ModuleContainer::getId)
-                        .filter(x -> {
-                            try {
-                                return finalNode.node(x).get(TypeToken.get(ModuleState.class), ModuleState.TRUE) == ModuleState.TRUE;
-                            } catch (final SerializationException e) {
-                                return true;
-                            }
-                        }).collect(Collectors.toSet()));
+                containerIds.toJavaSet(),
+                stateMap);
         this.game.eventManager().post(event);
         final ArrayList<ModuleContainer> containersToReturn = new ArrayList<>();
-        containersToReturn.add(new ModuleContainer("core", "Core", true, CoreModule.class));
         for (final ModuleContainer moduleContainer : moduleContainers) {
-            if (event.shouldLoad(moduleContainer.getId())) {
+            if (event.shouldLoad(moduleContainer.getId())) { // will return true if it doesn't exist - i.e. force load.
                 containersToReturn.add(moduleContainer);
             }
         }
