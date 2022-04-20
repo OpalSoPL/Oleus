@@ -7,6 +7,7 @@ package io.github.nucleuspowered.nucleus.core.services.impl;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import io.github.nucleuspowered.nucleus.core.IPropertyHolder;
 import io.github.nucleuspowered.nucleus.core.guice.ConfigDirectory;
 import io.github.nucleuspowered.nucleus.core.guice.DataDirectory;
 import io.github.nucleuspowered.nucleus.core.scaffold.service.annotations.APIService;
@@ -85,6 +86,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     private final Supplier<IModuleReporter> moduleReporterSupplier;
     private final Supplier<ISchedulerService> schedulerServiceProvider;
     private final Supplier<ITimingsService> timingsServiceProvider;
+    private final IPropertyHolder propertyHolder;
     private final Game game;
     private final Injector injector;
     private final PluginContainer pluginContainer;
@@ -98,6 +100,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
             final Injector injector,
             final PluginContainer pluginContainer,
             final Logger logger,
+            final IPropertyHolder propertyHolder,
             @DataDirectory final Supplier<Path> dataPath,
             @ConfigDirectory final Path configPath) {
         this.messageProviderService = new LazyLoad<>(this, injector, IMessageProviderService.class);
@@ -127,6 +130,7 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
         this.moduleReporterSupplier = new LazyLoad<>(this, injector, IModuleReporter.class);
         this.schedulerServiceProvider = new LazyLoad<>(this, injector, ISchedulerService.class);
         this.timingsServiceProvider = new LazyLoad<>(this, injector, ITimingsService.class);
+        this.propertyHolder = propertyHolder;
         this.injector = injector;
         this.pluginContainer = pluginContainer;
         this.logger = logger;
@@ -263,6 +267,11 @@ public class NucleusServiceCollection implements INucleusServiceCollection {
     @Override
     public Logger logger() {
         return this.logger;
+    }
+
+    @Override
+    public IPropertyHolder propertyHolder() {
+        return this.propertyHolder;
     }
 
     @Override

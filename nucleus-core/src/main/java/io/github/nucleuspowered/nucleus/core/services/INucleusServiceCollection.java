@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.core.services;
 
 import com.google.inject.ImplementedBy;
 import com.google.inject.Injector;
+import io.github.nucleuspowered.nucleus.core.IPropertyHolder;
 import io.github.nucleuspowered.nucleus.core.services.impl.NucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IChatMessageFormatterService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICommandElementSupplier;
@@ -103,6 +104,8 @@ public interface INucleusServiceCollection {
     ITimingsService timingsService();
 
     Logger logger();
+
+    IPropertyHolder propertyHolder();
 
     <I, C extends I> void registerService(Class<I> key, C service, boolean rereg);
 

@@ -7,11 +7,11 @@ package io.github.nucleuspowered.docgen.module;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.docgen.module.command.DocGenCommand;
 import io.github.nucleuspowered.docgen.module.service.DocumentationGenerationService;
-import io.github.nucleuspowered.nucleus.core.NucleusJavaProperties;
 import io.github.nucleuspowered.nucleus.core.module.IModule;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
@@ -27,6 +27,8 @@ public final class DocgenModule implements IModule {
 
     private final INucleusServiceCollection serviceCollection;
     private final Game game;
+
+    public final @Nullable String docgenPath = System.getProperty("nucleus.docgen");
 
     @Inject
     public DocgenModule(final INucleusServiceCollection serviceCollection, final Game game) {
@@ -51,10 +53,10 @@ public final class DocgenModule implements IModule {
 
     @Listener
     public void onServerStarted(final StartedEngineEvent<Server> event) {
-        if (NucleusJavaProperties.DOCGEN_PATH != null) {
+        if (this.docgenPath != null) {
             final Path finalPath;
             try {
-                final String docgenPath = NucleusJavaProperties.DOCGEN_PATH;
+                final String docgenPath = this.docgenPath;
                 if (docgenPath.isEmpty()) {
                     finalPath = this.serviceCollection.dataDir().get();
                 } else {

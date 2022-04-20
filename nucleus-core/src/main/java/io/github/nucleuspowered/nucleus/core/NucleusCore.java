@@ -45,7 +45,6 @@ import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
 import io.leangen.geantyref.TypeToken;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
-import io.vavr.collection.Seq;
 import io.vavr.collection.Set;
 import io.vavr.control.Try;
 import org.apache.logging.log4j.Level;
@@ -104,7 +103,7 @@ public final class NucleusCore {
     private final Injector injector;
     private final IModuleProvider coreModuleProvider = new CoreModuleProvider();
     private final IModuleProvider nucleusModulesProvider;
-    private final boolean runDocGen = NucleusJavaProperties.RUN_DOCGEN;
+    private final IPropertyHolder propertyHolder;
     private final List<Runnable> onStartedActions = new LinkedList<>();
     private final IPluginInfo pluginInfo;
 
@@ -120,19 +119,22 @@ public final class NucleusCore {
             final Logger logger,
             final Injector injector,
             final IModuleProvider nucleusModulesProvider,
-            final IPluginInfo pluginInfo) {
+            final IPluginInfo pluginInfo,
+            final IPropertyHolder propertyHolder) {
         this.game = game;
         this.pluginContainer = pluginContainer;
         this.configDirectory = configDirectory;
         this.logger = logger;
         this.pluginInfo = pluginInfo;
-        this.injector = injector.createChildInjector(new NucleusInjectorModule(() -> this, pluginInfo));
+        this.injector = injector.createChildInjector(new NucleusInjectorModule(() -> this, pluginInfo, propertyHolder));
         this.nucleusModulesProvider = nucleusModulesProvider;
+        this.propertyHolder = propertyHolder;
         this.serviceCollection = new NucleusServiceCollection(
                 this.game,
                 this.injector,
                 this.pluginContainer,
                 this.logger,
+                this.propertyHolder,
                 this::getDataDirectory,
                 this.configDirectory
         );
@@ -151,7 +153,7 @@ public final class NucleusCore {
             throw new NucleusConfigException(
                     "Could not load Nucleus core config. Aborting initialisation.",
                     provider.getCoreConfigFileName(),
-                    this.runDocGen,
+                    this.propertyHolder.shutdownOnError(),
                     e
             );
         }
@@ -161,7 +163,7 @@ public final class NucleusCore {
             throw new NucleusConfigException(
                     "Could not load Nucleus module config. Aborting initialisation.",
                     provider.getModuleConfigFileName(),
-                    this.runDocGen,
+                    this.propertyHolder.shutdownOnError(),
                     e
             );
         }
@@ -220,7 +222,7 @@ public final class NucleusCore {
             event.register(Registry.Keys.STORAGE_REPOSITORY_KEY, true,
                     () -> Collections.singletonMap(Registry.Keys.FLAT_FILE_STORAGE_KEY, this.serviceCollection.storageManager().getFlatFileRepositoryFactory()));
         } catch (final Exception e) {
-            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
+            new NucleusErrorHandler(this.pluginContainer, e, this.propertyHolder.shutdownOnError(), this.logger, this.pluginInfo)
                     .generatePrettyPrint(this.logger, Level.ERROR);
         }
     }
@@ -253,7 +255,7 @@ public final class NucleusCore {
         try {
             this.serviceCollection.registerFactories(event);
         } catch (final Exception e) {
-            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
+            new NucleusErrorHandler(this.pluginContainer, e, this.propertyHolder.shutdownOnError(), this.logger, this.pluginInfo)
                     .generatePrettyPrint(this.logger, Level.ERROR);
         }
     }
@@ -265,7 +267,7 @@ public final class NucleusCore {
             metadataService.reset(); // for clients.
             metadataService.completeRegistrationPhase(this.serviceCollection, event);
         } catch (final Exception e) {
-            new NucleusErrorHandler(this.pluginContainer, e, this.runDocGen, this.logger, this.pluginInfo)
+            new NucleusErrorHandler(this.pluginContainer, e, this.propertyHolder.shutdownOnError(), this.logger, this.pluginInfo)
                     .generatePrettyPrint(this.logger, Level.ERROR);
         }
     }
