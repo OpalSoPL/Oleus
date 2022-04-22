@@ -433,14 +433,12 @@ publishing {
     }
 
     repositories {
-        if (!versionString.contains("SNAPSHOT")) {
-            maven {
-                name = "GitHubPackages"
-                url = uri(project.findProperty("gpr.uri") as String? ?: "${project.properties["ghUri"]?.toString()!!}${System.getenv("REPO")}")
-                credentials {
-                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USER")
-                    password = project.findProperty("gpr.key") as String? ?: System.getenv("KEY")
-                }
+        maven {
+            name = "GitHubPackages"
+            url = uri(project.findProperty("gpr.uri") as String? ?: "${rootProject.properties["ghUri"]?.toString()!!}${rootProject.properties["ghSlug"]}")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }

@@ -79,7 +79,7 @@ tasks {
 
 publishing {
     publications {
-        create<MavenPublication>("api") {
+        create<MavenPublication>("storage-api") {
             from(components["java"])
             setArtifacts(listOf(javadocJar.get(), sourcesJar.get(), tasks.jar.get()))
             version = "${rootProject.version}"
@@ -89,14 +89,12 @@ publishing {
     }
 
     repositories {
-        if (!(rootProject.version as String).contains("SNAPSHOT")) {
-            maven {
-                name = "GitHubPackages"
-                url = uri(project.findProperty("gpr.uri") as String? ?: "${rootProject.properties["ghUri"]?.toString()!!}${System.getenv("REPO")}")
-                credentials {
-                    username = project.findProperty("gpr.user") as String? ?: System.getenv("USER")
-                    password = project.findProperty("gpr.key") as String? ?: System.getenv("KEY")
-                }
+        maven {
+            name = "GitHubPackages"
+            url = uri(project.findProperty("gpr.uri") as String? ?: "${rootProject.properties["ghUri"]?.toString()!!}${rootProject.properties["ghSlug"]}")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }
