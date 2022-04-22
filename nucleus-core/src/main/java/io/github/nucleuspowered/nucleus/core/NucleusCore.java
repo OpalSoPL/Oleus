@@ -102,7 +102,6 @@ public final class NucleusCore {
     private final Logger logger;
     private final Injector injector;
     private final IModuleProvider coreModuleProvider = new CoreModuleProvider();
-    private final IModuleProvider nucleusModulesProvider;
     private final IPropertyHolder propertyHolder;
     private final List<Runnable> onStartedActions = new LinkedList<>();
     private final IPluginInfo pluginInfo;
@@ -118,7 +117,6 @@ public final class NucleusCore {
             final Path configDirectory,
             final Logger logger,
             final Injector injector,
-            final IModuleProvider nucleusModulesProvider,
             final IPluginInfo pluginInfo,
             final IPropertyHolder propertyHolder) {
         this.game = game;
@@ -127,7 +125,6 @@ public final class NucleusCore {
         this.logger = logger;
         this.pluginInfo = pluginInfo;
         this.injector = injector.createChildInjector(new NucleusInjectorModule(() -> this, pluginInfo, propertyHolder));
-        this.nucleusModulesProvider = nucleusModulesProvider;
         this.propertyHolder = propertyHolder;
         this.serviceCollection = new NucleusServiceCollection(
                 this.game,
@@ -316,14 +313,13 @@ public final class NucleusCore {
 
     private LinkedList<Tuple<ModuleContainer, IModule>> startModuleLoading() {
         final io.vavr.collection.Set<ModuleContainer> initialModuleContainerCollection = io.vavr.collection.LinkedHashSet
-                .ofAll(this.coreModuleProvider.getModules())
-                .addAll(this.nucleusModulesProvider.getModules());
+                .ofAll(this.coreModuleProvider.getModules());
 
         // Now ask other plugins for their modules
         final NucleusRegisterModuleEvent event = new NucleusRegisterModuleEvent(Cause.of(EventContext.empty(), this.pluginContainer));
         Sponge.eventManager().post(event);
         final io.vavr.collection.Set<ModuleContainer> moduleContainerCollection = initialModuleContainerCollection
-                .addAll(HashSet.ofAll(event.getProviders()).flatMap(IModuleProvider::getModules));
+                .addAll(io.vavr.collection.LinkedHashSet.ofAll(event.getProviders()).flatMap(IModuleProvider::getModules));
 
         final LinkedList<Tuple<ModuleContainer, IModule>> modules = new LinkedList<>();
         for (final ModuleContainer container : this.filterModules(moduleContainerCollection)) {

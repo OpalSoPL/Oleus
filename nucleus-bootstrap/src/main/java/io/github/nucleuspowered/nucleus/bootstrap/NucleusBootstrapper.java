@@ -14,7 +14,6 @@ import io.github.nucleuspowered.nucleus.bootstrap.error.ConfigErrorHandler;
 import io.github.nucleuspowered.nucleus.core.datatypes.NucleusCoreDatatypeRegistration;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusConfigException;
 import io.github.nucleuspowered.nucleus.core.startuperror.NucleusErrorHandler;
-import io.github.nucleuspowered.nucleus.modules.NucleusModuleProvider;
 import io.github.nucleuspowered.nucleus.bootstrap.error.InvalidVersionErrorHandler;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -136,7 +135,6 @@ public class NucleusBootstrapper {
                                 this.configDirectory,
                                 this.logger,
                                 this.injector,
-                                new NucleusModuleProvider(),
                                 pluginInfo,
                                 propertyHolder);
                 NucleusCoreDatatypeRegistration.registerDataTypes(this.game.dataManager());

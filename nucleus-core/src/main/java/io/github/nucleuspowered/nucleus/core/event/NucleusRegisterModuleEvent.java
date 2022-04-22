@@ -10,12 +10,13 @@ import org.spongepowered.api.event.impl.AbstractEvent;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public final class NucleusRegisterModuleEvent extends AbstractEvent implements RegisterModuleEvent {
 
     private final Cause cause;
-    private final Set<IModuleProvider> providers = new HashSet<>();
+    private final Set<IModuleProvider> providers = new LinkedHashSet<>();
 
     public NucleusRegisterModuleEvent(final Cause cause) {
         this.cause = cause;

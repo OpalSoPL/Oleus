@@ -3,21 +3,21 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContex
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
-import io.github.nucleuspowered.gradle.data.*
-import io.github.nucleuspowered.gradle.data.Dependency as PluginDep
+import io.github.nucleuspowered.gradle.data.Contributor
+import io.github.nucleuspowered.gradle.data.Links
+import io.github.nucleuspowered.gradle.data.SpongePlugin
 import io.github.nucleuspowered.gradle.enums.getLevel
 import io.github.nucleuspowered.gradle.task.RelNotesTask
 import io.github.nucleuspowered.gradle.task.StdOutExec
 import org.spongepowered.gradle.plugin.config.PluginLoaders
 import org.spongepowered.plugin.metadata.model.PluginDependency
-import shadow.org.apache.tools.zip.ZipOutputStream
 import shadow.org.apache.tools.zip.ZipEntry
+import shadow.org.apache.tools.zip.ZipOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStreamReader
-import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
-import kotlin.streams.toList
+import io.github.nucleuspowered.gradle.data.Dependency as PluginDep
 
 val kotlinVersion: String? by project
 var kotlin_version: String by extra
@@ -164,6 +164,8 @@ dependencies {
     implementation(project(":nucleus-api"))
     implementation(project(":nucleus-core"))
     implementation(project(":nucleus-bootstrap"))
+    implementation(project(":nucleus-modules"))
+    implementation(project(":nucleus-storage-api"))
     testImplementation("junit:junit:4.13.2")
 }
 
@@ -346,6 +348,7 @@ tasks {
     shadowJar {
         dependsOn(":nucleus-api:build")
         dependsOn(":nucleus-core:build")
+        dependsOn(":nucleus-modules:build")
         dependsOn(":nucleus-bootstrap:build")
         dependsOn(gitHash)
         doFirst {
@@ -356,6 +359,19 @@ tasks {
                 attributes["Git-Hash"] = gitHash.get().result
             }
         }
+
+        transform(SpongePluginJsonTransformer(listOf(
+                SpongePlugin(
+                        "nucleus-modules",
+                        "Nucleus Modules",
+                        "io.github.nucleuspowered.nucleus.modules.NucleusModulesPlugin",
+                        "Standard Nucleus Modules",
+                        versionString,
+                        Links("https://nucleuspowered.org", "https://github.com/NucleusPowered/Nucleus", "https://github.com/NucleusPowered/Nucleus/issues"),
+                        listOf(Contributor("dualspiral", "Lead Developer")),
+                        listOf(PluginDep.sponge(spongeApiVersion), PluginDep("nucleus", "after", versionString, false))
+                )
+        )))
 
         dependencies {
             include(project(":nucleus-api"))
