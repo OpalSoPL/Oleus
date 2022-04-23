@@ -1,0 +1,22 @@
+name: Deploy to Ore
+
+on:
+  push:
+    tags:
+    - '[3-9]*'
+
+jobs:
+  buildAndPublish:
+    runs-on: ubuntu-latest
+    environment: ore
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+      - name: Upload to Ore
+        run: ./gradlew build uploadToOre
+        env:
+          NUCLEUS_ORE_APIKEY: ${{ secrets.OREAPIKEY }}

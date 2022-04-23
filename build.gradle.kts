@@ -250,7 +250,7 @@ val buildDocgen by tasks.registering {
     dependsOn(copyDocGenJar)
 }
 
-val upload by tasks.registering(io.github.nucleuspowered.gradle.task.UploadToOre::class) {
+val uploadToOre by tasks.registering(io.github.nucleuspowered.gradle.task.UploadToOre::class) {
     dependsOn(shadowJar)
     dependsOn(relNotes)
     fileProvider = shadowJar.archiveFile

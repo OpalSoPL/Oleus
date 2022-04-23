@@ -49,7 +49,7 @@ open class UploadToOre : DefaultTask() {
             // val logger =  // LoggerFactory.getLogger("Upload to Ore")
             // copy to avoid Kotlin complaining.
             val conf = fileProvider
-            val l = releaseLevel.invoke()
+            // val l = releaseLevel.invoke()
             if (apiKey != null && conf != null) {
                 // Create the URLs
                 val authenticateUrl = URL("$oreApiEndpoint/v2/authenticate")
@@ -58,7 +58,7 @@ open class UploadToOre : DefaultTask() {
 
                 // select the file we want to upload
                 val fileToUpload = conf.get()
-                //  val isRelease = (l == ReleaseLevel.RELEASE_MAJOR || l == ReleaseLevel.RELEASE_MINOR)
+                // val isRelease = (l == ReleaseLevel.RELEASE_MAJOR || l == ReleaseLevel.RELEASE_MINOR)
                 this.logger.info("Starting upload")
                 val con: HttpURLConnection = authenticateUrl.openConnection() as HttpURLConnection
                 val gson = Gson()
