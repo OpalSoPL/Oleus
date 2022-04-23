@@ -12,7 +12,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    environment: Deployment
     steps:
     - uses: actions/checkout@v3
     - name: Set up Java
@@ -24,9 +24,10 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Publish to repositories
-      run: ./gradlew publish -Part.uri="${{ secrets.ARTIFACTORYURL }}"
+      run: ./gradlew publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ARTIFACTORY_URL: ${{ secrets.ARTIFACTORYURL }}
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORYUSER }}
         ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORYTOKEN }}
 
