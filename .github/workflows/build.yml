@@ -24,10 +24,9 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Publish to repositories
-      run: ./gradlew publish
+      run: ./gradlew publish -Part.uri="${{ secrets.ARTIFACTORYURL }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ARTIFACTORY_URL: ${{ secrets.ARTIFACTORYURL }}
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORYUSER }}
         ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORYTOKEN }}
 
