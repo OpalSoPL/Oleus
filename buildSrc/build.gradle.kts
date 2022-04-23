@@ -17,6 +17,7 @@ buildscript {
 }
 plugins {
     java
+    `kotlin-dsl`
 }
 
 java {

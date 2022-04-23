@@ -27,6 +27,9 @@ jobs:
       run: ./gradlew publish
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ARTIFACTORY_URL: ${{ secrets.ARTIFACTORYURL }}
+        ARTIFACTORY_USER: ${{ secrets.ARTIFACTORYUSER }}
+        ARTIFACTORY_TOKEN: ${{ secrets.ARTIFACTORYTOKEN }}
 
     - name: Upload Plugin
       uses: actions/upload-artifact@v2

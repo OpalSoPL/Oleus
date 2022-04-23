@@ -13,6 +13,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import java.io.BufferedReader
 import java.io.InputStream
@@ -24,13 +26,21 @@ import java.util.stream.Collectors
 
 open class UploadToOre : DefaultTask() {
 
+    @Input
     var multipartBoundary: String = "thisissomegibberishusedasaboundary"
+    @Input
     var oreApiEndpoint: String = "https://ore.spongepowered.org/api"
+    @Input
     var apiKey: String? = null
+    @Input
     var force = false
+    @Input
     var fileProvider: Provider<RegularFile>? = null
+    @Input
     var notes: () -> String = { "" }
+    @Input
     var releaseLevel: () -> ReleaseLevel = { ReleaseLevel.SNAPSHOT }
+    @Input
     var pluginid: String = ""
 
     @TaskAction

@@ -3,7 +3,7 @@ plugins {
     `java-library`
     idea
     eclipse
-    `maven-publish`
+    id("nucleus-publishing-convention")
 }
 
 description = "The Ultimate Essentials Plugin API."
@@ -83,17 +83,6 @@ publishing {
             version = "${rootProject.version}"
             groupId = rootProject.properties["groupId"]?.toString()!!
             artifactId = project.properties["artifactId"]?.toString()!!
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri(project.findProperty("gpr.uri") as String? ?: "${rootProject.properties["ghUri"]?.toString()!!}${rootProject.properties["ghSlug"]}")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-            }
         }
     }
 }

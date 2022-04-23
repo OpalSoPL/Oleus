@@ -43,6 +43,7 @@ plugins {
     id("net.kyori.blossom") version "1.2.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("org.spongepowered.gradle.plugin") version "2.0.1"
+    id("nucleus-publishing-convention")
 }
 
 // Until I can figure out how to get Blossom to accept task outputs, if at all
@@ -445,17 +446,6 @@ publishing {
             version = versionString
             groupId = project.properties["groupId"]?.toString()!!
             artifactId = project.properties["artifactId"]?.toString()!!
-        }
-    }
-
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri(project.findProperty("gpr.uri") as String? ?: "${rootProject.properties["ghUri"]?.toString()!!}${rootProject.properties["ghSlug"]}")
-            credentials {
-                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-            }
         }
     }
 }
