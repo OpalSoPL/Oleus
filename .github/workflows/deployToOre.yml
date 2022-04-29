@@ -4,6 +4,7 @@ on:
   push:
     tags:
     - '[3-9]*'
+  workflow_dispatch:
 
 jobs:
   buildAndPublish:
