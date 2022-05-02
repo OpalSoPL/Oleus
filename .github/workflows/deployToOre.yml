@@ -37,5 +37,4 @@ jobs:
           plugin: plugin
           description: changelog
           apiKey: ${{ secrets.ORE_API_KEY }}
-          channel: Release
           pluginId: "nucleus"
