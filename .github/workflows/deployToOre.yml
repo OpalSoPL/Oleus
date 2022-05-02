@@ -17,7 +17,25 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+      - name: Build
+        run: ./gradlew clean build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: plugin
+          path: 'output/*-plugin.jar'
+          if-no-files-found: error
+      - name: Upload Description
+        uses: actions/upload-artifact@v3
+        with:
+          name: changelog
+          path: '*.md'
+          if-no-files-found: error
       - name: Upload to Ore
-        run: ./gradlew build uploadToOre
-        env:
-          NUCLEUS_ORE_APIKEY: ${{ secrets.OREAPIKEY }}
+        uses: dualspiral/ore-upload-action@v1
+        with:
+          plugin: plugin
+          description: changelog
+          apiKey: ${{ secrets.ORE_API_KEY }}
+          channel: Release
+          pluginId: "nucleus"

@@ -250,15 +250,6 @@ val buildDocgen by tasks.registering {
     dependsOn(copyDocGenJar)
 }
 
-val uploadToOre by tasks.registering(io.github.nucleuspowered.gradle.task.UploadToOre::class) {
-    dependsOn(shadowJar)
-    dependsOn(relNotes)
-    fileProvider = shadowJar.archiveFile
-    notes = { relNotes.get().relNotes!! }
-    releaseLevel = { level }
-    apiKey = properties["ore_apikey"]?.toString() ?: System.getenv("NUCLEUS_ORE_APIKEY")
-    pluginid = "nucleus"
-}
 /*
 // TODO: Re-enable
 val setupDocGen by tasks.registering(io.github.nucleuspowered.gradle.task.SetupServer::class) {
