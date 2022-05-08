@@ -228,6 +228,8 @@ val writeRelNotes by tasks.registering {
 val outputRelNotes by tasks.registering {
     dependsOn(relNotes)
     doLast {
+        val parentDirectory = project.projectDir.toPath().resolve("output")
+        Files.createDirectories(parentDirectory)
         Files.write(project.projectDir.toPath().resolve("output").resolve("${nucleusVersion}.md"),
                 relNotes.get().relNotes!!.toByteArray(StandardCharsets.UTF_8))
     }
