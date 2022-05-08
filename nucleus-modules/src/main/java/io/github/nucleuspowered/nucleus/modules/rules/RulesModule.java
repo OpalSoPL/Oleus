@@ -50,6 +50,7 @@ public class RulesModule implements IModule.Configurable<RulesConfig> {
     public void init(final INucleusServiceCollection serviceCollection) {
         this.textFileControllerCollection.register(ID,
                 new TextFileController(
+                        serviceCollection.logger(),
                         this.pluginContainer,
                         this.textTemplateFactory,
                         "rules.txt",

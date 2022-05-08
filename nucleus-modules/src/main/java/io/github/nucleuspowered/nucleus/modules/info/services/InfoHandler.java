@@ -14,8 +14,11 @@ import org.spongepowered.api.resource.Resource;
 import org.spongepowered.api.resource.ResourcePath;
 import org.spongepowered.api.resource.pack.Pack;
 import org.spongepowered.api.resource.pack.PackType;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -51,12 +54,17 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
 
     }
 
-    private void copyIfNotExists(final Logger logger, final Pack pack, final ResourcePath path, final Path target) {
+    private void copyIfNotExists(final Logger logger, final PluginContainer pluginContainer, final String file, final Path target) {
         if (Files.notExists(target)) {
-            try (final Resource resource = pack.contents().requireResource(PackType.server(), path)) {
-                Files.copy(resource.inputStream(), target);
-            } catch (final IOException e) {
-                logger.error("Could not find resource {} when it should exist.", path.toString());
+            final Optional<InputStream> optionalInputStream = pluginContainer.openResource(URI.create("data/plugin-nucleus/" + file));
+            if (optionalInputStream.isPresent()) {
+                try (final InputStream inputStream = optionalInputStream.get()) {
+                    Files.copy(inputStream, target);
+                } catch (final IOException e) {
+                    logger.error("Could not find resource {} when it should exist.", file);
+                }
+            } else {
+                logger.error("Could not locate data/plugin-nucleus/{}", file);
             }
         }
     }
@@ -69,16 +77,16 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
             try {
                 Files.createDirectories(infoDir);
 
-                final Pack pack = Sponge.server().packRepository().pack(serviceCollection.pluginContainer());
-                this.copyIfNotExists(serviceCollection.logger(), pack, ResourcePath.of(pack.id(), "info.txt"), infoDir.resolve("info.txt"));
-                this.copyIfNotExists(serviceCollection.logger(), pack, ResourcePath.of(pack.id(), "colors.txt"), infoDir.resolve("colors.txt"));
-                this.copyIfNotExists(serviceCollection.logger(), pack, ResourcePath.of(pack.id(), "links.txt"), infoDir.resolve("links.txt"));
+                final PluginContainer pluginContainer = serviceCollection.pluginContainer();
+                this.copyIfNotExists(serviceCollection.logger(), pluginContainer, "info.txt", infoDir.resolve("info.txt"));
+                this.copyIfNotExists(serviceCollection.logger(), pluginContainer, "colors.txt", infoDir.resolve("colors.txt"));
+                this.copyIfNotExists(serviceCollection.logger(), pluginContainer, "links.txt", infoDir.resolve("links.txt"));
             } catch (final IOException e) {
                 e.printStackTrace();
                 return;
             }
         } else if (!Files.isDirectory(infoDir)) {
-            throw new IllegalStateException("The file " + infoDir.toAbsolutePath().toString() + " should be a directory.");
+            throw new IllegalStateException("The file " + infoDir.toAbsolutePath() + " should be a directory.");
         }
 
         // Get all txt files.
@@ -105,8 +113,12 @@ public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
                     return;
                 }
 
-                final TextFileController tfc = new TextFileController(serviceCollection.pluginContainer(),
-                        serviceCollection.textTemplateFactory(), x, true);
+                final TextFileController tfc = new TextFileController(
+                        serviceCollection.logger(),
+                        serviceCollection.pluginContainer(),
+                        serviceCollection.textTemplateFactory(),
+                        x,
+                        true);
                 tfc.load();
                 mst.put(name, tfc);
             } catch (final IOException e) {

@@ -31,6 +31,7 @@ public class InfoModule implements IModule.Configurable<InfoConfig> {
     public void init(final INucleusServiceCollection serviceCollection) {
         serviceCollection.registerService(InfoHandler.class, new InfoHandler(), false);
         final TextFileController motdController = new TextFileController(
+                serviceCollection.logger(),
                 serviceCollection.pluginContainer(),
                 serviceCollection.textTemplateFactory(),
                 "motd.txt",

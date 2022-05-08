@@ -14,6 +14,7 @@ import io.vavr.control.Try;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.resource.Resource;
 import org.spongepowered.api.resource.ResourcePath;
@@ -22,7 +23,9 @@ import org.spongepowered.api.resource.pack.PackType;
 import org.spongepowered.api.service.pagination.PaginationList;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
@@ -81,33 +84,43 @@ public final class TextFileController {
     private final boolean getTitle;
     private final INucleusTextTemplateFactory textTemplateFactory;
     private final PluginContainer pluginContainer;
+    private final Logger logger;
 
     private long fileTimeStamp = 0;
     @Nullable private NucleusTextTemplate title;
 
-    public TextFileController(final PluginContainer pluginContainer,
-            final INucleusTextTemplateFactory textTemplateFactory, final Path fileLocation, final boolean getTitle) {
-        this(pluginContainer, textTemplateFactory, null, fileLocation, getTitle);
+    public TextFileController(
+            final Logger logger,
+            final PluginContainer pluginContainer,
+            final INucleusTextTemplateFactory textTemplateFactory,
+            final Path fileLocation,
+            final boolean getTitle) {
+        this(logger, pluginContainer, textTemplateFactory, null, fileLocation, getTitle);
     }
 
     public TextFileController(
+            final Logger logger,
             final PluginContainer pluginContainer,
             final INucleusTextTemplateFactory textTemplateFactory, @Nullable final String path, final Path fileLocation) {
-        this(pluginContainer, textTemplateFactory, path == null ? null : () -> {
+        this(logger, pluginContainer, textTemplateFactory, path == null ? null : () -> {
             final Pack pluginPack = Sponge.server().packRepository().pack(pluginContainer);
             return ResourcePath.of(pluginPack.id(), path);
         }, fileLocation, false);
     }
 
     private TextFileController(
+            final Logger logger,
             final PluginContainer pluginContainer,
-            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final Supplier<ResourcePath> resourcePath, final Path fileLocation,
+            final INucleusTextTemplateFactory textTemplateFactory,
+            @Nullable final Supplier<ResourcePath> resourcePath,
+            final Path fileLocation,
             final boolean getTitle) {
         this.textTemplateFactory = textTemplateFactory;
         this.resourcePath = resourcePath;
         this.fileLocation = fileLocation;
         this.getTitle = getTitle;
         this.pluginContainer = pluginContainer;
+        this.logger = logger;
     }
 
     /**
@@ -117,12 +130,32 @@ public final class TextFileController {
      */
     public void load() throws IOException {
         if (this.resourcePath != null && !Files.exists(this.fileLocation)) {
-            final Pack pluginPack = Sponge.server().packRepository().pack(this.pluginContainer);
-            // Create the file
-            final Optional<Resource> o = pluginPack.contents().resource(PackType.server(), this.resourcePath.get());
-            if (o.isPresent()) {
-                try (final Resource resource = o.get()) {
-                    Files.copy(resource.inputStream(), this.fileLocation);
+            InputStream inputStream = null;
+            try {
+                try {
+                    final Pack pluginPack = Sponge.server().packRepository().pack(this.pluginContainer);
+                    // Create the file
+                    final Optional<Resource> o = pluginPack.contents().resource(PackType.server(), this.resourcePath.get());
+                    if (o.isPresent()) {
+                        try (final Resource resource = o.get()) {
+                            inputStream = resource.inputStream();
+                        }
+                    }
+                } catch (final AbstractMethodError ex) {
+                    logger.warn("Resource packs are not implmemented for this platform yet. Falling back to resource location.");
+                    final Optional<InputStream> optionalInputStream = pluginContainer.openResource(URI.create("data/plugin-nucleus/" + resourcePath.get().path()));
+                    if (optionalInputStream.isPresent()) {
+                        inputStream = optionalInputStream.get();
+                    } else {
+                        logger.error("Could not locate data/plugin-nucleus/{}", resourcePath.get().path());
+                    }
+                }
+                if (inputStream != null) {
+                    Files.copy(inputStream, this.fileLocation);
+                }
+            } finally {
+                if (inputStream != null) {
+                    inputStream.close();
                 }
             }
         }
