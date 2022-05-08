@@ -1,28 +1,29 @@
----
-name: Feature request
-about: Suggest an idea for this project
-
----
-
-<!--
-GITHUB ISSUES ARE NOT FOR SUPPORT. Any support requests will be closed without 
-warning. 
-
-If you need help, please visit our Docs or Discord.
-
-* Docs: https://nucleuspowered.org/docs/
-* Discord: https://discord.gg/A9QHG5H
-
-If you do not use this template, your issue may be closed without warning. 
--->
-**What are you trying to do?**
-A clear and concise description of what you're requesting and why you're requesting it. Ex. I'm always frustrated when [...]
-
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Anything else that might help?**
-Add any other context or screenshots about the feature request here.
+name: Feature Request
+description: Request implementation or a feature.
+body:
+- type: markdown
+  attributes:
+    value: "## Before You Begin"
+- type: markdown
+  attributes:
+    value: >
+      Please make sure you have searched existing issues to see if someone else has reported your issue first. We will
+      close duplicates.
+      
+      Remember, Github Issues is not for support. If you require help, visit the 
+      [Nucleus Docs](https://v2.nucleuspowered.org) or our [Discord Server](https://discord.gg/sponge).
+- type: input
+  id: version
+  attributes:
+    label: Nucleus Version
+    description: What version number are you running that does not fulfil your requirements?
+    placeholder: ex. 2.4.1, 3.0.0-BETA2
+  validations:
+    required: true
+- type: textarea
+  id: what-do-you-want
+  attributes:
+    label: What are you requesting?
+    description: Explain what what you're requesting and why you're requesting it. Please add as much detail as you can.
+  validations:
+    required: true
