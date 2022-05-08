@@ -53,6 +53,11 @@ public class SpawnListener implements IReloadableService.Reloadable, ListenerBas
 
     @Listener
     public void onJoin(final ServerSideConnectionEvent.Login loginEvent) {
+        if (this.spawnConfig == null) {
+            // TODO: this should never happen, so let's log this and manually fire reladables for now
+            this.serviceCollection.logger().warn("SpawnConfig in SpawnListener is null when it shouldn't be (reloadables should have fired by now). Correcting...");
+            this.serviceCollection.reloadableService().fireReloadables(serviceCollection);
+        }
         final UUID pl = loginEvent.profile().uniqueId();
         final IStorageManager storageManager = this.serviceCollection.storageManager();
         final IMessageProviderService messageProviderService = this.serviceCollection.messageProvider();
