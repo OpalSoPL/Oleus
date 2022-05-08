@@ -1,10 +1,13 @@
-name: Deploy to Ore
+name: Release to Ore and GH Releases
 
 on:
   push:
     tags:
     - '[3-9]*'
   workflow_dispatch:
+
+env:
+  NUCLEUS_CHANGELOG_NAME: "changelog"
 
 jobs:
   buildAndPublish:
@@ -38,3 +41,8 @@ jobs:
           description: changelog
           apiKey: ${{ secrets.ORE_API_KEY }}
           pluginId: "nucleus"
+      - name: Upload to Github Releases
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: output/changelog.md
+          files: output/*.jar
