@@ -4,37 +4,27 @@
  */
 package io.github.nucleuspowered.nucleus.core.io;
 
-import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.api.text.NucleusTextTemplate;
+import io.github.nucleuspowered.nucleus.core.Util;
 import io.github.nucleuspowered.nucleus.core.services.impl.texttemplatefactory.NucleusTextTemplateImpl;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.INucleusTextTemplateFactory;
 import io.github.nucleuspowered.nucleus.core.util.AdventureUtils;
-import io.vavr.control.Option;
-import io.vavr.control.Try;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.apache.logging.log4j.Logger;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.resource.Resource;
-import org.spongepowered.api.resource.ResourcePath;
-import org.spongepowered.api.resource.pack.Pack;
-import org.spongepowered.api.resource.pack.PackType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.service.pagination.PaginationList;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -42,11 +32,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.plugin.PluginContainer;
 
 /**
  * Handles loading and reading text files.
@@ -63,9 +49,9 @@ public final class TextFileController {
     );
 
     /**
-     * The internal {@link ResourcePath} that represents the default file.
+     * The path that represents the default file.
      */
-    @Nullable private final Supplier<ResourcePath> resourcePath;
+    @Nullable private final String resourcePath;
 
     /**
      * Holds the file location.
@@ -101,18 +87,17 @@ public final class TextFileController {
     public TextFileController(
             final Logger logger,
             final PluginContainer pluginContainer,
-            final INucleusTextTemplateFactory textTemplateFactory, @Nullable final String path, final Path fileLocation) {
-        this(logger, pluginContainer, textTemplateFactory, path == null ? null : () -> {
-            final Pack pluginPack = Sponge.server().packRepository().pack(pluginContainer);
-            return ResourcePath.of(pluginPack.id(), path);
-        }, fileLocation, false);
+            final INucleusTextTemplateFactory textTemplateFactory,
+            @Nullable final String path,
+            final Path fileLocation) {
+        this(logger, pluginContainer, textTemplateFactory, path, fileLocation, false);
     }
 
     private TextFileController(
             final Logger logger,
             final PluginContainer pluginContainer,
             final INucleusTextTemplateFactory textTemplateFactory,
-            @Nullable final Supplier<ResourcePath> resourcePath,
+            @Nullable final String resourcePath,
             final Path fileLocation,
             final boolean getTitle) {
         this.textTemplateFactory = textTemplateFactory;
@@ -130,33 +115,13 @@ public final class TextFileController {
      */
     public void load() throws IOException {
         if (this.resourcePath != null && !Files.exists(this.fileLocation)) {
-            InputStream inputStream = null;
-            try {
-                try {
-                    final Pack pluginPack = Sponge.server().packRepository().pack(this.pluginContainer);
-                    // Create the file
-                    final Optional<Resource> o = pluginPack.contents().resource(PackType.server(), this.resourcePath.get());
-                    if (o.isPresent()) {
-                        try (final Resource resource = o.get()) {
-                            inputStream = resource.inputStream();
-                        }
-                    }
-                } catch (final AbstractMethodError ex) {
-                    logger.warn("Resource packs are not implmemented for this platform yet. Falling back to resource location.");
-                    final Optional<InputStream> optionalInputStream = pluginContainer.openResource(URI.create("data/plugin-nucleus/" + resourcePath.get().path()));
-                    if (optionalInputStream.isPresent()) {
-                        inputStream = optionalInputStream.get();
-                    } else {
-                        logger.error("Could not locate data/plugin-nucleus/{}", resourcePath.get().path());
-                    }
-                }
-                if (inputStream != null) {
+            final Optional<InputStream> optionalInputStream = pluginContainer.openResource(URI.create("data/plugin-nucleus/" + resourcePath));
+            if (optionalInputStream.isPresent()) {
+                try (final InputStream inputStream = optionalInputStream.get()) {
                     Files.copy(inputStream, this.fileLocation);
                 }
-            } finally {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
+            } else {
+                logger.error("Could not locate data/plugin-nucleus/{}", resourcePath);
             }
         }
 
