@@ -65,5 +65,5 @@ jobs:
           nodetail: true
           title: Nucleus ${{ steps.tagval.outputs.value }} has been released!
           description: 'Download it from Ore by clicking here!'
-          url: https://ore.spongepowered.org/Nucleus/Nucleus/versions/${{ tagval.outputs.value }}
+          url: https://ore.spongepowered.org/Nucleus/Nucleus/versions/${{ steps.tagval.outputs.value }}
           color: 0x00ff40
