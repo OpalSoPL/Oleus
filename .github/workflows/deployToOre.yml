@@ -35,7 +35,7 @@ jobs:
           path: '*.md'
           if-no-files-found: error
       - name: Upload to Ore
-        uses: dualspiral/ore-upload-action@v1
+        uses: dualspiral/ore-upload-action@v2
         with:
           plugin: plugin
           description: changelog
