@@ -45,7 +45,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          prerelease: ${{ contains(github.ref, "BETA") || contains(github.ref, "ALPHA") || contains(github.ref, "RC") || contains(github.ref, "PR") }}
+          prerelease: ${{ contains(github.ref, 'BETA') || contains(github.ref, 'ALPHA') || contains(github.ref, 'RC') || contains(github.ref, 'PR') }}
           body_path: output/changelog.md
           files: output/*.jar
       - name: Get tag
