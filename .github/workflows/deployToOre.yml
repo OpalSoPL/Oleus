@@ -63,7 +63,7 @@ jobs:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         with:
           nodetail: true
-          title: Nucleus ${{ tagval.outputs.value }} has been released!
+          title: Nucleus ${{ steps.tagval.outputs.value }} has been released!
           description: 'Download it from Ore by clicking here!'
           url: https://ore.spongepowered.org/Nucleus/Nucleus/versions/${{ tagval.outputs.value }}
           color: 0x00ff40
