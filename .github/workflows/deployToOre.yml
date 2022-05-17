@@ -3,7 +3,7 @@ name: Release to Ore and GH Releases
 on:
   push:
     tags:
-    - '[3-9]*'
+    - '[2-9]*'
   workflow_dispatch:
 
 env:
