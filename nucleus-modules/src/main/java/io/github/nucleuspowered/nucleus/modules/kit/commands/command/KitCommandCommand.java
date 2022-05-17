@@ -31,7 +31,7 @@ import java.util.List;
         commandDescriptionKey = "kit.command",
         parentCommand = KitCommand.class
 )
-public class KitCommandCommand implements ICommandExecutor {
+public class KitCommandCommand extends KitCommandCommandBase {
 
     private final Component removeIcon = LinearComponents.linear(
             Component.text("[", NamedTextColor.WHITE),
@@ -45,7 +45,8 @@ public class KitCommandCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    protected ICommandResult execute0(final ICommandContext context) throws CommandException {
         // List all commands on a kit.
         final Kit kit = context.requireOne(KitService.KIT_KEY);
         final List<String> commands = kit.getCommands();

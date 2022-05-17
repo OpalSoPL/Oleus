@@ -79,6 +79,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
     private boolean isProcessTokens = false;
     private boolean isMustGetAll = false;
+    private boolean isCommandsEnabled = false;
 
     private final Parameter.Value<Kit> withPermission;
     private final Parameter.Value<Kit> withoutPermission;
@@ -331,20 +332,23 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     }
 
     private boolean redeemKitCommands(final Collection<String> commands, final ServerPlayer player) {
-        final String playerName = player.name();
-        boolean success = true;
-        try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
-            frame.pushCause(Sponge.systemSubject());
-            for (final String command : commands) {
-                try {
-                    Sponge.server().commandManager().process(command.replace("{{player}}", playerName));
-                } catch (final CommandException e) {
-                    e.printStackTrace();
-                    success = false;
+        if (this.isCommandsEnabled) {
+            final String playerName = player.name();
+            boolean success = true;
+            try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
+                frame.pushCause(Sponge.systemSubject());
+                for (final String command : commands) {
+                    try {
+                        Sponge.server().commandManager().process(command.replace("{{player}}", playerName));
+                    } catch (final CommandException e) {
+                        e.printStackTrace();
+                        success = false;
+                    }
                 }
             }
+            return success;
         }
-        return success;
+        return true;
     }
 
     public boolean checkOneTime(final Kit kit, final UUID player) {
@@ -543,6 +547,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         final KitConfig kitConfig = serviceCollection.configProvider().getModuleConfig(KitConfig.class);
         this.isMustGetAll = kitConfig.isMustGetAll();
         this.isProcessTokens = kitConfig.isProcessTokens();
+        this.isCommandsEnabled = kitConfig.isEnableKitCommands();
     }
 
     public IStorageService.SingleCached<IKitDataObject> getKitService() {

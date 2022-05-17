@@ -6,6 +6,7 @@ package io.github.nucleuspowered.nucleus.modules.kit.commands.command;
 
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
+import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
@@ -22,7 +23,7 @@ import org.spongepowered.api.command.parameter.Parameter;
         commandDescriptionKey = "kit.command.add",
         parentCommand = KitCommandCommand.class
 )
-public class KitAddCommandCommand implements ICommandExecutor {
+public class KitAddCommandCommand extends KitCommandCommandBase {
 
     @Override
     public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
@@ -32,7 +33,7 @@ public class KitAddCommandCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override protected ICommandResult execute0(final ICommandContext context) throws CommandException {
         final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
         final String c = context.requireOne(NucleusParameters.COMMAND)
                 .replace(" {player} ", " {{player}} ");

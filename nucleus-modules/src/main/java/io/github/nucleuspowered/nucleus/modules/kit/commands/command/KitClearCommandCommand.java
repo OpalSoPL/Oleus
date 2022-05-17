@@ -23,7 +23,7 @@ import java.util.ArrayList;
         commandDescriptionKey = "kit.command.clear",
         parentCommand = KitCommandCommand.class
 )
-public class KitClearCommandCommand implements ICommandExecutor {
+public class KitClearCommandCommand extends KitCommandCommandBase {
 
     @Override public Parameter[] parameters(final INucleusServiceCollection serviceCollection) {
         return new Parameter[] {
@@ -31,7 +31,8 @@ public class KitClearCommandCommand implements ICommandExecutor {
         };
     }
 
-    @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
+    @Override
+    protected ICommandResult execute0(final ICommandContext context) throws CommandException {
         final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
         kitInfo.setCommands(new ArrayList<>());
         context.getServiceCollection().getServiceUnchecked(KitService.class).saveKit(kitInfo);

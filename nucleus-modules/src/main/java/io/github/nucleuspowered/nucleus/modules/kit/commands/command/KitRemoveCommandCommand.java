@@ -25,7 +25,7 @@ import java.util.List;
         commandDescriptionKey = "kit.command.remove",
         parentCommand = KitCommandCommand.class
 )
-public class KitRemoveCommandCommand implements ICommandExecutor {
+public class KitRemoveCommandCommand extends KitCommandCommandBase {
 
     private final Parameter.Value<Integer> commands = Parameter.builder(Integer.class)
             .addParser(VariableValueParameters.integerRange().min(1).build())
@@ -44,7 +44,7 @@ public class KitRemoveCommandCommand implements ICommandExecutor {
     }
 
     @Override
-    public ICommandResult execute(final ICommandContext context) throws CommandException {
+    protected ICommandResult execute0(final ICommandContext context) throws CommandException {
         final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
         final List<String> commands = kitInfo.getCommands();
 
