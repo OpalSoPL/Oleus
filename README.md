@@ -18,7 +18,7 @@ tidbits that you might need. Extremely configurable, only loading up the command
 plugins to disable modules that they replace the functionality of), and providing a simple and rich API, Nucleus is an
 elite plugin for providing simple server tasks, and an essential addition to your server!
 
-Nucleus is being actively developed for Sponge API 8. 
+Nucleus is being actively developed for Sponge API 8.1 and later 
 
 ## Contributions
 
@@ -31,7 +31,7 @@ be grateful for your contributions - we're an open community that appreciates an
 
 ## Getting and Building Nucleus
 
-Nucleus currently uses Gradle 7.3.3 and is compiled using JDK 11 (but to a Java 8 target). 
+Nucleus currently uses Gradle 7.3.3 and is compiled using JDK 17 (but to a Java 8 target). 
 
 To get a copy of the Nucleus source, ensure you have Git installed, and run the following commands from a command prompt
 or terminal:
@@ -66,7 +66,7 @@ You can also use [JitPack](https://jitpack.io/#NucleusPowered/Nucleus) as a repo
 
 The compiled Nucleus plugin includes the following libraries (with their licences in parentheses):
 
-* Vavr 0.10.3 (Apache 2.0)
+* Vavr 1.0-alpha-4 (Apache 2.0)
 
 See [THIRDPARTY.md](THIRDPARTY.md) for more details.
 
