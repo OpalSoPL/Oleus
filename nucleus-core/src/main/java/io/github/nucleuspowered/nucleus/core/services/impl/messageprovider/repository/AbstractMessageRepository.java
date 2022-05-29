@@ -59,6 +59,9 @@ abstract class AbstractMessageRepository implements IMessageRepository {
 
     @Override
     public Component getText(final String key, final Object[] args) {
+        if (args == null) { // this can happen unfortunately, until I fix it everywhere, this'll do
+            return this.getText(key);
+        }
         return this.getTextMessageWithTextFormat(key,
                 Arrays.stream(args).map(x -> {
                     final Component component;

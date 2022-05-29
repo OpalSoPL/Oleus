@@ -13,6 +13,7 @@ import net.kyori.adventure.text.format.Style;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.command.CommandResult;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class CommandResultImpl implements ICommandResult {
@@ -36,8 +37,8 @@ public class CommandResultImpl implements ICommandResult {
         this(
                 false,
                 false,
-                Preconditions.checkNotNull(key),
-                Preconditions.checkNotNull(args)
+                Objects.requireNonNull(key),
+                Objects.requireNonNull(args)
         );
     }
 
