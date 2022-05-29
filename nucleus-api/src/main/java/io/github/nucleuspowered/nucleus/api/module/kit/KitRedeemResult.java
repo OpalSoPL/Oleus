@@ -59,7 +59,7 @@ public interface KitRedeemResult {
      */
     default Optional<Duration> getCooldownDuration() {
         return this.getCooldownExpiry().map(x -> {
-            Instant now = Instant.now();
+            final Instant now = Instant.now();
             if (x.isAfter(now)) {
                 return Duration.between(now, x);
             }

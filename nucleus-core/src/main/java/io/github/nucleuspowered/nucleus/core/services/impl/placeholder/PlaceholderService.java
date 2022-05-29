@@ -28,6 +28,7 @@ import org.spongepowered.api.placeholder.PlaceholderParser;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Nameable;
+import org.spongepowered.api.world.DefaultWorldKeys;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -246,7 +247,7 @@ public class PlaceholderService implements IPlaceholderService, IInitService {
         return placeholder.associatedObject()
                 .filter(x -> x instanceof Locatable)
                 .map(x -> ((Locatable) x).serverLocation().world().properties())
-                .orElseGet(Sponge.server().worldManager().defaultWorld()::properties);
+                .orElseGet(Sponge.server().worldManager().world(DefaultWorldKeys.DEFAULT).get()::properties);
     }
 
 }

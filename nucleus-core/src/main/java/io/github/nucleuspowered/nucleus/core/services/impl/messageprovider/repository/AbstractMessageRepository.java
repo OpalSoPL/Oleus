@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 abstract class AbstractMessageRepository implements IMessageRepository {
 
-    private final static Pattern STRING_REPLACER = Pattern.compile("\\{+[^0-9]+}+");
+    private final static Pattern STRING_REPLACER = Pattern.compile("\\{+\\D+}+");
     private final static Pattern STRING_LOCALISER = Pattern.compile("loc:([a-z\\-.]+)");
 
     final Map<String, String> cachedStringMessages = new HashMap<>();
@@ -109,14 +109,14 @@ abstract class AbstractMessageRepository implements IMessageRepository {
 
     final Template templateCreator(final String string) {
         // regex!
-        final Matcher mat = Pattern.compile("\\{([\\d]+)}").matcher(string);
+        final Matcher mat = Pattern.compile("\\{(\\d+)}").matcher(string);
         final List<Integer> map = new ArrayList<>();
 
         while (mat.find()) {
             map.add(Integer.parseInt(mat.group(1)));
         }
 
-        final String[] s = string.split("\\{([\\d]+)}");
+        final String[] s = string.split("\\{(\\d+)}");
 
         final List<TextElement> objects = new ArrayList<>();
         final Component t = this.textStyleService.oldLegacy(s[0]);

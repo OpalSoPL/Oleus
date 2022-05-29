@@ -23,6 +23,7 @@ import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.util.Tuple;
+import org.spongepowered.api.world.DefaultWorldKeys;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.server.storage.ServerWorldProperties;
@@ -60,7 +61,7 @@ public class SpawnOtherCommand implements ICommandExecutor, IReloadableService.R
         final User target = Sponge.server().userManager().loadOrCreate(context.requireOne(NucleusParameters.ONE_USER)).join();
         final ServerWorld world = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.key())
             .orElseGet(() -> this.gsc.isOnSpawnCommand() ? this.gsc.getWorld().get() :
-                    Sponge.server().worldManager().defaultWorld());
+                    Sponge.server().worldManager().world(DefaultWorldKeys.DEFAULT).get());
 
         final Tuple<ServerLocation, Vector3d> worldTransform = SpawnHelper.getSpawn(world, target.player().orElse(null), context);
 

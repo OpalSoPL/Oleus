@@ -99,6 +99,6 @@ public final class NucleusCollectors {
         public Set<Collector.Characteristics> characteristics() {
             return Collections.emptySet();
         }
-    };
+    }
 
 }

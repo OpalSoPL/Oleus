@@ -37,7 +37,7 @@ public class KernelHelperTest {
         });
     }
 
-    @Parameterized.Parameter(0)
+    @Parameterized.Parameter()
     public int x;
 
     @Parameterized.Parameter(1)

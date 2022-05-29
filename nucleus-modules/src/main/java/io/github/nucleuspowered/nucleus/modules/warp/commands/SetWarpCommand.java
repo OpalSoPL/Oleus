@@ -51,7 +51,7 @@ import java.util.regex.Pattern;
 public class SetWarpCommand implements ICommandExecutor {
 
 //    private final WarpService qs = getServiceUnchecked(WarpService.class);
-    private final Pattern warpRegex = Pattern.compile("^[A-Za-z][A-Za-z0-9]{0,25}$");
+    private final Pattern warpRegex = Pattern.compile("^[A-Za-z][A-Za-z\\d]{0,25}$");
 
     private final Parameter.Value<String> warpParameter = Parameter.string().key("warp").build();
 

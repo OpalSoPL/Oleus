@@ -120,7 +120,7 @@ public class ChatListener implements IReloadableService.Reloadable, ListenerBase
         final ChatTemplateConfig chatTemplateConfig = templateCache.getConfig();
         String m = LegacyComponentSerializer.legacyAmpersand().serialize(rawMessage);
         if (this.chatConfig.isRemoveBlueUnderline()) {
-            m = m.replaceAll("&9&n([A-Za-z0-9-.]+)(&r)?", "$1");
+            m = m.replaceAll("&9&n([A-Za-z\\d-.]+)(&r)?", "$1");
         }
 
         m = this.textStyleService.stripPermissionless(ChatPermissions.CHAT_COLOR, ChatPermissions.CHAT_STYLE, player, m);

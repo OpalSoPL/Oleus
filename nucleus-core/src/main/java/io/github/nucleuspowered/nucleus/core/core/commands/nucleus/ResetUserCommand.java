@@ -19,6 +19,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProvide
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.services.IStorageService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.spongepowered.api.Sponge;
@@ -140,7 +141,7 @@ public class ResetUserCommand implements ICommandExecutor {
                     this.callbacks.remove(responsible);
                 })).build());
 
-        targetAudience.sendMessage(Component.join(Component.newline(), messages));
+        targetAudience.sendMessage(Component.join(JoinConfiguration.newlines(), messages));
         return context.successResult();
     }
 

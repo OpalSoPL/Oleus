@@ -8,6 +8,7 @@ import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.chatlogger.config.ChatLoggingConfig;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.command.ExecuteCommandEvent;
@@ -23,7 +24,7 @@ public class ChatLoggingListener extends AbstractLoggerListener {
 
     @Listener(order = Order.LAST)
     public void onChat(final PlayerChatEvent event) {
-        this.log(PlainComponentSerializer.plain().serialize(event.message()),
+        this.log(PlainTextComponentSerializer.plainText().serialize(event.message()),
                 event.cause().first(Nameable.class).map(Nameable::name).orElse("unknown"));
     }
 

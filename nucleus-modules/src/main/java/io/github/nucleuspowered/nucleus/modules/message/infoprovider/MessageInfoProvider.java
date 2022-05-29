@@ -11,6 +11,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.NucleusProvider;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
 
@@ -49,7 +50,7 @@ public class MessageInfoProvider implements NucleusProvider {
             final String msgToggleText = msgToggle ? "standard.yesno.true" : "standard.yesno.false";
             lt.add(mp.getMessageFor(source.audience(), "seen.msgtoggle", mp.getMessageFor(source.audience(), msgToggleText)));
 
-            return Optional.of(Component.join(Component.newline(), lt));
+            return Optional.of(Component.join(JoinConfiguration.newlines(), lt));
         }
 
         return Optional.empty();

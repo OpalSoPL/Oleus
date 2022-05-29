@@ -148,7 +148,7 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
         } else {
             source = context.requirePlayer().user();
         }
-        final boolean isOther = source != null && context.uniqueId().filter(x -> !x.equals(source.uniqueId())).isPresent();
+        final boolean isOther = context.uniqueId().filter(x -> !x.equals(source.uniqueId())).isPresent();
         final User to = context.getOptionalUserFromUUID(this.userToWarpTo).orElseGet(() -> context.requireOne(this.playerToWarpTo).user());
 
         final boolean beQuiet = context.getOne(this.quietOption).orElse(this.isDefaultQuiet);

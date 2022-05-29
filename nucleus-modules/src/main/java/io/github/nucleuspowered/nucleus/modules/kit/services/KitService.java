@@ -30,6 +30,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.services.IStorageService;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
@@ -443,7 +444,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         final Matcher m = inventory.matcher("");
         for (final ItemStack x : stacks) {
             x.get(Keys.CUSTOM_NAME).ifPresent(text -> {
-                if (m.reset(PlainComponentSerializer.plain().serialize(text)).find()) {
+                if (m.reset(PlainTextComponentSerializer.plainText().serialize(text)).find()) {
                     x.offer(Keys.CUSTOM_NAME,
                             this.textTemplateFactory
                                     .createFromAmpersandString(LegacyComponentSerializer.legacyAmpersand().serialize(text))
@@ -452,7 +453,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
             });
 
             x.get(Keys.LORE).ifPresent(text -> {
-                if (text.stream().map(PlainComponentSerializer.plain()::serialize).anyMatch(y -> m.reset(y).find())) {
+                if (text.stream().map(PlainTextComponentSerializer.plainText()::serialize).anyMatch(y -> m.reset(y).find())) {
                     x.offer(Keys.LORE,
                             text.stream().map(y ->
                                     this.textTemplateFactory

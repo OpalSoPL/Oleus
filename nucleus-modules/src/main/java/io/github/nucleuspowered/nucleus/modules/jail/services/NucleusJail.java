@@ -52,12 +52,11 @@ public final class NucleusJail implements Jail {
 
         @Override
         protected Optional<Jail> buildContent(final DataView container) throws InvalidDataException {
-            DataView dataView = container;
             if (!container.contains(Queries.CONTENT_VERSION)) {
-                NucleusNamedLocation.upgradeLegacy(dataView, NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY);
+                NucleusNamedLocation.upgradeLegacy(container, NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY);
                 container.set(Queries.CONTENT_VERSION, NucleusJail.CONTENT_VERSION);
             }
-            return dataView.getObject(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY, NamedLocation.class).map(NucleusJail::new);
+            return container.getObject(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY, NamedLocation.class).map(NucleusJail::new);
         }
     }
 

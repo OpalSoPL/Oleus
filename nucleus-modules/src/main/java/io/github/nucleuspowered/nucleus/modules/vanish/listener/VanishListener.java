@@ -20,6 +20,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.effect.VanishState;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -91,7 +92,7 @@ public class VanishListener implements IReloadableService.Reloadable, ListenerBa
 
     @Listener
     public void onQuit(final ServerSideConnectionEvent.Disconnect event, @Getter("player") final ServerPlayer player) {
-        if (player.get(Keys.VANISH).orElse(false)) {
+        if (player.get(Keys.VANISH_STATE).map(VanishState::invisible).orElse(false)) {
             this.storageManager.getUserService().get(player.uniqueId())
                     .thenAccept(x -> x.ifPresent(t -> t.set(VanishKeys.VANISH_STATUS, false)));
             if (this.vanishConfig.isSuppressMessagesOnVanish()) {

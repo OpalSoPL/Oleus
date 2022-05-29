@@ -27,6 +27,7 @@ import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
@@ -132,7 +133,7 @@ public class InfoCommand implements ICommandExecutor, IReloadableService.Reloada
         Util.getPaginationBuilder(context.audience()).contents()
                 .header(context.getMessage("command.info.header.default"))
                 .title(context.getMessage("command.info.title.default"))
-                .contents(s.stream().sorted(Comparator.comparing(x -> PlainComponentSerializer.plain().serialize(x))).collect(Collectors.toList()))
+                .contents(s.stream().sorted(Comparator.comparing(x -> PlainTextComponentSerializer.plainText().serialize(x))).collect(Collectors.toList()))
                 .padding(Component.text().content("-").color(NamedTextColor.GOLD).build())
                 .sendTo(context.audience());
         return context.successResult();

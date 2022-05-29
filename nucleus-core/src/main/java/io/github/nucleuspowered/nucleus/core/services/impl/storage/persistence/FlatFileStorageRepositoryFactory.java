@@ -64,7 +64,7 @@ public final class FlatFileStorageRepositoryFactory implements IStorageRepositor
 
             throw new DataQueryException("There must only a key", query);
         },
-        uuid -> this.dataPath.get().resolve(USER_DATA_DIRECTORY).resolve(uuid.toString().substring(0, 2)).resolve(uuid.toString() + ".json"),
+        uuid -> this.dataPath.get().resolve(USER_DATA_DIRECTORY).resolve(uuid.toString().substring(0, 2)).resolve(uuid + ".json"),
         () -> this.dataPath.get().resolve(USER_DATA_DIRECTORY));
     }
 

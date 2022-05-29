@@ -28,7 +28,7 @@ public class StaffChatConfig {
     }
 
     public String getMessageColour() {
-        if (this.messageColour.isEmpty() || !this.messageColour.matches("^[0-9a-f]")) {
+        if (this.messageColour.isEmpty() || !this.messageColour.matches("^[\\da-f]")) {
             return "b";
         }
 

@@ -27,7 +27,7 @@ public class NicknameConfig {
 
     @Setting(value = "pattern")
     @LocalisedComment("config.nicknames.pattern")
-    private Pattern pattern = Pattern.compile("[a-zA-Z0-9_]+");
+    private Pattern pattern = Pattern.compile("\\w+");
 
     public int getMinNicknameLength() {
         return this.minNicknameLength;

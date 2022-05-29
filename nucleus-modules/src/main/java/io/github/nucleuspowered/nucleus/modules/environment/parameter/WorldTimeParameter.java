@@ -47,7 +47,7 @@ public class WorldTimeParameter implements ValueParameter<MinecraftDayTime> {
 
     private static final HashMap<String, MinecraftDayTime> TICK_ALIASES = new HashMap<>();
     private static final Pattern tfh = Pattern.compile("^(\\d{1,2})[hH]$");
-    private static final Pattern ampm = Pattern.compile("^(\\d{1,2})(a[m]?|p[m]?)$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+    private static final Pattern ampm = Pattern.compile("^(\\d{1,2})(am?|pm?)$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Pattern ticks = Pattern.compile("^(\\d+)$");
 
     private static final MinecraftDayTime DAWN = MinecraftDayTime.minecraftEpoch();

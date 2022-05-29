@@ -15,6 +15,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandMo
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.vavr.collection.Stream;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.managed.Flag;
@@ -118,7 +119,7 @@ public class EnchantCommand implements ICommandExecutor {
             if (!allowOverwrite && toRemove.isEmpty()) {
                 // Build the list of the enchantment names, and send it.
                 return context.errorResult("command.enchant.overwrite",
-                        Component.join(Component.text(", "), toRemove.map(Enchantment::type).toJavaList()));
+                        Component.join(JoinConfiguration.commas(true), toRemove.map(Enchantment::type).toJavaList()));
             }
 
             enchantsToSet = new ArrayList<>(enchantments);

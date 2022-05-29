@@ -12,6 +12,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.INucleusTextTem
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ITextStyleService;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -45,9 +46,9 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
                     + "(?<urltwo>[^(]*?\\))?");
 
     private final Pattern enhancedUrlParser =
-            Pattern.compile("(?<first>(^|\\s))(?<reset>&r)?(?<colour>(&[0-9a-flmnrok])+)?"
-                            + "((?<options>\\{[a-z]+?})?(?<url>(http(s)?://)?([A-Za-z0-9]+\\.)+[A-Za-z0-9-]{2,}\\S*)|"
-                            + "(?<specialUrl>(\\[(?<msg>.+?)](?<optionssurl>\\{[a-z]+})?\\((?<sUrl>(http(s)?://)?([A-Za-z0-9-]+\\.)+[A-Za-z0-9]{2,}[^\\s)]*)\\)))|"
+            Pattern.compile("(?<first>(^|\\s))(?<reset>&r)?(?<colour>(&[\\da-flmnrok])+)?"
+                            + "((?<options>\\{[a-z]+?})?(?<url>(http(s)?://)?([A-Za-z\\d]+\\.)+[A-Za-z\\d-]{2,}\\S*)|"
+                            + "(?<specialUrl>(\\[(?<msg>.+?)](?<optionssurl>\\{[a-z]+})?\\((?<sUrl>(http(s)?://)?([A-Za-z\\d-]+\\.)+[A-Za-z\\d]{2,}[^\\s)]*)\\)))|"
                             + "(?<specialCmd>(\\[(?<sMsg>.+?)](?<optionsscmd>\\{[a-z]+})?\\((?<sCmd>/.+?)\\))))",
                     Pattern.CASE_INSENSITIVE);
 
@@ -300,7 +301,7 @@ public final class TemplateParser implements INucleusTextTemplateFactory {
 
         Component toAdd = textBuilder.build();
         if (!whiteSpace.isEmpty()) {
-            toAdd = Component.join(Component.text(whiteSpace), toAdd);
+            toAdd = Component.join(JoinConfiguration.separator(Component.text(whiteSpace)), toAdd);
         }
 
         return toAdd;

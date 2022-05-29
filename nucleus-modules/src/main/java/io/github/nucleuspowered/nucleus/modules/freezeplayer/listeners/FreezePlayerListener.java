@@ -60,7 +60,7 @@ public class FreezePlayerListener implements ListenerBase {
         this.service.invalidate(player.uniqueId());
     }
 
-    private boolean checkForFrozen(final Event event, final Player player, final String message) {
+    private void checkForFrozen(final Event event, final Player player, final String message) {
         if (this.service.getFromUUID(player.uniqueId())) {
             final Instant now = Instant.now();
             if (this.lastFreezeNotification.getOrDefault(player.uniqueId(), now).isBefore(now)) {
@@ -71,9 +71,7 @@ public class FreezePlayerListener implements ListenerBase {
             if (event instanceof Cancellable) {
                 ((Cancellable) event).setCancelled(true);
             }
-            return true;
         }
 
-        return false;
     }
 }

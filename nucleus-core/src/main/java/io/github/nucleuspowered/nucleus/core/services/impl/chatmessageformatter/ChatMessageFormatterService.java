@@ -53,11 +53,6 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
         }
         Preconditions.checkNotNull(channel);
         this.sourceChannelMap.put(audience, channel);
-      /*  final MessageChannel originalChannel = audience.getMessageChannel();
-        if (channel instanceof Channel.External<?>) {
-            final MessageChannel newChannel = ((Channel.External<?>) channel).createChannel(originalChannel);
-            source.setMessageChannel(newChannel);
-        } */
         return () -> {
             this.sourceChannelMap.remove(audience);
            // Sponge.server().getConsole().setMessageChannel(originalChannel);
@@ -68,20 +63,9 @@ public class ChatMessageFormatterService implements IChatMessageFormatterService
     public NoExceptionAutoClosable setPlayerNucleusChannelTemporarily(final UUID uuid, final Channel channel) {
         Preconditions.checkNotNull(channel);
         final Channel original = this.chatChannels.get(uuid);
-//        final Optional<Player> player = Sponge.server().player(uuid);
-//        final MessageChannel originalChannel = player.map(MessageReceiver::getMessageChannel).orElse(null);
         this.chatChannels.put(uuid, channel);
-//        if (channel instanceof Channel.External<?>) {
-//            final MessageChannel newChannel = ((Channel.External<?>) channel).createChannel(originalChannel);
-//            player.ifPresent(x -> x.setMessageChannel(newChannel));
-//        }
         return () -> {
             this.setPlayerNucleusChannel(uuid, original);
-//            if (originalChannel != null) {
-//                player.ifPresent(x -> x.setMessageChannel(originalChannel));
-//            } else {
-//                player.ifPresent(x -> x.setMessageChannel(MessageChannel.TO_ALL));
-//            }
         };
     }
 

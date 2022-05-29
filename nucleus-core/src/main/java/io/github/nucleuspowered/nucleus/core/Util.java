@@ -54,7 +54,7 @@ public final class Util {
     public static final DateTimeFormatter FULL_TIME_FORMATTER = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL)
             .withZone(ZoneId.systemDefault());
 
-    public static final String USERNAME_REGEX_STRING = "[0-9a-zA-Z_]{3,16}";
+    public static final String USERNAME_REGEX_STRING = "\\w{3,16}";
     public static final Pattern USERNAME_REGEX_PATTERN = Pattern.compile(USERNAME_REGEX_STRING);
 
     public static final UUID CONSOLE_FAKE_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
@@ -142,7 +142,7 @@ public final class Util {
     public static void compressAndDeleteFile(final Path from) throws IOException {
         // Get the file.
         if (Files.exists(from)) {
-            final Path to = Paths.get(from.toString() + ".gz");
+            final Path to = Paths.get(from + ".gz");
             try (final OutputStream os = new GZIPOutputStream(new FileOutputStream(to.toFile()))) {
                 Files.copy(from, os);
                 os.flush();

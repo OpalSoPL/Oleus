@@ -81,6 +81,8 @@ public interface IStorageRepository {
          * Gets the object, if it exists
          *
          * @return The object, if it exists
+         * @throws DataLoadException if the data could not be loaded
+         * @throws DataQueryException if the data could not be queried
          */
         Optional<O> get() throws DataLoadException, DataQueryException;
 
@@ -88,6 +90,7 @@ public interface IStorageRepository {
          * Saves the supplied {@code object}
          *
          * @param object The object to save
+         * @throws DataSaveException if the data could not be saved
          */
         void save(O object) throws DataSaveException;
     }
@@ -129,6 +132,8 @@ public interface IStorageRepository {
          *
          * @param query The query
          * @return The object, if it exists, along with its primary key
+         * @throws DataLoadException if the data could not be loaded
+         * @throws DataQueryException if the data could not be queried
          */
         Optional<KeyedObject<K, O>> get(Q query) throws DataLoadException, DataQueryException;
 
@@ -146,6 +151,7 @@ public interface IStorageRepository {
          *
          * @param key The key that indicates the location to store the object in
          * @param object The object to save
+         * @throws DataSaveException if the data could not be saved
          */
         void save(K key, O object) throws DataSaveException;
 
@@ -153,6 +159,7 @@ public interface IStorageRepository {
          * Deletes the object at the supplied {@code key}
          *
          * @param key The key
+         * @throws DataDeleteException if the data could not be deleted
          */
         void delete(K key) throws DataDeleteException;
 
@@ -169,6 +176,8 @@ public interface IStorageRepository {
          *
          * @param key The key
          * @return The object, if it exists
+         * @throws DataLoadException if the data could not be loaded
+         * @throws DataQueryException if the data could not be queried
          */
         Optional<O> get(K key) throws DataLoadException, DataQueryException;
 
@@ -177,6 +186,7 @@ public interface IStorageRepository {
          *
          * @return The objects, if any exist, or an empty collection if {@link #supportsNonKeyQueries()} is {@code false} and the query is more than
          *         just a key.
+         * @throws DataLoadException if the data could not be loaded
          */
         Collection<K> getAllKeys() throws DataLoadException;
 
@@ -186,6 +196,8 @@ public interface IStorageRepository {
          * @param query The query
          * @return The objects, if any exist, or an empty map if {@link #supportsNonKeyQueries()} is {@code false} and the query is more than
          *         just a key.
+         * @throws DataLoadException if the data could not be loaded
+         * @throws DataQueryException if the data could not be queried
          */
         Map<K, O> getAll(Q query) throws DataLoadException, DataQueryException;
 
@@ -195,6 +207,8 @@ public interface IStorageRepository {
          * @param query The query
          * @return The objects, if any exist, or an empty collection if {@link #supportsNonKeyQueries()} is {@code false} and the query is more than
          *         just a key.
+         * @throws DataLoadException if the data could not be loaded
+         * @throws DataQueryException if the data could not be queried
          */
         Collection<K> getAllKeys(Q query) throws DataLoadException, DataQueryException;
     }

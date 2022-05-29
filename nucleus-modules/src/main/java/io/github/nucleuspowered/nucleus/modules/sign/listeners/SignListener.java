@@ -12,6 +12,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionServ
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
@@ -34,7 +35,7 @@ public class SignListener implements ListenerBase {
             final ListValue.Mutable<Component> signText = event.text();
             for (int i = 0; i < signText.size(); i++) {
                 signText.set(i, LegacyComponentSerializer.legacyAmpersand().deserialize(
-                        PlainComponentSerializer.plain().serialize(signText.get(i))));
+                        PlainTextComponentSerializer.plainText().serialize(signText.get(i))));
             }
         }
     }

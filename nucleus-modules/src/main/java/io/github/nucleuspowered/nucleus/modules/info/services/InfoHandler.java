@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 public class InfoHandler implements IReloadableService.Reloadable, ServiceBase {
 
     private final Map<String, TextFileController> infoFiles = new HashMap<>();
-    private final Pattern validFile = Pattern.compile("[a-zA-Z0-9_.\\-]+\\.txt", Pattern.CASE_INSENSITIVE);
+    private final Pattern validFile = Pattern.compile("[a-zA-Z\\d_.\\-]+\\.txt", Pattern.CASE_INSENSITIVE);
 
     public Set<String> getInfoSections() {
         return Collections.unmodifiableSet(this.infoFiles.keySet());

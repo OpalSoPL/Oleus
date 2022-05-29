@@ -12,6 +12,7 @@ import io.github.nucleuspowered.nucleus.core.services.impl.playerinformation.Nuc
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProviderService;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import org.spongepowered.api.command.CommandCause;
@@ -42,7 +43,7 @@ public class MuteInfoProvider implements NucleusProvider {
                     m = messageProviderService.getMessageFor(audience, "seen.ismuted.perm");
                 }
 
-                return Optional.of(Component.join(Component.newline(),
+                return Optional.of(Component.join(JoinConfiguration.newlines(),
                         m.clickEvent(ClickEvent.runCommand("/checkmute " + user.name()))
                                 .hoverEvent(HoverEvent.showText(
                                         messageProviderService.getMessageFor(audience, "standard.clicktoseemore"))),

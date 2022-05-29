@@ -87,7 +87,7 @@ public abstract class TitleBase implements ICommandExecutor, IReloadableService.
         final String message = context.requireOne(NucleusParameters.MESSAGE);
         final NucleusTextTemplate textTemplate =
                 context.getServiceCollection().textTemplateFactory().createFromAmpersandString(message);
-        final Title.Times times = Title.Times.of(
+        final Title.Times times = Title.Times.times(
                 this.toDuration(context, this.fadeIn, this.titleConfig::getFadeIn),
                 this.toDuration(context, this.timeOnScreen, this.titleConfig::getTime),
                 this.toDuration(context, this.fadeOut, this.titleConfig::getFadeOut)

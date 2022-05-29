@@ -31,6 +31,7 @@ import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.effect.VanishState;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
@@ -258,7 +259,7 @@ public class AFKHandler implements NucleusAFKService, IReloadableService.Reloada
     }
 
     private Tuples.NullableTuple<Component, Audience> getAFKMessage(final Player player, final boolean isAfk) {
-        if (this.config.isBroadcastAfkOnVanish() || !player.get(Keys.VANISH).orElse(false)) {
+        if (this.config.isBroadcastAfkOnVanish() || !player.get(Keys.VANISH_STATE).map(VanishState::invisible).orElse(false)) {
             final NucleusTextTemplate template = isAfk ? this.afkMessage : this.returnAfkMessage;
             return Tuples.ofNullable(template.getForObject(player), Audience.audience(Sponge.server()));
         } else {

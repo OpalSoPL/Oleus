@@ -124,7 +124,7 @@ public final class StorageManager implements IStorageManager {
             new KeyBasedDataTranslator<>(TypeToken.get(IWorldDataObject.class), WorldDataObject::new);
 
     private final AbstractDataContainerDataTranslator<IGeneralDataObject> generalDataAccess =
-            new KeyBasedDataTranslator<>(TypeToken.get(IGeneralDataObject.class), GeneralDataObject::new);;
+            new KeyBasedDataTranslator<>(TypeToken.get(IGeneralDataObject.class), GeneralDataObject::new);
 
     @Override
     public IStorageService.SingleCached<IGeneralDataObject> getGeneralService() {

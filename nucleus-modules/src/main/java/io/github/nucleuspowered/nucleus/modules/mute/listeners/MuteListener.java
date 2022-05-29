@@ -106,7 +106,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
     private boolean isMutedNotify(final ServerPlayer player) {
         final Optional<Mute> mute = this.handler.getPlayerMuteInfo(player.uniqueId());
         if (mute.filter(x -> x instanceof NucleusMute).isPresent()) {
-            this.handler.onMute((NucleusMute) mute.get(), player);
+            this.handler.onMute(mute.get(), player);
             return true;
         }
         return false;
@@ -114,10 +114,7 @@ public class MuteListener implements IReloadableService.Reloadable, ListenerBase
 
     @Listener
     public void onPlayerMessage(final NucleusMessageEvent event, @Getter("getSenderAsPlayer") final ServerPlayer source) {
-        boolean isCancelled = false;
-        if (this.isMutedNotify(source)) {
-            isCancelled = true;
-        }
+        boolean isCancelled = this.isMutedNotify(source);
 
         if (this.cancelOnGlobalMute(source, isCancelled)) {
             isCancelled = true;

@@ -15,6 +15,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IModuleReporter;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -56,7 +57,7 @@ public class NucleusCommand implements ICommandExecutor {
             final Collection<Component> toJoin = modules.stream()
                     .map(x -> Component.text(x, enabled.contains(x) ? NamedTextColor.GREEN : NamedTextColor.RED))
                     .collect(Collectors.toList());
-            tb.append(Component.join(Component.text(", ", NamedTextColor.GREEN), toJoin));
+            tb.append(Component.join(JoinConfiguration.commas(true), toJoin));
             this.modules = tb.append(Component.text(".", NamedTextColor.GREEN)).build();
         }
 

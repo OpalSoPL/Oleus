@@ -51,7 +51,7 @@ public class SpawnMobCommand implements ICommandExecutor, IReloadableService.Rel
 
     @SuppressWarnings("unchecked")
     private final Parameter.Value<EntityType<?>> entityTypeParameter = Parameter.builder(new TypeToken<EntityType<?>>() {})
-            .addParser((ValueParameter<EntityType<?>>) (Object) VariableValueParameters.registryEntryBuilder(RegistryTypes.ENTITY_TYPE).build())
+            .addParser(VariableValueParameters.registryEntryBuilder(RegistryTypes.ENTITY_TYPE).build())
             .key("entity type")
             .build();
 

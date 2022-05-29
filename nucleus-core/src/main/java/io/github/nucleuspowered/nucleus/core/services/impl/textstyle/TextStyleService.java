@@ -12,6 +12,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IMessageProvide
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ITextStyleService;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -41,10 +42,10 @@ import java.util.regex.Pattern;
 @Singleton
 public class TextStyleService implements ITextStyleService {
 
-    private final Pattern colours = Pattern.compile(".*?(?<colour>(&[0-9a-flmnrok])+)$");
+    private final Pattern colours = Pattern.compile(".*?(?<colour>(&[\\da-flmnrok])+)$");
     private final Pattern urlParser =
-            Pattern.compile("(?<first>(^|\\s))(?<reset>&r)?(?<colour>(&[0-9a-flmnrok])+)?"
-                            + "(?<options>\\{[a-z]+?})?(?<url>(http(s)?://)?([A-Za-z0-9-]+\\.)+[A-Za-z0-9]{2,}\\S*)",
+            Pattern.compile("(?<first>(^|\\s))(?<reset>&r)?(?<colour>(&[\\da-flmnrok])+)?"
+                            + "(?<options>\\{[a-z]+?})?(?<url>(http(s)?://)?([A-Za-z\\d-]+\\.)+[A-Za-z\\d]{2,}\\S*)",
                     Pattern.CASE_INSENSITIVE);
 
     private final static TextFormat EMPTY = ITextStyleService.EMPTY;
@@ -527,7 +528,7 @@ public class TextStyleService implements ITextStyleService {
             last = n;
         }
 
-        return Component.join(Component.empty(), result);
+        return Component.join(JoinConfiguration.noSeparators(), result);
     }
 
     private static TextComponent.Builder create(@Nullable final String string, final TextFormat format) {

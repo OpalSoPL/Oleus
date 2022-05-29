@@ -47,8 +47,6 @@ public class ListWorldCommand implements ICommandExecutor {
         listContent.add(context.getMessage("command.world.list.worlditem", world.key().asString()));
 
         // As requested by Pixelmon for use in their config.
-        // x.getAdditionalProperties().getInt(DataQuery.of("SpongeData", "dimensionId")).ifPresent(i ->
-        //    listContent.add(context.getMessage("command.world.list.dimensionid", String.valueOf(i))));
         final Vector3i spawnPosition = properties.spawnPosition();
         listContent.add(context.getMessage("command.world.list.spawnpoint",
                 String.valueOf(spawnPosition.x()), String.valueOf(spawnPosition.y()), String.valueOf(spawnPosition.z())));

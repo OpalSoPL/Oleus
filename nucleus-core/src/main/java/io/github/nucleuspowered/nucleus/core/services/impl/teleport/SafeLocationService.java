@@ -111,10 +111,6 @@ public class SafeLocationService implements INucleusLocationService, IReloadable
 
             try (final CauseStackManager.StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame()) {
                 frame.addContext(EventContexts.BYPASS_JAILING_RESTRICTION, true);
-                /*final Optional<Entity> oe = player.getVehicle();
-                if (oe.isPresent()) {
-                    player.setVehicle(null);
-                }*/
 
                 // Do it, tell the routine if it worked.
                 if (centreBlock) {

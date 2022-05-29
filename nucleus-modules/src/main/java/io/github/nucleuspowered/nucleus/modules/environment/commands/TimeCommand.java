@@ -17,6 +17,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.parameter.CommonParameters;
 import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.world.DefaultWorldKeys;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -43,7 +44,7 @@ public class TimeCommand implements ICommandExecutor {
     @Override
     public ICommandResult execute(final ICommandContext context) {
         final ServerWorld pr = context.getWorldPropertiesOrFromSelfOptional(NucleusParameters.ONLINE_WORLD_OPTIONAL.key())
-                .orElseGet(() -> Sponge.server().worldManager().defaultWorld());
+                .orElseGet(() -> Sponge.server().worldManager().world(DefaultWorldKeys.DEFAULT).get());
 
         context.sendMessage("command.time", pr.key().asString(), context.getTimeString(pr.properties().dayTime().asInGameDuration()));
         return context.successResult();

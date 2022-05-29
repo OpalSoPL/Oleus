@@ -63,7 +63,7 @@ public class ModuleContainer implements Comparable<ModuleContainer> {
     }
 
     @Override
-    public int compareTo(@NotNull ModuleContainer o) {
+    public int compareTo(@NotNull final ModuleContainer o) {
         return this.id.compareTo(o.id);
     }
 

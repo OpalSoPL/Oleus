@@ -18,6 +18,7 @@ import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.k
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.effect.VanishState;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -83,7 +84,9 @@ public class VanishCommand implements ICommandExecutor {
         }
 
         // If we don't specify whether to vanish, toggle
-        final boolean toVanish = context.getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE).orElse(!playerToVanish.get(Keys.VANISH).orElse(false));
+        final boolean toVanish = context
+                .getOne(NucleusParameters.OPTIONAL_ONE_TRUE_FALSE)
+                .orElseGet(() -> !playerToVanish.get(Keys.VANISH_STATE).map(VanishState::invisible).orElse(false));
         final VanishService service = context.getServiceCollection().getServiceUnchecked(VanishService.class);
         if (toVanish) {
             service.vanishPlayer(playerToVanish.user());

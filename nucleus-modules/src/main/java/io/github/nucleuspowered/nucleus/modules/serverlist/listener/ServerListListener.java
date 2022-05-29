@@ -13,6 +13,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableServ
 import net.kyori.adventure.text.Component;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.effect.VanishState;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.Getter;
@@ -71,7 +72,7 @@ public class ServerListListener implements IReloadableService.Reloadable, Listen
             response.setHidePlayers(true);
         } else if (this.hideVanishPlayers) {
             final Collection<GameProfile> players = Sponge.server().onlinePlayers().stream()
-                    .filter(x -> !x.get(Keys.VANISH).orElse(false))
+                    .filter(x -> !x.get(Keys.VANISH_STATE).map(VanishState::invisible).orElse(false))
                     .map(ServerPlayer::profile)
                     .collect(Collectors.toList());
 

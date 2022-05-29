@@ -26,6 +26,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.entity.living.player.User;
@@ -33,6 +34,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.util.Identifiable;
+import org.spongepowered.api.world.DefaultWorldKeys;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
@@ -225,7 +227,7 @@ public final class JailService implements NucleusJailService, IReloadableService
             final ServerWorld world = player.world();
             return ServerLocation.of(world.key(), world.properties().spawnPosition());
         }, u -> {
-            final ServerWorld def = Sponge.server().worldManager().defaultWorld();
+            final ServerWorld def = Sponge.server().worldManager().world(DefaultWorldKeys.DEFAULT).get();
             if (u == null) {
                 return ServerLocation.of(def.key(), def.properties().spawnPosition());
             }
@@ -242,7 +244,7 @@ public final class JailService implements NucleusJailService, IReloadableService
                     TeleportScanners.NO_SCAN.get(),
                     TeleportHelperFilters.DEFAULT.get()
             ).orElseGet(() -> {
-                final ServerWorld def = Sponge.server().worldManager().defaultWorld();
+                final ServerWorld def = Sponge.server().worldManager().world(DefaultWorldKeys.DEFAULT).get();
                 return ServerLocation.of(def.key(), def.properties().spawnPosition());
             });
 

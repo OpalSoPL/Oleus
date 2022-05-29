@@ -128,7 +128,7 @@ public class SeenCommand implements ICommandExecutor {
 
     @Nullable
     private Component getFirstPlayed(final ICommandContext context, final User user, final IUserDataObject userDataModule) {
-        Optional<Instant> i = user.get(Keys.FIRST_DATE_JOINED);
+        final Optional<Instant> i = user.get(Keys.FIRST_DATE_JOINED);
         return i.map(x -> context.getMessage("command.seen.firstplayed",
                 DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
                         .withLocale(context.getLocale())

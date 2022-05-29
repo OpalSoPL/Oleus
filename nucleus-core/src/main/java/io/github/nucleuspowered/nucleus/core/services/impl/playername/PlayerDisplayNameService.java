@@ -263,7 +263,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
 
     private void addCommandToNameInternal(final TextComponent.Builder name, final String user) {
         if (this.commandNameOnClick == null) {
-            name.hoverEvent(HoverEvent.showText(this.messageProviderService.getMessage("name.hover.ign", user))).build();
+            name.hoverEvent(HoverEvent.showText(this.messageProviderService.getMessage("name.hover.ign", user)));
             return;
         }
 
@@ -273,7 +273,7 @@ public class PlayerDisplayNameService implements IPlayerDisplayNameService, IRel
                         this.messageProviderService.getMessage("name.hover.ign", user),
                         Component.newline(),
                         this.messageProviderService.getMessage("name.hover.command", commandToRun));
-        name.clickEvent(ClickEvent.suggestCommand(commandToRun)).hoverEvent(HoverEvent.showText(hoverAction.build())).build();
+        name.clickEvent(ClickEvent.suggestCommand(commandToRun)).hoverEvent(HoverEvent.showText(hoverAction.build()));
     }
 
     @Override

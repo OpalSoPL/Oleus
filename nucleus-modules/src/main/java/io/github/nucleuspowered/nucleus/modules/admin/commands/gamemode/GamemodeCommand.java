@@ -74,7 +74,7 @@ public class GamemodeCommand extends GamemodeBase {
         ogm = context.getOne(this.gameModeParameter);
 
         if (!ogm.isPresent()) {
-            final Component mode = user.get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL::get).asComponent();
+            final Component mode = user.get(Keys.GAME_MODE).orElseGet(GameModes.SURVIVAL).asComponent();
             if (context.is(user)) {
                 context.sendMessage("command.gamemode.get.base", mode);
             } else {

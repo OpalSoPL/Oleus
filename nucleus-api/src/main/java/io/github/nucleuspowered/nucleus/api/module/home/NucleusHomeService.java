@@ -34,7 +34,7 @@ public interface NucleusHomeService {
     /**
      * The pattern that all home names must follow.
      */
-    Pattern HOME_NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]{1,15}$");
+    Pattern HOME_NAME_PATTERN = Pattern.compile("^[a-zA-Z][a-zA-Z\\d]{1,15}$");
 
     /**
      * Gets the number of homes the player currently has.

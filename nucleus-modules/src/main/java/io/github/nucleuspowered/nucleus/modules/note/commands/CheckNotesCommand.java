@@ -94,7 +94,7 @@ public class CheckNotesCommand implements ICommandExecutor {
                     Component.text(" - ", NamedTextColor.GOLD),
                     context.getMessage("standard.action.return").color(NamedTextColor.GREEN)
                         .hoverEvent(HoverEvent.showText(context.getMessage("command.checknotes.hover.return")))
-                        .clickEvent(ClickEvent.runCommand("/nucleus:checknotes " + uuid.toString()))
+                        .clickEvent(ClickEvent.runCommand("/nucleus:checknotes " + uuid))
                 );
 
         //Get and format the date of the warning

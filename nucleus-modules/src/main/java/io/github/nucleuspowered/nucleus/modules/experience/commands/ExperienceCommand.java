@@ -70,9 +70,9 @@ public class ExperienceCommand implements ICommandExecutor {
         return context.successResult();
     }
 
-    static Optional<ICommandResult> checkGameMode(final ICommandContext source, final Player pl) throws CommandException {
+    static Optional<ICommandResult> checkGameMode(final ICommandContext source, final Player pl) {
         final GameMode gm = pl.get(Keys.GAME_MODE).orElse(GameModes.SURVIVAL.get());
-        if (gm == GameModes.CREATIVE || gm == GameModes.SPECTATOR) {
+        if (gm == GameModes.CREATIVE.get() || gm == GameModes.SPECTATOR.get()) {
             return Optional.of(source.errorResult("command.exp.gamemode", pl.name()));
         }
 

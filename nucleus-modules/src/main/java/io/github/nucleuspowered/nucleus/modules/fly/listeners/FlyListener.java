@@ -132,7 +132,7 @@ public class FlyListener implements IReloadableService.Reloadable, ListenerBase 
 
     static boolean shouldIgnoreFromGameMode(final Player player) {
         final GameMode gm = player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET.get());
-        return (gm.equals(GameModes.CREATIVE) || gm.equals(GameModes.SPECTATOR));
+        return (gm.equals(GameModes.CREATIVE.get()) || gm.equals(GameModes.SPECTATOR.get()));
     }
 
     @Override

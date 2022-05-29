@@ -15,6 +15,7 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableServ
 import io.github.nucleuspowered.nucleus.core.util.CommandNameCache;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.SystemSubject;
@@ -74,7 +75,7 @@ public class CommandLoggingListener implements IReloadableService.Reloadable, Li
             // We're not logging this!
             return;
         }
-        final String name = PlainComponentSerializer.plain().serialize(this.displayNameProvider.getName(source, Component.text("unknown")));
+        final String name = PlainTextComponentSerializer.plainText().serialize(this.displayNameProvider.getName(source, Component.text("unknown")));
 
         final String command = event.command().toLowerCase();
         final Set<String> commands = CommandNameCache.INSTANCE.getFromCommandAndSource(command, event.commandCause());

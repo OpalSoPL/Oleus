@@ -253,7 +253,7 @@ public class HomeService implements NucleusHomeService, ServiceBase {
 
     private boolean setHome(final UUID uuid, Map<String, Home> m, final String home, final ServerLocation location, final Vector3d rotation,
             final boolean overwrite) {
-        final Pattern warpName = Pattern.compile("^[a-zA-Z][a-zA-Z0-9]{1,15}$");
+        final Pattern warpName = Pattern.compile("^[a-zA-Z][a-zA-Z\\d]{1,15}$");
 
         if (m == null) {
             m = new HashMap<>();
