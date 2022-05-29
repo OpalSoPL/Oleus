@@ -73,7 +73,7 @@ See [THIRDPARTY.md](THIRDPARTY.md) for more details.
 [Source]: https://github.com/NucleusPowered/Nucleus
 [Issues]: https://github.com/NucleusPowered/Nucleus/issues
 [Downloads]: https://github.com/NucleusPowered/Nucleus/releases
-[Website]: http://v2-beta.nucleuspowered.org/
-[Documentation]: http://v2-beta.nucleuspowered.org/docs
+[Website]: http://v2.nucleuspowered.org/
+[Documentation]: http://v2.nucleuspowered.org/docs
 [guidelines]: Contributing.md
 [Discord]: https://discord.gg/A9QHG5H
