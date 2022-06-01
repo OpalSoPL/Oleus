@@ -90,17 +90,17 @@ public class VanishService implements IReloadableService.Reloadable, ServiceBase
         this.vanishPlayer(player, false);
     }
 
-    public void vanishPlayer(final User player, final boolean delay) {
+    public void vanishPlayer(final User user, final boolean delay) {
         this.storageManager.getUserService()
-                .getOrNewOnThread(player.uniqueId())
+                .getOrNewOnThread(user.uniqueId())
                 .set(VanishKeys.VANISH_STATUS, true);
 
-        if (player.isOnline()) {
+        if (user.isOnline()) {
             if (delay) {
-                this.schedulerService.runOnMainThread(() -> this.vanishPlayerInternal(player.player().get()));
+                this.schedulerService.runOnMainThread(() -> this.vanishPlayerInternal(user.player().get()));
             } else {
-                this.lastVanish.put(player.uniqueId(), Instant.now());
-                this.vanishPlayerInternal((Player) player);
+                this.lastVanish.put(user.uniqueId(), Instant.now());
+                user.player().ifPresent(this::vanishPlayerInternal);
             }
         }
     }
