@@ -17,14 +17,9 @@ import java.util.stream.Collectors;
 public final class Template implements ComponentLike {
 
     private final List<TextElement> elements;
-    private final Map<String, ArgumentElement> knownArgs;
 
     public Template(final List<TextElement> elements) {
         this.elements = elements;
-        this.knownArgs = elements.stream()
-                .filter(x -> x instanceof ArgumentElement)
-                .map(x -> (ArgumentElement) x)
-                .collect(Collectors.toMap(x -> x.key, x -> x));
     }
 
     public Component create() {
@@ -37,14 +32,6 @@ public final class Template implements ComponentLike {
             builder.append(element.retrieve(replacements));
         }
         return builder.build();
-    }
-
-    public Map<String, ArgumentElement> getKnownArgs() {
-        return this.knownArgs;
-    }
-
-    public boolean hasTokens() {
-        return !this.knownArgs.isEmpty();
     }
 
     @Override

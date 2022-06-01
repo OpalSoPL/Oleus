@@ -31,7 +31,7 @@ public class StaffChatMessageChannel implements IChatMessageFormatterService.Cha
     private static StaffChatMessageChannel INSTANCE = null;
 
     public static StaffChatMessageChannel getInstance() {
-        if (StaffChatMessageChannel.INSTANCE != null) {
+        if (StaffChatMessageChannel.INSTANCE == null) {
             throw new IllegalStateException("StaffChatMessageChannel#Instance");
         }
 

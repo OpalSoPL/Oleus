@@ -33,6 +33,7 @@ import org.spongepowered.api.world.server.ServerLocation;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -77,7 +78,10 @@ public class ListHomeCommand implements ICommandExecutor, IReloadableService.Rel
         }
 
         final IPermissionService permissionService = context.getServiceCollection().permissionService();
-        final List<Component> lt = msw.stream().sorted(Comparator.comparing(x -> x.getLocation().getName())).map(x -> {
+        final List<Component> lt = msw.stream()
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(x -> x.getLocation().getName()))
+                .map(x -> {
             final Optional<ServerLocation> olw = x.getLocation().getLocation();
             if (!olw.isPresent()) {
                 return Component.text().append(
