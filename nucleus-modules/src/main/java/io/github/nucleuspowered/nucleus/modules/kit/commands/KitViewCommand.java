@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.kit.commands;
 
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
-import io.github.nucleuspowered.nucleus.modules.kit.KitUtil;
 import io.github.nucleuspowered.nucleus.modules.kit.config.KitConfig;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
@@ -47,7 +46,7 @@ public class KitViewCommand implements ICommandExecutor, IReloadableService.Relo
         final Kit kitInfo = context.requireOne(KitService.KIT_KEY);
         final KitService service = context.getServiceCollection().getServiceUnchecked(KitService.class);
 
-        final ViewableInventory kitInv = KitUtil.getKitInventoryBuilder();
+        final ViewableInventory kitInv = service.getKitInventoryBuilder();
         kitInfo.getStacks().stream().filter(x -> !x.isEmpty()).forEach(x -> kitInv.offer(x.createStack()));
         final InventoryMenu inventory = kitInv.asMenu();
         inventory.setTitle(context.getMessage("command.kit.edit.title", kitInfo.getName()));

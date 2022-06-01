@@ -67,7 +67,11 @@ public class InvSeeCommand implements ICommandExecutor {
                 || context.testPermissionFor(target, InventoryPermissions.INVSEE_EXEMPT_INTERACT)) {
             final UUID uuid = UUID.randomUUID();
             final InventoryMenu menu =
-                    ViewableInventory.builder().type(ContainerTypes.GENERIC_9X5).slots(targetInv.slots(), 0).completeStructure()
+                    ViewableInventory.builder()
+                            .type(ContainerTypes.GENERIC_9X5)
+                            .slots(targetInv.slots(), 0)
+                            .completeStructure()
+                            .plugin(context.getServiceCollection().pluginContainer())
                             .identity(uuid).build().asMenu();
             menu.setReadOnly(true);
             return menu.open(src)

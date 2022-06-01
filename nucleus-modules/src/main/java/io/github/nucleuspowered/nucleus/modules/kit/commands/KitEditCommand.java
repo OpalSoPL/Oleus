@@ -9,7 +9,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
-import io.github.nucleuspowered.nucleus.modules.kit.KitUtil;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
@@ -61,7 +60,7 @@ public class KitEditCommand implements ICommandExecutor {
             return context.errorResult("command.kit.edit.current", kitInfo.getName());
         }
 
-        final ViewableInventory kitInv = KitUtil.getKitInventoryBuilder();
+        final ViewableInventory kitInv = service.getKitInventoryBuilder();
         kitInfo.getStacks().stream().filter(x -> !x.isEmpty()).forEach(x -> kitInv.offer(x.createStack()));
         final InventoryMenu inventory = kitInv.asMenu();
         inventory.setTitle(context.getMessage("command.kit.edit.title", kitName));

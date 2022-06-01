@@ -39,12 +39,15 @@ import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.CauseStackManager;
+import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -84,9 +87,11 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
     private final Parameter.Value<Kit> withPermission;
     private final Parameter.Value<Kit> withoutPermission;
+    private final PluginContainer pluginContainer;
 
     @Inject
     public KitService(final INucleusServiceCollection serviceCollection) {
+        this.pluginContainer = serviceCollection.pluginContainer();
         this.permissionService = serviceCollection.permissionService();
         this.storageManager = serviceCollection.storageManager();
         this.messageProviderService = serviceCollection.messageProvider();
@@ -557,6 +562,15 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
 
     private IKitDataObject getKits() {
         return this.getKitService().getOrNewOnThread();
+    }
+
+    public ViewableInventory getKitInventoryBuilder() {
+        return ViewableInventory.builder()
+                .type(ContainerTypes.GENERIC_9X4)
+                .fillDummy()
+                .completeStructure()
+                .plugin(this.pluginContainer)
+                .build();
     }
 
 }

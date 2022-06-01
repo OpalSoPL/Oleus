@@ -35,6 +35,7 @@ public class TrashCommand implements ICommandExecutor {
                 .type(ContainerTypes.GENERIC_9X6)
                 .fillDummy()
                 .completeStructure()
+                .plugin(context.getServiceCollection().pluginContainer())
                 .build()).isPresent()) {
             return context.successResult();
         }

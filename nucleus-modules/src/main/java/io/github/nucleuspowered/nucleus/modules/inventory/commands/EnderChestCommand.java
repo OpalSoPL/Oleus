@@ -97,7 +97,9 @@ public class EnderChestCommand implements ICommandExecutor {
                     || context.testPermissionFor(subject, InventoryPermissions.ENDERCHEST_EXEMPT_MODIFY)) {
                 final UUID uuid = UUID.randomUUID();
                 final InventoryMenu menu =
-                        ViewableInventory.builder().type(ContainerTypes.GENERIC_9X5).slots(ec.slots(), 0).completeStructure()
+                        ViewableInventory.builder().type(ContainerTypes.GENERIC_9X5)
+                                .slots(ec.slots(), 0).completeStructure()
+                                .plugin(context.getServiceCollection().pluginContainer())
                                 .identity(uuid).build().asMenu();
                 menu.setReadOnly(true);
                 return menu.open(currentPlayer)

@@ -6,7 +6,6 @@ package io.github.nucleuspowered.nucleus.modules.kit.commands;
 
 import com.google.inject.Inject;
 import io.github.nucleuspowered.nucleus.modules.kit.KitPermissions;
-import io.github.nucleuspowered.nucleus.modules.kit.KitUtil;
 import io.github.nucleuspowered.nucleus.modules.kit.services.KitService;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
@@ -70,7 +69,7 @@ public final class KitCreateCommand implements ICommandExecutor {
                 service.saveKit(service.createKit(kitName).updateKitInventory(player.inventory()));
                 context.sendMessage("command.kit.add.success", kitName);
             } else {
-                final InventoryMenu inventory = KitUtil.getKitInventoryBuilder().asMenu();
+                final InventoryMenu inventory = service.getKitInventoryBuilder().asMenu();
                 inventory.setTitle(context.getMessage("command.kit.create.title", kitName));
                 inventory.registerClose((cause, container) -> {
                     if (!service.exists(kitName, true)) {

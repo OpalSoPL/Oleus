@@ -8,7 +8,6 @@ import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
-import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -20,7 +19,6 @@ import org.spongepowered.math.vector.Vector3d;
 
 import java.text.MessageFormat;
 import java.util.Optional;
-import java.util.Vector;
 
 public final class NucleusNamedLocation implements NamedLocation {
 
@@ -36,13 +34,6 @@ public final class NucleusNamedLocation implements NamedLocation {
     private final ResourceKey worldResourceKey;
     private final Vector3d position;
     private final Vector3d rotation;
-
-    public NucleusNamedLocation(final NamedLocation from) {
-        this.name = from.getName();
-        this.worldResourceKey = from.getWorldResourceKey();
-        this.position = from.getPosition();
-        this.rotation = from.getRotation();
-    }
 
     public NucleusNamedLocation(final String name, final ResourceKey world, final Vector3d position, final Vector3d rotation) {
         this.rotation = rotation;
@@ -74,11 +65,6 @@ public final class NucleusNamedLocation implements NamedLocation {
 
     @Override public Optional<ServerLocation> getLocation() {
         return Sponge.server().worldManager().world(this.worldResourceKey).map(x -> x.location(this.position));
-    }
-
-    public String toLocationString() {
-        return MessageFormat.format("name: {0}, world: {1}, x: {2}, y: {3}, z: {4}", this.name, this.worldResourceKey.asString(),
-            (int) this.position.x(), (int) this.position.y(), (int) this.position.z());
     }
 
     @Override
