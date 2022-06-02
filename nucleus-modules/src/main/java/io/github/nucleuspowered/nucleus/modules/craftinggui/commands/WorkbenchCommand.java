@@ -25,8 +25,14 @@ import java.util.function.Supplier;
 )
 public final class WorkbenchCommand extends BasicCraftingCommand {
 
-    @Override protected Supplier<ContainerType> getArchetype() {
+    @Override
+    protected Supplier<ContainerType> getArchetype() {
         return ContainerTypes.CRAFTING;
+    }
+
+    @Override
+    protected String titleKey() {
+        return "command.workbench.gui.title";
     }
 
 }

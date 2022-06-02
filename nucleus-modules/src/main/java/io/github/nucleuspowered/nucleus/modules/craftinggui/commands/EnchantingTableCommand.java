@@ -31,5 +31,9 @@ public class EnchantingTableCommand extends BasicCraftingCommand {
         return ContainerTypes.ENCHANTMENT;
     }
 
+    @Override
+    protected String titleKey() {
+        return "command.enchantingtable.gui.title";
+    }
 
 }

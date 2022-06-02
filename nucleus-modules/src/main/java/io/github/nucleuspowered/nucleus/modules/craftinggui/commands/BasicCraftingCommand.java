@@ -17,11 +17,17 @@ public abstract class BasicCraftingCommand implements ICommandExecutor {
 
     protected abstract Supplier<ContainerType> getArchetype();
 
+    protected abstract String titleKey();
+
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
         context.getIfPlayer()
-                .openInventory(ViewableInventory.builder().type(this.getArchetype()).completeStructure()
-                        .plugin(context.getServiceCollection().pluginContainer()).build())
+                .openInventory(ViewableInventory
+                        .builder()
+                        .type(this.getArchetype())
+                        .completeStructure()
+                        .plugin(context.getServiceCollection().pluginContainer())
+                        .build())
                 .orElseThrow(() -> context.createException("command.crafting.error"));
         return context.successResult();
     }

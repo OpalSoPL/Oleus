@@ -29,4 +29,9 @@ public class AnvilCommand extends BasicCraftingCommand {
     protected Supplier<ContainerType> getArchetype() {
         return ContainerTypes.ANVIL;
     }
+
+    @Override
+    protected String titleKey() {
+        return "command.anvil.gui.title";
+    }
 }
