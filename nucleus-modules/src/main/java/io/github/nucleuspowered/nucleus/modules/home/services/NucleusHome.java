@@ -5,17 +5,13 @@
 package io.github.nucleuspowered.nucleus.modules.home.services;
 
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
-import org.spongepowered.math.vector.Vector3d;
 import io.github.nucleuspowered.nucleus.api.module.home.data.Home;
-import io.github.nucleuspowered.nucleus.core.configurate.datatypes.LocationNode;
 import io.github.nucleuspowered.nucleus.core.datatypes.NucleusNamedLocation;
 
 import java.util.Optional;
@@ -35,10 +31,6 @@ public class NucleusHome implements Home {
         this.namedLocation = location;
     }
 
-    public NucleusHome(final String name, final UUID owner, final ResourceKey world, final Vector3d location, final Vector3d rotation) {
-        this(owner, new NucleusNamedLocation(name, world, location, rotation));
-    }
-
     @Override
     public UUID getOwnersUniqueId() {
         return this.owner;
@@ -46,7 +38,7 @@ public class NucleusHome implements Home {
 
     @Override
     public NamedLocation getLocation() {
-        return null;
+        return this.namedLocation;
     }
 
     @Override
