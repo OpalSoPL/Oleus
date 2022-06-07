@@ -65,13 +65,18 @@ public class CommandResultImpl implements ICommandResult {
 
     @Override
     public Optional<Component> getErrorMessage(final ICommandContext source) {
+        if (this.key == null) {
+            return Optional.empty();
+        }
         return Optional.of(source.getMessage(this.key, this.args));
     }
 
     @Override
     public CommandResult getResult(final ICommandContext source) {
         return this.success ? CommandResult.success() :
-                this.getErrorMessage(source).map(CommandResult::error).orElseGet(() -> CommandResult.error(Component.text("Unknown error occurred", Style.style(NamedTextColor.RED))));
+                this.getErrorMessage(source)
+                        .map(CommandResult::error)
+                        .orElseGet(() -> CommandResult.error(Component.text("Unknown error occurred", Style.style(NamedTextColor.RED))));
     }
 
     public static final class Literal extends CommandResultImpl {
