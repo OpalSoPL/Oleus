@@ -18,6 +18,7 @@ import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
 import io.github.nucleuspowered.nucleus.core.util.PrettyPrinter;
 import io.github.nucleuspowered.nucleus.core.util.functional.NucleusCollectors;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
@@ -157,6 +158,16 @@ public final class CommandControl {
 
     @NonNull
     public CommandResult process(@NonNull final CommandContext context) throws CommandException {
+        // TODO: Temporary until I fix this in SF -- empty text.
+        final CommandResult r = this.process0(context);
+        if (r.errorMessage().isPresent()) {
+            context.sendMessage(Identity.nil(), r.errorMessage().get());
+            return CommandResult.success();
+        }
+        return r;
+    }
+
+    private CommandResult process0(@NonNull final CommandContext context) throws CommandException {
         if (this.executor == null) {
             throw new CommandException(Component.text("This should not be executed"));
         }
