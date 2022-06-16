@@ -77,7 +77,7 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
 
     @Override
     public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
-        if (context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
+        if (!context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
                 .canTeleportTo(
                         context.requirePlayer(),
                         context.requireOne(NucleusParameters.ONE_PLAYER).user()
