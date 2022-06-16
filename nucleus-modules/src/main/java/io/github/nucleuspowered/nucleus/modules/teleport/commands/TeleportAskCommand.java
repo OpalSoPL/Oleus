@@ -19,6 +19,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Essenti
 import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandModifiers;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.modules.teleport.services.TPAResult;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
@@ -75,16 +76,18 @@ public class TeleportAskCommand implements ICommandExecutor, IReloadableService.
         };
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Override
     public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
-        if (!context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
+        final TPAResult result = context.getServiceCollection().getServiceUnchecked(PlayerTeleporterService.class)
                 .canTeleportTo(
                         context.requirePlayer(),
                         context.requireOne(NucleusParameters.ONE_PLAYER).user()
-                )) {
-            return Optional.of(context.failResult());
+                );
+        if (result.isSuccess()) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        return Optional.of(context.errorResult(result.key(), result.name()));
     }
 
     @Override

@@ -72,29 +72,27 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
         this.serviceCollection = serviceCollection;
     }
 
-    public boolean canTeleportTo(final ServerPlayer source, final User to)  {
+    public TPAResult canTeleportTo(final ServerPlayer source, final User to)  {
         return this.canTeleportTo(source, source.user(), to, false);
     }
 
-    public boolean canTeleportTo(final Audience audience, final User source, final User to, final boolean isOther)  {
+    public TPAResult canTeleportTo(final Audience audience, final User source, final User to, final boolean isOther)  {
         if (!this.canBypassTpToggle(source)) {
             if (!isOther && !this.userPreferenceService.get(to.uniqueId(), TeleportKeys.TELEPORT_TOGGLE).orElse(true)) {
-                this.messageProviderService.sendMessageTo(audience, "teleport.fail.targettoggle", to.name());
-                return false;
+                return TPAResult.failure( "teleport.fail.targettoggle", to.name());
             }
         }
 
         if (!isOther && this.isOnlySameDimension) {
             if (!source.worldKey().equals(to.worldKey())) {
                 if (!this.permissionService.hasPermission(source, "nucleus.teleport.exempt.samedimension")) {
-                    this.messageProviderService.sendMessageTo(audience, "teleport.fail.samedimension", to.name());
-                    return false;
+                    return TPAResult.failure( "teleport.fail.samedimension", to.name());
                 }
             }
         }
 
 
-        return true;
+        return TPAResult.SUCCESS;
     }
 
     private boolean canBypassTpToggle(final Subject from) {
@@ -153,7 +151,8 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
             final String messageKey) {
         this.removeExpired();
 
-        if (this.canTeleportTo(playerToTeleport, target.user())) {
+        final TPAResult result = this.canTeleportTo(playerToTeleport, target.user());
+        if (result.isSuccess()) {
             final Audience src = requester == null ? Sponge.systemSubject() : requester;
 
             final TeleportRequest request = new TeleportRequest(
@@ -186,6 +185,7 @@ public final class PlayerTeleporterService implements ServiceBase, IReloadableSe
             return true;
         }
 
+        this.messageProviderService.sendMessageTo(playerToTeleport, result.key(), target.user().name());
         return false;
     }
 

@@ -20,6 +20,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandMo
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableService;
+import io.github.nucleuspowered.nucleus.modules.teleport.services.TPAResult;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
@@ -131,11 +132,13 @@ public class TeleportCommand implements ICommandExecutor, IReloadableService.Rel
                         .orElseGet(() -> context.getOne(this.playerToWarp).map(ServerPlayer::user).orElse(null));
         final boolean isOther = source != null && context.uniqueId().filter(x -> !x.equals(source.uniqueId())).isPresent();
         final User to = context.getOptionalUserFromUUID(this.userToWarpTo).orElseGet(() -> context.requireOne(this.playerToWarpTo).user());
-        return context.getServiceCollection()
-                    .getServiceUnchecked(PlayerTeleporterService.class)
-                    .canTeleportTo(context.audience(), source, to, isOther) ?
-                Optional.empty() :
-                Optional.of(context.failResult());
+        final TPAResult result = context.getServiceCollection()
+                .getServiceUnchecked(PlayerTeleporterService.class)
+                .canTeleportTo(context.audience(), source, to, isOther);
+        if (result.isSuccess()) {
+            return Optional.empty();
+        }
+        return Optional.of(context.errorResult(result.key(), result.name()));
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {

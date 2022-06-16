@@ -19,6 +19,7 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.modifier.CommandMo
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.ICooldownService;
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IPermissionService;
+import io.github.nucleuspowered.nucleus.modules.teleport.services.TPAResult;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
@@ -79,10 +80,13 @@ public class TeleportAskHereCommand implements ICommandExecutor {
 
     @Override public Optional<ICommandResult> preExecute(final ICommandContext context) throws CommandException {
         final ServerPlayer target = context.requireOne(NucleusParameters.ONE_PLAYER);
-        final boolean cont = context.getServiceCollection()
+        final TPAResult result = context.getServiceCollection()
                 .getServiceUnchecked(PlayerTeleporterService.class)
                 .canTeleportTo(context.requirePlayer(), target.user());
-        return cont ? Optional.empty() : Optional.of(context.failResult());
+        if (result.isSuccess()) {
+            return Optional.empty();
+        }
+        return Optional.of(context.errorResult(result.key(), result.name()));
     }
 
     @Override public ICommandResult execute(final ICommandContext context) throws CommandException {
