@@ -7,9 +7,11 @@ package io.github.nucleuspowered.nucleus.modules.mail.data;
 import io.github.nucleuspowered.nucleus.api.module.mail.data.MailMessage;
 import io.github.nucleuspowered.nucleus.modules.message.MessageKeys;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
@@ -101,12 +103,13 @@ public class NucleusMailMessage implements MailMessage {
 
         @Override
         protected Optional<MailMessage> buildContent(final DataView container) throws InvalidDataException {
+            final DataTranslator<UUID> translator = Sponge.dataManager().translator(UUID.class).get();
             if (!container.contains(Queries.CONTENT_VERSION)) {
-                container.getObject(DataQuery.of("uuid"), UUID.class).ifPresent(x -> container.set(NucleusMailMessage.SENDER, x));
+                container.getView(DataQuery.of("uuid")).map(translator::translate).ifPresent(x -> container.set(NucleusMailMessage.SENDER, x));
             }
             return Optional.of(
                     new NucleusMailMessage(
-                            container.getObject(NucleusMailMessage.SENDER, UUID.class).orElse(null),
+                            container.getView(NucleusMailMessage.SENDER).map(translator::translate).orElse(null),
                             container.getLong(NucleusMailMessage.DATE).map(Instant::ofEpochMilli).get(),
                             container.getString(NucleusMailMessage.MESSAGE).get()
                     )

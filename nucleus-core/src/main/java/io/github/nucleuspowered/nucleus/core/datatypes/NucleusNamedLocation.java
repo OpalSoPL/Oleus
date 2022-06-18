@@ -10,6 +10,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
@@ -83,7 +84,12 @@ public final class NucleusNamedLocation implements NamedLocation {
     }
 
     public static DataView upgradeLegacy(final DataView dataContainer, final DataQuery childQuery) {
-        final DataView targetView = dataContainer.createView(childQuery);
+        final DataView targetView;
+        if (childQuery.queryParts().isEmpty()) {
+            targetView = dataContainer;
+        } else {
+            targetView = dataContainer.createView(childQuery);
+        }
         targetView.set(Queries.CONTENT_VERSION, 1);
         targetView.set(NucleusNamedLocation.nameKey, dataContainer.getString(DataQuery.of("name")));
         targetView.set(NucleusNamedLocation.worldKey, dataContainer.getResourceKey(DataQuery.of("world")));
@@ -123,11 +129,12 @@ public final class NucleusNamedLocation implements NamedLocation {
         @Override
         protected Optional<NamedLocation> buildContent(final DataView container) throws InvalidDataException {
             if (container.contains(NucleusNamedLocation.nameKey, NucleusNamedLocation.worldKey, NucleusNamedLocation.positionKey)) {
+                final DataTranslator<Vector3d> translator = Sponge.dataManager().translator(Vector3d.class).get();
                 return Optional.of(new NucleusNamedLocation(
                         container.getString(NucleusNamedLocation.nameKey).get(),
                         container.getResourceKey(NucleusNamedLocation.worldKey).get(),
-                        container.getObject(NucleusNamedLocation.positionKey, Vector3d.class).get(),
-                        container.getObject(NucleusNamedLocation.rotationKey, Vector3d.class).orElse(Vector3d.ZERO)
+                        container.getView(NucleusNamedLocation.positionKey).map(translator::translate).get(),
+                        container.getView(NucleusNamedLocation.rotationKey).map(translator::translate).orElse(Vector3d.ZERO)
                 ));
             }
             return Optional.empty();

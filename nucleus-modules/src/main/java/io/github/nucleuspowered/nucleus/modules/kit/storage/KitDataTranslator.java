@@ -49,7 +49,7 @@ public final class KitDataTranslator extends AbstractDataContainerDataTranslator
         dataObject
                 .setKitMap(dataView.keys(false)
                 .stream()
-                .map(query -> dataView.getObject(query, Kit.class).map(x -> Tuple.of(query.parts().get(0), x)).orElse(null))
+                .map(query -> dataView.getSerializable(query, Kit.class).map(x -> Tuple.of(query.parts().get(0), x)).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(k -> k._1, k -> k._2)));
         return dataObject;

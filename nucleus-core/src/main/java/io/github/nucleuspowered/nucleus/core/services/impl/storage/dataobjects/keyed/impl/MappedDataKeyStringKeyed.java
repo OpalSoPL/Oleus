@@ -17,8 +17,11 @@ import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -33,26 +36,33 @@ public class MappedDataKeyStringKeyed<V, O extends IKeyedDataObject<?>> extends 
         implements DataKey.StringKeyedMapKey<V, O> {
 
     private final Class<V> erasedType;
+    private final DataKeyDeserialisers.Deserialiser<V> converter;
 
     private static <Value> Type createMapType(final TypeToken<Value> valueToken) {
         return TypeFactory.parameterizedClass(Map.class, String.class, valueToken.getType());
     }
 
     @SuppressWarnings("unchecked")
-    public MappedDataKeyStringKeyed(final String[] key, final TypeToken<V> valueType, final Class<O> target, final @Nullable BiFunction<DataQuery, DataView, DataView> transformer) {
+    public MappedDataKeyStringKeyed(final String[] key, final TypeToken<V> valueType, final Class<O> target, final @Nullable BiConsumer<DataQuery, DataView> transformer) {
         super(key, MappedDataKeyStringKeyed.createMapType(valueType), target, null, transformer);
         this.erasedType = (Class<V>) GenericTypeReflector.erase(valueType.getType());
+        this.converter = DataKeyDeserialisers.getTypeFor(this.erasedType);
     }
 
     @Override
     public Optional<Map<String, V>> getFromDataView(final DataView dataView) {
-        return dataView.getView(this.getDataQuery())
-                .map(x ->
-                        io.vavr.collection.List.ofAll(x.keys(false))
-                            .flatMap(k -> Option.ofOptional(dataView.getView(k)).map(y -> Tuple.of(k, y)))
-                            .flatMap(t -> Option.ofOptional(t._2.getObject(DataQuery.of(), this.erasedType))
-                            .map(y -> Tuple.of(t._1.asString('.'), y)))
-                            .toJavaMap(Function.identity()));
+        final Optional<DataView> viewOpt = dataView.getView(this.getDataQuery());
+        if (viewOpt.isPresent()) {
+            final DataView view = viewOpt.get().copy(DataView.SafetyMode.NO_DATA_CLONED);
+            final Set<DataQuery> keys = view.keys(false);
+
+            final Map<String, V> result = new HashMap<>();
+            for (final DataQuery query : keys) {
+                this.converter.scalar.apply(view, query).ifPresent(x -> result.put(query.last().asString('.'), x));
+            }
+            return Optional.of(result);
+        }
+        return Optional.empty();
     }
 
 

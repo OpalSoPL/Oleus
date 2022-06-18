@@ -85,8 +85,8 @@ public abstract class AbstractKeyBasedDataObject<T extends IKeyedDataObject<T>> 
     }
 
     public <V> boolean set(final DataKey<V, ? extends T> dataKey, final V data) {
-
         this.dataHolder.put(dataKey, data);
+        this.data.set(dataKey.getDataQuery(), data);
         this.markDirty();
         return true;
     }

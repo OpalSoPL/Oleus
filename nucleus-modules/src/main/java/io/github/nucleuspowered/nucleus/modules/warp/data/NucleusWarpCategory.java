@@ -8,14 +8,17 @@ import io.github.nucleuspowered.nucleus.api.module.warp.data.WarpCategory;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class NucleusWarpCategory implements WarpCategory {
 
@@ -83,11 +86,12 @@ public class NucleusWarpCategory implements WarpCategory {
                 container.set(NucleusWarpCategory.DISPLAY_NAME, component);
             }
             if (container.contains(NucleusWarpCategory.DISPLAY_NAME, NucleusWarpCategory.ID)) {
+                final DataTranslator<Component> translator = Sponge.dataManager().translator(Component.class).get();
                 return Optional.of(
                         new NucleusWarpCategory(
                                 container.getString(NucleusWarpCategory.ID).get(),
-                                container.getObject(NucleusWarpCategory.DISPLAY_NAME, Component.class).get(),
-                                container.getObject(NucleusWarpCategory.DESCRIPTION, Component.class).orElse(null)
+                                container.getView(NucleusWarpCategory.DISPLAY_NAME).map(translator::translate).get(),
+                                container.getView(NucleusWarpCategory.DESCRIPTION).map(translator::translate).orElse(null)
                         )
                 );
             }

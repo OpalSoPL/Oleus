@@ -6,9 +6,11 @@ package io.github.nucleuspowered.nucleus.modules.note.services;
 
 import io.github.nucleuspowered.nucleus.api.module.note.data.Note;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
@@ -94,8 +96,9 @@ public final class NucleusNote implements Note {
         @Override
         protected Optional<Note> buildContent(final DataView container) throws InvalidDataException {
             if (container.contains(NucleusNote.NOTE, NucleusNote.DATE)) {
+                final DataTranslator<UUID> translator = Sponge.dataManager().translator(UUID.class).get();
                 return Optional.of(new NucleusNote(
-                        container.getObject(NucleusNote.NOTER, UUID.class).orElse(null),
+                        container.getView(NucleusNote.NOTER).map(translator::translate).orElse(null),
                         container.getString(NucleusNote.NOTE).get(),
                         container.getLong(NucleusNote.DATE).map(Instant::ofEpochMilli).get()
                 ));

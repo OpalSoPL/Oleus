@@ -56,7 +56,7 @@ public final class NucleusJail implements Jail {
                 NucleusNamedLocation.upgradeLegacy(container, NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY);
                 container.set(Queries.CONTENT_VERSION, NucleusJail.CONTENT_VERSION);
             }
-            return container.getObject(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY, NamedLocation.class).map(NucleusJail::new);
+            return container.getSerializable(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY, NamedLocation.class).map(NucleusJail::new);
         }
     }
 

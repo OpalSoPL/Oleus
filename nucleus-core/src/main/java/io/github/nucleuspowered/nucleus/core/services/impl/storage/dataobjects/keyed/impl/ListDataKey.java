@@ -17,6 +17,7 @@ import org.spongepowered.api.data.persistence.DataView;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -31,19 +32,21 @@ public class ListDataKey<R, O extends IKeyedDataObject<?>> extends AbstractDataK
         implements DataKey.ListKey<R, O> {
 
     private final TypeToken<R> innerType;
+    private final DataKeyDeserialisers.Deserialiser<R> converter;
 
     private static <S> Type createListToken(final TypeToken<S> innerToken) {
         return TypeFactory.parameterizedClass(List.class, innerToken.getType());
     }
 
-    public ListDataKey(final String[] key, final TypeToken<R> type, final Class<O> target, final @Nullable BiFunction<DataQuery, DataView, DataView> transformer) {
+    public ListDataKey(final String[] key, final TypeToken<R> type, final Class<O> target,
+            final @Nullable BiConsumer<DataQuery, DataView> transformer) {
         super(key, ListDataKey.createListToken(type), target, null, transformer);
         this.innerType = type;
+        this.converter = DataKeyDeserialisers.getTypeFor(this.innerType.getType());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Optional<List<R>> getFromDataView(final DataView view) {
-        return view.getObjectList(this.getDataQuery(), (Class<R>) GenericTypeReflector.erase(this.innerType.getType()));
+        return this.converter.list.apply(view, this.getDataQuery());
     }
 }

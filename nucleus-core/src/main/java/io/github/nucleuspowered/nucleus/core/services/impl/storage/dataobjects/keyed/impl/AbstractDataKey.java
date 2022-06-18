@@ -6,12 +6,18 @@ package io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.
 
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.keyed.DataKey;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.dataobjects.keyed.IKeyedDataObject;
+import io.leangen.geantyref.GenericTypeReflector;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataSerializable;
 import org.spongepowered.api.data.persistence.DataView;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -23,9 +29,9 @@ public abstract class AbstractDataKey<R, O extends IKeyedDataObject<?>> implemen
     private final Type type;
     private final R def;
     private final Class<O> target;
-    private final BiFunction<DataQuery, DataView, DataView> transform;
+    private final BiConsumer<DataQuery, DataView> transform;
 
-    public AbstractDataKey(final String[] key, final Type type, final Class<O> target, @Nullable final R def, final @Nullable BiFunction<DataQuery, DataView, DataView> transform) {
+    public AbstractDataKey(final String[] key, final Type type, final Class<O> target, @Nullable final R def, final @Nullable BiConsumer<DataQuery, DataView> transform) {
         this.key = key;
         this.type = type;
         this.def = def;
@@ -58,7 +64,8 @@ public abstract class AbstractDataKey<R, O extends IKeyedDataObject<?>> implemen
     @Override
     public final void performTransformation(final DataContainer data) {
         if (this.transform != null && data.contains(this.dataQuery)) {
-            data.set(this.dataQuery, this.transform.apply(this.dataQuery, data));
+            this.transform.accept(this.dataQuery, data);
         }
     }
+
 }

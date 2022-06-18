@@ -18,6 +18,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -38,7 +39,8 @@ public interface DataKey<R, O extends IKeyedDataObject<?>> {
         return new ScalarDataKey<>(key, type.getType(), target, def, null);
     }
 
-    static <T, O extends IKeyedDataObject<?>> DataKey.ListKey<T, O> ofList(final TypeToken<T> type, final Class<O> target, final BiFunction<DataQuery, DataView, DataView> transformer, final String... key) {
+    // The transformer takes in the entire data and returns the entire data.
+    static <T, O extends IKeyedDataObject<?>> DataKey.ListKey<T, O> ofList(final TypeToken<T> type, final Class<O> target, final BiConsumer<DataQuery, DataView> transformer, final String... key) {
         return new ListDataKey<>(key, type, target, transformer);
     }
 

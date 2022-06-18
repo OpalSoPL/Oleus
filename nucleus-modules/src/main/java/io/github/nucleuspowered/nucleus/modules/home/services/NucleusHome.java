@@ -5,9 +5,11 @@
 package io.github.nucleuspowered.nucleus.modules.home.services;
 
 import io.github.nucleuspowered.nucleus.api.util.data.NamedLocation;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
@@ -66,9 +68,10 @@ public class NucleusHome implements Home {
                 NucleusNamedLocation.upgradeLegacy(container, NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY);
             }
 
+            final DataTranslator<UUID> translator = Sponge.dataManager().translator(UUID.class).get();
             return Optional.of(new NucleusHome(
-                    container.getObject(NucleusHome.OWNER, UUID.class).get(),
-                    container.getObject(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY, NamedLocation.class).get()
+                    container.getView(NucleusHome.OWNER).map(translator::translate).get(),
+                    container.getSerializable(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY, NamedLocation.class).get()
             ));
         }
     }

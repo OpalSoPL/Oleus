@@ -27,19 +27,17 @@ public final class WarpKeys {
 
     public static final DataKey.ListKey<WarpCategory, IGeneralDataObject> WARP_CATEGORIES
             = DataKey.ofList(TypeToken.get(WarpCategory.class), IGeneralDataObject.class, (dataQuery, dataContainer) -> {
-                if (dataContainer.getList(dataQuery).isPresent()) {
-                    return dataContainer;
+                if (!dataContainer.getList(dataQuery).isPresent()) {
+                    // we have a map.
+                    final DataView internal = dataContainer.getView(dataQuery).orElse(null);
+                    if (internal != null) {
+                        final List<DataView> replacement = dataContainer.keys(false).stream()
+                                .map(x -> dataContainer.getView(x).map(view -> view.set(NucleusWarpCategory.ID, x)).orElse(null))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList());
+                        dataContainer.set(dataQuery, replacement);
+                    }
                 }
-                // we have a map.
-                final DataView internal = dataContainer.getView(dataQuery).orElse(null);
-                if (internal != null) {
-                    final List<DataView> replacement = dataContainer.keys(false).stream()
-                            .map(x -> dataContainer.getView(x).map(view -> view.set(NucleusWarpCategory.ID, x)).orElse(null))
-                            .filter(Objects::nonNull)
-                            .collect(Collectors.toList());
-                    dataContainer.set(dataQuery, replacement);
-                }
-                return dataContainer;
             }, "warpCategories");
 
 }

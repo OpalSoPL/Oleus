@@ -10,9 +10,12 @@ import io.github.nucleuspowered.nucleus.core.datatypes.NucleusNamedLocation;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
@@ -96,13 +99,15 @@ public class NucleusWarp implements Warp {
                 }
             }
 
+
             if (container.contains(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY)) {
+                final DataTranslator<Component> componentDataTranslator = Sponge.dataManager().translator(Component.class).get();
                 return Optional.of(
                         new NucleusWarp(
                                 container.getString(NucleusWarp.CATEGORY).orElse(null),
                                 container.getDouble(NucleusWarp.COST).orElse(0.0),
-                                container.getObject(NucleusWarp.DESCRIPTION, Component.class).orElse(null),
-                                container.getObject(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY, NamedLocation.class).get()
+                                container.getView(NucleusWarp.DESCRIPTION).map(componentDataTranslator::translate).orElse(null),
+                                container.getSerializable(NucleusNamedLocation.NAMED_LOCATION_DATA_QUERY, NamedLocation.class).get()
                         )
                 );
             }

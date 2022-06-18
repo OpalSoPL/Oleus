@@ -13,19 +13,22 @@ import org.spongepowered.api.data.persistence.DataView;
 
 import java.lang.reflect.Type;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ScalarDataKey<R, O extends IKeyedDataObject<?>> extends AbstractDataKey<R, O> {
 
-    public ScalarDataKey(final String[] key, final Type type, final Class<O> target, @Nullable final R def, final @Nullable BiFunction<DataQuery, DataView, DataView> transformer) {
+    private final DataKeyDeserialisers.Deserialiser<R> converter;
+
+    public ScalarDataKey(final String[] key, final Type type, final Class<O> target, @Nullable final R def, final @Nullable BiConsumer<DataQuery, DataView> transformer) {
         super(key, type, target, def, transformer);
+        this.converter = DataKeyDeserialisers.getTypeFor(type);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Optional<R> getFromDataView(final DataView view) {
-        return view.getObject(this.getDataQuery(), (Class<R>) GenericTypeReflector.erase(this.getKeyType()));
+        return this.converter.scalar.apply(view, this.getDataQuery());
     }
 }

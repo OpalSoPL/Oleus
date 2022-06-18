@@ -13,6 +13,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
@@ -151,10 +152,12 @@ public class NucleusJailing implements Jailing {
 
         @Override
         protected Optional<Jailing> buildContent(final DataView container) throws InvalidDataException {
+            final DataTranslator<UUID> translator = Sponge.dataManager().translator(UUID.class).get();
             if (!container.contains(Queries.CONTENT_VERSION)) {
                 NucleusTimedEntry.upgradeLegacy(container, NucleusTimedEntry.TIMED_ENTRY);
 
-                final @Nullable ResourceKey previousWorld = container.getObject(DataQuery.of("world"), UUID.class)
+                final @Nullable ResourceKey previousWorld = container.getView(DataQuery.of("world"))
+                        .map(translator::translate)
                         .flatMap(x -> Sponge.server().worldManager().worldKey(x))
                         .orElse(null);
                 if (previousWorld != null) {
@@ -172,21 +175,25 @@ public class NucleusJailing implements Jailing {
                 }
             }
 
+            final DataTranslator<Vector3d> vector3dDataTranslator = Sponge.dataManager().translator(Vector3d.class).get();
             final ServerLocation previous =
-                    container.getObject(NucleusJailing.PREVIOUS_LOCATION_WORLD, ResourceKey.class)
+                    container.getResourceKey(NucleusJailing.PREVIOUS_LOCATION_WORLD)
                             .filter(x -> Sponge.server().worldManager().worldExists(x))
                             .map(x ->
-                                ServerLocation.of(x, container.getObject(NucleusJailing.PREVIOUS_LOCATION_POSITION, Vector3d.class).orElse(DataBuilder.DEFAULT))
+                                ServerLocation.of(x,
+                                        container.getView(NucleusJailing.PREVIOUS_LOCATION_POSITION)
+                                                .map(vector3dDataTranslator::translate)
+                                                .orElse(DataBuilder.DEFAULT))
                             )
                             .orElse(null);
 
             return Optional.of(new NucleusJailing(
                     container.getString(NucleusJailing.REASON).get(),
                     container.getString(NucleusJailing.JAIL_NAME).get(),
-                    container.getObject(NucleusJailing.JAILER, UUID.class).orElse(null),
+                    container.getView(NucleusJailing.JAILER).map(translator::translate).orElse(null),
                     previous,
                     container.getLong(NucleusJailing.CREATION_INSTANT).map(Instant::ofEpochSecond).orElse(null),
-                    container.getObject(NucleusTimedEntry.TIMED_ENTRY, TimedEntry.class).orElse(null),
+                    container.getSerializable(NucleusTimedEntry.TIMED_ENTRY, TimedEntry.class).orElse(null),
                     this.shouldSaveStopped)
             );
         }

@@ -12,6 +12,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
@@ -134,6 +135,7 @@ public final class NucleusMute implements Mute {
 
         @Override
         protected Optional<Mute> buildContent(final DataView container) throws InvalidDataException {
+            final DataTranslator<UUID> translator = Sponge.dataManager().translator(UUID.class).get();
             if (!container.contains(Queries.CONTENT_VERSION)) {
                 NucleusTimedEntry.upgradeLegacy(container, NucleusTimedEntry.TIMED_ENTRY);
             }
@@ -141,9 +143,9 @@ public final class NucleusMute implements Mute {
             return Optional.of(
                     new NucleusMute(
                             container.getString(NucleusMute.REASON).orElse(null),
-                            container.getObject(NucleusMute.MUTER, UUID.class).orElse(null),
+                            container.getView(NucleusMute.MUTER).map(translator::translate).orElse(null),
                             container.getLong(NucleusMute.CREATION_INSTANT).map(Instant::ofEpochSecond).orElse(null),
-                            container.getObject(NucleusTimedEntry.TIMED_ENTRY, NucleusTimedEntry.class).orElse(null),
+                            container.getSerializable(NucleusTimedEntry.TIMED_ENTRY, NucleusTimedEntry.class).orElse(null),
                             this.isSavedStopped
                     )
             );

@@ -19,6 +19,8 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -33,6 +35,7 @@ public class StringKeyedMappedListDataKeyStringKeyed<V, O extends IKeyedDataObje
         implements DataKey.StringKeyedMapListKey<V, O> {
 
     private final Class<V> erasedType;
+    private final DataKeyDeserialisers.Deserialiser<V> converter;
 
     private static <Value> Type createMapListToken(
             final TypeToken<Value> valueToken) {
@@ -40,9 +43,10 @@ public class StringKeyedMappedListDataKeyStringKeyed<V, O extends IKeyedDataObje
     }
 
     @SuppressWarnings("unchecked")
-    public StringKeyedMappedListDataKeyStringKeyed(final String[] key, final TypeToken<V> valueType, final Class<O> target, final @Nullable BiFunction<DataQuery, DataView, DataView> transformer) {
+    public StringKeyedMappedListDataKeyStringKeyed(final String[] key, final TypeToken<V> valueType, final Class<O> target, final @Nullable BiConsumer<DataQuery, DataView> transformer) {
         super(key, createMapListToken(valueType), target, null, transformer);
         this.erasedType = (Class<V>) GenericTypeReflector.erase(valueType.getType());
+        this.converter = DataKeyDeserialisers.getTypeFor(this.erasedType);
     }
 
     @Override
@@ -51,8 +55,7 @@ public class StringKeyedMappedListDataKeyStringKeyed<V, O extends IKeyedDataObje
                 .map(x ->
                         io.vavr.collection.List.ofAll(x.keys(false))
                                 .flatMap(k -> Option.ofOptional(dataView.getView(k)).map(y -> Tuple.of(k, y)))
-                                .flatMap(t -> Option.ofOptional(t._2.getObjectList(DataQuery.of(), this.erasedType))
-                                .map(y -> Tuple.of(t._1.asString('.'), y)))
+                                .flatMap(t -> Option.ofOptional(this.converter.list.apply(t._2, DataQuery.of())).map(y -> Tuple.of(t._1.asString('.'), y)))
                                 .toJavaMap(Function.identity()));
     }
 }
