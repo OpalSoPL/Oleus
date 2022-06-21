@@ -567,7 +567,6 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     public ViewableInventory getKitInventoryBuilder() {
         return ViewableInventory.builder()
                 .type(ContainerTypes.GENERIC_9X4)
-                .fillDummy()
                 .completeStructure()
                 .plugin(this.pluginContainer)
                 .build();

@@ -33,7 +33,6 @@ public class TrashCommand implements ICommandExecutor {
         final ServerPlayer src = context.getIfPlayer();
         if (src.openInventory(ViewableInventory.builder()
                 .type(ContainerTypes.GENERIC_9X6)
-                .fillDummy()
                 .completeStructure()
                 .plugin(context.getServiceCollection().pluginContainer())
                 .build()).isPresent()) {
