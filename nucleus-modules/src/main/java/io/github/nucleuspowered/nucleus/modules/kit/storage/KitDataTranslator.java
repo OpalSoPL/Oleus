@@ -46,12 +46,12 @@ public final class KitDataTranslator extends AbstractDataContainerDataTranslator
     @Override
     protected IKitDataObject loadFromDataContainer(final DataView dataView) throws InvalidDataException {
         final IKitDataObject dataObject = this.createNew();
-        dataObject
-                .setKitMap(dataView.keys(false)
-                .stream()
-                .map(query -> dataView.getSerializable(query, Kit.class).map(x -> Tuple.of(query.parts().get(0), x)).orElse(null))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(k -> k._1, k -> k._2)));
+        dataObject.setKitMap(
+                        dataView.keys(false)
+                            .stream()
+                            .map(query -> dataView.getSerializable(query, Kit.class).map(x -> Tuple.of(query.parts().get(0), x)).orElse(null))
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toMap(k -> k._1, k -> k._2)));
         return dataObject;
     }
 

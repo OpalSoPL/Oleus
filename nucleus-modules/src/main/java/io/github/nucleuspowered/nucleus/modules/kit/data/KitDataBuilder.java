@@ -5,6 +5,7 @@
 package io.github.nucleuspowered.nucleus.modules.kit.data;
 
 import io.github.nucleuspowered.nucleus.api.module.kit.data.Kit;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataContentUpdater;
@@ -12,10 +13,16 @@ import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.persistence.Queries;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public final class KitDataBuilder extends AbstractDataBuilder<Kit> {
+
+    private final Logger logger;
 
     public static final int CONTENT_VERSION = 1;
 
@@ -30,8 +37,9 @@ public final class KitDataBuilder extends AbstractDataBuilder<Kit> {
     private static final DataQuery FIRSTJOIN = DataQuery.of("firstJoin");
     private static final DataQuery COOLDOWN = DataQuery.of("cooldown");
 
-    public KitDataBuilder() {
+    public KitDataBuilder(final Logger logger) {
         super(Kit.class, KitDataBuilder.CONTENT_VERSION);
+        this.logger = logger;
     }
 
     @Override
@@ -39,7 +47,24 @@ public final class KitDataBuilder extends AbstractDataBuilder<Kit> {
         if (!container.contains(Queries.CONTENT_VERSION)) {
             Updater0to1.Holder.INSTANCE.update(container);
         }
-        return Optional.empty();
+        try {
+            return Optional.of(new SingleKit(
+                    container.name(), // Remove when possible
+                    container.getSerializableList(KitDataBuilder.STACKS, ItemStackSnapshot.class).get(),
+                    container.getLong(KitDataBuilder.COOLDOWN).map(Duration::ofSeconds).orElse(null),
+                    container.getLong(KitDataBuilder.COST).get(),
+                    container.getBoolean(KitDataBuilder.AUTOREDEEM).get(),
+                    container.getBoolean(KitDataBuilder.ONETIME).get(),
+                    container.getBoolean(KitDataBuilder.DISPLAYONREDEEM).get(),
+                    container.getBoolean(KitDataBuilder.IGNORESPERMISSION).get(),
+                    container.getBoolean(KitDataBuilder.HIDDEN).get(),
+                    container.getStringList(KitDataBuilder.COMMANDS).orElseGet(ArrayList::new),
+                    container.getBoolean(KitDataBuilder.FIRSTJOIN).get()
+            ));
+        } catch (final NoSuchElementException e) {
+            this.logger.error("Could not load kit {}, it has been ignored", container.name(), e);
+            return Optional.empty();
+        }
     }
 
     // So that things are in the same place.

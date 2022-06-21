@@ -40,11 +40,6 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
 import io.github.nucleuspowered.nucleus.core.scaffold.listener.ListenerBase;
 import io.github.nucleuspowered.nucleus.core.scaffold.task.TaskBase;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataRegistration;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
-import org.spongepowered.api.event.lifecycle.RegisterRegistryValueEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,7 +61,7 @@ public class KitModule implements IModule.Configurable<KitConfig> {
         final KitService kitService = new KitService(serviceCollection);
         serviceCollection.registerService(KitService.class, kitService, false);
         // Data
-        serviceCollection.game().dataManager().registerBuilder(Kit.class, new KitDataBuilder());
+        serviceCollection.game().dataManager().registerBuilder(Kit.class, new KitDataBuilder(serviceCollection.logger()));
     }
 
     @Override

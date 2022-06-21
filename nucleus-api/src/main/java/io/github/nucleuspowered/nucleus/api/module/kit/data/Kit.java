@@ -40,7 +40,9 @@ public interface Kit extends DataSerializable {
      * Gets the name of the kit.
      *
      * @return The name
+     * @deprecated This will be removed for version 3.
      */
+    @Deprecated
     String getName();
 
     /**

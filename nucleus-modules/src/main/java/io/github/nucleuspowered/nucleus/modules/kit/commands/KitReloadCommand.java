@@ -23,7 +23,7 @@ public class KitReloadCommand implements ICommandExecutor {
 
     @Override
     public ICommandResult execute(final ICommandContext context) throws CommandException {
-        final CompletableFuture<Void> res = context.getServiceCollection().getServiceUnchecked(KitService.class).getKitService().reload();
+        final CompletableFuture<Void> res = context.getServiceCollection().getServiceUnchecked(KitService.class).getKitStorageService().reload();
         res.whenComplete((v, e) -> {
             if (e == null) {
                 context.sendMessage("command.kit.reload.success");

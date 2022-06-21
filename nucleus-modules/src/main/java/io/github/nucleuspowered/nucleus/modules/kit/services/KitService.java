@@ -29,7 +29,6 @@ import io.github.nucleuspowered.nucleus.core.services.interfaces.IReloadableServ
 import io.github.nucleuspowered.nucleus.core.services.interfaces.IStorageManager;
 import io.github.nucleuspowered.nucleus.core.services.impl.storage.services.IStorageService;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -405,7 +404,7 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
     }
 
     public void saveKit(final Kit kit, final boolean save) {
-        final IStorageService.Single<IKitDataObject> kdo = this.getKitService();
+        final IStorageService.Single<IKitDataObject> kdo = this.getKitStorageService();
         final IKitDataObject kitDataObject = kdo.getOrNewOnThread();
         final Map<String, Kit> kits = new HashMap<>(kitDataObject.getKitMap());
         Util.getKeyIgnoreCase(this.getKitNames(true), kit.getName()).ifPresent(kits::remove);
@@ -556,12 +555,12 @@ public class KitService implements NucleusKitService, IReloadableService.Reloada
         this.isCommandsEnabled = kitConfig.isEnableKitCommands();
     }
 
-    public IStorageService.SingleCached<IKitDataObject> getKitService() {
+    public IStorageService.SingleCached<IKitDataObject> getKitStorageService() {
         return this.storageManager.getAdditionalStorageServiceForDataObject(KitStorageModule.class).get();
     }
 
     private IKitDataObject getKits() {
-        return this.getKitService().getOrNewOnThread();
+        return this.getKitStorageService().getOrNewOnThread();
     }
 
     public ViewableInventory getKitInventoryBuilder() {

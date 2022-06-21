@@ -64,9 +64,4 @@ public final class KitStorageModule implements IStorageModule<IKitDataObject, IS
         this.repository = null;
     }
 
-    public IKitDataObject getKits() {
-        final IStorageService.SingleCached<IKitDataObject> gs = this.kitsService;
-        return gs.getCached().orElseGet(() -> gs.getOrNew().join());
-    }
-
 }
