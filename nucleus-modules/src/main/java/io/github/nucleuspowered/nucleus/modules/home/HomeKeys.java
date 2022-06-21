@@ -14,6 +14,6 @@ import java.util.Map;
 
 public final class HomeKeys {
 
-    public static DataKey<Map<String, Home>, IUserDataObject> HOMES = DataKey.of(TypeTokens.HOMES_MAP, IUserDataObject.class, "homes");
+    public final static DataKey<Map<String, Home>, IUserDataObject> HOMES = DataKey.ofMap(TypeTokens.HOMES, IUserDataObject.class, "homes");
 
 }

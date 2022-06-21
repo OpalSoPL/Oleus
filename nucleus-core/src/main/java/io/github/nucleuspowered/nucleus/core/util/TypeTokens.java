@@ -38,7 +38,7 @@ public final class TypeTokens {
 
     public static final TypeToken<NamedLocation> NAMED_LOCATION = TypeToken.get(NamedLocation.class);
 
-    public static final TypeToken<Map<String, Home>> HOMES_MAP = new TypeToken<Map<String, Home>>() { };
+    public static final TypeToken<Home> HOMES = TypeToken.get(Home.class);
 
     public static final TypeToken<ResourceKey> RESOURCE_KEY = TypeToken.get(ResourceKey.class);
 
