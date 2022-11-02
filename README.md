@@ -1,6 +1,8 @@
 Nucleus v3
 ====
 
+**This project is no longer active. You are welcome to fork under the terms of the MIT licence under a different name.**
+
 For version 1, the legacy version for Sponge API 7.1 (Minecraft 1.12), see the tag "S7.1-v1-FINAL".\
 For version 2, the current version for Sponge API 7.3 (Minecraft 1.12), see the branch "v2/S7".
 
@@ -17,8 +19,6 @@ Nucleus is a Sponge plugin that forms a solid base for your server, providing es
 tidbits that you might need. Extremely configurable, only loading up the commands and modules you want (and providing a way for
 plugins to disable modules that they replace the functionality of), and providing a simple and rich API, Nucleus is an
 elite plugin for providing simple server tasks, and an essential addition to your server!
-
-Nucleus is being actively developed for Sponge API 8.1 and later 
 
 ## Contributions
 
