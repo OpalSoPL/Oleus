@@ -1,7 +1,7 @@
-Nucleus v3
+Oleus v3
 ====
 
-**This project is no longer active. You are welcome to fork under the terms of the MIT licence under a different name.**
+**This project is fork of unsupported plugin Nucleus.**
 
 For version 1, the legacy version for Sponge API 7.1 (Minecraft 1.12), see the tag "S7.1-v1-FINAL".\
 For version 2, the current version for Sponge API 7.3 (Minecraft 1.12), see the branch "v2/S7".
