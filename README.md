@@ -8,10 +8,8 @@ For version 2, the current version for Sponge API 7.3 (Minecraft 1.12), see the 
 
 * [Source]
 * [Issues]
-* [Website]
 * [Downloads]
-* [Documentation]
-* [Discord]
+* [Old Documentation]
 
 Licence: [MIT](LICENSE.md) (except for the Nucleus logo, which is all rights reserved, and any third party shaded code)
 
@@ -70,10 +68,9 @@ The compiled Nucleus plugin includes the following libraries (with their licence
 
 See [THIRDPARTY.md](THIRDPARTY.md) for more details.
 
-[Source]: https://github.com/NucleusPowered/Nucleus
-[Issues]: https://github.com/NucleusPowered/Nucleus/issues
+[Source]: https://github.com/OpalSoPL/Oleus
+[Issues]: https://github.com/OpalSoPL/Oleus/issues
 [Downloads]: https://github.com/NucleusPowered/Nucleus/releases
-[Website]: http://v2.nucleuspowered.org/
-[Documentation]: http://v2.nucleuspowered.org/docs
+[Old Documentation]: http://v2.nucleuspowered.org/docs
 [guidelines]: Contributing.md
-[Discord]: https://discord.gg/A9QHG5H
+
