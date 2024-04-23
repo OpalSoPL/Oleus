@@ -1,17 +1,14 @@
 Oleus v3
 ====
-
-**This project is fork of unsupported plugin Nucleus.**
-
-For version 1, the legacy version for Sponge API 7.1 (Minecraft 1.12), see the tag "S7.1-v1-FINAL".\
-For version 2, the current version for Sponge API 7.3 (Minecraft 1.12), see the branch "v2/S7".
-
+> [!IMPORTANT]
+>**This project is fork of unsupported plugin Nucleus.**<br>
+>**[Original Source] by *dualspiral***
 * [Source]
 * [Issues]
 * [Downloads]
 * [Old Documentation]
 
-Licence: [MIT](LICENSE.md) (except for the Nucleus logo, which is all rights reserved, and any third party shaded code)
+Licence: [MIT](LICENSE.md) (except for any third party shaded code)
 
 Nucleus is a Sponge plugin that forms a solid base for your server, providing essential commands, events, and other
 tidbits that you might need. Extremely configurable, only loading up the commands and modules you want (and providing a way for
@@ -34,7 +31,7 @@ Nucleus currently uses Gradle 7.3.3 and is compiled using JDK 17 (but to a Java 
 To get a copy of the Nucleus source, ensure you have Git installed, and run the following commands from a command prompt
 or terminal:
 
-1. `git clone git@github.com:NucleusPowered/Nucleus.git`
+1. `git clone git@github.com:OpalSoPL/Oleus.git`
 2. `cd Nucleus`
 3. `cp scripts/pre-commit .git/hooks`
 
@@ -70,7 +67,8 @@ See [THIRDPARTY.md](THIRDPARTY.md) for more details.
 
 [Source]: https://github.com/OpalSoPL/Oleus
 [Issues]: https://github.com/OpalSoPL/Oleus/issues
-[Downloads]: https://github.com/NucleusPowered/Nucleus/releases
+[Downloads]: #
 [Old Documentation]: http://v2.nucleuspowered.org/docs
 [guidelines]: Contributing.md
+[Original Source]: https://github.com/NucleusPowered/Nucleus
 
