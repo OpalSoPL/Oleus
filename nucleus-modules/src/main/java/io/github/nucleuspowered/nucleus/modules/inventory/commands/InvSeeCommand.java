@@ -52,7 +52,7 @@ public class InvSeeCommand implements ICommandExecutor {
             return context.errorResult("command.invsee.nooffline");
         }
 
-        if (!context.is(target)) {
+        if (context.is(target)) {
             return context.errorResult("command.invsee.self");
         }
 

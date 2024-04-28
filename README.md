@@ -45,11 +45,6 @@ javadocs jar will also exist.
 
 ## Building against the Nucleus API
 
-Nucleus is available via a Maven repository.
-
-* Repo: `https://repo.drnaylor.co.uk/artifactory/list/minecraft`
-* Group ID: `io.github.nucleuspowered`
-* Artifact Name: `nucleus-api`
 
 The versioning follows `version[-SNAPSHOT|-ALPHAn|-BETAn|-RCn]`, where `n` is an integer. Add the `-SNAPSHOT` section for the latest snapshot.
 
