@@ -4,6 +4,7 @@
  */
 package io.github.nucleuspowered.nucleus.modules.inventory.commands;
 
+import com.sun.tools.javac.jvm.Items;
 import io.github.nucleuspowered.nucleus.modules.inventory.InventoryPermissions;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandContext;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.ICommandExecutor;
@@ -12,12 +13,14 @@ import io.github.nucleuspowered.nucleus.core.scaffold.command.NucleusParameters;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.Command;
 import io.github.nucleuspowered.nucleus.core.scaffold.command.annotation.EssentialsEquivalent;
 import io.github.nucleuspowered.nucleus.core.services.INucleusServiceCollection;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.command.exception.CommandException;
 import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.ContainerTypes;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
@@ -74,14 +77,28 @@ public class InvSeeCommand implements ICommandExecutor {
                             .plugin(context.getServiceCollection().pluginContainer())
                             .identity(uuid).build().asMenu();
             menu.setReadOnly(true);
-            return menu.open(src)
-                    .map(x -> context.successResult())
-                    .orElseGet(() -> context.errorResult("command.invsee.failed"));
-        } else {
-            return src.openInventory(targetInv)
-                    .map(x -> context.successResult())
-                    .orElseGet(() -> context.errorResult("command.invsee.failed"));
+            menu.setTitle(Component.text(target.name()));
+            if (menu.open(src).isPresent()){
+                menu.open(src);
+                return context.successResult();
+            }
+            else {return context.errorResult("command.invsee.failed");}
+        } else{
+            final UUID uuid = UUID.randomUUID();
+            final InventoryMenu menu =
+                    ViewableInventory.builder()
+                            .type(ContainerTypes.GENERIC_9X5)
+                            .slots(targetInv.slots(), 0)
+                            .completeStructure()
+                            .plugin(context.getServiceCollection().pluginContainer())
+                            .identity(uuid).build().asMenu();
+            menu.setTitle(Component.text(target.name()));
+
+                if (menu.open(src).isPresent()){
+                    menu.open(src);
+                    return context.successResult();
+                }
+                else {return context.errorResult("command.invsee.failed");}
         }
     }
-
 }
